@@ -1,0 +1,30 @@
+{{ define "main" }}
+<script>
+    document.querySelector('html').classList.remove('dark');
+</script>
+<div class='mx-auto flex bg-white text-primary-text'>
+    {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
+    <article class="w-full break-words flex justify-center">
+        <main class="w-full relative overflow-hidden">
+            {{ partial "nav.html" }}
+            <section class="bg-primary-bg text-white font-primary pb-[4.375rem] lg:pb-20 px-4 lg:px-12 xl:px-25 bg-[url(/hero-background.svg)] bg-center bg-no-repeat pt-[9.875rem] lg:pt-40 bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
+                <div class="mx-auto max-w-[1440px] flex flex-col justify-center">
+                    <h1 class="text-[2.1875rem] lg:text-[4.0625rem] font-bold leading-[2.40625rem] lg:leading-[4.46875rem] pb-4 text-white">
+                    {{ $.Page.Params.Title }}
+                    </h1>
+                    <h2 class="text-3xl font-semibold text-white">
+                    {{ $.Page.Params.Author }}
+                    </h2>
+                    <h3 class="text-2xl font-semibold pb-4 text-white">
+                    {{ $.Page.Params.PublishDate | time.Format ":date_medium" }}
+                    </h3>
+                    <p class="text-white">{{ $.Page.Params.Description }}</p>
+                </div>
+            </section>
+            <div class="content px-10 md:px-56 py-32 !text-primary-text">
+                {{ .Content }}
+            </div>
+        </main>
+    </article>
+</div>
+{{ end }}

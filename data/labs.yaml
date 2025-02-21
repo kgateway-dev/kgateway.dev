@@ -1,0 +1,19 @@
+- title: Getting Started with ambient mesh
+  description: Learn the basics of ambient and how to set up your first environment.
+  tag: Getting Started
+  href: https://www.solo.io/resources/lab/getting-started-with-ambient-mesh?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+
+- title: "Secure your cluster with ambient mesh and mTLS"
+  description: Learn how to secure services in your Kubernetes cluster using ambient mesh and mTLS.
+  tag: "Security"
+  href: https://www.solo.io/resources/lab/secure-your-cluster-with-ambient-mesh-and-mtls?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+
+- title: "Traffic routing with waypoints"
+  description: Learn how to route traffic using waypoint proxies in ambient mesh.
+  tag: "Traffic Control"
+  href: https://www.solo.io/resources/lab/traffic-routing-with-waypoints?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+
+- title: "Access control with authorization policies"
+  description: Learn how to enforce access control and write authorization policies for L4 and L7 traffic.
+  tag: "Security"
+  href: https://www.solo.io/resources/lab/access-control-with-authorization-policies?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
