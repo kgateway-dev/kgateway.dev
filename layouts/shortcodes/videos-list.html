@@ -37,7 +37,7 @@
     --_g: radial-gradient(calc(var(--s)/2),var(--c1) 97%,#0000);
   }
 
-  .card {
+  .thumbnail {
     background:
       var(--_g),var(--_g) calc(2*var(--s)) calc(2*var(--s)),
       repeating-conic-gradient(from 45deg,#0000 0 25%,var(--c2) 0 50%) calc(-.707*var(--s)) calc(-.707*var(--s)),
@@ -76,13 +76,18 @@
     {{ end }} -->
     <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
       {{ range $data }}
-        <div class='tag-{{ replace .tag " " "" }} card bg-primary-bg min-h-[15.625rem] rounded-[.625rem] flex flex-col items-start w-[24.5rem] p-6 gap-4 justify-between'>
+        <div class='tag-{{ replace .tag " " "" }} card flex flex-col items-start p-6 gap-4 justify-between'>
+          {{ if .thumbnailHref }}
+            <div class="bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-cover"></div>
+          {{ else }}
+            <div class="thumbnail bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem]"></div>
+          {{ end }}
           <div class="flex flex-col gap-4">
             <!-- <p class="bg-[#6458f4] rounded-xl p-2 text-white">{{ .tag }}</p> -->
-            <h3 class="font-primary text-3xl text-white font-bold">
+            <h3 class="font-primary text-3xl text-primary-text font-bold">
               {{ .title }}
             </h3>
-            <p class="text-white">{{ .description }}</p>
+            <p class="text-primary-text">{{ .description }}</p>
           </div>
           <a href="{{ .href }}" class="bg-[#6458f4] rounded-xl p-2 text-white flex flex-row items-center font-medium gap-4">Watch Video {{ partial "utils/icon.html" (dict "name" "arrow-right" "attributes" "class='w-8 h-8'") }}</a>
         </div>
