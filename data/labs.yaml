@@ -1,19 +1,15 @@
-- title: Getting Started with ambient mesh
-  description: Learn the basics of ambient and how to set up your first environment.
-  tag: Getting Started
-  href: https://www.solo.io/resources/lab/getting-started-with-ambient-mesh?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- title: Installing kgateway, the open source implementation of Kubernetes Gateway API
+  description: Learn how to install kgateway and apply Kubernetes Gateway API Custom Resource Definitions (CRDs)
+  href: http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api
 
-- title: "Secure your cluster with ambient mesh and mTLS"
-  description: Learn how to secure services in your Kubernetes cluster using ambient mesh and mTLS.
-  tag: "Security"
-  href: https://www.solo.io/resources/lab/secure-your-cluster-with-ambient-mesh-and-mtls?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- title: Understanding the basics of kgateway
+  description: Learn to configure Gateway and HTTPRoute resources and expose a service with kgateway.
+  href: http://www.solo.io/resources/lab/understanding-the-basics-of-kubernetes-gateway-api-with-kgateway
 
-- title: "Traffic routing with waypoints"
-  description: Learn how to route traffic using waypoint proxies in ambient mesh.
-  tag: "Traffic Control"
-  href: https://www.solo.io/resources/lab/traffic-routing-with-waypoints?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- title: Configuring kgateway to expose a cluster service over HTTPS
+  description: Learn to secure your services with Gateway API and retrofit your configuration to enforce HTTPS traffic with kgateway.
+  href: http://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway
 
-- title: "Access control with authorization policies"
-  description: Learn how to enforce access control and write authorization policies for L4 and L7 traffic.
-  tag: "Security"
-  href: https://www.solo.io/resources/lab/access-control-with-authorization-policies?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- title: Configuring gateways across multiple teams with kgateway
+  description: Learn how to configure a shared gateway for multiple development team using the Kubernetes Gateway API
+  href: http://www.solo.io/resources/lab/configuring-gateways-across-multiple-teams-with-kgateway
