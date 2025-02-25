@@ -87,13 +87,13 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
    
 4. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname. 
    ```sh
-   kubectl get services gloo-proxy-aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get services aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
    Example output: 
    ```console
    NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP                                                                     PORT(S)        AGE
-   gloo-proxy-aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   80:30557/TCP   12m
+   aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   80:30557/TCP   12m
    ```
 
 5. Review the NLB in the AWS EC2 dashboard. 
@@ -178,13 +178,13 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    
 5. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname.  
    ```sh
-   kubectl get services gloo-proxy-aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get services aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
    Example output: 
    ```console
    NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP                                                                     PORT(S)        AGE
-   gloo-proxy-aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   443:30557/TCP   12m
+   aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   443:30557/TCP   12m
    ```
 
 6. Review the load balancer in the AWS EC2 dashboard. 
@@ -231,7 +231,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 
 2. Get the AWS hostname of the NLB. 
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} gloo-proxy-aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -271,7 +271,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 
 2. Get the IP address that is associated with the NLB's AWS hostname. 
    ```sh
-   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} gloo-proxy-aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_HOSTNAME
    export INGRESS_GW_ADDRESS=$(dig +short ${INGRESS_GW_HOSTNAME} | head -1)
    echo $INGRESS_GW_ADDRESS

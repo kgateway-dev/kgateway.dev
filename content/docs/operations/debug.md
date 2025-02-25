@@ -35,7 +35,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
 3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
    
    ```sh
-   kubectl port-forward deploy/gloo-proxy-http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &  
+   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &  
    ```
    
    {{< reuse-image src="img/gateway-admin-interface.png" caption="Figure: Debugging interface of the gateway proxy.">}}
@@ -55,7 +55,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
    kubectl logs -n {{< reuse "docs/snippets/ns-system.md" >}} deployment/kgateway
    
    # Replace $GATEWAY_NAME with the name of your gateway.
-   kubectl logs -n {{< reuse "docs/snippets/ns-system.md" >}} deployment/gloo-proxy-$GATEWAY_NAME
+   kubectl logs -n {{< reuse "docs/snippets/ns-system.md" >}} deployment/$GATEWAY_NAME
    ```
    
 <!-- TODO: CLI
@@ -76,7 +76,7 @@ Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that
 <!-- TODO: CLI
 5. Check the proxy configuration that is served by the {{< reuse "docs/snippets/product-name.md" >}} xDS server. When you create {{< reuse "docs/snippets/product-name.md" >}} resources, these resources are translated into Envoy configuration and sent to the xDS server. If {{< reuse "docs/snippets/product-name.md" >}} resources are configured correctly, the configuration must be included in the proxy configuration that is served by the xDS server. 
    ```sh
-   {{< reuse "docs/snippets/cli-name.md" >}} proxy served-config --name gloo-proxy-http
+   {{< reuse "docs/snippets/cli-name.md" >}} proxy served-config --name http
    ```
 
 6. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command. 

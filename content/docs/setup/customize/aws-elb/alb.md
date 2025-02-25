@@ -82,7 +82,7 @@ Keep in mind the following considerations when working with an ALB:
              pathType: Prefix
              backend:
                service:
-                 name: gloo-proxy-alb
+                 name: alb
                  port:
                    number: 8080
    EOF

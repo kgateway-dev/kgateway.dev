@@ -77,7 +77,7 @@ The example in this guide uses the GatewayParameters resource to change settings
 
 4. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
    ```sh
-   kubectl get pods -l app.kubernetes.io/name=gloo-proxy-custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
    
    {{< callout type="info" >}}
@@ -94,10 +94,10 @@ The example in this guide uses the GatewayParameters resource to change settings
        prometheus.io/port: "9091"
        prometheus.io/scrape: "true"
      creationTimestamp: "2024-08-07T19:47:27Z"
-     generateName: gloo-proxy-custom-7d9bf46f96-
+     generateName: custom-7d9bf46f96-
      labels:
        app.kubernetes.io/instance: custom
-       app.kubernetes.io/name: gloo-proxy-custom
+       app.kubernetes.io/name: custom
        gateway: custom
        gateway.networking.k8s.io/gateway-name: custom
        gloo: kube-gateway
@@ -113,7 +113,7 @@ The example in this guide uses the GatewayParameters resource to change settings
 
 5. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service. 
    ```sh
-   kubectl get service gloo-proxy-custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get service custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
    
    Example output: 
@@ -125,13 +125,13 @@ The example in this guide uses the GatewayParameters resource to change settings
      labels:
        app.kubernetes.io/instance: custom
        app.kubernetes.io/managed-by: Helm
-       app.kubernetes.io/name: gloo-proxy-custom
+       app.kubernetes.io/name: custom
        app.kubernetes.io/version: 2.0.0-alpha1
        gateway: custom
        gateway.networking.k8s.io/gateway-name: custom
        gloo: kube-gateway
        helm.sh/chart: kgateway-0.0.1-alpha1
-     name: gloo-proxy-custom
+     name: custom
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      ownerReferences:
      - apiVersion: gateway.networking.k8s.io/v1
@@ -150,7 +150,7 @@ The example in this guide uses the GatewayParameters resource to change settings
        targetPort: 8080
      selector:
        app.kubernetes.io/instance: custom
-       app.kubernetes.io/name: gloo-proxy-custom
+       app.kubernetes.io/name: custom
        gateway.networking.k8s.io/gateway-name: custom
      sessionAffinity: None
      type: NodePort

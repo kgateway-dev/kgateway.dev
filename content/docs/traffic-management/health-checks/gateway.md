@@ -36,7 +36,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 2. To test the health check, drain the Envoy connections by sending an `HTTP POST` request to the `/healthcheck/fail` endpoint of the Envoy admin port.
    1. Port-forward the `gloo-gateway-http` deployment on port 19000.
       ```shell
-      kubectl port-forward deploy/gloo-proxy-http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &
+      kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &
       ```
    2. Send an `HTTP POST` request to the `/healthcheck/fail` endpoint. This causes Envoy connections to begin draining.
       ```sh
