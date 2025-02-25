@@ -1,0 +1,30 @@
+<style>
+  html {
+    --s: 12px; /* control the size*/
+    --c1: #6458f4;
+    --c2: #5044e9;
+    
+    --_g: radial-gradient(calc(var(--s)/2),var(--c1) 97%,#0000);
+  }
+
+  .card {
+    background:
+      var(--_g),var(--_g) calc(2*var(--s)) calc(2*var(--s)),
+      repeating-conic-gradient(from 45deg,#0000 0 25%,var(--c2) 0 50%) calc(-.707*var(--s)) calc(-.707*var(--s)),
+      repeating-linear-gradient(135deg,var(--c1) calc(var(--s)/-2) calc(var(--s)/2),var(--c2) 0 calc(2.328*var(--s)));
+    background-size: calc(4*var(--s)) calc(4*var(--s));
+  }
+</style>
+
+<section class="px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24">
+  <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
+    {{ range $.Page.Pages }}
+      <a href="{{ .RelPermalink }}" class="card bg-primary-bg min-h-[15.625rem] rounded-[.625rem] flex flex-col items-center justify-center w-[24.5rem] p-6 gap-4">
+        <h3 class="font-primary text-4xl text-white font-bold">
+          {{ .LinkTitle }}
+        </h3>
+      </a>
+    {{ end }}
+  </div>
+</section>
+

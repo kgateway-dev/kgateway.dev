@@ -32,7 +32,7 @@
     transition-timing-function: linear;
   }
   
-  .navbar.scrolled a.link {
+  .navbar.scrolled .link {
     color: #121212;
     transition: color 500ms linear;
   }
@@ -74,6 +74,18 @@
   .visible.hamburger {
     display: block;
   }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .dropdown-content {
+    display: none;
+    min-width: 160px;
+  }
+
+  .dropdown:hover .dropdown-content {display: block;}
 </style>
 
 <nav class="navbar py-[1.875rem] px-12 xl:px-25 fixed top-0 border-b-white border-b w-full hidden lg:block z-20">
@@ -88,7 +100,14 @@
         Slack
       </a>
     </div>
-    <div class="flex flex-grow lg:flex-grow-0 items-center align-center justify-between lg:gap-[3.5625rem]">
+    <div class="flex flex-grow lg:flex-grow-0 items-center align-center justify-between lg:gap-8 xl:gap-[3.5625rem]">
+      <div class="dropdown">
+        <button class="link whitespace-nowrap font-primary text-secondary-link" href="/resources">Resources {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
+        <div class="dropdown-content rounded-xl bg-white absolute">
+          <a href="/resources/labs" class="rounded-xl text-primary-text px-4 py-3 block hover:text-primary-bg text-center">Labs</a>
+          <!-- <a href="/resources/videos" class="rounded-xl text-primary-text px-4 py-3 block hover:text-primary-bg text-center">Videos</a> -->
+        </div>
+      </div>
       <a class="link whitespace-nowrap font-primary text-secondary-link" href="/blog">Blog</a>
       <a class="link whitespace-nowrap font-primary text-secondary-link" href="/docs/quickstart/">Get Started</a>
       <a class="link whitespace-nowrap font-primary text-secondary-link" href="/docs/about/overview/">Why kgateway?</a>
@@ -114,6 +133,8 @@
 
 <div class="mobile-nav absolute bg-primary-text w-screen z-40">
   <div class="h-full flex flex-col px-4 items-stretch justify-end w-screen">
+    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/labs">Labs</a>
+    <!-- <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/videos">Videos</a> -->
     <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/blog">Blog</a>
     <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/quickstart/">Get Started</a>
     <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/about/overview/">Why kgateway?</a>

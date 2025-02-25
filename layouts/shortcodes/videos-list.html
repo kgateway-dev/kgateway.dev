@@ -1,0 +1,97 @@
+{{ $data := .Site.Data.videos }}
+
+<script>
+  filterSelection("All")
+  function filterSelection(tag) {
+    document.querySelectorAll("button[class^='tag']").forEach(
+      function (v) {
+        const className = v.getAttribute("class");
+        if (className.startsWith("tag-" + tag)) {
+          if (!className.endsWith("selected")) {
+            v.setAttribute("class", className + " selected");
+          }
+        } else {
+          v.setAttribute("class", className.replace(/ selected$/, ""));
+        }
+      }
+    );
+    document.querySelectorAll("a[class^='tag']").forEach(
+      function (v) {
+        const className = v.getAttribute("class");
+        if (tag === "All" || className.includes("tag-" + tag)) {
+          v.setAttribute("class", className.replace(/ hidden$/, ""));
+        } else if (!className.endsWith("hidden")) {
+          v.setAttribute("class", className + " hidden");
+        }
+      }
+    );
+  }
+</script>
+
+<style>
+  html {
+    --s: 12px; /* control the size*/
+    --c1: #6458f4;
+    --c2: #5044e9;
+    
+    --_g: radial-gradient(calc(var(--s)/2),var(--c1) 97%,#0000);
+  }
+
+  .thumbnail {
+    background:
+      var(--_g),var(--_g) calc(2*var(--s)) calc(2*var(--s)),
+      repeating-conic-gradient(from 45deg,#0000 0 25%,var(--c2) 0 50%) calc(-.707*var(--s)) calc(-.707*var(--s)),
+      repeating-linear-gradient(135deg,var(--c1) calc(var(--s)/-2) calc(var(--s)/2),var(--c2) 0 calc(2.328*var(--s)));
+    background-size: calc(4*var(--s)) calc(4*var(--s));
+  }
+</style>
+
+{{ if $data }}
+  {{ $tags := slice }}
+  {{ range $data }}
+    {{ $tag := (replace .tag " " "") }}
+    {{ if not (in $tags (dict "tag" $tag "name" .tag)) }}
+      {{ $tags = $tags | append (dict "tag" $tag "name" .tag) }}
+    {{ end }}
+  {{ end }}
+
+  <section class="px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
+    <!-- {{ if $tags }}
+      <div class="flex gap-8 justify-center items-center flex-wrap sm:flex-nowrap">
+          <button
+            class="tag-All flex py-2.5 px-5 justify-center items-center rounded-[0.25rem] bg-[#DDDFED] text-[#9DA1BD] font-complementary text-base leading-[1.2rem] tracking-[-0.05rem] [&.selected]:text-white [&.selected]:bg-primary-bg selected"
+            onClick="filterSelection('All')"
+          >
+            All
+          </button>
+        {{ range $tags }}
+          <button
+            class='tag-{{ replace .tag " " "" }} flex py-2.5 px-5 justify-center items-center rounded-[0.25rem] bg-[#DDDFED] text-[#9DA1BD] font-complementary text-base leading-[1.2rem]tracking-[-0.05rem] [&.selected]:text-white [&.selected]:bg-primary-bg'
+            onclick="filterSelection({{ .tag }})"
+          >
+            {{ .name }}
+          </button>
+        {{ end }}
+      </div>
+    {{ end }} -->
+    <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
+      {{ range $data }}
+        <div class='tag-{{ replace .tag " " "" }} card flex flex-col items-start p-6 gap-4 justify-between'>
+          {{ if .thumbnailHref }}
+            <div class="bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-cover"></div>
+          {{ else }}
+            <div class="thumbnail bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem]"></div>
+          {{ end }}
+          <div class="flex flex-col gap-4">
+            <!-- <p class="bg-[#6458f4] rounded-xl p-2 text-white">{{ .tag }}</p> -->
+            <h3 class="font-primary text-3xl text-primary-text font-bold">
+              {{ .title }}
+            </h3>
+            <p class="text-primary-text">{{ .description }}</p>
+          </div>
+          <a href="{{ .href }}" class="bg-[#6458f4] rounded-xl p-2 text-white flex flex-row items-center font-medium gap-4">Watch Video {{ partial "utils/icon.html" (dict "name" "arrow-right" "attributes" "class='w-8 h-8'") }}</a>
+        </div>
+      {{ end }}
+    </div>
+  </section>
+{{ end }}
