@@ -1,15 +1,15 @@
-- title: Installing kgateway, the open source implementation of Kubernetes Gateway API
+- title: How to install kgateway - an open implementation of K8s Gateway API
   description: Learn how to install kgateway and apply Kubernetes Gateway API Custom Resource Definitions (CRDs)
-  href: http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api
+  href: http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
-- title: Understanding the basics of kgateway
+- title: Understanding the basics of Kubernetes Gateway API with kgateway
   description: Learn to configure Gateway and HTTPRoute resources and expose a service with kgateway.
-  href: http://www.solo.io/resources/lab/understanding-the-basics-of-kubernetes-gateway-api-with-kgateway
+  href: http://www.solo.io/resources/lab/understanding-the-basics-of-kubernetes-gateway-api-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Configuring kgateway to expose a cluster service over HTTPS
   description: Learn to secure your services with Gateway API and retrofit your configuration to enforce HTTPS traffic with kgateway.
-  href: http://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway
+  href: http://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Configuring gateways across multiple teams with kgateway
   description: Learn how to configure a shared gateway for multiple development team using the Kubernetes Gateway API
-  href: http://www.solo.io/resources/lab/configuring-gateways-across-multiple-teams-with-kgateway
+  href: http://www.solo.io/resources/lab/configuring-gateways-across-multiple-teams-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
