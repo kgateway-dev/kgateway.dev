@@ -100,7 +100,7 @@ When Envoy is used as an HTTP proxy, additional HTTP information is available fo
    
 3. Get the logs for the gateway pod and verify that you see an entry for each request that you sent to the httpbin app. 
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} logs deployments/gloo-proxy-http | tail -1 | jq --sort-keys
+   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} logs deployments/http | tail -1 | jq --sort-keys
    ```
    
    Example output: 

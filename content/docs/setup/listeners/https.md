@@ -102,13 +102,13 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} gloo-proxy-https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward svc/gloo-proxy-https -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:443
+   kubectl port-forward svc/https -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}

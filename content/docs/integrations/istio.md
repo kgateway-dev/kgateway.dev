@@ -104,14 +104,14 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
       --version={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Verify that your `gloo-proxy-http` pod is restarted with 3 containers now: `gateway-proxy`, `istio-proxy`, and `sds`. 
+6. Verify that your `http` pod is restarted with 3 containers now: `gateway-proxy`, `istio-proxy`, and `sds`. 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep gloo-proxy-http
+   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep http
    ```
    
    Example output: 
    ```
-   gloo-proxy-http-f7cd596b7-tv5z7    3/3     Running            0              3h31m
+   http-f7cd596b7-tv5z7    3/3     Running            0              3h31m
    ```
    
 7. Optional: Review the GatewayParameters resource and verify that the `istioDiscoveryAddress`, `istioMetaClusterId`, and `istioMetaMeshId` are set to the values from your Helm chart. 
@@ -242,7 +242,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
         "8189f0a6c4e3582792744e97e79d8f22"
       ],
       "X-Forwarded-Client-Cert": [
-        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/gloo-proxy-http"
+        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/http"
       ],
       "X-Forwarded-Proto": [
         "http"
@@ -366,7 +366,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
         "curl/7.77.0"
       ],
       "X-Forwarded-Client-Cert": [
-        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/gloo-proxy-http"
+        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/http"
       ],
       "X-Forwarded-Proto": [
         "http"

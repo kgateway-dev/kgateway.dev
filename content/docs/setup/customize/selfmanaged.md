@@ -60,7 +60,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
      address:
        socket_address: { address: 127.0.0.1, port_value: 19000 }
    node:
-     cluster: gloo-proxy-$GATEWAY_NAME.$GATEWAY_NAMESPACE
+     cluster: $GATEWAY_NAME.$GATEWAY_NAMESPACE
      metadata:
        role: gloo-kube-gateway-api~$GATEWAY_NAMESPACE~$GATEWAY_NAMESPACE-$GATEWAY_NAME
    static_resources:

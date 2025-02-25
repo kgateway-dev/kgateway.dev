@@ -6,6 +6,18 @@ description: Deploy httpbin as a sample app.
 
 The httpbin app lets you test your API gateway by sending requests to it and receiving responses.
 
+Review the following diagram to understand the setup.
+
+```mermaid
+flowchart LR
+    A[client] -->|example.com| B[kgateway proxy]
+    B --> C[httpbin backend]
+```
+
+* The client calls the `www.example.com` hostname that you set up in the Gateway configuration.
+* The {{< reuse "docs/snippets/product-name.md" >}} proxy receives the request. Based on the routing rules that you set up in the Gateway configuration, the {{< reuse "docs/snippets/product-name.md" >}} proxy forwards the traffic to the backend destination, which is the httpbin service. The {{< reuse "docs/snippets/product-name.md" >}} proxy is available from an external LoadBalancer service that is backed by an IP address that your cloud provider typically assigns. For testing in a local cluster where you do not have an external service, you can enable port-forwarding so that the {{< reuse "docs/snippets/product-name.md" >}} proxy listens on the localhost instead.
+* The httpbin service receives and responds to the request. Note that the httpbin service does not have to be publicly exposed because the {{< reuse "docs/snippets/product-name.md" >}} proxy handles the external traffic. Instead, it can have an internal service type, such as ClusterIP.
+
 ## Before you begin
 
 Set up {{< reuse "docs/snippets/product-name.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
@@ -39,7 +51,7 @@ The following configuration file creates the httpbin app. To review the source f
    
    ```txt
    NAME                      READY   STATUS    RESTARTS   AGE
-   httpbin-d57c95548-nz98t   3/3     Running   0          18s
+   httpbin-d57c95548-nz98t   2/2     Running   0          18s
    ```
 
 ## Set up an API gateway {#api-gateway}
@@ -89,8 +101,8 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    Example output:
    
    ```txt
-   NAME                             READY   STATUS    RESTARTS   AGE
-   gloo-proxy-http-7dd94b74-k26j6   3/3     Running   0          18s
+   NAME                  READY   STATUS    RESTARTS   AGE
+   http-7dd94b74-k26j6   3/3     Running   0          18s
    ```
 
    {{< callout type="info" >}}
@@ -172,7 +184,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system gloo-proxy-http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -196,10 +208,10 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
    ```
 {{% /tab %}}
 {{% tab %}}
-1. Port-forward the `kgateway-proxy-http` pod on port 8080. 
+1. Port-forward the gateway proxy `http` pod on port 8080. 
    
    ```sh
-   kubectl port-forward deployment/gloo-proxy-http -n kgateway-system 8080:8080
+   kubectl port-forward deployment/http -n kgateway-system 8080:8080
    ```
 
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. 

@@ -38,7 +38,7 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 2. Verify that your configuration is applied by reviewing the Envoy configuration. 
    1. Port forward the `gloo-gateway-http` deployment on port 19000. 
       ```sh
-      kubectl port-forward deploy/gloo-proxy-http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 & 
+      kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 & 
       ```
    2. Open the `config_dump` endpoint. 
       ```sh

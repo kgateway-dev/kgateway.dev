@@ -282,7 +282,7 @@ Use a RouteOption resource to define your CSRF rules.
 
 1. Port-forward the gateway proxy. 
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/ns-system.md" >}} deploy/gloo-proxy-http 19000
+   kubectl port-forward -n {{< reuse "docs/snippets/ns-system.md" >}} deploy/http 19000
    ```
 
 2. Open the [`/stats`](http://localhost:19000/stats) endpoint. 
