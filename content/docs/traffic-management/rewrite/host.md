@@ -18,7 +18,7 @@ Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or
 1. Create a RouteOption resource to define your rewrite rules. In the following example the host request header is rewritten to the `www.example.com` host. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: rewrite

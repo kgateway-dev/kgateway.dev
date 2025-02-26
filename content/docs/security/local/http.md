@@ -12,11 +12,11 @@ To learn more about what local rate limiting is and the differences between loca
 
 ## Apply local rate limit settings to Layer 4 traffic {#layer4}
 
-1. Create an HttpListenerOption resource with your local rate limit settings.  
+1. Create an HttpListenerPolicy resource with your local rate limit settings.  
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: HttpListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HttpListenerPolicy
    metadata:
      name: local-ratelimit
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -81,11 +81,11 @@ To learn more about what local rate limiting is and the differences between loca
 
 ## Apply local rate limit settings to Layer 7 traffic {#layer7}
 
-1. Change the local rate limiting settings in the HttpListenerOption resource to apply to Layer 7 traffic instead of Layer 4 traffic by using the `httpLocalRatelimit` option. The following example configures the gateway with a token bucket with a maximum of 1 token that is refilled every 100 seconds. To verify that your rate limiting settings are working as expected and to simplify troubleshooting, set `enableXRatelimitHeaders: true`. This option adds rate limiting headers to your response that indicate the local rate limiting settings that are applied, the number of tokens that are left in the bucket, and the number of seconds until the token bucket is refilled. For more information, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/common/ratelimit/v3/ratelimit.proto#envoy-v3-api-enum-extensions-common-ratelimit-v3-xratelimitheadersrfcversion).
+1. Change the local rate limiting settings in the HttpListenerPolicy resource to apply to Layer 7 traffic instead of Layer 4 traffic by using the `httpLocalRatelimit` option. The following example configures the gateway with a token bucket with a maximum of 1 token that is refilled every 100 seconds. To verify that your rate limiting settings are working as expected and to simplify troubleshooting, set `enableXRatelimitHeaders: true`. This option adds rate limiting headers to your response that indicate the local rate limiting settings that are applied, the number of tokens that are left in the bucket, and the number of seconds until the token bucket is refilled. For more information, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/common/ratelimit/v3/ratelimit.proto#envoy-v3-api-enum-extensions-common-ratelimit-v3-xratelimitheadersrfcversion).
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: HttpListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HttpListenerPolicy
    metadata:
      name: local-ratelimit
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}

@@ -23,7 +23,7 @@ Use a VirtualHostOption resource to add response headers for responses from all 
 1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: kgateway` header is added to each response.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
@@ -89,7 +89,7 @@ Use a RouteOption resource to add response headers to responses from a specific 
 1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `my-response: kgateway` header is added to each response.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -217,7 +217,7 @@ Remove specific headers from all responses from the routes that the gateway serv
 2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `content-length` header is removed from each response.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
@@ -311,7 +311,7 @@ You can remove HTTP headers from a response of a specific route before the respo
 2. Create a RouteOption resource to specify your header manipulation rules. In this example, you remove the `content-length` response header from each response. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation

@@ -77,7 +77,7 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
 5. Create a RouteOption resource to define your shadowing rules. The following example shadows 100% of the traffic to the `shadow` Upstream resource that you just created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: shadowing

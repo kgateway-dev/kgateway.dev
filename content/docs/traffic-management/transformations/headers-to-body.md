@@ -15,7 +15,7 @@ The following example walks you through how to use extractors to extract request
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you extract the `root` and `nested` request headers and add them to the response body by using the `mergeExtractorsToBody` setting. The dot notation that you use for the extractor names determines the placement of the header in the body. For example, if no dot notation is used, such as in `root`, the header is added to the body's root level. If dot notation is used, such as in `payload.nested`, the extractor is added under the `payload.nested` field. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation

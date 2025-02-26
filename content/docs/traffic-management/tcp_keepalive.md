@@ -65,14 +65,14 @@ Downstream connections are between the Envoy gateway proxy and the client that s
 * The end user that sends a request.
 * The Layer 4 or Layer 7 load balancer that forwards the request from the end user to the gateway proxy.
 
-To enable TCP keepalive on downstream connections, create a [ListenerOption](/docs/about/policies/listeneroption/) resource that selects the Gateway resource with `targetRefs`.
+To enable TCP keepalive on downstream connections, create a [ListenerPolicy](/docs/about/policies/listeneroption/) resource that selects the Gateway resource with `targetRefs`.
 
 The following example enables TCP keepalive probes between the client and the gateway proxy. The first probe is sent when the connection has been idle for 60 seconds (`TCP_KEEPIDLE`). After, each probe is sent every 20 seconds (`TCP_KEEPINTVL`). After no response for 2 consecutive probes (`TCP_KEEPCNT`), the connection is dropped.
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.solo.io/v1
-kind: ListenerOption
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
 metadata:
   name: tcpkeepalive
   namespace: {{< reuse "docs/snippets/ns-system.md" >}}

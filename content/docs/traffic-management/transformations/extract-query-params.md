@@ -15,7 +15,7 @@ The following example walks you through how to use an Inja template to find spec
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you use a regular expression to find the `foo` and `bar` query parameters in the request path and to capture their values. Then, these values are added to the response headers `foo-response` and `bar-response`.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation

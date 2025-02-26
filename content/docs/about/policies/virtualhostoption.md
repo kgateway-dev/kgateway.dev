@@ -18,7 +18,7 @@ You can use the `spec.targetRefs` section in the VirtualHostOption resource to a
 The following VirtualHostOption resource defines a CSRF policy that is attached to the `http` Gateway resource. Because no gateway listener is defined, the policy is attached to all the hosts on all the listeners that are set up on the gateway. 
 
 ```yaml {hl_lines=[15,16,17,18,19]}
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: VirtualHostOption
 metadata:
   name: csrf
@@ -80,7 +80,7 @@ spec:
 To attach the policy to only the hosts on the `https` listener, you specify the listener name in the `spec.targetRefs.sectionName` field of the VirtualHostOption resource as shown in the following example. 
 
 ```yaml {hl_lines=[20]}
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: VirtualHostOption
 metadata:
   name: csrf

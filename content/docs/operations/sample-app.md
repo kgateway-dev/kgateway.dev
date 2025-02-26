@@ -172,7 +172,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
          group: gateway.networking.k8s.io
          kind: Gateway
          name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 ## Send a request {#send-request}
@@ -184,7 +184,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -211,7 +211,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 1. Port-forward the gateway proxy `http` pod on port 8080. 
    
    ```sh
-   kubectl port-forward deployment/http -n kgateway-system 8080:8080
+   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
    ```
 
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. 

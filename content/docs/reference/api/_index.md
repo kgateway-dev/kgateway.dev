@@ -14,8 +14,8 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 {{< cards >}}
   {{< card link="top-level/direct-response" title="DirectResponse" >}}
-  {{< card link="top-level/httplisteneroptions" title="HttpListenerOptions" >}}
-  {{< card link="top-level/listeneroptions" title="ListenerOptions" >}}
+  {{< card link="top-level/httplisteneroptions" title="HttpListenerPolicys" >}}
+  {{< card link="top-level/listeneroptions" title="ListenerPolicys" >}}
   {{< card link="top-level/routeoptions" title="RouteOptions" >}}
   {{< card link="top-level/virtualhostoptions" title="VirtualHostOptions" >}}
 {{< /cards >}}

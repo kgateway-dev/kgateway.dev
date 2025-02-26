@@ -35,17 +35,17 @@ When Envoy is used as an HTTP proxy, additional HTTP information is available fo
 
 ## Set up access logging for `stdout`
 
-1. Create a ListenerOption resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom string format that is defined in the `jsonFormat` field. If no custom string format is defined, the [default Envoy format](https://www.envoyproxy.io/docs/envoy/v1.14.1/configuration/observability/access_log#config-access-log-format-strings) is used.  
+1. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom string format that is defined in the `jsonFormat` field. If no custom string format is defined, the [default Envoy format](https://www.envoyproxy.io/docs/envoy/v1.14.1/configuration/observability/access_log#config-access-log-format-strings) is used.  
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: ListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
    metadata:
      name: access-logs
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
+     targetRef:
+       group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      options:
@@ -131,5 +131,5 @@ When Envoy is used as an HTTP proxy, additional HTTP information is available fo
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete listeneroption access-logs -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete ListenerPolicy access-logs -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

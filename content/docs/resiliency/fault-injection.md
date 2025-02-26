@@ -31,7 +31,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
 1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are rejected with a 503 HTTP response code.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: faults
@@ -119,7 +119,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
 1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are delayed by 5 seconds.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: faults

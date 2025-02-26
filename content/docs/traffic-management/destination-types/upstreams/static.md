@@ -31,7 +31,7 @@ You simply add the list of static hosts or DNS names to your Upstream resource a
 2. Create a RouteOption resource that rewrites the hostname to the `jsonplaceholder.typicode.com`. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: rewrite

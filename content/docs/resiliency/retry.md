@@ -26,7 +26,7 @@ Use a RouteOption resource to specify retries for a specific route.
 1. Create a RouteOption custom resource to specify your retry rules. In the following example, the request is retried up to 3 times when a connection failure is detected. For each retry a timeout of 5 seconds is set. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: retry

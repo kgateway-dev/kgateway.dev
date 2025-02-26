@@ -28,13 +28,13 @@ These quick start steps assume that you have `kubectl` and `helm` installed. For
 3. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm.
 
    ```sh
-   helm install --create-namespace --namespace kgateway-system --version v2.0.0-main kgateway oci://ghcr.io/kgateway-dev/charts/kgateway
+   helm install --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v2.0.0-main kgateway oci://ghcr.io/kgateway-dev/charts/kgateway
    ```
 
 4. Make sure that `kgateway` is running.
 
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
    Example output:
@@ -56,5 +56,5 @@ Ready to try out more features? Check out the following guides:
 No longer need {{< reuse "docs/snippets/product-name.md" >}}? Uninstall with the following command:
 
 ```sh
-helm uninstall kgateway -n kgateway-system
+helm uninstall kgateway -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

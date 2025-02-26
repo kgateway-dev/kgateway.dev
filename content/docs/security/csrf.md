@@ -36,7 +36,7 @@ Use a VirtualHostOption resource to define your CSRF rules.
 1. Create a VirtualHostOption resource to define your CSRF rules. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: csrf
@@ -148,7 +148,7 @@ Use a RouteOption resource to define your CSRF rules.
 1. Create a RouteOption resource to define your CSRF rules. The following example allows request from only the `allowThisOne.solo.io` origin. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: csrf

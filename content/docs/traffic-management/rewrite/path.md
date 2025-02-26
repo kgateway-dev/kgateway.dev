@@ -19,7 +19,7 @@ Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or
 1. Create a RouteOption resource to define your rewrite rules. In the following example all incoming request paths are rewritten to the `/anything` path.
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: rewrite
@@ -98,7 +98,7 @@ Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or
 1. Create a RouteOption resource to define your rewrite rules. In the following example all incoming request paths are evaluated against the regex pattern. If `headers` is part of the request path, it is replaced with `anything`. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: rewrite

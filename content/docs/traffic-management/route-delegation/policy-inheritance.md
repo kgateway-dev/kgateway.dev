@@ -91,7 +91,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
 2. Create a RouteOption resource that adds the `test: bar` header to the response and apply this policy to the `parent` HTTPRoute resource by using the `spec.targetRefs` section. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
     name: parent-remove-header
@@ -133,7 +133,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
 4. Create a RouteOption resource that aborts all requests with a 418 HTTP response code and apply this policy to the `child-team1` HTTPRoute resource by using the `spec.targetRefs` section.  
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: child-team1-fault
@@ -181,7 +181,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
 6. Create a RouteOption resource that rewrites prefix paths to `/anything/rewrite` apply this policy to the `child-team2` HTTPRoute resource by using the `spec.targetRefs` section.  
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: child-team2-rewrite
