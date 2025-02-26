@@ -1,6 +1,6 @@
 
 ---
-title: "ListenerPolicys"
+title: "ListenerPolicies"
 weight: 5
 ---
 
@@ -11,7 +11,7 @@ weight: 5
 **Types**:
 
  
-- [ListenerPolicys](#listeneroptions)
+- [ListenerPolicies](#listeneroptions)
 - [ConnectionBalanceConfig](#connectionbalanceconfig)
 - [ExactBalance](#exactbalance)
   
@@ -20,7 +20,7 @@ weight: 5
 **Source File**: [github.com/solo-io/gloo/projects/gloo/api/v1/listener_options.proto](https://github.com/solo-io/gloo/blob/main/projects/gloo/api/v1/listener_options.proto)
 
 ---
-### ListenerPolicys
+### ListenerPolicies
 
  
 Optional, feature-specific configuration that lives on gateways.
