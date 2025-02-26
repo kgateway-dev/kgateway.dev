@@ -53,7 +53,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    EOF
    ```
 
-3. Create a Gateway resource that references your custom GatewayParameters by using the `gateway.gloo.solo.io/gateway-parameters-name` annotation. 
+3. Create a Gateway resource that references your custom GatewayParameters by using the `gateway.kgateway.dev/gateway-parameters-name` annotation. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -62,7 +62,7 @@ The example in this guide uses the GatewayParameters resource to change settings
      name: custom
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "custom-gw-params"
+       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
      listeners:

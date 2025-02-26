@@ -107,7 +107,7 @@ The following steps show how to deploy the AWS Load Balancer Controller in your 
      name: http-aws
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "gwparams"
+       gateway.kgateway.dev/gateway-parameters-name: "gwparams"
    spec:
      gatewayClassName: kgateway
      listeners:
