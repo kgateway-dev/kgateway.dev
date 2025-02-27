@@ -28,24 +28,6 @@
   }
 </script>
 
-<style>
-  html {
-    --s: 12px; /* control the size*/
-    --c1: #6458f4;
-    --c2: #5044e9;
-    
-    --_g: radial-gradient(calc(var(--s)/2),var(--c1) 97%,#0000);
-  }
-
-  .thumbnail {
-    background:
-      var(--_g),var(--_g) calc(2*var(--s)) calc(2*var(--s)),
-      repeating-conic-gradient(from 45deg,#0000 0 25%,var(--c2) 0 50%) calc(-.707*var(--s)) calc(-.707*var(--s)),
-      repeating-linear-gradient(135deg,var(--c1) calc(var(--s)/-2) calc(var(--s)/2),var(--c2) 0 calc(2.328*var(--s)));
-    background-size: calc(4*var(--s)) calc(4*var(--s));
-  }
-</style>
-
 {{ if $data }}
   {{ $tags := slice }}
   {{ range $data }}
@@ -78,7 +60,7 @@
       {{ range $data }}
         <div class='tag-{{ replace .tag " " "" }} card flex flex-col items-start p-6 gap-4 justify-between'>
           {{ if .thumbnailHref }}
-            <div class="bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-cover"></div>
+            <div class="bg-primary-bg h-[216px] w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat"></div>
           {{ else }}
             <div class="thumbnail bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem]"></div>
           {{ end }}
