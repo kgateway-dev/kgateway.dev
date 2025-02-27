@@ -1,23 +1,15 @@
-# - title: Getting Started with ambient mesh
-#   description: Learn the basics of ambient and how to set up your first environment.
-#   tag: Getting Started
-#   thumbnailHref: https://cdn.pixabay.com/photo/2014/06/03/19/38/board-361516_1280.jpg
-#   href: https://www.solo.io/resources/lab/getting-started-with-ambient-mesh?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- description: Explore the Kubernetes Gateway API and learn about real-world use cases that influenced its development and adoption.
+  href: https://youtu.be/kzWgbSTVphs?si=JmAy1MMR8PUu4PfU
+  thumbnailHref: /thumbnails/intro-to-k8s-gateway-api.jpg
 
-# - title: "Secure your cluster with ambient mesh and mTLS"
-#   description: Learn how to secure services in your Kubernetes cluster using ambient mesh and mTLS.
-#   tag: "Security"
-#   thumbnailHref: 
-#   href: https://www.solo.io/resources/lab/secure-your-cluster-with-ambient-mesh-and-mtls?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- description: Introducing kgateway, the open implementation of Kubernetes Gateway API in this video, get a step by step guide on installing kgateway.
+  href: https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g
+  thumbnailHref: /thumbnails/install-kgateway.jpg
 
-# - title: "Traffic routing with waypoints"
-#   description: Learn how to route traffic using waypoint proxies in ambient mesh.
-#   tag: "Traffic Control"
-#   thumbnailHref: 
-#   href: https://www.solo.io/resources/lab/traffic-routing-with-waypoints?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- description: Learn the basic concepts of Kubernetes Gateway API with kgateway including how to implement custom resource definitions (CRDs) across clusters.
+  href: https://youtu.be/j89S4tV192g?si=mm88aKWBCBA8k0gU
+  thumbnailHref: /thumbnails/gateway-api-basics.jpg
 
-# - title: "Access control with authorization policies"
-#   description: Learn how to enforce access control and write authorization policies for L4 and L7 traffic.
-#   tag: "Security"
-#   thumbnailHref: 
-#   href: https://www.solo.io/resources/lab/access-control-with-authorization-policies?&utm_source=web&utm_medium=organic&utm_campaign=FY25_WW_DIG_Ambient&utm_content=
+- description: Deep dive into how to configure HTTPS routes with the Kubernetes Gateway API and kgateway.
+  href: https://youtu.be/cOnL9vjVRvQ?si=KDfDuWSypcc5KkEr
+  thumbnailHref: /thumbnails/configuring-https.jpg

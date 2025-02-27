@@ -28,24 +28,6 @@
   }
 </script>
 
-<style>
-  html {
-    --s: 12px; /* control the size*/
-    --c1: #6458f4;
-    --c2: #5044e9;
-    
-    --_g: radial-gradient(calc(var(--s)/2),var(--c1) 97%,#0000);
-  }
-
-  .thumbnail {
-    background:
-      var(--_g),var(--_g) calc(2*var(--s)) calc(2*var(--s)),
-      repeating-conic-gradient(from 45deg,#0000 0 25%,var(--c2) 0 50%) calc(-.707*var(--s)) calc(-.707*var(--s)),
-      repeating-linear-gradient(135deg,var(--c1) calc(var(--s)/-2) calc(var(--s)/2),var(--c2) 0 calc(2.328*var(--s)));
-    background-size: calc(4*var(--s)) calc(4*var(--s));
-  }
-</style>
-
 {{ if $data }}
   {{ $tags := slice }}
   {{ range $data }}
@@ -76,20 +58,16 @@
     {{ end }} -->
     <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
       {{ range $data }}
-        <div class='tag-{{ replace .tag " " "" }} card flex flex-col items-start p-6 gap-4 justify-between'>
+        <div class='tag-{{ replace .tag " " "" }} w-[386px] card flex flex-col items-start pb-3 gap-4 justify-between rounded-[.625rem] border-2 border-[#6052f6]'>
           {{ if .thumbnailHref }}
-            <div class="bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-cover"></div>
+            <div class="bg-primary-bg h-[216px] w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat"></div>
           {{ else }}
             <div class="thumbnail bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem]"></div>
           {{ end }}
           <div class="flex flex-col gap-4">
-            <!-- <p class="bg-[#6458f4] rounded-xl p-2 text-white">{{ .tag }}</p> -->
-            <h3 class="font-primary text-3xl text-primary-text font-bold">
-              {{ .title }}
-            </h3>
-            <p class="text-primary-text">{{ .description }}</p>
+            <p class="text-primary-text px-2">{{ .description }}</p>
           </div>
-          <a href="{{ .href }}" class="bg-[#6458f4] rounded-xl p-2 text-white flex flex-row items-center font-medium gap-4">Watch Video {{ partial "utils/icon.html" (dict "name" "arrow-right" "attributes" "class='w-8 h-8'") }}</a>
+          <a href="{{ .href }}" class="bg-[#6458f4] rounded-xl mx-2 p-2 text-white flex flex-row items-center font-medium gap-4">Watch Video</a>
         </div>
       {{ end }}
     </div>
