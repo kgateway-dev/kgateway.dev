@@ -14,11 +14,11 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
  
 ## Configure a health check on a gateway
 
-1. Create an HTTPListenerOption resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
+1. Create an HTTPListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: HttpListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HttpListenerPolicy
    metadata:
      name: healthcheck
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -86,5 +86,5 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete HttpListenerOption healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete HttpListenerPolicy healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

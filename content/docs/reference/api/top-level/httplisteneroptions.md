@@ -1,5 +1,5 @@
 ---
-title: HttpListenerOptions
+title: HttpListenerPolicies
 weight: 5
 ---
 
@@ -11,7 +11,7 @@ weight: 5
 **Types**:
 
 
-- [HttpListenerOptions](#httplisteneroptions)
+- [HttpListenerPolicies](#httplisteneroptions)
   
 
 
@@ -23,7 +23,7 @@ weight: 5
 
 
 ---
-### HttpListenerOptions
+### HttpListenerPolicies
 
  
 Optional, feature-specific configuration that lives on http listeners

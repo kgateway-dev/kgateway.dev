@@ -87,7 +87,7 @@ To also reject {{< reuse "docs/snippets/product-name.md" >}} custom resources th
    1. Create a RouteOption resource with an invalid fault injection configuration. The following example aborts 50% of all incoming requests. However, no HTTP status code is defined. 
       ```yaml
       kubectl apply -n httpbin -f- <<EOF
-      apiVersion: gateway.solo.io/v1
+      apiVersion: gateway.kgateway.dev/v1alpha1
       kind: RouteOption
       metadata:
         name: faults

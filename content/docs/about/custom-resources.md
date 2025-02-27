@@ -64,8 +64,8 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 {{< reuse "docs/snippets/product-name-caps.md" >}} uses the following custom resources to attach policies to routes and gateway listeners: 
 
 * [**DirectResponse**](/docs/traffic-management/direct-response/): Directly respond to incoming requests with a custom HTTP response code and body.
-* [**ListenerOption**](/docs/about/policies/listeneroption/): Attach policies to one, multiple, or all gateway listeners.
-* [**HTTPListenerOption**](/docs/about/policies/httplisteneroption/): Apply policies to one, multiple, or all HTTP and HTTPS listeners.
+* [**ListenerPolicy**](/docs/about/policies/listeneroption/): Attach policies to one, multiple, or all gateway listeners.
+* [**HTTPListenerPolicy**](/docs/about/policies/httplisteneroption/): Apply policies to one, multiple, or all HTTP and HTTPS listeners.
 * [**RouteOption**](/docs/about/policies/routeoption/): Attach policies to one, multiple, or all routes in an HTTPRoute resource.
 * [**VirtualHostOption**](/docs/about/policies/virtualhostoption/): Attach policies to the hosts on one, multiple, or all gateway listeners. 
 

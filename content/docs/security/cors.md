@@ -79,7 +79,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    Create a VirtualHostOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. The example also sets the `corsPolicyMergeSettings` to configure how conflicting CORS policies at the virtual host and route levels are handled. In the example, you configure a `UNION` merge strategy for the `exposeHeaders` field. Now, the CORS policy applies to requests so that all the `exposeHeaders` values from both the virtual host and route are included. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`.
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: cors
@@ -116,7 +116,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    1. Create a RouteOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. 
       ```yaml
       kubectl apply -f- <<EOF
-      apiVersion: gateway.solo.io/v1
+      apiVersion: gateway.kgateway.dev/v1alpha1
       kind: RouteOption
       metadata:
         name: cors

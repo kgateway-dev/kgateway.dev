@@ -29,7 +29,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation

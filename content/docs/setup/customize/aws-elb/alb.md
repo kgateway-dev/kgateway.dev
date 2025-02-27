@@ -41,11 +41,11 @@ Keep in mind the following considerations when working with an ALB:
    EOF
    ```
    
-2. Create an HttpListenerOption resource to change the default health check path for the gateway proxy. This step is required to ensure that the ALB health checks pass successfully. 
+2. Create an HttpListenerPolicy resource to change the default health check path for the gateway proxy. This step is required to ensure that the ALB health checks pass successfully. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: HttpListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HttpListenerPolicy
    metadata:
      name: alb-healthcheck
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}

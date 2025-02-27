@@ -67,7 +67,7 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
      name: aws-cloud
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "custom-gw-params"
+       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
      listeners:
@@ -152,7 +152,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
      labels:
        gateway: aws-cloud
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "custom-gw-params"
+       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
      listeners:

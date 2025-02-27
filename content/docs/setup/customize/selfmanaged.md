@@ -30,7 +30,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
      name: self-managed
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "self-managed"
+       gateway.kgateway.dev/gateway-parameters-name: "self-managed"
    spec:
      gatewayClassName: kgateway
      listeners:

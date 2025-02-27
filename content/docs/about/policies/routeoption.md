@@ -18,7 +18,7 @@ You can use the `spec.targetRefs` section in the RouteOption resource to apply p
 The following example RouteOption resource specifies header manipulation rules. Because the `my-httproute` HTTPRoute resource is referenced in the `spec.targetRefs` section, the header manipulation rules are applied to all routes in that HTTPRoute resource. 
 
 ```yaml {hl_lines=[7,8,9,10]}
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: RouteOption
 metadata:
   name: parent-remove-header
@@ -43,7 +43,7 @@ Instead of applying the policy to all routes that are defined in an HTTPRoute re
 The following example shows a RouteOption resource that defines a host rewrite rule. Note that the `spec.targetRefs` field is not set. Because of that, the RouteOption policy does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
 ```yaml
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: RouteOption
 metadata:
   name: rewrite

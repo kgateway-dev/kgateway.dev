@@ -23,7 +23,7 @@ Use a VirtualHostOption resource to add request headers to all requests that the
 1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: kgateway` header is added to each request.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
@@ -101,7 +101,7 @@ Use a RouteOption resource to add request headers for incoming requests to a spe
 1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request. If this header is already present in the request, the value is overwritten with `kgateway` (`append: false`). 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -214,7 +214,7 @@ Add headers from a Kubernetes secret to each request that the gateway serves.
 2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
@@ -304,7 +304,7 @@ Add headers from a Kubernetes secret for requests to a specific route.
 2. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request. If this header is already present in the request, the value is overwritten with `kgateway` (`append: false`). 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -452,7 +452,7 @@ Remove specific headers from all requests to the routes that the gateway serves.
 2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `User-Agent` header is removed from each request.  
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
@@ -552,7 +552,7 @@ Remove specific headers from requests to a specific route.
 2. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `User-Agent` header is removed from the request. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
