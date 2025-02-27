@@ -1,15 +1,15 @@
-- title: Introduction to Kubernetes Gateway API
+- description: Explore the Kubernetes Gateway API its core functionality, design principles, and learn about real-world use cases that influenced its development and adoption.
   href: https://youtu.be/kzWgbSTVphs?si=JmAy1MMR8PUu4PfU
   thumbnailHref: /thumbnails/intro-to-k8s-gateway-api.jpg
 
-- title: How to install kgateway
+- description: Introducing kgateway, the open implementation of Kubernetes Gateway API in this video, get a step by step guide on installing kgateway.
   href: https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g
   thumbnailHref: /thumbnails/install-kgateway.jpg
 
-- title: Basics of Gateway API and kgateway
+- description: Learn the basic concepts of Kubernetes Gateway API with kgateway including how to implement custom resource definitions (CRDs) across clusters.
   href: https://youtu.be/j89S4tV192g?si=mm88aKWBCBA8k0gU
   thumbnailHref: /thumbnails/gateway-api-basics.jpg
 
-- title: Configuring HTTPS with Gateway API and kgateway
+- description: Deep dive into how to configure HTTPS routes with the Kubernetes Gateway API and kgateway.
   href: https://youtu.be/cOnL9vjVRvQ?si=KDfDuWSypcc5KkEr
   thumbnailHref: /thumbnails/configuring-https.jpg
