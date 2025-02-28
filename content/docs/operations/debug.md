@@ -38,6 +38,8 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
    kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &  
    ```
    
+   * [http://localhost:19000/](http://localhost:19000/)
+
    {{< reuse-image src="img/gateway-admin-interface.png" caption="Figure: Debugging interface of the gateway proxy.">}}
    
    Common endpoints that can help troubleshoot your setup further, include: 
