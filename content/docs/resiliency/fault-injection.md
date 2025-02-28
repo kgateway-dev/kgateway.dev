@@ -9,7 +9,7 @@ Test the resilience of your apps by injecting delays and connection failures int
 
 You can set two following fault injection types in {{< reuse "docs/snippets/product-name.md" >}}. 
 
-* **Delays**: Delays simulate timing failures, such as network latency or overloaded upstreams.
+* **Delays**: Delays simulate timing failures, such as network latency or overloaded backends.
 * **Aborts**: Aborts simulate crash failures, such as HTTP error codes or TCP connection failures. 
 
 Delays and aborts are independent of one another. When both values are set, your requests are either delayed only, delayed and aborted, or aborted only.

@@ -57,16 +57,16 @@ Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" 
 
 5. Click **Deploy**.
 
-## Create an Upstream and HTTPRoute
+## Create an Backend and HTTPRoute
 
-Create {{< reuse "docs/snippets/product-name.md" >}} `Upstream` and `HTTPRoute` resources to route requests to the Lambda function.
+Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
-1. In your terminal, create an Upstream resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
+1. In your terminal, create an Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
    
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      name: lambda
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -83,7 +83,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Upstream` and `HTTPRoute` 
    EOF
    ```
 
-2. Create an HTTPRoute resource that references the `lambda` Upstream.
+2. Create an HTTPRoute resource that references the `lambda` Backend.
    
    ```yaml
    kubectl apply -f - <<EOF
@@ -105,7 +105,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Upstream` and `HTTPRoute` 
        - name: lambda
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
          group: gloo.solo.io
-         kind: Upstream
+         kind: Backend
          filters:
            - type: ExtensionRef
              extensionRef:
@@ -142,11 +142,11 @@ At this point, {{< reuse "docs/snippets/product-name.md" >}} is routing directly
 
 {{% reuse "docs/snippets/cleanup.md" %}}
 
-1. Delete the `lambda` HTTPRoute and `lambda` Upstream.
+1. Delete the `lambda` HTTPRoute and `lambda` Backend.
    
    ```sh
    kubectl delete HTTPRoute lambda -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete Upstream lambda -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete Backend lambda -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 2. Delete the `aws-creds` secret.

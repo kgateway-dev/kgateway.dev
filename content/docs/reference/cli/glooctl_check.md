@@ -20,7 +20,7 @@ usage: {{< reuse "docs/snippets/cli-name.md" >}} check [-o FORMAT]
 ### Options
 
 ```
-  -x, --exclude strings                   check to exclude: (deployments, pods, upstreams, upstreamgroup, auth-configs, rate-limit-configs, virtual-host-options, route-options, secrets, virtual-services, gateways, proxies, xds-metrics, kube-gateway-classes, kube-gateways, kube-http-routes)
+  -x, --exclude strings                   check to exclude: (deployments, pods, backends, backendgroup, auth-configs, rate-limit-configs, virtual-host-options, route-options, secrets, virtual-services, gateways, proxies, xds-metrics, kube-gateway-classes, kube-gateways, kube-http-routes)
   -h, --help                              help for check
   -n, --namespace string                  namespace for reading or writing resources (default "{{< reuse "docs/snippets/ns-system.md" >}}")
   -o, --output OutputType                 output format: (json, table) (default table)

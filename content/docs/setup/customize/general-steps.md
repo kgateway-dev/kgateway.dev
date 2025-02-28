@@ -33,7 +33,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
@@ -100,7 +100,7 @@ The example in this guide uses the GatewayParameters resource to change settings
        app.kubernetes.io/name: custom
        gateway: custom
        gateway.networking.k8s.io/gateway-name: custom
-       gloo: kube-gateway
+       kgateway: kube-gateway
    ...
      priority: 0
      restartPolicy: Always
@@ -126,11 +126,11 @@ The example in this guide uses the GatewayParameters resource to change settings
        app.kubernetes.io/instance: custom
        app.kubernetes.io/managed-by: Helm
        app.kubernetes.io/name: custom
-       app.kubernetes.io/version: 2.0.0-alpha1
+       app.kubernetes.io/version: kgateway-proxy-v{{< reuse "docs/versions/n-patch.md" >}}
        gateway: custom
        gateway.networking.k8s.io/gateway-name: custom
-       gloo: kube-gateway
-       helm.sh/chart: kgateway-0.0.1-alpha1
+       kgateway: kube-gateway
+       helm.sh/chart: kgateway-proxy-v{{< reuse "docs/versions/n-patch.md" >}}
      name: custom
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      ownerReferences:

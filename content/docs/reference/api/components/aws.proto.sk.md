@@ -28,8 +28,8 @@ weight: 10
 ### UpstreamSpec
 
  
-Upstream Spec for AWS Lambda Upstreams
-AWS Upstreams represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
+Backend Spec for AWS Lambda Backends
+AWS Backends represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
 in a particular region
 
 ```yaml

@@ -10,7 +10,7 @@ Review how the {{< reuse "docs/snippets/product-name.md" >}} project handles the
 The {{< reuse "docs/snippets/product-name.md" >}} project appreciates the efforts of our users in helping us to discover and resolve security vulnerabilities. The following sources are used to determine product exposure to CVEs:
 
 * The {{< reuse "docs/snippets/product-name.md" >}} team scans {{< reuse "docs/snippets/product-name.md" >}} components to detect vulnerabilities.
-* The {{< reuse "docs/snippets/product-name.md" >}} team participates in early disclosure and security workgroups of multiple upstream communities.
+* The {{< reuse "docs/snippets/product-name.md" >}} team participates in early disclosure and security workgroups of multiple backend communities.
 * Users may share output from their own security scanning tools for analysis and response from the {{< reuse "docs/snippets/product-name.md" >}} team.
 
 ### 📨 Where to report
@@ -45,8 +45,8 @@ Do not send a report for vulnerabilities that are not part of the {{< reuse "doc
 The {{< reuse "docs/snippets/product-name.md" >}} team evaluates vulnerability reports for:
 
 * Severity level, which can affect the priority of the fix
-* Impact of the vulnerability on {{< reuse "docs/snippets/product-name.md" >}} code as opposed to upstream code
-* Potential dependencies on third-party or upstream code that might delay the remediation process
+* Impact of the vulnerability on {{< reuse "docs/snippets/product-name.md" >}} code as opposed to backend code
+* Potential dependencies on third-party or backend code that might delay the remediation process
 
 The {{< reuse "docs/snippets/product-name.md" >}} team strives to keep private any vulnerability information with us as part of the remediation process. We only share information on a need-to-know basis to address the issue.
 

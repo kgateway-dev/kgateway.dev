@@ -5,7 +5,7 @@ weight: 5
 
 Packages:
 
-- [gateway.gloo.solo.io/v1alpha1](#gatewaygloosoloiov1alpha1)
+- [gateway.kgateway.dev/v1alpha1](#gatewaygloosoloiov1alpha1)
 
 
 Resource Types:
@@ -35,7 +35,7 @@ Resource Types:
     <tbody><tr>
       <td><b>apiVersion</b></td>
       <td>string</td>
-      <td>gateway.gloo.solo.io/v1alpha1</td>
+      <td>gateway.kgateway.dev/v1alpha1</td>
       <td>true</td>
       </tr>
       <tr>

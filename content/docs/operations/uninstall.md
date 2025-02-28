@@ -53,19 +53,38 @@ Did you use Argo CD to install {{< reuse "docs/snippets/product-name.md" >}}? Sk
 7. Uninstall {{< reuse "docs/snippets/product-name.md" >}}.
    
    1. Uninstall the {{< reuse "docs/snippets/product-name.md" >}} release.
+      
       ```sh
       helm uninstall kgateway -n {{< reuse "docs/snippets/ns-system.md" >}}
       ```
 
    2. Remove the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. 
+      
       ```sh
       kubectl delete namespace {{< reuse "docs/snippets/ns-system.md" >}}
+      ```
+
+   3. Delete the {{< reuse "docs/snippets/product-name.md" >}} CRDs.
+
+      ```sh
+      kubectl delete crd backends.gateway.kgateway.dev
+      kubectl delete crd directresponses.gateway.kgateway.dev
+      kubectl delete crd gatewayparameters.gateway.kgateway.dev
+      kubectl delete crd httplistenerpolicies.gateway.kgateway.dev
+      kubectl delete crd listenerpolicies.gateway.kgateway.dev
+      kubectl delete crd routepolicies.gateway.kgateway.dev
+      ```
+
+   4. Confirm that the CRDs are deleted.
+
+      ```sh
+      kubectl get crds | grep {{< reuse "docs/snippets/product-name.md" >}}
       ```
 
 8. Remove the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. 
    
    ```sh
-   kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
+   kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
 
 ## Uninstall with ArgoCD {#argocd}
