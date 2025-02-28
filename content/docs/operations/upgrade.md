@@ -1,11 +1,12 @@
 ---
 title: Upgrade
 weight: 20
-description: Upgrade the control plane and any {{< reuse "docs/snippets/product-name.md" >}} proxies that run in your cluster. 
+description: Upgrade the control plane and any gateway proxies that run in your cluster. 
 ---
 
 You can use this guide to upgrade the version of your {{< reuse "docs/snippets/product-name.md" >}} components, or to apply changes to the components’ configuration settings.
 
+<!-- TODO upgrade guide when we have a minor version
 ## Considerations
 Consider the following rules before you plan your {{< reuse "docs/snippets/product-name.md" >}} upgrade.
 
@@ -16,11 +17,11 @@ During the upgrade, pods that run the new version of the control plane and proxi
 ### Patch and minor versions
 
 **Patch version upgrades**: </br>
-- You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "docs/versions/gloo_short.md" >}}.0 to {{< reuse "docs/versions/gloo_oss_patch.md" >}} directly, and skip the patch versions in between.
+- You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "docs/versions/short.md" >}}.0 to {{< reuse "docs/versions/n-patch.md" >}} directly, and skip the patch versions in between.
 
 **Minor version upgrades**: </br>
 - Before you upgrade the minor version, always upgrade your _current_ minor version to the latest patch. This ensures that your current environment is up-to-date with any bug fixes or security patches before you begin the minor version upgrade process.
-- Always upgrade to the latest patch version of the target minor release. Do not upgrade to a lower patch version, such as {{< reuse "docs/versions/gloo_short.md" >}}.0, {{< reuse "docs/versions/gloo_short.md" >}}.1, and so on.
+- Always upgrade to the latest patch version of the target minor release. Do not upgrade to a lower patch version, such as {{< reuse "docs/versions/short.md" >}}.0, {{< reuse "docs/versions/short.md" >}}.1, and so on.
 - Do not skip minor versions during your upgrade. Upgrade minor release versions one at a time. 
 
 ## Step 1: Prepare to upgrade
@@ -35,9 +36,9 @@ During the upgrade, pods that run the new version of the control plane and proxi
    2. Compare the supported version against the versions that you currently use. 
    3. If necessary, upgrade your dependencies, such as consulting your cluster infrastructure provider to upgrade the version of Kubernetes that your cluster runs.
 
-3. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/gloo_oss_patch.md" >}}`) .
+3. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    ```sh
-   export NEW_VERSION={{< reuse "docs/versions/gloo_oss_patch.md" >}}
+   export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
 ## Step 2: Upgrade the CLI
@@ -56,17 +57,30 @@ During the upgrade, pods that run the new version of the control plane and proxi
    ```json
    {
    "client": {
-     "version": "{{< reuse "docs/versions/gloo_oss_patch.md" >}}"
+     "version": "{{< reuse "docs/versions/n-patch.md" >}}"
    },
    ```
 
 ## Step 3: Upgrade kgateway
 
-1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version 1.2.0. 
+-->
+
+## Upgrade kgateway
+
+1. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+   
+   ```sh
+   export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
+   ```
+
+2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
+   
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
+   
    Example output: 
+   
    ```
    customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
@@ -82,33 +96,21 @@ During the upgrade, pods that run the new version of the control plane and proxi
    ```
    {{< /callout >}}
 
-1. Update the {{< reuse "docs/snippets/product-name.md" >}} Helm repositories.
-   ```sh
-   helm repo update
-   ```
-   
-2. Apply the Gloo custom resource definitions (CRDs) for the upgrade version.
-   1. Download and apply the new CRDs.
-      ```sh
-      helm pull gloo/gloo --version $NEW_VERSION --untar
-      kubectl apply -f gloo/crds
-      ```
-   2. Check the deployed CRDs to ensure that none of them are out of date.
-      ```sh
-      {{< reuse "docs/snippets/cli-name.md" >}} check-crds
-      ```
-     
 3. Make any changes to your Helm values.
+   
    1. Get the Helm values file for your current version.
+      
       ```sh
       helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
       open kgateway.yaml
       ```
 
-   2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a values file for the upgrade version with the `helm show values` command.
+   2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a values file for the upgrade version by pulling and inspecting the Helm chart locally.
+      
       ```sh
-      helm show values gloo/gloo --version $NEW_VERSION > all-values.yaml
-      open all-values.yaml
+      helm pull oci://ghcr.io/kgateway-dev/charts/kgateway --version v$NEW_VERSION
+      tar -xvf kgateway-v$NEW_VERSION.tgz
+      open kgateway/values.yaml
       ```
 
    3. Make any changes that you want by editing your `kgateway.yaml` Helm values file or preparing the `--set` flags.
@@ -117,23 +119,26 @@ During the upgrade, pods that run the new version of the control plane and proxi
    {{< callout type="warning" >}}
    Make sure to include your Helm values when you upgrade either as a configuration file or with <code>--set</code> flags. Otherwise, any previous custom values that you set might be overwritten.
    {{< /callout >}}
+   
    ```sh
-   helm upgrade -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway kgateway/kgateway \
+   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://ghcr.io/kgateway-dev/charts/kgateway \
      -f kgateway.yaml \
-     --version=$NEW_VERSION
+     --version v$NEW_VERSION
    ```
    
-5. Verify that {{< reuse "docs/snippets/product-name.md" >}} runs the upgraded version.
+7. Verify that {{< reuse "docs/snippets/product-name.md" >}} runs the upgraded version.
+   
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} get pod -l gloo=gloo -ojsonpath='{.items[0].spec.containers[0].image}'
+   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} get pod -l kgateway=kgateway -ojsonpath='{.items[0].spec.containers[0].image}'
    ```
    
    Example output:
    ```
-   quay.io/solo-io/gloo:{{< reuse "docs/versions/gloo_oss_patch.md" >}}@sha256:582ab27a995e9526522f81a9325584aefb528fa4d939455fd285e5148615991b
+   ghcr.io/kgateway-dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+8. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+   
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
    ``` 
