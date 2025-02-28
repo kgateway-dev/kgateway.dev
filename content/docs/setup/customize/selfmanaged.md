@@ -107,11 +107,11 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
                      address: $CONTROLLER_HOST
                      port_value: 9977
          typed_extension_protocol_options:
-           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-             "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+           envoy.extensions.backends.http.v3.HttpProtocolOptions:
+             "@type": type.googleapis.com/envoy.extensions.backends.http.v3.HttpProtocolOptions
              explicit_http_config:
                http2_protocol_options: {}
-         upstream_connection_options:
+         backend_connection_options:
            tcp_keepalive:
              keepalive_time: 10
          type: STRICT_DNS

@@ -10,7 +10,7 @@ weight: 10
 **Types**:
 
 
-- [UpstreamSpec](#upstreamspec)
+- [BackendSpec](#upstreamspec)
 - [LambdaFunctionSpec](#lambdafunctionspec)
 - [DestinationSpec](#destinationspec)
 - [InvocationStyle](#invocationstyle)
@@ -25,11 +25,11 @@ weight: 10
 
 
 ---
-### UpstreamSpec
+### BackendSpec
 
  
-Upstream Spec for AWS Lambda Upstreams
-AWS Upstreams represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
+Backend Spec for AWS Lambda Backends
+AWS Backends represent a collection of Lambda Functions for a particular AWS Account (IAM Role or User account)
 in a particular region
 
 ```yaml

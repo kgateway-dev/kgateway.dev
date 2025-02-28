@@ -12,7 +12,7 @@ weight: 10
 
 - [SslConfig](#sslconfig)
 - [SSLFiles](#sslfiles)
-- [UpstreamSslConfig](#upstreamsslconfig)
+- [BackendSslConfig](#upstreamsslconfig)
 - [SDSConfig](#sdsconfig)
 - [CallCredentials](#callcredentials)
 - [FileCredentialSource](#filecredentialsource)
@@ -87,7 +87,7 @@ SSLFiles reference paths to certificates which can be read by the proxy off of i
 
 
 ---
-### UpstreamSslConfig
+### BackendSslConfig
 
  
 SslConfig contains the options necessary to configure an upstream to use TLS origination

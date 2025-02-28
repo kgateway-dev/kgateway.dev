@@ -31,7 +31,7 @@ Configuration for the Zipkin tracer.
 
 
 ```yaml
-"collectorUpstreamRef": .core.solo.io.ResourceRef
+"collectorBackendRef": .core.solo.io.ResourceRef
 "clusterName": string
 "collectorEndpoint": string
 "traceId128Bit": .google.protobuf.BoolValue
@@ -42,8 +42,8 @@ Configuration for the Zipkin tracer.
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `collectorUpstreamRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | The upstream that hosts the Zipkin collectors. Only one of `collectorUpstreamRef` or `clusterName` can be set. |
-| `clusterName` | `string` | The name of the cluster that hosts the Zipkin collectors. Note that the Zipkin cluster must be defined in the Bootstrap static cluster resources. Only one of `clusterName` or `collectorUpstreamRef` can be set. |
+| `collectorBackendRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | The upstream that hosts the Zipkin collectors. Only one of `collectorBackendRef` or `clusterName` can be set. |
+| `clusterName` | `string` | The name of the cluster that hosts the Zipkin collectors. Note that the Zipkin cluster must be defined in the Bootstrap static cluster resources. Only one of `clusterName` or `collectorBackendRef` can be set. |
 | `collectorEndpoint` | `string` | The API endpoint of the Zipkin service where the spans will be sent. When using a standard Zipkin installation, the API endpoint is typically /api/v1/spans, which is the default value. |
 | `traceId128Bit` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | Determines whether a 128bit trace id will be used when creating a new trace instance. The default value is false, which will result in a 64 bit trace id being used. |
 | `sharedSpanContext` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | Determines whether client and server spans will share the same span context. The default value is true. |

@@ -40,10 +40,10 @@ If traffic matches the conditions that are defined in the HTTPRoute, the Gateway
 
 ### ReferenceGrant
 
-A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Upstream that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
+A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Backend that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
 
 {{% callout type="info" %}}
-{{< reuse "docs/snippets/product-name-caps.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a RouteOption resource in `namespace1` and an Upstream resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
+{{< reuse "docs/snippets/product-name-caps.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a RouteOption resource in `namespace1` and an Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
 {{% /callout %}}
 
 ## Kgateway resources {#kgateway}
@@ -69,9 +69,9 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 * [**RouteOption**](/docs/about/policies/routeoption/): Attach policies to one, multiple, or all routes in an HTTPRoute resource.
 * [**VirtualHostOption**](/docs/about/policies/virtualhostoption/): Attach policies to the hosts on one, multiple, or all gateway listeners. 
 
-### Upstreams
+### Backends
 
 While you can route incoming traffic to a Kubernetes Service directly by referencing the Service in your HTTPRoute, you might want to add additional configuration to your service or point to endpoints outside your cluster. For example, you might want to route traffic to an AWS Lambda instance. You might also want to add settings to a Kubernetes Service, such as HTTP/2, traffic shadowing, or health check capabilities. 
 
-You can use an [Upstream](/docs/traffic-management/destination-types/upstreams/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Upstream in your HTTPRoute resource. For more information about Upstreams, see [Upstreams](/docs/traffic-management/destination-types/upstreams/). 
+You can use an [Backend](/docs/traffic-management/destination-types/backends/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/). 
 

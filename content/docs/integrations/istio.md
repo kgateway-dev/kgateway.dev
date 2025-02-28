@@ -256,13 +256,13 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    
 ## Exclude a service from mTLS 
 
-You can exclude a service from requiring to communicate with the gateway proxy via mTLS by adding the `disableIstioAutoMtls` option to the Upstream that represents your service. 
+You can exclude a service from requiring to communicate with the gateway proxy via mTLS by adding the `disableIstioAutoMtls` option to the Backend that represents your service. 
 
-1. Create an Upstream resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Upstream from communicating with the gateway proxy via mTLS. 
+1. Create an Backend resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Backend from communicating with the gateway proxy via mTLS. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      name: httpbin
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -275,7 +275,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
    EOF
    ```
    
-2. Create an HTTPRoute resource that routes traffic to the httpbin Upstream that you created. 
+2. Create an HTTPRoute resource that routes traffic to the httpbin Backend that you created. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -292,7 +292,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
      rules:
        - backendRefs:
          - name: httpbin
-           kind: Upstream
+           kind: Backend
            group: gloo.solo.io
    EOF
    ```
@@ -405,9 +405,9 @@ You can exclude a service from requiring to communicate with the gateway proxy v
       httpbin-7d4965fb6d-mslx2   3/3     Running       0          6s
       ```
 
-3. Remove the Upstream and HTTPRoute that you used to exclude a service from mTLS. 
+3. Remove the Backend and HTTPRoute that you used to exclude a service from mTLS. 
    ```sh
-   kubectl delete upstream httpbin -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete backend httpbin -n {{< reuse "docs/snippets/ns-system.md" >}}
    kubectl delete httproute exclude-automtls -n {{< reuse "docs/snippets/ns-system.md" >}} 
    ```
 

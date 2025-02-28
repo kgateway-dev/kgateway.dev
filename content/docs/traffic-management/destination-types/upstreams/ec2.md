@@ -95,14 +95,14 @@ The following example shows how to use a user's AWS access key ID and secret key
 ## Set up routing to your EC2 instance
 
 
-1. Create an Upstream that represents your EC2 instance. Replace the AWS region with the region that your instance is in. Also make sure to add the ARN of the AWS role that you created earlier. If you assigned the permissions directly to your AWS user, the AWS access key ID and secret key are sufficient to authenticate with AWS and access the EC2 instance. In this case, remove the `spec.awsEc2.roleArn` from your Upstream configuration. 
+1. Create an Backend that represents your EC2 instance. Replace the AWS region with the region that your instance is in. Also make sure to add the ARN of the AWS role that you created earlier. If you assigned the permissions directly to your AWS user, the AWS access key ID and secret key are sufficient to authenticate with AWS and access the EC2 instance. In this case, remove the `spec.awsEc2.roleArn` from your Backend configuration. 
    ```yaml
    kubectl apply -f- <<EOF              
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      annotations:
-     name: my-ec2-upstream
+     name: my-ec2-backend
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      awsEc2:
@@ -124,7 +124,7 @@ The following example shows how to use a user's AWS access key ID and secret key
    EOF
    ```
 
-2. Create an HTTPRoute that routes traffic to the EC2 Upstream. 
+2. Create an HTTPRoute that routes traffic to the EC2 Backend. 
    ```yaml
    kubectl apply -f- <<EOF   
    apiVersion: gateway.networking.k8s.io/v1
@@ -143,7 +143,7 @@ The following example shows how to use a user's AWS access key ID and secret key
      rules:
      - backendRefs:
        - group: gloo.solo.io
-         kind: Upstream
+         kind: Backend
          name: ec2
        matches:
        - path:
@@ -184,10 +184,10 @@ The following example shows how to use a user's AWS access key ID and secret key
 
 ## Cleanup
 
-1. Remove the Upstream and HTTProute.
+1. Remove the Backend and HTTProute.
    ```sh
    kubectl delete httproute ec2-route -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete upstream ec2 -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete backend ec2 -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 2. Delete the AWS role or revoke permissions for your user.  

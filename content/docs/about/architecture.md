@@ -25,11 +25,11 @@ The following image shows the different components that make up the {{< reuse "d
 
 ### Config watcher 
 
-The config watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches the cluster for new or updated Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, and Upstreams. When the config watcher detects new or updated resources, it sends the Kubernetes configuration to the {{< reuse "docs/snippets/product-name.md" >}} translation engine.
+The config watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches the cluster for new or updated Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, and Backends. When the config watcher detects new or updated resources, it sends the Kubernetes configuration to the {{< reuse "docs/snippets/product-name.md" >}} translation engine.
 
 ### Secret watcher
 
-The secret watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches a secret store for updates to secrets. For example, you might use a Kubernetes Secret to store the AWS access key and secret key credentials for an Upstream to access an AWS Lambda. However, you can configure {{< reuse "docs/snippets/product-name.md" >}} to also watch other secret stores.
+The secret watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches a secret store for updates to secrets. For example, you might use a Kubernetes Secret to store the AWS access key and secret key credentials for an Backend to access an AWS Lambda. However, you can configure {{< reuse "docs/snippets/product-name.md" >}} to also watch other secret stores.
 
 
 ### Endpoint discovery 
@@ -44,9 +44,9 @@ The following image shows the different stages of a translation cycle.
 
 {{< reuse-image src="img/translation-loop.svg" caption="Kgateway translation cycle" >}}
 
-1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Upstream and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Upstream has a type that determines how the Upstream is processed. Correctly configured Upstreams and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
+1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
 
-2. The next step in the translation cycle is to process all the functions on each Upstream. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.
+2. The next step in the translation cycle is to process all the functions on each Backend. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.
 
 3. In the next step, all [Envoy routes](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route.proto) are generated. Routes are generated for each route rule that is defined on the HTTPRoute and RouteOption resources. When all of the routes are created, the translator processes any VirtualHostOption, ListenerPolicy, and HttpListenerPolicy resources, aggregates them into [Envoy virtual hosts](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#config-route-v3-virtualhost), and adds them to a new [Envoy HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management) configuration. 
 
@@ -67,9 +67,9 @@ The final snapshot is passed to the xDS Server, which notifies Envoy of a succes
 
 {{< reuse "docs/snippets/discovery-about.md" >}}
 
-To enable automatic discovery of services, see [Discovery](/docs/traffic-management/destination-types/upstreams/#discovery). To learn more about Upstreams, see [Upstreams](/docs/traffic-management/destination-types/upstreams/).
+To enable automatic discovery of services, see [Discovery](/docs/traffic-management/destination-types/backends/#discovery). To learn more about Backends, see [Backends](/docs/traffic-management/destination-types/backends/).
 
-The following image shows how the endpoint discovery component discovers Kubernetes services and Functions and automatically creates Upstream resources for them. 
+The following image shows how the endpoint discovery component discovers Kubernetes services and Functions and automatically creates Backend resources for them. 
 
 {{< reuse-image src="img/discovery.svg" >}}
 

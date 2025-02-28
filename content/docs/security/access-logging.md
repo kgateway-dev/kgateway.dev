@@ -17,7 +17,7 @@ Access logs can be written to a file, the `stdout` stream of the gateway proxy c
 Envoy exposes a lot of data that can be used when customizing access logs. The following data properties are available for both TCP and HTTP access logging:
 
 * The downstream (client) address, connection information, TLS configuration, and timing
-* The upstream (service) address, connection information, TLS configuration, timing, and Envoy routing information
+* The backend (service) address, connection information, TLS configuration, timing, and Envoy routing information
 * Relevant Envoy configuration, such as rate of sampling (if used)
 * Filter-specific context that is published to Envoy’s dynamic metadata during the filter chain
 
@@ -64,13 +64,13 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
              bytes_received: "%BYTES_RECEIVED%"
              bytes_sent: "%BYTES_SENT%"
              total_duration: "%DURATION%"
-             resp_upstream_service_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+             resp_backend_service_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
              req_x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
              user_agent: "%REQ(USER-AGENT)%"
              request_id: "%REQ(X-REQUEST-ID)%"
              authority: "%REQ(:AUTHORITY)%"
-             upstreamHost: "%UPSTREAM_HOST%"
-             upstreamCluster: "%UPSTREAM_CLUSTER%"
+             backendHost: "%UPSTREAM_HOST%"
+             backendCluster: "%UPSTREAM_CLUSTER%"
      - fileSink:
          path: /dev/default-access-logs.txt
          stringFormat: ""
@@ -128,13 +128,13 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
      "protocol": "HTTP/1.1",
      "req_x_forwarded_for": null,
      "request_id": "a6758866-0f26-4c95-95d9-4032c365c498",
-     "resp_upstream_service_time": "0",
+     "resp_backend_service_time": "0",
      "response_code": 200,
      "response_flags": "-",
      "start_time": "2024-08-19T20:57:57.511Z",
      "total_duration": 1,
-     "upstreamCluster": "kube-svc:httpbin-httpbin-8000_httpbin",
-     "upstreamHost": "10.36.0.14:8080",
+     "backendCluster": "kube-svc:httpbin-httpbin-8000_httpbin",
+     "backendHost": "10.36.0.14:8080",
      "user_agent": "curl/7.77.0"
    }
    ```
@@ -363,13 +363,13 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
      "protocol": "HTTP/1.1",
      "req_x_forwarded_for": null,
      "request_id": "a6758866-0f26-4c95-95d9-4032c365c498",
-     "resp_upstream_service_time": "0",
+     "resp_backend_service_time": "0",
      "response_code": 200,
      "response_flags": "-",
      "start_time": "2024-08-19T20:57:57.511Z",
      "total_duration": 1,
-     "upstreamCluster": "kube-svc:httpbin-httpbin-8000_httpbin",
-     "upstreamHost": "10.36.0.14:8080",
+     "backendCluster": "kube-svc:httpbin-httpbin-8000_httpbin",
+     "backendHost": "10.36.0.14:8080",
      "user_agent": "curl/7.77.0"
    }
    ```

@@ -12,6 +12,6 @@ Review the API reference for the top-level APIs:
 {{< card title="ListenerPolicies" link="listeneroptions" >}}
 {{< card title="RouteOptions" link="routeoptions" >}}
 {{< card title="Settings" link="settings.proto.sk" >}}
-{{< card title="Upstreams" link="upstream.proto.sk" >}}
+{{< card title="Backends" link="backend.proto.sk" >}}
 {{< card title="VirtualHostOptions" link="virtualhostoptions" >}}
 {{< /cards >}}
