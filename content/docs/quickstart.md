@@ -28,7 +28,7 @@ These quick start steps assume that you have `kubectl` and `helm` installed. For
 3. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm.
 
    ```sh
-   helm install --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v2.0.0-main kgateway oci://ghcr.io/kgateway-dev/charts/kgateway
+   helm install --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://ghcr.io/kgateway-dev/charts/kgateway
    ```
 
 4. Make sure that `kgateway` is running.

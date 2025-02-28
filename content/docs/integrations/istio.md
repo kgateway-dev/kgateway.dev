@@ -121,7 +121,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    
    Example output: 
    ```console {hl_lines=[20,21,22]}
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      annotations:
@@ -146,7 +146,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
            logLevel: warning
         podTemplate:
          extraLabels:
-           gloo: kube-gateway
+           kgateway: kube-gateway
    ...
    ```
 

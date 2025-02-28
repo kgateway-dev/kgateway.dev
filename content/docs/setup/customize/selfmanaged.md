@@ -11,7 +11,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
 1. Create a GatewayParameters resource that allows you to create self-managed gateway proxies. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: self-managed

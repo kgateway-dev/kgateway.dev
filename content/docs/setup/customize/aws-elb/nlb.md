@@ -37,7 +37,7 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
 1. Create a GatewayParameters resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
@@ -117,7 +117,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 1. Create a GatewayParameters resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
