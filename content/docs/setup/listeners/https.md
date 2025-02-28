@@ -90,7 +90,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
        - backendRefs:
            - name: httpbin
              port: 8000
-   EOF  
+   EOF
    ```
 
 4. Verify that the HTTP route is applied successfully. 

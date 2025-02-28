@@ -40,7 +40,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
        allowedRoutes:
          namespaces:
            from: All
-   EOF  
+   EOF
    ```
 
 3. Verify that the Gateway is created.  
@@ -48,7 +48,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
    kubectl get gateway self-managed -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
 
-4. Verify that no gateway proxy deployment and service were created for your Gateway. 
+4. Verify that no gateway proxy deployment and service were created for your Gateway. The output is blank.
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
    kubectl get services -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
