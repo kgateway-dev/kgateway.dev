@@ -24,7 +24,7 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 * [GatewayParameters](/docs/reference/api/top-level/gatewayparameters)
 * [Settings](/docs/reference/api/top-level/settings.proto.sk)
-* [Backend](/docs/reference/api/top-level/backend.proto.sk)
+* [Backend](/docs/reference/api/top-level/upstream.proto.sk)
 
 ## Kubernetes Gateway API
 

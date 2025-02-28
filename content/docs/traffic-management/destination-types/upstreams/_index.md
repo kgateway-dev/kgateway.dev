@@ -13,7 +13,7 @@ Backends allow you to add additional configuration to instruct {{< reuse "docs/s
 
 You can manually create Backends or enable Backend discovery in {{< reuse "docs/snippets/product-name.md" >}} to automatically create Backends for any Kubernetes service that is created and discovered in the cluster. 
 
-For more information, see the [Backend API reference](/docs/reference/api/backend). 
+For more information, see the [Backend API reference](/docs/reference/api/upstream). 
 
 ## Types
 
@@ -35,11 +35,11 @@ Backends of type `azure`, `consul`, `grpc`, `rest`, or `awsEc2` are not supporte
 {{% /callout %}}
 
 Check out the following guides for examples on how to use Backends with {{< reuse "docs/snippets/product-name.md" >}}:  
-* [Static](/traffic-management/destination-types/backends/static/)
-* [Kubernetes service](/traffic-management/destination-types/backends/kubernetes/)
-* [Google Cloud Run](/traffic-management/destination-types/backends/cloud-run/)
-* [AWS Lambda](/traffic-management/destination-types/backends/lambda/)
-* [HTTP/2](/traffic-management/destination-types/backends/http2/)
+* [Static](/traffic-management/destination-types/upstreams/static/)
+* [Kubernetes service](/traffic-management/destination-types/upstreams/kubernetes/)
+* [Google Cloud Run](/traffic-management/destination-types/upstreams/cloud-run/)
+* [AWS Lambda](/traffic-management/destination-types/upstreams/lambda/)
+* [HTTP/2](/traffic-management/destination-types/upstreams/http2/)
 
 -->
 
@@ -116,4 +116,4 @@ spec:
           name: rewrite
 ```
 
-For an example, see the [Static](/docs/traffic-management/destination-types/backends/static/) Backend guide. 
+For an example, see the [Static](/docs/traffic-management/destination-types/upstreams/static/) Backend guide. 

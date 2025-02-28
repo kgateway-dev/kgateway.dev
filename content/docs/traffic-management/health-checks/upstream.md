@@ -7,11 +7,11 @@ Automatically monitor the status of backends by configuring health checks.
 
 ## About
 
-When you configure a {{< reuse "docs/snippets/product-name.md" >}} [Backend](/docs/traffic-management/destination-types/backends/) resource, you can add both health checks and outlier detection, which are important elements of building resilient apps.
+When you configure a {{< reuse "docs/snippets/product-name.md" >}} [Backend](/docs/traffic-management/destination-types/upstreams/) resource, you can add both health checks and outlier detection, which are important elements of building resilient apps.
 
 ### Health checks
 
-Health checks periodically and automatically assess the readiness of the Backend to receive requests. You can configure several settings, such as health thresholds and check intervals, that {{< reuse "docs/snippets/product-name.md" >}} uses to determine whether a service is marked as healthy or unhealthy. For more information, see the Envoy [health checking](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/backend/health_checking#arch-overview-health-checking) documentation.
+Health checks periodically and automatically assess the readiness of the Backend to receive requests. You can configure several settings, such as health thresholds and check intervals, that {{< reuse "docs/snippets/product-name.md" >}} uses to determine whether a service is marked as healthy or unhealthy. For more information, see the Envoy [health checking](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/health_checking#arch-overview-health-checking) documentation.
 
 In the `healthChecks` section of an Backend resource, specify settings for how you want the health check to perform. For more information about all of the settings that you can configure, see the [reference documentation](/docs/reference/api/health_check).
 
@@ -26,7 +26,7 @@ In the `healthChecks` section of an Backend resource, specify settings for how y
 
 ### Outlier detection
 
-Outlier detection defines how {{< reuse "docs/snippets/product-name.md" >}} removes (ejects) any unhealthy services from the pool of healthy destinations to send traffic to. Your apps then have time to recover before they are added back to the load-balancing pool and checked again for consecutive errors. For more information, see the Envoy [outlier detection](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/backend/outlier) documentation.
+Outlier detection defines how {{< reuse "docs/snippets/product-name.md" >}} removes (ejects) any unhealthy services from the pool of healthy destinations to send traffic to. Your apps then have time to recover before they are added back to the load-balancing pool and checked again for consecutive errors. For more information, see the Envoy [outlier detection](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier) documentation.
 
 In the `outlierDetection` section of an Backend resource, specify settings for how you want {{< reuse "docs/snippets/product-name.md" >}} to handle Backends that fail healthchecks. For more information about all of the settings that you can configure, see the [reference documentation](/docs/reference/api/outlier_detection/).
 

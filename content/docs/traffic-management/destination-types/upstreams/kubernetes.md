@@ -5,7 +5,7 @@ weight: 20
 
 Instead of referencing a Kubernetes service in your HTTPRoute directly, you can create an Backend resource that represents your Kubernetes service and reference that Backend in your HTTPRoute. 
 
-With Kubernetes Backend resources, you can configure additional settings for your Kubernetes service that cannot be configured when using the KubernetesService resource. For example, you can require communication to your Kubernetes service to use the HTTP/2 protocol, or add health checks. Because Backends bypass the `kube-proxy`, you can also improve load balancing times for your workloads. 
+With Kubernetes Upstream resources, you can configure additional settings for your Kubernetes service that cannot be configured when using the KubernetesService resource. For example, you can require communication to your Kubernetes service to use the HTTP/2 protocol, or add health checks. Because Backends bypass the `kube-proxy`, you can also improve load balancing times for your workloads. 
 
 {{% callout type="info" %}}
 Backends of type `kube` are automatically created when service discovery is enabled in {{< reuse "docs/snippets/product-name.md" >}}. However, you can also manually create the Backend in your cluster as shown in this guide. 

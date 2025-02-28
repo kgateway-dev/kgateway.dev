@@ -29,15 +29,15 @@ Configuration for the OpenTelemetry tracer.
 [#extension: envoy.tracers.opentelemetry]
 
 ```yaml
-"collectorBackendRef": .core.solo.io.ResourceRef
+"collectorUpstreamRef": .core.solo.io.ResourceRef
 "clusterName": string
 
 ```
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `collectorBackendRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | The upstream to use for submitting traces to the OpenTelemetry agent. Only one of `collectorBackendRef` or `clusterName` can be set. |
-| `clusterName` | `string` | The name of the Envoy cluster to use for submitting traces to the OpenTelemetry agent. Only one of `clusterName` or `collectorBackendRef` can be set. |
+| `collectorUpstreamRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | The upstream to use for submitting traces to the OpenTelemetry agent. Only one of `collectorUpstreamRef` or `clusterName` can be set. |
+| `clusterName` | `string` | The name of the Envoy cluster to use for submitting traces to the OpenTelemetry agent. Only one of `clusterName` or `collectorUpstreamRef` can be set. |
 
 
 

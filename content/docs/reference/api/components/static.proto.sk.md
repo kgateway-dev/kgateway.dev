@@ -10,7 +10,7 @@ weight: 10
 **Types**:
 
 
-- [BackendSpec](#upstreamspec)
+- [UpstreamSpec](#upstreamspec)
 - [Host](#host)
 - [HealthCheckConfig](#healthcheckconfig)
   
@@ -24,7 +24,7 @@ weight: 10
 
 
 ---
-### BackendSpec
+### UpstreamSpec
 
  
 Static upstreams are used to route request to services listening at fixed IP/Host & Port pairs.

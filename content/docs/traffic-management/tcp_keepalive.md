@@ -119,7 +119,7 @@ kubectl delete listeneroption tcpkeepalive -n {{< reuse "docs/snippets/ns-system
 Backend connections are between the Envoy gateway proxy and your services, such as {{< reuse "docs/snippets/product-name.md" >}}backends, Kubernetes services, external services, OTel collectors, TAP servers, cloud functions, or other destinations.
 
 To enable TCP keepalive on backend connections, configure the following [ConnectionConfig](/docs/reference/api/connection/) settings in the
-[Backend](/docs/reference/api/backend/) resource.
+[Backend](/docs/reference/api/upstream/) resource.
 
 The following example enables TCP keepalive probes between the gateway proxy and the backend connection. The first probe is sent when the connection has been idle for 60 seconds (`keepaliveTime`). After, a TCP keepalive probe is sent every 20 seconds (`keepaliveInterval`). After no response for 2 consecutive probes (`keepaliveProbes`), the connection is dropped.
 

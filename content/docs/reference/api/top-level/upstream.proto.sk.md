@@ -38,15 +38,15 @@ Each upstream type is handled by a corresponding plugin. (plugins currently need
 "namespacedStatuses": .core.solo.io.NamespacedStatuses
 "metadata": .core.solo.io.Metadata
 "discoveryMetadata": .gloo.solo.io.DiscoveryMetadata
-"sslConfig": .gloo.solo.io.BackendSslConfig
+"sslConfig": .gloo.solo.io.UpstreamSslConfig
 "circuitBreakers": .gloo.solo.io.CircuitBreakerConfig
 "loadBalancerConfig": .gloo.solo.io.LoadBalancerConfig
 "healthChecks": []solo.io.envoy.api.v2.core.HealthCheck
 "outlierDetection": .solo.io.envoy.api.v2.cluster.OutlierDetection
-"kube": .kubernetes.options.gloo.solo.io.BackendSpec
-"static": .static.options.gloo.solo.io.BackendSpec
-"pipe": .pipe.options.gloo.solo.io.BackendSpec
-"aws": .aws.options.gloo.solo.io.BackendSpec
+"kube": .kubernetes.options.gloo.solo.io.UpstreamSpec
+"static": .static.options.gloo.solo.io.UpstreamSpec
+"pipe": .pipe.options.gloo.solo.io.UpstreamSpec
+"aws": .aws.options.gloo.solo.io.UpstreamSpec
 "failover": .gloo.solo.io.Failover
 "connectionConfig": .gloo.solo.io.ConnectionConfig
 "protocolSelection": .gloo.solo.io.Backend.ClusterProtocolSelection
@@ -56,7 +56,7 @@ Each upstream type is handled by a corresponding plugin. (plugins currently need
 "maxConcurrentStreams": .google.protobuf.UInt32Value
 "overrideStreamErrorOnInvalidHttpMessage": .google.protobuf.BoolValue
 "httpProxyHostname": .google.protobuf.StringValue
-"httpConnectSslConfig": .gloo.solo.io.BackendSslConfig
+"httpConnectSslConfig": .gloo.solo.io.UpstreamSslConfig
 "httpConnectHeaders": []gloo.solo.io.HeaderValue
 "ignoreHealthOnHostRemoval": .google.protobuf.BoolValue
 "respectDnsTtl": .google.protobuf.BoolValue
@@ -72,14 +72,14 @@ Each upstream type is handled by a corresponding plugin. (plugins currently need
 | `namespacedStatuses` | [.core.solo.io.NamespacedStatuses](../../components/status.proto.sk/#namespacedstatuses) | NamespacedStatuses indicates the validation status of this resource. NamespacedStatuses is read-only by clients, and set by {{< reuse "docs/snippets/product-name.md" >}} during validation. |
 | `metadata` | [.core.solo.io.Metadata](../../components/metadata.proto.sk/#metadata) | Metadata contains the object metadata for this resource. |
 | `discoveryMetadata` | [.gloo.solo.io.DiscoveryMetadata](#discoverymetadata) | Backends and their configuration can be automatically by Backend Discovery if this upstream is created or modified by Discovery, metadata about the operation will be placed here. |
-| `sslConfig` | [.gloo.solo.io.BackendSslConfig](../../components/ssl.proto.sk/#upstreamsslconfig) | SslConfig contains the options necessary to configure envoy to originate TLS to an upstream. |
+| `sslConfig` | [.gloo.solo.io.UpstreamSslConfig](../../components/ssl.proto.sk/#upstreamsslconfig) | SslConfig contains the options necessary to configure envoy to originate TLS to an upstream. |
 | `circuitBreakers` | [.gloo.solo.io.CircuitBreakerConfig](../../components/circuit_breaker.proto.sk/#circuitbreakerconfig) | Circuit breakers for this upstream. if not set, the default ones in {{< reuse "docs/snippets/product-name.md" >}} will be used. if those are not set, [envoy's defaults](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto#envoy-api-msg-cluster-circuitbreakers) will be used. |
 | `loadBalancerConfig` | [.gloo.solo.io.LoadBalancerConfig](../../components/load_balancer.proto.sk/#loadbalancerconfig) | Settings for the load balancer that sends requests to the Backend. The load balancing method is set to round robin by default. |
 | `healthChecks` | [[]solo.io.envoy.api.v2.core.HealthCheck](../../components/health_check.proto.sk/#healthcheck) |  |
 | `outlierDetection` | [.solo.io.envoy.api.v2.cluster.OutlierDetection](../../components/outlier_detection.proto.sk/#outlierdetection) |  |
-| `kube` | [.kubernetes.options.gloo.solo.io.BackendSpec](../../components/kubernetes.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set. |
-| `static` | [.static.options.gloo.solo.io.BackendSpec](../../components/static.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set. |
-| `aws` | [.aws.options.gloo.solo.io.BackendSpec](../../components/aws.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set.|
+| `kube` | [.kubernetes.options.gloo.solo.io.UpstreamSpec](../../components/kubernetes.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set. |
+| `static` | [.static.options.gloo.solo.io.UpstreamSpec](../../components/static.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set. |
+| `aws` | [.aws.options.gloo.solo.io.UpstreamSpec](../../components/aws.proto.sk/#upstreamspec) |  Only one of `static`, `kube`, or `aws` can be set.|
 | `failover` | [.gloo.solo.io.Failover](../../components/failover.proto.sk/#failover) | Failover endpoints for this upstream. If omitted (the default) no failovers will be applied. |
 | `connectionConfig` | [.gloo.solo.io.ConnectionConfig](../../components/connection.proto.sk/#connectionconfig) | HTTP/1 connection configurations. |
 | `protocolSelection` | [.gloo.solo.io.Backend.ClusterProtocolSelection](#clusterprotocolselection) | Determines how Envoy selects the protocol used to speak to upstream hosts. |
@@ -89,7 +89,7 @@ Each upstream type is handled by a corresponding plugin. (plugins currently need
 | `maxConcurrentStreams` | [.google.protobuf.UInt32Value](https://protobuf.dev/reference/protobuf/google.protobuf/#uint32-value) | (UInt32Value) Maximum concurrent streams allowed for peer on one HTTP/2 connection. Valid values range from 1 to 2147483647 (2^31 - 1) and defaults to 2147483647. Requires UseHttp2 to be true to be acknowledged. |
 | `overrideStreamErrorOnInvalidHttpMessage` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | Allows invalid HTTP messaging and headers. When this option is disabled (default), then the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame. However, when this option is enabled, only the offending stream is terminated. This overrides any HCM stream_error_on_invalid_http_messaging See `RFC7540, sec. 8.1 <https://datatracker.ietf.org/doc/html/rfc7540#section-8.1>`_ for details. |
 | `httpProxyHostname` | [.google.protobuf.StringValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/string-value) | Tells envoy that the upstream is an HTTP proxy (e.g., another proxy in a DMZ) that supports HTTP Connect. This configuration sets the hostname used as part of the HTTP Connect request. For example, setting to: host.com:443 and making a request routed to the upstream such as `curl <envoy>:<port>/v1` would result in the following request: CONNECT host.com:443 HTTP/1.1 host: host.com:443 GET /v1 HTTP/1.1 host: <envoy>:<port> user-agent: curl/7.64.1 accept: */* Note: if setting this field to a hostname rather than IP:PORT, you may want to also set `host_rewrite` on the route. |
-| `httpConnectSslConfig` | [.gloo.solo.io.BackendSslConfig](../../components/ssl.proto.sk/#upstreamsslconfig) | HttpConnectSslConfig contains the options necessary to configure envoy to originate TLS to an HTTP Connect proxy. If you also want to ensure the bytes proxied by the HTTP Connect proxy are encrypted, you should also specify `ssl_config`. |
+| `httpConnectSslConfig` | [.gloo.solo.io.UpstreamSslConfig](../../components/ssl.proto.sk/#upstreamsslconfig) | HttpConnectSslConfig contains the options necessary to configure envoy to originate TLS to an HTTP Connect proxy. If you also want to ensure the bytes proxied by the HTTP Connect proxy are encrypted, you should also specify `ssl_config`. |
 | `httpConnectHeaders` | [[]gloo.solo.io.HeaderValue](#headervalue) | HttpConnectHeaders specifies the headers sent with the initial HTTP Connect request. |
 | `ignoreHealthOnHostRemoval` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | (bool) If set to true, Envoy will ignore the health value of a host when processing its removal from service discovery. This means that if active health checking is used, Envoy will not wait for the endpoint to go unhealthy before removing it. |
 | `respectDnsTtl` | [.google.protobuf.BoolValue](https://developers.google.com/protocol-buffers/docs/reference/csharp/class/google/protobuf/well-known-types/bool-value) | If set to true, Service Discovery update period will be triggered once the TTL is expired. If minimum TTL of all records is 0 then dns_refresh_rate will be used. |

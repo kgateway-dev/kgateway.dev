@@ -10,7 +10,7 @@ weight: 10
 **Types**:
 
 
-- [BackendSpec](#upstreamspec)
+- [UpstreamSpec](#upstreamspec)
   
 
 
@@ -22,13 +22,13 @@ weight: 10
 
 
 ---
-### BackendSpec
+### UpstreamSpec
 
  
-Kubernetes Backends represent a set of one or more addressable pods for a Kubernetes Service
-the Kubernetes Backend maps to a single service port. Because Kubernetes Services support multiple ports,
+Kubernetes Upstreams represent a set of one or more addressable pods for a Kubernetes Service
+the Kubernetes Upstream maps to a single service port. Because Kubernetes Services support multiple ports,
 {{< reuse "docs/snippets/product-name.md" >}} requires that a different upstream be created for each port
-Kubernetes Backends are typically generated automatically by {{< reuse "docs/snippets/product-name.md" >}} from the Kubernetes API
+Kubernetes Upstreams are typically generated automatically by {{< reuse "docs/snippets/product-name.md" >}} from the Kubernetes API
 
 ```yaml
 "serviceName": string

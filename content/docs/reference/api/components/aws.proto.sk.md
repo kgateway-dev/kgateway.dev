@@ -10,7 +10,7 @@ weight: 10
 **Types**:
 
 
-- [BackendSpec](#upstreamspec)
+- [UpstreamSpec](#upstreamspec)
 - [LambdaFunctionSpec](#lambdafunctionspec)
 - [DestinationSpec](#destinationspec)
 - [InvocationStyle](#invocationstyle)
@@ -25,7 +25,7 @@ weight: 10
 
 
 ---
-### BackendSpec
+### UpstreamSpec
 
  
 Backend Spec for AWS Lambda Backends
