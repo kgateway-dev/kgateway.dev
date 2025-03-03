@@ -67,7 +67,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 ## Upgrade kgateway
 
-1. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+1. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    
    ```sh
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
