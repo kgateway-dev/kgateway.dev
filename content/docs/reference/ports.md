@@ -14,7 +14,7 @@ This list of ports reflects the default values that are included in an unmodifie
 
 ## Kgateway 
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} open source software is the free, open source version of {{< reuse "docs/snippets/product-name.md" >}}. The installation process uses a Helm chart to create the necessary custom resource definitions (CRDs), deployments, services, pods, etc. The services and pods listen on specific ports to enable communication between the components that make up {{< reuse "docs/snippets/product-name.md" >}} and outside sources that will consume Upstream resources through {{< reuse "docs/snippets/product-name.md" >}}.
+{{< reuse "docs/snippets/product-name-caps.md" >}} open source software is the free, open source version of {{< reuse "docs/snippets/product-name.md" >}}. The installation process uses a Helm chart to create the necessary custom resource definitions (CRDs), deployments, services, pods, etc. The services and pods listen on specific ports to enable communication between the components that make up {{< reuse "docs/snippets/product-name.md" >}} and outside sources that will consume Backend resources through {{< reuse "docs/snippets/product-name.md" >}}.
 
 ### What's included
 
@@ -31,7 +31,7 @@ A standard installation of {{< reuse "docs/snippets/product-name.md" >}} include
   * Receives and loads configuration from {{< reuse "docs/snippets/product-name.md" >}} xDS.
   * Proxies incoming traffic.
 * **Discovery**
-  * Discovers Upstreams in the cluster.
+  * Discovers Backends in the cluster.
   * Discovers functions with the Function Discovery Service.
 
 ### Pods and ports

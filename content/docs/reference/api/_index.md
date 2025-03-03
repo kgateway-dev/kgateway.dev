@@ -14,7 +14,7 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 {{< cards >}}
   {{< card link="top-level/direct-response" title="DirectResponse" >}}
-  {{< card link="top-level/httplisteneroptions" title="HttpListenerPolicies" >}}
+  {{< card link="top-level/httplisteneroptions" title="HTTPListenerPolicies" >}}
   {{< card link="top-level/listeneroptions" title="ListenerPolicies" >}}
   {{< card link="top-level/routeoptions" title="RouteOptions" >}}
   {{< card link="top-level/virtualhostoptions" title="VirtualHostOptions" >}}
@@ -24,7 +24,7 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 * [GatewayParameters](/docs/reference/api/top-level/gatewayparameters)
 * [Settings](/docs/reference/api/top-level/settings.proto.sk)
-* [Upstream](/docs/reference/api/top-level/upstream.proto.sk)
+* [Backend](/docs/reference/api/top-level/upstream.proto.sk)
 
 ## Kubernetes Gateway API
 

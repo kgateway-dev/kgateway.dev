@@ -1,5 +1,5 @@
 ---
-title: HttpListenerPolicies
+title: HTTPListenerPolicies
 weight: 5
 ---
 
@@ -11,7 +11,7 @@ weight: 5
 **Types**:
 
 
-- [HttpListenerPolicies](#httplisteneroptions)
+- [HTTPListenerPolicies](#httplisteneroptions)
   
 
 
@@ -23,7 +23,7 @@ weight: 5
 
 
 ---
-### HttpListenerPolicies
+### HTTPListenerPolicies
 
  
 Optional, feature-specific configuration that lives on http listeners
@@ -51,7 +51,7 @@ Optional, feature-specific configuration that lives on http listeners
 | `httpConnectionManagerSettings` | [.hcm.options.gloo.solo.io.HttpConnectionManagerSettings](../../components/hcm.proto.sk/#httpconnectionmanagersettings) |  |
 | `healthCheck` | [.healthcheck.options.gloo.solo.io.HealthCheck](../../components/healthcheck.proto.sk/#healthcheck) | enable [Envoy health checks](https://www.envoyproxy.io/docs/envoy/v1.7.0/api-v2/config/filter/http/health_check/v2/health_check.proto) on this listener. |
 | `extensions` | [.gloo.solo.io.Extensions](../../components/extensions.proto.sk/#extensions) | Extensions will be passed along from Listeners, Gateways, VirtualServices, Routes, and Route tables to the underlying Proxy, making them useful for controllers, validation tools, etc. which interact with kubernetes yaml. Some sample use cases: * controllers, deployment pipelines, helm charts, etc. which wish to use extensions as a kind of opaque metadata.  |
-| `gzip` | [.solo.io.envoy.config.filter.http.gzip.v2.Gzip](../../components/gzip.proto.sk/#gzip) | Gzip is an HTTP option which enables compressing data returned from an upstream service upon client request. Compression is useful in situations where large payloads need to be transmitted without compromising the response time. Example: ``` gzip: contentType: - "application/json" compressionLevel: BEST ```. |
+| `gzip` | [.solo.io.envoy.config.filter.http.gzip.v2.Gzip](../../components/gzip.proto.sk/#gzip) | Gzip is an HTTP option which enables compressing data returned from an backend service upon client request. Compression is useful in situations where large payloads need to be transmitted without compromising the response time. Example: ``` gzip: contentType: - "application/json" compressionLevel: BEST ```. |
 | `buffer` | [.solo.io.envoy.extensions.filters.http.buffer.v3.Buffer](../../components/buffer.proto.sk/#buffer) | Buffer can be used to set the maximum request size that the filter will buffer before the connection manager will stop buffering and return a 413 response. |
 | `csrf` | [.solo.io.envoy.extensions.filters.http.csrf.v3.CsrfPolicy](../../components/csrf.proto.sk/#csrfpolicy) | Csrf can be used to set percent of requests for which the CSRF filter is enabled, enable shadow-only mode where policies will be evaluated and tracked, but not enforced and add additional source origins that will be allowed in addition to the destination origin. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/csrf/v3/csrf.proto#envoy-v3-api-msg-extensions-filters-http-csrf-v3-csrfpolicy. |
 | `grpcJsonTranscoder` | [.grpc_json.options.gloo.solo.io.GrpcJsonTranscoder](../../components/grpc_json.proto.sk/#grpcjsontranscoder) | Exposed envoy config for the gRPC to JSON transcoding filter, envoy.filters.http.grpc_json_transcoder. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/grpc_json_transcoder/v3/transcoder.proto. |

@@ -22,6 +22,30 @@ Keep in mind the following considerations when working with an ALB:
    
 ## Step 2: Deploy your gateway proxy
 
+<!-- TODO HTTPListenerPolicy healtcheck
+
+The following step does not work because the HTTPListenerPolicy does not have the options.healthcheck
+
+2. Create an HTTPListenerPolicy resource to change the default health check path for the gateway proxy. This step is required to ensure that the ALB health checks pass successfully. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HTTPListenerPolicy
+   metadata:
+     name: alb-healthcheck
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: alb
+     options:
+       healthCheck:
+         path: "/healthz"
+   EOF
+   ```
+-->
+
 1. Create a Gateway resource with an HTTP listener. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
@@ -41,26 +65,7 @@ Keep in mind the following considerations when working with an ALB:
    EOF
    ```
    
-2. Create an HttpListenerPolicy resource to change the default health check path for the gateway proxy. This step is required to ensure that the ALB health checks pass successfully. 
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HttpListenerPolicy
-   metadata:
-     name: alb-healthcheck
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: Gateway
-       name: alb
-     options:
-       healthCheck:
-         path: "/healthz"
-   EOF
-   ```
-   
-3. Use an Ingress resource to create your ALB. Make sure to include the health check path that you set up earlier. 
+2. Use an Ingress resource to create your ALB. Make sure to include the health check path that you set up earlier. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: networking.k8s.io/v1
@@ -92,7 +97,7 @@ Keep in mind the following considerations when working with an ALB:
    If you later change your Ingress resource configuration, you might need to delete and re-create your Ingress resource for AWS to pick up the changes.
    {{< /callout >}}
 
-4. Review the load balancer in the AWS EC2 dashboard. 
+3. Review the load balancer in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 
    2. Go to **Load Balancing > Load Balancers**. Find and open the ALB that was created for you. 
    3. On the **Resource map** tab, verify that the load balancer points to targets in your cluster. 
@@ -101,7 +106,7 @@ Keep in mind the following considerations when working with an ALB:
    {{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy is unhealthy. Continue with this guide to create an HTTPRoute resource to open up a port in the ALB.
    {{< /callout >}}
  
-5. Create an HTTPRoute resource to open up a port on the gateway proxy. This step is required for AWS ELB health checks to pass. 
+4. Create an HTTPRoute resource to open up a port on the gateway proxy. This step is required for AWS ELB health checks to pass. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -124,7 +129,7 @@ Keep in mind the following considerations when working with an ALB:
    EOF
    ```
 
-6. Go back to the AWS EC2 console to verify that the AWS ELB checks now pass. 
+5. Go back to the AWS EC2 console to verify that the AWS ELB checks now pass. 
    {{< reuse-image src="img/alb.png" >}}
 
 ## Test the ALB
@@ -155,5 +160,5 @@ Keep in mind the following considerations when working with an ALB:
 kubectl delete ingress alb -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute httpbin-alb -n httpbin
 kubectl delete gateway alb -n {{< reuse "docs/snippets/ns-system.md" >}} 
-kubectl delete httplisteneroption alb-healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}} 
+kubectl delete HTTPListenerPolicy alb-healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}} 
 ```

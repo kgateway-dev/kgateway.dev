@@ -82,7 +82,7 @@ The following steps show how to deploy the AWS Load Balancer Controller in your 
 1. Create a GatewayParameters resource that you later use to configure your gateway. The following example configuration uses the most common AWS annotations. You might want to add other annotations to your configuration. For more information, see the [AWS Load Balancer Controller documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/annotations/). 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: gwparams

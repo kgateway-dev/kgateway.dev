@@ -18,7 +18,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HttpListenerPolicy
+   kind: HTTPListenerPolicy
    metadata:
      name: healthcheck
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -86,5 +86,5 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete HttpListenerPolicy healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete HTTPListenerPolicy healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
