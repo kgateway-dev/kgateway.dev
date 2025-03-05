@@ -13,3 +13,12 @@
 - description: Deep dive into how to configure HTTPS routes with the Kubernetes Gateway API and kgateway.
   href: https://youtu.be/cOnL9vjVRvQ?si=KDfDuWSypcc5KkEr
   thumbnailHref: /thumbnails/configuring-https.jpg
+
+- description: Explore the roles and responsibilities of Gateway API and learn how to build a shared gateway.
+  href: https://youtu.be/O3_za6WU_iA?si=yklId_SKODrwZ4UX
+  thumbnailHref: /thumbnails/shared-gateways.jpg
+
+- description: Learn HTTP traffic management features including request matching, URL rewriting, traffic splitting and header modification.
+  href: https://youtu.be/CGF3aZXOyxc
+  thumbnailHref: /thumbnails/exploring-gateway-api-routing-rules.jpg
+  

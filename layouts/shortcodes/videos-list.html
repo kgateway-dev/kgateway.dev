@@ -58,16 +58,16 @@
     {{ end }} -->
     <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
       {{ range $data }}
-        <div class='tag-{{ replace .tag " " "" }} w-[386px] card flex flex-col items-start pb-3 gap-4 justify-between rounded-[.625rem] border-2 border-[#6052f6]'>
+        <div class='tag-{{ replace .tag " " "" }} w-[386px] card flex flex-col items-start rounded-[.625rem] pb-3 gap-4 justify-between border-2 border-[#6052f6] bg-primary-[#6052f6]'>
           {{ if .thumbnailHref }}
-            <div class="bg-primary-bg h-[216px] w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat"></div>
+            <div class="bg-primary-[#6052f6] h-[216px] w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat mt-[-2px] ml-[-1px]"></div>
           {{ else }}
-            <div class="thumbnail bg-primary-bg min-h-[15.625rem] w-[24.5rem] rounded-[.625rem]"></div>
+            <div class="thumbnail bg-primary-[#6052f6] min-h-[15.625rem] w-[24.5rem]"></div>
           {{ end }}
-          <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-4 bg-white">
             <p class="text-primary-text px-2">{{ .description }}</p>
+            <a href="{{ .href }}" class="bg-[#6458f4] rounded-[.625rem] mx-2 p-2 text-white flex flex-row items-center font-medium gap-4 w-fit">Watch Video</a>
           </div>
-          <a href="{{ .href }}" class="bg-[#6458f4] rounded-xl mx-2 p-2 text-white flex flex-row items-center font-medium gap-4">Watch Video</a>
         </div>
       {{ end }}
     </div>
