@@ -24,9 +24,12 @@ The [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/) custom resourc
 
 To spin up a Gateway and manage its lifecycle, a gateway controller is used. The gateway controller is defined in the  [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) resource and manages the underlying infrastructure to ensure that traffic to endpoints is routed accordingly. When you install {{< reuse "docs/snippets/product-name.md" >}}, a GatewayClass resource is automatically created that points to the {{< reuse "docs/snippets/product-name.md" >}} controller. For more information, see [GatewayClass](/docs/setup/default/#gatewayclass). 
 
-### HTTPRoute
+### HTTPRoute and TCPRoute {#httproute}
 
-To configure routing, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides several routing resources, such as an HTTPRoute, TLSRoute, or GRPCRoute. These routes attach to a Gateway resource and define how incoming traffic is matched and forwarded to a backing destination. The most commonly used route resource is the [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/) that configures traffic routing for HTTP and HTTPS traffic. 
+To configure routing, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides several routing resources, such as an HTTPRoute and TCPRoute. These routes attach to a Gateway resource and define how incoming traffic is matched and forwarded to a backing destination.
+
+* [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/): The most commonly used route resource, that configures traffic routing for HTTP and HTTPS traffic. 
+* [TCPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute): A resource to route TCP requests.
 
 While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides the functionality for basic request matching, redirects, rewrites, and header manipulation, it is missing more complex traffic management, resiliency, and security features, such as transformations, fault injection, access logging, or route delegation. 
 
