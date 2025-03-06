@@ -108,7 +108,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
    2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a values file for the upgrade version by pulling and inspecting the Helm chart locally.
       
       ```sh
-      helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v$NEW_VERSION
+      helm pull oci://cr.kgateway.dev/charts/kgateway --version v$NEW_VERSION
       tar -xvf kgateway-v$NEW_VERSION.tgz
       open kgateway/values.yaml
       ```
@@ -121,7 +121,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
    {{< /callout >}}
    
    ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/charts/kgateway \
      -f kgateway.yaml \
      --version v$NEW_VERSION
    ```
@@ -134,7 +134,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
    
    Example output:
    ```
-   cr.kgateway.dev/kgateway-dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
+   cr.kgateway.dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
 8. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
