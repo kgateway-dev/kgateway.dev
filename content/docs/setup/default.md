@@ -16,12 +16,18 @@ When you install {{< reuse "docs/snippets/product-name.md" >}}, a default Gatewa
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
-  name: gloo-gateway
+  name: kgateway
 spec:
-  controllerName: solo.io/gloo-gateway
+  controllerName: kgateway.dev/kgateway
+  description: KGateway Controller
+  parametersRef:
+    group: gateway.kgateway.dev
+    kind: GatewayParameters
+    name: kgateway
+    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
 ```
 
-The `solo.io/gloo-gateway` controller implements the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and provides an abstraction of the gateway's underlying infrastructure. The controller watches the resources in your cluster. When a Gateway resource is created that references this GatewayClass, the controller spins up an Envoy-based gateway proxy by using the configuration that is defined in the GatewayParameters resource. The controller also translates other resources, such as HTTPRoute, RouteOption, VirtualHostOption, and more, into valid Envoy configuration, and applies the configuration to the gateway proxies it manages. 
+The `kgateway.dev/kgateway` controller implements the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and provides an abstraction of the gateway's underlying infrastructure. The controller watches the resources in your cluster. When a Gateway resource is created that references this GatewayClass, the controller spins up an Envoy-based gateway proxy by using the configuration that is defined in the GatewayParameters resource. The controller also translates other resources, such as HTTPRoute, RouteOption, VirtualHostOption, and more, into valid Envoy configuration, and applies the configuration to the gateway proxies it manages. 
 
 ## Gateway proxy template
 
@@ -52,35 +58,35 @@ Do not edit or change the Settings resource directly. Always update the values i
 
 To view the default Settings resource, run the following command:
 ```sh
-kubectl get settings default -n gloo-system -o yaml
+kubectl get settings default -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
 ```
 
-When you follow the [Get started](/docs/quickstart/) guide, the following Settings resource is created for you. To understand each setting, check out the [Settings custom resource documentation](/docs/reference/api/settings). 
+When you follow the [Get started](/docs/quickstart/) guide, the following Settings resource is created for you. To understand each setting, check out the [Settings custom resource documentation](/docs/reference/api/top-level/settings.proto.sk/). 
 ```yaml
 apiVersion: gloo.solo.io/v1
 kind: Settings
 metadata:
   annotations:
-    meta.helm.sh/release-name: gloo-gateway
-    meta.helm.sh/release-namespace: gloo-system
+    meta.helm.sh/release-name: kgateway
+    meta.helm.sh/release-namespace: {{< reuse "docs/snippets/ns-system.md" >}}
   generation: 1
   labels:
     app: gloo
     app.kubernetes.io/managed-by: Helm
     gloo: settings
   name: default
-  namespace: gloo-system
+  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
 spec:
   consoleOptions:
     apiExplorerEnabled: true
     readOnly: false
   discovery:
     fdsMode: WHITELIST
-  discoveryNamespace: gloo-system
+  discoveryNamespace: {{< reuse "docs/snippets/ns-system.md" >}}
   extauth:
     extauthzServerRef:
       name: extauth
-      namespace: gloo-system
+      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
     transportApiVersion: V3
     userIdHeader: x-user-id
   gateway:
@@ -123,7 +129,7 @@ spec:
     rateLimitBeforeAuth: false
     ratelimitServerRef:
       name: rate-limit
-      namespace: gloo-system
+      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
   refreshRate: 60s
 status:
   statuses: {}

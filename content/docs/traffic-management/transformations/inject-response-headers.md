@@ -14,12 +14,12 @@ The following example walks you through how to use an Inja template to extract a
    
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        transformations:
@@ -32,7 +32,7 @@ The following example walks you through how to use an Inja template to extract a
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -84,6 +84,6 @@ The following example walks you through how to use an Inja template to extract a
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete virtualhostoption transformation -n gloo-system
+kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
    

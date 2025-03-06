@@ -14,12 +14,12 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you change the request path and HTTP method when a `foo: bar` header is present in the request.   
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        transformations:
@@ -40,7 +40,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -170,6 +170,6 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete virtualhostoption transformation -n gloo-system
+kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
    

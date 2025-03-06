@@ -21,7 +21,7 @@ To test whether a YAML file is accepted by the validation webhook, you can use t
 Try to create a RouteOption with an invalid fault injection configuration and verify that your resource is denied by the validation API. The following example is missing the required HTTP status code field that is returned when the request is aborted. 
 ```yaml
 kubectl apply -n httpbin --dry-run=server -f- <<EOF
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: RouteOption
 metadata:
   name: faults
@@ -38,7 +38,7 @@ EOF
 
 Example output:
 ```console
-Error from server: error when creating "STDIN": admission webhook "gloo.gloo-system.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.RouteOption failed: 1 error occurred:
+Error from server: error when creating "STDIN": admission webhook "gloo.{{< reuse "docs/snippets/ns-system.md" >}}.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.RouteOption failed: 1 error occurred:
 * Validating *v1.RouteOption failed: validating *v1.RouteOption name:"faults"  namespace:"httpbin": 1 error occurred:
 * Route Error: ProcessingError. Reason: *faultinjection.plugin: invalid abort status code '0', must be in range of [200,600). Route Name: 
 ```
@@ -49,7 +49,7 @@ Error from server: error when creating "STDIN": admission webhook "gloo.gloo-sys
 Try to create a VirtualHostOption resource with an invalid retry policy. In the following example, the `baseInterval` is greater than the `maxInterval`. Verify that the configuration is rejected.  
 ```yaml
 kubectl apply --dry-run=server -f- <<EOF
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: VirtualHostOption
 metadata:
   name: bad-retries
@@ -71,7 +71,7 @@ EOF
    
 Example output: 
 ```console
-Error from server: error when creating "STDIN": admission webhook "gloo.gloo-system.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.VirtualHostOption failed: 1 error occurred:
+Error from server: error when creating "STDIN": admission webhook "gloo.{{< reuse "docs/snippets/ns-system.md" >}}.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.VirtualHostOption failed: 1 error occurred:
   * Validating *v1.VirtualHostOption failed: validating *v1.VirtualHostOption name:"bad-retries"  namespace:"default": 1 error occurred:
   * VirtualHost Error: ProcessingError. Reason: invalid virtual host [vhost] while processing plugin basic_route: base interval: 1000 is > max interval: 1
 ```
@@ -95,7 +95,7 @@ The validation API currently assumes that all configuration that is sent to the 
 
 1. Port-forward the gloo service on port 8443. 
    ```sh
-   kubectl -n gloo-system port-forward service/gloo 8443:443
+   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} port-forward service/gloo 8443:443
    ```
 
 2. Send a request with your resource configuration to the {{< reuse "docs/snippets/product-name.md" >}} validation API. The following example shows successful and unsuccessful resource configuration validation for the RouteOption and VirtualHostOption resources.
@@ -105,7 +105,7 @@ The validation API currently assumes that all configuration that is sent to the 
    The following RouteOption resource configures an invalid fault injection policy that aborts 50% of all traffic. The configuration is missing an HTTP status code. 
 
    ```yaml
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: faults
@@ -122,7 +122,7 @@ The validation API currently assumes that all configuration that is sent to the 
    
    1. Send a request to the validation API and pass in the invalid RouteOption configuration. Verify that the configuration is rejected.
       ```sh
-      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"RouteOption"},"resource":{"group":"","version":"","resource":""},"name":"faults","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.solo.io/v1", "kind": "RouteOption", "metadata": { "name": "faults", "namespace": "httpbin" }, "spec": { "options": { "faults": { "abort": { "percentage": "50" } }}}}}}' \
+      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"RouteOption"},"resource":{"group":"","version":"","resource":""},"name":"faults","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.kgateway.dev/v1alpha1", "kind": "RouteOption", "metadata": { "name": "faults", "namespace": "httpbin" }, "spec": { "options": { "faults": { "abort": { "percentage": "50" } }}}}}}' \
       -H 'Content-Type: application/json' https://localhost:8443/validation 
       ```
       
@@ -133,7 +133,7 @@ The validation API currently assumes that all configuration that is sent to the 
 
    2. Add the HTTP status code field to the RouteOption configuration (`"httpStatus": "503"`). Verify that the configuration is accepted. 
       ```sh
-      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"RouteOption"},"resource":{"group":"","version":"","resource":""},"name":"faults","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.solo.io/v1", "kind": "RouteOption", "metadata": { "name": "faults", "namespace": "httpbin" }, "spec": { "options": { "faults": { "abort": { "percentage": "50", "httpStatus": "503" } }}}}}}' \
+      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"RouteOption"},"resource":{"group":"","version":"","resource":""},"name":"faults","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.kgateway.dev/v1alpha1", "kind": "RouteOption", "metadata": { "name": "faults", "namespace": "httpbin" }, "spec": { "options": { "faults": { "abort": { "percentage": "50", "httpStatus": "503" } }}}}}}' \
       -H 'Content-Type: application/json' https://localhost:8443/validation 
       ```
 
@@ -149,7 +149,7 @@ The validation API currently assumes that all configuration that is sent to the 
    The following VirtualHostOption resource configures an invalid retry policy that sets a `maxInterval` that is smaller than the `baseInterval`. 
 
    ```yaml
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: bad-retries
@@ -173,7 +173,7 @@ The validation API currently assumes that all configuration that is sent to the 
    
    1. Send a request to the validation API and pass in the invalid VirtualHostOption configuration. Verify that the configuration is rejected.
       ```sh
-      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.solo.io/v1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"1ms"} } }}}}}' \
+      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.kgateway.dev/v1alpha1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"1ms"} } }}}}}' \
       -H 'Content-Type: application/json' https://localhost:8443/validation 
       ```
 
@@ -184,7 +184,7 @@ The validation API currently assumes that all configuration that is sent to the 
   
    2. Change the `maxInterval` to an invalid value, such as `5` (`"maxInterval":"5"`). This value is missing the time unit. Verify that the configuration is rejected. 
       ```sh
-      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.solo.io/v1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"5"} } }}}}}' \
+      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.kgateway.dev/v1alpha1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"5"} } }}}}}' \
       -H 'Content-Type: application/json' https://localhost:8443/validation
       ```
       
@@ -195,7 +195,7 @@ The validation API currently assumes that all configuration that is sent to the 
 
    3. Change the `maxInterval` to a value that is greater than the `baseInterval`, such as `5s` (`"maxInterval":"5s"`). Verify that your configuration is now accepted. 
       ```sh
-      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.solo.io/v1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"5s"} } }}}}}' \
+      curl -k -XPOST -d '{"request":{"uid":"1234","kind":{"group":"gateway.solo.io","version":"v1","kind":"VirtualHostOption"},"resource":{"group":"","version":"","resource":""},"name":"bad-retries","namespace":"httpbin","operation":"CREATE","userInfo":{},"object": { "apiVersion": "gateway.kgateway.dev/v1alpha1", "kind": "VirtualHostOption", "metadata": { "name": "bad-retries", "namespace": "httpbin" }, "spec": { "targetRefs": [{ "group": "gateway.networking.k8s.io", "kind": "Gateway", "name": "http", "sectionName": "http" }], "options": { "retries": { "retryOn": "5xx", "retryBackOff": { "baseInterval": "1s", "maxInterval":"5s"} } }}}}}' \
       -H 'Content-Type: application/json' https://localhost:8443/validation
       ```
 
@@ -226,7 +226,7 @@ The {{< reuse "docs/snippets/product-name.md" >}} validation API is implemented 
       "resource": ""
     },
     "name": "vs-dry-run",
-    "namespace": "gloo-system",
+    "namespace": "{{< reuse "docs/snippets/ns-system.md" >}}",
     "operation": "CREATE",
     "userInfo": {
       "username": "system:serviceaccount:kube-system:my-serviceaccount",

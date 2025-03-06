@@ -1,8 +1,12 @@
 {{ define "main" }}
+<div class="w-full absolute top-20 lg:top-25 z-10">
+    {{ partial "announcement.html" .}}
+</div>
 <div class='mx-auto flex bg-white text-primary-dark'>
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
     <article class="w-full break-words flex justify-center">
-        <main class="w-full overflow-hidden">
+        <main class="w-full relative overflow-hidden">
+            {{ partial "nav.html" }}
             {{ .Content }}
         </main>
     </article>

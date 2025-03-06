@@ -20,26 +20,26 @@ Add response headers to responses before they are sent back to the client.
 
 Use a VirtualHostOption resource to add response headers for responses from all routes that the gateway serves.
 
-1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: gloo-gateway` header is added to each response.  
+1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: kgateway` header is added to each response.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        headerManipulation:
          responseHeadersToAdd: 
            - header:
                key: "my-header"
-               value: "gloo-gateway"
+               value: "kgateway"
      targetRefs:
        group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -70,15 +70,15 @@ Use a VirtualHostOption resource to add response headers for responses from all 
    content-length: 3
    < x-envoy-upstream-service-time: 0
    x-envoy-upstream-service-time: 0
-   < my-header: gloo-gateway
-   my-header: gloo-gateway
+   < my-header: kgateway
+   my-header: kgateway
    < server: envoy
    server: envoy
    ```
    
 3. Optional: Clean up the resources that you created. 
    ```sh
-   kubectl delete virtualhostoption header-manipulation -n gloo-system
+   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 {{% /tab %}}
@@ -86,10 +86,10 @@ Use a VirtualHostOption resource to add response headers for responses from all 
    
 Use a RouteOption resource to add response headers to responses from a specific route.
 
-1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `my-response: gloo-gateway` header is added to each response.  
+1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `my-response: kgateway` header is added to each response.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -100,14 +100,14 @@ Use a RouteOption resource to add response headers to responses from a specific 
          responseHeadersToAdd:
            - header:
                key: "my-response"
-               value: "gloo-gateway"
+               value: "kgateway"
    EOF
    ```
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOptions that you just created. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-headers
@@ -115,7 +115,7 @@ Use a RouteOption resource to add response headers to responses from a specific 
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -158,8 +158,8 @@ Use a RouteOption resource to add response headers to responses from a specific 
    content-length: 3
    < x-envoy-upstream-service-time: 0
    x-envoy-upstream-service-time: 0
-   < my-response: gloo-gateway
-   my-response: gloo-gateway
+   < my-response: kgateway
+   my-response: kgateway
    < server: envoy
    server: envoy
    ```
@@ -216,12 +216,12 @@ Remove specific headers from all responses from the routes that the gateway serv
    
 2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `content-length` header is removed from each response.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        headerManipulation:
@@ -230,7 +230,7 @@ Remove specific headers from all responses from the routes that the gateway serv
        group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -267,7 +267,7 @@ Remove specific headers from all responses from the routes that the gateway serv
 
 4. Optional: Clean up the resources that you created. 
    ```sh
-   kubectl delete virtualhostoption header-manipulation -n gloo-system
+   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 {{% /tab %}}
@@ -311,7 +311,7 @@ You can remove HTTP headers from a response of a specific route before the respo
 2. Create a RouteOption resource to specify your header manipulation rules. In this example, you remove the `content-length` response header from each response. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -327,7 +327,7 @@ You can remove HTTP headers from a response of a specific route before the respo
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-headers
@@ -335,7 +335,7 @@ You can remove HTTP headers from a response of a specific route before the respo
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - headers.example
      rules:

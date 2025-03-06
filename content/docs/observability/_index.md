@@ -18,7 +18,7 @@ In this guide, you deploy an OpenTelemetry collector that scapes metrics from th
 If you do not want to deploy an OpenTelemetry collector and Grafana, you can quickly see the raw Prometheus metrics that are automatically exposed on the gateway proxy by accessing the Prometheus metrics on your gateway. 
 1. Port-forward the gateway deployment on port 19000.
    ```sh
-   kubectl -n gloo-system port-forward deployment/gloo-proxy-http 19000
+   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} port-forward deployment/http 19000
    ```
 2. Access the gateway metrics by reviewing the [Prometheus statistics](http://localhost:19000/stats/prometheus). 
 {{% /callout %}}
@@ -69,7 +69,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
          config:
            scrape_configs:
            # Scrape the {{< reuse "docs/snippets/product-name.md" >}} proxies
-           - job_name: gloo-gateways
+           - job_name: kgateways
              honor_labels: true
              kubernetes_sd_configs:
              - role: pod
@@ -103,7 +103,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
          config:
            scrape_configs:
            # Scrape the {{< reuse "docs/snippets/product-name.md" >}} control plane
-           - job_name: gloo-gateways
+           - job_name: kgateways
              honor_labels: true
              kubernetes_sd_configs:
              - role: pod
@@ -137,7 +137,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
          config:
            scrape_configs:
            # Scrape the extauth and ratelimit workloads
-           - job_name: gloo-gateways
+           - job_name: kgateways
              honor_labels: true
              kubernetes_sd_configs:
              - role: pod

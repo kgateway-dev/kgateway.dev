@@ -2,10 +2,10 @@ GatewayParameters is a {{< reuse "docs/snippets/product-name.md" >}} custom reso
 
 When you install {{< reuse "docs/snippets/product-name.md" >}}, a default GatewayParameters resource is automatically created for you. You can review its configuration by using the following command:  
 ```sh
-kubectl get gatewayparameters gloo-gateway -n gloo-system -o yaml  
+kubectl get gatewayparameters kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
 ```
 
-To spin up new gateway proxies, the Gloo Gateway controller uses a [gateway proxy template](#gatewayproxytemplate) and the configuration in the default GatewayParameters and [Settings](#settings) resources. You can change the default configuration for your gateway proxies by updating the respective values in the Gloo Gateway Helm chart. You can also create additional GatewayParameters resources to spin up different types of gateway proxies. 
+To spin up new gateway proxies, the {{< reuse "docs/snippets/product-name.md" >}} controller uses a [gateway proxy template](#gatewayproxytemplate) and the configuration in the default GatewayParameters and [Settings](#settings) resources. You can change the default configuration for your gateway proxies by updating the respective values in the Gloo Gateway Helm chart. You can also create additional GatewayParameters resources to spin up different types of gateway proxies.
 
 {{% callout type="info" %}}
 Do not edit or change the default GatewayParameters resource directly. Always update the values in the Gloo Gateway Helm chart so that they persist between upgrades, or create your own GatewayParameters resource that holds your custom values. Note that you are responsible to maintain any GatewayParameters resources that you manually created.  

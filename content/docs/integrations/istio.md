@@ -1,7 +1,7 @@
 ---
 title: Istio service mesh
 weight: 530
-description: Use your k8sgateway proxy as the ingress gateway to control and secure traffic that enters your service mesh. 
+description: Use your kgateway proxy as the ingress gateway to control and secure traffic that enters your service mesh. 
 ---
 
 Use your {{< reuse "docs/snippets/product-name.md" >}} proxy as the ingress gateway to control and secure traffic that enters your service mesh.
@@ -22,7 +22,7 @@ The open source project Istio is the leading service mesh implementation that of
 
 ### About the Istio integration
 
-{{< reuse "docs/snippets/product-name.md" >}} comes with an Istio integration that allows you to configure your gateway proxy with an Istio sidecar. The Istio sidecar uses mutual TLS (mTLS) to prove its identity and to secure the connection between your gateway and the services in your Istio service mesh. In addition, you can control and secure the traffic that enters the mesh by applying all the advanced routing, traffic management, security, and resiliency capabilities that {{< reuse "docs/snippets/product-name.md" >}} offers.  
+{{< reuse "docs/snippets/product-name-caps.md" >}} comes with an Istio integration that allows you to configure your gateway proxy with an Istio sidecar. The Istio sidecar uses mutual TLS (mTLS) to prove its identity and to secure the connection between your gateway and the services in your Istio service mesh. In addition, you can control and secure the traffic that enters the mesh by applying all the advanced routing, traffic management, security, and resiliency capabilities that {{< reuse "docs/snippets/product-name.md" >}} offers.  
 
 ## Before you begin
 
@@ -68,8 +68,8 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
 
 3. Get the Helm values for your current {{< reuse "docs/snippets/product-name.md" >}} installation. 
    ```sh
-   helm get values gloo-gateway -n gloo-system -o yaml > gloo-gateway.yaml
-   open gloo-gateway.yaml
+   helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
+   open kgateway.yaml
    ```
    
 4. Add the following values to the Helm value file. Make sure that you change the `istioProxyContainer` values to the service address and cluster name of your Istio installation.
@@ -99,34 +99,34 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    
 5. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation. 
    ```sh
-   helm upgrade -n gloo-system gloo-gateway gloo/gloo \
-      -f gloo-gateway.yaml \
-      --version={{< reuse "docs/versions/gloo_oss_patch.md" >}}
+   helm upgrade -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway kgateway/kgateway \
+      -f kgateway.yaml \
+      --version={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Verify that your `gloo-proxy-http` pod is restarted with 3 containers now: `gateway-proxy`, `istio-proxy`, and `sds`. 
+6. Verify that your `http` pod is restarted with 3 containers now: `gateway-proxy`, `istio-proxy`, and `sds`. 
    ```sh
-   kubectl get pods -n gloo-system | grep gloo-proxy-http
+   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep http
    ```
    
    Example output: 
    ```
-   gloo-proxy-http-f7cd596b7-tv5z7    3/3     Running            0              3h31m
+   http-f7cd596b7-tv5z7    3/3     Running            0              3h31m
    ```
    
 7. Optional: Review the GatewayParameters resource and verify that the `istioDiscoveryAddress`, `istioMetaClusterId`, and `istioMetaMeshId` are set to the values from your Helm chart. 
    ```sh
-   kubectl get gatewayparameters gloo-gateway -n gloo-system -o yaml
+   kubectl get gatewayparameters kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
    
    Example output: 
    ```console {hl_lines=[20,21,22]}
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      annotations:
-       meta.helm.sh/release-name: gloo-gateway
-       meta.helm.sh/release-namespace: gloo-system
+       meta.helm.sh/release-name: kgateway
+       meta.helm.sh/release-namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    ...
    spec:
      kube:
@@ -146,13 +146,13 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
            logLevel: warning
         podTemplate:
          extraLabels:
-           gloo: kube-gateway
+           kgateway: kube-gateway
    ...
    ```
 
 8. Optional: Review the Settings resource and verify that `appendXForwardedHost`, `enableAutoMtls`, and `enableIntegration` are all set to `true`. 
    ```sh
-   kubectl get settings default -n gloo-system -o yaml
+   kubectl get settings default -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
    
    Example output: 
@@ -161,15 +161,15 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    kind: Settings
    metadata:
      annotations:
-       meta.helm.sh/release-name: gloo-gateway
-       meta.helm.sh/release-namespace: gloo-system
+       meta.helm.sh/release-name: kgateway
+       meta.helm.sh/release-namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      consoleOptions:
        apiExplorerEnabled: true
        readOnly: false
      discovery:
        fdsMode: WHITELIST
-     discoveryNamespace: gloo-system
+     discoveryNamespace: {{< reuse "docs/snippets/ns-system.md" >}}
      gloo:
        ...
        istioOptions:
@@ -242,7 +242,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
         "8189f0a6c4e3582792744e97e79d8f22"
       ],
       "X-Forwarded-Client-Cert": [
-        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/gloo-system/sa/gloo-proxy-http"
+        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/http"
       ],
       "X-Forwarded-Proto": [
         "http"
@@ -256,16 +256,16 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    
 ## Exclude a service from mTLS 
 
-You can exclude a service from requiring to communicate with the gateway proxy via mTLS by adding the `disableIstioAutoMtls` option to the Upstream that represents your service. 
+You can exclude a service from requiring to communicate with the gateway proxy via mTLS by adding the `disableIstioAutoMtls` option to the Backend that represents your service. 
 
-1. Create an Upstream resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Upstream from communicating with the gateway proxy via mTLS. 
+1. Create an Backend resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Backend from communicating with the gateway proxy via mTLS. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      name: httpbin
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      disableIstioAutoMtls: true
      kube:
@@ -275,24 +275,24 @@ You can exclude a service from requiring to communicate with the gateway proxy v
    EOF
    ```
    
-2. Create an HTTPRoute resource that routes traffic to the httpbin Upstream that you created. 
+2. Create an HTTPRoute resource that routes traffic to the httpbin Backend that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: exclude-automtls
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - disable-automtls.example
      rules:
        - backendRefs:
          - name: httpbin
-           kind: Upstream
+           kind: Backend
            group: gloo.solo.io
    EOF
    ```
@@ -366,7 +366,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
         "curl/7.77.0"
       ],
       "X-Forwarded-Client-Cert": [
-        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/gloo-system/sa/gloo-proxy-http"
+        "By=spiffe://gloo-edge-docs-mgt/ns/httpbin/sa/httpbin;Hash=3a57f9d8fddea59614b4ade84fcc186edeffb47794c06608068a3553e811bdfe;Subject=\"\";URI=spiffe://gloo-edge-docs-mgt/ns/{{< reuse "docs/snippets/ns-system.md" >}}/sa/http"
       ],
       "X-Forwarded-Proto": [
         "http"
@@ -384,10 +384,8 @@ You can exclude a service from requiring to communicate with the gateway proxy v
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 1. Follow the [Uninstall guide in the Gloo Mesh Enterprise documentation](https://docs.solo.io/gloo-mesh-enterprise/main/setup/uninstall/) to remove Gloo Mesh Enterprise. 
-   
-2. Follow the [upgrade guide](/docs/operations/upgrade/) to upgrade your {{< reuse "docs/snippets/product-name.md" >}} Helm installation values. Remove the Helm values that you added as part of this guide. 
 
-3. Remove the Istio sidecar from the httpbin app. 
+2. Remove the Istio sidecar from the httpbin app. 
    1. Remove the Istio label from the httpbin namespace. 
       ```sh
       kubectl label ns httpbin istio.io/rev-
@@ -407,11 +405,14 @@ You can exclude a service from requiring to communicate with the gateway proxy v
       httpbin-7d4965fb6d-mslx2   3/3     Running       0          6s
       ```
 
-4. Remove the Upstream and HTTPRoute that you used to exclude a service from mTLS. 
+3. Remove the Backend and HTTPRoute that you used to exclude a service from mTLS. 
    ```sh
-   kubectl delete upstream httpbin -n gloo-system
-   kubectl delete httproute exclude-automtls -n gloo-system 
+   kubectl delete backend httpbin -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete httproute exclude-automtls -n {{< reuse "docs/snippets/ns-system.md" >}} 
    ```
 
+<!-- TODO: Upgrade guide   
+2. Follow the [upgrade guide](/docs/operations/upgrade/) to upgrade your {{< reuse "docs/snippets/product-name.md" >}} Helm installation values. Remove the Helm values that you added as part of this guide.
+-->
 
 

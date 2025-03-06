@@ -6,8 +6,8 @@
 
 2. Deploy the httpbin app into both namespaces. 
    ```sh
-   kubectl -n team1 apply -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml
-   kubectl -n team2 apply -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml
+   kubectl -n team1 apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+   kubectl -n team2 apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
    ```
 
 3. Verify that the httpbin apps are up and running. 

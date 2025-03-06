@@ -1,1 +1,1 @@
-gloo-system
+kgateway-system

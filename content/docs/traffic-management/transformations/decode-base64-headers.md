@@ -28,12 +28,12 @@ In the following example, you combine multiple Inja functions to accomplish the 
    
 1. Create a VirtualHostOption resource with your transformation rules. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: transformation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        transformations:
@@ -46,7 +46,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -98,6 +98,6 @@ In the following example, you combine multiple Inja functions to accomplish the 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete virtualhostoption transformation -n gloo-system
+kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
    

@@ -1,15 +1,15 @@
-- quote: "As one of the world's fastest-growing digital banks, Trust Bank has greatly benefited from integrating K8sGateway into our Kubernetes architecture. This has not only been an enabler of our rapid growth, but has also unlocked significant improvements in both resiliency and operational excellence—critical pillars for any regulated enterprise."
+- quote: "As one of the world's fastest-growing digital banks, Trust Bank has greatly benefited from integrating kgateway into our Kubernetes architecture. This has not only been an enabler of our rapid growth, but has also unlocked significant improvements in both resiliency and operational excellence—critical pillars for any regulated enterprise."
   name: Scott Gordon Maclure
   role: Head of Cloud Platform - Trust Bank
 
-- quote: "With over 16 million users of our application and a complex ecosystem of integrations, ParkMobile relies on K8sGateway and the supporting product suite for best-in-class API gateway and hybrid application communications that also adds in the power of monitoring and security to ensure peak performance of the platform at all times."
+- quote: "With over 16 million users of our application and a complex ecosystem of integrations, ParkMobile relies on kgateway and the supporting product suite for best-in-class API gateway and hybrid application communications that also adds in the power of monitoring and security to ensure peak performance of the platform at all times."
   name: Matt Ball
   role: CTO, ParkMobile
 
-- quote: "With K8sGateway, we gave access to a single, cloud native gateway that serves APIs spanning from legacy servers to modern, serverless and Kubernetes-based services. K8sGateway's robust technology, coupled with the collaborative maintainer team, allows us to deploy these capabilities across regions and cloud providers, while integrating with our authentication mechanism to deliver business requirements for advanced usage plans and with our CI/CD pipelines to enable Vonage’s autonomous team."
+- quote: "With kgateway, we gave access to a single, cloud native gateway that serves APIs spanning from legacy servers to modern, serverless and Kubernetes-based services. Kgateway's robust technology, coupled with the collaborative maintainer team, allows us to deploy these capabilities across regions and cloud providers, while integrating with our authentication mechanism to deliver business requirements for advanced usage plans and with our CI/CD pipelines to enable Vonage’s autonomous team."
   name: Sagi Dudai
   role: CTO, Vonage
 
-- quote: "K8sGateway checked all the boxes. API Gateway, advanced traffic routing, strong security controls, multi-cloud support and self-service for developers."
+- quote: "Kgateway checked all the boxes. API Gateway, advanced traffic routing, strong security controls, multi-cloud support and self-service for developers."
   name: Frédéric Médery
   role: Solutions Architect, AWS

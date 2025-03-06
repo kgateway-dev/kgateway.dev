@@ -6,7 +6,7 @@ weight: 10
 Enable a health check plugin on your gateway proxy to respond with common HTTP codes.
 
 ## About
-{{< reuse "docs/snippets/product-name.md" >}} includes an HTTP health checking plug-in that you can enable for a gateway proxy listener. This plug-in responds to health check requests directly with either a `200 OK` or `503 Service Unavailable` message, depending on the current draining state of Envoy.
+{{< reuse "docs/snippets/product-name-caps.md" >}} includes an HTTP health checking plug-in that you can enable for a gateway proxy listener. This plug-in responds to health check requests directly with either a `200 OK` or `503 Service Unavailable` message, depending on the current draining state of Envoy.
 
 ## Before you begin
 
@@ -14,14 +14,14 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
  
 ## Configure a health check on a gateway
 
-1. Create an HTTPListenerOption resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
+1. Create an HTTPListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: HttpListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HTTPListenerPolicy
    metadata:
      name: healthcheck
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -36,7 +36,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 2. To test the health check, drain the Envoy connections by sending an `HTTP POST` request to the `/healthcheck/fail` endpoint of the Envoy admin port.
    1. Port-forward the `gloo-gateway-http` deployment on port 19000.
       ```shell
-      kubectl port-forward deploy/gloo-proxy-http -n gloo-system 19000 &
+      kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &
       ```
    2. Send an `HTTP POST` request to the `/healthcheck/fail` endpoint. This causes Envoy connections to begin draining.
       ```sh
@@ -86,5 +86,5 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete HttpListenerOption healthcheck -n gloo-system
+kubectl delete HTTPListenerPolicy healthcheck -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

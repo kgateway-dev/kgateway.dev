@@ -78,12 +78,12 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    {{% tab %}}
    Create a VirtualHostOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. The example also sets the `corsPolicyMergeSettings` to configure how conflicting CORS policies at the virtual host and route levels are handled. In the example, you configure a `UNION` merge strategy for the `exposeHeaders` field. Now, the CORS policy applies to requests so that all the `exposeHeaders` values from both the virtual host and route are included. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`.
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: cors
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        corsPolicyMergeSettings:
@@ -108,7 +108,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
    {{% /tab %}}
@@ -116,7 +116,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    1. Create a RouteOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. 
       ```yaml
       kubectl apply -f- <<EOF
-      apiVersion: gateway.solo.io/v1
+      apiVersion: gateway.kgateway.dev/v1alpha1
       kind: RouteOption
       metadata:
         name: cors
@@ -145,7 +145,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
 2. Create an HTTPRoute resource for the Petstore app that applies the RouteOption resources that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: petstore-cors
@@ -153,7 +153,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - cors.example
      rules:
@@ -241,7 +241,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
 
 ```sh
 kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo/v1.16.x/example/petstore/petstore.yaml
-kubectl delete virtualhostoption cors -n gloo-system
+kubectl delete virtualhostoption cors -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete routeoption cors -n default
 kubectl delete httproute petstore-cors -n default
 ```

@@ -7,7 +7,7 @@ description: Set a maximum time for the gateway to handle a request, including e
 Set a maximum time for the gateway to handle a request, including error retries.
 
 ## About
-A timeout is the amount of time ([duration](https://protobuf.dev/reference/protobuf/google.protobuf/#duration)) that {{< reuse "docs/snippets/product-name.md" >}} waits for replies from an upstream service before the service is considered unavailable. This setting can be useful to avoid your apps from hanging or fail if no response is returned in a specific timeframe. With timeouts, calls either succeed or fail within a predicatble timeframe.
+A timeout is the amount of time ([duration](https://protobuf.dev/reference/protobuf/google.protobuf/#duration)) that {{< reuse "docs/snippets/product-name.md" >}} waits for replies from an backend service before the service is considered unavailable. This setting can be useful to avoid your apps from hanging or fail if no response is returned in a specific timeframe. With timeouts, calls either succeed or fail within a predicatble timeframe.
 
 The time an app needs to process a request can vary a lot which is why applying the same timeout across services can cause a variety of issues. For example, a timeout that is too long can result in excessive latency from waiting for replies from failing services. On the other hand, a timeout that is too short can result in calls failing unnecessarily while waiting for an operation that needs responses from multiple services.
 
@@ -26,7 +26,7 @@ Use a RouteOption resource to specify timeouts for a specific route.
 1. Create a RouteOption custom resource to specify your timeout rules. In the following example, the request must be completed within 20 seconds.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: timeout
@@ -40,7 +40,7 @@ Use a RouteOption resource to specify timeouts for a specific route.
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-timeout
@@ -48,7 +48,7 @@ Use a RouteOption resource to specify timeouts for a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - timeout.example
      rules:

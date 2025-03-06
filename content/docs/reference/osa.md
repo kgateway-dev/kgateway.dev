@@ -5,7 +5,7 @@ description: Review Open Source Attribution and Licenses.
 prev: /docs/reference/contribution
 ---
 
-## Third-party open source software in connection with K8sGateway
+## Third-party open source software in connection with kgateway
 
 Name|Version|License
 ---|---|---
@@ -92,7 +92,7 @@ Name|Version|License
 [envoyproxy/protoc-gen-validate](https://github.com/envoyproxy/protoc-gen-validate)|latest|Apache License 2.0
 [paulvollmer/2gobytes](https://github.com/paulvollmer/2gobytes)|latest|MIT License
 
-## Free Software under GNU General Public License, and Mozilla Public License Software utilized by K8sGateway
+## Free Software under GNU General Public License, and Mozilla Public License Software utilized by kgateway
 
 |Name|Version|License|
 ---|---|---

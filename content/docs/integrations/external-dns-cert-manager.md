@@ -18,7 +18,7 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
 1. Create an HTTP route resource to expose httpbin on your domain. Replace `<my-domain.com>` with your domain. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin
@@ -28,7 +28,7 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
    spec:
      parentRefs:
        - name: http
-         namespace: gloo-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - "<my-domain.com>"
      rules:
@@ -138,7 +138,7 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
    kind: Issuer
    metadata:
      name: letsencrypt-http
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      acme:
        email: hello@world.com
@@ -152,14 +152,14 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
              gatewayHTTPRoute:
                parentRefs:
                  - name: http
-                   namespace: gloo-system
+                   namespace: {{< reuse "docs/snippets/ns-system.md" >}}
                    kind: Gateway
    EOF
    ```  
 
 3. Verify that your TLS certificates are created successfully. Note that depending on the CA that you use, this process might take a while to complete. 
    ```sh
-   kubectl get issuer letsencrypt-http -n gloo-system
+   kubectl get issuer letsencrypt-http -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
    Example output for successfully issued TLS certificates: 
@@ -177,7 +177,7 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
    
 4. Verify that the TLS certificate was added to the secret that you configured in the Cert Manager issuer resource. 
     ```sh
-    kubectl get secret letsencrypt-http-issuer-account-key -n gloo-system -o yaml
+    kubectl get secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
     ```
 
 ## Configure an HTTPS listener on your gateway
@@ -191,9 +191,9 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
      name: http
      annotations:
        cert-manager.io/issuer: letsencrypt-http
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     gatewayClassName: gloo-gateway
+     gatewayClassName: kgateway
      listeners:
      - allowedRoutes:
          namespaces:
@@ -218,13 +218,13 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
    
 2. Verify that the gateway is configured successfully. You can also review the external address that is assigned to the gateway. 
    ```sh
-   kubectl get gateway http -n gloo-system
+   kubectl get gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
    Example output for an AWS EKS cluster: 
    ```console
    NAME   CLASS          ADDRESS                                                                  PROGRAMMED   AGE
-   http   gloo-gateway   a3a6c06e2f4154185bf3f8af46abf22e-139567718.us-east-2.elb.amazonaws.com   True         93s
+   http   kgateway  a3a6c06e2f4154185bf3f8af46abf22e-139567718.us-east-2.elb.amazonaws.com   True         93s
    ```
 
 ## Test your HTTPS listener

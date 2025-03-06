@@ -17,7 +17,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 1. Create an HTTP route for the httpbin app that you created as part of the [Get started guide](/docs/quickstart/). In the following example, requests for the `host.redirect.example` domain are redirected to the `www.example.com` hostname, and a 302 HTTP response code is returned to the user.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-redirect
@@ -25,7 +25,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: gloo-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - host.redirect.example
      rules:

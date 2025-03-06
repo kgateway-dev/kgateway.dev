@@ -20,7 +20,7 @@ Uninstall {{< reuse "docs/snippets/product-name.md" >}}.
       --delete-crds           Delete all {{< reuse "docs/snippets/product-name.md" >}} crds (all custom {{< reuse "docs/snippets/product-name.md" >}} objects will be deleted)
       --delete-namespace      Delete the namespace (all objects written to this namespace will be deleted)
   -h, --help                  help for uninstall
-  -n, --namespace string      namespace in which {{< reuse "docs/snippets/product-name.md" >}} is installed (default "gloo-system")
+  -n, --namespace string      namespace in which {{< reuse "docs/snippets/product-name.md" >}} is installed (default "{{< reuse "docs/snippets/ns-system.md" >}}")
       --release-name string   helm release name (default "gloo")
   -v, --verbose               If true, output from kubectl commands will print to stdout/stderr
 ```

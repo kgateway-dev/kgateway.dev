@@ -20,26 +20,26 @@ Add request headers to incoming requests.
 
 Use a VirtualHostOption resource to add request headers to all requests that the gateway serves. 
 
-1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: gloo-gateway` header is added to each request.  
+1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: kgateway` header is added to each request.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        headerManipulation:
          requestHeadersToAdd: 
            - header:
                key: "my-header"
-               value: "gloo-gateway"
+               value: "kgateway"
      targetRefs:
        group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -69,7 +69,7 @@ Use a VirtualHostOption resource to add request headers to all requests that the
         "www.example.com:8080"
       ],
       "My-Header": [
-        "gloo-gateway"
+        "kgateway"
       ],
       "User-Agent": [
         "curl/7.77.0"
@@ -90,7 +90,7 @@ Use a VirtualHostOption resource to add request headers to all requests that the
 
 3. Optional: Remove the resources that you created. 
    ```sh
-   kubectl delete virtualhostoption header-manipulation -n gloo-system
+   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 {{% /tab %}}
@@ -98,10 +98,10 @@ Use a VirtualHostOption resource to add request headers to all requests that the
    
 Use a RouteOption resource to add request headers for incoming requests to a specific route. 
 
-1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: gloo-gateway` header is added to each request. If this header is already present in the request, the value is overwritten with `gloo-gateway` (`append: false`). 
+1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request. If this header is already present in the request, the value is overwritten with `kgateway` (`append: false`). 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -112,7 +112,7 @@ Use a RouteOption resource to add request headers for incoming requests to a spe
          requestHeadersToAdd:
            - header:
                key: "my-header"
-               value: "gloo-gateway"
+               value: "kgateway"
              append: false
    EOF
    ```
@@ -120,7 +120,7 @@ Use a RouteOption resource to add request headers for incoming requests to a spe
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-headers
@@ -128,7 +128,7 @@ Use a RouteOption resource to add request headers for incoming requests to a spe
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -176,7 +176,7 @@ Use a RouteOption resource to add request headers for incoming requests to a spe
          "headers.example:8080"
        ],
        "My-Header": [
-         "gloo-gateway"
+         "kgateway"
        ],
       "User-Agent": [
          "curl/7.77.0"
@@ -204,33 +204,33 @@ Add headers from a Kubernetes secret to each request that the gateway serves.
 
 1. Create a Kubernetes secret of type `gloo.solo.io/header` or `Opaque` that contains the headers that you want to add to a request. The following command creates a Kubernetes secret of type `gloo.solo.io/header` with two headers `x-header-1: one` and `x-header-2: two`. 
    ```sh
-   {{< reuse "docs/snippets/cli-name.md" >}} create secret header my-headers --headers x-header-1=one,x-header-2=two -n gloo-system
+   {{< reuse "docs/snippets/cli-name.md" >}} create secret header my-headers --headers x-header-1=one,x-header-2=two -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
    {{< callout type="info" >}}
    Make sure that the secret is created in the same namespace that your gateway is deployed to.
    {{< /callout >}}
 
-2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `myheader: gloo-gateway` header is added to each request.  
+2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        headerManipulation:
          requestHeadersToAdd: 
            - headerSecretRef:
                name: my-headers
-               namespace: gloo-system
+               namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      targetRefs:
        group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -283,8 +283,8 @@ Add headers from a Kubernetes secret to each request that the gateway serves.
 
 4. Optional: Remove the resources that you created. 
    ```sh
-   kubectl delete virtualhostoption header-manipulation -n gloo-system
-   kubectl delete secret my-headers -n gloo-system
+   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete secret my-headers -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
 {{% /tab %}}
@@ -301,10 +301,10 @@ Add headers from a Kubernetes secret for requests to a specific route.
    Make sure that the secret is created in the same namespace that your gateway is deployed to.
    {{< /callout >}}
    
-2. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: gloo-gateway` header is added to each request. If this header is already present in the request, the value is overwritten with `gloo-gateway` (`append: false`). 
+2. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `myheader: kgateway` header is added to each request. If this header is already present in the request, the value is overwritten with `kgateway` (`append: false`). 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -322,7 +322,7 @@ Add headers from a Kubernetes secret for requests to a specific route.
 3. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-headers
@@ -330,7 +330,7 @@ Add headers from a Kubernetes secret for requests to a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -451,12 +451,12 @@ Remove specific headers from all requests to the routes that the gateway serves.
 
 2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `User-Agent` header is removed from each request.  
    ```yaml
-   kubectl apply -n gloo-system -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: header-manipulation
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      options:
        headerManipulation:
@@ -465,7 +465,7 @@ Remove specific headers from all requests to the routes that the gateway serves.
        group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
@@ -504,7 +504,7 @@ Remove specific headers from all requests to the routes that the gateway serves.
 
 4. Optional: Clean up the resources that you created.  
    ```sh
-   kubectl delete virtualhostoption header-manipulation -n gloo-system
+   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
 {{% /tab %}}
@@ -552,7 +552,7 @@ Remove specific headers from requests to a specific route.
 2. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `User-Agent` header is removed from the request. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: header-manipulation
@@ -568,7 +568,7 @@ Remove specific headers from requests to a specific route.
 3. Create the HTTPRoute resource for the httpbin app that removes the `User-Agent` header when requests are sent to the `headers.example` domain. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-headers
@@ -576,7 +576,7 @@ Remove specific headers from requests to a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - headers.example
      rules:

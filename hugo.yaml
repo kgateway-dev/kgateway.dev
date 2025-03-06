@@ -1,11 +1,11 @@
 baseURL: "/"
 enableRobotsTXT: true
 canonifyURLs: true
-title: "Kubernetes Gateway"
+title: "kgateway"
 
 services:
   googleAnalytics:
-    ID: ""
+    ID: "G-9P21XPDJPX"
 
 outputs:
   home: [HTML]
@@ -51,15 +51,22 @@ menu:
     - name: Home
       url: /
       weight: 1
-    - name: Get Started
+    - name: Blog
+      url: /blog
       weight: 2
-      url: /docs/quickstart/
-    - name: Why K8s Gateway
+    - name: Get Started
       weight: 3
+      url: /docs/quickstart/
+    - name: Why kgateway
+      weight: 4
       url: /docs/about/overview/
+    - name: Search
+      weight: 5
+      params:
+        type: search
 
 params:
-  description: K8sGateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
+  description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
   navbar:
     displayTitle: false
     displayLogo: true
@@ -95,7 +102,7 @@ params:
 
     flexsearch:
       # index page by: content | summary | heading | title
-      index: content
+      index: summary
 
   editURL:
     enable: false

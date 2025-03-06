@@ -9,7 +9,7 @@ Test the resilience of your apps by injecting delays and connection failures int
 
 You can set two following fault injection types in {{< reuse "docs/snippets/product-name.md" >}}. 
 
-* **Delays**: Delays simulate timing failures, such as network latency or overloaded upstreams.
+* **Delays**: Delays simulate timing failures, such as network latency or overloaded backends.
 * **Aborts**: Aborts simulate crash failures, such as HTTP error codes or TCP connection failures. 
 
 Delays and aborts are independent of one another. When both values are set, your requests are either delayed only, delayed and aborted, or aborted only.
@@ -31,7 +31,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
 1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are rejected with a 503 HTTP response code.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: faults
@@ -48,7 +48,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-faults
@@ -56,7 +56,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - faults.example
      rules:
@@ -119,7 +119,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
 1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are delayed by 5 seconds.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: faults
@@ -136,7 +136,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-faults
@@ -144,7 +144,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - faults.example
      rules:

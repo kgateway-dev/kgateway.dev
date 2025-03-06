@@ -6,7 +6,7 @@ description: API reference
 
 Review the API specification for the custom resource definitions that you use in {{< reuse "docs/snippets/product-name.md" >}}.
 
-## K8sGateway API
+## Kgateway API
 
 Use the following links to review the specifications for the {{< reuse "docs/snippets/product-name.md" >}} API: 
 
@@ -14,8 +14,8 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 {{< cards >}}
   {{< card link="top-level/direct-response" title="DirectResponse" >}}
-  {{< card link="top-level/httplisteneroptions" title="HttpListenerOptions" >}}
-  {{< card link="top-level/listeneroptions" title="ListenerOptions" >}}
+  {{< card link="top-level/httplisteneroptions" title="HTTPListenerPolicies" >}}
+  {{< card link="top-level/listeneroptions" title="ListenerPolicies" >}}
   {{< card link="top-level/routeoptions" title="RouteOptions" >}}
   {{< card link="top-level/virtualhostoptions" title="VirtualHostOptions" >}}
 {{< /cards >}}
@@ -24,7 +24,7 @@ Use the following links to review the specifications for the {{< reuse "docs/sni
 
 * [GatewayParameters](/docs/reference/api/top-level/gatewayparameters)
 * [Settings](/docs/reference/api/top-level/settings.proto.sk)
-* [Upstream](/docs/reference/api/top-level/upstream.proto.sk)
+* [Backend](/docs/reference/api/top-level/upstream.proto.sk)
 
 ## Kubernetes Gateway API
 

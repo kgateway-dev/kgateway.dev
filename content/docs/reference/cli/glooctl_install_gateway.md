@@ -24,7 +24,7 @@ requires kubectl to be installed
   -d, --dry-run               Dump the raw installation yaml instead of applying it to kubernetes
   -f, --file string           Install {{< reuse "docs/snippets/product-name.md" >}} from this Helm chart archive file rather than from a release
   -h, --help                  help for gateway
-  -n, --namespace string      namespace to install {{< reuse "docs/snippets/product-name.md" >}} into (default "gloo-system")
+  -n, --namespace string      namespace to install {{< reuse "docs/snippets/product-name.md" >}} into (default "{{< reuse "docs/snippets/ns-system.md" >}}")
       --release-name string   helm release name (default "gloo")
       --values strings        List of files with value overrides for the {{< reuse "docs/snippets/product-name.md" >}}  Helm chart, (e.g. --values file1,file2 or --values file1 --values file2)
       --version string        version to install (e.g. 1.4.0, defaults to latest)

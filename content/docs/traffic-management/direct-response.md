@@ -39,7 +39,7 @@ The following rules are applied during schema validation:
 1. Create a DirectResponse resource that sends back a 510 HTTP response code and a custom message to incoming requests. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: DirectResponse
    metadata:
      name: direct-response
@@ -63,7 +63,7 @@ The following rules are applied during schema validation:
      - direct-response.com
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      rules:
      - matches:
        - path:

@@ -24,7 +24,7 @@ Install the latest version of `{{< reuse "docs/snippets/cli-name.md" >}}`. Make 
 
 You can download a specific version of `{{< reuse "docs/snippets/cli-name.md" >}}` directly from the GitHub releases page.
 
-1. In your browser, navigate to the [{{< reuse "docs/snippets/product-name.md" >}} project releases](https://github.com/k8sgateway/k8sgateway/releases).
+1. In your browser, navigate to the [{{< reuse "docs/snippets/product-name.md" >}} project releases](https://github.com/kgateway-dev/kgateway/releases).
 2. Choose the version of `{{< reuse "docs/snippets/cli-name.md" >}}` to install.
 3. Click the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that you want to install.
 4. In the **Assets**, download the `{{< reuse "docs/snippets/cli-name.md" >}}` package that matches your operating system, and follow your operating system procedures for replacing your existing `{{< reuse "docs/snippets/cli-name.md" >}}` binary file with the upgraded version.

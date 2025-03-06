@@ -1,7 +1,7 @@
 {{/* CSS */}}
 {{ $options := dict "inlineImports" true "config" "./assets/css/postcss.config.js" }}
 {{ $styles := resources.Get "css/styles.css" }}
-{{ $styles = $styles | resources.PostCSS $options }}
+{{ $styles = $styles | css.PostCSS $options }}
 {{- if hugo.IsProduction }}
 {{ $styles = $styles | minify | fingerprint | resources.PostProcess }}
 <link href="{{ $styles.Permalink }}" rel="stylesheet" integrity="{{ $styles.Data.Integrity }}" />

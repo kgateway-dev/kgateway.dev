@@ -7,5 +7,5 @@ You can route to two main types of destinations.
 
 {{< cards >}}
   {{< card link="kube-services" title="Services" tag= "Kubernetes API" >}}
-  {{< card link="upstreams" title="Upstreams" tag= "K8sGateway API" >}}
+  {{< card link="backends" title="Backends" tag= "Kgateway API" >}}
 {{< /cards >}}

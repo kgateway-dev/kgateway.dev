@@ -1,0 +1,11 @@
+{{ $announcements := site.Data.announcement }}
+{{ range $announcements }}
+  {{ if .visible }}
+    <div class="bg-[#151927] w-full font-secondary text-sm lg:text-base text-[#DDDFED] text-center inline-flex items-center justify-center leading-7 min-h-4">
+      <a class="p-4" href="{{ .link }}" target="_blank" rel="noreferrer" class="hover:underline">
+        {{ .title }}<span aria-hidden="true">&nbsp;{{ if .link }}&rarr;{{ end }}</span>
+      </a>
+    </div>
+    {{ break }}
+  {{ end }}
+{{ end }}

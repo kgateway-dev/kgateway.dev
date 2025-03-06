@@ -12,12 +12,12 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 ## Policy CRDs
 
-{{< reuse "docs/snippets/product-name.md" >}} uses the following custom resources to attach policies to routes and gateway listeners. 
+{{< reuse "docs/snippets/product-name-caps.md" >}} uses the following custom resources to attach policies to routes and gateway listeners. 
 
 {{< cards >}}
   {{< card link="../../traffic-management/direct-response" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
-  {{< card link="listeneroption" title="ListenerOption" subtitle="Attach policies to one, multiple, or all gateway listeners." >}}
-  {{< card link="httplisteneroption" title="HTTPListenerOption patterns" subtitle="Apply policies to one, multiple, or all HTTP and HTTPS listeners." >}}
+  {{< card link="listeneroption" title="ListenerPolicy" subtitle="Attach policies to one, multiple, or all gateway listeners." >}}
+  {{< card link="httplisteneroption" title="HTTPListenerPolicy patterns" subtitle="Apply policies to one, multiple, or all HTTP and HTTPS listeners." >}}
   {{< card link="routeoption" title="RouteOption" subtitle="Attach policies to one, multiple, or all routes in an HTTPRoute resource." >}}
   {{< card link="virtualhostoption" title="VirtualHostOption" subtitle="Attach policies to the hosts on one, multiple, or all gateway listeners." >}}
 {{< /cards >}}
@@ -30,11 +30,11 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 
 | Policy | Applied via | Precedence and merging rules |
 | -- | -- | -- | 
-| [Connection buffer limits](/docs/traffic-management/buffering/) | ListenerOption | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerOption resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).   | 
+| [Connection buffer limits](/docs/traffic-management/buffering/) | ListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).   | 
 | [Direct response](/docs/traffic-management/direct-response/) | DirectResponse | No cross-resource conflict. If multiple DirectResponse resources are applied to the same route, only the one that is referenced first is enforced. | 
 |[Fault injection](/docs/resiliency/fault-injection/) | RouteOption|  No cross-resource conflict. Policies can conflict only if applied in multiple RouteOption resources. For more information, see [Conflicting policies](/docs/about/policies/routeoption/#conflicting-policies-and-merging-rules). |
 | [Header control](/docs/traffic-management/header-control/})  | <ul><li>RouteOption</li><li>VirtualHostOption</li></ul> |  Headers that are defined at the route and virtual host-level are merged as long as they do not conflict. If the same header is defined in both a RouteOption and VirtualHostOption resource, the RouteOption configuration takes precedence and the VirtualHostOption configuration is ignored.  |  
-| [Proxy protocol](/docs/traffic-management/proxy-protocol/) | ListenerOption | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerOption resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).  | 
+| [Proxy protocol](/docs/traffic-management/proxy-protocol/) | ListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).  | 
 | [Rewrites](/docs/traffic-management/rewrite/) | RouteOption |  No cross-resource conflict. Policies can conflict only if applied in multiple RouteOption resources. For more information, see [Conflicting policies](/docs/about/policies/routeoption/#conflicting-policies-and-merging-rules).  | 
 | [Transformations](/docs/traffic-management/transformations) | <ul><li>RouteOption</li><li>VirtualHostOption</li></ul> | RouteOption configuration takes precedence over VirtualHostOption configuration. Policies that are defined at different levels are not merged. |
 
@@ -51,10 +51,10 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 
 | Policy | Applied to | Precedence and merging rules | 
 | -- | -- | -- | 
-| [Access logging](/docs/security/access-logging) | ListenerOption | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerOption resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).    | 
+| [Access logging](/docs/security/access-logging) | ListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).    | 
 | [CORS](/docs/security/cors) | <ul><li>RouteOption</li><li>VirtualHostOption</li></ul> | By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the `exposeHeaders` CORS option by using the `corsPolicyMergeSettings` field in the VirtualHostOption. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`. For more information about this option, see the [CORS configuration options](/docs/security/cors/#configuration-options).  |
-| [CSRF](/docs/security/csrf/) | <ul><li>RouteOption</li><li>VirtualHostOption</li><li>HttpListenerOption</ul> | RouteOption configuration takes precedence over VirtualHostOption configuration, which takes precedence over HttpListenerOption configuration. Policies that are defined at different levels are not merged.   |  
-| [Local rate limiting](/docs/security/ratelimit/local/) | HttpListenerOption | No cross-resource conflict. Policies can conflict only if applied in multiple HttpListenerOption resources. For more information, see [Conflicting policies](/docs/about/policies/httplisteneroption/#conflicting-policies).| 
+| [CSRF](/docs/security/csrf/) | <ul><li>RouteOption</li><li>VirtualHostOption</li><li>HTTPListenerPolicy</ul> | RouteOption configuration takes precedence over VirtualHostOption configuration, which takes precedence over HTTPListenerPolicy configuration. Policies that are defined at different levels are not merged.   |  
+| [Local rate limiting](/docs/security/ratelimit/local/) | HTTPListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple HTTPListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/httplisteneroption/#conflicting-policies).| 
 
 
 ## Policy inheritance rules when using route delegation

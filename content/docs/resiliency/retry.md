@@ -1,17 +1,17 @@
 ---
 title: Retries
 weight: 10
-description: Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive upstream service.
+description: Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive backend service.
 ---
 
-Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive upstream service.
+Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive backend service.
 
 ## About retries
 
-A retry specifies the maximum number of times {{< reuse "docs/snippets/product-name.md" >}} attempts to connect to an upstream service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
+A retry specifies the maximum number of times {{< reuse "docs/snippets/product-name.md" >}} attempts to connect to an backend service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
 
 To configure retries, you can use the following settings in the RouteOption resource: 
-- `options.retries.retryOn` : The condition under which to retry forwarding the request to the upstream service. This setting exposes the [`x-envoy-retry-on` Envoy header](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on). 
+- `options.retries.retryOn` : The condition under which to retry forwarding the request to the backend service. This setting exposes the [`x-envoy-retry-on` Envoy header](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on). 
 - `options.retries.numRetries`: The number of allowed retries. The default value is 1.  
 - `options.retries.perTryTimeout`: The timeout [duration](https://protobuf.dev/reference/protobuf/google.protobuf/#duration) for each retry attempt. This setting exposes the [x-envoy-expected-rq-timeout-ms](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-expected-rq-timeout-ms) header.
 
@@ -26,7 +26,7 @@ Use a RouteOption resource to specify retries for a specific route.
 1. Create a RouteOption custom resource to specify your retry rules. In the following example, the request is retried up to 3 times when a connection failure is detected. For each retry a timeout of 5 seconds is set. 
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: retry
@@ -43,7 +43,7 @@ Use a RouteOption resource to specify retries for a specific route.
 2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-retry
@@ -51,7 +51,7 @@ Use a RouteOption resource to specify retries for a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - retry.example
      rules:

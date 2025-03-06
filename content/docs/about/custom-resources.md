@@ -8,7 +8,7 @@ Learn how the {{< reuse "docs/snippets/product-name.md" >}} and {{< reuse "docs/
 
 ## Custom resource overview
 
-The following image illustrates how the {{< reuse "docs/snippets/product-name.md" >}} custom resources interact with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} custom resources to provide advanced routing, traffic management, security, resiliency, and integration capabilities. To learn more about each custom resource, see [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources](#k8s) and [{{< reuse "docs/snippets/product-name.md" >}} resources](#gloo-gateway).
+The following image illustrates how the {{< reuse "docs/snippets/product-name.md" >}} custom resources interact with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} custom resources to provide advanced routing, traffic management, security, resiliency, and integration capabilities. To learn more about each custom resource, see [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources](#k8s) and [{{< reuse "docs/snippets/product-name.md" >}} resources](#kgateway).
 
 {{< reuse-image src="img/gg-crs.svg" >}}
 
@@ -43,13 +43,13 @@ If traffic matches the conditions that are defined in the HTTPRoute, the Gateway
 
 ### ReferenceGrant
 
-A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Upstream that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
+A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Backend that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
 
 {{% callout type="info" %}}
-{{< reuse "docs/snippets/product-name.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the Kubernetes Gateway API. For example, access between a RouteOption resource in `namespace1` and an Upstream resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a Kubernetes Gateway API resource, you must create a ReferenceGrant. 
+{{< reuse "docs/snippets/product-name-caps.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a RouteOption resource in `namespace1` and an Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
 {{% /callout %}}
 
-## K8sGateway resources {#gloo-gateway}
+## Kgateway resources {#kgateway}
 
 Review the {{< reuse "docs/snippets/product-name.md" >}} resources that you use to bootstrap, configure, and customize your gateway proxy, and the policies that you can leverage to add additional traffic management, resiliency, and security capabilities to your gateway and routes. 
 
@@ -64,17 +64,17 @@ To learn more about the default gateway setup and how these resource interact wi
 
 While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such as fault injection, access logging, CORS, or CSRF. [Policies](/docs/about/policies/overview/) allow you to apply intelligent traffic management, resiliency, and security standards to individual routes or all the routes that the gateway serves. 
 
-{{< reuse "docs/snippets/product-name.md" >}} uses the following custom resources to attach policies to routes and gateway listeners: 
+{{< reuse "docs/snippets/product-name-caps.md" >}} uses the following custom resources to attach policies to routes and gateway listeners: 
 
 * [**DirectResponse**](/docs/traffic-management/direct-response/): Directly respond to incoming requests with a custom HTTP response code and body.
-* [**ListenerOption**](/docs/about/policies/listeneroption/): Attach policies to one, multiple, or all gateway listeners.
-* [**HTTPListenerOption**](/docs/about/policies/httplisteneroption/): Apply policies to one, multiple, or all HTTP and HTTPS listeners.
+* [**ListenerPolicy**](/docs/about/policies/listeneroption/): Attach policies to one, multiple, or all gateway listeners.
+* [**HTTPListenerPolicy**](/docs/about/policies/httplisteneroption/): Apply policies to one, multiple, or all HTTP and HTTPS listeners.
 * [**RouteOption**](/docs/about/policies/routeoption/): Attach policies to one, multiple, or all routes in an HTTPRoute resource.
 * [**VirtualHostOption**](/docs/about/policies/virtualhostoption/): Attach policies to the hosts on one, multiple, or all gateway listeners. 
 
-### Upstreams
+### Backends
 
 While you can route incoming traffic to a Kubernetes Service directly by referencing the Service in your HTTPRoute, you might want to add additional configuration to your service or point to endpoints outside your cluster. For example, you might want to route traffic to an AWS Lambda instance. You might also want to add settings to a Kubernetes Service, such as HTTP/2, traffic shadowing, or health check capabilities. 
 
-You can use an [Upstream](/docs/traffic-management/destination-types/upstreams/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Upstream in your HTTPRoute resource. For more information about Upstreams, see [Upstreams](/docs/traffic-management/destination-types/upstreams/). 
+You can use an [Backend](/docs/traffic-management/destination-types/upstreams/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/upstreams/). 
 

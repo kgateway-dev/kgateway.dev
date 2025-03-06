@@ -30,7 +30,7 @@ weight: 10
 Static upstreams are used to route request to services listening at fixed IP/Host & Port pairs.
 Static upstreams can be used to proxy any kind of service, and therefore contain a ServiceSpec
 for additional service-specific configuration.
-Unlike upstreams created by service discovery, Static Upstreams must be created manually by users
+Unlike upstreams created by service discovery, Static Backends must be created manually by users
 
 ```yaml
 "hosts": []static.options.gloo.solo.io.Host

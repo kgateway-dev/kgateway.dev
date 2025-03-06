@@ -11,11 +11,11 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
 1. Create a GatewayParameters resource that allows you to create self-managed gateway proxies. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: self-managed
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      selfManaged: {}
    EOF
@@ -28,11 +28,11 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: self-managed
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "self-managed"
+       gateway.kgateway.dev/gateway-parameters-name: "self-managed"
    spec:
-     gatewayClassName: gloo-gateway
+     gatewayClassName: kgateway
      listeners:
      - protocol: HTTP
        port: 80
@@ -40,18 +40,18 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
        allowedRoutes:
          namespaces:
            from: All
-   EOF  
+   EOF
    ```
 
 3. Verify that the Gateway is created.  
    ```sh
-   kubectl get gateway self-managed -n gloo-system -o yaml
+   kubectl get gateway self-managed -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
 
-4. Verify that no gateway proxy deployment and service were created for your Gateway. 
+4. Verify that no gateway proxy deployment and service were created for your Gateway. The output is blank.
    ```sh
-   kubectl get pods -n gloo-system | grep self-managed
-   kubectl get services -n gloo-system | grep self-managed
+   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
+   kubectl get services -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
    ```
    
 5. Create your own gateway proxy deployment. Note that this deployment needs to have valid Envoy configuration that includes the correct name and namespace of your Gateway resource to successfully bootstrap your gateway proxy and bind it to the Gateway resource. You can use the following template as a starting point to build your own Envoy configuration. To bind your gateway proxy with the Gateway resource, ensure that you replace `$GATEWAY_NAME` and `$GATEWAY_NAMESPACE` with the name of the Gateway that you created earlier. 
@@ -60,7 +60,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
      address:
        socket_address: { address: 127.0.0.1, port_value: 19000 }
    node:
-     cluster: gloo-proxy-$GATEWAY_NAME.$GATEWAY_NAMESPACE
+     cluster: $GATEWAY_NAME.$GATEWAY_NAMESPACE
      metadata:
        role: gloo-kube-gateway-api~$GATEWAY_NAMESPACE~$GATEWAY_NAMESPACE-$GATEWAY_NAME
    static_resources:
@@ -107,11 +107,11 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
                      address: $CONTROLLER_HOST
                      port_value: 9977
          typed_extension_protocol_options:
-           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
-             "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
+           envoy.extensions.backends.http.v3.HttpProtocolOptions:
+             "@type": type.googleapis.com/envoy.extensions.backends.http.v3.HttpProtocolOptions
              explicit_http_config:
                http2_protocol_options: {}
-         upstream_connection_options:
+         backend_connection_options:
            tcp_keepalive:
              keepalive_time: 10
          type: STRICT_DNS
@@ -150,6 +150,6 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gatewayparameters self-managed -n gloo-system
-kubectl delete gateway self-managed -n gloo-system
+kubectl delete gatewayparameters self-managed -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway self-managed -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

@@ -52,7 +52,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
 1. Create an HTTPRoute resource for the `traffic.split.example` domain that routes 10% of the traffic to `helloworld-v1`, 10% to `helloworld-v2`, and 80% to `helloworld-v3`.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: traffic-split
@@ -60,7 +60,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
      - traffic.split.example
      rules:
@@ -97,13 +97,13 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n gloo-system gloo-proxy-http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/gloo-proxy-http -n gloo-system 8080:8080
+   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}

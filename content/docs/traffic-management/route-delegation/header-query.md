@@ -48,7 +48,7 @@ The following image illustrates the route delegation hierarchy:
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      hostnames:
      - delegation.example
@@ -235,10 +235,10 @@ The following image illustrates the route delegation hierarchy:
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httproute parent -n gloo-system
+kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
-kubectl delete -n team1 -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml
-kubectl delete -n team2 -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml
+kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2
 ```

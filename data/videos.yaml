@@ -1,0 +1,24 @@
+- description: Explore the Kubernetes Gateway API and learn about real-world use cases that influenced its development and adoption.
+  href: https://youtu.be/kzWgbSTVphs?si=JmAy1MMR8PUu4PfU
+  thumbnailHref: /thumbnails/intro-to-k8s-gateway-api.jpg
+
+- description: Introducing kgateway, the open implementation of Kubernetes Gateway API in this video, get a step by step guide on installing kgateway.
+  href: https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g
+  thumbnailHref: /thumbnails/install-kgateway.jpg
+
+- description: Learn the basic concepts of Kubernetes Gateway API with kgateway including how to implement custom resource definitions (CRDs) across clusters.
+  href: https://youtu.be/j89S4tV192g?si=mm88aKWBCBA8k0gU
+  thumbnailHref: /thumbnails/gateway-api-basics.jpg
+
+- description: Deep dive into how to configure HTTPS routes with the Kubernetes Gateway API and kgateway.
+  href: https://youtu.be/cOnL9vjVRvQ?si=KDfDuWSypcc5KkEr
+  thumbnailHref: /thumbnails/configuring-https.jpg
+
+- description: Explore the roles and responsibilities of Gateway API and learn how to build a shared gateway.
+  href: https://youtu.be/O3_za6WU_iA?si=yklId_SKODrwZ4UX
+  thumbnailHref: /thumbnails/shared-gateways.jpg
+
+- description: Learn HTTP traffic management features including request matching, URL rewriting, traffic splitting and header modification.
+  href: https://youtu.be/CGF3aZXOyxc
+  thumbnailHref: /thumbnails/exploring-gateway-api-routing-rules.jpg
+  

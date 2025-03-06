@@ -3,7 +3,7 @@ title: Deployment patterns
 weight: 20
 ---
 
-Learn how you can deploy K8sGateway proxies to ensure proper traffic routing, security, and isolation for your apps. 
+Learn how you can deploy {{< reuse "docs/snippets/product-name.md" >}} proxies to ensure proper traffic routing, security, and isolation for your apps. 
 
 The flexibility of {{< reuse "docs/snippets/product-name.md" >}} allows you to deploy it in a way that best serves your environment. Review the following recommended deployment patterns to choose how to set up {{< reuse "docs/snippets/product-name.md" >}} proxies.
 
@@ -11,7 +11,7 @@ The flexibility of {{< reuse "docs/snippets/product-name.md" >}} allows you to d
 
 The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that serves as a single ingress API gateway to the workloads in a Kubernetes cluster. The gateway is centrally managed by the {{< reuse "docs/snippets/product-name.md" >}} control plane and configured to match and forward traffic based on the traffic management, resiliency, and security rules that you define. 
 
-{{% reuse-image src="img/pattern-simple-ingress.svg" width="400px" caption="K8sGateway as a simple ingress"  %}}
+{{% reuse-image src="img/pattern-simple-ingress.svg" width="400px" caption="Kgateway as a simple ingress"  %}}
 
 This setup is a great way to get started with {{< reuse "docs/snippets/product-name.md" >}}, and is suitable for smaller environments where all workloads run in a single cluster and traffic is balanced between services. However, in larger environments or environments where you have both high traffic and low traffic services, consider adding [multiple gateway proxies to distribute traffic load more evenly](#sharded-gateway). 
 
@@ -19,7 +19,7 @@ This setup is a great way to get started with {{< reuse "docs/snippets/product-n
 
 In larger environments or environments where you have both high traffic and low traffic services, you can isolate services from each other and protect against noisy neighbors by using a sharded gateway. With a sharded gateway architecture, you typically have multiple gateway proxies that split up the traffic for different services in the cluster as depicted in the following image. 
 
-{{% reuse-image src="img/pattern-sharded-gateway.svg" width="400px" caption="K8sGateway as a sharded gateway" %}}
+{{% reuse-image src="img/pattern-sharded-gateway.svg" width="400px" caption="Kgateway as a sharded gateway" %}}
 
 All gateway proxies are managed by the {{< reuse "docs/snippets/product-name.md" >}} control plane. However, one gateway proxy manages traffic for the workloads in the `foo` and `bar` namespaces. The second gateway proxy is a dedicated API gateway for the workloads in the `extra` namespace. Both gateway proxies are exposed directly on the edge. 
 

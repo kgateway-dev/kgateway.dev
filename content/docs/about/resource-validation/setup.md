@@ -12,7 +12,7 @@ You can check whether strict or permissive validation is enabled in your {{< reu
 
 1. Get the details of the default settings resource. 
    ```sh
-   kubectl get settings default -n gloo-system -o yaml
+   kubectl get settings default -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
 
 2. In your CLI output, find the `spec.gateway.validation.alwaysAccept` setting.
@@ -32,7 +32,7 @@ Configure the validating admission webhook to reject invalid {{< reuse "docs/sni
    
    1. Edit the default Settings resource. 
       ```sh
-      kubectl edit settings default -n gloo-system
+      kubectl edit settings default -n {{< reuse "docs/snippets/ns-system.md" >}}
       ```
       
    2. In your Settings resource, set `spec.gateway.validation.alwaysAccept=false` to enable strict resource validation. 
@@ -56,8 +56,8 @@ Configure the validating admission webhook to reject invalid {{< reuse "docs/sni
    {{% tab  %}}
    1. Get the current values for your Helm chart.
       ```sh
-      helm get values gloo-gateway -n gloo-system -o yaml > gloo-gateway.yaml
-      open gloo-gateway.yaml
+      helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
+      open kgateway.yaml
       ```
    2. In your Helm values file, enable strict resource validation.
       ```yaml
@@ -73,9 +73,9 @@ To also reject {{< reuse "docs/snippets/product-name.md" >}} custom resources th
     
    3. Upgrade your installation. 
       ```sh
-      helm upgrade -n gloo-system gloo-gateway gloo/gloo \
-       --values gloo-gateway.yaml \
-       --version {{< reuse "docs/versions/gloo_oss_patch.md" >}}
+      helm upgrade -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway kgateway/kgateway \
+       --values kgateway.yaml \
+       --version {{< reuse "docs/versions/n-patch.md" >}}
       ```
    
    {{% /tab %}}
@@ -87,7 +87,7 @@ To also reject {{< reuse "docs/snippets/product-name.md" >}} custom resources th
    1. Create a RouteOption resource with an invalid fault injection configuration. The following example aborts 50% of all incoming requests. However, no HTTP status code is defined. 
       ```yaml
       kubectl apply -n httpbin -f- <<EOF
-      apiVersion: gateway.solo.io/v1
+      apiVersion: gateway.kgateway.dev/v1alpha1
       kind: RouteOption
       metadata:
         name: faults
@@ -103,7 +103,7 @@ To also reject {{< reuse "docs/snippets/product-name.md" >}} custom resources th
 
    2. Verify that the RouteOption resource is rejected. You see an error message similar to the following.
       ```
-      Error from server: error when creating "STDIN": admission webhook "gloo.gloo-system.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.RouteOption failed: 1 error occurred:
+      Error from server: error when creating "STDIN": admission webhook "gloo.{{< reuse "docs/snippets/ns-system.md" >}}.svc" denied the request: resource incompatible with current Gloo snapshot: [Validating *v1.RouteOption failed: 1 error occurred:
 	  * Validating *v1.RouteOption failed: validating *v1.RouteOption name:"faults"  namespace:"httpbin": 1 error occurred:
 	  * Route Error: ProcessingError. Reason: *faultinjection.plugin: invalid abort status code '0', must be in range of [200,600). Route Name: 
       ```

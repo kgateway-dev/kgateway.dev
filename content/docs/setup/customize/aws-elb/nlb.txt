@@ -10,7 +10,7 @@ In this guide you explore how to expose the {{< reuse "docs/snippets/product-nam
 
 {{< callout type="warning" >}}
 Keep in mind the following considerations when working with an NLB: 
-* {{< reuse "docs/snippets/product-name.md" >}} does not open any proxy ports until at least one HTTPRoute resource is created that references the gateway. However, AWS ELB health checks are automatically created and run after you create the gateway. Because of that, registered targets might appear unhealthy until an HTTPRoute resource is created. 
+* {{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute resource is created that references the gateway. However, AWS ELB health checks are automatically created and run after you create the gateway. Because of that, registered targets might appear unhealthy until an HTTPRoute resource is created. 
 * An AWS NLB has an idle timeout of 350 seconds that you cannot change. This limitation can increase the number of reset TCP connections. 
 {{< /callout >}}
 
@@ -37,11 +37,11 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
 1. Create a GatewayParameters resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      kube: 
        service:
@@ -65,11 +65,11 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: aws-cloud
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "custom-gw-params"
+       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
-     gatewayClassName: gloo-gateway
+     gatewayClassName: kgateway
      listeners:
      - protocol: HTTP
        port: 80
@@ -82,18 +82,18 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
    
 3. Verify that your gateway is created. 
    ```sh
-   kubectl get gateway aws-cloud -n gloo-system
+   kubectl get gateway aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
 4. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname. 
    ```sh
-   kubectl get services gloo-proxy-aws-cloud -n gloo-system
+   kubectl get services aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
    Example output: 
    ```console
    NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP                                                                     PORT(S)        AGE
-   gloo-proxy-aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   80:30557/TCP   12m
+   aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   80:30557/TCP   12m
    ```
 
 5. Review the NLB in the AWS EC2 dashboard. 
@@ -102,7 +102,7 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
    3. On the **Resource map** tab, verify that the load balancer points to targets in your cluster. 
 
    {{< callout type="info" >}}
-   {{< reuse "docs/snippets/product-name.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy  is unhealthy. Continue with this guide to create an HTTPRoute resource and send traffic through the NLB.
+   {{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy  is unhealthy. Continue with this guide to create an HTTPRoute resource and send traffic through the NLB.
    {{< /callout >}}
 
 6. Continue with [Step 3: Test traffic to the NLB](#test-traffic). 
@@ -117,11 +117,11 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 1. Create a GatewayParameters resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.gloo.solo.io/v1alpha1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      kube: 
        service:
@@ -148,13 +148,13 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    kind: Gateway
    metadata:
      name: aws-cloud
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
        gateway: aws-cloud
      annotations:
-       gateway.gloo.solo.io/gateway-parameters-name: "custom-gw-params"
+       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
-     gatewayClassName: gloo-gateway
+     gatewayClassName: kgateway
      listeners:
        - name: https
          port: 443
@@ -173,18 +173,18 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    
 4. Verify that your gateway is created. 
    ```sh
-   kubectl get gateway aws-cloud -n gloo-system
+   kubectl get gateway aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
 5. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname.  
    ```sh
-   kubectl get services gloo-proxy-aws-cloud -n gloo-system
+   kubectl get services aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
    
    Example output: 
    ```console
    NAME                   TYPE           CLUSTER-IP      EXTERNAL-IP                                                                     PORT(S)        AGE
-   gloo-proxy-aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   443:30557/TCP   12m
+   aws-cloud   LoadBalancer   172.20.181.57   k8s-gloosyst-glooprox-e11111a111-111a1111aaaa1aa.elb.us-east-2.amazonaws.com   443:30557/TCP   12m
    ```
 
 6. Review the load balancer in the AWS EC2 dashboard. 
@@ -193,7 +193,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    3. On the **Resource map** tab, and verify that the load balancer points to targets in your cluster. 
 
    {{< callout type="info" >}}
-   {{< reuse "docs/snippets/product-name.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy is unhealthy. Continue with this guide to create an HTTPRoute resource and send traffic through the NLB.
+   {{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy is unhealthy. Continue with this guide to create an HTTPRoute resource and send traffic through the NLB.
    {{< /callout >}}
 
 7. Continue with [Step 3: Test traffic to the NLB](#test-traffic). 
@@ -209,7 +209,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-elb
@@ -219,7 +219,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: gloo-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - "www.nlb.com"
      rules:
@@ -231,7 +231,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 
 2. Get the AWS hostname of the NLB. 
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n gloo-system gloo-proxy-aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -249,7 +249,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-elb
@@ -259,7 +259,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: gloo-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - "https.example.com"
      rules:
@@ -271,7 +271,7 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 
 2. Get the IP address that is associated with the NLB's AWS hostname. 
    ```sh
-   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n gloo-system gloo-proxy-aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_HOSTNAME
    export INGRESS_GW_ADDRESS=$(dig +short ${INGRESS_GW_HOSTNAME} | head -1)
    echo $INGRESS_GW_ADDRESS
@@ -327,8 +327,8 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gatewayparameters custom-gw-params -n gloo-system
-kubectl delete gateway aws-cloud -n gloo-system
-kubectl delete httproute httpbin-elb -n gloo-system
-kubectl delete secret tls -n gloo-system
+kubectl delete gatewayparameters custom-gw-params -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete httproute httpbin-elb -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete secret tls -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

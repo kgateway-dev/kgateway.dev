@@ -18,11 +18,11 @@ You can use the `spec.targetRefs` section in the RouteOption resource to apply p
 The following example RouteOption resource specifies header manipulation rules. Because the `my-httproute` HTTPRoute resource is referenced in the `spec.targetRefs` section, the header manipulation rules are applied to all routes in that HTTPRoute resource. 
 
 ```yaml {hl_lines=[7,8,9,10]}
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: RouteOption
 metadata:
   name: parent-remove-header
-  namespace: gloo-system
+  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
@@ -43,7 +43,7 @@ Instead of applying the policy to all routes that are defined in an HTTPRoute re
 The following example shows a RouteOption resource that defines a host rewrite rule. Note that the `spec.targetRefs` field is not set. Because of that, the RouteOption policy does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
 ```yaml
-apiVersion: gateway.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: RouteOption
 metadata:
   name: rewrite
@@ -56,7 +56,7 @@ spec:
 To apply the policies to a particular route, you use the `ExtensionRef` filter on the desired HTTPRoute route. In the following example, the RouteOption policy is applied to the `/anything/path1` route. However, it is not applied to the `/anything/path2` path.   
 
 ```yaml {hl_lines=[17,18,19,20,21,22]}
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httpbin-rewrite
@@ -64,7 +64,7 @@ metadata:
 spec:
   parentRefs:
   - name: http
-    namespace: gloo-system
+    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
   hostnames:
     - rewrite.example
   rules:
@@ -93,7 +93,7 @@ spec:
 You can also add multiple `ExtensionRef` filters to the same route as shown in the following example. 
 
 ```yaml {hl_lines=[17,18,19,20,21,22,23,24,25,26,27]}
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httpbin-rewrite
@@ -101,7 +101,7 @@ metadata:
 spec:
   parentRefs:
   - name: http
-    namespace: gloo-system
+    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
   hostnames:
     - rewrite.example
   rules:

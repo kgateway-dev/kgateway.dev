@@ -17,7 +17,7 @@ When a copy of the request is sent to the shadow app, {{< reuse "docs/snippets/p
 To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](https://github.com/opendiffy/diffy). This tool create diff-compares on the responses. You can use this data to verify that the response is correct and to detect API forward/backward compatibility problems. 
 
 {{% callout type="info" %}}
-To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-management/destination-types/upstreams/) resource for the app that you want to shadow traffic for and for the app that receives the shadowed traffic.  
+To enable traffic shadowing, you must set up an [Backend](/docs/traffic-management/destination-types/upstreams/) resource for the app that you want to shadow traffic for and for the app that receives the shadowed traffic.  
 {{% /callout %}}
 
 
@@ -34,7 +34,7 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
 
 2. Deploy the httpbin shadow app. 
    ```sh
-   kubectl -n shadow apply -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml
+   kubectl -n shadow apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
    ```
 
 3. Verify that the httpbin shadow app is running.
@@ -42,14 +42,14 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
    kubectl -n shadow get pods
    ```
 
-4. Create an Upstream resource for the httpbin shadow app. 
+4. Create an Backend resource for the httpbin shadow app. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      name: shadow
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      kube:
        serviceName: httpbin
@@ -58,14 +58,14 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
    EOF
    ```
 
-5. Create another Upstream resource for the httpbin app that you deployed as part of the [Get started](/docs/quickstart/}) guide. 
+5. Create another Backend resource for the httpbin app that you deployed as part of the [Get started](/docs/quickstart/}) guide. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gloo.solo.io/v1
-   kind: Upstream
+   kind: Backend
    metadata:
      name: httpbin
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      kube:
        serviceName: httpbin
@@ -74,10 +74,10 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
    EOF
    ```
 
-5. Create a RouteOption resource to define your shadowing rules. The following example shadows 100% of the traffic to the `shadow` Upstream resource that you just created. 
+5. Create a RouteOption resource to define your shadowing rules. The following example shadows 100% of the traffic to the `shadow` Backend resource that you just created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: RouteOption
    metadata:
      name: shadowing
@@ -85,17 +85,17 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
    spec:
      options:
        shadowing:
-          upstream:
+          backend:
             name: shadow
-            namespace: gloo-system
+            namespace: {{< reuse "docs/snippets/ns-system.md" >}}
           percentage: 100
    EOF
    ```
 
-6. Create an HTTPRoute resource for the httpbin app that you want to shadow traffic for and reference the RouteOption resource that you created. Note that shadowing requires you to route traffic to the httpbin Upstream and not to the httpbin service directly. 
+6. Create an HTTPRoute resource for the httpbin app that you want to shadow traffic for and reference the RouteOption resource that you created. Note that shadowing requires you to route traffic to the httpbin Backend and not to the httpbin service directly. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-shadow
@@ -103,7 +103,7 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
    spec:
      parentRefs:
      - name: http
-       namespace: gloo-system
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
        - shadowing.example
      rules:
@@ -115,20 +115,20 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
                name: shadowing
          backendRefs:
            - name: httpbin
-             kind: Upstream
+             kind: Backend
              group: gloo.solo.io
-             namespace: gloo-system
+             namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
 
-7. Create a reference grant to allow the HTTPRoute resource to access Upstream resources in the `gloo-system` namespace. 
+7. Create a reference grant to allow the HTTPRoute resource to access Backend resources in the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   apiVersion: gateway.networking.k8s.io/v1
    kind: ReferenceGrant
    metadata:
      name: shadow-rg
-     namespace: gloo-system   
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}   
    spec:
      from:
        - group: gateway.networking.k8s.io
@@ -136,7 +136,7 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
          namespace: httpbin
      to:
        - group: "gloo.solo.io"
-         kind: Upstream
+         kind: Backend
    EOF
    ```
 
@@ -210,10 +210,10 @@ To enable traffic shadowing, you must set up an [Upstream](/docs/traffic-managem
 ```sh
 kubectl delete httproutes httpbin-shadow -n httpbin 
 kubectl delete routeoption shadowing -n httpbin
-kubectl delete upstream shadow -n gloo-system
-kubectl delete upstream httpbin -n gloo-system 
-kubectl delete referencegrant shadow-rg -n gloo-system
-kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml -n shadow
+kubectl delete backend shadow -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete backend httpbin -n {{< reuse "docs/snippets/ns-system.md" >}} 
+kubectl delete referencegrant shadow-rg -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml -n shadow
 kubectl delete ns shadow
 ```
 

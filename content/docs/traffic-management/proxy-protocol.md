@@ -16,14 +16,14 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 
 ## Enable proxy protocol for a listener
 
-1. Create a ListenerOption resource to enable proxy protocol for the listeners on your gateway proxy. The following example enables proxy protocol on all listeners that are configured on the gateway. To enable proxy protocol for a particular listener, include the `spec.targetRefs.sectionName` field as described in [Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)](/docs/about/policies/listeneroption/#option-2-attach-the-policy-to-a-particular-listener-on-the-gateway-targetrefssectionname/).   
+1. Create a ListenerPolicy resource to enable proxy protocol for the listeners on your gateway proxy. The following example enables proxy protocol on all listeners that are configured on the gateway. To enable proxy protocol for a particular listener, include the `spec.targetRefs.sectionName` field as described in [Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)](/docs/about/policies/listeneroption/#option-2-attach-the-policy-to-a-particular-listener-on-the-gateway-targetrefssectionname/).   
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.solo.io/v1
-   kind: ListenerOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
    metadata:
      name: proxy-protocol
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -38,7 +38,7 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 2. Verify that your configuration is applied by reviewing the Envoy configuration. 
    1. Port forward the `gloo-gateway-http` deployment on port 19000. 
       ```sh
-      kubectl port-forward deploy/gloo-proxy-http -n gloo-system 19000 & 
+      kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 & 
       ```
    2. Open the `config_dump` endpoint. 
       ```sh
@@ -60,5 +60,5 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete listeneroption proxy-protocol -n gloo-system
+kubectl delete listeneroption proxy-protocol -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```

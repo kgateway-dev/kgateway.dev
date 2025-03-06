@@ -1,5 +1,5 @@
 ---
-title: HttpListenerOptions
+title: HTTPListenerPolicies
 weight: 5
 ---
 
@@ -11,7 +11,7 @@ weight: 5
 **Types**:
 
 
-- [HttpListenerOptions](#httplisteneroptions)
+- [HTTPListenerPolicies](#httplisteneroptions)
   
 
 
@@ -23,7 +23,7 @@ weight: 5
 
 
 ---
-### HttpListenerOptions
+### HTTPListenerPolicies
 
  
 Optional, feature-specific configuration that lives on http listeners
@@ -47,19 +47,19 @@ Optional, feature-specific configuration that lives on http listeners
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `grpcWeb` | [.grpc_web.options.gloo.solo.io.GrpcWeb](../../grpc_web.proto.sk/#grpcweb) |  |
-| `httpConnectionManagerSettings` | [.hcm.options.gloo.solo.io.HttpConnectionManagerSettings](../../hcm.proto.sk/#httpconnectionmanagersettings) |  |
-| `healthCheck` | [.healthcheck.options.gloo.solo.io.HealthCheck](../../healthcheck.proto.sk/#healthcheck) | enable [Envoy health checks](https://www.envoyproxy.io/docs/envoy/v1.7.0/api-v2/config/filter/http/health_check/v2/health_check.proto) on this listener. |
-| `extensions` | [.gloo.solo.io.Extensions](../../extensions.proto.sk/#extensions) | Extensions will be passed along from Listeners, Gateways, VirtualServices, Routes, and Route tables to the underlying Proxy, making them useful for controllers, validation tools, etc. which interact with kubernetes yaml. Some sample use cases: * controllers, deployment pipelines, helm charts, etc. which wish to use extensions as a kind of opaque metadata.  |
-| `gzip` | [.solo.io.envoy.config.filter.http.gzip.v2.Gzip](../../gzip.proto.sk/#gzip) | Gzip is an HTTP option which enables compressing data returned from an upstream service upon client request. Compression is useful in situations where large payloads need to be transmitted without compromising the response time. Example: ``` gzip: contentType: - "application/json" compressionLevel: BEST ```. |
-| `buffer` | [.solo.io.envoy.extensions.filters.http.buffer.v3.Buffer](../../buffer.proto.sk/#buffer) | Buffer can be used to set the maximum request size that the filter will buffer before the connection manager will stop buffering and return a 413 response. |
-| `csrf` | [.solo.io.envoy.extensions.filters.http.csrf.v3.CsrfPolicy](../../csrf.proto.sk/#csrfpolicy) | Csrf can be used to set percent of requests for which the CSRF filter is enabled, enable shadow-only mode where policies will be evaluated and tracked, but not enforced and add additional source origins that will be allowed in addition to the destination origin. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/csrf/v3/csrf.proto#envoy-v3-api-msg-extensions-filters-http-csrf-v3-csrfpolicy. |
-| `grpcJsonTranscoder` | [.grpc_json.options.gloo.solo.io.GrpcJsonTranscoder](../../grpc_json.proto.sk/#grpcjsontranscoder) | Exposed envoy config for the gRPC to JSON transcoding filter, envoy.filters.http.grpc_json_transcoder. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/grpc_json_transcoder/v3/transcoder.proto. |
-| `dynamicForwardProxy` | [.dfp.options.gloo.solo.io.FilterConfig](../../dynamic_forward_proxy.proto.sk/#filterconfig) |  |
-| `connectionLimit` | [.connection_limit.options.gloo.solo.io.ConnectionLimit](../../connection_limit.proto.sk/#connectionlimit) | ConnectionLimit can be used to limit the number of active connections per gateway. Useful for resource protection as well as DoS prevention. |
-| `httpLocalRatelimit` | [.local_ratelimit.options.gloo.solo.io.Settings](../../local_ratelimit.proto.sk/#settings) | HttpLocalRatelimit can be used to rate limit the number of requests per gateway and works pre-auth. Unlike the NetworkLocalRatelimit, this works as part of the HCM (ie: L7 layer). All virtual host and routes that are part of this gateway will share this rate limit unless explicity configured with another limit. It uses envoy's own local rate limit filter to do so, without the need for an external rate limit server to be set up. |
-| `router` | [.gloo.solo.io.Router](../../router.proto.sk/#router) | Router is an extension of the envoy http filters Maps to https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/router/v3/router.proto. |
-| `headerValidationSettings` | [.header_validation.options.gloo.solo.io.HeaderValidationSettings](../../header_validation.proto.sk/#headervalidationsettings) | Header validation settings - fields in this message can be used to determine whether requests should be rejected based on the contents of the header. |
+| `grpcWeb` | [.grpc_web.options.gloo.solo.io.GrpcWeb](../../components/grpc_web.proto.sk/#grpcweb) |  |
+| `httpConnectionManagerSettings` | [.hcm.options.gloo.solo.io.HttpConnectionManagerSettings](../../components/hcm.proto.sk/#httpconnectionmanagersettings) |  |
+| `healthCheck` | [.healthcheck.options.gloo.solo.io.HealthCheck](../../components/healthcheck.proto.sk/#healthcheck) | enable [Envoy health checks](https://www.envoyproxy.io/docs/envoy/v1.7.0/api-v2/config/filter/http/health_check/v2/health_check.proto) on this listener. |
+| `extensions` | [.gloo.solo.io.Extensions](../../components/extensions.proto.sk/#extensions) | Extensions will be passed along from Listeners, Gateways, VirtualServices, Routes, and Route tables to the underlying Proxy, making them useful for controllers, validation tools, etc. which interact with kubernetes yaml. Some sample use cases: * controllers, deployment pipelines, helm charts, etc. which wish to use extensions as a kind of opaque metadata.  |
+| `gzip` | [.solo.io.envoy.config.filter.http.gzip.v2.Gzip](../../components/gzip.proto.sk/#gzip) | Gzip is an HTTP option which enables compressing data returned from an backend service upon client request. Compression is useful in situations where large payloads need to be transmitted without compromising the response time. Example: ``` gzip: contentType: - "application/json" compressionLevel: BEST ```. |
+| `buffer` | [.solo.io.envoy.extensions.filters.http.buffer.v3.Buffer](../../components/buffer.proto.sk/#buffer) | Buffer can be used to set the maximum request size that the filter will buffer before the connection manager will stop buffering and return a 413 response. |
+| `csrf` | [.solo.io.envoy.extensions.filters.http.csrf.v3.CsrfPolicy](../../components/csrf.proto.sk/#csrfpolicy) | Csrf can be used to set percent of requests for which the CSRF filter is enabled, enable shadow-only mode where policies will be evaluated and tracked, but not enforced and add additional source origins that will be allowed in addition to the destination origin. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/csrf/v3/csrf.proto#envoy-v3-api-msg-extensions-filters-http-csrf-v3-csrfpolicy. |
+| `grpcJsonTranscoder` | [.grpc_json.options.gloo.solo.io.GrpcJsonTranscoder](../../components/grpc_json.proto.sk/#grpcjsontranscoder) | Exposed envoy config for the gRPC to JSON transcoding filter, envoy.filters.http.grpc_json_transcoder. For more, see https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/grpc_json_transcoder/v3/transcoder.proto. |
+| `dynamicForwardProxy` | [.dfp.options.gloo.solo.io.FilterConfig](../../components/dynamic_forward_proxy.proto.sk/#filterconfig) |  |
+| `connectionLimit` | [.connection_limit.options.gloo.solo.io.ConnectionLimit](../../components/connection_limit.proto.sk/#connectionlimit) | ConnectionLimit can be used to limit the number of active connections per gateway. Useful for resource protection as well as DoS prevention. |
+| `httpLocalRatelimit` | [.local_ratelimit.options.gloo.solo.io.Settings](../../components/local_ratelimit.proto.sk/#settings) | HttpLocalRatelimit can be used to rate limit the number of requests per gateway and works pre-auth. Unlike the NetworkLocalRatelimit, this works as part of the HCM (ie: L7 layer). All virtual host and routes that are part of this gateway will share this rate limit unless explicity configured with another limit. It uses envoy's own local rate limit filter to do so, without the need for an external rate limit server to be set up. |
+| `router` | [.gloo.solo.io.Router](../../components/router.proto.sk/#router) | Router is an extension of the envoy http filters Maps to https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/router/v3/router.proto. |
+| `headerValidationSettings` | [.header_validation.options.gloo.solo.io.HeaderValidationSettings](../../components/header_validation.proto.sk/#headervalidationsettings) | Header validation settings - fields in this message can be used to determine whether requests should be rejected based on the contents of the header. |
 
 
 
