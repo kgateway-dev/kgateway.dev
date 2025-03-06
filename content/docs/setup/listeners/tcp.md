@@ -71,7 +71,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
      labels:
        app: tcp-echo
    spec:
-     gatewayClassName: gloo-gateway
+     gatewayClassName: kgateway
      listeners:
      - protocol: TCP
        port: 8000
@@ -115,7 +115,27 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
        type: Programmed
    ```
 
-3. Create a TCPRoute resource for the TCP echo app that is served by the gateway that you created.
+3. Create a ReferenceGrant to allow TCPRoutes to reference the tcp-echo service.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: ReferenceGrant
+   metadata:
+     name: allow-tcp-route-to-echo
+     namespace: default
+   spec:
+     from:
+       - group: gateway.networking.k8s.io
+         kind: TCPRoute
+         namespace: kgateway-system
+     to:
+       - group: ""
+         kind: Service
+   EOF
+   ```
+
+4. Create a TCPRoute for the TCP echo app that is served by the gateway that you created.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -134,11 +154,12 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
      rules:
        - backendRefs:
            - name: tcp-echo
+             namespace: default
              port: 1025
    EOF
    ```
 
-4. Verify that the TCPRoute is applied successfully. 
+5. Verify that the TCPRoute is applied successfully. 
    
    ```sh
    kubectl get tcproute/tcp-route-echo -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
@@ -162,15 +183,20 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
          reason: ResolvedRefs
          status: "True"
          type: ResolvedRefs
-       controllerName: solo.io/gloo-gateway
+       controllerName: kgateway.dev/kgateway
        parentRef:
          group: gateway.networking.k8s.io
          kind: Gateway
          name: tcp-gateway
+         namespace: kgateway-system
          sectionName: tcp
    ```
 
-5. Get the external address of the gateway and save it in an environment variable.
+## Verify the TCP route {#verify-tcp-route}
+
+Verify that the TCP route to the TCP echo app is working.
+
+1. Get the external address of the gateway and save it in an environment variable.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -181,33 +207,29 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
+   kubectl port-forward deployment/tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} 8000:8000
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Send a TCP request to the external address of the TCP gateway on port 8000. You might use a tool such as telnet or netcat as in the following example.
+2. Send a TCP request to the external address of the TCP gateway on port 8000. You might use a tool such as telnet or netcat as in the following example.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   nc -v $INGRESS_GW_ADDRESS 8000
+   nc $INGRESS_GW_ADDRESS 8000
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   nc -v localhost 8080
+   nc localhost 8000
    ```
    {{% /tab %}}
    {{< /tabs >}} 
 
-   Example output:
+   The output is an open session for you to send more requests.
 
-   ```console
-   Connection to ${INGRESS_GW_ADDRESS} port 8000 [tcp/irdmi] succeeded!
-   ```
-
-7. Enter any string to verify that the TCP echo service "echoes," returning the same string back.
+3. Enter any string to verify that the TCP echo service "echoes," returning the same string back.
 
    ```console
    hello
