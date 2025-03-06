@@ -16,7 +16,7 @@ TCPRoutes are an experimental feature in the [upstream Kubernetes Gateway API](h
 2. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
 
    ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
 3. Deploy the sample TCP echo app.
@@ -67,7 +67,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    kind: Gateway
    metadata:
      name: tcp-gateway
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
        app: tcp-echo
    spec:
@@ -90,7 +90,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 2. Check the status of the gateway to make sure that your configuration is accepted and no conflicts exist in your cluster. 
    
    ```sh
-   kubectl get gateway tcp-gateway -n gloo-system -o yaml
+   kubectl get gateway tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
 
    Example output:
@@ -123,13 +123,13 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    kind: TCPRoute
    metadata:
      name: tcp-route-echo
-     namespace: gloo-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
        app: tcp-echo
    spec:
      parentRefs:
        - name: tcp-gateway
-         namespace: gloo-system
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
          sectionName: tcp
      rules:
        - backendRefs:
@@ -141,7 +141,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 4. Verify that the TCPRoute is applied successfully. 
    
    ```sh
-   kubectl get tcproute/tcp-route-echo -n gloo-system -o yaml
+   kubectl get tcproute/tcp-route-echo -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
 
    Example output:
@@ -175,13 +175,13 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n gloo-system gloo-proxy-tcp-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} tcp-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/gloo-proxy-tcp-gateway -n gloo-system 8080:8080
+   kubectl port-forward deployment/tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
