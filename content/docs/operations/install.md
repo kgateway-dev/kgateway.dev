@@ -89,7 +89,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 2. Optional: Pull and inspect the {{< reuse "docs/snippets/product-name.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
    ```sh
-   helm pull oci://ghcr.io/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
+   helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
    tar -xvf kgateway-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
    cat kgateway/values.yaml
    ```
@@ -97,7 +97,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 3. Install {{< reuse "docs/snippets/product-name.md" >}}. This command creates the {{< reuse "docs/snippets/ns-system.md" >}} namespace and installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it.
    
    ```sh
-   helm install -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://ghcr.io/kgateway-dev/charts/kgateway \
+   helm install -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --create-namespace \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
@@ -180,7 +180,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
        chart: kgateway
        helm:
          skipCrds: false
-       repoURL: oci://ghcr.io/kgateway-dev/charts/kgateway
+       repoURL: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
        targetRevision: {{< reuse "docs/versions/n-patch.md" >}}
      syncPolicy:
        automated:
