@@ -55,7 +55,7 @@ Label selection proved another scaling challenge as we can’t index them. You m
 
 Four years ago, we explored using Istio’s control plane to manage Gloo’s gateway proxy. Given Istio’s adoption by major enterprises like eBay and Airbnb, we expected it to handle large-scale environments effectively. Unifying control planes for mesh and gateway seemed like a natural simplification.
 
-{{< reuse-image src="blog/five-learnings-2.png" width="400px" >}}
+{{< reuse-image src="blog/five-learnings-2.png" width="500px" >}}
 
 However, Istio lacked features we needed, leading us to implement numerous Envoy filters—a decision that quickly proved problematic. To prevent users from encountering upgrade issues, we had to add complex workarounds in our code base. Additionally, we struggled with eventual consistency and large Envoy filter sizes.
 
