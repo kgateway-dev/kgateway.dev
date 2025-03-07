@@ -15,7 +15,7 @@ This blog covers some ways to enable tighter control and audit for your interact
 
 Application developers building apps that leverage LLMs are the first line of defense when establishing control over LLM usage. These developers must be responsible for what data they send or receive in terms of detecting, scrubbing, or outright limiting it. They can adopt content safety or guardrail systems to help with that. They must also be responsible for securely connecting to any LLMs they use. This includes keeping client IDs, secrets, and authorization tokens safe. Code reviews and responsible coding can help here, but this is just one line of defense.
 
-{{< reuse-image src="blog/control-diagram.png" >}}
+{{< reuse-image src="blog/navigating-deepseek-1.png" >}}
 
 Whenever you consider security and compliance, you must think in terms of "defense in depth" as organizations now require having more options to control these LLM interactions.
 
@@ -23,17 +23,17 @@ Establishing an intermediary that acts as an out-of-application way to observe, 
 
 This intermediary allows an organization to implement a ["kill-switch"](https://en.wikipedia.org/wiki/Internet_kill_switch) type architecture should a vulnerability be discovered. That is, it would be easier to apply new guardrails quickly at this intermediary than it would be to go to all respective application teams and ask them to update their code.
 
-{{< reuse-image src="blog/ai-gateway-intermediary.png" >}}
+{{< reuse-image src="blog/navigating-deepseek-2.png" >}}
 
 In the case of DeepSeek R1, we also have the option to take the open source model ([or one of it's distilled variants](https://ollama.com/library/deepseek-r1)) and run it ourselves, that is, in our datacenters/VPC, and under our control. We will still want guardrails in place, but running it ourselves means the data being sent to/from will be under our control. We see some of our larger enterprise customers doing this by building out their own GPU infrastructure to run these types of models.
 
-{{< reuse-image src="blog/self-hosted-r1.png" width="1000px" >}}
+{{< reuse-image src="blog/navigating-deepseek-3.png" width="1000px" >}}
 
 ## Putting this into Practice
 
 We can use an AI Gateway like [kgateway](https://github.com/kgateway-dev/kgateway/pull/10495/files) to help implement these intermediary controls for security, prompt guarding, and routing/failover to either the public DeepSeek R1 or to our own self-hosted R1 model. KGateway is a powerful, mature AI gateway built on top of the CNCF Envoy Proxy project. 
 
-{{< reuse-image src="blog/deployment-options.png" width="1000px" >}}
+{{< reuse-image src="blog/navigating-deepseek-4.png" width="1000px" >}}
 
 To demonstrate this, we will deploy the AI gateway on GKE along with a locally hosted deepseek-r1:7b model. We will use the NVIDIA GPU operator to configure the GPUs and `containerd` so that GPU enabled workloads can take advantage of the accelerators. 
 
