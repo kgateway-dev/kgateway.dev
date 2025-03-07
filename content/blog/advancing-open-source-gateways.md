@@ -25,7 +25,7 @@ Given Gloo’s large adopter base, we believe kgateway qualifies as a CNCF incub
 
 Working closely with the maintainer community, we established governance for the project that rewards maintainership while ensuring no single company has a controlling stake. Using the `git-vote` bot for transparency, we successfully held our first governance vote. Out of 10 eligible voters (including 4 maintainers outside Solo.io), nine voted favorably on the [proposed governance PR](https://github.com/kgateway-dev/community/pull/19):
 
-{{< reuse-image src="blog/governance-pr.png" width="750px" >}}
+{{< reuse-image src="blog/advancing-open-source-gateways-1.png" width="750px" >}}
 
 ### Development focus
 
@@ -58,13 +58,13 @@ Kgateway simplifies these challenges with two proposed declarative APIs for rout
 
 The [Gateway API Inference extension](https://gateway-api-inference-extension.sigs.k8s.io/), sponsored by Kubernetes SIG-Network, focuses on extending the Kubernetes Gateway API with inference-specific routing extensions. It introduces the concept of an “InferencePool” (composed of one or more inference pods), enabling application developers to effectively route requests based on AI workload requirements. [Daneyon Hanson](https://github.com/danehans) has been leading our [work](https://github.com/kgateway-dev/kgateway/pull/10420) for interference extensions and we are proud to see him nominated as a maintainer on the Gateway API Inference extension project as a result!
 
-{{< reuse-image src="blog/traffic-control.png" >}}
+{{< reuse-image src="blog/advancing-open-source-gateways-2.png" >}}
 
 ### Providing advanced Layer 7 features for Istio in ambient mode
 
 Ambient mode splits Istio functionality into a secure overlay layer (ztunnels) and a Layer 7 processing layer (waypoint). With kgateway as the waypoint proxy, users gain advanced L7 features such as request transformation, retries, and traffic control for AI workloads connecting to LLM services. This pluggability ensures consistent operational experiences for north-south and inter-service traffic. [Steven Landow](https://gist.github.com/stevenctl), who is a maintainer on both Istio and kgateway, is leading [this effort](https://github.com/kgateway-dev/kgateway/issues/10453).
 
-{{< reuse-image src="blog/kgateway-waypoint.png" >}}
+{{< reuse-image src="blog/advancing-open-source-gateways-3.png" >}}
 
 To explore additional roadmap initiatives or propose updates, please refer to our [roadmap document](https://github.com/kgateway-dev/community/blob/main/ROADMAP.md).
 
