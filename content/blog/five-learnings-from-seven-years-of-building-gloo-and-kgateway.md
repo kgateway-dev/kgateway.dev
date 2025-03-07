@@ -29,7 +29,7 @@ While this worked well for small to medium-scale users, it introduced challenges
 
 ## Rethinking Control Plane Extensibility
 
-When we started Gloo in 2018, Kubernetes had not yet won the container orchestration war, so we built an abstraction layer to support multiple environments like Nomad, Consul, and file-based configurations. While this seemed flexible, it introduced inefficiencies. Our translation model used a snapshot-based structure, where upstreams, routes, and listeners were processed as a single large list. This simplified translation logic but severely impacted performance which saw any small change requiring recalculating the entire snapshot.
+When we started Gloo in 2018, Kubernetes had not yet won the container orchestration war, so we built an abstraction layer to support multiple environments like Nomad, Consul, and file-based configurations. While this seemed flexible, it introduced inefficiencies. Our translation model used a snapshot-based structure, where upstreams, routes, and listeners were processed as a single large list. This simplified translation logic but severely impacted performance—any small change requiring recalculating the entire snapshot.
 
 Furthermore, all proprietary fields were bundled into one snapshot, which worked in a project like Gloo but was unsuitable for a vendor-neutral CNCF project. This forced us to rethink extensibility.
 
