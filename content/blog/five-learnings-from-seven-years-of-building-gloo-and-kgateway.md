@@ -1,8 +1,8 @@
 ---
 title: Five Learnings from Seven Years of Building Gloo and kgateway
 toc: false
-publishDate: 2025-03-05T00:00:00-00:00
-author: Lin Sun & Yuval Kohavi 
+publishDate: 2025-03-04T00:00:00-00:00
+author: Lin Sun, & Yuval Kohavi
 ---
 
 We started Gloo Open Source in 2018, reaching GA in early 2019. Since then, we have grown Gloo adoption to hundreds of paid customers and numerous open-source users. We truly believe Gloo Gateway is the most mature and widely deployed Envoy-based gateway available in the market. This belief led us to [donate Gloo Gateway to the CNCF](https://www.youtube.com/watch?v=psZi_T1np4U) as ‘kgateway’ at KubeCon NA 2024, further enriching the cloud native API gateway ecosystem. In this blog, we share five key learnings from the past seven years of building [Gloo](https://github.com/solo-io/gloo)/[kgateway](https://github.com/kgateway-dev/kgateway).

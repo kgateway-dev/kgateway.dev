@@ -2,7 +2,7 @@
 title: Introduction to the Kubernetes Gateway API
 toc: false
 publishDate: 2025-03-05T00:00:00-00:00
-author: Eitan Suez & Alex Ly
+author:  Eitan Suez & Alex Ly
 ---
 
 Kubernetes has come a long way since its early days of exposing services via the original Ingress API. As more workloads adopt Kubernetes, the types of traffic management needed—ingress from the outside world, service-to-service (east-west) communication within the cluster, and egress to external systems—have also become more sophisticated. 
@@ -90,7 +90,7 @@ The design of Gateway API no longer forces implementers to resort to using annot
 
 Gateway API specification explicitly defines patterns for extensibility through [policy attachments](https://gateway-api.sigs.k8s.io/reference/policy-attachment/). The idea behind policy attachments is providing a way to extend the API with resources that are unique to an implementer, and that can be associated with a Gateway or Route.
 
-An example might be a custom resource for configuring rate limiting on requests through a particular route. The gateway and route definitions are a part of the API proper, whereas the custom CRD, plausibly named RateLimitOptions, is a policy attachment associated with the route, defined by the implementer.
+An example might be a custom resource for configuring rate limiting on requests through a particular route. The gateway and route definitions are a part of the API proper, whereas the custom CRD, for example, a CRD named RateLimitOptions, is a policy attachment associated with the route, defined by the implementer.
 
 Below is an example where an implementation might augment Gateway API with its own CRDs:
 
@@ -110,4 +110,4 @@ Gateway API is already fulfilling its promise as a widely adopted standard, [ove
 
 Now that we’ve explored motivation for Gateway API and how it improves upon Kubernetes' traditional ingress model, it’s time to see it in action. In the next post, we’ll take a deeper dive into the core concepts of Gateway API and walk through a concrete example. 
 
-Also, don’t forget that this blog series is accompanied by an in-depth video series which you can watch [here](https://kgateway.dev/resources/videos/) and [hands-labs](https://kgateway.dev/resources/labs/) for you to test out the concepts. 
+Also, don’t forget that this blog series is accompanied by an in-depth video series which you can watch [here](https://kgateway.dev/resources/videos/) and [hands-on-labs](https://kgateway.dev/resources/labs/) for you to test out the concepts.

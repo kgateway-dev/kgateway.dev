@@ -2,7 +2,7 @@
 title: Guide to Installing kgateway
 toc: false
 publishDate: 2025-03-06T00:00:00-00:00
-author: Eitan Suez, Technical Marketing Manager @ Solo.io & Alex Ly, Field Engineer @ Solo.io
+author: Eitan Suez & Alex Ly 
 ---
 
 [kgateway](https://kgateway.dev/) is an implementation of the Kubernetes Gateway API developed by Solo.io and donated to the CNCF at KubeCon Salt Lake City in Fall 2024. It’s designed to program Envoy, the CNCF's popular cloud-native proxy, offering modern traffic management across Kubernetes (and even non-Kubernetes) workloads. For more information around the motivations behind the kgateway project, Lin Sun recently [penned a blog](https://kgateway.dev/blog/advancing-open-source-gateways/) providing an update on the project.
