@@ -7,7 +7,7 @@ Automatically monitor the status of backends by configuring health checks.
 
 ## About
 
-When you configure a {{< reuse "docs/snippets/product-name.md" >}} [Backend](/docs/traffic-management/destination-types/upstreams/) resource, you can add both health checks and outlier detection, which are important elements of building resilient apps.
+When you configure a {{< reuse "docs/snippets/product-name.md" >}} [Backend](/docs/traffic-management/destination-types/backends/) resource, you can add both health checks and outlier detection, which are important elements of building resilient apps.
 
 ### Health checks
 

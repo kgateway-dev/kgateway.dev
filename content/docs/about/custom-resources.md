@@ -76,5 +76,5 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 While you can route incoming traffic to a Kubernetes Service directly by referencing the Service in your HTTPRoute, you might want to add additional configuration to your service or point to endpoints outside your cluster. For example, you might want to route traffic to an AWS Lambda instance. You might also want to add settings to a Kubernetes Service, such as HTTP/2, traffic shadowing, or health check capabilities. 
 
-You can use an [Backend](/docs/traffic-management/destination-types/upstreams/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/upstreams/). 
+You can use an [Backend](/docs/traffic-management/destination-types/backends/) resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/). 
 

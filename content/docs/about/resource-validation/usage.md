@@ -1,7 +1,7 @@
 ---
 title: Test resources
 weight: 20
-description: Try out the resource validation capability in {{< reuse "docs/snippets/product-name.md" >}} to check configuration before you apply it to your cluster.
+description: Try out the resource validation capability in kgateway to check configuration before you apply it to your cluster.
 
 ---
 

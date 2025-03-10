@@ -1,0 +1,50 @@
+name: Card Check on _index.md Changes
+
+on:
+  pull_request:
+    paths:
+      - 'content/**/_index.md'
+
+jobs:
+  card-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+
+      - name: Run Card Check Script
+        id: card_check
+        continue-on-error: true  # Ensures the job does not fail
+        run: |
+          python3 scripts/card-check.py > card-check-results.txt || echo "CHECK_FAILED=true" >> $GITHUB_ENV
+
+      - name: Display Results
+        run: cat card-check-results.txt
+
+      - name: Comment on PR if Issues Found
+        if: env.CHECK_FAILED == 'true'
+        uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            ⚠️ **Card Check Notice** ⚠️
+
+            The `_index.md` files in this PR contain discrepancies between the `cards` shortcode and actual files/subdirectories.
+
+            **This check does not block merging**, but you might want to review the following issues and update the `_index.md` files if necessary.
+
+            > [!NOTE]
+            > For more information, see the card-check.py script and readme in the [scripts](https://github.com/kgateway-dev/kgateway.dev/tree/main/scripts) directory.
+
+            ```
+            $(cat card-check-results.txt)
+            ```

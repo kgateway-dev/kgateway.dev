@@ -17,7 +17,7 @@ When a copy of the request is sent to the shadow app, {{< reuse "docs/snippets/p
 To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](https://github.com/opendiffy/diffy). This tool create diff-compares on the responses. You can use this data to verify that the response is correct and to detect API forward/backward compatibility problems. 
 
 {{% callout type="info" %}}
-To enable traffic shadowing, you must set up an [Backend](/docs/traffic-management/destination-types/upstreams/) resource for the app that you want to shadow traffic for and for the app that receives the shadowed traffic.  
+To enable traffic shadowing, you must set up an [Backend](/docs/traffic-management/destination-types/backends/) resource for the app that you want to shadow traffic for and for the app that receives the shadowed traffic.  
 {{% /callout %}}
 
 

@@ -1,7 +1,7 @@
 ---
 title: ExternalDNS & Cert Manager
 weight: 520
-description: Use {{< reuse "docs/snippets/product-name.md" >}} with External DNS and Cert Manager. 
+description: Use kgateway with External DNS and Cert Manager. 
 ---
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) and [Cert Manager](https://github.com/cert-manager/cert-manager) are two well known integrations within the Kubernetes ecosystem that can be used in conjunction to automate the creation of TLS certificates. 

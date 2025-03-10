@@ -1,7 +1,7 @@
 ---
 title: Argo Rollouts
 weight: 510
-description: Use {{< reuse "docs/snippets/product-name.md" >}} with Argo Rollouts. 
+description: Use kgateway with Argo Rollouts. 
 ---
 
 [Argo Rollouts](https://argoproj.github.io/rollouts/) is a Kubernetes controller that provides advanced deployment capabilities such as blue-green, canary, canary analysis, experimentation, and progressive delivery features to Kubernetes. Because Argo Rollouts supports the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, you can use Argo Rollouts to control how traffic is split and forwarded from the proxies that {{< reuse "docs/snippets/product-name.md" >}} v2 manages to the apps in your cluster. 
