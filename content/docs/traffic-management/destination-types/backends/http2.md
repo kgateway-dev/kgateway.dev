@@ -63,7 +63,7 @@ You can add the `spec.useHttp2` setting to an Backend directly.
 One of the ways to enable HTTP/2, is to add the `gloo.solo.io/h2_service` annotation to the Kubernetes service and set it to `true`. If the annotation is present, {{< reuse "docs/snippets/product-name.md" >}} automatically updates the Backend and adds the `useHttp2` value.
 
 {{% callout type="info" %}}
-To use service annotations to enable HTTP/2 for a destination, you must [enable service discovery in {{< reuse "docs/snippets/product-name.md" >}}](/docs/traffic-management/destination-types/upstreams/#discovered-backends).
+To use service annotations to enable HTTP/2 for a destination, you must [enable service discovery in {{< reuse "docs/snippets/product-name.md" >}}](/docs/traffic-management/destination-types/backends/#discovered-backends).
 {{% /callout %}}
 
 1. Review the httpbin Backend resource that was automatically created for the httpbin app that you deployed as part of the [Get started](/docs/quickstart/) guide. Note that the `spec.useHttp2` option is not set. 
@@ -152,7 +152,7 @@ In a race condition where both the annotation and port name are set, the annotat
 You can enable HTTP/2 by setting specific port names on the service that exposes the Backend. The name of the port must be one of the following: `grpc`, `http2`, or `h2`. 
 
 {{% callout type="info" %}}
-To use port names to enable HTTP/2 for a destination, you must [enable service discovery in {{< reuse "docs/snippets/product-name.md" >}}](/docs/traffic-management/destination-types/upstreams/#discovered-backends).
+To use port names to enable HTTP/2 for a destination, you must [enable service discovery in {{< reuse "docs/snippets/product-name.md" >}}](/docs/traffic-management/destination-types/backends/#discovered-backends).
 {{% /callout %}}
 
 1. Review the httpbin Backend resource that was automatically created for the httpbin app that you deployed as part of the [Get started](/docs/quickstart/) guide. Note that the `spec.useHttp2` option is not set. 

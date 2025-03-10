@@ -67,7 +67,7 @@ The final snapshot is passed to the xDS Server, which notifies Envoy of a succes
 
 {{< reuse "docs/snippets/discovery-about.md" >}}
 
-To enable automatic discovery of services, see [Discovery](/docs/traffic-management/destination-types/upstreams/#discovery). To learn more about Backends, see [Backends](/docs/traffic-management/destination-types/upstreams/).
+To enable automatic discovery of services, see [Discovery](/docs/traffic-management/destination-types/backends/#discovery). To learn more about Backends, see [Backends](/docs/traffic-management/destination-types/backends/).
 
 The following image shows how the endpoint discovery component discovers Kubernetes services and Functions and automatically creates Backend resources for them. 
 

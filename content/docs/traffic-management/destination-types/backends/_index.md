@@ -23,6 +23,7 @@ Check out the following guides for examples on how to use the supported Backends
   {{< card link="static" title="Static IP address or hostname" >}}
   {{< card link="kubernetes" title="Kubernetes Service" >}}
   {{< card link="lambda" title="AWS Lambda" >}}
+  {{< card link="ec2" title="AWS EC2 instance" >}}
   {{< card link="http2" title="HTTP/2" >}}
 {{< /cards >}}
 
@@ -35,11 +36,11 @@ Backends of type `azure`, `consul`, `grpc`, `rest`, or `awsEc2` are not supporte
 {{% /callout %}}
 
 Check out the following guides for examples on how to use Backends with {{< reuse "docs/snippets/product-name.md" >}}:  
-* [Static](/traffic-management/destination-types/upstreams/static/)
-* [Kubernetes service](/traffic-management/destination-types/upstreams/kubernetes/)
-* [Google Cloud Run](/traffic-management/destination-types/upstreams/cloud-run/)
-* [AWS Lambda](/traffic-management/destination-types/upstreams/lambda/)
-* [HTTP/2](/traffic-management/destination-types/upstreams/http2/)
+* [Static](/traffic-management/destination-types/backends/static/)
+* [Kubernetes service](/traffic-management/destination-types/backends/kubernetes/)
+* [Google Cloud Run](/traffic-management/destination-types/backends/cloud-run/)
+* [AWS Lambda](/traffic-management/destination-types/backends/lambda/)
+* [HTTP/2](/traffic-management/destination-types/backends/http2/)
 
 -->
 
@@ -116,4 +117,4 @@ spec:
           name: rewrite
 ```
 
-For an example, see the [Static](/docs/traffic-management/destination-types/upstreams/static/) Backend guide. 
+For an example, see the [Static](/docs/traffic-management/destination-types/backends/static/) Backend guide. 

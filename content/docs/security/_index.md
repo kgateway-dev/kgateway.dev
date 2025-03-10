@@ -9,5 +9,4 @@ Secure your gateway to prevent unauthenticated and unauthorized access to your a
   {{< card link="access-logging" title="Access logging" >}}
   {{< card link="cors" title="CORS" >}}
   {{< card link="csrf" title="CSRF" >}}
-  {{< card link="local" title="Local rate limiting" >}}
 {{< /cards >}}

@@ -18,7 +18,7 @@ The {{< reuse "docs/snippets/product-name.md" >}} project provides the following
 {{< cards >}}
   {{< card link="/docs/security/access-logging/" title="Access logging" tag="Security" >}}
   {{< card link="/docs/setup/customize/aws-elb/" title="AWS ALB and NLB" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/destination-types/upstreams/lambda" title="AWS Lambda" tag="Traffic" >}}
+  {{< card link="/docs/traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/buffering/" title="Buffering" tag="Traffic" >}}
   {{< card link="/docs/security/cors/" title="Cross-Origin Resource Sharing (CORS)" tag="Security" >}}
   {{< card link="/docs/security/csrf/" title="Cross-Site Request Forgery (CSRF)" tag="Security" >}}
