@@ -1,7 +1,7 @@
 ---
 title: Uninstall
 weight: 50
-description: Uninstall {{< reuse "docs/snippets/product-name.md" >}} and related components.
+description: Uninstall kgateway and related components.
 ---
 
 If you no longer need your {{< reuse "docs/snippets/product-name.md" >}} environment, you can uninstall the control plane and all gateway proxies. You can also optionally remove related components such as Prometheus and sample apps.

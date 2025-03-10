@@ -1,6 +1,6 @@
 ---
 title: Version support
-description: View supported {{< reuse "docs/snippets/product-name.md" >}} versions and their release cycle.
+description: View supported kgateway versions and their release cycle.
 weight: 50
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: Retries
 weight: 10
-description: Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive backend service.
+description: Specify the number of times and duration you want kgateway to try a connection to an unresponsive backend service.
 ---
 
 Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive backend service.
