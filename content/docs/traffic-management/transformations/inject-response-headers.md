@@ -12,31 +12,56 @@ The following example walks you through how to use an Inja template to extract a
 
 ## Inject response headers
    
-1. Create a VirtualHostOption resource with your transformation rules. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.  
+1. Create a RoutePolicy resource with your transformation rules. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.
+   
    ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
+   kind: RoutePolicy
    metadata:
      name: transformation
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     options:
-       transformations:
-         responseTransformation:
-           transformationTemplate:
-             headers:
-               x-solo-response:
-                 text: '{{ request_header("x-solo-request") }}'
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     transformation:
+       response:
+         set:
+         - name: x-solo-response
+           value: '{{ request_header("x-solo-request") }}' 
    EOF
    ```
 
-2. Send a request to the httpbin app and include the `x-solo-request` request header. Verify that you get back a 200 HTTP response code and that the value of the `x-solo-request` header was added to the `x-solo-response` response header. 
+2. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+         filters:
+         - type: ExtensionRef
+           extensionRef:
+             group: gateway.kgateway.dev
+             kind: RoutePolicy
+             name: transformation
+   EOF
+   ```
+
+3. Send a request to the httpbin app and include the `x-solo-request` request header. Verify that you get back a 200 HTTP response code and that the value of the `x-solo-request` header was added to the `x-solo-response` response header. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -84,6 +109,6 @@ The following example walks you through how to use an Inja template to extract a
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete RoutePolicy transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
    
