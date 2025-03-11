@@ -57,11 +57,11 @@ Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" 
 
 5. Click **Deploy**.
 
-## Create an Backend and HTTPRoute
+## Create a Backend and HTTPRoute
 
 Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
-1. In your terminal, create an Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
+1. In your terminal, create a Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
    
    ```yaml
    kubectl apply -f - <<EOF

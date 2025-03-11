@@ -258,7 +258,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
 
 You can exclude a service from requiring to communicate with the gateway proxy via mTLS by adding the `disableIstioAutoMtls` option to the Backend that represents your service. 
 
-1. Create an Backend resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Backend from communicating with the gateway proxy via mTLS. 
+1. Create a Backend resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Backend from communicating with the gateway proxy via mTLS. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

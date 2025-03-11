@@ -18,7 +18,7 @@ To help you think about Backends, consider how they relate to the underlying ope
 
 Each {{< reuse "docs/snippets/product-name.md" >}} Backend must define a type, such as `ai` or `static`. Each type is handled by a different plugin in {{< reuse "docs/snippets/product-name.md" >}}. For more information, see [Types](#types). 
 
-To route to an Backend resource, you reference the Backend in the `backendRefs` section of your HTTPRoute, just like you do when routing to a Kubernetes service directly. For more information, see [Routing](#routing).
+To route to a Backend resource, you reference the Backend in the `backendRefs` section of your HTTPRoute, just like you do when routing to a Kubernetes service directly. For more information, see [Routing](#routing).
 
 ## Types
 
@@ -31,7 +31,7 @@ Check out the following guides for examples on how to use the supported Backends
 
 ## Routing
 
-You can route to an Backend by simply referencing that Backend in the `backendRefs` section of your HTTPRoute resource as shown in the following example. Note that if your Backend and HTTPRoute resources exist in different namespaces, you must create a Kubernetes ReferenceGrant resource to allow the HTTPRoute to access the Backend.
+You can route to a Backend by simply referencing that Backend in the `backendRefs` section of your HTTPRoute resource as shown in the following example. Note that if your Backend and HTTPRoute resources exist in different namespaces, you must create a Kubernetes ReferenceGrant resource to allow the HTTPRoute to access the Backend.
 
 {{< callout type="warning" >}}
 Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
@@ -49,17 +49,16 @@ spec:
     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
   hostnames:
     - static.example
-  rules:
-    - backendRefs:
-      - name: json-backend
-        kind: Backend
-        group: gateway.kgateway.dev
-      filters:
-      - type: ExtensionRef
-        extensionRef:
-          group: gateway.kgateway.dev
-          kind: RoutePolicy
-          name: rewrite
+     rules:
+       - backendRefs:
+         - name: json-backend
+           kind: Backend
+           group: gateway.kgateway.dev
+         filters:
+         - type: URLRewrite
+           urlRewrite:
+             hostname: jsonplaceholder.typicode.com
+   EOF
 ```
 
 For an example, see the [Static](/docs/traffic-management/destination-types/backends/static/) Backend guide. 

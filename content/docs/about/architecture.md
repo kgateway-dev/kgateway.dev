@@ -29,7 +29,7 @@ The config watcher component is part of the {{< reuse "docs/snippets/product-nam
 
 ### Secret watcher
 
-The secret watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches a secret store for updates to secrets. For example, you might use a Kubernetes Secret to store the AWS access key and secret key credentials for an Backend to access an AWS Lambda. However, you can configure {{< reuse "docs/snippets/product-name.md" >}} to also watch other secret stores.
+The secret watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches a secret store for updates to secrets. For example, you might use a Kubernetes Secret to store the AWS access key and secret key credentials for a Backend to access an AWS Lambda. However, you can configure {{< reuse "docs/snippets/product-name.md" >}} to also watch other secret stores.
 
 
 ### Endpoint discovery 

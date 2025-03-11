@@ -42,7 +42,7 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
    kubectl -n shadow get pods
    ```
 
-4. Create an Backend resource for the httpbin shadow app. 
+4. Create a Backend resource for the httpbin shadow app. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
