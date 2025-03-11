@@ -27,7 +27,6 @@ Check out the following guides for examples on how to use the supported Backends
 {{< cards >}}
   {{< card link="static" title="Static IP address or hostname" >}}
   {{< card link="lambda" title="AWS Lambda" >}}
-  {{< card link="ec2" title="AWS EC2 instance" >}}
 {{< /cards >}}
 
 ## Routing
