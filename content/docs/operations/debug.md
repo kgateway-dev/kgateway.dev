@@ -100,7 +100,7 @@ Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that
    | Component | Command |
    | ------------- | ------------- |
    | Gloo control plane | `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l kgateway=kgateway` |
-   | Gloo gateway proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l gloo=kube-gateway` |
+   | {{< reuse "docs/snippets/product-name.md" >}} proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l gloo=kube-gateway` |
    | Redis | `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l gloo=redis` |
 
 7. If you still cannot troubleshoot the issue, capture the logs and the state of {{< reuse "docs/snippets/product-name.md" >}} in a file. 
