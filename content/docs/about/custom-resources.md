@@ -74,7 +74,7 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 ### Backends
 
-For workloads within your cluster, you can can route incoming traffic to their Kubernetes Service. But what if you have external services such as static hostnames or AWS Lambda functions?
+For workloads within your cluster, you can can route incoming traffic to their Kubernetes Service. But what if you have external services such as static hostnames or AWS Lambda functions that you want to route traffic to?
 
-You can use a {{< reuse "docs/snippets/product-name.md" >}} Backend resource to accomplish these tasks. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/). 
+You can use a {{< reuse "docs/snippets/product-name.md" >}} Backend resource to accomplish this task. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/). 
 
