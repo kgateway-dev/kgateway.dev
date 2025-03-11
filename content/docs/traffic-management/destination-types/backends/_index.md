@@ -4,16 +4,21 @@ weight: 20
 prev: /docs/traffic-management/destination-types/kube-services
 ---
 
+Use a Backend resource to define a backing destination that you want {{< reuse "docs/snippets/product-name.md" >}} to route to. For more information, see the [Backend API docs](/docs/reference/api/upstream). 
 
-Use Backend resources to define a backing destination for a route that you want {{< reuse "docs/snippets/product-name.md" >}} to route to.
+## About
 
-Backends can be compared to a [cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) in Envoy terminology. Each Backend must define a type. Supported types include `static` and `kubernetes`. Each type is handled by a different plugin in {{< reuse "docs/snippets/product-name.md" >}}. For more information, see [Types](#types). 
+To help you think about Backends, consider how they relate to the underlying open source projects that you might be familiar with:
 
-Backends allow you to add additional configuration to instruct {{< reuse "docs/snippets/product-name.md" >}} how to handle the request to the backing destination. For example, you can define that the destination requires the requests to be sent with the HTTP/2 protocol or that you want requests to be load balanced by using a specific load balancing algorithm. To route to an Backend resource, you reference the Backend in the `backendRefs` section of your HTTPRoute, just like you do when routing to a Kubernetes service directly. For more information, see [Routing](#routing). 
+* Envoy: The {{< reuse "docs/snippets/product-name.md" >}} Backend can be compared to a [cluster](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) in Envoy terminology.
+* {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}: The {{< reuse "docs/snippets/product-name.md" >}} Backend is a backend destination that Gateway API routing resources refer to through `backendRefs` [extension points](https://gateway-api.sigs.k8s.io/concepts/api-overview/#extension-points).
+* Gloo Edge API: The {{< reuse "docs/snippets/product-name.md" >}} Backend is similar to a [Gloo Upstream](https://docs.solo.io/gloo-edge/latest/guides/traffic_management/destination_types/), but with several important differences as follows: 
+  * Destination-only, no policy: The Gloo Upstream combines both routing destination and policy rules. Unlike the Gloo Upstream, the {{< reuse "docs/snippets/product-name.md" >}} Backend sets up only routing destination. Routing policy rules, such as TLS connectivity or load balancing behavior, must be set up with a separate {{< reuse "docs/snippets/product-name.md" >}} resource, such as BackendTlsPolicy. 
+  * No discovery: {{< reuse "docs/snippets/product-name.md" >}} does not automatically discover and create Backends for the Kubernetes Services in your cluster.
 
-You can manually create Backends or enable Backend discovery in {{< reuse "docs/snippets/product-name.md" >}} to automatically create Backends for any Kubernetes service that is created and discovered in the cluster. 
+Each {{< reuse "docs/snippets/product-name.md" >}} Backend must define a type, such as `ai` or `static`. Each type is handled by a different plugin in {{< reuse "docs/snippets/product-name.md" >}}. For more information, see [Types](#types). 
 
-For more information, see the [Backend API reference](/docs/reference/api/upstream). 
+To route to an Backend resource, you reference the Backend in the `backendRefs` section of your HTTPRoute, just like you do when routing to a Kubernetes service directly. For more information, see [Routing](#routing).
 
 ## Types
 
@@ -21,68 +26,9 @@ Check out the following guides for examples on how to use the supported Backends
 
 {{< cards >}}
   {{< card link="static" title="Static IP address or hostname" >}}
-  {{< card link="kubernetes" title="Kubernetes Service" >}}
   {{< card link="lambda" title="AWS Lambda" >}}
   {{< card link="ec2" title="AWS EC2 instance" >}}
-  {{< card link="http2" title="HTTP/2" >}}
 {{< /cards >}}
-
-<!-- TODO supported backends
-
-You can create Backends of type `static`, `kube`, `aws`, and `gcp`. 
-
-{{% callout type="info" %}}
-Backends of type `azure`, `consul`, `grpc`, `rest`, or `awsEc2` are not supported in {{< reuse "docs/snippets/product-name.md" >}} when using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. You can use these types of Backends when using a gateway proxy that is configured for the {{< reuse "docs/snippets/product-name.md" >}} API. For more information, see [Destination types in the {{< reuse "docs/snippets/product-name.md" >}} ({{< reuse "docs/snippets/product-name.md" >}} API) documentation](https://docs.solo.io/gloo-edge/latest/guides/traffic_management/destination_types/).
-{{% /callout %}}
-
-Check out the following guides for examples on how to use Backends with {{< reuse "docs/snippets/product-name.md" >}}:  
-* [Static](/traffic-management/destination-types/backends/static/)
-* [Kubernetes service](/traffic-management/destination-types/backends/kubernetes/)
-* [Google Cloud Run](/traffic-management/destination-types/backends/cloud-run/)
-* [AWS Lambda](/traffic-management/destination-types/backends/lambda/)
-* [HTTP/2](/traffic-management/destination-types/backends/http2/)
-
--->
-
-<!--
-
-### Static
-
-Static Backends are the 
-
-### Kubernetes
--->
-
-## Discovery
-
-{{< reuse "docs/snippets/discovery-about.md" >}}
-
-To enable service discovery: 
-
-1. Get the current values for your Helm chart. 
-   ```sh
-   helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
-   open kgateway.yaml
-   ```
-
-2. In your Helm values file, enable service discovery. 
-   ```yaml
-   gloo:
-     discovery:
-       enabled: true
-   ```
-
-3. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enable service discovery. 
-   ```sh
-   helm upgrade -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway kgateway/kgateway\
-   --values kgateway.yaml \
-   --version {{< reuse "docs/versions/n-patch.md" >}} 
-   ```
-   
-4. Review the Backend resources that are automatically created for the Kubernetes services that you have in your cluster. 
-   ```sh
-   kubectl get backends -n {{< reuse "docs/snippets/ns-system.md" >}}
-   ```
 
 ## Routing
 
@@ -108,12 +54,12 @@ spec:
     - backendRefs:
       - name: json-backend
         kind: Backend
-        group: gloo.solo.io
+        group: gateway.kgateway.dev
       filters:
       - type: ExtensionRef
         extensionRef:
-          group: gateway.solo.io
-          kind: RouteOption
+          group: gateway.kgateway.dev
+          kind: RoutePolicy
           name: rewrite
 ```
 
