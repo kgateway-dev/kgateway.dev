@@ -157,7 +157,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    
    Example output: 
    ```console {hl_lines=[17,18,19]}
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Settings
    metadata:
      annotations:
@@ -261,7 +261,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
 1. Create an Backend resource that represents the httpbin app and add the `disableIstioAutoMtls: true` option to it. This option excludes the httpbin Backend from communicating with the gateway proxy via mTLS. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: httpbin
@@ -293,7 +293,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
        - backendRefs:
          - name: httpbin
            kind: Backend
-           group: gloo.solo.io
+           group: gateway.kgateway.dev
    EOF
    ```
 

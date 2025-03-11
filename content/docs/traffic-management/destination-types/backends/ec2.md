@@ -98,7 +98,7 @@ The following example shows how to use a user's AWS access key ID and secret key
 1. Create an Backend that represents your EC2 instance. Replace the AWS region with the region that your instance is in. Also make sure to add the ARN of the AWS role that you created earlier. If you assigned the permissions directly to your AWS user, the AWS access key ID and secret key are sufficient to authenticate with AWS and access the EC2 instance. In this case, remove the `spec.awsEc2.roleArn` from your Backend configuration. 
    ```yaml
    kubectl apply -f- <<EOF              
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      annotations:
@@ -142,7 +142,7 @@ The following example shows how to use a user's AWS access key ID and secret key
        namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      rules:
      - backendRefs:
-       - group: gloo.solo.io
+       - group: gateway.kgateway.dev
          kind: Backend
          name: ec2
        matches:

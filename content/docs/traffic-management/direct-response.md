@@ -80,7 +80,7 @@ The following rules are applied during schema validation:
        - type: ExtensionRef
          extensionRef:
           name: direct-response
-          group: gateway.gloo.solo.io
+          group: gateway.gateway.kgateway.dev
           kind: DirectResponse
    EOF
    ```

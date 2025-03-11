@@ -202,7 +202,7 @@ Instead of specifying the headers in your VirtualHostOption or RouteOption resou
 
 Add headers from a Kubernetes secret to each request that the gateway serves. 
 
-1. Create a Kubernetes secret of type `gloo.solo.io/header` or `Opaque` that contains the headers that you want to add to a request. The following command creates a Kubernetes secret of type `gloo.solo.io/header` with two headers `x-header-1: one` and `x-header-2: two`. 
+1. Create a Kubernetes secret of type `gateway.kgateway.dev/header` or `Opaque` that contains the headers that you want to add to a request. The following command creates a Kubernetes secret of type `gateway.kgateway.dev/header` with two headers `x-header-1: one` and `x-header-2: two`. 
    ```sh
    {{< reuse "docs/snippets/cli-name.md" >}} create secret header my-headers --headers x-header-1=one,x-header-2=two -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
@@ -292,7 +292,7 @@ Add headers from a Kubernetes secret to each request that the gateway serves.
 
 Add headers from a Kubernetes secret for requests to a specific route. 
 
-1. Create a Kubernetes secret of type `gloo.solo.io/header` or `Opaque` that contains the headers that you want to add to a request. The following command creates a Kubernetes secret of type `gloo.solo.io/header` with two headers `x-header-1: one` and `x-header-2: two`. 
+1. Create a Kubernetes secret of type `gateway.kgateway.dev/header` or `Opaque` that contains the headers that you want to add to a request. The following command creates a Kubernetes secret of type `gateway.kgateway.dev/header` with two headers `x-header-1: one` and `x-header-2: two`. 
    ```sh
    {{< reuse "docs/snippets/cli-name.md" >}} create secret header my-headers --headers x-header-1=one,x-header-2=two -n httpbin
    ```

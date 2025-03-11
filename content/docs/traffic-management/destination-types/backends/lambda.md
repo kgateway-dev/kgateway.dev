@@ -65,7 +65,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
    
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: lambda
@@ -104,12 +104,12 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
        backendRefs:
        - name: lambda
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-         group: gloo.solo.io
+         group: gateway.kgateway.dev
          kind: Backend
          filters:
            - type: ExtensionRef
              extensionRef:
-               group: "gloo.solo.io"
+               group: "gateway.kgateway.dev"
                kind: Parameter
                name: echo
    EOF

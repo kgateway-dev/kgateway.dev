@@ -51,7 +51,7 @@ You can add the following additional settings to adjust the health check configu
 In an Backend resource, add the following configuration sections to configure health checks and outlier detection. The following example configures a simple set of health check and outlier detection settings to get you started.
 
 ```yaml
-apiVersion: gloo.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: Backend
 metadata:
   name: my-backend
@@ -83,7 +83,7 @@ To try out an active health check and outlier detection policy, you can follow t
 1. Create an Backend resource that configures a health check on the httpbin path `/status/503`. This path always returns a `503 Service Unavailable` HTTP response code, which {{< reuse "docs/snippets/product-name.md" >}} interprets as a failing request. Additionally, the outlier detection settings allow {{< reuse "docs/snippets/product-name.md" >}} to remove the Backend from its pool of healthy destinations that it can send traffic to.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: httpbin
@@ -128,7 +128,7 @@ To try out an active health check and outlier detection policy, you can follow t
        namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      rules:
      - backendRefs:
-       - group: gloo.solo.io
+       - group: gateway.kgateway.dev
          kind: Backend
          name: httpbin
    EOF
