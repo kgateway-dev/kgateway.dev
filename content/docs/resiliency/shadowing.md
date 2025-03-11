@@ -42,10 +42,10 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
    kubectl -n shadow get pods
    ```
 
-4. Create an Backend resource for the httpbin shadow app. 
+4. Create a Backend resource for the httpbin shadow app. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: shadow
@@ -61,7 +61,7 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
 5. Create another Backend resource for the httpbin app that you deployed as part of the [Get started](/docs/quickstart/}) guide. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: httpbin
@@ -116,7 +116,7 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
          backendRefs:
            - name: httpbin
              kind: Backend
-             group: gloo.solo.io
+             group: gateway.kgateway.dev
              namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    EOF
    ```
@@ -135,7 +135,7 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
          kind: HTTPRoute
          namespace: httpbin
      to:
-       - group: "gloo.solo.io"
+       - group: "gateway.kgateway.dev"
          kind: Backend
    EOF
    ```

@@ -3,6 +3,8 @@ title: AWS EC2
 weight: 30
 ---
 
+<!--TODO add in ec2 support when ready -->
+
 Route traffic directly to an AWS EC2 instance. 
 
 ## Before you begin 
@@ -19,23 +21,46 @@ Route traffic directly to an AWS EC2 instance.
      - `gateway-tag: group1`
      - `version: v1.2.3`. 
 
-2. [Connect to your EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-connect-to-instance). 
+2. Save the EC2 instance region and account ID as environment variables.
 
-3. Use the following script to set up a demo echo app that returns specific HTTP response codes. For example, a request to `http://$INSTANCE_IP/?code=404` returns a 404 HTTP response. 
+   ```sh
+   export AWS_REGION=<us-east-2>
+   export AWS_ACCOUNT_ID=<12-digit-account-ID>
+   ```
+
+3. [Connect to your EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-connect-to-instance). 
+
+4. Use the following script to set up a demo echo app that returns specific HTTP response codes. For example, a request to `http://$INSTANCE_IP/?code=404` returns a 404 HTTP response. 
    ```sh
    wget https://mitch-solo-public.s3.amazonaws.com/echoapp2
    chmod +x echoapp2
    sudo ./echoapp2 --port 81 &
    ```
    
-4. Verify that you can reach the echo app. The following curl request returns the app's help menu. 
-   ```sh
-   curl http://$INSTANCE_IP/
-   ```
+5. Verify that you can reach the echo app. The following curl request returns the app's help menu. Replace `$INSTANCE_IP` with the IP address of your EC2 instance.
    
+   ```sh
+   curl http://$INSTANCE_IP/help
+   ```
+
+   Example output:
+
+   ```
+   usage:
+   curl -v http://localhost:8080/?code=<httpCode>
+     where httpCode is a http response code such as 200, 404, or 500
+   
+   /metrics - returns http response code metrics in the form:
+     {"Counts":{"100":1,"200":3,"202":1}}
+   
+   /metrics/reset - resets the metrics
+   
+   /help - prints this message
+   ```
+
 ## Create AWS credentials
 
-Create AWS credentials for the EC2 instance so that Gloo Gateway can connect to it. 
+Create AWS credentials for the EC2 instance so that {{< reuse "docs/snippets/product-name.md" >}} can connect to it. 
 
 {{% callout type="info" %}}
 The following example shows how to use a user's AWS access key ID and secret key to authenticate with AWS, and an AWS role to authorize access to the EC2 instance. This approach is recommended. However, you can also assign the required permissions to your AWS user directly and only use an AWS access key ID and secret key. 
@@ -44,20 +69,29 @@ The following example shows how to use a user's AWS access key ID and secret key
 1. Get the AWS access key ID and secret key of the user that you want to use to authenticate with AWS. For more information, see the [AWS documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html). 
 
 2. Create a Kubernetes secret that holds your AWS access key ID and secret key. 
+   
    ```sh
-   glooctl create secret aws \
-    --name gateway-tag-group1 \
-    --namespace default \
-    --access-key <aws_access_key_ID> \
-    --secret-key <aws_secret_key>
+   kubectl apply -f- <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: gateway-tag-group1
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+   type: Opaque
+   stringData:
+     AWS_ACCESS_KEY_ID: <access_key>
+     AWS_SECRET_ACCESS_KEY: <secret_key>
+   EOF
     ```
 
 3. Create an AWS role. 
+   
    1. From the AWS console, navigate to **IAM** > **Roles**. 
    2. Click **Create Role**.
    3. Select **AWS account** as the type of trusted entity.
    4. Enter the 12-digit account ID of the account that has the EC2 instances that you want to route to.
    5. Assign the required permission. At a minimum, you must be able to describe EC2 instances. The following example shows a sample policy configuration. 
+      
       ```json
       {
         "Version": "2012-10-17",
@@ -72,7 +106,14 @@ The following example shows how to use a user's AWS access key ID and secret key
       }
       ```
 
+   6. Save the role ARN as an environment variable.
+
+      ```sh
+      export AWS_ROLE_ARN=arn:aws:iam::802411188784:role/docs-eks-cluster
+      ```
+
 4. Add your AWS user as a trusted entity to your role. 
+   
    1. Open the AWS role that you created. 
    2. Navigate to the **Trust relationship** tab. 
    3. Edit the **Trusted entities** to allow your AWS user to assume this role. 
@@ -94,37 +135,32 @@ The following example shows how to use a user's AWS access key ID and secret key
  
 ## Set up routing to your EC2 instance
 
+Create a Backend that represents your EC2 instance.
 
-1. Create an Backend that represents your EC2 instance. Replace the AWS region with the region that your instance is in. Also make sure to add the ARN of the AWS role that you created earlier. If you assigned the permissions directly to your AWS user, the AWS access key ID and secret key are sufficient to authenticate with AWS and access the EC2 instance. In this case, remove the `spec.awsEc2.roleArn` from your Backend configuration. 
+1. Create a Backend that represents your EC2 instance. Replace the AWS region with the region that your instance is in. Also make sure to add the ARN of the AWS role that you created earlier. If you assigned the permissions directly to your AWS user, the AWS access key ID and secret key are sufficient to authenticate with AWS and access the EC2 instance. In this case, remove the `spec.awsEc2.roleArn` from your Backend configuration. 
+   
    ```yaml
    kubectl apply -f- <<EOF              
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      annotations:
      name: my-ec2-backend
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     awsEc2:
-       filters:
-       - key: gateway-id
-       - kvPair:
-           key: gateway-tag
-           value: group1
-       - kvPair:
-           key: version
-           value: v1.2.3
-       region: <region>
-       publicIp: true
-       port: 81
-       secretRef:
-         name: gateway-tag-group1
-         namespace: default
-       roleArn: <role-arn>
+     type: AWS
+     aws:
+       accountId: '$AWS_ACCOUNT_ID'
+       region: $AWS_REGION
+       auth:
+         type: Secret
+         secret:
+           name: gateway-tag-group1
    EOF
    ```
 
 2. Create an HTTPRoute that routes traffic to the EC2 Backend. 
+   
    ```yaml
    kubectl apply -f- <<EOF   
    apiVersion: gateway.networking.k8s.io/v1
@@ -142,9 +178,9 @@ The following example shows how to use a user's AWS access key ID and secret key
        namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      rules:
      - backendRefs:
-       - group: gloo.solo.io
+       - group: gateway.kgateway.dev
          kind: Backend
-         name: ec2
+         name: my-ec2-backend
        matches:
        - path:
            type: PathPrefix
@@ -153,6 +189,7 @@ The following example shows how to use a user's AWS access key ID and secret key
    ```
 
 3. Send a request to your EC2 instance. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
    {{% tab %}}
    ```sh
@@ -161,12 +198,13 @@ The following example shows how to use a user's AWS access key ID and secret key
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl localhost:8080/\?code\=500 -H "host: ec2.example"
+   curl -vik localhost:8080/\?code\=500 -H "host: ec2.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: 
+   Example output: Note that the response code is 500, which is the response code that you specified in the request.
+   
    ```
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 500 Internal Server Error
@@ -181,13 +219,15 @@ The following example shows how to use a user's AWS access key ID and secret key
    server: envoy
    ```
 
+   If you get a 404 error, make sure that your AWS credentials, secret, Backend, and HTTPRoute are correctly configured.
 
 ## Cleanup
 
-1. Remove the Backend and HTTProute.
+1. Remove the Backend and HTTPRoute.
+   
    ```sh
    kubectl delete httproute ec2-route -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete backend ec2 -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete backend my-ec2-backend -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 2. Delete the AWS role or revoke permissions for your user.  

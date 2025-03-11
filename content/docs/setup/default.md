@@ -63,7 +63,7 @@ kubectl get settings default -n {{< reuse "docs/snippets/ns-system.md" >}} -o ya
 
 When you follow the [Get started](/docs/quickstart/) guide, the following Settings resource is created for you. To understand each setting, check out the [Settings custom resource documentation](/docs/reference/api/top-level/settings.proto.sk/). 
 ```yaml
-apiVersion: gloo.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: Settings
 metadata:
   annotations:

@@ -124,7 +124,7 @@ To enable TCP keepalive on backend connections, configure the following [Connect
 The following example enables TCP keepalive probes between the gateway proxy and the backend connection. The first probe is sent when the connection has been idle for 60 seconds (`keepaliveTime`). After, a TCP keepalive probe is sent every 20 seconds (`keepaliveInterval`). After no response for 2 consecutive probes (`keepaliveProbes`), the connection is dropped.
 
 ```yaml
-apiVersion: gloo.solo.io/v1
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: Backend
 metadata: # collapsed for brevity
 spec:

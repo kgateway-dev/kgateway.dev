@@ -8,7 +8,7 @@ Specify the number of times and duration you want {{< reuse "docs/snippets/produ
 
 ## About retries
 
-A retry specifies the maximum number of times {{< reuse "docs/snippets/product-name.md" >}} attempts to connect to an backend service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
+A retry specifies the maximum number of times {{< reuse "docs/snippets/product-name.md" >}} attempts to connect to a backend service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
 
 To configure retries, you can use the following settings in the RouteOption resource: 
 - `options.retries.retryOn` : The condition under which to retry forwarding the request to the backend service. This setting exposes the [`x-envoy-retry-on` Envoy header](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on). 

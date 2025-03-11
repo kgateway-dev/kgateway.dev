@@ -57,15 +57,15 @@ Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" 
 
 5. Click **Deploy**.
 
-## Create an Backend and HTTPRoute
+## Create a Backend and HTTPRoute
 
 Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
-1. In your terminal, create an Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
+1. In your terminal, create a Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
    
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: lambda
@@ -104,12 +104,12 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
        backendRefs:
        - name: lambda
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-         group: gloo.solo.io
+         group: gateway.kgateway.dev
          kind: Backend
          filters:
            - type: ExtensionRef
              extensionRef:
-               group: "gloo.solo.io"
+               group: "gateway.kgateway.dev"
                kind: Parameter
                name: echo
    EOF

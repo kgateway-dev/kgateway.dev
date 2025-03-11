@@ -14,35 +14,23 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 ## Set up a static Backend
 
 1. Create a static Backend resource that routes requests to the [JSON testing API](http://jsonplaceholder.typicode.com/).
+   
    ```yaml
    kubectl apply -f- <<EOF 
-   apiVersion: gloo.solo.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
      name: json-backend
    spec:
+     type: Static
      static:
        hosts:
-         - addr: jsonplaceholder.typicode.com
+         - host: jsonplaceholder.typicode.com
            port: 80
    EOF
    ```
-
-2. Create a RouteOption resource that rewrites the hostname to the `jsonplaceholder.typicode.com`. 
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
-   metadata:
-     name: rewrite
-     namespace: default
-   spec:
-     options:
-       hostRewrite: 'jsonplaceholder.typicode.com'
-   EOF
-   ```
    
-3. Create an HTTPRoute resource that routes traffic on the `static.example` domain to your Backend resource. To ensure that your request can be forwarded to the JSON testing API, you must also reference the RouteOption resource that rewrites hostnames to `jsonplaceholder.typicode.com`.
+2. Create an HTTPRoute resource that routes traffic on the `static.example` domain and rewrites the traffic to the hostname of your Backend resource.
    
    {{< callout type="warning" >}}
    Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
@@ -65,17 +53,16 @@ You simply add the list of static hosts or DNS names to your Backend resource an
        - backendRefs:
          - name: json-backend
            kind: Backend
-           group: gloo.solo.io
+           group: gateway.kgateway.dev
          filters:
-         - type: ExtensionRef
-           extensionRef:
-             group: gateway.solo.io
-             kind: RouteOption
-             name: rewrite
+         - type: URLRewrite
+           urlRewrite:
+             hostname: jsonplaceholder.typicode.com
    EOF
    ```
 
-4. Send a request to your Backend and verify that you get back a 200 HTTP response code and a list of posts. 
+3. Send a request to your Backend and verify that you get back a 200 HTTP response code and a list of posts. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -90,7 +77,18 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    {{< /tabs >}}
    
    Example output: 
+   
    ```
+   * Connected to <host> (::1) port 8080
+   > GET /posts HTTP/1.1
+   > Host: static.example:8080
+   > User-Agent: curl/8.7.1
+   > Accept: */*
+   > 
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   ...
     < 
     [
       {  
@@ -126,6 +124,5 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 ```sh
 kubectl delete httproute static-backend
-kubectl delete routeoption rewrite
 kubectl delete backend json-backend
 ```
