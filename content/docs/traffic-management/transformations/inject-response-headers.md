@@ -127,7 +127,7 @@ The following example walks you through how to use an Inja template to extract a
 1. Delete the RoutePolicy resource.
 
    ```sh
-   kubectl delete RoutePolicy transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete RoutePolicy transformation -n httpbin
    ```
    
 2. Remove the `extensionRef` filter from the HTTPRoute resource.
