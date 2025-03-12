@@ -8,7 +8,7 @@ Set up weight-based routing between multiple apps.
 
 ## Before you begin
 
-Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}}, set up a gateway resource, and deploy the httpbin sample app. 
+{{< reuse "docs/snippets/prereq.md" >}}
 
 ## Deploy the Helloworld sample app
 
@@ -83,7 +83,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you installed as part of the [Get started guide](/docs/quickstart/). |
+   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you created when you set up the [Sample app](/docs/operations/sample-app/). |
    |`spec.hostnames`| The hostname for which you want to apply traffic splitting.|
    |`spec.rules.matches.path`|The path prefix to match on. In this example, `/` is used. |
    |`spec.rules.backendRefs`| A list of services you want to forward traffic to. Use the `weight` option to define the amount of traffic that you want to forward to each service. |
@@ -93,53 +93,32 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    kubectl get httproute/traffic-split -n helloworld -o yaml
    ```
 
-3. Get the external address of the gateway and save it in an environment variable.
+3. Send a few requests to the `/hello` path. Verify that you see responses from all 3 Helloworld apps, and that most responses are returned from `helloworld-v3`. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
+   for i in {1..20}; do curl -i http://$INGRESS_GW_ADDRESS:8080/hello \
+   -H "host: traffic.split.example:8080"; done
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-4. Send a few requests to the `/hello` path. Verify that you see responses from all 3 Helloworld apps, and that most responses are returned from `helloworld-v3`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/hello -H "host: traffic.split.example:8080"
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   curl -vik localhost:8080/hello -H "host: traffic.split.example"
+   for i in {1..20}; do curl -i localhost:8080/hello \
+   -H "host: traffic.split.example"; done
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
-   < server: envoy
    server: envoy
-   < date: Mon, 20 Nov 2023 18:04:30 GMT
-   date: Mon, 20 Nov 2023 18:04:30 GMT
-   < content-type: text/html; charset=utf-8
+   date: Wed, 12 Mar 2025 20:59:35 GMT
    content-type: text/html; charset=utf-8
-   < content-length: 60
    content-length: 60
-   < x-envoy-upstream-service-time: 178
-   x-envoy-upstream-service-time: 178
+   x-envoy-upstream-service-time: 110
 
-   < 
-   Hello version: v3, instance: helloworld-v3-8576f76d87-hhn4r   
+   Hello version: v3, instance: helloworld-v3-55bfdf76cf-nv545
    ```
 
    
