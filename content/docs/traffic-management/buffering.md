@@ -12,10 +12,6 @@ Fine-tune connection speeds for read and write operations.
 
 By default, {{< reuse "docs/snippets/product-name.md" >}} is set up with 1MiB of request read and write buffer for each gateway listener. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "docs/snippets/product-name.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 500 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service.
 
-{{< callout type="info" >}}
-You can configure a maximum payload size on a gateway (`perConnectionBufferLimitBytes`) with the ListenerPolicy resource or on a route (`perRequestBufferLimitBytes`) with the RouteOption resource. The smaller size takes precedence. For example, if a gateway sets the maximum payload size to 10MB and the route to 15MB, the gateway maximum size is enforced. However, if the route size is only 5MB (less than the gateway), then the route maximum size is enforced. To configure different maximum payload sizes for specific workloads, set a larger size on the gateway. Then, set smaller sizes for each workload’s route. Routes that do not specify a maximum payload size inherit the payload size from the gateway.
-{{< /callout >}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -31,12 +27,11 @@ You can configure a maximum payload size on a gateway (`perConnectionBufferLimit
      name: bufferlimits
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
+     targetRef:
+       group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     options:
-       perConnectionBufferLimitBytes: 10485760
+     perConnectionBufferLimitBytes: 10485760
    EOF
    ```
 
@@ -49,7 +44,7 @@ You can configure a maximum payload size on a gateway (`perConnectionBufferLimit
       ```sh
       open http://localhost:19000/config_dump
       ```
-   3. Look for the `perConnectionBufferLimitBytes: 10485760` string in your Envoy configuration. 
+   3. Look for the `per_connection_buffer_limit_bytes": 10485760` string in your Envoy configuration. 
    
 
 ## Cleanup
@@ -57,5 +52,5 @@ You can configure a maximum payload size on a gateway (`perConnectionBufferLimit
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete listeneroption bufferlimits -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete listenerpolicy bufferlimits -n {{< reuse "docs/snippets/ns-system.md" >}}
 ```
