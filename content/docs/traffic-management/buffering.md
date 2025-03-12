@@ -44,7 +44,7 @@ By default, {{< reuse "docs/snippets/product-name.md" >}} is set up with 1MiB of
       ```sh
       open http://localhost:19000/config_dump
       ```
-   3. Look for the `per_connection_buffer_limit_bytes": 10485760` string in your Envoy configuration. 
+   3. Look for the `"per_connection_buffer_limit_bytes": 10485760` string in your Envoy configuration. 
    
 
 ## Cleanup
