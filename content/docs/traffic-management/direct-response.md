@@ -5,11 +5,11 @@ prev: /docs/traffic-management/destination-types
 next: /docs/traffic-management/match
 ---
 
-Directly respond to incoming requests without forwarding them to services by returning a pre-defined body and HTTP status to the client.
+Use the {{< reuse "docs/snippets/product-name.md" >}} [DirectResponse](/docs/reference/api/top-level/direct-response/) API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
 
 ## About direct responses
 
-When you configure a direct response, the gateway proxy intercepts requests to specific routes and directly sends back a predefined response. Common use cases include: 
+When you configure a DirectResponse, the gateway proxy intercepts requests to specific routes and directly sends back a predefined response. Common use cases include: 
 
 * **Static responses**: You might have endpoints for which sending back static responses is sufficient.
 * **Health checks**: You might use direct responses when configuring health checks for the gateway. 
@@ -80,7 +80,7 @@ The following rules are applied during schema validation:
        - type: ExtensionRef
          extensionRef:
           name: direct-response
-          group: gateway.gateway.kgateway.dev
+          group: gateway.kgateway.dev
           kind: DirectResponse
    EOF
    ```
@@ -138,19 +138,19 @@ The following rules are applied during schema validation:
    
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
+   * Request completely sent off
    < HTTP/1.1 510 Not Extended
    HTTP/1.1 510 Not Extended
    < content-length: 41
    content-length: 41
    < content-type: text/plain
    content-type: text/plain
-   < date: Mon, 23 Sep 2024 17:48:37 GMT
-   date: Mon, 23 Sep 2024 17:48:37 GMT
+   < date: Wed, 12 Mar 2025 18:33:45 GMT
+   date: Wed, 12 Mar 2025 18:33:45 GMT
    < server: envoy
    server: envoy
-   
    < 
+
    User-agent: *
    Disallow: /direct-response
    ```
