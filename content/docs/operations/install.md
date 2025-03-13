@@ -101,10 +101,10 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    cat kgateway/values.yaml
    ```
       
-4. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm. This command installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it.
+4. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm. This command installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
    
    ```sh
-   helm install -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
    
