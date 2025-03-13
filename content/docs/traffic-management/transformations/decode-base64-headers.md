@@ -5,6 +5,7 @@ description: Automatically decode base64 values in request headers and add the d
 ---
 
 In the following example, you combine multiple Inja functions to accomplish the following tasks: 
+
 - Extract a base64-encoded value from a specific request header. 
 - Decode the base64-encoded value. 
 - Trim the decoded value and only capture everything starting from the 11th character. 
@@ -26,31 +27,56 @@ In the following example, you combine multiple Inja functions to accomplish the 
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-1. Create a VirtualHostOption resource with your transformation rules. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+
    ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
+   kind: RoutePolicy
    metadata:
      name: transformation
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: httpbin
    spec:
-     options:
-       transformations:
-         responseTransformation:
-           transformationTemplate:
-             headers:
-               x-base64-decoded:
-                 text: '{{substring(base64_decode(request_header("x-base64-encoded")), 11)}}'
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     transformation:
+       response:
+         set:
+         - name: x-base64-decoded
+           value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
    EOF
    ```
 
-2. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
+3. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+         filters:
+         - type: ExtensionRef
+           extensionRef:
+             group: gateway.kgateway.dev
+             kind: RoutePolicy
+             name: transformation
+   EOF
+   ```
+
+4. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -97,7 +123,32 @@ In the following example, you combine multiple Inja functions to accomplish the 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-```sh
-kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
-```
-   
+1. Delete the RoutePolicy resource.
+
+   ```sh
+   kubectl delete RoutePolicy transformation -n httpbin
+   ```
+
+2. Remove the `extensionRef` filter from the HTTPRoute resource.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```

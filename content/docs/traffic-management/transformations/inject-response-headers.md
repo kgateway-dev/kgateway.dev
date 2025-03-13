@@ -12,31 +12,56 @@ The following example walks you through how to use an Inja template to extract a
 
 ## Inject response headers
    
-1. Create a VirtualHostOption resource with your transformation rules. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.  
+1. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.
+   
    ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
+   kind: RoutePolicy
    metadata:
      name: transformation
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: httpbin
    spec:
-     options:
-       transformations:
-         responseTransformation:
-           transformationTemplate:
-             headers:
-               x-solo-response:
-                 text: '{{ request_header("x-solo-request") }}'
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     transformation:
+       response:
+         set:
+         - name: x-solo-response
+           value: '{{ request_header("x-solo-request") }}' 
    EOF
    ```
 
-2. Send a request to the httpbin app and include the `x-solo-request` request header. Verify that you get back a 200 HTTP response code and that the value of the `x-solo-request` header was added to the `x-solo-response` response header. 
+2. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+         filters:
+         - type: ExtensionRef
+           extensionRef:
+             group: gateway.kgateway.dev
+             kind: RoutePolicy
+             name: transformation
+   EOF
+   ```
+
+3. Send a request to the httpbin app and include the `x-solo-request` request header.
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -54,9 +79,25 @@ The following example walks you through how to use an Inja template to extract a
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: 
-   ```yaml {linenos=table,hl_lines=[20,21],linenostart=1}
-   * Mark bundle as not supporting multiuse
+   In the example output, verify the following:
+   
+   * The `x-solo-request` request header is included in the request.
+   * The request is successful and returns a 200 HTTP response code.
+   * The `x-solo-response` response header is included in the response and has the same value as the `x-solo-request` request header.
+
+   ```yaml {linenos=table,hl_lines=[10,14,32],linenostart=1}
+   * Host <host-address>:8080 was resolved.
+   * IPv6: ::1
+   * IPv4: 127.0.0.1
+   *   Trying [::1]:8080...
+   * Connected to <host-address> (::1) port 8080
+   > GET /response-headers HTTP/1.1
+   > Host: www.example.com
+   > User-Agent: curl/8.7.1
+   > Accept: */*
+   > x-solo-request: my custom request header
+   > 
+   * Request completely sent off
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    < access-control-allow-credentials: true
@@ -83,7 +124,33 @@ The following example walks you through how to use an Inja template to extract a
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-```sh
-kubectl delete virtualhostoption transformation -n {{< reuse "docs/snippets/ns-system.md" >}}
-```
+1. Delete the RoutePolicy resource.
+
+   ```sh
+   kubectl delete RoutePolicy transformation -n httpbin
+   ```
+   
+2. Remove the `extensionRef` filter from the HTTPRoute resource.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
    
