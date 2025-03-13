@@ -8,9 +8,11 @@ Review the following information about supported release versions for {{< reuse 
 
 ## Supported versions
 
-| {{< reuse "docs/snippets/product-name-caps.md" >}} | Kubernetes | Envoy | Helm | Istio`†`|
-|--------------|------------|-------|------|---------|
-| 1.18.x | 1.25 - 1.31 | v3 xDS API | >= 3.12 | 1.16 - 1.22 |
+| {{< reuse "docs/snippets/product-name-caps.md" >}} | Kubernetes | Kubernetes Gateway API | Envoy | Helm | Istio`†`|
+|--------------|------------|-------|------|---------|---------|
+| 2.0.x | 1.27 - 1.31 | 1.2.x | v3 xDS API | >= 3.12 | 1.18 - 1.23 |
+
+`†` Istio versions: Istio must run on a compatible version of Kubernetes. For example, Istio 1.22 is tested, but not supported, on Kubernetes 1.26. For more information, see the [Istio docs](https://istio.io/latest/docs/releases/supported-releases/). 
 
 ## Image variants
 

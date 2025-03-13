@@ -67,16 +67,9 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 ## Upgrade the Kubernetes Gateway API {#k8s-gw-api}
 
-Optionally, you can upgrade the Kubernetes Gateway API version. Make sure that the Kubernetes Gateway API version is compatible with the {{< reuse "docs/snippets/product-name.md" >}} version that you want to upgrade to.
+Upgrade the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version to a compatible version with {{< reuse "docs/snippets/product-name.md" >}}.
 
-{{< callout type="info" >}}
-If you want to use TCPRoutes to set up a TCP listener on your Gateway, you must install the TCPRoute CRD, which is part of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} experimental channel. Use the following command to install the CRDs. 
-```sh
-kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-```
-{{< /callout >}}
-
-1. Check the current version of the Kubernetes Gateway API. The following command returns the CRD name, API version, Kubernetes Gateway API bundle version, and channel.
+1. Check the current version of the installed {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. The following command returns the CRD name, API version, {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} bundle version, and channel.
 
    ```sh
    kubectl get crds -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.versions[*].name}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/bundle-version}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/channel}{"\n"}{end}' | grep gateway.networking.k8s.io
@@ -85,19 +78,34 @@ kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/gateway-api
    Example output:
 
    ```
-   gatewayclasses.gateway.networking.k8s.io	v1 v1beta1	v1.2.0	standard
-   gateways.gateway.networking.k8s.io	      v1 v1beta1	v1.2.0	standard
-   grpcroutes.gateway.networking.k8s.io	   v1	         v1.2.0	standard
-   httproutes.gateway.networking.k8s.io	   v1 v1beta1	v1.2.0	standard
-   referencegrants.gateway.networking.k8s.io	v1beta1	   v1.2.0	standard
+   gatewayclasses.gateway.networking.k8s.io  v1 v1beta1  v1.2.0	standard
+   gateways.gateway.networking.k8s.io        v1 v1beta1  v1.2.0	standard
+   grpcroutes.gateway.networking.k8s.io      v1          v1.2.0	standard
+   httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	standard
+   referencegrants.gateway.networking.k8s.io v1beta1     v1.2.0	standard
    ```
 
-2. Install the custom resources of the Kubernetes Gateway API version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
+2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions) for {{< reuse "docs/snippets/product-name.md" >}} and the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. If the version of {{< reuse "docs/snippets/product-name.md" >}} that you are upgrading to requires a different version of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, continue with these steps.
 
+3. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel. The following {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} features require experimental.
+   
+   * TCPRoutes to set up a TCP listener on your Gateway.
+
+4. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
+
+   {{< tabs items="Standard channel,Experimental channel" >}}
+   {{% tab %}}
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
-   
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
    Example output: 
    
    ```
@@ -108,7 +116,11 @@ kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/gateway-api
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
 
-3. Repeat the command to check the Kubernetes Gateway API CRDs. Remove any outdated CRDs.
+5. Repeat the command to check the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. Remove any outdated CRDs.
+
+   ```sh
+   kubectl get crds -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.versions[*].name}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/bundle-version}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/channel}{"\n"}{end}' | grep gateway.networking.k8s.io
+   ```
 
 ## Upgrade kgateway {#kgateway}
 
