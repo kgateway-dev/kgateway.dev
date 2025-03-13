@@ -65,50 +65,37 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 -->
 
-## Upgrade the Kubernetes Gateway API {#k8s-gw-api}
+## Prepare to upgrade {#prepare}
 
-Upgrade the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version to a compatible version with {{< reuse "docs/snippets/product-name.md" >}}.
+Before you upgrade {{< reuse "docs/snippets/product-name.md" >}}, review the following information.
 
-1. Check the current version of the installed {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. The following command returns the CRD name, API version, {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} bundle version, and channel.
+1. Review the [release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
-   ```sh
-   kubectl get crds -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.versions[*].name}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/bundle-version}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/channel}{"\n"}{end}' | grep gateway.networking.k8s.io
-   ```
+2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "docs/snippets/product-name.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
 
-   Example output:
-
-   ```
-   gatewayclasses.gateway.networking.k8s.io  v1 v1beta1  v1.2.0	standard
-   gateways.gateway.networking.k8s.io        v1 v1beta1  v1.2.0	standard
-   grpcroutes.gateway.networking.k8s.io      v1          v1.2.0	standard
-   httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	standard
-   referencegrants.gateway.networking.k8s.io v1beta1     v1.2.0	standard
-   ```
-
-2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions) for {{< reuse "docs/snippets/product-name.md" >}} and the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. If the version of {{< reuse "docs/snippets/product-name.md" >}} that you are upgrading to requires a different version of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, continue with these steps.
-
-3. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel. The following {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} features require experimental.
+   {{< tabs items="Kubernetes Gateway API, Kubernetes, Istio" >}}
+{{% tab %}}
+1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel. The following {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} features require experimental.
    
    * TCPRoutes to set up a TCP listener on your Gateway.
 
-4. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
-
-   {{< tabs items="Standard channel,Experimental channel" >}}
-   {{% tab %}}
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
+   
+   * Standard channel:
+     
+     ```sh
+     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
+     ```
+   
+   * Experimental channel:
+     
+     ```sh
+     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+     ```   
 
    Example output: 
    
-   ```
+   ```txt
    customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io created
@@ -116,11 +103,32 @@ Upgrade the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version to a c
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
 
-5. Repeat the command to check the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. Remove any outdated CRDs.
+3. Check the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. Remove any outdated CRDs.
 
    ```sh
    kubectl get crds -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.versions[*].name}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/bundle-version}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/channel}{"\n"}{end}' | grep gateway.networking.k8s.io
    ```
+
+   Example output:
+   
+   ```txt
+   gatewayclasses.gateway.networking.k8s.io  v1 v1beta1  v1.2.0	experimental
+   gateways.gateway.networking.k8s.io        v1 v1beta1  v1.2.0	experimental
+   grpcroutes.gateway.networking.k8s.io      v1          v1.2.0	experimental
+   httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	experimental
+   ```
+{{% /tab %}}
+{{% tab %}}
+For Kubernetes upgrades, consult your cloud infrastructure provider.
+{{% /tab %}}
+{{% tab %}}
+For Istio upgrades, consult the docs based on the way that you installed Istio. Example providers:
+
+* [Upstream Istio](https://istio.io/latest/docs/setup/upgrade/)
+* [Gloo Mesh Enterprise](https://docs.solo.io/gloo-mesh-enterprise/latest/istio/upgrade/)
+
+{{% /tab %}}
+   {{< /tabs >}}
 
 ## Upgrade kgateway {#kgateway}
 
