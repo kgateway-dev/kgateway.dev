@@ -13,7 +13,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 ## Add response headers {#add-response-headers-route}
 
-Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is apended to the value of the header in the response. 
+Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
 1. Create an HTTPRoute resource for the httpbin app with an `ResponseHeaderModifier`. In this example, you want to add the `my-response: kgateway` response header. 
    ```yaml
