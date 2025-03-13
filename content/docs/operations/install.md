@@ -66,7 +66,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 {{< tabs items="Helm,Argo CD" >}}
 
 {{% tab %}}
-1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version 1.2.0. 
+1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
@@ -81,12 +81,19 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    
    {{< callout type="info" >}}
    If you want to use TCPRoutes to set up a TCP listener on your Gateway, you must install the TCPRoute CRD, which is part of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} experimental channel. Use the following command to install the CRDs. 
+   
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
    {{< /callout >}}
 
-2. Optional: Pull and inspect the {{< reuse "docs/snippets/product-name.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
+2. Deploy the {{< reuse "docs/snippets/product-name.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/ns-system.md" >}} namespace and creates the {{< reuse "docs/snippets/product-name.md" >}} CRDs in the cluster.
+
+   ```sh
+   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   ```
+
+3. Optional: Pull and inspect the {{< reuse "docs/snippets/product-name.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
    ```sh
    helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
@@ -94,11 +101,10 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    cat kgateway/values.yaml
    ```
       
-3. Install {{< reuse "docs/snippets/product-name.md" >}}. This command creates the {{< reuse "docs/snippets/ns-system.md" >}} namespace and installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it.
+4. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm. This command installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
    
    ```sh
-   helm install -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-   --create-namespace \
+   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
    
@@ -112,7 +118,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    TEST SUITE: None
    ```
 
-4. Verify that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+5. Verify that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
@@ -124,16 +130,18 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    kgateway-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-5. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
+6. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
    ```sh
    kubectl get gatewayclass kgateway
    ```
 {{% /tab %}}
 {{% tab %}}
-1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version 1.2.0. 
+1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
+   
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
+   
    Example output: 
    ```console
    customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
@@ -161,6 +169,38 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 4. Log in with the `admin` username and `kgateway` password.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
+
+4. Create an Argo CD application to deploy the {{% reuse "docs/snippets/product-name.md" %}} CRD Helm chart. 
+   
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: argoproj.io/v1alpha1
+   kind: Application
+   metadata:
+     name: kgateway-crds-oss-helm
+     namespace: argocd
+   spec:
+     destination:
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       server: https://kubernetes.default.svc
+     project: default
+     source:
+       chart: kgateway-crds
+       helm:
+         skipCrds: false
+       repoURL: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+       targetRevision: {{< reuse "docs/versions/n-patch.md" >}}
+     syncPolicy:
+       automated:
+         # Prune resources during auto-syncing (default is false)
+         prune: true 
+         # Sync the app in part when resources are changed only in the target Kubernetes cluster
+         # but not in the git source (default is false).
+         selfHeal: true 
+       syncOptions:
+       - CreateNamespace=true 
+   EOF
+   ```
 
 5. Create an Argo CD application to install the {{% reuse "docs/snippets/product-name.md" %}} Helm chart. 
    

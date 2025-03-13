@@ -65,7 +65,72 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 -->
 
-## Upgrade kgateway
+## Prepare to upgrade {#prepare}
+
+Before you upgrade {{< reuse "docs/snippets/product-name.md" >}}, review the following information.
+
+1. Review the [release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
+
+2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "docs/snippets/product-name.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
+
+   {{< tabs items="Kubernetes Gateway API, Kubernetes, Istio" >}}
+{{% tab %}}
+1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel. The following {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} features require experimental.
+   
+   * TCPRoutes to set up a TCP listener on your Gateway.
+
+2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
+   
+   * Standard channel:
+     
+     ```sh
+     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
+     ```
+   
+   * Experimental channel:
+     
+     ```sh
+     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+     ```   
+
+   Example output: 
+   
+   ```txt
+   customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
+   ```
+
+3. Check the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. Remove any outdated CRDs.
+
+   ```sh
+   kubectl get crds -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.versions[*].name}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/bundle-version}{"\t"}{.metadata.annotations.gateway\.networking\.k8s\.io/channel}{"\n"}{end}' | grep gateway.networking.k8s.io
+   ```
+
+   Example output:
+   
+   ```txt
+   gatewayclasses.gateway.networking.k8s.io  v1 v1beta1  v1.2.0	experimental
+   gateways.gateway.networking.k8s.io        v1 v1beta1  v1.2.0	experimental
+   grpcroutes.gateway.networking.k8s.io      v1          v1.2.0	experimental
+   httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	experimental
+   ```
+{{% /tab %}}
+{{% tab %}}
+For Kubernetes upgrades, consult your cloud infrastructure provider.
+{{% /tab %}}
+{{% tab %}}
+For Istio upgrades, consult the docs based on the way that you installed Istio. Example providers:
+
+* [Upstream Istio](https://istio.io/latest/docs/setup/upgrade/)
+* [Gloo Mesh Enterprise](https://docs.solo.io/gloo-mesh-enterprise/latest/istio/upgrade/)
+
+{{% /tab %}}
+   {{< /tabs >}}
+
+## Upgrade kgateway {#kgateway}
 
 1. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    
@@ -73,28 +138,11 @@ During the upgrade, pods that run the new version of the control plane and proxi
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
-   
+2. Apply the {{< reuse "docs/snippets/product-name.md" >}} CRDs for the upgrade version by using Helm.
+
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
+   helm upgrade -i --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
-   
-   Example output: 
-   
-   ```
-   customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
-   ```
-   
-   {{< callout type="info" >}}
-   If you want to use TCPRoutes to set up a TCP listener on your Gateway, you must install the TCPRoute CRD, which is part of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} experimental channel. Use the following command to install the CRDs. 
-   ```sh
-   kubectl apply -f kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-   {{< /callout >}}
 
 3. Make any changes to your Helm values.
    
@@ -126,7 +174,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
      --version v$NEW_VERSION
    ```
    
-7. Verify that {{< reuse "docs/snippets/product-name.md" >}} runs the upgraded version.
+5. Verify that {{< reuse "docs/snippets/product-name.md" >}} runs the upgraded version.
    
    ```sh
    kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} get pod -l kgateway=kgateway -ojsonpath='{.items[0].spec.containers[0].image}'
@@ -137,8 +185,8 @@ During the upgrade, pods that run the new version of the control plane and proxi
    cr.kgateway.dev/kgateway-dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-8. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+6. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
-   ``` 
+   ```
