@@ -3,9 +3,9 @@ title: Response headers
 weight: 20
 ---
 
-Use the {{< reuse "docs/snippets/product-name.md" >}} VirtualHostOption or RouteOption resources to add or remove response headers for a specific route or all routes that the gateway serves. 
+Use the `ResponseHeaderModifier` filter to add, append, overwrite, or remove headers from a response before it is sent back to the client. 
 
-For more information, see the [Header manipulation API](/docs/reference/api/headers).
+For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPHeaderFilter).
 
 ## Before you begin
 
@@ -13,98 +13,9 @@ For more information, see the [Header manipulation API](/docs/reference/api/head
 
 ## Add response headers {#add-response-headers-route}
 
-Add response headers to responses before they are sent back to the client.
+Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
-{{< tabs items="Gateway-level configuration,Route-level configuration" >}}
-{{% tab %}}
-
-Use a VirtualHostOption resource to add response headers for responses from all routes that the gateway serves.
-
-1. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `my-header: kgateway` header is added to each response.  
-   ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
-   metadata:
-     name: header-manipulation
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   spec:
-     options:
-       headerManipulation:
-         responseHeadersToAdd: 
-           - header:
-               key: "my-header"
-               value: "kgateway"
-     targetRefs:
-       group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   EOF
-   ```
-
-2. Send a request to the httpbin app and verify that the `my-header` header is added to the response. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/response-headers -H "host: www.example.com"
-     ```
-     
-   Example output: 
-   ```yaml {linenos=table,hl_lines=[16,17],linenostart=1}
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   HTTP/1.1 200 OK
-   < access-control-allow-credentials: true
-   access-control-allow-credentials: true
-   < access-control-allow-origin: *
-   access-control-allow-origin: *
-   < content-type: application/json; encoding=utf-8
-   content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 13:26:23 GMT
-   date: Fri, 19 Apr 2024 13:26:23 GMT
-   < content-length: 3
-   content-length: 3
-   < x-envoy-upstream-service-time: 0
-   x-envoy-upstream-service-time: 0
-   < my-header: kgateway
-   my-header: kgateway
-   < server: envoy
-   server: envoy
-   ```
-   
-3. Optional: Clean up the resources that you created. 
-   ```sh
-   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
-   ```
-
-{{% /tab %}}
-{{% tab %}}
-   
-Use a RouteOption resource to add response headers to responses from a specific route.
-
-1. Create a RouteOption custom resource to specify your header manipulation rules. In the following example, the `my-response: kgateway` header is added to each response.  
-   ```yaml
-   kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
-   metadata:
-     name: header-manipulation
-     namespace: httpbin
-   spec:
-     options:
-       headerManipulation:
-         responseHeadersToAdd:
-           - header:
-               key: "my-response"
-               value: "kgateway"
-   EOF
-   ```
-2. Create an HTTPRoute resource for the httpbin app that references the RouteOptions that you just created. 
-
+1. Create an HTTPRoute resource for the httpbin app with an `ResponseHeaderModifier`. In this example, you want to add the `my-response: kgateway` response header. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -120,29 +31,40 @@ Use a RouteOption resource to add response headers to responses from a specific 
        - headers.example
      rules:
        - filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.solo.io
-               kind: RouteOption
-               name: header-manipulation
+           - type: ResponseHeaderModifier
+             responseHeaderModifier:
+               add: 
+               - name: my-response
+                 value: kgateway
          backendRefs:
            - name: httpbin
              port: 8000
    EOF
    ```
    
-3. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/response-headers -H "host: headers.example"
-     ```
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.responseHeaderModifier.add`|The name and value of the response header that you want to add. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
+   
+2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+{{% tab %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+```
+{{% /tab %}}
+{{% tab %}}
+```sh
+curl -vik localhost:8080/response-headers -H "host: headers.example"
+```
+{{% /tab %}}
+   {{< /tabs >}}
 
    Example output: 
-   ```yaml {linenos=table,hl_lines=[16,17],linenostart=1}
+   ```yaml {linenos=table,hl_lines=[14,15],linenostart=1}
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
@@ -152,8 +74,6 @@ Use a RouteOption resource to add response headers to responses from a specific 
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 02:23:58 GMT
-   date: Fri, 19 Apr 2024 02:23:58 GMT
    < content-length: 3
    content-length: 3
    < x-envoy-upstream-service-time: 0
@@ -164,130 +84,105 @@ Use a RouteOption resource to add response headers to responses from a specific 
    server: envoy
    ```
 
-4. Optional: Remove the resources that you created. 
+4. Optional: Remove the HTTPRoute that you created. 
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete routeoption header-manipulation -n httpbin
    ```
 
+## Set response headers 
+
+Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
+
+1. Create an HTTPRoute resource for the httpbin app with an `ResponseHeaderModifier`. In this example, you want to set the `my-response` response header to the value `custom`. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-headers
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+       - headers.example
+     rules:
+       - filters:
+           - type: ResponseHeaderModifier
+             responseHeaderModifier:
+               set: 
+               - name: my-response
+                 value: custom
+         backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.requestHeaderModifier.set`|The name and value of the response header that you want to set. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
+
+2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-response: custom` header was set. 
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+{{% tab %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+```
 {{% /tab %}}
-{{< /tabs >}}
+{{% tab %}}
+```sh
+curl -vik localhost:8080/response-headers -H "host: headers.example"
+```
+{{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   ```yaml {linenos=table,hl_lines=[10,11],linenostart=1}
+   ...
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   access-control-allow-origin: *
+   ...
+   < my-response: custom
+   my-response: custom
+   < server: envoy
+   server: envoy
+   ```
+
+3. Optional: Remove the HTTPRoute that you created. 
+   ```sh
+   kubectl delete httproute httpbin-headers -n httpbin
+   ```
 
 ## Remove response headers {#remove-response-headers}
 
 You can remove HTTP headers from a response before the response is sent back to the client. 
 
-{{< tabs items="Gateway-level configuration,Route-level configuration" >}}
-{{% tab %}}
-
-Remove specific headers from all responses from the routes that the gateway serves.
-
 1. Send a request to the httpbin app and find the `content-length` header. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/response-headers -H "host: www.example.com"
-     ```
-
-   Example output: 
-   ```yaml {linenos=table,hl_lines=[9,10],linenostart=1}
-   ...
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   HTTP/1.1 200 OK
-   < access-control-allow-credentials: true
-   access-control-allow-credentials: true
-   < access-control-allow-origin: *
-   access-control-allow-origin: *
-   < content-type: application/json; encoding=utf-8
-   content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 13:37:36 GMT
-   date: Fri, 19 Apr 2024 13:37:36 GMT
-   < content-length: 3
-   content-length: 3
-   < x-envoy-upstream-service-time: 0
-   x-envoy-upstream-service-time: 0
-   < server: envoy
-   server: envoy
-   ```
-   
-2. Create a VirtualHostOption custom resource to specify your header manipulation rules. In the following example, the `content-length` header is removed from each response.  
-   ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
-   metadata:
-     name: header-manipulation
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   spec:
-     options:
-       headerManipulation:
-         responseHeadersToRemove: ["content-length"] 
-     targetRefs:
-       group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   EOF
-   ```
-
-3. Send a request to the httpbin app and verify that the `content-length` header is removed from the response. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/response-headers -H "host: www.example.com"
-     ```
-   
-   Example output: 
-   ```console
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   HTTP/1.1 200 OK
-   < access-control-allow-credentials: true
-   access-control-allow-credentials: true
-   < access-control-allow-origin: *
-   access-control-allow-origin: *
-   < content-type: application/json; encoding=utf-8
-   content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 13:51:53 GMT
-   date: Fri, 19 Apr 2024 13:51:53 GMT
-   < x-envoy-upstream-service-time: 0
-   x-envoy-upstream-service-time: 0
-   < server: envoy
-   server: envoy
-   < transfer-encoding: chunked
-   transfer-encoding: chunked
-   ```
-
-4. Optional: Clean up the resources that you created. 
-   ```sh
-   kubectl delete virtualhostoption header-manipulation -n {{< reuse "docs/snippets/ns-system.md" >}}
-   ```
-
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+{{% tab %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
+```
 {{% /tab %}}
 {{% tab %}}
-   
-You can remove HTTP headers from a response of a specific route before the response is sent back to the client. 
-
-
-1. Send a request to the httpbin app and find the `content-length` header. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/response-headers -H "host: www.example.com"
-     ```
+```sh
+curl -vik localhost:8080/response-headers -H "host: www.example.com"
+```
+{{% /tab %}}
+   {{< /tabs >}}
 
    Example output: 
-   ```yaml {linenos=table,hl_lines=[9,10],linenostart=1}
+   ```yaml {linenos=table,hl_lines=[11,12],linenostart=1}
    ...
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
@@ -298,8 +193,6 @@ You can remove HTTP headers from a response of a specific route before the respo
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 16:40:01 GMT
-   date: Fri, 19 Apr 2024 16:40:01 GMT
    < content-length: 3
    content-length: 3
    < x-envoy-upstream-service-time: 0
@@ -307,23 +200,8 @@ You can remove HTTP headers from a response of a specific route before the respo
    < server: envoy
    server: envoy
    ```
-
-2. Create a RouteOption resource to specify your header manipulation rules. In this example, you remove the `content-length` response header from each response. 
-   ```yaml
-   kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
-   metadata:
-     name: header-manipulation
-     namespace: httpbin
-   spec:
-     options:
-       headerManipulation:
-         responseHeadersToRemove: ["content-length"]
-   EOF
-   ```
    
-3. Create an HTTPRoute resource for the httpbin app that references the RouteOptions that you just created. 
+2. Create an HTTPRoute resource for the httpbin app that removes the `content-length` header from the response. 
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -340,29 +218,39 @@ You can remove HTTP headers from a response of a specific route before the respo
        - headers.example
      rules:
        - filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.solo.io
-               kind: RouteOption
-               name: header-manipulation
+           - type: ResponseHeaderModifier
+             responseHeaderModifier:
+               remove: 
+               - content-length
          backendRefs:
            - name: httpbin
              port: 8000
    EOF
    ```
+   
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRefs`| The name and namespace of the gateway that servesthis HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.rules.filters.type`| The type of filter that you want to apply. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.responseHeaderModifier.remove`|The name of the response header that you want to remove. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
-4. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
-   * **LoadBalancer IP address or hostname**
-     ```sh
-     curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-     ```
-   * **Port-forward for local testing**
-     ```sh
-     curl -vik localhost:8080/reesponse-headers -H "host: headers.example"
-     ```
+3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+{{% tab %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+```
+{{% /tab %}}
+{{% tab %}}
+```sh
+curl -vik localhost:8080/reesponse-headers -H "host: headers.example"
+```
+{{% /tab %}}
+   {{< /tabs >}}
 
    Example output: 
-   ```console
+   ```
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
@@ -372,8 +260,6 @@ You can remove HTTP headers from a response of a specific route before the respo
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < date: Fri, 19 Apr 2024 13:51:53 GMT
-   date: Fri, 19 Apr 2024 13:51:53 GMT
    < x-envoy-upstream-service-time: 0
    x-envoy-upstream-service-time: 0
    < server: envoy
@@ -382,11 +268,8 @@ You can remove HTTP headers from a response of a specific route before the respo
    transfer-encoding: chunked
    ```
 
-5. Optional: Remove the resources that you created. 
+4. Optional: Remove the HTTPRoute that you created. 
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete routeoption header-manipulation -n httpbin
    ```
 
-{{% /tab %}}
-{{< /tabs >}}

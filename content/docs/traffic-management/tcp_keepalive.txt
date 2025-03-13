@@ -81,28 +81,27 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-  options:
-    socketOptions:
-      - description: "enable keepalive" # socket level options
-        level: 1 # means socket level options (SOL_SOCKET)
-        name: 9 # means the keepalive parameter (SO_KEEPALIVE)
-        intValue: 1 # a nonzero value means "yes" to enable
-        state: STATE_PREBIND
-      - description: "idle time before first keepalive probe is sent" # TCP protocol
-        level: 6 # IPPROTO_TCP
-        name: 4 # TCP_KEEPIDLE parameter - The time in seconds that the connection is idle before TCP starts sending keepalive probes.
-        intValue: 60 # seconds
-        state: STATE_PREBIND
-      - description: "keepalive interval" # TCP protocol
-        level: 6 # IPPROTO_TCP
-        name: 5 # the TCP_KEEPINTVL parameter - The time in seconds between individual keepalive probes.
-        intValue: 20 # seconds
-        state: STATE_PREBIND
-      - description: "keepalive probes count" # TCP protocol
-        level: 6 # IPPROTO_TCP
-        name: 6 # the TCP_KEEPCNT parameter - The maximum number of keepalive probes that TCP sends before dropping the connection.
-        intValue: 2 # number of failed probes
-        state: STATE_PREBIND
+  socketOptions:
+    - description: "enable keepalive" # socket level options
+      level: 1 # means socket level options (SOL_SOCKET)
+      name: 9 # means the keepalive parameter (SO_KEEPALIVE)
+      intValue: 1 # a nonzero value means "yes" to enable
+      state: STATE_PREBIND
+    - description: "idle time before first keepalive probe is sent" # TCP protocol
+      level: 6 # IPPROTO_TCP
+      name: 4 # TCP_KEEPIDLE parameter - The time in seconds that the connection is idle before TCP starts sending keepalive probes.
+      intValue: 60 # seconds
+      state: STATE_PREBIND
+    - description: "keepalive interval" # TCP protocol
+      level: 6 # IPPROTO_TCP
+      name: 5 # the TCP_KEEPINTVL parameter - The time in seconds between individual keepalive probes.
+      intValue: 20 # seconds
+      state: STATE_PREBIND
+    - description: "keepalive probes count" # TCP protocol
+      level: 6 # IPPROTO_TCP
+      name: 6 # the TCP_KEEPCNT parameter - The maximum number of keepalive probes that TCP sends before dropping the connection.
+      intValue: 2 # number of failed probes
+      state: STATE_PREBIND
 EOF
 ```
 
