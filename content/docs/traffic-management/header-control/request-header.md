@@ -161,7 +161,7 @@ Setting headers is similar to adding headers. If the request does not include th
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that services this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `RequestHeaderModifier` filter is used.|
    |`spec.rules.filters.requestHeaderModifier.set`|The name and value of the request header that you want to set. |
    |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
