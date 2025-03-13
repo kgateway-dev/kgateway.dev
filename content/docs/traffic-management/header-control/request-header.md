@@ -44,10 +44,10 @@ Add headers to incoming requests before they are forwarded to an upstream servic
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that services this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `RequestHeaderModifier` filter is used.|
    |`spec.rules.filters.requestHeaderModifier.add`|The name and value of the request header that you want to add. |
-   |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain and verify that you get back a 200 HTTP response code and that you see the `my-header` request header. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
@@ -317,10 +317,10 @@ curl -vik localhost:8080/headers -H "host: www.example.com"
    
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that services this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `RequestHeaderModifier` filter is used.|
    |`spec.rules.filters.requestHeaderModifier.remove`|The name of the request header that you want to remove. |
-   |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `User-Agent` request header is removed. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
