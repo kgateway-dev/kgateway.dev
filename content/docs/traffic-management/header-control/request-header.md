@@ -13,7 +13,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 ## Add and append request headers {#add-request-header}
 
-Add headers to incoming requests before they are forwarded to an upstream service. If the request already has the header set, the value of the header in the `RequestHeaderModifier` filter is apended to the value of the header in the request. 
+Add headers to incoming requests before they are forwarded to an upstream service. If the request already has the header set, the value of the header in the `RequestHeaderModifier` filter is appended to the value of the header in the request. 
 
 1. Create an HTTPRoute resource for the httpbin app with an `RequestHeaderModifier`. In this example, you want to add the `my-header: kgateway` request header. 
    ```yaml
