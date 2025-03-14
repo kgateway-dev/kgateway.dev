@@ -36,7 +36,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
          backendRefs:
            - name: httpbin
              port: 8000
-   EOF 
+   EOF
    ```
    
 2. Send a request to the `/status/200` path of the httpbin app on the `match.example` domain. Verify that you get back a 200 HTTP response code.  

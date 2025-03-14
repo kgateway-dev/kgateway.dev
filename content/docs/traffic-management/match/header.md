@@ -37,7 +37,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
          backendRefs:
            - name: httpbin
              port: 8000
-   EOF 
+   EOF
    ```
 
 2. Send a request to the httpbin app on the `match.example` domain without any headers. Verify that you get back a 404 HTTP response code as no matching request could be found. 

@@ -37,7 +37,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
          backendRefs:
            - name: httpbin
              port: 8000
-   EOF 
+   EOF
    ```
 
 2. Send a request to the `/status/200` path of the httpbin app on the `match.example` domain without any query parameters. Verify that your request is not forwarded to the httpbin app because no matching query parameter is found. 
@@ -71,12 +71,12 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200?user=me -H "host: match.example:8080"
+   curl -vik "http://$INGRESS_GW_ADDRESS:8080/status/200?user=me" -H "host: match.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200?user=me -H "host: match.example"
+   curl -vik "localhost:8080/status/200?user=me" -H "host: match.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
