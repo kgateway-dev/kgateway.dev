@@ -13,8 +13,6 @@ weight: 400
   {{< card link="route-delegation" title="Route delegation" >}}
   {{< card link="buffering" title="Buffering" >}}
   {{< card link="header-control" title="Header control" >}}
-  {{< card link="health-checks" title="Health checks" >}}
-  {{< card link="tcp_keepalive" title="TCP keepalive" >}}
   {{< card link="transformations" title="Transformations" >}}
   {{< card link="traffic-split" title="Traffic splitting" >}}
 {{< /cards >}}
