@@ -12,30 +12,46 @@ Gain insight into the health and performance of your gateways.
 
 Metrics are essential to gain insight into the health and performance of your gateway proxies. [OpenTelemetry](https://opentelemetry.io/) is a flexible open source framework that provides a set of APIs, libraries, and instrumentation to help capture and export telemetry data, such as metrics. The framework can also be used to collect traces and logs from your apps. Then, you can use observability tools, such as Grafana or Prometheus, to visualize your metrics so that you can analyze the health of your gateway and troubleshoot issues more easily. 
 
-In this guide, you deploy an OpenTelemetry collector that scapes metrics from the {{< reuse "docs/snippets/product-name.md" >}} proxies in the data plane, the {{< reuse "docs/snippets/product-name.md" >}} pods in the control plane, and the external auth and rate limiting add-ons. The metrics that are collected by the OpenTelemetry collector are exposed in Prometheus format. To visualize these metrics, you also deploy a Grafana instance that scrapes the metrics from the OpenTelemetry collector.
-
-{{% callout type="info" %}}
-If you do not want to deploy an OpenTelemetry collector and Grafana, you can quickly see the raw Prometheus metrics that are automatically exposed on the gateway proxy by accessing the Prometheus metrics on your gateway. 
-1. Port-forward the gateway deployment on port 19000.
-   ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} port-forward deployment/http 19000
-   ```
-2. Access the gateway metrics by reviewing the [Prometheus statistics](http://localhost:19000/stats/prometheus). 
-{{% /callout %}}
+In this guide, you deploy an OpenTelemetry collector that scapes metrics from the {{< reuse "docs/snippets/product-name.md" >}} control plane and data plane gateway proxies. The metrics that are collected by the OpenTelemetry collector are exposed in Prometheus format. To visualize these metrics, you also deploy a Grafana instance that scrapes the metrics from the OpenTelemetry collector.
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up an OpenTelemetry collector
+## View default metrics in Prometheus {#prometheus-metrics}
+
+You can quickly see the raw Prometheus metrics that are automatically exposed on the gateway proxy by accessing the Prometheus metrics on your gateway.
+
+1. Port-forward the gateway deployment on port 19000.
+   
+   ```sh
+   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} port-forward deployment/http 19000
+   ```
+
+2. Access the gateway metrics by reviewing the [Prometheus statistics `/stats/prometheus` endpoint](http://localhost:19000/stats/prometheus).
+
+   Example output: For more details about the collected metrics, see the [Envoy statistics reference docs](https://www.envoyproxy.io/docs/envoy/latest/operations/stats_overview).
+
+   ```console
+   # TYPE envoy_cluster_external_upstream_rq counter
+   envoy_cluster_external_upstream_rq{envoy_response_code="200",envoy_cluster_name="kube_httpbin_httpbin_8000"} 5
+   ```
+
+To collect and visualize metrics, continue to set up OpenTelemetry and Grafana.
+
+## Set up an OpenTelemetry collector {#otel}
+
+Deploy the open source OpenTelemetry collector in your cluster.
 
 1. Add the Helm repository for OpenTelemetry. 
+   
    ```sh
    helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
    helm repo update
    ```
 
-2. Install the OpenTelemetry collector in your cluster. This command sets up pipelines that scrape metrics from the gateway proxies, {{< reuse "docs/snippets/product-name.md" >}} control plane, and external auth and rate limiting add-ons, and exposes them in Prometheus format.
+2. Install the OpenTelemetry collector in your cluster. This command sets up pipelines that scrape metrics from the {{< reuse "docs/snippets/product-name.md" >}} control plane and data plane gateway, and exposes them in Prometheus format.
+   
    ```sh
    helm upgrade --install opentelemetry-collector open-telemetry/opentelemetry-collector \
    --version 0.97.1 \
@@ -65,19 +81,19 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
        protocol: TCP
    config:
      receivers:
-       prometheus/gloo-dataplane:
+       prometheus/kgateway-dataplane:
          config:
            scrape_configs:
-           # Scrape the {{< reuse "docs/snippets/product-name.md" >}} proxies
-           - job_name: kgateways
+           # Scrape the kgateway Gateway pods
+           - job_name: kgateway-gateways
              honor_labels: true
              kubernetes_sd_configs:
              - role: pod
              relabel_configs:
                - action: keep
-                 regex: kube-gateway
+                 regex: (.+)
                  source_labels:
-                 - __meta_kubernetes_pod_label_gloo
+                 - __meta_kubernetes_pod_label_gateway_networking_k8s_io_gateway_name
                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
                  action: keep
                  regex: true
@@ -99,53 +115,19 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
                - source_labels: [__meta_kubernetes_pod_name]
                  action: replace
                  target_label: pod
-       prometheus/gloo-controlplane:
+       prometheus/kgateway-controlplane:
          config:
            scrape_configs:
-           # Scrape the {{< reuse "docs/snippets/product-name.md" >}} control plane
-           - job_name: kgateways
+           # Scrape the kgateway pods
+           - job_name: kgateway-gateways
              honor_labels: true
              kubernetes_sd_configs:
              - role: pod
              relabel_configs:
                - action: keep
-                 regex: gloo
+                 regex: kgateway
                  source_labels:
-                 - __meta_kubernetes_pod_label_gloo
-               - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
-                 action: keep
-                 regex: true
-               - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
-                 action: replace
-                 target_label: __metrics_path__
-                 regex: (.+)
-               - action: replace
-                 source_labels:
-                 - __meta_kubernetes_pod_ip
-                 - __meta_kubernetes_pod_annotation_prometheus_io_port
-                 separator: ':'
-                 target_label: __address__
-               - action: labelmap
-                 regex: __meta_kubernetes_pod_label_(.+)
-               - source_labels: [__meta_kubernetes_namespace]
-                 action: replace
-                 target_label: kube_namespace
-               - source_labels: [__meta_kubernetes_pod_name]
-                 action: replace
-                 target_label: pod
-       prometheus/gloo-addons:
-         config:
-           scrape_configs:
-           # Scrape the extauth and ratelimit workloads
-           - job_name: kgateways
-             honor_labels: true
-             kubernetes_sd_configs:
-             - role: pod
-             relabel_configs:
-               - action: keep
-                 regex: extauth|rate-limit
-                 source_labels:
-                 - __meta_kubernetes_pod_label_gloo
+                 - __meta_kubernetes_pod_label_kgateway
                - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
                  action: keep
                  regex: true
@@ -174,13 +156,14 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
      service:
        pipelines:
          metrics:
-           receivers: [prometheus/gloo-dataplane, prometheus/gloo-controlplane, prometheus/gloo-addons]
+           receivers: [prometheus/kgateway-dataplane, prometheus/kgateway-controlplane]
            processors: [batch]
-           exporters: [prometheus]
+           exporters: [debug, prometheus]
    EOF
    ```
 
 3. Verify that the OpenTelemetry collector pod is running. 
+   
    ```sh
    kubectl get pods -n otel
    ```
@@ -191,9 +174,14 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
    opentelemetry-collector-6d658bf47c-hw6v8   1/1     Running   0          12m
    ```
 
-## Set up Grafana 
+Good job! Now you have an OpenTelemetry collector that scrapes and exposes metrics in Prometheus format.
+
+## Set up Grafana {#grafana}
+
+To visualize the metrics that you collect with the OpenTelemetry collector, deploy Grafana as part of the Prometheus stack in your cluster.
 
 1. Deploy Grafana and other Prometheus components in your cluster. The following example uses the [kube-prometheus-stack community Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) to install these components. 
+   
    ```yaml
    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
    helm repo update
@@ -210,8 +198,6 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
      service: 
        type: LoadBalancer
        port: 3000
-   nodeExporter:
-     enabled: false   
    prometheus: 
      prometheusSpec: 
        ruleSelectorNilUsesHelmValues: false
@@ -221,6 +207,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
    ```
    
 2. Verify that the Prometheus stack's components are up and running. 
+   
    ```sh
    kubectl get pods -n monitoring
    ```
@@ -235,6 +222,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
    ```
 
 3. Create a PodMonitor resource to scrape metrics from the OpenTelemetry collector. 
+   
    ```yaml
    kubectl apply -n otel -f- <<EOF
    apiVersion: monitoring.coreos.com/v1
@@ -255,6 +243,7 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
 4. Save the [sample Grafana dashboard configuration](grafana.json) as `envoy.json`. 
 
 5. Import the Grafana dashboard. 
+   
    ```sh
    kubectl -n monitoring create cm envoy-dashboard \
    --from-file=envoy.json
@@ -264,11 +253,22 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
 ## Visualize metrics in Grafana
    
 1. Generate traffic for the httpbin app. 
+
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
    ```sh
    for i in {1..5}; do curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"; done
    ```
+   {{% /tab %}}
+   {{% tab  %}}
+   ```sh
+   for i in {1..5}; do curl -v localhost:8080/headers -H "host: www.example.com:8080"; done
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Open Grafana and log in to Grafana by using the username `admin` and password `prom-operator`. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -276,16 +276,18 @@ If you do not want to deploy an OpenTelemetry collector and Grafana, you can qui
    ```
    {{% /tab %}}
    {{% tab  %}}
-   ```sh
-   kubectl port-forward deployment/kube-prometheus-stack-grafana -n monitoring 3000
-   ```
+   1. Port-forward the Grafana service to your local machine.
+      ```sh
+      kubectl port-forward deployment/kube-prometheus-stack-grafana -n monitoring 3000
+      ```
+   2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
    {{% /tab %}}
    {{< /tabs >}}
    
 3. Go to **Dashboards** > **Envoy** to open the dashboard that you imported. Verify that you see the traffic that you generated for the httpbin app. 
    
    {{< reuse-image src="img/grafana-dashboard.png" >}}
-   
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
