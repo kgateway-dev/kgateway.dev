@@ -3,9 +3,9 @@ title: Host rewrites
 weight: 461
 description: Replace the host header value before forwarding a request to a backend service. 
 ---
-Replace the host header value before forwarding a request to a backend service. 
+Replace the host header value before forwarding a request to a backend service by using the `URLRewrite` filter. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/api-types/httproute/#filters-optional).
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPURLRewriteFilter).
 
 ## Before you begin
 
@@ -13,23 +13,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 ## Rewrite hosts
 
-Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or -->path prefixes. 
-
-1. Create a RouteOption resource to define your rewrite rules. In the following example the host request header is rewritten to the `www.example.com` host. 
-   ```yaml
-   kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
-   metadata:
-     name: rewrite
-     namespace: httpbin
-   spec:
-     options:
-       hostRewrite: 'www.example.com'
-   EOF
-   ```
-
-2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. In this example, all incoming requests on the `rewrite.example` domain are rewritten to the `www.example.com` host as defined in the referenced RouteOption resource.
+1. Create an HTTPRoute resource for the httpbin app that uses the `URLRewrite` filter to rewrite the hostname of th request. In this example, all incoming requests on the `rewrite.example` domain are rewritten to the `www.example.com` host.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -45,18 +29,23 @@ Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or
        - rewrite.example
      rules:
         - filters:
-          - type: ExtensionRef
-            extensionRef:
-              group: gateway.solo.io
-              kind: RouteOption
-              name: rewrite
+          - type: URLRewrite
+            urlRewrite:
+              hostname: "www.example.com"
           backendRefs:
            - name: httpbin
              port: 8000
    EOF
    ```
+   
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRefs`| The name and namespace of the Gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `URLRewrite` filter is used.|
+   |`spec.rules.filters.urlRewrite.hostname`| The hostname that you want to rewrite requests to. |
+   |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
-3. Send a request to the httpbin app on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that you see the `Host: www.example.com` header in your response. 
+2. Send a request to the httpbin app on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that you see the `Host: www.example.com` header in your response. 
 
    {{< callout type="info" >}}
    The following request returns a 200 HTTP response code, because you set up an HTTPRoute for the httpbin app on the `www.example.com` domain as part of the [Getting started guide](/docs/quickstart/). If you chose a different domain for your example, make sure that you have an HTTPRoute that can be reached under the host you want to rewrite to. 
@@ -102,8 +91,7 @@ Path rewrites use the HTTP path modifier to rewrite <!--either an entire path or
    }
    ```
 
-4. Optional: Clean up the resources that you created. 
+3. Optional: Clean up the resources that you created. 
    ```sh
-   kubectl delete routeoption rewrite -n httpbin
    kubectl delete httproute httpbin-rewrite -n httpbin
    ```
