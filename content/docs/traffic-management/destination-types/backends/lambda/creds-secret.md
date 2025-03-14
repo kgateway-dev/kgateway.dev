@@ -1,15 +1,15 @@
 ---
-title: Get started
+title: Access AWS Lambda with a credentials secret
 weight: 10
 ---
 
-Use {{< reuse "docs/snippets/product-name.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
+Use {{% reuse "docs/snippets/product-name.md" %}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
 ## About
 
 Serverless functions, such as Lambda functions, provide an alternative to traditional applications or services. The functions run on servers that you do not have to manage yourself, and you pay for only for the compute time you use.
 
-However, you might want to invoke your serverless functions from other services or apps, such as the Kubernetes workloads that run in your cluster. By abstracting a Lambda as a type of destination in your {{< reuse "docs/snippets/product-name.md" >}} environment, your workloads can send requests to the Lambda destination in the same way that you set up routing through {{< reuse "docs/snippets/product-name.md" >}} to other types of destinations. {{< reuse "docs/snippets/product-name.md" >}} does the work of assuming an AWS IAM role to invoke the actual Lambda function in your AWS account.
+However, you might want to invoke your serverless functions from other services or apps, such as the Kubernetes workloads that run in your cluster. By abstracting a Lambda as a type of destination in your {{% reuse "docs/snippets/product-name.md" %}} environment, your workloads can send requests to the Lambda destination in the same way that you set up routing through {{% reuse "docs/snippets/product-name.md" %}} to other types of destinations. {{% reuse "docs/snippets/product-name.md" %}} does the work of assuming an AWS IAM role to invoke the actual Lambda function in your AWS account.
 
 For more information, see the AWS Lambda documentation on [configuring Lambda functions as targets](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html).
 
@@ -19,13 +19,13 @@ For more information, see the AWS Lambda documentation on [configuring Lambda fu
 
 ## Create an AWS credentials secret
 
-Create a Kubernetes secret that contains your AWS access key and secret key. {{< reuse "docs/snippets/product-name.md" >}} uses this secret to connect to AWS Lambda for authentication and function invocation.
+Create a Kubernetes secret that contains your AWS access key and secret key. {{% reuse "docs/snippets/product-name.md" %}} uses this secret to connect to AWS Lambda for authentication and function invocation.
 
 1. Get the access key and secret key for your AWS account. Note that your [AWS credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) must have the appropriate permissions to interact with AWS Lambda.
 
 2. Create a Kubernetes secret that contains the AWS access key and secret key.
    ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f - << EOF
+   kubectl apply -n {{% reuse "docs/snippets/ns-system.md" %}} -f - << EOF
    apiVersion: v1
    stringData:
      accessKey: ${AWS_ACCESS_KEY_ID}
@@ -41,7 +41,7 @@ Create a Kubernetes secret that contains your AWS access key and secret key. {{<
 
 ## Create a Lambda function
 
-Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" >}} routing.
+Create an AWS Lambda function to test {{% reuse "docs/snippets/product-name.md" %}} routing.
 
 1. Log in to the AWS console and navigate to the Lambda page.
 
@@ -65,7 +65,7 @@ Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" 
 
 ## Create a Backend and HTTPRoute
 
-Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
+Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
 1. In your terminal, create a Backend resource that references the Lambda secret. Update the `region` with your AWS account region, such as `us-east-1`, and update the `accountId`.
    
@@ -75,7 +75,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
    kind: Backend
    metadata:
      name: lambda
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
    spec:
      type: AWS
      aws:
@@ -98,11 +98,11 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
    kind: HTTPRoute
    metadata:
      name: lambda
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: {{% reuse "docs/snippets/ns-system.md" %}}
      rules:
      - matches:
        - path:
@@ -110,7 +110,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
            value: /echo
        backendRefs:
        - name: lambda
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: {{% reuse "docs/snippets/ns-system.md" %}}
          group: gateway.kgateway.dev
          kind: Backend
          filters:
@@ -122,7 +122,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
    EOF
    ```
 
-3. Confirm that {{< reuse "docs/snippets/product-name.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
+3. Confirm that {{% reuse "docs/snippets/product-name.md" %}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -143,7 +143,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
    {"statusCode":200,"body":"Response from AWS Lambda. Here's the request you just sent me: {\"key1\":\"value1\",\"key2\":\"value2\"}"}% 
    ```
 
-At this point, {{< reuse "docs/snippets/product-name.md" >}} is routing directly to the `echo` Lambda function!
+At this point, {{% reuse "docs/snippets/product-name.md" %}} is routing directly to the `echo` Lambda function!
 
 <!-- TODO unwrapAsAwsAlb? -->
 
@@ -154,14 +154,14 @@ At this point, {{< reuse "docs/snippets/product-name.md" >}} is routing directly
 1. Delete the `lambda` HTTPRoute and `lambda` Backend.
    
    ```sh
-   kubectl delete HTTPRoute lambda -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete Backend lambda -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete HTTPRoute lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
+   kubectl delete Backend lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
 2. Delete the `aws-creds` secret.
    
    ```sh
-   kubectl delete secret aws-creds -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete secret aws-creds -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
 3. Use the AWS Lambda console to delete the `echo` test function.
