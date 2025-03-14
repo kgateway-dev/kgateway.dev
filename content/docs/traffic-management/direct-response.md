@@ -19,7 +19,7 @@ When you configure a DirectResponse, the gateway proxy intercepts requests to sp
 ### Limitations
 
 Consider the following limitations before creating DirectResponse resources in your cluster: 
-* You cannot configure multiple DirectResponse resources on the same route. If multiple DirectResponse resources are defined on the same route, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. 
+* You cannot configure multiple DirectResponse resources on the same route. <!-- If multiple DirectResponse resources are defined on the same route, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. -->
 * You cannot combine a DirectResponse with other route actions on the same route. For example, you cannot configure a DirectResponse and a `RequestRedirect` filter or `backendRefs` rule at the same time. If multiple route actions are defined, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. 
 * DirectResponse resources can be referenced by using an `ExtensionRef` filter only. If specified in a `backendRef` filter, the DirectResponse configuration is ignored. 
 * No status information is currently populated to the DirectResponse resource.
