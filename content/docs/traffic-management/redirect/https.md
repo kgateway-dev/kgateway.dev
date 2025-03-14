@@ -77,7 +77,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs.name` </br> `spec.parentRefs.namespace` |The name and namespace of the Gateway resource that serves the route. In this example, you use the gGateway that you set up earlier. |
+   |`spec.parentRefs.name` </br> `spec.parentRefs.namespace` |The name and namespace of the Gateway resource that serves the route. In this example, you use the Gateway that you set up earlier. |
    |`spec.parentRefs.sectionName`|The Gateway listener to bind this route to. In this example, you want to apply the HTTPS redirect to all traffic that is sent to the HTTP listener on Gateway. |
    |`spec.hostnames`| The hostname for which you want to apply the redirect.|
    |`spec.rules.filters.type`|The type of filter that you want to apply to incoming requests. In this example, the `RequestRedirect` is used.|
