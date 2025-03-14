@@ -56,7 +56,7 @@ The following rules are applied during schema validation:
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
-     name: httpbin-direct-resonse
+     name: httpbin-direct-response
      namespace: httpbin
    spec:
      hostnames:
@@ -161,5 +161,5 @@ The following rules are applied during schema validation:
 
 ```sh
 kubectl delete directresponse direct-response -n httpbin
-kubectl delete httproute httpbin-direct-resonse -n httpbin
+kubectl delete httproute httpbin-direct-response -n httpbin
 ```
