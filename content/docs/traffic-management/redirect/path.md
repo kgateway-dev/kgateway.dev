@@ -6,7 +6,7 @@ description: Redirect requests to a different path prefix.
 
 Redirect requests to a different path prefix. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/api-types/httproute/#filters-optional).
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRequestRedirectFilter).
 
 ## Before you begin
 
@@ -17,7 +17,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
 ### Replace prefix path
 
-1. Create an HTTP route for the httpbin app that you set up as part of the [Get started guide](/docs/quickstart/). In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
+1. Create an HTTPRoute for the httpbin app. In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
 
    Because the `ReplacePrefixPath` path modifier is used, only the path prefix is replaced during the redirect. For example, requests to `http://path.redirect.example/get` result in the `https://path.redirect.example/status/200` redirect location. However, for longer paths, such as in `http://path.redirect.example/get/headers`, only the prefix is replaced and a redirect location of `https://path.redirect.example/status/200/headers` is returned.
 
@@ -51,7 +51,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you installed as part of the [Get started guide](/docs/quickstart). |
+   |`spec.parentRefs.name` </br> `spec.parentRefs.namespace`|The name and namespace of the Gateway resource that serves the route. In this example, you use the Gateway that you created earlier. |
    |`spec.hostnames`| The hostname for which you want to apply the redirect.|
    |`spec.rules.matches.path`|The prefix path that you want to redirect. In this example, you want to redirect all requests to the `/get` path. |
    |`spec.rules.filters.type`|The type of filter that you want to apply to incoming requests. In this example, the `RequestRedirect` is used.|
@@ -59,7 +59,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    |`spec.rules.filters.requestRedirect.path.replacePrefixPath`|The prefix path you want to redirect to. In this example, all requests to the `/get` prefix path are redirected to the `/status/200` prefix path.  |
    |`spec.rules.filters.requestRedirect.statusCode`| The HTTP status code that you want to return to the client in case of a redirect. For non-permanent redirects, use the 302 HTTP response code. |
 
-2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and `path.redirect.example:8080/status/200` redirect location. 
+2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and the `path.redirect.example:8080/status/200` redirect location. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -80,8 +80,6 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    HTTP/1.1 302 Found
    < location: http://path.redirect.example:8080/status/200
    location: http://path.redirect.example:8080/status/200
-   < date: Mon, 06 Nov 2023 01:51:00 GMT
-   date: Mon, 06 Nov 2023 01:51:00 GMT
    < server: envoy
    server: envoy
    < content-length: 0
@@ -109,8 +107,6 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    HTTP/1.1 302 Found
    < location: http://path.redirect.example:8080/status/200/headers
    location: http://path.redirect.example:8080/status/200/headers
-   < date: Mon, 06 Nov 2023 01:53:56 GMT
-   date: Mon, 06 Nov 2023 01:53:56 GMT
    < server: envoy
    server: envoy
    < content-length: 0
@@ -119,7 +115,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
 ### Replace full path
 
-1. Create an HTTP route for the httpbin app that you set up as part of the [Get started guide](/docs/quickstart/). In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
+1. Create an HTTPRoute for the httpbin app. In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
 
    Because the `ReplaceFullPath` path modifier is used, requests to `http://path.redirect.example/get` and `http://path.redirect.example/get/headers` both receive `https://path.redirect.example/status/200` as the redirect location.
 
@@ -153,7 +149,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you installed as part of the [Get started guide](/docs/quickstart). |
+   |`spec.parentRefs.name` </br> `spec.parentRefs.namespace` |The name and namespace of the Gateway resource that serves the route. In this example, you use the Gateway that you created earlier. |
    |`spec.hostnames`| The hostname for which you want to apply the redirect.|
    |`spec.rules.matches.path`|The prefix path that you want to redirect. In this example, you want to redirect all requests to the `/get` path. |
    |`spec.rules.filters.type`|The type of filter that you want to apply to incoming requests. In this example, the `RequestRedirect` is used.|
@@ -182,8 +178,6 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    HTTP/1.1 302 Found
    < location: http://path.redirect.example:8080/status/200
    location: http://path.redirect.example:8080/status/200
-   < date: Mon, 06 Nov 2023 01:55:14 GMT
-   date: Mon, 06 Nov 2023 01:55:14 GMT
    < server: envoy
    server: envoy
    < content-length: 0
@@ -211,8 +205,6 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    HTTP/1.1 302 Found
    < location: http://path.redirect.example:8080/status/200
    location: http://path.redirect.example:8080/status/200
-   < date: Mon, 06 Nov 2023 01:56:06 GMT
-   date: Mon, 06 Nov 2023 01:56:06 GMT
    < server: envoy
    server: envoy
    < content-length: 0

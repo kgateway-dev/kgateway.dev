@@ -6,7 +6,7 @@ description: Redirect requests to a different host.
 
 Redirect requests to a different host. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/api-types/httproute/#filters-optional).
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRequestRedirectFilter).
 
 ## Before you begin
 
@@ -14,7 +14,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 ## Set up host redirects
 
-1. Create an HTTP route for the httpbin app that you created as part of the [Get started guide](/docs/quickstart/). In the following example, requests for the `host.redirect.example` domain are redirected to the `www.example.com` hostname, and a 302 HTTP response code is returned to the user.
+1. Create an HTTPRoute for the httpbin app. In the following example, requests for the `host.redirect.example` domain are redirected to the `www.example.com` hostname, and a 302 HTTP response code is returned to the user.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -58,8 +58,6 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    HTTP/1.1 302 Found
    < location: http://www.example.com/headers
    location: http://www.example.com/headers
-   < date: Sat, 04 Nov 2023 01:40:06 GMT
-   date: Sat, 04 Nov 2023 01:40:06 GMT
    < server: envoy
    server: envoy
    < content-length: 0
