@@ -1,6 +1,6 @@
 ---
-title: AWS Lambda
-weight: 30
+title: Get started
+weight: 10
 ---
 
 Use {{< reuse "docs/snippets/product-name.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
@@ -21,16 +21,22 @@ For more information, see the AWS Lambda documentation on [configuring Lambda fu
 
 Create a Kubernetes secret that contains your AWS access key and secret key. {{< reuse "docs/snippets/product-name.md" >}} uses this secret to connect to AWS Lambda for authentication and function invocation.
 
-1. Get the access key, secret key, and session token for your AWS account. If your AWS account setup does not require a session token, you can remove the session token parameter from the Kubernetes secret. Note that your [AWS credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) must have the appropriate permissions to interact with AWS Lambda.
+1. Get the access key and secret key for your AWS account. Note that your [AWS credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) must have the appropriate permissions to interact with AWS Lambda.
 
 2. Create a Kubernetes secret that contains the AWS access key and secret key.
-   ```sh
-   {{< reuse "docs/snippets/cli-name.md" >}} create secret aws \
-       --name 'aws-creds' \
-       --namespace {{< reuse "docs/snippets/ns-system.md" >}} \
-       --access-key ${AWS_ACCESS_KEY_ID} \
-       --secret-key ${AWS_SECRET_ACCESS_KEY} \
-       --session-token ${AWS_SESSION_TOKEN}
+   ```yaml
+   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f - << EOF
+   apiVersion: v1
+   stringData:
+     accessKey: ${AWS_ACCESS_KEY_ID}
+     secretKey: ${AWS_SECRET_ACCESS_KEY}
+     sessionToken: ""
+   kind: Secret
+   metadata:
+     name: aws-creds
+     namespace: lambda
+   type: Opaque
+   EOF
    ```
 
 ## Create a Lambda function
@@ -61,7 +67,7 @@ Create an AWS Lambda function to test {{< reuse "docs/snippets/product-name.md" 
 
 Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
-1. In your terminal, create a Backend resource that references the Lambda secret. Update the region with your AWS account region, such as `us-east-1`.
+1. In your terminal, create a Backend resource that references the Lambda secret. Update the `region` with your AWS account region, such as `us-east-1`, and update the `accountId`.
    
    ```yaml
    kubectl apply -f - <<EOF
@@ -71,15 +77,16 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
      name: lambda
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
+     type: AWS
      aws:
        region: <region>
-       secretRef:
-         name: aws-creds
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-       lambdaFunctions:
-       - lambdaFunctionName: echo
-         logicalName: echo
-         qualifier: $LATEST
+       accountId: <account-id>
+       auth:
+         type: Secret
+         secret:
+           name: aws-creds
+       lambda:
+         functionName: echo
    EOF
    ```
 
@@ -109,7 +116,7 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
          filters:
            - type: ExtensionRef
              extensionRef:
-               group: "gateway.kgateway.dev"
+               group: gateway.kgateway.dev
                kind: Parameter
                name: echo
    EOF
@@ -138,6 +145,8 @@ Create {{< reuse "docs/snippets/product-name.md" >}} `Backend` and `HTTPRoute` r
 
 At this point, {{< reuse "docs/snippets/product-name.md" >}} is routing directly to the `echo` Lambda function!
 
+<!-- TODO unwrapAsAwsAlb? -->
+
 ## Cleanup
 
 {{% reuse "docs/snippets/cleanup.md" %}}
@@ -160,4 +169,3 @@ At this point, {{< reuse "docs/snippets/product-name.md" >}} is routing directly
 ## Known limitations
 
 - Currently, the only parameter that is supported for the `backendRefs.filters.extensionRef` field in the HTTPRoute resource is the name of the Lambda function. Additional parameters, such as `wrapAsApiGateway`, `unwrapAsApiGateway`, or `invocationStyle`, are not supported.
-- Authenticating with your AWS account by using IAM Roles for Service Accounts (IRSA) is currently unsupported.
