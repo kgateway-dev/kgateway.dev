@@ -22,3 +22,7 @@
   href: https://youtu.be/CGF3aZXOyxc
   thumbnailHref: /thumbnails/exploring-gateway-api-routing-rules.jpg
   
+- description: Explore how Gateway API supports, manages and control internal service mesh traffic across systems.
+  href: https://youtu.be/c5ZfIUOFb9I
+  thumbnailHref: /thumbnails/gateway-api-service-mesh.jpg
+  
