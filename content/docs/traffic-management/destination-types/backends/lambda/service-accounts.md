@@ -145,15 +145,11 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    kubectl rollout status deploy/pod-identity-webhook
    ```
 
-## Install {{% reuse "docs/snippets/product-name.md" %}} with service account authentication {#kgateway}
-
-Install {{% reuse "docs/snippets/product-name.md" %}}, including settings to support gateway proxy service account authentication with your AWS account.
+## Install {{% reuse "docs/snippets/product-name.md" %}} {#kgateway}
 
 {{< reuse "docs/snippets/get-started.md" >}}
 
 ## Create a gateway proxy and annotate its service account {#annotate}
-
-Create an HTTP gateway, and annotate its service account with the AWS IRSA.
 
 1. Create a Gateway resource with an HTTP listener. 
    ```yaml
