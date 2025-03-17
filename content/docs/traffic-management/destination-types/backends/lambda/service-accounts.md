@@ -242,8 +242,6 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
      aws:
        region: ${AWS_LAMBDA_REGION}
        accountId: "${ACCOUNT_ID}"
-       auth:
-         type: IRSA
        lambda:
          functionName: echo
    EOF
@@ -272,12 +270,6 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
          namespace: {{% reuse "docs/snippets/ns-system.md" %}}
          group: gateway.kgateway.dev
          kind: Backend
-         filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.kgateway.dev
-               kind: Parameter
-               name: echo
    EOF
    ```
 
@@ -338,8 +330,8 @@ If you no longer need to access Lambda functions from {{% reuse "docs/snippets/p
 
 1. Delete the Gateway and GatewayParameters resources.
    ```sh
-   kubectl delete Gateway http -n {{% reuse "docs/snippets/product-name.md" %}}
-   kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/product-name.md" %}}
+   kubectl delete Gateway http -n {{% reuse "docs/snippets/ns-system.md" %}}
+   kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
 2. Delete the pod identity webhook.

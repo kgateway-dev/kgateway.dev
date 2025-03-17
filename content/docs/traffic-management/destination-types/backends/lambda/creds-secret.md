@@ -27,14 +27,13 @@ Create a Kubernetes secret that contains your AWS access key and secret key. {{%
    ```yaml
    kubectl apply -n {{% reuse "docs/snippets/ns-system.md" %}} -f - << EOF
    apiVersion: v1
+   kind: Secret
+   metadata:
+     name: aws-creds
    stringData:
      accessKey: ${AWS_ACCESS_KEY_ID}
      secretKey: ${AWS_SECRET_ACCESS_KEY}
      sessionToken: ""
-   kind: Secret
-   metadata:
-     name: aws-creds
-     namespace: lambda
    type: Opaque
    EOF
    ```
@@ -113,12 +112,6 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
          namespace: {{% reuse "docs/snippets/ns-system.md" %}}
          group: gateway.kgateway.dev
          kind: Backend
-         filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.kgateway.dev
-               kind: Parameter
-               name: echo
    EOF
    ```
 
@@ -163,7 +156,3 @@ At this point, {{% reuse "docs/snippets/product-name.md" %}} is routing directly
    ```
 
 3. Use the AWS Lambda console to delete the `echo` test function.
-
-## Known limitations
-
-- Currently, the only parameter that is supported for the `backendRefs.filters.extensionRef` field in the HTTPRoute resource is the name of the Lambda function. Additional parameters, such as `wrapAsApiGateway`, `unwrapAsApiGateway`, or `invocationStyle`, are not supported.
