@@ -19,7 +19,7 @@ These quick start steps assume that you have `kubectl` and `helm` installed. For
    kind create cluster
    ```
 
-{{< reuse "docs/snippets/get-started.md" >}}
+{{% reuse "docs/snippets/get-started.md" %}}
 
 Good job! You now have the {{< reuse "docs/snippets/product-name.md" >}} control plane running in your cluster.
 

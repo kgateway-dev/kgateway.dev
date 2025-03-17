@@ -147,7 +147,9 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 ## Install {{% reuse "docs/snippets/product-name.md" %}} {#kgateway}
 
-{{< reuse "docs/snippets/get-started.md" >}}
+1. Be sure that you [deployed the Amazon EKS Pod Identity Webhook](#webhook) to your cluster first before you continue to install {{% reuse "docs/snippets/product-name.md" %}}.
+
+{{% reuse "docs/snippets/get-started.md" %}}
 
 ## Create a gateway proxy and annotate its service account {#annotate}
 
