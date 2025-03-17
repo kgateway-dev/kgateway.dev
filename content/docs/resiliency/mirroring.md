@@ -6,7 +6,7 @@ description: Copy live production traffic to a shadow environment or service so 
 
 Copy live production traffic to a shadow environment or service so that you can try out, analyze, and monitor new software changes before deploying them to production.
 
-## About traffic shadowing
+## About traffic mirroring
 
 When releasing changes to a service, you want to finely control how those changes get exposed to users. This [progressive delivery](https://redmonk.com/jgovernor/2018/08/06/towards-progressive-delivery/) approach to releasing software allows you to reduce the blast radius, especially when changes introduce unintended behaviors. Traffic mirroring, also referred to as traffic shadowing, is one way to observe the impact of new software releases and test out new changes before you roll them out to production. Other approaches to slowly introduce new software include canary releases, A/B testing, or blue-green deployments. 
 
@@ -23,7 +23,37 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
 
 ## Set up traffic shadowing
 
-1. Deploy another version of httpbin that serves as the app that traffic is mirrored to. 
+1. Edit the httpbin service that you deployed earlier. 
+   ```sh
+   kubectl edit service httpbin -n httpbin
+   ```
+   
+2. In the `spec.selector` field, add `version: v1` to make sure that the httpbin service routes requests always to the `v1` version of the httpbin app. 
+   ```yaml {linenos=table,hl_lines=[21],linenostart=1,filename="httpbin service snippet"}
+   ...
+   spec:
+     clusterIP: 172.20.134.236
+     clusterIPs:
+     - 172.20.134.236
+     internalTrafficPolicy: Cluster
+     ipFamilies:
+     - IPv4
+     ipFamilyPolicy: SingleStack
+     ports:
+     - name: http
+       port: 8000
+       protocol: TCP
+       targetPort: 8080
+     - name: tcp
+       port: 9000
+       protocol: TCP
+       targetPort: 9000
+     selector:
+       app: httpbin
+       version: v1
+   ```
+
+3. Deploy another version (`v2`) of httpbin. You use this app to receive the mirrored traffic from httpbin `v1`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: v1
@@ -43,6 +73,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
          port: 9000
      selector:
        app: httpbin
+       version: v2
    ---
    apiVersion: apps/v1
    kind: Deployment
@@ -92,12 +123,12 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
              imagePullPolicy: IfNotPresent
    EOF
    ```
-2. Verify that the httpbin2 pod is up and running. 
+4. Verify that the httpbin2 pod is up and running. 
    ```sh
    kubectl get pods -n httpbin
    ```
    
-3. Create an HTTPRoute for the httpbin app that mirrors requests along the `mirror.example` domain from the httpbin app to the httpbin2 app. 
+5. Create an HTTPRoute for the httpbin app that mirrors requests along the `mirror.example` domain from the httpbin app to the httpbin2 app. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -129,7 +160,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    EOF
    ```
 
-4. Send a few requests to the httpbin app on the `mirror.example` domain. Verify that you get back a 200 HTTP response code. 
+6. Send a few requests to the httpbin app on the `mirror.example` domain. Verify that you get back a 200 HTTP response code. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
@@ -145,7 +176,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    {{% /tab %}}
    {{< /tabs >}}
    
-5. Get the logs of the httpbin app and verify that you see the requests that you sent. 
+7. Get the logs of the httpbin app and verify that you see the requests that you sent. 
    ```sh
    kubectl logs -l version=v1 -n httpbin
    ```
@@ -159,7 +190,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    time="2025-03-14T19:43:03.6862" status=200 method="GET" uri="/headers" size_bytes=443 duration_ms=0.07 user_agent="curl/8.7.1" client_ip=10.0.6.27
    ```
 
-6. Get the logs of the httpbin2 app and verify that you see the same requests. 
+8. Get the logs of the httpbin2 app and verify that you see the same requests. 
    ```sh
    kubectl logs -l version=v2 -n httpbin
    ```
