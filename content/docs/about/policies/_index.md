@@ -51,11 +51,15 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 
 | Policy | Applied to | Precedence and merging rules | 
 | -- | -- | -- | 
-| [Access logging](/docs/security/access-logging) | ListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).    | 
-| [CORS](/docs/security/cors) | <ul><li>RouteOption</li><li>VirtualHostOption</li></ul> | By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the `exposeHeaders` CORS option by using the `corsPolicyMergeSettings` field in the VirtualHostOption. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`. For more information about this option, see the [CORS configuration options](/docs/security/cors/#configuration-options).  |
-| [CSRF](/docs/security/csrf/) | <ul><li>RouteOption</li><li>VirtualHostOption</li><li>HTTPListenerPolicy</ul> | RouteOption configuration takes precedence over VirtualHostOption configuration, which takes precedence over HTTPListenerPolicy configuration. Policies that are defined at different levels are not merged.   |  
+| [Access logging](/docs/security/access-logging) | ListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple ListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/listeneroption/#conflicting-policies).    |  
 | [Local rate limiting](/docs/security/ratelimit/local/) | HTTPListenerPolicy | No cross-resource conflict. Policies can conflict only if applied in multiple HTTPListenerPolicy resources. For more information, see [Conflicting policies](/docs/about/policies/httplisteneroption/#conflicting-policies).| 
 
+<!-- TODO: Add CSRF and CORS policies 
+
+| [CORS](/docs/security/cors) | <ul><li>RouteOption</li><li>VirtualHostOption</li></ul> | By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the `exposeHeaders` CORS option by using the `corsPolicyMergeSettings` field in the VirtualHostOption. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`. For more information about this option, see the [CORS configuration options](/docs/security/cors/#configuration-options).  |
+| [CSRF](/docs/security/csrf/) | <ul><li>RouteOption</li><li>VirtualHostOption</li><li>HTTPListenerPolicy</ul> | RouteOption configuration takes precedence over VirtualHostOption configuration, which takes precedence over HTTPListenerPolicy configuration. Policies that are defined at different levels are not merged.   | 
+
+-->
 
 ## Policy inheritance rules when using route delegation
 
