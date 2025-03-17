@@ -13,7 +13,7 @@ Note that this guide uses a Kubernetes secret that contains you AWS access key a
 
 ## Create an AWS credentials secret
 
-Create a Kubernetes secret that contains your AWS access key and secret key. {{% reuse "docs/snippets/product-name.md" %}} uses this secret to connect to AWS Lambda for authentication and function invocation.
+Create a Kubernetes secret that contains your AWS access key and secret key. {{% reuse "docs/snippets/product-name-caps.md" %}} uses this secret to connect to AWS Lambda for authentication and function invocation.
 
 1. Get the access key and secret key for your AWS account. Note that your [AWS credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) must have the appropriate permissions to interact with AWS Lambda.
 

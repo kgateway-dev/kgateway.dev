@@ -7,7 +7,7 @@ Associate an IAM role with a gateway proxy service account, and configure {{% re
 
 ## About
 
-Amazon Web Services (AWS) offers the ability to associate an IAM role with a Kubernetes service account, also known as creating an IRSA. {{% reuse "docs/snippets/product-name.md" %}} supports discovering and invoking AWS Lambda functions by using an IRSA. For more information, see the [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html).
+Amazon Web Services (AWS) offers the ability to associate an IAM role with a Kubernetes service account, also known as creating an IRSA. {{% reuse "docs/snippets/product-name-caps.md" %}} supports discovering and invoking AWS Lambda functions by using an IRSA. For more information, see the [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html).
 
 In this guide, you follow these steps:
 
@@ -18,7 +18,7 @@ In this guide, you follow these steps:
 * Deploy the Amazon EKS Pod Identity Webhook to your cluster
 * Create a Lambda function for testing
 
-**{{% reuse "docs/snippets/product-name.md" %}} resources**:
+**{{% reuse "docs/snippets/product-name-caps.md" %}} resources**:
 * Install {{% reuse "docs/snippets/product-name.md" %}}
 * Annotate the gateway proxy service account with the IRSA
 * Set up routing to your function by creating `Upstream` and `HTTPRoute` resources
@@ -151,7 +151,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 {{% reuse "docs/snippets/get-started.md" %}}
 
-## Create a gateway proxy and annotate its service account {#annotate}
+## Annotate the gateway proxy service account {#annotate}
 
 1. Create a GatewayParameters resource to specify the `eks.amazonaws.com/role-arn` IRSA annotation for the gateway proxy service account.
    ```yaml
