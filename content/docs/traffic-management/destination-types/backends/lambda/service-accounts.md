@@ -153,7 +153,23 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 ## Create a gateway proxy and annotate its service account {#annotate}
 
-1. Create a Gateway resource with an HTTP listener. 
+1. Create a GatewayParameters resource to specify the `eks.amazonaws.com/role-arn` IRSA annotation for the gateway proxy service account.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayParameters
+   metadata:
+     name: http-lambda
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+   spec:
+     kube:
+       serviceAccount:
+         extraAnnotations:
+           eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role
+   EOF
+   ```
+
+2. Create a Gateway resource with an HTTP listener that references the `http-lambda` GatewayParameters.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -161,6 +177,8 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    metadata:
      name: http
      namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+     annotations:
+       gateway.kgateway.dev/gateway-parameters-name: http-lambda
    spec:
      gatewayClassName: kgateway
      listeners:
@@ -173,22 +191,12 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    EOF
    ```
 
-2. Check the status of the gateway to make sure that your configuration is accepted. 
+3. Check the status of the gateway to make sure that your configuration is accepted. 
    ```sh
    kubectl get gateway http -n {{% reuse "docs/snippets/ns-system.md" %}} -o yaml
    ```
 
-3. Annotate the `http` service account with the `eks.amazonaws.com/role-arn` IRSA annotation.
-   ```sh
-   kubectl annotate sa http -n {{% reuse "docs/snippets/ns-system.md" %}} eks.amazonaws.com/role-arn=arn:aws:iam::${ACCOUNT_ID}:role/kgateway-lambda-role
-   ``` 
-
-4. Restart the `http` gateway deployment to pick up the service account annotation.
-   ```sh
-   kubectl rollout restart deployment http -n {{% reuse "docs/snippets/ns-system.md" %}}
-   ```
-
-5. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
+4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
    ```sh
    kubectl describe serviceaccount http -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
@@ -328,22 +336,11 @@ At this point, {{% reuse "docs/snippets/product-name.md" %}} is routing directly
 
 If you no longer need to access Lambda functions from {{% reuse "docs/snippets/product-name.md" %}}:
 
-1. Upgrade your {{% reuse "docs/snippets/product-name.md" %}} Helm installation to remove the added settings and annotation.
-   1. Get the Helm values for your current installation, and save them in a file.
-      ```sh
-      helm get values kgateway -n {{% reuse "docs/snippets/ns-system.md" %}} -o yaml > kgateway.yaml
-      open kgateway.yaml
-      ```
-   2. Delete the following settings, and save the file.
-      * `kubeGateway.gatewayParameters.glooGateway.serviceAccount.extraAnnotations`
-      * `settings.aws.enableServiceAccountCredentials`
-      * `settings.aws.stsCredentialsRegion`
-   3. Upgrade the Helm release. Replace the example {{% reuse "docs/snippets/product-name.md" %}} version with the version that you run.
-     ```sh
-     helm upgrade -i -n {{% reuse "docs/snippets/ns-system.md" %}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     -f kgateway.yaml \
-     --version v{{< reuse "docs/versions/n-patch.md" >}}
-     ```
+1. Delete the Gateway and GatewayParameters resources.
+   ```sh
+   kubectl delete Gateway http -n {{% reuse "docs/snippets/product-name.md" %}}
+   kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/product-name.md" %}}
+   ```
 
 2. Delete the pod identity webhook.
    ```sh
