@@ -5,13 +5,7 @@ weight: 10
 
 Use {{% reuse "docs/snippets/product-name.md" %}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
-## About
-
-Serverless functions, such as Lambda functions, provide an alternative to traditional applications or services. The functions run on servers that you do not have to manage yourself, and you pay for only for the compute time you use.
-
-However, you might want to invoke your serverless functions from other services or apps, such as the Kubernetes workloads that run in your cluster. By abstracting a Lambda as a type of destination in your {{% reuse "docs/snippets/product-name.md" %}} environment, your workloads can send requests to the Lambda destination in the same way that you set up routing through {{% reuse "docs/snippets/product-name.md" %}} to other types of destinations. {{% reuse "docs/snippets/product-name.md" %}} does the work of assuming an AWS IAM role to invoke the actual Lambda function in your AWS account.
-
-For more information, see the AWS Lambda documentation on [configuring Lambda functions as targets](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/lambda-functions.html).
+Note that this guide uses a Kubernetes secret that contains you AWS access key and secret key to invoke Lambda functions. To use AWS IAM roles to control access instead, see [Access AWS Lambda with a service account](/docs/traffic-management/destination-types/backends/lambda/service-accounts/) instead.
 
 ## Before you begin
 

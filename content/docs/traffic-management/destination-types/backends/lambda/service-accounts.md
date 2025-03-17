@@ -191,7 +191,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    EOF
    ```
 
-3. Check the status of the gateway to make sure that your configuration is accepted. 
+3. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
    ```sh
    kubectl get gateway http -n {{% reuse "docs/snippets/ns-system.md" %}} -o yaml
    ```
