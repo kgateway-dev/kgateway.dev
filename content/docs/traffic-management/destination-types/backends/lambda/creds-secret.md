@@ -80,7 +80,7 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
      type: AWS
      aws:
        region: <region>
-       accountId: <account-id>
+       accountId: "<account-id>"
        auth:
          type: Secret
          secret:
@@ -144,8 +144,6 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
    ```
 
 At this point, {{% reuse "docs/snippets/product-name.md" %}} is routing directly to the `echo` Lambda function!
-
-<!-- TODO unwrapAsAwsAlb? -->
 
 ## Cleanup
 
