@@ -35,7 +35,7 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
    |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up {{< reuse "docs/snippets/product-name.md" >}}, a default gateway class is set up for you.  |
    |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure an HTTP gateway that listens for incoming traffic for the `mydomain.com` domain on port 8080. The gateway can serve HTTP routes from any namespace. |
 
-2. Check the status of the gateway to make sure that your configuration is accepted and no conflicts exist in your cluster. 
+2. Check the status of the gateway to make sure that your configuration is accepted. 
    ```sh
    kubectl get gateway my-http-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```

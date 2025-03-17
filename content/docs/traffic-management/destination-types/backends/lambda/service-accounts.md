@@ -19,7 +19,8 @@ In this guide, you follow these steps:
 * Create a Lambda function for testing
 
 **{{% reuse "docs/snippets/product-name.md" %}} resources**:
-* Install {{% reuse "docs/snippets/product-name.md" %}}, including settings to annotate the gateway proxy service account with the IRSA
+* Install {{% reuse "docs/snippets/product-name.md" %}}
+* Annotate the gateway proxy service account with the IRSA
 * Set up routing to your function by creating `Upstream` and `HTTPRoute` resources
 
 {{% callout type="warning" %}}
@@ -148,56 +149,11 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 Install {{% reuse "docs/snippets/product-name.md" %}}, including settings to support gateway proxy service account authentication with your AWS account.
 
-1. Deploy the Kubernetes Gateway API CRDs.
-
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
-   ```
-
-2. Deploy the {{% reuse "docs/snippets/product-name.md" %}} CRDs by using Helm.
-
-   ```sh
-   helm upgrade -i --create-namespace --namespace {{% reuse "docs/snippets/ns-system.md" %}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-   ```
-   
-3. Install {{% reuse "docs/snippets/product-name.md" %}} by using Helm. The following settings enable {{% reuse "docs/snippets/product-name.md" %}} to use an AWS IRSA and annotate the `http` service account.
-   ```yaml
-   helm install -n {{% reuse "docs/snippets/ns-system.md" %}} \
-   --create-namespace \
-   --version v{{< reuse "docs/versions/n-patch.md" >}} \
-   kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-   -f -<<EOF
-   # Annotate the gateway proxy service account
-   kubeGateway:
-     gatewayParameters:
-       glooGateway:
-         serviceAccount:
-           extraAnnotations:
-             eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role
-   # Enable AWS account authentication with IRSA
-   settings:
-     aws:
-       enableServiceAccountCredentials: true
-       stsCredentialsRegion: ${AWS_LAMBDA_REGION}
-   EOF
-   ```
-
-4. Make sure that `kgateway` is running.
-
-   ```sh
-   kubectl get pods -n {{% reuse "docs/snippets/ns-system.md" %}}
-   ```
-
-   Example output:
-
-   ```
-   NAME                        READY   STATUS    RESTARTS   AGE
-   kgateway-5495d98459-46dpk   1/1     Running   0          19s
-   ```
+{{< reuse "docs/snippets/get-started.md" >}}
 
 ## Create a gateway proxy and annotate its service account {#annotate}
 
-Create an HTTP gateway, and verify that its service account is annotated.
+Create an HTTP gateway, and annotate its service account with the AWS IRSA.
 
 1. Create a Gateway resource with an HTTP listener. 
    ```yaml
@@ -219,27 +175,22 @@ Create an HTTP gateway, and verify that its service account is annotated.
    EOF
    ```
 
-2. Check the status of the gateway to make sure that your configuration is accepted and no conflicts exist in your cluster. 
+2. Check the status of the gateway to make sure that your configuration is accepted. 
    ```sh
    kubectl get gateway http -n {{% reuse "docs/snippets/ns-system.md" %}} -o yaml
    ```
 
-3. Get the external address of the gateway and save it in an environment variable.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+3. Annotate the `http` service account with the `eks.amazonaws.com/role-arn` IRSA annotation.
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{% reuse "docs/snippets/ns-system.md" %}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS   
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl port-forward deployment/http -n {{% reuse "docs/snippets/ns-system.md" %}} 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+   kubectl annotate sa http -n {{% reuse "docs/snippets/ns-system.md" %}} eks.amazonaws.com/role-arn=arn:aws:iam::${ACCOUNT_ID}:role/kgateway-lambda-role
+   ``` 
 
-4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
+4. Restart the `http` gateway deployment to pick up the service account annotation.
+   ```sh
+   kubectl rollout restart deployment http -n {{% reuse "docs/snippets/ns-system.md" %}}
+   ```
+
+5. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
    ```sh
    kubectl describe serviceaccount http -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
@@ -284,7 +235,7 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
      type: AWS
      aws:
        region: ${AWS_LAMBDA_REGION}
-       accountId: ${ACCOUNT_ID}
+       accountId: "${ACCOUNT_ID}"
        auth:
          type: IRSA
        lambda:
@@ -324,7 +275,22 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
    EOF
    ```
 
-3. Confirm that {{% reuse "docs/snippets/product-name.md" %}} correctly routes requests to Lambda by sending a curl request to the `echo` function. Note that the first request might take a few seconds to process, because the AWS Security Token Service (STS) credential request must be performed first. However, after the credentials are cached, subsequent requests are processed more quickly.
+3. Get the external address of the gateway and save it in an environment variable.
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{% reuse "docs/snippets/ns-system.md" %}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS   
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   kubectl port-forward deployment/http -n {{% reuse "docs/snippets/ns-system.md" %}} 8080:8080
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+4. Confirm that {{% reuse "docs/snippets/product-name.md" %}} correctly routes requests to Lambda by sending a curl request to the `echo` function. Note that the first request might take a few seconds to process, because the AWS Security Token Service (STS) credential request must be performed first. However, after the credentials are cached, subsequent requests are processed more quickly.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
