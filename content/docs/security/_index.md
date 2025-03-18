@@ -7,6 +7,10 @@ Secure your gateway to prevent unauthenticated and unauthorized access to your a
 
 {{< cards >}}
   {{< card link="access-logging" title="Access logging" >}}
-  {{< card link="cors" title="CORS" >}}
-  {{< card link="csrf" title="CSRF" >}}
+  {{< card link="backend-tls" title="Backend TLS" >}}
+  {{< card link="/docs/setup/listeners/https/" title="HTTPS listener" icon="external-link">}}
+  {{< card link="/docs/setup/listeners/tcp/" title="TCP listener" icon="external-link">}}
+  {{< card link="/docs/integrations/external-dns-cert-manager/" title="ExternalDNS and Cert-Manager" icon="external-link">}}
+  {{< card link="/docs/integrations/istio/" title="Istio for mTLS" icon="external-link">}}
+  
 {{< /cards >}}

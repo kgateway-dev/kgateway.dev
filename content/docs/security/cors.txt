@@ -21,21 +21,6 @@ CORS policies are typically implemented to limit access to server resources for 
 * A JavaScript on a web page at `example.com` tries to access a different port, such as `example.com:3001`.
 * A JavaScript on a web page at `https://example.com` tries to access the resources by using a different protocol, such as `http://example.com`.
 
-For more information, see the [CORS API](/docs/reference/api/cors/).
-
-### Configuration options
-
-You can configure the CORS policy at two levels:
-
-* VirtualHostOption: Configure a CORS policy in the VirtualHostOption that is applied to a gateway proxy. The policy is automatically attached to all the listeners that are defined for one or multiple hosts on the gateway. 
-* RouteOption: Configure a CORS policy in the RouteOption. Then, you can apply the policy to one or multiple routes by using the `targetRefs` field on the RouteOption or the `ExtensionRef` filter on the HTTPRoute. For more information, see [Policy attachment](/docs/about/policies/routeoption/#policy-attachment-routeoption}). 
-
-By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the `exposeHeaders` CORS option by using the `corsPolicyMergeSettings` field in the VirtualHostOption. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`. 
-
-For example, you might want to expose the CORS `origin` header for traffic that reaches any of the gateway listeners with the VirtualHostOption. Additionally, each team or product might have their own headers on a per route basis that you want to expose also, such as `product-a`. By setting the `corsPolicyMergeSettings` to `UNION`, the exposed headers are merged together. This way, both the VirtualHostOption and RouteOption `exposeHeaders` CORS policies are applied. When the routes are called, the exposed headers from the VirtualHostOption and RouteOption are both returned, such as `origin` and `product-a`.
-
-For more information about the supported merge strategies, see the [API docs](/docs/reference/api/cors/#corspolicymergesettings).
-
 {{% callout type="info" %}} 
 Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in {{< reuse "docs/snippets/product-name.md" >}}. 
 {{% /callout %}}
@@ -44,24 +29,31 @@ Some apps, such as `httpbin`, have built-in CORS policies that allow all origins
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up CORS policies
+### Set up your environment to test CORS {#setup-env}
 
-{{% callout type="info" %}}
-This example uses the Petstore app to demonstrate CORS policies. You cannot use the httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in {{< reuse "docs/snippets/product-name.md" >}}.
-{{% /callout %}}
+Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Petstore app to test CORS policies.
 
-1. Deploy the Petstore app. 
+1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use CORS.
+
+   ```shell
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```
+
+2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in {{< reuse "docs/snippets/product-name.md" >}}.
+   
    ```sh
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/gloo/v1.16.x/example/petstore/petstore.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
    ```
    
    Example output: 
+   
    ```console
    deployment.apps/petstore created
    service/petstore created
    ```
 
-2. Verify that the Petstore app is up and running. 
+3. Verify that the Petstore app is up and running. 
+   
    ```sh
    kubectl get pods   
    ```
@@ -72,77 +64,13 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    petstore-66cddd5bb4-x7vdd   1/1     Running   0          26s
    ```
 
-3. Create the CORS policy at either the virtual host level or the route level. Policies at the virtual host level apply to all routes that are attached to the gateway that the virtual host targets. If you have a CORS policy at both virtual host and route levels, the route policy takes precedence by default.
 
-   {{< tabs items="Virtual host, Route" >}}
-   {{% tab %}}
-   Create a VirtualHostOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. The example also sets the `corsPolicyMergeSettings` to configure how conflicting CORS policies at the virtual host and route levels are handled. In the example, you configure a `UNION` merge strategy for the `exposeHeaders` field. Now, the CORS policy applies to requests so that all the `exposeHeaders` values from both the virtual host and route are included. Currently, only `exposeHeaders` is configurable. You cannot merge other CORS options such as `allowHeaders` or `allowOrigin`.
-   ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: VirtualHostOption
-   metadata:
-     name: cors
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   spec:
-     options:
-       corsPolicyMergeSettings:
-         exposeHeaders: UNION
-       cors:
-         allowCredentials: true
-         allowHeaders:
-         - origin
-         allowMethods:
-         - GET
-         - POST
-         - OPTIONS
-         allowOrigin:
-         - https://example.com/
-         allowOriginRegex:
-         - https://\[a-zA-Z0-9\]\*.example
-         exposeHeaders:
-         - origin
-         - vh-header
-         maxAge: 1d
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: Gateway
-       name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-   EOF
-   ```
-   {{% /tab %}}
-   {{% tab  %}}
-   1. Create a RouteOption resource to define your CORS rules. The following example allows requests from the `example.com/` and `*.example.com` origins. 
-      ```yaml
-      kubectl apply -f- <<EOF
-      apiVersion: gateway.kgateway.dev/v1alpha1
-      kind: RouteOption
-      metadata:
-        name: cors
-        namespace: default
-      spec:
-        options:
-          cors:
-            allowCredentials: true
-            allowHeaders:
-            - origin
-            allowMethods:
-            - GET
-            - POST
-            - OPTIONS
-            allowOrigin:
-            - https://example.com/
-            allowOriginRegex:
-            - https://\[a-zA-Z0-9\]\*.example
-            exposeHeaders:
-            - origin
-            - route-header
-            maxAge: 1d
-      EOF
-      ```
+## Set up CORS policies
 
-2. Create an HTTPRoute resource for the Petstore app that applies the RouteOption resources that you created. 
+Use the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs to create CORS policies.
+
+1. Create an HTTPRoute resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com/` and `*.example.com` origins.
+
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -158,20 +86,32 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
        - cors.example
      rules:
        - filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.solo.io
-               kind: RouteOption
-               name: cors
+         - type: CORS
+           cors:
+           - allowCredentials: true
+             allowOrigins:
+             - "https://example.com/"
+             allowMethods: 
+             - GET
+             - POST
+             - OPTIONS
+             allowHeaders: 
+             - origin
+         - type: ResponseHeaderModifier
+           responseHeaderModifier:
+             add:
+               - name: Access-Control-Expose-Headers
+                 value: "origin, vh-header"
+               - name: Access-Control-Max-Age
+                 value: "86400"
          backendRefs:
            - name: petstore
              port: 8080
    EOF
    ```
-   {{% /tab %}}
-   {{< /tabs >}}   
 
-1. Send a request to the Petstore app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
+2. Send a request to the Petstore app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
+   
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
@@ -206,7 +146,8 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
    [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
    ```
    
-2. Send another request to the Petstore app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
+3. Send another request to the Petstore app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
+   
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -240,9 +181,7 @@ This example uses the Petstore app to demonstrate CORS policies. You cannot use 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo/v1.16.x/example/petstore/petstore.yaml
-kubectl delete virtualhostoption cors -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete routeoption cors -n default
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
 kubectl delete httproute petstore-cors -n default
 ```
    

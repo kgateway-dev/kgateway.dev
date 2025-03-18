@@ -24,12 +24,12 @@ Set up {{< reuse "docs/snippets/product-name.md" >}} by following the [Quick sta
 
 ## Deploy a sample app {#deploy-app}
 
-The following configuration file creates the httpbin app. To review the source file, see [the kgateway project](https://github.com/kgateway-dev/kgateway/blob/main/examples/httpbin.yaml).
+The following configuration file creates the httpbin app. To review the source file, see [the kgateway project](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml).
 
 1. Create the httpbin app.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
    ```
 
    Example output:
@@ -275,7 +275,7 @@ Now that you have {{< reuse "docs/snippets/product-name.md" >}} set up and runni
 1. Delete the httpbin app.
 
    ```sh
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
    ```
 
 2. Delete the HTTPRoute.

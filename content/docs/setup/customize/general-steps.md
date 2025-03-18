@@ -28,7 +28,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
    
    {{< callout type="info" >}}
-   For other settings, see the [GatewayParameters proto file](https://github.com/solo-io/gloo/blob/main/projects/gateway2/api/v1alpha1/gateway_parameters_types.go) or check out the [Gateway customization guides](../).
+   For other settings, see the [GatewayParameters proto file](https://github.com/solo-io/gloo/blob/{{< reuse "docs/versions/github-branch.md" >}}/projects/gateway2/api/v1alpha1/gateway_parameters_types.go) or check out the [Gateway customization guides](../).
    {{< /callout >}}
    
    ```yaml

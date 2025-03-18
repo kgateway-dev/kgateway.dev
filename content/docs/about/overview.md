@@ -20,8 +20,6 @@ The {{< reuse "docs/snippets/product-name.md" >}} project provides the following
   {{< card link="/docs/setup/customize/aws-elb/" title="AWS ALB and NLB" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/buffering/" title="Buffering" tag="Traffic" >}}
-  {{< card link="/docs/security/cors/" title="Cross-Origin Resource Sharing (CORS)" tag="Security" >}}
-  {{< card link="/docs/security/csrf/" title="Cross-Site Request Forgery (CSRF)" tag="Security" >}}
   {{< card link="/docs/traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
   {{< card link="/docs/resiliency/fault-injection/" title="Fault injection" tag="Resiliency" >}}
