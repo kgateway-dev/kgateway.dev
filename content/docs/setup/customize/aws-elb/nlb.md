@@ -142,7 +142,7 @@ Keep in mind the following considerations when working with an NLB:
 5. Review the NLB in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 
    2. In the left navigation, go to **Load Balancing > Load Balancers**.
-   3. Find and open the ALB that was created for you, with a name such as `k8s-kgateway-awscloud-<hash>`.
+   3. Find and open the NLB that was created for you, with a name such as `k8s-kgateway-awscloud-<hash>`.
    4. On the **Resource map** tab, verify that the load balancer points to EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
 
 <!-- TODO HTTPListenerPolicy healthcheck

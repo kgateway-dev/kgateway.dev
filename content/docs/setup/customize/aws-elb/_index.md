@@ -1,5 +1,5 @@
 ---
-title: AWS ELB
+title: AWS ELBs
 weight: 20
 ---
 
