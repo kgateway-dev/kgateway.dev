@@ -4,6 +4,8 @@ weight: 10
 description: Configure TLS to terminate for a specific backend workload. 
 ---
 
+Configure TLS to terminate for a specific backend workload.
+
 When you configure an [HTTPS listener](/docs/setup/listeners/https), the Gateway terminates the TLS connection and decrypts the traffic. The Gateway then routes the decrypted traffic to the backend service.
 
 However, you might have a specific backend workload that uses its own TLS certificate. In this case, you can configure the Gateway to originate a TLS connection that terminates at the backend service by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
@@ -14,13 +16,13 @@ However, you might have a specific backend workload that uses its own TLS certif
 
 ## Create a backend workload with a TLS certificate {#workload-tls-cert}
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the {{< reuse "docs/snippets/product-name.md" >}} GitHub repository](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/backendtls/inputs).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the {{< reuse "docs/snippets/product-name.md" >}} GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
 
 2. Verify that the NGINX server is running.
@@ -203,7 +205,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
    
 2. Delete the routing resources that your created for the NGINX server.
