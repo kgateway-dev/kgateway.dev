@@ -6,160 +6,137 @@ description: Configure TLS to terminate for a specific backend workload.
 
 When you configure an [HTTPS listener](/docs/setup/listeners/https), the Gateway terminates the TLS connection and decrypts the traffic. The Gateway then routes the decrypted traffic to the backend service.
 
-However, you might have a specific backend workload that uses its own TLS certificate. In this case, you can terminate the TLS connection at the backend service by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+However, you might have a specific backend workload that uses its own TLS certificate. In this case, you can configure the Gateway to originate a TLS connection that terminates at the backend service by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Create a TLS certificate {#tls-certs}
+## Create a backend workload with a TLS certificate {#workload-tls-cert}
 
-The following steps create a TLS certificate for the sample httpbin workload.
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the {{< reuse "docs/snippets/product-name.md" >}} GitHub repository](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/backendtls/inputs).
 
-1. Create a directory to store your TLS credentials in. 
-   
-   ```sh
-   mkdir example_certs
-   ```
 
-2. Create a self-signed root certificate. The following command creates a root certificate that is valid for a year and can serve any hostname. You use this certificate to sign the server certificate for the httpbin workload later. For other command options, see the [OpenSSL docs](https://www.openssl.org/docs/manmaster/man1/openssl-req.html).
-   
-   ```sh
-   # root cert
-   openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=any domain/CN=*' -keyout example_certs/root.key -out example_certs/root.crt
-   ```
-
-3. Use the root certificate to sign the httpbin workload certificate.
-   
-   ```sh
-   openssl req -out example_certs/httpbin.csr -newkey rsa:2048 -nodes -keyout example_certs/httpbin.key -subj "/CN=*/O=any domain"
-   openssl x509 -req -sha256 -days 365 -CA example_certs/root.crt -CAkey example_certs/root.key -set_serial 0 -in example_certs/httpbin.csr -out example_certs/httpbin.crt
-   ```
-
-4. Create a Kubernetes Secret to store your server TLS certificate. You create the secret in the same cluster and namespace that the httpbin workload is deployed to.
-   
-   ```sh
-   kubectl create secret tls -n httpbin httpbin \
-     --key example_certs/httpbin.key \
-     --cert example_certs/httpbin.crt
-   kubectl label secret httpbin app=httpbin --namespace httpbin
-   ```
-
-5. Create a Kubernetes ConfigMap to store the root certificate. Later, you refer to this ConfigMap to validate the BackendTLSPolicy.
-
-   ConfigMap:
-
-   ```sh
-   kubectl create configmap -n httpbin httpbin-root-ca \
-     --from-file=ca.crt=example_certs/root.crt
-   kubectl label configmap httpbin-root-ca app=httpbin --namespace httpbin
-   ```
-
-   Secret:
-   ```
-   kubectl create secret generic httpbin-root-ca \
-     --from-file=ca.crt=example_certs/root.crt \
-     -n httpbin
-   kubectl label secret httpbin-root-ca app=httpbin --namespace httpbin
-   ```
-
-## Add the TLS certificate to your backend workload {#add-tls-cert}
-
-1. Get the configuration of the `httpbin` sample app.
+1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   wget -0 httpbin-tls.yaml https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
 
-2. Open the `httpbin-tls.yaml` file and update the Deployment container spec to mount the TLS certificate, such as with the following example:
-
-   ```yaml
-   spec:
-     serviceAccountName: httpbin
-     containers:
-       - image: docker.io/mccutchen/go-httpbin:v2.6.0
-         imagePullPolicy: IfNotPresent
-         name: httpbin
-         command: [ go-httpbin ]
-         args:
-           - "-port"
-           - "8080"
-           - "-max-duration"
-           - "600s" # override default 10s
-         ports:
-           - containerPort: 8080
-         volumeMounts:
-           - name: tls-cert
-             mountPath: "/etc/tls"
-             readOnly: true
-       - name: curl
-         image: curlimages/curl:7.83.1
-         resources:
-           requests:
-             cpu: "100m"
-           limits:
-             cpu: "200m"
-         imagePullPolicy: IfNotPresent
-         command:
-           - "tail"
-           - "-f"
-           - "/dev/null"
-     volumes:
-       - name: tls-cert
-         secret:
-           secretName: httpbin
-           optional: false
-   ```
-
-3. Apply the updated configuration to your cluster.
+2. Verify that the NGINX server is running.
 
    ```shell
-   kubectl apply -f httpbin-tls.yaml
-   ```
-
-4. Verify that the `httpbin` sample app is running.
-
-   ```shell
-   kubectl get pods -n httpbin
+   kubectl get pods -l app.kubernetes.io/name=nginx
    ```
 
    Example output:
 
    ```
-   NAME                     READY   STATUS    RESTARTS   AGE
-   httpbin-569d948984-42424   2/2     Running   0          10s
+   NAME    READY   STATUS    RESTARTS   AGE
+   nginx   1/1     Running   0          9s
    ```
    
 ## Create a BackendTLSPolicy {#create-backend-tls-policy}
 
-Create the BackendTLSPolicy for the httpbin workload. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+Create the BackendTLSPolicy for the NGINX workload. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
 
-1. Create the BackendTLSPolicy.
+1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use BackendTLSPolicy.
+
+   ```shell
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```
+
+2. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: ca
+     labels:
+       app: nginx
+   data:
+     ca.crt: |
+       -----BEGIN CERTIFICATE-----
+       MIIC6zCCAdOgAwIBAgIJAPdgL5W5vugOMA0GCSqGSIb3DQEBCwUAMBYxFDASBgNV
+       BAMMC2V4YW1wbGUuY29tMB4XDTI1MDMxMDIyMDY0OVoXDTI1MDQwOTIyMDY0OVow
+       FjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
+       ggEKAoIBAQC46DSkpngZavNVgByw/h7rbKyvgzp2wGDW/fPGL0/rkLcKIsIiNgHH
+       6vA0UPTSI3YsHeu+CnQCEhZWk9KhQ2q8etSynUoizIrj2iuxKTEsL3SJ7cI03cpH
+       iQoMuUqp4L4lA6/YXsLkXjHWtnTLKjsvsrjBFiu96ueoje6B2sfcSlYRFI1WgMgZ
+       QP+LALy9tVtMManIqKVr63BG0884AghF3sPo5ryOEP/1Oc9F6Ivf67JfNjMhuBHa
+       hT500hYyuxzjgUPoMWyX1FQ7NL/OWUJ5EXuSnxpDb7edVDVCz+z199S76wpAKEe0
+       hoJG5Ahw1vWNRRBO8gnsSjLAHEw0nXpvAgMBAAGjPDA6MBYGA1UdEQQPMA2CC2V4
+       YW1wbGUuY29tMAsGA1UdDwQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDATANBgkq
+       hkiG9w0BAQsFAAOCAQEANRIdAdlJgSsgBdUcO7fmAKAZtlUUPWHa1nq5hzxCkdBj
+       hnGBCE4d8tyffTkL4kZ3cQZmDjeb7KiVL9/OBDjbe3coaKrNeFRZ+0XTJtcnRzrB
+       gRpnXAJvYCbq4AIOkGdUfp2mw1fLdoNaoW8snb6RMV/7YrOSmhUa8H9YeiW3bZIh
+       oOhsl5u5DXaInkTUR4ZOVV6UJVsG+JnN71nFGikcKKMGgOC2rpFP658M3jCHX5yx
+       EGqH5JRIpCX9epfIvFeJWJY8u8G4pg3Sryko72RWwUQBQ5HGInO0nYGU1ff/enW6
+       ywK+felXBiCUKrWKFjChgwmrs2bGAUfegKF/TQtvWQ==
+       -----END CERTIFICATE-----
+   EOF
+   ```
+
+3. Create the BackendTLSPolicy.
 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha3
    kind: BackendTLSPolicy
    metadata:
-     name: httpbin-backend-tls
-     namespace: httpbin
+     name: nginx-tls-policy
      labels:
-       app: httpbin
+       app: nginx
    spec:
      targetRefs:
-     - group: ''
+     - group: ""
        kind: Service
-       name: httpbin
+       name: nginx
      validation:
+       hostname: "example.com"
        caCertificateRefs:
-       - name: httpbin-root-ca
-         group: ''
-         kind: Secret
-       hostname: www.example.com
+       - group: ""
+         kind: ConfigMap
+         name: ca
    EOF
    ```
 
-2. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
+   | Setting | Description |
+   |---------|-------------|
+   | `targetRefs` | The service that you want the Gateway to originate a TLS connection to, such as the NGINX server. |
+   | `validation.hostname` | The hostname that matches the NGINX server certificate. |
+   | `validation.caCertificateRefs` | The ConfigMap that has the public CA certificate for the NGINX server. |
+
+4. Create an HTTPRoute that routes traffic to the NGINX server on the `example.com` hostname and HTTPS port 8443. Note that the parent Gateway is the sample `http` Gateway resource that you created [before you began](#before-you-begin).
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: HTTPRoute
+   metadata:
+     name: nginx-route
+     labels:
+       app: nginx
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     hostnames:
+     - "example.com"
+     rules:
+     - backendRefs:
+       - name: nginx
+         port: 8443
+   EOF
+   ```
+
+## Verify the TLS connection {#verify-tls-connection}
+
+Now that your TLS backend and routing resources are configured, verify the TLS connection.
+
+1. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -169,81 +146,68 @@ Create the BackendTLSPolicy for the httpbin workload. For more information, see 
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward svc/https -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
+   kubectl port-forward svc/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-3. Send a request to the httpbin app and verify that you see the TLS handshake and you get back a 200 HTTP response code. 
+2. Send a request to the NGINX server and verify that you get back a 200 HTTP response code. 
+   
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik https://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   curl -vik http://$INGRESS_GW_ADDRESS:8080/ -H "host: example.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik https://localhost:8080/headers -H "host: www.example.com"
+   curl -vik http://localhost:8080/ -H "host: example.com:8080"
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
    ```
-   * ALPN, offering h2
-   * ALPN, offering http/1.1
-   * successfully set certificate verify locations:
-   *  CAfile: /etc/ssl/cert.pem
-   *  CApath: none
-   * TLSv1.2 (OUT), TLS handshake, Client hello (1):
-   * TLSv1.2 (IN), TLS handshake, Server hello (2):
-   * TLSv1.2 (IN), TLS handshake, Certificate (11):
-   * TLSv1.2 (IN), TLS handshake, Server key exchange (12):
-   * TLSv1.2 (IN), TLS handshake, Server finished (14):
-   * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
-   * TLSv1.2 (OUT), TLS change cipher, Change cipher spec (1):
-   * TLSv1.2 (OUT), TLS handshake, Finished (20):
-   * TLSv1.2 (IN), TLS change cipher, Change cipher spec (1):
-   * TLSv1.2 (IN), TLS handshake, Finished (20):
-   * SSL connection using TLSv1.2 / ECDHE-RSA-CHACHA20-POLY1305
-   * ALPN, server accepted to use h2
-   * Server certificate:
-   *  subject: CN=*; O=gateway
-   *  start date: Nov  5 01:54:04 2023 GMT
-   *  expire date: Nov  2 01:54:04 2033 GMT
-   *  issuer: CN=*; O=root
-   *  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
-   * Using HTTP2, server supports multi-use
-   * Connection state changed (HTTP/2 confirmed)
-   * Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
-   * Using Stream ID: 1 (easy handle 0x15200e800)
-   > GET /status/200 HTTP/2
-   > Host: https.example.com
-   > user-agent: curl/7.77.0
-   > accept: */*
+   * Host localhost:8080 was resolved.
+   * IPv6: ::1
+   * IPv4: 127.0.0.1
+   *   Trying [::1]:8080...
+   * Connected to localhost (::1) port 8080
+   > GET / HTTP/1.1
+   > Host: example.com:8080
+   > User-Agent: curl/8.7.1
+   > Accept: */*
    > 
-   *  Connection state changed (MAX_CONCURRENT_STREAMS == 2147483647)!
-   < HTTP/2 200 
-   HTTP/2 200 
-   ...
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
    ```
+
+3. Enable port-forwarding on the Gateway.
+
+   ```sh
+   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000
+   ```
+
+4. In your browser, open the Envoy stats page at [http://127.0.0.1:19000/stats](http://127.0.0.1:19000/stats).
+
+5. Search for the following stats that indicate the TLS connection is working. The count increases each time that the Gateway sends a request to the NGINX server.
+
+   * `cluster.kube_default_nginx_8443.ssl.versions.TLSv1.2`: The number of TLSv1.2 connections from the Envoy gateway proxy to the NGINX server.
+   * `cluster.kube_default_nginx_8443.ssl.handshake`: The number of successful TLS handshakes between the Envoy gateway proxy and the NGINX server.
 
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Update the httpbin Deployment to remove the TLS certificate.
+1. Delete the NGINX server.
 
    ```yaml
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
    
-2. Remove the HTTP route for the httpbin app, the HTTPS gateway, and the Kubernetes secret that holds the TLS certificate and key.
+2. Delete the routing resources that your created for the NGINX server.
+   
    ```sh
-   kubectl delete backendtlspolicy,secret,configmap -A -l app=httpbin
-   ```
-
-3. Remove the `example_certs` directory that stores your TLS credentials. 
-   ```sh
-   rm -rf example_certs
+   kubectl delete backendtlspolicy,configmap,httproute -A -l app=nginx
    ```
