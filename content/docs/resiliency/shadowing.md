@@ -34,7 +34,7 @@ To enable traffic shadowing, you must set up an [Backend](/docs/traffic-manageme
 
 2. Deploy the httpbin shadow app. 
    ```sh
-   kubectl -n shadow apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+   kubectl -n shadow apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
    ```
 
 3. Verify that the httpbin shadow app is running.
@@ -213,7 +213,7 @@ kubectl delete routeoption shadowing -n httpbin
 kubectl delete backend shadow -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete backend httpbin -n {{< reuse "docs/snippets/ns-system.md" >}} 
 kubectl delete referencegrant shadow-rg -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml -n shadow
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml -n shadow
 kubectl delete ns shadow
 ```
 

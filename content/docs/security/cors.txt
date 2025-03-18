@@ -42,7 +42,7 @@ Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Pe
 2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in {{< reuse "docs/snippets/product-name.md" >}}.
    
    ```sh
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/main/assets/docs/examples/petstore.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
    ```
    
    Example output: 
@@ -181,7 +181,7 @@ Use the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs to create COR
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/main/assets/docs/examples/petstore.yaml
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
 kubectl delete httproute petstore-cors -n default
 ```
    

@@ -338,6 +338,6 @@ kubectl delete httproute grandchild -n team2
 kubectl delete routeoption parent-remove-header -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete routeoption child-team1-fault -n team1
 kubectl delete routeoption child-team2-rewrite -n team2
-kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
-kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
+kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2

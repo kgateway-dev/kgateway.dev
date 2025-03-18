@@ -87,7 +87,7 @@ You must actively meet the membership criteria to remain part of the early discl
 
 #### Other membership notes
 
-Membership in the [Envoy security group](https://github.com/envoyproxy/envoy/blob/main/SECURITY.md#security-reporting-process) is a separate process. Because {{< reuse "docs/snippets/product-name.md" >}} integrates closely with the Envoy project, you might also consider joining the Envoy early disclosure group. Even if not, you are still expected to abide by their embargo policy when a {{< reuse "docs/snippets/product-name.md" >}} vulnerability relates to the Envoy project.
+Membership in the [Envoy security group](https://github.com/envoyproxy/envoy/blob/{{< reuse "docs/versions/github-branch.md" >}}/SECURITY.md#security-reporting-process) is a separate process. Because {{< reuse "docs/snippets/product-name.md" >}} integrates closely with the Envoy project, you might also consider joining the Envoy early disclosure group. Even if not, you are still expected to abide by their embargo policy when a {{< reuse "docs/snippets/product-name.md" >}} vulnerability relates to the Envoy project.
 
 ## Updates and questions
 
