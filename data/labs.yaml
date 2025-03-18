@@ -17,3 +17,7 @@
 - title: Exploring HTTPRoute resource configurations with kgateway
   description: Learn HTTP traffic management features including request matching, url rewriting, traffic splitting and header modification
   href: http://www.solo.io/resources/lab/exploring-httproute-resource-configurations-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Gateway API support for service mesh with kgateway
+  description: See how Kubernetes Gateway API supports service mesh with kgateway to manage and control internal east-west traffic with your system
+  href: https://www.solo.io/resources/lab/gatewayapi-support-for-service-mesh-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community

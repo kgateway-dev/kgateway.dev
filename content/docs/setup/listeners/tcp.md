@@ -87,7 +87,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up {{% reuse "docs/snippets/product-name.md" %}}, a default gateway class is set up for you. To view the gateway class configuration, see [Gateway classes and types](docs/about/class-type/). |
    |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure a TCP gateway that listens for incoming traffic on port 8000. The gateway can serve TCPRoutes from any namespace. |
 
-2. Check the status of the gateway to make sure that your configuration is accepted and no conflicts exist in your cluster. 
+2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
    
    ```sh
    kubectl get gateway tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml

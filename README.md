@@ -4,7 +4,7 @@
 
 #### Dependencies:
 * `Node.js v18.18.2 or greater`
-* `hugo v0.134.2 or greater`
+* `hugo extended v0.135.0`
 
 #### To run `kgateway.dev` locally:
 1. `git@github.com:kgateway-dev/kgateway.dev.git`
