@@ -36,7 +36,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    export AWS_LAMBDA_REGION=<lambda_function_region>
    export AWS_CLUSTER_REGION=<cluster_region>
    export CLUSTER_NAME=<cluster_name>
-   export ACCOUNT_ID=<account_id>
+   export AWS_ACCOUNT_ID=<account_id>
    ```
 
 2. Check whether your EKS cluster has an OIDC provider.
@@ -80,7 +80,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
           {
             "Effect": "Allow",
             "Principal": {
-              "Federated": "arn:aws:iam::${ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}"
+              "Federated": "arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
@@ -99,7 +99,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
       ```
    2. Attach the IAM role to the IAM policy. This IAM role for the service account is known as an IRSA.
       ```sh
-      aws iam attach-role-policy --role-name {{% reuse "docs/snippets/product-name.md" %}}-lambda-role --policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
+      aws iam attach-role-policy --role-name {{% reuse "docs/snippets/product-name.md" %}}-lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
       ```
    3. Verify that the policy is attached to the role.
       ```sh
@@ -165,7 +165,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
      kube:
        serviceAccount:
          extraAnnotations:
-           eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role
+           eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role
    EOF
    ```
 
@@ -196,7 +196,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    kubectl get gateway http -n {{% reuse "docs/snippets/ns-system.md" %}} -o yaml
    ```
 
-4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
+4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/{{% reuse "docs/snippets/product-name.md" %}}-lambda-role` annotation.
    ```sh
    kubectl describe serviceaccount http -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
@@ -241,7 +241,7 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
      type: AWS
      aws:
        region: ${AWS_LAMBDA_REGION}
-       accountId: "${ACCOUNT_ID}"
+       accountId: "${AWS_ACCOUNT_ID}"
        lambda:
          functionName: echo
    EOF
@@ -328,26 +328,45 @@ At this point, {{% reuse "docs/snippets/product-name.md" %}} is routing directly
 
 If you no longer need to access Lambda functions from {{% reuse "docs/snippets/product-name.md" %}}:
 
-1. Delete the Gateway and GatewayParameters resources.
+1. Delete the GatewayParameters resources.
    ```sh
-   kubectl delete Gateway http -n {{% reuse "docs/snippets/ns-system.md" %}}
    kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
-2. Delete the pod identity webhook.
+2. Remove the annotation from the `http` Gateway that specifies the `http-lambda` GatewayParameters.
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: http
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+   spec:
+     gatewayClassName: kgateway
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+3. Delete the pod identity webhook.
    ```sh
    kubectl delete deploy pod-identity-webhook
    ```
 
-3. Remove cert-manager.
+4. Remove cert-manager.
    ```sh
    kubectl delete -f cert-manager.yaml -n cert-manager
    kubectl delete ns cert-manager
    ```
 
-4. Delete the AWS IAM resources that you created.
+5. Delete the AWS IAM resources that you created.
    ```sh
-   aws iam detach-role-policy --role-name {{% reuse "docs/snippets/product-name.md" %}}-lambda-role --policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
+   aws iam detach-role-policy --role-name {{% reuse "docs/snippets/product-name.md" %}}-lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
    aws iam delete-role --role-name {{% reuse "docs/snippets/product-name.md" %}}-lambda-role
-   aws iam delete-policy --policy-arn=arn:aws:iam::${ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
+   aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{% reuse "docs/snippets/product-name.md" %}}-lambda-policy
    ```

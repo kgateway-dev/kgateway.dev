@@ -3,7 +3,9 @@ title: AWS ELB
 weight: 20
 ---
 
-Review your options for configuring gateway proxies to work with Amazon Web Services (AWS) elastic load balancers (ELBs).
+{{< reuse "docs/snippets/aws-alb-nlb.md" >}}
+
+To get started, choose one of the following guides.
 
 {{< cards >}}
   {{< card link="alb" title="Application load balancers (ALBs)" >}}
