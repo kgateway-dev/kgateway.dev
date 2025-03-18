@@ -10,5 +10,5 @@ The {{< reuse "docs/snippets/product-name.md" >}} project welcomes your document
 {{< card link="preview" title="Preview and build locally" >}}
 {{< card link="styleguide" title="Style guide" >}}
 {{< card link="https://github.com/kgateway-dev/kgateway.dev" icon="external-link" title="GitHub repo for doc site" >}}
-{{< card link="https://github.com/kgateway-dev/community/blob/{{< reuse "docs/versions/github-branch.md" >}}/CONTRIBUTING.md" icon="external-link" title="Contributor guide for code" >}}
+{{< card link="https://github.com/kgateway-dev/community/blob/main/CONTRIBUTING.md" icon="external-link" title="Contributor guide for code" >}}
 {{< /cards >}}
