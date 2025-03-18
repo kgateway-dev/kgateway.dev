@@ -3,7 +3,7 @@ title: Contributor guide
 weight: 50
 ---
 
-The {{< reuse "docs/snippets/product-name.md" >}} project welcomes your documentation contributions. This section contains all the information you need to contribute content to the {{< reuse "docs/snippets/product-name.md" >}} docs. For code contributions, see the [contributing guide in the Community repo](https://github.com/kgateway-dev/community/blob/main/CONTRIBUTING.md).
+The {{< reuse "docs/snippets/product-name.md" >}} project welcomes your documentation contributions. This section contains all the information you need to contribute content to the {{< reuse "docs/snippets/product-name.md" >}} docs. For code contributions, see the [contributing guide in the Community repo](https://github.com/kgateway-dev/community/blob/{{< reuse "docs/versions/github-branch.md" >}}/CONTRIBUTING.md).
 
 {{< cards >}}
 {{< card link="add-docs" title="Add documentation">}}

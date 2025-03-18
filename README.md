@@ -4,7 +4,7 @@
 
 #### Dependencies:
 * `Node.js v18.18.2 or greater`
-* `hugo v0.134.2 or greater`
+* `hugo extended v0.135.0`
 
 #### To run `kgateway.dev` locally:
 1. `git@github.com:kgateway-dev/kgateway.dev.git`
@@ -14,6 +14,13 @@
 5. Visit http://localhost:1313/
 
 ## Contributing
+
+### General Pull Request Guidelines
+When opening a pull request, each of your commits must contain a `Signed-off-by` trailer to adhere to [DCO](https://developercertificate.org/) requirements. This can be done by one of the following methods:
+- Running `make init-git-hooks` which will configure your repo to use the version-controlled [Git hooks](/.githooks) from this repo (preferred)
+- Manually copying the [.githooks/prepare-commit-msg](/.githooks/prepare-commit-msg) file to `.git/hooks/prepare-commit-msg` in your copy of this repo
+- Making sure to use the `-s` / `--signoff` [flag](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--s) on each commit
+
 ### Adding a Lab
 1. Add an entry to `data/labs.yaml` with a title, description, and href
 2. Verify that the new lab appears correctly at http://localhost:1313/resources/labs/

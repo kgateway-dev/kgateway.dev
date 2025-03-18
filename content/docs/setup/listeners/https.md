@@ -169,7 +169,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 ## Cleanup
 
-You can optionally remove the resources that you created as part of this guide. 
+{{< reuse "docs/snippets/cleanup.md" >}}
 
 1. Remove the HTTP route for the httpbin app, the HTTPS gateway, and the Kubernetes secret that holds the TLS certificate and key.
    ```sh

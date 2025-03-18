@@ -383,7 +383,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Follow the [Uninstall guide in the Gloo Mesh Enterprise documentation](https://docs.solo.io/gloo-mesh-enterprise/main/setup/uninstall/) to remove Gloo Mesh Enterprise. 
+1. Follow the [Uninstall guide in the Gloo Mesh Enterprise documentation](https://docs.solo.io/gloo-mesh-enterprise/{{< reuse "docs/versions/github-branch.md" >}}/setup/uninstall/) to remove Gloo Mesh Enterprise. 
 
 2. Remove the Istio sidecar from the httpbin app. 
    1. Remove the Istio label from the httpbin namespace. 
