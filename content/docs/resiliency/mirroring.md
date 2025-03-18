@@ -21,7 +21,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up traffic shadowing
+## Set up mirroring
 
 1. Edit the httpbin service that you deployed earlier. 
    ```sh

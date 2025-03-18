@@ -7,5 +7,4 @@ Simulate failures, disruptions, and adverse conditions to test that your gateway
 
 {{< cards >}}
   {{< card link="shadowing" title="Mirroring" >}}
-  {{< card link="timeouts" title="Timeouts" >}}
 {{< /cards >}}

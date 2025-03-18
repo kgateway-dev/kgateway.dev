@@ -12,12 +12,12 @@ The following image shows the different components that make up the {{< reuse "d
 
 {{< reuse-image src="img/translation.svg" >}}
 
-1. The config and secret watcher components in the `gloo` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, or RouteOptions.
+1. The config and secret watcher components in the `kgateway` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, or RoutePolicies.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "docs/snippets/product-name.md" >}} translation engine. 
 3. The translation engine translates Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources into Envoy configuration. All Envoy configuration is consolidated into an xDS snapshot. 
 4. The reporter receives a status report for every resource that is processed by the translator. 
 5. The reporter writes the resource status back to the etcd data store. 
-6. The xDS snapshot is provided to the {{< reuse "docs/snippets/product-name.md" >}} xDS server component in the `gloo` pod. 
+6. The xDS snapshot is provided to the {{< reuse "docs/snippets/product-name.md" >}} xDS server component in the `kgateway` pod. 
 7. Gateway proxies in the cluster pull the latest Envoy configuration from the {{< reuse "docs/snippets/product-name.md" >}} xDS server.
 8. Users send a request to the IP address or hostname that the gateway proxy is exposed on. 
 9. The gateway proxy uses the listener and route-specific configuration that was provided in the xDS snapshot to perform routing decisions and forward requests to destinations in the cluster.
@@ -31,10 +31,10 @@ The config watcher component is part of the {{< reuse "docs/snippets/product-nam
 
 The secret watcher component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches a secret store for updates to secrets. For example, you might use a Kubernetes Secret to store the AWS access key and secret key credentials for a Backend to access an AWS Lambda. However, you can configure {{< reuse "docs/snippets/product-name.md" >}} to also watch other secret stores.
 
-
+<!--
 ### Endpoint discovery 
 
-The endpoint discovery component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches service registries such as Kubernetes for IP addresses and hostnames that are associated with services. Each endpoint requires its own plug-in that supports the discovery functionality. For example, Kubernetes runs its own endpoint discovery goroutine. When endpoint discovery discovers a new or updated endpoint, the configuration is stored in etcd.
+The endpoint discovery component is part of the {{< reuse "docs/snippets/product-name.md" >}} control plane and watches service registries such as Kubernetes for IP addresses and hostnames that are associated with services. Each endpoint requires its own plug-in that supports the discovery functionality. For example, Kubernetes runs its own endpoint discovery goroutine. When endpoint discovery discovers a new or updated endpoint, the configuration is stored in etcd. -->
 
 ### Translation engine
 
@@ -62,6 +62,7 @@ The reporter component receives a validation report for every {{< reuse "docs/sn
 
 The final snapshot is passed to the xDS Server, which notifies Envoy of a successful config update, updating the Envoy cluster with a new configuration to match the desired state set expressed by {{< reuse "docs/snippets/product-name.md" >}}.
 
+<!--
 
 ## Discovery architecture
 
@@ -72,4 +73,6 @@ To enable automatic discovery of services, see [Discovery](/docs/traffic-managem
 The following image shows how the endpoint discovery component discovers Kubernetes services and Functions and automatically creates Backend resources for them. 
 
 {{< reuse-image src="img/discovery.svg" >}}
+
+-->
 

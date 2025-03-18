@@ -1,41 +1,38 @@
 ---
 title: ListenerPolicy
 weight: 30
-description: You can use a ListenerPolicy resource to attach policies to one, multiple, or all gateway listeners. 
+description: You can use a ListenerPolicy resource to attach policies to all gateway listeners. 
 ---
 
-You can use a ListenerPolicy resource to attach policies to one, multiple, or all gateway listeners.
+You can use a ListenerPolicy resource to attach policies to all gateway listeners.
 
 ## Policy attachment {#policy-attachment-listeneroption}
-
+ <!--
 
 Learn more about how you can attach policies to gateway listeners.  
 
-### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`)
+### Option 1: Attach the policy to all listeners on the gateway (`targetRef`) -->
 
-You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRefs` section in the ListenerPolicy resource. 
+You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRef` section in the ListenerPolicy resource. 
 
-The following ListenerPolicy resource specifies an access logging policy and applies this policy to a Gateway resource that is named `http`. Because no listener is targeted, the policy applies to all the listeners that are defined on the gateway. 
+The following ListenerPolicy resource sets a request read and write buffer limit and applies this policy to a Gateway resource that is named `http`.
 
-```console {hl_lines=[7,8,9,10]}
+```yaml {hl_lines=[8,9,10,11]}
+kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: ListenerPolicy
 metadata:
-  name: access-logs
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  name: bufferlimits
+  namespace: kgateway-system
 spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
+  targetRef:
+    group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-  options:
-    accessLoggingService:
-      accessLog:
-      - fileSink:
-          path: /dev/stdout
-          stringFormat: ""
+  perConnectionBufferLimitBytes: 10485760
+EOF
 ```
-
+<!--
 ### Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)
 
 Instead of attaching a policy to all the listeners that are defined on the gateway, you can target a particular listener by using the `spec.targetRefs.sectionName` field in the ListenerPolicy resource. 
@@ -92,11 +89,13 @@ spec:
           path: /dev/stdout
           stringFormat: ""
 ```
-
+-->
 
 ## Conflicting policies
 
-If you create multiple ListenerPolicy resources and attach them to the same gateway listener by using the `targetRefs` option, only the ListenerPolicy that was first created is applied. 
+If you create multiple ListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRef` option, only the ListenerPolicy that was last applied is enforced. 
+
+<!--
 
 {{% callout type="info" %}}
 You cannot attach multiple ListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same ListenerPolicy resource.
@@ -105,3 +104,4 @@ You cannot attach multiple ListenerPolicy resources to the same listener, *even 
 In the following image, you want to attach two ListenerPolicy resources to the HTTP listener. One adds an access logging policy and the other one defines connection buffer limits. Because only one ListenerPolicy can be attached to a gateway listener via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 
 {{< reuse-image src="img/policy-ov-multiple-listeneroption.svg" width="800" >}}
+-->
