@@ -106,15 +106,15 @@ jobs:
             mkdir -p assets/docs/reference/
             
             # Generate Helm Docs with helm-docs
-            (echo '---
-            title: Helm value reference
-            weight: 10
-            next: /docs/reference/contribution
-            prev: /docs/reference/cli
-            ---'; \
-            go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 \
-            --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" \
-            --dry-run) > assets/docs/reference/helm.md
+            for chart in "kgateway:helm" "kgateway-crds:crds"; do
+              IFS=: read -r dir file <<< "$chart"
+              go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 \
+                --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/$dir" \
+                --dry-run > "assets/docs/reference/${file}.md"
+
+              # Remove badge line and following empty line
+              sed -i '/!\[Version:/,/^$/d' "assets/docs/reference/${file}.md"
+            done
 
             echo "=== Debug: After creating index file ==="
             echo "Content directory structure:"
