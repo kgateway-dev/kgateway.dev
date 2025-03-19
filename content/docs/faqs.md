@@ -33,7 +33,6 @@ The {{< reuse "docs/snippets/product-name.md" >}} includes the following capabil
 * Function-level routing that goes beyond routing to a `host:port` for clusters, including routing to a Swagger/OpenAPI spec endpoint, gRPC function, cloud provider function such as AWS Lambda, and more
 * Transformation of request/response via a super-fast C++ templating filter built on Inja
 * Envoy filters to call AWS Lambda directly, handling the complex security handshaking
-* Discovery of services running in a hybrid platform such as of virtual machines (VMs), containers, infrastructure as code (IaC), function as a service (FaaS), and so on
 
 ## What license is kgateway under?
 
@@ -41,11 +40,11 @@ The {{< reuse "docs/snippets/product-name.md" >}} project uses [Apache License 2
 
 ## What is the project roadmap?
 
-The {{< reuse "docs/snippets/product-name.md" >}} project organizes issues into milestones for release. For more details, see the GitHub project.
+The {{< reuse "docs/snippets/product-name.md" >}} project organizes issues into milestones for release. For more details, see the [GitHub project](https://github.com/kgateway-dev/kgateway/milestones).
 
 ## What is the version support policy?
 
-The {{< reuse "docs/snippets/product-name.md" >}} project supports one `n` latest version.
+The {{< reuse "docs/snippets/product-name.md" >}} project supports one latest version.
 
 The `main` branch of the `kgateway-dev/kgateway` Git repository is for feature work under development, and is not stable.
 
@@ -53,15 +52,12 @@ The `main` branch of the `kgateway-dev/kgateway` Git repository is for feature w
 
 The changelog is part of each [GitHub release](https://github.com/kgateway-dev/kgateway/releases).
 
+<!--
 ## Is there enterprise software that is based on kgateway?
 
 {{< cards >}}
   {{< card link="https://www.solo.io/products/gloo-gateway/" title="Solo.io" tag= "Enterprise" image="/img/gloo-gateway-ver-light-on-dark.png" icon="external-link">}}
-{{< /cards >}}
-
-## Why are there some references to Gloo in this project?
-
-The {{< reuse "docs/snippets/product-name.md" >}} project was initially created as an open source project under the `solo-io` GitHub organization and maintained as part of Solo.io's Gloo product family. While the open source project is transferred to the {{< reuse "docs/snippets/product-name.md" >}} organization, some of the references have not been cleaned up yet. Such references might include resource names, Helm chart values, image repositories, or other hardcoded elements. The maintainers are currently working on removing Solo.io and Gloo branding from this project. If you notice any issues, feel free to contact the {{< reuse "docs/snippets/product-name.md" >}} team on Slack or open an issue in the {{< reuse "docs/snippets/product-name.md" >}} GitHub repo. 
+{{< /cards >}} -->
 
 ## Can I use kgateway in a service mesh?
 
@@ -72,8 +68,5 @@ The {{< reuse "docs/snippets/product-name.md" >}} project is not a service mesh,
 * Mutual TLS (mTLS) encryption of traffic between the gateway and services
 * Transformation of request/response to decouple backend APIs from frontend
 * Function routing such as AWS Lambda
-* Request/response caching
-* Unified discovery services of infrastructure like Kubernetes, Consul, Vault, AWS EC2
-* Unified discovery services of functions like REST/OAS spec, gRPC reflection, SOAP/WSDL, WebSockets, Cloud Functions, AWS Lambda
 
-For an example, see the [Istio integration guide](/docs/integrations/istio/).
+For an example, see the [Istio integration guide](/docs/integrations/istio/ambient-ingress/).
