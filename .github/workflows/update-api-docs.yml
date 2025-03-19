@@ -49,7 +49,7 @@ jobs:
           ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
 
           # Update docs repository
-          cd "$GITHUB_WORKSPACE/kgateway.dev"
+          cd "$GITHUB_WORKSPACE"
           echo "Changed to docs repository: $PWD"
           rm -rf content/docs/reference/api/top-level/
           mkdir -p content/docs/reference/api/top-level/
@@ -102,7 +102,7 @@ jobs:
             ls -la "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" || echo "Helm directory not found!"
   
             # Update docs repository
-            cd "$GITHUB_WORKSPACE/kgateway.dev"
+            cd "$GITHUB_WORKSPACE"
             echo "Changed to docs repository: $PWD"
             
             # Create directory for Helm docs
