@@ -168,7 +168,7 @@ You can set up access logs to write to a file. The following example writes acce
    EOF
    ```
 
-2. Update the `http` Gateway to use the GatewayParameters that you created. Note the `gateway.kgateway.dev/gateway-parameters-name` annotation.
+2. Update the `http` Gateway to use the GatewayParameters that you created.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -177,10 +177,13 @@ You can set up access logs to write to a file. The following example writes acce
    metadata:
      name: http
      namespace: kgateway-system
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "gateway-config-access-logs"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: gateway-config-access-logs
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
      - protocol: HTTP
        port: 8080
@@ -220,7 +223,7 @@ You can set up access logs to write to a file. The following example writes acce
    | `jsonFormat` | The structured JSON format to write logs in. For more information about the JSON format dictionaries and command operators you can use, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#format-dictionaries). To format as a string, use the `stringFormat` setting instead. If you omit or leave this setting blank, the [Envoy default format string](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#default-format-string) is used. |
    | `stringFormat` | The string format to write logs in. For more information about the string format and command operators you can use, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-strings). To format as JSON, use the `jsonFormat` setting instead. If you omit or leave this setting blank, the [Envoy default format string](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#default-format-string) is used. |
 
-2. Send a request to the httpbin app on the `www.example.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
+4. Send a request to the httpbin app on the `www.example.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
    
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
@@ -246,7 +249,7 @@ You can set up access logs to write to a file. The following example writes acce
    transfer-encoding: chunked
    ```
    
-3. Check the access log file in the gateway pod and verify that you see a string entry for each request that you sent to the httpbin app. 
+5. Check the access log file in the gateway pod and verify that you see a string entry for each request that you sent to the httpbin app. 
    
    ```sh
    kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} exec -it deploy/http -- cat /dev/default-access-logs.txt

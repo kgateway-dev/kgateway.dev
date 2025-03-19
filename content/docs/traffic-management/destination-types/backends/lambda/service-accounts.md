@@ -178,9 +178,13 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
      name: http
      namespace: {{% reuse "docs/snippets/ns-system.md" %}}
      annotations:
-       gateway.kgateway.dev/gateway-parameters-name: http-lambda
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: http-lambda
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
      - protocol: HTTP
        port: 8080

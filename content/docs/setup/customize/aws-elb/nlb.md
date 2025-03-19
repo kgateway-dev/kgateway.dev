@@ -11,9 +11,6 @@ In this guide you explore how to expose the {{< reuse "docs/snippets/product-nam
 {{< callout type="warning" >}}
 Keep in mind the following considerations when working with an NLB:
 * An AWS NLB has an idle timeout of 350 seconds that you cannot change. This limitation can increase the number of reset TCP connections.
-<!-- TODO HTTPListenerPolicy healthcheck
-* {{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute resource is created that references the gateway. However, AWS ELB health checks are automatically created and run after you create the gateway. Because of this, registered targets might appear unhealthy until an HTTPRoute resource is created. 
--->
 {{< /callout >}}
 
 ## Before you begin
@@ -67,11 +64,14 @@ Keep in mind the following considerations when working with an NLB:
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: aws-cloud
-     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: custom-gw-params
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: custom-gw-params
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
      - protocol: HTTP
        port: 80
@@ -101,10 +101,13 @@ Keep in mind the following considerations when working with an NLB:
         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
         labels:
           gateway: aws-cloud
-        annotations:
-          gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
       spec:
         gatewayClassName: kgateway
+        infrastructure:
+          parametersRef:
+            name: custom-gw-params
+            group: gateway.kgateway.dev
+            kind: GatewayParameters
         listeners:
           - name: https
             port: 443
@@ -144,11 +147,6 @@ Keep in mind the following considerations when working with an NLB:
    2. In the left navigation, go to **Load Balancing > Load Balancers**.
    3. Find and open the NLB that was created for you, with a name such as `k8s-kgateway-awscloud-<hash>`.
    4. On the **Resource map** tab, verify that the load balancer points to EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
-
-<!-- TODO HTTPListenerPolicy healthcheck
-{{< callout type="info" >}}
-{{< reuse "docs/snippets/product-name-caps.md" >}} does not open any proxy ports until at least one HTTPRoute is associated with the gateway. The AWS ELB health checks are automatically created when you create the Gateway resource and might report that the gateway proxy is unhealthy. Continue with this guide to create an HTTPRoute resource and send traffic through the NLB.
-{{< /callout >}}-->
 
 ## Step 3: Test traffic to the NLB {#test-traffic}
 
@@ -274,10 +272,6 @@ Keep in mind the following considerations when working with an NLB:
    
 {{% /tab %}}
 {{< /tabs >}}
-
-<!--TODO HTTPListenerPolicy healthcheck
-4. Go back to the AWS EC2 dashboard and verify that the NLB health checks now show a `Healthy` status. 
-   {{< reuse-image src="/img/elb-resource-map.png" >}}-->
 
 ## Cleanup
 
