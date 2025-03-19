@@ -47,7 +47,7 @@ jobs:
           echo "=== Debug: Before generating docs ==="
           echo "Looking for API directory:"
           ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
-          ls -la "$GITHUB_WORKSPACE/content/docs/reference/api/" || echo "Docs API directory not found!"
+          ls -la "$GITHUB_WORKSPACE/kgateway.dev/content/docs/reference/api/" || echo "Docs API directory not found!"
           # Update docs repository
           cd "$GITHUB_WORKSPACE/kgateway.dev"
           echo "Changed to docs repository: $PWD"
@@ -58,7 +58,7 @@ jobs:
           go run github.com/elastic/crd-ref-docs@v0.1.0 \
             --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
             --renderer=markdown \
-            --output-path content/docs/reference/api/top-level/_index.md \
+            --output-path ./ \
             --config=<(echo 'processor:
               ignoreTypes:
                 - ".*List$"
@@ -71,7 +71,7 @@ jobs:
           weight: 10
           ---
           
-          '; cat "content/docs/reference/api/top-level/_index.md") > content/docs/reference/api/top-level/_index.md
+          '; cat "./out.md" ) > content/docs/reference/api/top-level/_index.md
           
           # Format generated docs
           sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api/top-level/_index.md
