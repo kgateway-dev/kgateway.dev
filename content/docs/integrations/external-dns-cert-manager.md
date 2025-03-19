@@ -5,8 +5,8 @@ weight: 520
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) and [cert-manager](https://github.com/cert-manager/cert-manager) are two well-known integrations within the Kubernetes ecosystem that can be used in conjunction to automate the creation of TLS certificates. 
 
-* **ExternalDNS**: Instead of manually editing your domain in your DNS provider to add load balancer IP addresses, you can use ExternalDNS to dynamically set up and control DNS records for discovered gateway and HTTP resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
-* **cert-manager**: You can then use cert-manager to quickly and programmatically generate certificates for your domain, and store them in a Kubernetes secret. By adding this certificates secret to the HTTPRoute on the gateway for your domain, you can secure it for HTTPS traffic.
+* **ExternalDNS**: Instead of manually editing your domain in your DNS provider to add load balancer IP addresses, you can use ExternalDNS to dynamically set up and control DNS records for discovered Gateway and HTTPRoute resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the Gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
+* **cert-manager**: You can then use cert-manager to quickly and programmatically generate certificates for your domain, and store them in a Kubernetes secret. By adding this certificates secret to the HTTPRoute on the Gateway for your domain, you can secure it for HTTPS traffic.
 
 ## Before you begin 
 
@@ -14,9 +14,9 @@ weight: 520
 
 ## Set up ExternalDNS
 
-Use ExternalDNS to dynamically set up and control DNS records for discovered gateway and HTTP resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
+Use ExternalDNS to dynamically set up and control DNS records for discovered Gateway and HTTPRoute resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the Gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
 
-In the next section, you use cert-manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your gateway. 
+In the next section, you use cert-manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your Gateway. 
 
 1. Save your domain in an environment variable. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf.
    ```sh
@@ -81,7 +81,7 @@ In the next section, you use cert-manager to create TLS certificates for this ho
    EOF
    ```
    
-4. Create the deployment for ExternalDNS, which configures ExternalDNS to monitor gateway and HTTP route resources to determine the list of DNS records that must be created or changed. Note that in the following example, DNS records are set up in DigitalOcean, in which you provide your token. If you use a different DNS provider, find the required ExternalDNS configuration settings in the [Kubernetes documentation](https://kubernetes-sigs.github.io/external-dns/v0.14.0/#deploying-to-a-cluster).
+4. Create the deployment for ExternalDNS, which configures ExternalDNS to monitor Gateway and HTTPRoute resources to determine the list of DNS records that must be created or changed. Note that in the following example, DNS records are set up in DigitalOcean, in which you provide your token. If you use a different DNS provider, find the required ExternalDNS configuration settings in the [Kubernetes documentation](https://kubernetes-sigs.github.io/external-dns/v0.14.0/#deploying-to-a-cluster).
    ```yaml {linenos=table,hl_lines=[25,26,27,28,29],linenostart=1}
    kubectl apply -f- <<EOF
    apiVersion: apps/v1
