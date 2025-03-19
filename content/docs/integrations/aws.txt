@@ -106,10 +106,13 @@ The following steps show how to deploy the AWS Load Balancer Controller in your 
    metadata:
      name: http-aws
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "gwparams"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: gwparams
+         group: gateway.kgateway.dev
+         kind: GatewayParameters     
      listeners:
      - protocol: HTTP
        port: 80

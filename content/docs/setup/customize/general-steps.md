@@ -53,7 +53,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    EOF
    ```
 
-3. Create a Gateway resource that references your custom GatewayParameters by using the `gateway.kgateway.dev/gateway-parameters-name` annotation. 
+3. Create a Gateway resource that references your custom GatewayParameters. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -61,10 +61,13 @@ The example in this guide uses the GatewayParameters resource to change settings
    metadata:
      name: custom
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: custom-gw-params
+         group: gateway.kgateway.dev
+         kind: GatewayParameters       
      listeners:
      - protocol: HTTP
        port: 80
