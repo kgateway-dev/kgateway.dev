@@ -14,10 +14,6 @@ weight: 520
 
 ## Set up ExternalDNS
 
-Use ExternalDNS to dynamically set up and control DNS records for discovered Gateway and HTTPRoute resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the Gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
-
-In the next section, you use cert-manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your Gateway. 
-
 1. Save your domain in an environment variable. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf.
    ```sh
    export DOMAIN=<my-domain.com>
