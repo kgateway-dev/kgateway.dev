@@ -69,10 +69,10 @@ jobs:
           weight: 10
           ---
           
-          '; cat "./out.md" ) > content/docs/reference/_index.md
+          '; cat "./out.md" ) > content/docs/reference/api.md
           
           # Format generated docs
-          sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api/top-level/api.md
+          sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api.md
           # Fix formatting issues in the markdown
           sed -i '
           /```yaml<br \/>/ {
@@ -86,9 +86,9 @@ jobs:
             s/      metadataKey:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataKey:/g
             s/```//
             /^\s*$/d
-          }' content/docs/reference/api/top-level/api.md
-          sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/reference/api/top-level/api.md
-          sed -i '/^# API Reference$/,/^$/d' content/docs/reference/api/top-level/api.md
+          }' content/docs/reference/api.md
+          sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/reference/api.md
+          sed -i '/^# API Reference$/,/^$/d' content/docs/reference/api.md
 
       - name: Generate Helm Chart Reference
         run: |
