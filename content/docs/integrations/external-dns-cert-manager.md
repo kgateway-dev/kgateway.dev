@@ -1,21 +1,28 @@
 ---
-title: ExternalDNS & Cert Manager
+title: ExternalDNS and cert-manager
 weight: 520
-description: Use kgateway with External DNS and Cert Manager. 
 ---
 
-[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) and [Cert Manager](https://github.com/cert-manager/cert-manager) are two well known integrations within the Kubernetes ecosystem that can be used in conjunction to automate the creation of TLS certificates. 
+[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) and [cert-manager](https://github.com/cert-manager/cert-manager) are two well-known integrations within the Kubernetes ecosystem that can be used in conjunction to automate the creation of TLS certificates. 
+
+* **ExternalDNS**: Instead of manually editing your domain in your DNS provider to add load balancer IP addresses, you can use ExternalDNS to dynamically set up and control DNS records for discovered gateway and HTTP resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
+* **cert-manager**: You can then use cert-manager to quickly and programmatically generate certificates for your domain, and store them in a Kubernetes secret. By adding this certificates secret to the HTTPRoute on the gateway for your domain, you can secure it for HTTPS traffic.
 
 ## Before you begin 
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## Set up ExternalDNS
-ExternalDNS is used to dynamically set up and control DNS records for discovered gateway and HTTP resources. When you create a gateway or HTTP resource, and you define a hostname, External DNS uses the external address that is assigned to the gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured. 
 
-You can later use Cert Manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your gateway. 
+Use ExternalDNS to dynamically set up and control DNS records for discovered gateway and HTTP resources. When you define a hostname in an HTTPRoute resource, ExternalDNS uses the external address that is assigned to the gateway's load balancer service that serves this hostname, and uses this information to create a DNS record in the DNS provider that you configured.
 
-1. Create an HTTP route resource to expose httpbin on your domain. Replace `<my-domain.com>` with your domain. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf. 
+In the next section, you use cert-manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your gateway. 
+
+1. Save your domain in en environment variable. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf.
+   ```sh
+   export DOMAIN=<my-domain.com>
+
+2. Create an HTTP route resource to expose httpbin on your domain.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -30,7 +37,7 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
        - name: http
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
-       - "<my-domain.com>"
+       - "${DOMAIN}"
      rules:
        - backendRefs:
            - name: httpbin
@@ -38,9 +45,9 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
    EOF
    ```
 
-2. Deploy the ExternalDNS components. The following example configures ExternalDNS to monitor gateway and HTTP route resources to determine the list of DNS records that must be created or changed. DNS records are set up in DigitalOcean. To find the ExternalDNS configuration for your DNS provider, see the  [Kubernetes documentation](https://kubernetes-sigs.github.io/external-dns/v0.14.0/#deploying-to-a-cluster).
+3. Deploy the following Kubernetes components required for ExternalDNS.
    ```yaml
-   cat <<EOF | kubectl apply -f -
+   kubectl apply -f- <<EOF
    apiVersion: v1
    kind: ServiceAccount
    metadata:
@@ -71,7 +78,12 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
    - kind: ServiceAccount
      name: external-dns
      namespace: default
-   ---
+   EOF
+   ```
+   
+4. Create the deployment for ExternalDNS, which configures ExternalDNS to monitor gateway and HTTP route resources to determine the list of DNS records that must be created or changed. Note that in the following example, DNS records are set up in DigitalOcean, in which you provide your token. If you use a different DNS provider, find the required ExternalDNS configuration settings in the [Kubernetes documentation](https://kubernetes-sigs.github.io/external-dns/v0.14.0/#deploying-to-a-cluster).
+   ```yaml {linenos=table,hl_lines=[25,26,27,28,29],linenostart=1}
+   kubectl apply -f- <<EOF
    apiVersion: apps/v1
    kind: Deployment
    metadata:
@@ -94,44 +106,43 @@ You can later use Cert Manager to create TLS certificates for this hostname so t
            image: registry.k8s.io/external-dns/external-dns:v0.13.5
            args:
            - --source=gateway-httproute
-           - --provider=digitalocean
            - --log-level=debug
+           # Change the following fields for your DNS provider details
+           - --provider=digitalocean
            env:
            - name: DO_TOKEN
-             value: "<my-token>"
+             value: "<digital-ocean-token>"
    EOF
    ```
 
-3. Wait for the DNS entry to get created. Note that depending on the DNS provider that you use, this process can take some time to complete. To verify that the DNS record is created, use the `dig` command as shown in the following example. 
+5. Wait for the DNS entry to be created. Note that depending on the DNS provider you use, this process can take some time to complete. To verify that the DNS record is created, use the `dig` command as shown in the following example.
    ```sh
-   dig <my-domain.com>
+   dig ${DOMAIN}
    ```
 
    Example output for a successfully created DNS record: 
    ```console
    ;; ANSWER SECTION:
-   <my-domain.com>	300	IN	A	164.90.241.80
+   ${DOMAIN}	300	IN	A	164.90.241.80
    ```
 
-## Set up Cert Manager
-Cert Manager is a Kubernetes controller that helps you automate the process of obtaining and renewing certificates from various PKI providers, such as AWS Private CA, Google Cloud CA, or Vault. In this example, you learn how to install Cert Manager by using Helm and how to configure it to obtain TLS certificates for your domain from Let's Encrypt.
+## Set up cert-manager
 
-{{% callout type="info" %}}
-To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` during the Helm installation.
-{{% /callout %}}
+cert-manager is a Kubernetes controller that helps you automate the process of obtaining and renewing certificates from various PKI providers, such as AWS Private CA, Google Cloud CA, or Vault. In this example, you install cert-manager by using Helm and configure it to obtain TLS certificates for your domain from Let's Encrypt.
 
-1. Install Cert Manager.
+1. Install cert-manager.
    1. Add the Jetstack Helm repository.
       ```sh
       helm repo add jetstack https://charts.jetstack.io --force-update
       ```
-   2. Install Cert Manager in your cluster.
+   2. Install cert-manager in your cluster.
       ```sh
       helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
       --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set installCRDs=true
       ```
+      {{< callout type="info" >}}To allow cert-manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.{{< /callout >}}
       
-2. Create an issuer resource that represents the Certificate Authority (CA) that you want to use to issue the TLS certificates for your domain. In this example, you configure Cert Manager to obtain a Let's Encrypt certificate by using the ACME protocol. To automate domain validation and certificate issuance, you use the `http01` challenge. The `http01` challenge is designed to prove that you have control over your domain by requiring you to store a challenge token in your cluster so that Let's Encrypt can validate it. For more information about this challenge, see the [Let's Encrypt documentation](https://letsencrypt.org/docs/challenge-types/#http-01-challenge).
+2. Create an Issuer resource that represents the Certificate Authority (CA) that you want cert-manager to use to issue the TLS certificates for your domain.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: cert-manager.io/v1
@@ -141,9 +152,7 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      acme:
-       email: hello@world.com
-       #You can switch to live URL if you are brave
-       #server: https://acme-v02.api.letsencrypt.org/directory
+       email: <email_address>
        server: https://acme-staging-v02.api.letsencrypt.org/directory
        privateKeySecretRef:
          name: letsencrypt-http-issuer-account-key
@@ -157,6 +166,15 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
    EOF
    ```  
 
+   | Setting | Description |
+   | -- | -- | 
+   | `acme` | The protocol to use for issuing certificates. In this example, you configure cert-manager to obtain a Let's Encrypt certificate by using the ACME (Automated Certificate Management Environment) protocol. |
+   | `email` | Provide an email address where you can receive Let's Encrypt notifications for certificate expiration and account recovery. |
+   | `server` | The Let's Encrypt ACME server used for issuing certificates. The value `https://acme-staging-v02.api.letsencrypt.org/directory` uses the Let’s Encrypt staging environment to avoid hitting rate limits during testing. For production setups, use the `https://acme-v02.api.letsencrypt.org/directory` server instead. |
+   | `privateKeySecretRef.name` | Using your email address, cert-manager automatically generates and stores an ACME private account key in a Kubernetes secret of this name. cert-manager then uses this key to authenticate with Let’s Encrypt. This example uses the name `letsencrypt-http-issuer-account-key` in the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. |
+   | `solvers.http01` | To automate domain validation and certificate issuance, you use the HTTP-01 challenge. The HTTP-01 challenge is designed to prove that you have control over your domain by requiring you to store a challenge token in your cluster so that Let's Encrypt can validate it. For more information about this challenge, see the [Let's Encrypt documentation](https://letsencrypt.org/docs/challenge-types/#http-01-challenge). |
+   | `gatewayHTTPRoute.parentRefs` | The reference to the Gateway resource to solve certificate challenges. This example uses the `http` Gateway that you created in the get started guide. |
+
 3. Verify that your TLS certificates are created successfully. Note that depending on the CA that you use, this process might take a while to complete. 
    ```sh
    kubectl get issuer letsencrypt-http -n {{< reuse "docs/snippets/ns-system.md" >}}
@@ -164,25 +182,25 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
 
    Example output for successfully issued TLS certificates: 
    ```console
-    Status:
-    Acme:
-    Conditions:
-        Last Transition Time:  2023-11-09T16:03:58Z
-        Message:               The ACME account was registered with the ACME server
-        Observed Generation:   1
-        Reason:                ACMEAccountRegistered
-        Status:                True
-        Type:                  Ready
+   Status:
+   Acme:
+   Conditions:
+       Last Transition Time:  2023-11-09T16:03:58Z
+       Message:               The ACME account was registered with the ACME server
+       Observed Generation:   1
+       Reason:                ACMEAccountRegistered
+       Status:                True
+       Type:                  Ready
    ```
    
-4. Verify that the TLS certificate was added to the secret that you configured in the Cert Manager issuer resource. 
-    ```sh
-    kubectl get secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
-    ```
+4. Verify that the TLS certificate was added to the secret that you configured in the cert-manager issuer resource. 
+   ```sh
+   kubectl get secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   ```
 
 ## Configure an HTTPS listener on your gateway
 
-1. Add an HTTPS listener to the gateway that you set up as part of the [Get started guide](/docs/quickstart/). Replace `<my-domain.com>` with your domain.
+1. Add the cert-manager annotation and an HTTPS listener to the `http` gateway that you set up as part of the [Get started guide](/docs/quickstart/).
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -204,7 +222,7 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
      - allowedRoutes:
          namespaces:
            from: All
-       hostname: <my-hostname.com>
+       hostname: ${DOMAIN}
        name: https
        port: 443
        protocol: HTTPS
@@ -223,24 +241,24 @@ To allow Cert Manager to use the {{< reuse "docs/snippets/k8s-gateway-api-name.m
 
    Example output for an AWS EKS cluster: 
    ```console
-   NAME   CLASS          ADDRESS                                                                  PROGRAMMED   AGE
-   http   kgateway  a3a6c06e2f4154185bf3f8af46abf22e-139567718.us-east-2.elb.amazonaws.com   True         93s
+   NAME   CLASS        ADDRESS                                                                  PROGRAMMED   AGE
+   http   kgateway     a3a6c06e2f4154185bf3f8af46abf22e-139567718.us-east-2.elb.amazonaws.com   True         93s
    ```
 
 ## Test your HTTPS listener
 
 With the TLS certificate in place, you can now test your HTTPS listener. 
 
-Send a curl request to the httpbin app on the domain that you configured. 
+Send an HTTPS curl request to the httpbin app on the domain that you configured. 
 
 ```sh
-curl -vik https://<my-domain.com>/status/200
+curl -vik https://${DOMAIN}/status/200
 ```
 
-Example output:
+In the output, verify that the TLS handshake finishes, and that you get a 200 response code:
 ```console
 *   Trying 164.90.241.80:443...
-* Connected to <my-domain.com> (164.90.241.80) port 443 (#0)
+* Connected to ${DOMAIN} (164.90.241.80) port 443 (#0)
 * ALPN: offers h2,http/1.1
 * (304) (OUT), TLS handshake, Client hello (1):
 * (304) (IN), TLS handshake, Server hello (2):
@@ -252,7 +270,7 @@ Example output:
 * SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256
 * ALPN: server accepted h2
 * Server certificate:
-*  subject: CN=<my-domain.com>
+*  subject: CN=${DOMAIN}
 *  start date: Nov  9 15:32:59 2023 GMT
 *  expire date: Feb  7 15:32:58 2024 GMT
 *  issuer: C=US; O=Let's Encrypt; CN=R3
@@ -261,12 +279,12 @@ Example output:
 * h2h3 [:method: GET]
 * h2h3 [:path: /status/200]
 * h2h3 [:scheme: https]
-* h2h3 [:authority: <my-domain.com>]
+* h2h3 [:authority: ${DOMAIN}]
 * h2h3 [user-agent: curl/7.88.1]
 * h2h3 [accept: */*]
 * Using Stream ID: 1 (easy handle 0x12c812800)
 > GET /status/200 HTTP/2
-> Host: <my-domain.com>
+> Host: ${DOMAIN}
 > user-agent: curl/7.88.1
 > accept: */*
 >
@@ -286,5 +304,58 @@ x-envoy-upstream-service-time: 2
 server: envoy
 
 <
-* Connection #0 to host <my-domain.com> left intact
+* Connection #0 to host ${DOMAIN} left intact
 ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+1. Remove the cert-manager annotation and HTTPS listener from the `http` Gateway.
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: http
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+   spec:
+     gatewayClassName: kgateway
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+2. Delete the Issuer resource.
+   ```sh
+   kubectl delete Issuer letsencrypt-http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   ```
+
+3. Delete the `letsencrypt-http-issuer-account-key` secret.
+   ```sh
+   kubectl delete secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}}
+   ```
+
+4. Remove cert-manager.
+   ```sh
+   kubectl uninstall cert-manager -n cert-manager
+   kubectl delete ns cert-manager
+   ```
+
+5. Delete the ExternalDNS deployment and related resources.
+   ```sh
+   kubectl delete Deployment external-dns
+   kubectl delete ClusterRoleBinding external-dns
+   kubectl delete ClusterRole external-dns
+   kubectl delete ServiceAccount external-dns
+   ```
+
+6. Optional: Delete the HTTPRoute that exposes httpbin on your domain.
+   ```sh
+   kubectl delete HTTPRoute httpbin -n httpbin
+   ```
