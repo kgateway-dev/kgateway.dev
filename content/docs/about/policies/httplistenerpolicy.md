@@ -1,37 +1,60 @@
 ---
 title: HTTPListenerPolicy
 weight: 35
-description: You can use an HTTPListenerPolicy resource to attach policies to one, multiple, or all HTTP or HTTPs listeners on the gateway. 
+description: You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway. 
 ---
 
-You can use an HTTPListenerPolicy resource to attach policies to one, multiple, or all HTTP or HTTPs listeners on the gateway.
+You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway.
 
 ## Policy attachment {#policy-attachment-listeneroption}
 
+<!--
+
 Learn more about how you can attach policies to HTTP or HTTPS listeners. 
 
-### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`)
+### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`) -->
 
-You can apply a policy to all HTTP and HTTPS listeners that are defined on the gateway by using the `spec.targetRefs` section in the HTTPListenerPolicy resource. 
+You can apply a policy to all HTTP and HTTPS listeners that are defined on the gateway by using the `spec.targetRef` section in the HTTPListenerPolicy resource. 
 
-The following HTTPListenerPolicy resource configures Envoy HTTPConnectionManager settings on a Gateway resource that is named `http`. Because no listener is targeted, the policy applies to all the HTTP and HTTPS listeners that are defined on the gateway. 
+The following HTTPListenerPolicy resource configures access logs on a Gateway that is named `http`. The policy applies to all the HTTP and HTTPS listeners that are defined on the gateway. 
 
-```console {hl_lines=[7,8,9,10]} 
+```yaml {hl_lines=[7,8,9,10]} 
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
-  name: server-name
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  name: access-logs
+  namespace: kgateway-system
 spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
+  targetRef:
+    group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-  options:
-    httpConnectionManagerSettings:
-      serverName: "myserver"
+  accessLog:
+  - fileSink:
+      path: /dev/stdout
+      jsonFormat:
+          start_time: "%START_TIME%"
+          method: "%REQ(X-ENVOY-ORIGINAL-METHOD?:METHOD)%"
+          path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+          protocol: "%PROTOCOL%"
+          response_code: "%RESPONSE_CODE%"
+          response_flags: "%RESPONSE_FLAGS%"
+          bytes_received: "%BYTES_RECEIVED%"
+          bytes_sent: "%BYTES_SENT%"
+          total_duration: "%DURATION%"
+          resp_backend_service_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+          req_x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
+          user_agent: "%REQ(USER-AGENT)%"
+          request_id: "%REQ(X-REQUEST-ID)%"
+          authority: "%REQ(:AUTHORITY)%"
+          backendHost: "%UPSTREAM_HOST%"
+          backendCluster: "%UPSTREAM_CLUSTER%"
+  - fileSink:
+      path: /dev/default-access-logs.txt
+      stringFormat: ""
 ```
 
+<!--
 
 ### Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)
 
@@ -86,11 +109,13 @@ spec:
     httpConnectionManagerSettings:
       serverName: "myserver"
 ```
-
+-->
 
 ## Conflicting policies
 
-If you create multiple HTTPListenerPolicy resources and attach them to the same gateway listener by using the `targetRefs` option, only the HTTPListenerPolicy that was first created is applied. 
+If you create multiple HTTPListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRef` option, only the HTTPListenerPolicy that was last applied is enforced. 
+
+<!--
 
 {{% callout type="info" %}}
 You cannot attach multiple HTTPListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same HTTPListenerPolicy resource.
@@ -99,3 +124,4 @@ You cannot attach multiple HTTPListenerPolicy resources to the same listener, *e
 In the following image, you want to attach two HTTPListenerPolicy resources to the HTTP listener. One configures local rate limiting and the other one configures a CSRF policy. Because only one HTTPListenerPolicy can be attached to a gateway listener via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 
 {{< reuse-image src="img/policy-ov-multiple-httplisteneroption.svg" width="800" >}}
+-->

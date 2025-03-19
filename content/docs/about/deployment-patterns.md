@@ -28,13 +28,13 @@ While this setup is great to split up and load balance traffic across apps, you 
 
 ## Sharded gateway with central ingress {#sharded-gatway-with-central-ingress}
 
-The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that serves as the main ingress endpoint for all traffic. The gateway proxy can be configured to apply common traffic management, resiliency, and security rules to all traffic that enters the cluster. For example, you can set CORS or header manipulation policies on that gateway before you forward traffic to a second layer of gateway proxies. This is useful if you need a central IP address and DNS name for the gateway that serves all your traffic. 
+The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that serves as the main ingress endpoint for all traffic. The gateway proxy can be configured to apply common traffic management, resiliency, and security rules to all traffic that enters the cluster. For example, you can set header manipulation policies on that gateway before you forward traffic to a second layer of gateway proxies. This is useful if you need a central IP address and DNS name for the gateway that serves all your traffic. 
 
 The second layer of gateway proxies can apply additional traffic management, resiliency, and security policies to incoming traffic for specific apps. You also shard the second layer of proxies to better account for high and low traffic services to avoid noisy neighbor problems. All gateway proxies are managed by the same {{< reuse "docs/snippets/product-name.md" >}} control plane.
 
 {{% reuse-image src="img/pattern-central-ingress-gloo.svg" width="600px"  %}}
 
-Depending on your existing setup, you might want to use a different type of proxy as your central ingress endpoint. For example, you might have an HAProxy or AWS NLB/ALB instance that all traffic must go through. {{< reuse "docs/snippets/product-name.md" >}} can be paired with these types of proxies as depicted in the following image. 
+Depending on your existing setup, you might want to use a different type of proxy as your central ingress endpoint. For example, you might have an HAProxy or AWS NLB/ALB instance that all traffic must go through. {{< reuse "docs/snippets/product-name-caps.md" >}} can be paired with these types of proxies as depicted in the following image. 
 
 {{% reuse-image src="img/pattern-central-ingress-any.svg" width="600px"  %}}
 
@@ -42,6 +42,6 @@ Depending on your existing setup, you might want to use a different type of prox
 
 You can deploy {{< reuse "docs/snippets/product-name.md" >}} as an API gateway for any ingress and egress traffic to and from the service mesh. A service mesh uses proxies to provide central management for your cloud-native microservices architecture to optimize communication, routing, reliability, security, and observability between your apps. 
 
-The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that is exposed on the edge and serves traffic for the service mesh. Services in the mesh communicate with each other via mutual TLS (mTLS). {{< reuse "docs/snippets/product-name.md" >}} proxies can be configured with an Istio sidecar to establish a trusted, mTLS connection to the services in the mesh. 
+The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that is exposed on the edge and serves traffic for the service mesh. Services in the mesh communicate with each other via mutual TLS (mTLS). {{< reuse "docs/snippets/product-name-caps.md" >}} proxies can be configured with an Istio sidecar to establish a trusted, mTLS connection to the services in the mesh. 
 
 {{% reuse-image src="img/pattern-service-mesh.svg" width="600px"  %}}
