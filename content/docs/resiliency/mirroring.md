@@ -10,7 +10,7 @@ Copy live production traffic to a shadow environment or service so that you can 
 
 When releasing changes to a service, you want to finely control how those changes get exposed to users. This [progressive delivery](https://redmonk.com/jgovernor/2018/08/06/towards-progressive-delivery/) approach to releasing software allows you to reduce the blast radius, especially when changes introduce unintended behaviors. Traffic mirroring, also referred to as traffic shadowing, is one way to observe the impact of new software releases and test out new changes before you roll them out to production. Other approaches to slowly introduce new software include canary releases, A/B testing, or blue-green deployments. 
 
-When you turn on traffic shadowing for an app, {{< reuse "docs/snippets/product-name.md" >}} makes a copy of all incoming requests. {{< reuse "docs/snippets/product-name.md" >}} still proxies the request to the backing destination along the request path. It also sends a copy of the request asynchronously to another shadow destination. When a response or failure happens, copies are not generated. This way, you can test how traffic is handled by a new release or version of your app with zero production impact. You can also compare the shadowed results against the expected results. You can use this information to decide how to proceed with a canary release.
+When you turn on traffic shadowing for an app, {{< reuse "docs/snippets/product-name.md" >}} makes a copy of all incoming requests. {{< reuse "docs/snippets/product-name-caps.md" >}} still proxies the request to the backing destination along the request path. It also sends a copy of the request asynchronously to another shadow destination. When a response or failure happens, copies are not generated. This way, you can test how traffic is handled by a new release or version of your app with zero production impact. You can also compare the shadowed results against the expected results. You can use this information to decide how to proceed with a canary release.
 
 <!--
 When a copy of the request is sent to the shadow app, {{< reuse "docs/snippets/product-name.md" >}} adds a `-shadow` postfix to the `Host` or `Authority` header. For example, if traffic is sent to `foo.bar.com`, the `Host` header value is set to `foo.bar.com-shadow`. This way, the app that receives the shadowed traffic can determine if the traffic is shadowed or not. This information might be valuable for stateful services, such as to roll back any stateful transactions that are associated with processing the request. To learn more about advanced traffic shadowing patterns, see [this blog](https://blog.christianposta.com/microservices/advanced-traffic-shadowing-patterns-for-microservices-with-istio-service-mesh/). -->
@@ -21,7 +21,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up traffic shadowing
+## Set up mirroring
 
 1. Edit the httpbin service that you deployed earlier. 
    ```sh

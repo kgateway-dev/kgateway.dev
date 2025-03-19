@@ -50,7 +50,7 @@ SslConfig contains the options necessary to configure a virtual host or listener
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `secretRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | SecretRef contains the secret ref to a {{< reuse "docs/snippets/product-name.md" >}}tls secret or a kubernetes tls secret. {{< reuse "docs/snippets/product-name.md" >}}tls secret can contain a root ca as well if verification is needed. Only one of `secretRef`, `sslFiles`, or `sds` can be set. |
+| `secretRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | SecretRef contains the secret ref to a {{< reuse "docs/snippets/product-name.md" >}}tls secret or a kubernetes tls secret. {{< reuse "docs/snippets/product-name-caps.md" >}}tls secret can contain a root ca as well if verification is needed. Only one of `secretRef`, `sslFiles`, or `sds` can be set. |
 | `sslFiles` | [.gloo.solo.io.SSLFiles](../ssl.proto.sk/#sslfiles) | SSLFiles reference paths to certificates which are local to the proxy. Only one of `sslFiles`, `secretRef`, or `sds` can be set. |
 | `sds` | [.gloo.solo.io.SDSConfig](../ssl.proto.sk/#sdsconfig) | Use secret discovery service. Only one of `sds`, `secretRef`, or `sslFiles` can be set. |
 | `sniDomains` | `[]string` | optional. the SNI domains that should be considered for TLS connections. |
@@ -106,7 +106,7 @@ SslConfig contains the options necessary to configure an upstream to use TLS ori
 
 | Field | Type | Description |
 | ----- | ---- | ----------- | 
-| `secretRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | SecretRef contains the secret ref to a {{< reuse "docs/snippets/product-name.md" >}}tls secret or a kubernetes tls secret. {{< reuse "docs/snippets/product-name.md" >}}tls secret can contain a root ca as well if verification is needed. Only one of `secretRef`, `sslFiles`, or `sds` can be set. |
+| `secretRef` | [.core.solo.io.ResourceRef](../ref.proto.sk/#resourceref) | SecretRef contains the secret ref to a {{< reuse "docs/snippets/product-name.md" >}}tls secret or a kubernetes tls secret. {{< reuse "docs/snippets/product-name-caps.md" >}}tls secret can contain a root ca as well if verification is needed. Only one of `secretRef`, `sslFiles`, or `sds` can be set. |
 | `sslFiles` | [.gloo.solo.io.SSLFiles](../ssl.proto.sk/#sslfiles) | SSLFiles reference paths to certificates which are local to the proxy. Only one of `sslFiles`, `secretRef`, or `sds` can be set. |
 | `sds` | [.gloo.solo.io.SDSConfig](../ssl.proto.sk/#sdsconfig) | Use secret discovery service. Only one of `sds`, `secretRef`, or `sslFiles` can be set. |
 | `sni` | `string` | optional. the SNI domains that should be considered for TLS connections. |
