@@ -14,6 +14,7 @@ Review the following information about supported release versions for {{< reuse 
 
 `†` Istio versions: Istio must run on a compatible version of Kubernetes. For example, Istio 1.22 is tested, but not supported, on Kubernetes 1.26. For more information, see the [Istio docs](https://istio.io/latest/docs/releases/supported-releases/). 
 
+<!--
 ## Image variants
 
 For some {{< reuse "docs/snippets/product-name.md" >}} component images, the following image variants are supported. 
@@ -33,7 +34,7 @@ For some {{< reuse "docs/snippets/product-name.md" >}} component images, the fol
 
 You have two options for specifying the variant for a {{< reuse "docs/snippets/product-name.md" >}} image in your Helm values:
 * Specify the image variant for all {{< reuse "docs/snippets/product-name.md" >}} components in the `global.image.variant` Helm field. Supported values include `standard`, and `distroless`. If unset, the default value is `standard`.
-* Specify images for individual components by using variant tags in the `gloo.<component>.deployment.image.tag` field of the component's Helm settings, such as `quay.io/solo-io/gloo:v{{< reuse "docs/versions/n-patch.md" >}}-distroless`.
+* Specify images for individual components by using variant tags in the `gloo.<component>.deployment.image.tag` field of the component's Helm settings, such as `quay.io/solo-io/gloo:v{{< reuse "docs/versions/n-patch.md" >}}-distroless`. -->
 
 ## Release cadence
 
