@@ -399,7 +399,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
    kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
-5. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to remove the Helm values that you added as part of this guide.
+5. <!--TODO: these should be environment variables set on the control plane, see https://github.com/kgateway-dev/kgateway/issues/10525-->Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to remove the Helm values that you added as part of this guide.
    1. Get the Helm values for your current {{< reuse "docs/snippets/product-name.md" >}} installation. 
       ```sh
       helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
@@ -429,4 +429,4 @@ You can exclude a service from requiring to communicate with the gateway proxy v
       --version={{< reuse "docs/versions/n-patch.md" >}}
       ```
 
-4. To uninstall Istio, follow the uninstall guide for your installation method, such as [community Istio](https://istio.io/latest/docs/setup/install/istioctl/#uninstall-istio).
+6. To uninstall Istio, follow the uninstall guide for your installation method, such as [community Istio](https://istio.io/latest/docs/setup/install/istioctl/#uninstall-istio).
