@@ -1,6 +1,6 @@
 ---
-title: Istio sidecar service mesh
-weight: 530
+title: Ingress to an Istio sidecar service mesh
+weight: 20
 description: Use your kgateway proxy as the ingress gateway to control and secure traffic that enters your sidecar service mesh. 
 ---
 
