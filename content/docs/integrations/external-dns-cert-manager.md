@@ -18,11 +18,11 @@ Use ExternalDNS to dynamically set up and control DNS records for discovered gat
 
 In the next section, you use cert-manager to create TLS certificates for this hostname so that you can serve HTTPS traffic on your gateway. 
 
-1. Save your domain in en environment variable. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf.
+1. Save your domain in an environment variable. Note that you must own the domain to enable ExternalDNS to create DNS records on your behalf.
    ```sh
    export DOMAIN=<my-domain.com>
 
-2. Create an HTTP route resource to expose httpbin on your domain.
+2. Create an HTTPRoute resource to expose httpbin on your domain.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
