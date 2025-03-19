@@ -6,11 +6,15 @@ description: Use a custom GatewayParameters resource to set up AI Gateway.
 
 Configure your Helm chart installation to use AI Gateway. Then, use a custom GatewayParameters resource to set up AI Gateway.
 
+## Before you begin
+
+[Get started](/docs/quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "docs/snippets/product-name.md" >}}.
+
 ## Enable the AI extension {#ai-extension}
 
 Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Install](/docs/operations/install/) or [upgrade](/docs/operations/upgrade/) {{< reuse "docs/snippets/product-name.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade](/docs/operations/upgrade/) {{< reuse "docs/snippets/product-name.md" >}} with the AI Gateway extension enabled.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings, update the following command accordingly.
@@ -89,8 +93,11 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    EOF
    ```
 
-3. Verify that the AI Gateway is created. Note that it might take a few minutes for an address to be assigned.
-   
+3. Verify that the AI Gateway is created. 
+
+   * Gateway: Note that it might take a few minutes for an address to be assigned.
+   * Deployment: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
+
    ```sh
    kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A
    ```
@@ -102,6 +109,12 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    
    NAMESPACE         NAME                              READY   STATUS             RESTARTS   AGE
    kgateway-system   pod/ai-gateway-6f4786fcb6-gqhlm   2/2     Running   0          13s
+   ```
+
+   If you see an error, check the logs of the `kgateway-ai-extension` container.
+
+   ```sh
+   kubectl logs -l app.kubernetes.io/name=ai-gateway -n kgateway-system -c kgateway-ai-extension
    ```
 
 ## Next
