@@ -101,7 +101,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    | `istioDiscoveryAddress` | The address of the istiod service. If omitted, `istiod.istio-system.svc:15012` is used. |
    | `istioMetaClusterId` </br> `istioMetaMeshId` | The name of the cluster where {{< reuse "docs/snippets/product-name.md" >}} is installed. |
 
-7. Update the `http` Gateway resource to add an annotation that references the `http-istio` GatewayParameters.
+7. Update the `http` Gateway resource to add a reference to the `http-istio` GatewayParameters.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -109,9 +109,12 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    metadata:
      name: http
      namespace: {{% reuse "docs/snippets/ns-system.md" %}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: http-istio
    spec:
+     infrastructure:
+       parametersRef:
+         name: http-istio
+         group: gateway.kgateway.dev
+         kind: GatewayParameters
      gatewayClassName: kgateway
      listeners:
      - protocol: HTTP
@@ -371,7 +374,32 @@ You can exclude a service from requiring to communicate with the gateway proxy v
       httpbin-7d4965fb6d-mslx2   3/3     Running       0          6s
       ```
    
-3. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to remove the Helm values that you added as part of this guide.
+3. Remove the reference to the `http-lambda` GatewayParameters from the `http` Gateway.
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: http
+     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+   spec:
+     gatewayClassName: kgateway
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+4. Delete the `http-lambda` GatewayParameters.
+   ```sh
+   kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
+   ```
+
+5. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to remove the Helm values that you added as part of this guide.
    1. Get the Helm values for your current {{< reuse "docs/snippets/product-name.md" >}} installation. 
       ```sh
       helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml

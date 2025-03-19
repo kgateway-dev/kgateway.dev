@@ -169,7 +169,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    EOF
    ```
 
-2. Update the `http` Gateway resource to add an annotation that references the `http-lambda` GatewayParameters.
+2. Update the `http` Gateway resource to add a reference to the `http-lambda` GatewayParameters.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -337,7 +337,7 @@ If you no longer need to access Lambda functions from {{% reuse "docs/snippets/p
    kubectl delete GatewayParameters http-lambda -n {{% reuse "docs/snippets/ns-system.md" %}}
    ```
 
-2. Remove the annotation from the `http` Gateway that specifies the `http-lambda` GatewayParameters.
+2. Remove the reference to the `http-lambda` GatewayParameters from the `http` Gateway.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
