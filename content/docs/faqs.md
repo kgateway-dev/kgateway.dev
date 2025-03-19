@@ -76,4 +76,4 @@ The {{< reuse "docs/snippets/product-name.md" >}} project is not a service mesh,
 * Unified discovery services of infrastructure like Kubernetes, Consul, Vault, AWS EC2
 * Unified discovery services of functions like REST/OAS spec, gRPC reflection, SOAP/WSDL, WebSockets, Cloud Functions, AWS Lambda
 
-For an example, see the [Istio integration guide](/docs/integrations/istio/).
+<!--For an example, see the [Istio integration guide](/docs/integrations/istio/).-->

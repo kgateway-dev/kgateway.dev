@@ -11,6 +11,7 @@ Secure your gateway to prevent unauthenticated and unauthorized access to your a
   {{< card link="/docs/setup/listeners/https/" title="HTTPS listener" icon="external-link">}}
   {{< card link="/docs/setup/listeners/tcp/" title="TCP listener" icon="external-link">}}
   {{< card link="/docs/integrations/external-dns-cert-manager/" title="ExternalDNS and Cert-Manager" icon="external-link">}}
-  {{< card link="/docs/integrations/istio/" title="Istio for mTLS" icon="external-link">}}
   
 {{< /cards >}}
+
+<!--{{< card link="/docs/integrations/istio/" title="Istio for mTLS" icon="external-link">}}-->

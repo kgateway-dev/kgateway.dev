@@ -169,7 +169,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    EOF
    ```
 
-2. Create a Gateway resource with an HTTP listener that references the `http-lambda` GatewayParameters.
+2. Update the `http` Gateway resource to add an annotation that references the `http-lambda` GatewayParameters.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
