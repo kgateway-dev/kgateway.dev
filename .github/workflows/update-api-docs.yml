@@ -1,0 +1,143 @@
+name: Update API Documentation
+
+on:
+  workflow_dispatch:  # Allow manual triggers for now
+  # Later we can add:
+  # push:
+  #   paths:
+  #     - 'api/v1alpha1/**'
+  #   branches:
+  #     - main
+
+jobs:
+  generate-api-docs:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+      - name: Checkout kgateway repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/kgateway
+          path: kgateway
+
+      - name: Checkout docs repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/kgateway.dev
+          path: kgateway.dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+          cache: false
+
+      - name: Generate API Reference
+        run: |
+          echo "=== Debug: Starting Generate API Reference ==="
+          echo "Current directory: $PWD"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Listing GITHUB_WORKSPACE contents:"
+          ls -la $GITHUB_WORKSPACE
+
+          echo "=== Debug: Before generating docs ==="
+          echo "Looking for API directory:"
+          ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
+
+          # Update docs repository
+          cd "$GITHUB_WORKSPACE/kgateway.dev"
+          echo "Changed to docs repository: $PWD"
+          rm -rf content/docs/reference/api/top-level/
+          mkdir -p content/docs/reference/api/top-level/
+          
+          # Generate docs with frontmatter
+          (echo '---
+          title: API reference
+          weight: 10
+          ---'; \
+          go run github.com/elastic/crd-ref-docs@v0.1.0 \
+            --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
+            --renderer=markdown \
+            --output-path content/docs/reference/api/top-level/_index.md \
+            --config=<(echo 'processor:
+              ignoreTypes:
+                - ".*List$"
+            render:
+              kubernetesVersion: 1.33')
+          
+          # Create index file with frontmatter
+          (echo '---
+          title: API reference
+          weight: 10
+          ---
+          
+          '; cat "content/docs/reference/api/top-level/_index.md") > content/docs/reference/api/top-level/_index.md
+          
+          # Format generated docs
+          sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api/top-level/_index.md
+          # Fix formatting issues in the markdown
+          sed -i '
+          /```yaml<br \/>/ {
+            s/```yaml<br \/>//
+            s/<br \/>$//
+            /^$/d
+            s/stats:<br \/>/stats:<br \/>/
+            s/  customLabels:<br \/>/\&nbsp;\&nbsp;customLabels:<br \/>/
+            s/    - name:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;- name:/g
+            s/      metadataNamespace:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataNamespace:/g
+            s/      metadataKey:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataKey:/g
+            s/```//
+            /^\s*$/d
+          }' content/docs/reference/api/top-level/_index.md
+          sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/reference/api/top-level/_index.md
+          sed -i '/^# API Reference$/,/^$/d' content/docs/reference/api/top-level/_index.md
+
+      - name: Generate Helm Chart Reference
+        run: |
+            echo "Looking for API directory:"
+            ls -la "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" || echo "Helm directory not found!"
+  
+            # Update docs repository
+            cd "$GITHUB_WORKSPACE/kgateway.dev"
+            echo "Changed to docs repository: $PWD"
+            
+            # Create directory for Helm docs
+            mkdir -p content/docs/reference/helm/
+            
+            # Generate Helm Docs with helm-docs
+            (echo '---
+            title: Helm value reference
+            weight: 10
+            next: /docs/reference/contribution
+            prev: /docs/reference/cli
+            ---'; \
+            go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 \
+            --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" \
+            --dry-run) > content/docs/reference/helm/_index.md
+
+            echo "=== Debug: After creating index file ==="
+            echo "Content directory structure:"
+            ls -la content/docs/reference/helm/
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: kgateway.dev
+          commit-message: "docs: Update API documentation"
+          title: "Update API Documentation"
+          body: |
+            Automated API documentation update generated on $(date '+%B %d, %Y at %H:%M')
+            
+            This PR was automatically generated by the API documentation workflow.
+          branch: api-gen-update
+          branch-suffix: timestamp
+          delete-branch: true
+          base: main
+          labels: |
+            documentation
+            automated pr 
