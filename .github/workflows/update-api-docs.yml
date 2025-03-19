@@ -92,12 +92,15 @@ jobs:
 
       - name: Generate Helm Chart Reference
         run: |
-            echo "Looking for API directory:"
+            echo "Looking for Helm directory:"
             ls -la "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" || echo "Helm directory not found!"
   
             # Update docs repository
             cd "$GITHUB_WORKSPACE/kgateway.dev"
             echo "Changed to docs repository: $PWD"
+
+            # Create directory for Helm docs
+            mkdir -p assets/docs/reference/
             
             # Generate Helm Docs with helm-docs
             (echo '---
