@@ -10,7 +10,7 @@ Learn more about the components that make up {{< reuse "docs/snippets/product-na
 
 The following image shows the different components that make up the {{< reuse "docs/snippets/product-name.md" >}} control and data plane. These components work together to translate gateway custom resources into Envoy configuration. The Envoy configuration controls the behavior of the gateway proxies that serve your apps.
 
-{{< reuse-image src="img/translation.svg" >}}
+{{< reuse-image src="img/translation.svg" caption="Kgateway component architecture" >}}
 
 1. The config and secret watcher components in the `kgateway` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, or RoutePolicies.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "docs/snippets/product-name.md" >}} translation engine. 
