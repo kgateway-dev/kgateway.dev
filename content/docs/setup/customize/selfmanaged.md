@@ -29,10 +29,13 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
    metadata:
      name: self-managed
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "self-managed"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: self-managed
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
      - protocol: HTTP
        port: 80

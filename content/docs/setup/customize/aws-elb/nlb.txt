@@ -66,10 +66,13 @@ Follow these steps to create a simple NLB that accepts HTTP traffic on port 80 a
    metadata:
      name: aws-cloud
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: custom-gw-params
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
      - protocol: HTTP
        port: 80
@@ -151,10 +154,13 @@ Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminat
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
        gateway: aws-cloud
-     annotations:
-       gateway.kgateway.dev/gateway-parameters-name: "custom-gw-params"
    spec:
      gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: custom-gw-params
+         group: gateway.kgateway.dev
+         kind: GatewayParameters        
      listeners:
        - name: https
          port: 443
