@@ -70,7 +70,10 @@ jobs:
           ---
           
           '; cat "./out.md" ) > content/docs/reference/api.md
-          
+
+          # Remove temporary file
+          rm -f "./out.md"
+
           # Format generated docs
           sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api.md
           # Fix formatting issues in the markdown
