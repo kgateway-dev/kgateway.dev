@@ -47,18 +47,14 @@ jobs:
           echo "=== Debug: Before generating docs ==="
           echo "Looking for API directory:"
           ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
-
+          ls -la "$GITHUB_WORKSPACE/content/docs/reference/api/" || echo "Docs API directory not found!"
           # Update docs repository
-          cd "$GITHUB_WORKSPACE"
+          cd "$GITHUB_WORKSPACE/kgateway.dev"
           echo "Changed to docs repository: $PWD"
           rm -rf content/docs/reference/api/top-level/
           mkdir -p content/docs/reference/api/top-level/
           
           # Generate docs with frontmatter
-          (echo '---
-          title: API reference
-          weight: 10
-          ---'; \
           go run github.com/elastic/crd-ref-docs@v0.1.0 \
             --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
             --renderer=markdown \
@@ -102,7 +98,7 @@ jobs:
             ls -la "$GITHUB_WORKSPACE/kgateway/install/helm/kgateway" || echo "Helm directory not found!"
   
             # Update docs repository
-            cd "$GITHUB_WORKSPACE"
+            cd "$GITHUB_WORKSPACE/kgateway.dev"
             echo "Changed to docs repository: $PWD"
             
             # Create directory for Helm docs
