@@ -13,7 +13,7 @@ You can apply RouteOption policies to all routes in an HTTPRoute resource or onl
 
 ### Option 1: Attach the policy to all HTTPRoute routes (`targetRefs`)
 
-You can use the `spec.targetRefs=` section in the RoutePolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 
+You can use the `spec.targetRef` section in the RoutePolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 
 
 The following example RoutePolicy resource specifies transformation rules. Because the `httpbin` HTTPRoute resource is referenced in the `spec.targetRef` section, the transformation rules are applied to all routes in that HTTPRoute resource. 
 
