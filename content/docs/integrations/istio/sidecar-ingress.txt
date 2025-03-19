@@ -374,7 +374,7 @@ You can exclude a service from requiring to communicate with the gateway proxy v
       httpbin-7d4965fb6d-mslx2   3/3     Running       0          6s
       ```
    
-3. Remove the reference to the `http-lambda` GatewayParameters from the `http` Gateway.
+3. Remove the reference to the `http-istio` GatewayParameters from the `http` Gateway.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
