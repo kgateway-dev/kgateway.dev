@@ -6,7 +6,7 @@ weight: 10
 In this guide you explore how to expose the {{< reuse "docs/snippets/product-name.md" >}} proxy with an AWS application load balancer (ALB). 
 
 {{< callout type="warning" >}}
-The AWS Load Balancer Controller only supports creation of an ALB through an Ingress Controller and not through the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
+The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
 {{< /callout >}}
 
 ## Before you begin
@@ -16,7 +16,7 @@ The AWS Load Balancer Controller only supports creation of an ALB through an Ing
    
 ## Step 1: Deploy gateway proxy resources
  
-1. Create a Gateway resource with an HTTP listener.
+1. Create a Gateway resource with an HTTP listener. You later pair this Gateway with an AWS ALB. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
    kind: Gateway
@@ -35,7 +35,7 @@ The AWS Load Balancer Controller only supports creation of an ALB through an Ing
    EOF
    ```
 
-2. Create DirectResponse and HTTPRoute resources to configure a healthcheck for the gateway. This step is required for AWS ELB health checks to pass. 
+2. Create DirectResponse and HTTPRoute resources to configure a custom healthcheck path on the gateway. In this example, you expose the `/healthz` path and configure it to always return a 200 HTTP response code by using the DirectResponse. Later, you configure the ALB to perform the health check against the `/healthz` path to determine if the Gateway is healthy. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -71,7 +71,7 @@ The AWS Load Balancer Controller only supports creation of an ALB through an Ing
    EOF
    ```
 
-3. Create an HTTPRoute resource to configure to open up a port for the `albtest.com` hostname on the gateway proxy.
+3. Create another HTTPRoute resource to expose the httpbin app on the `albtest.com` domain. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
