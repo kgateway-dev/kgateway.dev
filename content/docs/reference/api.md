@@ -1131,10 +1131,6 @@ _Appears in:_
 
 
 
-not sure why i need to copy this; codegen fails if i dont
-
-
-
 _Appears in:_
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
 - [ListenerPolicySpec](#listenerpolicyspec)
