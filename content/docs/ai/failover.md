@@ -73,7 +73,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} rollout status deploy model-failover
    ```
 
-3. Create or update the Upstream for your LLM providers. The following example uses the `spec.ai.multi.priorities` setting to configure three pools. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. By default, each request is tried 3 times before marked as failed. The Upstream uses the `model-failover` as the destination for requests instead of the actual OpenAI API endpoint. For more information, see the [MultiPool API reference in the Gloo Edge docs](https://docs.solo.io/gloo-edge/main/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/enterprise/options/ai/ai.proto.sk/#multipool).
+3. Create or update the Backend for your LLM providers. The following example uses the `spec.ai.multi.priorities` setting to configure three pools. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. By default, each request is tried 3 times before marked as failed. The Backend uses the `model-failover` as the destination for requests instead of the actual OpenAI API endpoint. For more information, see the [MultiPool API reference in the Gloo Edge docs](https://docs.solo.io/gloo-edge/main/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/enterprise/options/ai/ai.proto.sk/#multipool).
    
    1. OpenAI `gpt-4o` model
    2. OpenAI `gpt-4.0-turbo` model
@@ -129,7 +129,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    EOF
    ```
 
-4. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Upstream backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+4. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF

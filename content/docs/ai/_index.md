@@ -64,8 +64,6 @@ The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but 
 * [OpenAI](https://platform.openai.com/docs/overview)
 * [Vertex AI](https://cloud.google.com/vertex-ai/docs)
 
-For the full list of currently supported providers, see the [AI options in the Upstream reference](https://docs.solo.io/gloo-edge/main/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/enterprise/options/ai/ai.proto.sk/#upstreamspec).
-
 Note the following differences in how AI Gateway features function for each provider.
 
 ### Chat streaming
