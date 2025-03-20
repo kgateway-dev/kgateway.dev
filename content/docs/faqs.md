@@ -70,3 +70,4 @@ The {{< reuse "docs/snippets/product-name.md" >}} project is not a service mesh,
 * Function routing such as AWS Lambda
 
 For an example, see the [Istio integration guide](/docs/integrations/istio/ambient-ingress/).
+<!--For examples, see the [Istio integration guides](/docs/integrations/istio/).-->
