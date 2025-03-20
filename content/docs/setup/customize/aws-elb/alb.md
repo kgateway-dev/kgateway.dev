@@ -12,7 +12,8 @@ The AWS Load Balancer Controller only supports creation of an ALB through an Ing
 ## Before you begin
 
 1. Create or use an existing AWS account. 
-2. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}} and deploy the httpbin sample app. You do not need to set up a Gateway as you create a custom Gateway as part of this guide. 
+2. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}}. You do not need to set up a Gateway as you create a custom Gateway as part of this guide.
+3. Follow the [Sample app guide](/docs/operations/sample-app/#deploy-app) to deploy the httpbin sample app.
    
 ## Step 1: Deploy gateway proxy resources
  
