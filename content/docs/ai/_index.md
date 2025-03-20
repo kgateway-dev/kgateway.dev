@@ -83,7 +83,6 @@ Explore what you can do with AI Gateway in the following guides.
 {{< cards >}}
   {{< card link="setup" title="Set up AI Gateway" >}}
   {{< card link="auth" title="Authenticate LLM providers" >}}
-  {{< card link="access-control" title="Control access" >}}
   {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
   {{< card link="prompt-guards" title="Set up prompt guards" >}}
   {{< card link="failover" title="Fail over model traffic" >}}
