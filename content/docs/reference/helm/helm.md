@@ -1,6 +1,6 @@
 # kgateway
 
-A Helm chart for the kgateway project
+A Helm chart for the kgateway project.
 
 ## Values
 
@@ -89,4 +89,3 @@ A Helm chart for the kgateway project
 | waypointClass.parametersRef.podTemplate.extraAnnotations | object | `{}` |  |
 | waypointClass.parametersRef.podTemplate.extraLabels."istio.io/dataplane-mode" | string | `"ambient"` |  |
 | waypointClass.service.type | string | `"ClusterIP"` |  |
-
