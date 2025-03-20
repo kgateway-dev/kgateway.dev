@@ -322,8 +322,7 @@ To overwrite a setting that you added to a RoutePolicy resource, you simply incl
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete secret -n {{< reuse "docs/snippets/ns-system.md" >}} openai-secret
-kubectl delete backend,deployment,httproute,service -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=model-failover
+kubectl delete routepolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
 ```
 
 ## Next

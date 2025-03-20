@@ -246,3 +246,8 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    kubectl delete secret -n {{< reuse "docs/snippets/ns-system.md" >}} openai-secret
    kubectl delete backend,deployment,httproute,service -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=model-failover
    ```
+
+## Next
+
+* Explore how to set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
+* [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.

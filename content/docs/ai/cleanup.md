@@ -12,6 +12,14 @@ Remove the AI Gateway resources that you created as part of the guides.
    kubectl delete backend openai -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
+1. Delete any LLM provider credentials,model failover, RoutePolicy, and other AI Gateway resources that you created.
+
+   ```sh
+   kubectl delete secret -n kgateway-system openai-secret
+   kubectl delete backend,deployment,httproute,service -n kgateway-system -l app=model-failover
+   kubectl delete routepolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
+   ```
+
 1. Remove the AI Gateway.
 
    ```sh

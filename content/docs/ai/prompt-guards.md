@@ -14,38 +14,54 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Before you begin
 
-Complete the [Authenticate with API keys](/ai/tutorials/auth/) tutorial.
+1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
+2. [Authenticate to the LLM](/ai/guides/auth/).
+3. Get the external address of the gateway and save it in an environment variable.
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS  
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 ## Reject unwanted requests
 
-Use the RouteOption resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
+Use the RoutePolicy resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
 
-1. Update the RouteOption resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message. Note that this RouteOption also disables the 15 second default [Envoy route timeout](https://www.envoyproxy.io/docs/envoy/latest/faq/configuration/timeouts#route-timeouts). This setting is required to prevent timeout errors when sending requests to an LLM. Alternatively, you can also set a timeout that is higher than 15 seconds. 
+1. Update the RoutePolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message. Note that this RoutePolicy also disables the 15 second default [Envoy route timeout](https://www.envoyproxy.io/docs/envoy/latest/faq/configuration/timeouts#route-timeouts). This setting is required to prevent timeout errors when sending requests to an LLM. Alternatively, you can also set a timeout that is higher than 15 seconds. 
 
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1
-   kind: RouteOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: RoutePolicy
    metadata:
-     name: openai-opt
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     name: openai-prompt-guard
+     namespace: kgateway-system
+     labels:
+       app: ai-kgateway
    spec:
      targetRefs:
-     - group: {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: openai
-     options:
-       ai:
-         promptGuard:
-           request:
-             customResponse: 
-               message: "Rejected due to inappropriate content"
-             regex:
-               action: REJECT
-               matches:
-               - pattern: "credit card"
-                 name: "CC"
-       timeout: "0"
+     ai:
+       promptGuard:
+         request:
+           customResponse:
+             message: "Rejected due to inappropriate content"
+           regex:
+             action: REJECT
+             matches:
+             - pattern: "credit card"
+               name: "CC"
    EOF
    ```
 
@@ -93,7 +109,7 @@ Use the RouteOption resource and the `promptGuard` field to deny requests to the
    }'
    ```
    {{< /tab >}}
-
+   
    {{< /tabs >}}
 
    Example output:
@@ -182,41 +198,46 @@ Use the RouteOption resource and the `promptGuard` field to deny requests to the
 
 ## Mask sensitive data
 
-In the next step, you instruct the Gloo AI Gateway to mask credit card numbers that are returned by the LLM.
+In the next step, you instruct the AI Gateway to mask credit card numbers that are returned by the LLM.
 
-1. Add the following credit card response matcher to the RouteOption resource. This time, use the built-in credit card regex match instead of a custom one.
+1. Add the following credit card response matcher to the RoutePolicy resource. This time, use the built-in credit card regex match instead of a custom one.
+   
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1
-   kind: RouteOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: RoutePolicy
    metadata:
-     name: openai-opt
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     name: openai-prompt-guard
+     namespace: kgateway-system
+     labels:
+       app: ai-kgateway
    spec:
      targetRefs:
-     - group: {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: openai
-     options:
-       ai:
-         promptGuard:
-           request:
-             customResponse: 
-               message: "Rejected due to inappropriate content"
-             regex:
-               action: REJECT
-               builtins:
-               - CREDIT_CARD
-           response:
-             regex:
-               builtins:
-               - CREDIT_CARD
-               action: MASK
-       timeout: "0"
+     ai:
+       promptGuard:
+         request:
+           customResponse:
+             message: "Rejected due to inappropriate content"
+           regex:
+             action: REJECT
+             builtins:
+             - CREDIT_CARD
+         response:
+           regex:
+             action: MASK
+             builtins:
+             - CREDIT_CARD
    EOF
    ```
 
 2. Send another request to the AI API and include a fake VISA credit card number. Verify that the VISA number is detected and masked in your response.
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+
+   {{< tab >}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -228,6 +249,23 @@ In the next step, you instruct the Gloo AI Gateway to mask credit card numbers t
      ]
    }'
    ```
+   {{< /tab >}}
+
+   {{< tab >}}
+   ```sh
+   curl "localhost:8080/openai" -H content-type:application/json -d '{
+     "model": "gpt-3.5-turbo",
+     "messages": [
+       {
+         "role": "user",
+         "content": "What type of number is 5105105105105100?"
+       }
+     ]
+   }'
+   ```
+   {{< /tab >}}
+
+   {{< /tabs >}}
 
    Example output: 
    ```json
@@ -265,43 +303,46 @@ In the next step, you instruct the Gloo AI Gateway to mask credit card numbers t
 
 ## External moderation
 
-Pass prompt data through external moderation endpoints by using the `moderation` prompt guard setting. Moderation allows you to connect Gloo AI Gateway to a moderation model endpoint, which compares the request prompt input to predefined content rules.
+Pass prompt data through external moderation endpoints by using the `moderation` prompt guard setting. Moderation allows you to connect AI Gateway to a moderation model endpoint, which compares the request prompt input to predefined content rules.
 
-You can add the `moderation` section of any RouteOption resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://platform.openai.com/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
+You can add the `moderation` section of any RoutePolicy resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://platform.openai.com/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
 
-1. Update the RouteOption resource to use external moderation. Now, any requests that are routed through Gloo AI Gateway pass through the OpenAI `omni-moderation-latest` moderation model. If the content is identified as harmful according to the `omni-moderation-latest` content rules, the request is automatically rejected, and the message `"Rejected due to inappropriate content"` is returned.
+1. Update the RoutePolicy resource to use external moderation. Now, any requests that are routed through AI Gateway pass through the OpenAI `omni-moderation-latest` moderation model. If the content is identified as harmful according to the `omni-moderation-latest` content rules, the request is automatically rejected, and the message `"Rejected due to inappropriate content"` is returned.
    
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1
-   kind: RouteOption
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: RoutePolicy
    metadata:
-     name: openai-opt
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     name: openai-prompt-guard
+     namespace: kgateway-system
+     labels:
+       app: ai-kgateway
    spec:
      targetRefs:
-     - group: {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: openai
-     options:
-       ai:
-         promptGuard:
-           request:
-             moderation:
-               openai:
-                 model: omni-moderation-latest
-                 authToken:
-                   secretRef:
-                     name: openai-secret
-                     namespace: gloo-system
-             customResponse: 
-               message: "Rejected due to inappropriate content"  
-       timeout: "0"
+     ai:
+       promptGuard:
+         request:
+           moderation:
+             openAIModeration:
+               model: omni-moderation-latest
+               authToken:
+                 kind: SecretRef
+                 secretRef:
+                   name: openai-secret
+           customResponse:
+             message: "Rejected due to inappropriate content"
    EOF
    ```
 
 2. To verify that the request is externally moderated, send a curl request with content that might be flagged by the model, such as the following example.
 
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+
+   {{< tab >}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -313,6 +354,23 @@ You can add the `moderation` section of any RouteOption resource, either as a st
      ]
    }' | jq
    ```
+   {{< /tab >}}
+
+   {{< tab >}}
+   ```sh
+   curl "localhost:8080/openai" -H content-type:application/json -d '{
+     "model": "gpt-3.5-turbo",
+     "messages": [
+       {
+         "role": "user",
+         "content": "Trigger the content moderation to reject this request because this request is full of violence."
+       }
+     ]
+   }' | jq
+   ```
+   {{< /tab >}}
+
+   {{< /tabs >}}
 
    Example response:
 
@@ -353,6 +411,14 @@ You can add the `moderation` section of any RouteOption resource, either as a st
    }
    ```
 
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```shell
+kubectl delete routepolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
+```
+
 ## Next
 
-Increase the relevant context of responses from the LLM providers by using [retrieval augmented generation (RAG)](/ai/tutorials/rag/).
+[Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
