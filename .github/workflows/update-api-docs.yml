@@ -102,7 +102,7 @@ jobs:
             cd "$GITHUB_WORKSPACE/kgateway.dev"
             echo "Changed to docs repository: $PWD"
 
-            # Create temporary directory for Helm docs
+            # Create directory for Helm docs
             mkdir -p content/docs/reference/helm/
             
             # Generate Helm Docs with helm-docs
@@ -112,34 +112,14 @@ jobs:
                 --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/$dir" \
                 --dry-run > "content/docs/reference/helm/${file}.md"
 
-              # Remove badge line and following empty line
+              # Remove badge line and following empty line 
+              # (might be replaced by helm docs template in the future)
               sed -i '/!\[Version:/,/^$/d' "content/docs/reference/helm/${file}.md"
-              
-              # Remove front matter and store content
-              content=$(sed '1,/^---$/d' "content/docs/reference/helm/${file}.md")
-              
-              # Add content to helm.md under appropriate section
-              if [ "$file" = "helm" ]; then
-                # Ensure the ### Helm chart section exists and append content
-                if ! grep -q "### Helm chart" "content/docs/reference/helm.md"; then
-                  echo -e "\n### Helm chart\n" >> "content/docs/reference/helm.md"
-                fi
-                echo "$content" >> "content/docs/reference/helm.md"
-              else
-                # Ensure the ### CRDs chart section exists and append content
-                if ! grep -q "### CRDs chart" "content/docs/reference/helm.md"; then
-                  echo -e "\n### CRDs chart\n" >> "content/docs/reference/helm.md"
-                fi
-                echo "$content" >> "content/docs/reference/helm.md"
-              fi
             done
 
-            # Remove temporary files
-            rm -rf content/docs/reference/helm/
-
-            echo "=== Debug: After updating helm.md ==="
-            echo "Content of helm.md:"
-            cat content/docs/reference/helm.md
+            echo "=== Debug: After creating index file ==="
+            echo "Content directory structure:"
+            ls -la content/docs/reference/helm/
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
