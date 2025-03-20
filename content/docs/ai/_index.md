@@ -61,7 +61,6 @@ The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but 
 * [Anthropic](https://docs.anthropic.com/en/release-notes/api)
 * [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
 * [Gemini](https://ai.google.dev/gemini-api/docs)
-* [Mistral AI](https://docs.mistral.ai/getting-started/quickstart/)
 * [OpenAI](https://platform.openai.com/docs/overview)
 * [Vertex AI](https://cloud.google.com/vertex-ai/docs)
 
