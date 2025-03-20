@@ -35,7 +35,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    kind: Backend
    metadata:
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -68,7 +68,7 @@ Provide the token directly in the configuration for the Backend. This option is 
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
@@ -193,11 +193,20 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    ```
 
 3. Create a Kubernetes secret to store your AI API key.
-   
-   ```sh
-   kubectl create secret generic openai-secret -n {{< reuse "docs/snippets/ns-system.md" >}} \
-     --from-literal="Authorization=Bearer $OPENAI_API_KEY" \
-     --dry-run=client -o yaml | kubectl label --local -f - app=ai-gateway --overwrite | kubectl apply -f -
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: openai-secret
+     namespace: kgateway-system
+     labels:
+       app.kubernetes.io/name: ai-gateway
+   type: Opaque
+   stringData:
+     Authorization: $OPENAI_API_KEY
+   EOF
    ```
    
 4. Create a Backend resource to configure an LLM provider that references the AI API key secret.
@@ -208,7 +217,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    kind: Backend
    metadata:
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -225,25 +234,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    EOF
    ```
 
-5. Verify that the Backend has a `State` of `Accepted`.
-   
-   ```sh
-   kubectl describe backend -n {{< reuse "docs/snippets/ns-system.md" >}} openai
-   ```
-   
-   Example output:
-   
-   ```
-   ...
-   Status:
-     Statuses:
-       Gloo - System:
-         Reported By:  gloo
-         State:        Accepted
-   Events:             <none>
-   ```
-
-6. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -253,7 +244,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
@@ -382,7 +373,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    kind: Backend
    metadata:
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -407,7 +398,7 @@ Pass through an existing token directly from the client or a successful OpenID C
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app: ai-gateway
+       app.kubernetes.io/name: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
