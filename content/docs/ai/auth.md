@@ -35,7 +35,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    kind: Backend
    metadata:
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -68,7 +68,7 @@ Provide the token directly in the configuration for the Backend. This option is 
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway
@@ -202,7 +202,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
      name: openai-secret
      namespace: kgateway-system
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    type: Opaque
    stringData:
      Authorization: $OPENAI_API_KEY
@@ -217,7 +217,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    kind: Backend
    metadata:
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -244,7 +244,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway
@@ -373,7 +373,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    kind: Backend
    metadata:
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
      name: openai
      namespace: kgateway-system
    spec:
@@ -398,7 +398,7 @@ Pass through an existing token directly from the client or a successful OpenID C
      name: openai
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway

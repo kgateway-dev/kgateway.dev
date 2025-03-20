@@ -52,7 +52,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
      name: ai-gateway
      namespace: kgateway-system
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    spec:
      kube:
        aiExtension:
@@ -75,7 +75,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
      name: ai-gateway
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      labels:
-       app.kubernetes.io/name: ai-gateway
+       app: ai-kgateway
    spec:
      gatewayClassName: kgateway
      infrastructure:
