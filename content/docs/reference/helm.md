@@ -4,8 +4,9 @@ weight: 20
 description: 
 ---
 
-You can download the Helm chart to review the Helm values that are supported. 
+## Download the Helm chart {#download}
 
+You can download the Helm chart to review the Helm values that are supported. 
 
 1. Download the Helm chart as an archive to your local machine. 
    ```sh
@@ -21,4 +22,9 @@ You can download the Helm chart to review the Helm values that are supported.
    ```sh
    open kgateway/values.yaml
    ```
+
+### Helm chart
+
+
+### CRDs chart
 
