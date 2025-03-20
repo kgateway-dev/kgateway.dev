@@ -22,9 +22,3 @@ You can download the Helm chart to review the Helm values that are supported.
    ```sh
    open kgateway/values.yaml
    ```
-
-### Helm chart
-
-
-### CRDs chart
-
