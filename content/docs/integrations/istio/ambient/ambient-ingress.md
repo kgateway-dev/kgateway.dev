@@ -1,5 +1,5 @@
 ---
-title: Ingress to ambient mesh
+title: Ingress
 weight: 10
 description: Use kgateway as the ingress gateway for your ambient mesh. 
 ---

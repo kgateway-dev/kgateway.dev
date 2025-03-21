@@ -1,5 +1,5 @@
 ---
-title: kgateway as a waypoint
+title: Waypoint proxy
 weight: 20
 description: Enforce Layer 7 policies for the apps in your ambient mesh by using kgateway as a waypoint proxy.
 ---
@@ -504,7 +504,92 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
    }
    ```
 
+### Transformations
+
+Use {{< reuse "docs/snippets/product-name.md" >}}'s RoutePolicy to apply a transformation policy to the httpbin2 app. 
+
+1. Create a RoutePolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: RoutePolicy
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRef: 
+       group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin2
+     transformation:
+       response:
+         set:
+         - name: x-base64-decoded
+           value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
+   EOF
+   ```
+  
+2. Use the client app to send a request to the httpbin2 app and include a base64-encoded value of `transformation test` in the request `x-base64-encoded` header. Verify that you get back a 200 HTTP response code, and that the decoded value is added to the `x-base64-decoded` response header, starting from the 11th character. 
+   ```sh
+   kubectl -n httpbin exec deploy/client -- curl -vik http://httpbin2:8000/headers \
+    -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
+   ```
    
+   Example output: 
+   ```console {linenos=table,hl_lines=[8,25,26],linenostart=1,filename="Console output"}
+   < HTTP/1.1 200 OK
+   ...
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; charset=utf-8
+   content-length: 544
+   x-envoy-upstream-service-time: 0
+   x-base64-decoded: ion test
+   server: envoy
+
+   {
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "App": [
+         "httpbin2"
+       ],
+       "Host": [
+         "httpbin2:8000"
+       ],
+       "User-Agent": [
+         "custom"
+       ],
+       "X-Base64-Encoded": [
+         "dHJhbnNmb3JtYXRpb24gdGVzdA=="
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Envoy-External-Address": [
+         "10.0.74.217"
+       ],
+       "X-Forwarded-For": [
+         "10.0.74.217"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "4b6444cc-b631-49c9-b2b4-f71ec479925f"
+       ]
+     }
+   }
+   ```
+
+3. Optional: Remove the RoutePolicy that you created in this guide. 
+   ```sh
+   kubectl delete routepolicy transformation -n httpbin
+   ```
+
+   
+
 ## Cleanup
 
 Delete the resources that you created in this guide. 
@@ -522,4 +607,5 @@ kubectl delete deployment httpbin3 -n httpbin
 kubectl delete serviceaccount client -n httpbin
 kubectl delete service client -n httpbin
 kubectl delete deployment client -n httpbin
+kubectl delete routepolicy transformation -n httpbin
 ```
