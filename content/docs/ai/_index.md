@@ -83,5 +83,6 @@ Explore what you can do with AI Gateway in the following guides.
   {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
   {{< card link="prompt-guards" title="Set up prompt guards" >}}
   {{< card link="failover" title="Fail over model traffic" >}}
+  {{< card link="observability" title="AI observability" >}}
   {{< card link="cleanup" title="Cleanup" >}}
 {{< /cards >}}

@@ -1,6 +1,6 @@
 ---
 title: Cleanup
-weight: 90
+weight: 100
 description: Remove the AI Gateway resources that you created as part of the guides. 
 ---
 
