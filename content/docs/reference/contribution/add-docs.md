@@ -161,3 +161,12 @@ The contribution guidelines assume you can complete the following tasks:
 ## Review {#review}
 
 The documentation maintainers of the {{< reuse "docs/snippets/product-name.md" >}} project will review your pull request to ensure the PR follows the documentation contribution guidelines. Once reviewed and approved by the maintainers, your PR is merged into the documentation codebase and your changes will show up on the documentation site. 
+
+## Generated docs {#generated-docs}
+
+The {{< reuse "docs/snippets/product-name.md" >}} project automatically generates the following documentation from the code.
+
+* [API reference](/docs/reference/api/)
+* [Helm reference](/docs/reference/helm/)
+
+To learn more about how to generate these docs, see the [GitHub Workflows README](https://github.com/kgateway-dev/kgateway.dev/tree/main/.github/workflows/README.md).
