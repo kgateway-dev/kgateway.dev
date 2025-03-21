@@ -21,3 +21,7 @@
 - title: Gateway API support for service mesh with kgateway
   description: See how Kubernetes Gateway API supports service mesh with kgateway to manage and control internal east-west traffic with your system
   href: https://www.solo.io/resources/lab/gatewayapi-support-for-service-mesh-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Understanding kgateway and Gateway API policy attachments
+  description: Explore the Gateway API Policy Attachments pattern and learn how policies can extend gateways and routes
+  href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community  

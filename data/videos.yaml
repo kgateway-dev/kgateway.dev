@@ -26,3 +26,7 @@
   href: https://youtu.be/c5ZfIUOFb9I
   thumbnailHref: /thumbnails/gateway-api-service-mesh.jpg
   
+- description: Learn about policy attachments in Gateway API and see how kgateway extends its capabilities. 
+  href: https://youtu.be/NQSADVpcO8M
+  thumbnailHref: /thumbnails/policy-attachments.jpg
+    
