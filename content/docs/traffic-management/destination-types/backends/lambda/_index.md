@@ -1,5 +1,5 @@
 ---
-title: Lambda
+title: AWS Lambda
 weight: 30
 ---
 

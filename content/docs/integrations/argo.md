@@ -304,7 +304,7 @@ Congratulations, you successfully rolled out a new version of your app without d
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Remove the HTTP route. 
+1. Remove the HTTPRoute. 
    ```sh
    kubectl delete httproute argo-rollouts-http-route
    ```
@@ -334,5 +334,3 @@ Congratulations, you successfully rolled out a new version of your app without d
    kubectl delete -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
    kubectl delete namespace argo-rollouts
    ```
-
-

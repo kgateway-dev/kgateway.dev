@@ -274,7 +274,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret IRSA] <br />Required <br /> |
+| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br />Required <br /> |
 | `secret` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Secret references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  | Optional <br /> |
 
 
@@ -292,7 +292,6 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Secret` | AwsAuthTypeSecret uses credentials stored in a Kubernetes Secret.<br /> |
-| `IRSA` | AwsAuthTypeIRSA uses pod identity (IRSA) to obtain credentials.<br /> |
 
 
 #### AwsBackend
@@ -910,7 +909,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRef` _[LocalPolicyTargetReference](#localpolicytargetreference)_ |  |  |  |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `compress` _boolean_ |  |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  |  |
 
@@ -932,6 +931,23 @@ _Appears in:_
 | `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  | Required <br /> |
 
 
+#### HeaderName
+
+_Underlying type:_ _string_
+
+EnvoyHeaderName is the name of a header or pseudo header
+Based on gateway api v1.Headername but allows a singular : at the start
+
+_Validation:_
+- MaxLength: 256
+- MinLength: 1
+- Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+
+_Appears in:_
+- [HeaderTransformation](#headertransformation)
+
+
+
 #### HeaderTransformation
 
 
@@ -945,7 +961,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+| `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
@@ -1123,7 +1139,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRef` _[LocalPolicyTargetReference](#localpolicytargetreference)_ |  |  |  |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `perConnectionBufferLimitBytes` _integer_ |  |  |  |
 
 
@@ -1131,7 +1147,9 @@ _Appears in:_
 
 
 
-not sure why i need to copy this; codegen fails if i dont
+Select the object to attach the policy to.
+The object must be in the same namespace as the policy.
+You can target only one object at a time.
 
 
 
@@ -1142,9 +1160,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | Group is the group of the target resource. |  |  |
-| `kind` _[Kind](#kind)_ | Kind is kind of the target resource. |  |  |
-| `name` _[ObjectName](#objectname)_ | Name is the name of the target resource. |  |  |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
 
 
 #### Message
@@ -1496,7 +1514,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRef` _[LocalPolicyTargetReference](#localpolicytargetreference)_ |  |  |  |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `ai` _[AIRoutePolicy](#airoutepolicy)_ |  |  |  |
 | `transformation` _[TransformationPolicy](#transformationpolicy)_ |  |  |  |
 
