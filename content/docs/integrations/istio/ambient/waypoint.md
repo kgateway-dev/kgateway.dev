@@ -16,7 +16,7 @@ To learn more about ambient, see the [ambient mesh documentation](https://ambien
 
 In this guide, you learn how to set up kgateway as a waypoint proxy for multiple apps in your ambient mesh. To demonstrate the Layer 7 capabilities of the waypoint proxy, you deploy the three sample apps `client`, `httpbin2`, and `httpbin3` to your cluster. The `client` app sends in-mesh traffic to `httpbin2` and `httpbin3`. To apply Layer 7 policies, you create HTTPRoute resources for the `httpbin2` and `httpbin3` apps that define the policies that you want to apply to each app. Because the HTTPRoute is scoped to a particular service, when the `client` app sends a request to that service, only the policies that are defined for that service are enforced by the waypoint proxy. 
 
-{{% callout %}}
+{{% callout type="info" %}}
 You can create an HTTPRoute and scope it to the waypoint proxy by referencing the waypoint proxy in the `parentRef` section. This way, the policies that are defined in the HTTPRoute are automatically applied to all services in the waypoint proxy namespace. 
 {{% /callout %}}
 
