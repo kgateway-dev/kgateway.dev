@@ -35,7 +35,7 @@ Source files:
 
 The workflow uses the [helm docs](https://github.com/norwoodj/helm-docs/) tool to generate Markdown documentation from the API types.
 
-Process to generate markdown content from source files: (same as the API docs process)
+Process to generate markdown content from source files:
 
 1. Update the comments in the `values.yaml` files in the `kgateway/install/helm` directory for each field: 
    * [kgateway values](https://github.com/kgateway-dev/kgateway/blob/main/install/helm/kgateway/values.yaml)
