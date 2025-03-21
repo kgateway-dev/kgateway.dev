@@ -40,8 +40,10 @@ Depending on your existing setup, you might want to use a different type of prox
 
 ## API gateway for a service mesh
 
-You can deploy {{< reuse "docs/snippets/product-name.md" >}} as an API gateway for any ingress and egress traffic to and from the service mesh. A service mesh uses proxies to provide central management for your cloud-native microservices architecture to optimize communication, routing, reliability, security, and observability between your apps. 
+You can deploy {{< reuse "docs/snippets/product-name.md" >}} as an ingress, egress, or waypoint proxy gateway for the workloads in an Istio ambient mesh. An ambient mesh uses node-level ztunnels to route and secure Layer 4 traffic between pods with mutual TLS (mTLS). Waypoint proxies enforce Layer 7 traffic policies whenever needed.
 
-The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that is exposed on the edge and serves traffic for the service mesh. Services in the mesh communicate with each other via mutual TLS (mTLS). {{< reuse "docs/snippets/product-name-caps.md" >}} proxies can be configured with an Istio sidecar to establish a trusted, mTLS connection to the services in the mesh. 
+The following image shows a {{< reuse "docs/snippets/product-name.md" >}} proxy that is exposed on the edge and serves traffic for the ambient mesh. Services in the mesh communicate with each other via mutual TLS (mTLS). 
 
-{{% reuse-image src="img/pattern-service-mesh.svg" width="600px"  %}}
+{{% reuse-image src="img/ambient-ingress.svg" width="600px"  %}}
+
+For more information, see the guides for using {{< reuse "docs/snippets/product-name.md" >}} as an [ingress](/docs/integrations/istio/ambient/ambient-ingress/) or [waypoint proxy](/docs/integrations/istio/ambient/waypoint/) for your ambient mesh. 
