@@ -21,6 +21,10 @@ When opening a pull request, each of your commits must contain a `Signed-off-by`
 - Manually copying the [.githooks/prepare-commit-msg](/.githooks/prepare-commit-msg) file to `.git/hooks/prepare-commit-msg` in your copy of this repo
 - Making sure to use the `-s` / `--signoff` [flag](https://git-scm.com/docs/git-commit#Documentation/git-commit.txt--s) on each commit
 
+### Contributing to the Documentation
+
+Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/reference/contribution/) for details on adding documentation, previewing locally, and a style guide.
+
 ### Adding a Lab
 1. Add an entry to `data/labs.yaml` with a title, description, and href
 2. Verify that the new lab appears correctly at http://localhost:1313/resources/labs/
