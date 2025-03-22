@@ -38,19 +38,19 @@ This collaboration also extends beyond just “ingress” traffic. The community
 
 Gateway API is a family of Custom Resource Definitions (CRDs) that provide dynamic infrastructure provisioning and advanced traffic routing and can be applied to a cluster with the following command:
 
-```
+```yaml
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.0/standard-install.yaml
 ```
 
 This command will list the applied resource definitions:
 
-```
+```yaml
 kubectl api-resources --api-group=gateway.networking.k8s.io
 ```
 
 Here is the output:
 
-```
+```yaml
 NAME              SHORTNAMES   APIVERSION                          NAMESPACED   KIND
 gatewayclasses    gc           gateway.networking.k8s.io/v1        false        GatewayClass
 gateways          gtw          gateway.networking.k8s.io/v1        true         Gateway
@@ -110,4 +110,7 @@ Gateway API is already fulfilling its promise as a widely adopted standard, [ove
 
 Now that we’ve explored motivation for Gateway API and how it improves upon Kubernetes' traditional ingress model, it’s time to see it in action. In the next post, we’ll take a deeper dive into the core concepts of Gateway API and walk through a concrete example. 
 
-Also, don’t forget that this blog series is accompanied by an in-depth video series which you can watch [here](https://kgateway.dev/resources/videos/) and [hands-on-labs](https://kgateway.dev/resources/labs/) for you to test out the concepts.
+Also, don’t forget that this blog series is accompanied by an in-depth video series which you can watch [here](https://kgateway.dev/resources/videos/) and [hands-on-labs](https://kgateway.dev/resources/labs/) for you to test out the concepts. Check out the first video in the series below. 
+
+<br>
+{{< youtube kzWgbSTVphs >}}

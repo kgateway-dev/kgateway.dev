@@ -34,17 +34,17 @@ The Gateway API community provides guidance in their [versioning](https://gatewa
 kgateway's instructions steer us to the experimental channel, which enables us to quickly
 iterate and test the latest and greatest features. Currently this includes CRDs that are still deemed to be "alpha" quality such as TCPRoute, TLSRoute, UDPRoute, and others.
 
-```
+```yaml
 kubectl apply --kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.2.1"
 ```
 
 We can look at the associated API resources just applied to review which resources are stable vs alpha:
 
-```
+```yaml
 kubectl api-resources --api-group=gateway.networking.k8s.io
 ```
 
-```
+```yaml
 NAME                 SHORTNAMES   APIVERSION                           NAMESPACED   KIND
 backendlbpolicies    blbpolicy    gateway.networking.k8s.io/v1alpha2   true         BackendLBPolicy
 backendtlspolicies   btlspolicy   gateway.networking.k8s.io/v1alpha3   true         BackendTLSPolicy
@@ -64,7 +64,7 @@ Installation consists of deploying the following helm chart.
 
 As of March 2025, note that the build we are currently using is v2.0.0-main, which is a nightly build of kgateway, we expect to have a formal generally available (GA) release of kgateway announced by Kubecon EU in April 2025.
 
-```
+```yaml
 helm install --create-namespace --namespace kgateway-system \
   --version v2.0.0-main kgateway \
   oci://ghcr.io/kgateway-dev/charts/kgateway
@@ -72,11 +72,11 @@ helm install --create-namespace --namespace kgateway-system \
 
 Once installation is complete, we can take a peek at kgateway and its additional extensions and policy attachments that support a wider set of advanced traffic management and configuration capabilities.
 
-```
+```yaml
 kubectl api-resources --api-group=gateway.kgateway.dev
 ```
 
-```
+```yaml
 NAME                   SHORTNAMES   APIVERSION                      NAMESPACED   KIND
 directresponses        dr           gateway.kgateway.dev/v1alpha1   true         DirectResponse
 gatewayparameters      gwp          gateway.kgateway.dev/v1alpha1   true         GatewayParameters
@@ -88,11 +88,11 @@ upstreams              up           gateway.kgateway.dev/v1alpha1   true        
 
 We can also inspect the default [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) that gets created as part of the Helm installation:
 
-```
+```yaml
 kubectl get gatewayclass kgateway -o yaml | bat -l yaml
 ```
 
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
@@ -134,7 +134,7 @@ The GatewayClass immediately solves a problem that existed with the legacy Ingre
 
 After installing kgateway, let’s confirm that it’s running properly in the kgateway-system namespace. Should you encounter any issues, check the controller logs for more details.
 
-```
+```yaml
 % kubectl get pods -n kgateway-system
 NAME                        READY   STATUS    RESTARTS   AGE
 kgateway-6848684bc9-t4d78   1/1     Running   0          10m
@@ -146,6 +146,10 @@ Unlike a traditional Ingress API setup, no data-plane proxy (Envoy, in this case
 
 We have laid the groundwork for creating and programming a Gateway resource, deploying a sample application, and defining routing and policy configurations for your workloads. In the next blog, we will show you exactly how to accomplish this using kgateway.
 
-In the meantime, we encourage you to explore the [kgateway documentation concepts](https://kgateway.dev/docs/about/), recap the concepts in this [demo](https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g) video or get hands on and test out the concepts in the free technical lab on [installing kgateway](http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community).
+In the meantime, we encourage you to explore the [kgateway documentation concepts](https://kgateway.dev/docs/about/), recap the concepts in the [demo](https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g) video below or get hands on and test out the concepts in the free technical lab on [installing kgateway](http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community).
 
-Thanks to the standards set forth by the Gateway API specification, you’d be surprised how intuitive it is to get started. Stay tuned for the next part of the series writeup!
+Thanks to the standards set forth by the Gateway API specification, you’d be surprised how intuitive it is to get started. 
+Stay tuned for the next part of the series writeup!
+
+<br>
+{{< youtube eGo8uJDsBEc >}}

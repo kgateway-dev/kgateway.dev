@@ -22,7 +22,7 @@ Let us study an example gateway configuration.
 ## Defining the Gateway
 
 The following example demonstrates how to configure a Gateway with an HTTPS listener:
-```
+```yaml
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
@@ -57,7 +57,7 @@ Next, let us study a route definition.
 ### Defining Routes 
 
 The following example illustrates an HTTPRoute resource that directs traffic to a backend service:
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -82,7 +82,7 @@ It is best practice to redirect clients who erroneously attempt to call the serv
 ### Redirecting HTTP to HTTPS
 
 Below is a second route configuration, this route binds to the HTTP listener on port 80:
-```
+```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -115,7 +115,7 @@ The `cert-manager` project supports the [Gateway API](https://cert-manager.io/do
 By adding a `cert-manager` specific annotation associating the certificate issuer with the Gateway, we're instructing `cert-manager` to call out to the issuer and generate a certificate for the host names associated with its listeners, and to create the TLS secret whose name is referenced in the `tls` configuration for that listener.
 
 Here is an example:
-```
+```yaml
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
@@ -141,4 +141,7 @@ Above, `cert-manager` will be responsible for creating the secret `httpbin-cert`
 
 ### Summary
 
-The Kubernetes Gateway API offers a simple and streamlined approach to configuring gateways incorporating HTTPS listeners. From the examples provided, adapting this configuration to an enterprise environment is easily achievable by incorporating listeners for supplementary hostnames that have routing rules directing traffic towards other backend APIs or applications. You can get [hands-on experience](https://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway) on HTTP route configuration with Gateway API in our free technical labs or watch a [quick demo video](https://youtu.be/cOnL9vjVRvQ) for more information.
+The Kubernetes Gateway API offers a simple and streamlined approach to configuring gateways incorporating HTTPS listeners. From the examples provided, adapting this configuration to an enterprise environment is easily achievable by incorporating listeners for supplementary hostnames that have routing rules directing traffic towards other backend APIs or applications. You can get [hands-on experience](https://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway) on HTTP route configuration with Gateway API in our free technical labs or watch the [quick demo video below](https://youtu.be/cOnL9vjVRvQ) for more information.
+
+<br>
+{{< youtube cOnL9vjVRvQ >}}
