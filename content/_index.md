@@ -19,14 +19,14 @@ description: ""
           <img src="/feature-ingress.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An ingress/<br/>edge router for Kubernetes</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Powered by Envoy, kgateway is a world-leading Cloud Native ingress.</p>
+        <p class="text-primary-text text-center">Powered by Envoy, kgateway is a world-leading Cloud Native ingress.</p>
       </div>
       <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-api-gateway.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An advanced<br/>API gateway</h3>
         </div>
-        <p class="text-primary-text font-primary text-center px-4">Aggregate web APIs and apply key functions like authentication, authorization and rate limiting in one place</p>
+        <p class="text-primary-text text-center px-4">Aggregate web APIs and apply key functions like authentication, authorization and rate limiting in one place</p>
       </div>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
@@ -35,20 +35,20 @@ description: ""
           <img src="/feature-waypoint.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">A better<br/>waypoint proxy for<br/>ambient mesh</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Use the same stack for east-west management as you do for north-south.</p>
+        <p class="text-primary-text text-center">Use the same stack for east-west management as you do for north-south.</p>
       </div>
       <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-ai.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An AI gateway for securing LLMs</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Protect applications, models, and data from inappropriate access, whether you're producing or consuming.</p>
+        <p class="text-primary-text text-center">Protect applications, models, and data from inappropriate access, whether you're producing or consuming.</p>
       </div>
     </div>
   </div>  
 </section>
 
-<section id="about" class="font-primary py-[4.375rem] md:py-50 px-4 md:px-12 xl:px-25 bg-card-bg">
+<section id="about" class="py-[4.375rem] md:py-50 px-4 md:px-12 xl:px-25 bg-card-bg">
  <div class="flex flex-col gap-[3.125rem] md:gap-[6.94rem] items-center">
   <h2 class="text-primary-text text-[2.5rem] leading-[2.75rem] font-semibold font-heading tracking-tight">
       About kgateway
@@ -72,14 +72,14 @@ description: ""
           <img src="/use-case-security.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading">Security</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Apply network encryption, invoke external authentication, or filter requests with a Web Application Firewall.</p>
+        <p class="text-primary-text text-center">Apply network encryption, invoke external authentication, or filter requests with a Web Application Firewall.</p>
       </div>
       <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-traffic.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading">Traffic Management</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Manipulate incoming traffic and route requests to services in your cluster.</p>
+        <p class="text-primary-text text-center">Manipulate incoming traffic and route requests to services in your cluster.</p>
       </div>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
@@ -88,14 +88,14 @@ description: ""
           <img src="/use-case-resilience.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading">Resilience</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Simulate failures, disruptions, and adverse conditions to test that your gateway and apps continue to function.</p>
+        <p class="text-primary-text text-center">Simulate failures, disruptions, and adverse conditions to test that your gateway and apps continue to function.</p>
       </div>
       <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-ai.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading">AI Innovation</h3>
         </div>
-        <p class="text-primary-text font-primary text-center">Protect applications, models, and data from inappropriate access.</p>
+        <p class="text-primary-text text-center">Protect applications, models, and data from inappropriate access.</p>
       </div>
     </div>
   </div>
