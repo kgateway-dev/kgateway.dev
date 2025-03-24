@@ -42,30 +42,6 @@ Prompts are basic building blocks for guiding LLMs to produce relevant and accur
 
 Prompt guards are mechanisms that ensure that prompt-based interactions with a language model are secure, appropriate, and aligned with the intended use. These mechanisms help to filter, block, monitor, and control LLM inputs and outputs to filter offensive content, prevent misuse, and ensure ethical and responsible AI usage. With AI Gateway, you can set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.
 
-### Advanced enterprise features {#enterprise}
-
-For the following features, consider an enterprise solution such as [Gloo AI Gateway](https://docs.solo.io/gateway/latest/ai/).
-
-* Centralized credential management
-* Access control
-* Token-weighted rate limiting
-* Retrieval augmented generation (RAG)
-* Semantic caching
-* Function calling
-
-## Supported LLM providers {#supported-llm-providers}
-
-The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers supported by AI Gateway.
-
-{{< reuse "docs/snippets/product-name-caps.md" >}} supports the following AI providers:
-* [Anthropic](https://docs.anthropic.com/en/release-notes/api)
-* [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-* [Gemini](https://ai.google.dev/gemini-api/docs)
-* [OpenAI](https://platform.openai.com/docs/overview)
-* [Vertex AI](https://cloud.google.com/vertex-ai/docs)
-
-Note the following differences in how AI Gateway features function for each provider.
-
 ### Chat streaming
 
 AI Gateway supports chat streaming, which allows the LLM to stream out tokens as they are generated. The way that chat streaming is determined varies by AI provider.
