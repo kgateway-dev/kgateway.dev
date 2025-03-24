@@ -49,6 +49,20 @@ AI Gateway supports chat streaming, which allows the LLM to stream out tokens as
 * OpenAI and most AI providers: Most providers send the `is-streaming` boolean as part of the request to determine whether or not a request should receive a streamed response. 
 * Google Gemini and Vertex AI: In contrast, the Gemini and Vertex AI providers change the path to determine streaming, such as the `streamGenerateContent` segment of the path in the Vertex AI streaming endpoint `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=<key>`. To prevent the path you defined in your HTTPRoute from being overwritten by this streaming path, you instead indicate chat streaming for Gemini and Vertex AI by setting `spec.options.ai.routeType=CHAT_STREAMING` in your RouteOptions resource.
 
+## Supported LLM providers {#supported-llm-providers}
+
+The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers supported by AI Gateway.
+
+{{< reuse "docs/snippets/product-name-caps.md" >}} supports the following AI providers:
+
+* [Anthropic](https://docs.anthropic.com/en/release-notes/api)
+* [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
+* [Gemini](https://ai.google.dev/gemini-api/docs)
+* [OpenAI](https://platform.openai.com/docs/overview)
+* [Vertex AI](https://cloud.google.com/vertex-ai/docs)
+
+Note the following differences in how AI Gateway features function for each provider.
+
 ## Guides
 
 Explore what you can do with AI Gateway in the following guides.
