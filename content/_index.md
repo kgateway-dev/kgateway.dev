@@ -8,7 +8,7 @@ description: ""
 <section class="bg-primary-bg text-white pt-[7.875rem] pb-40 bg-[url(/hero-background.svg)] bg-center bg-no-repeat bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
   <div class="py-8 lg:py-16 flex items-center px-6">
     <div class="text-center mx-auto inline-block">
-      <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most mature and widely deployed Envoy-based gateway in the market today is now a CNCF project</h1>
+      <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most mature and widely deployed Envoy-based gateway is now a CNCF project</h1>
       <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">kgateway is:</h2>
     </div>
   </div>

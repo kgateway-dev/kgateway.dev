@@ -1,11 +1,10 @@
 - logoPath: integrations/amazon-elb.svg
 - logoPath: integrations/aws-lambda.svg
-- logoPath: integrations/google-cloud-function.svg
-- logoPath: integrations/open-faas.svg
 - logoPath: integrations/openai.svg
 - logoPath: integrations/anthropic.svg
 - logoPath: integrations/gemini.svg
 - logoPath: integrations/mistral-ai.svg
+- logoPath: integrations/deepseek.svg
 - logoPath: integrations/azure.svg
 - logoPath: integrations/argo.svg
 - logoPath: integrations/istio.svg
