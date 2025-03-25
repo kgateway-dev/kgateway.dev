@@ -8,7 +8,8 @@ description: ""
 <section class="bg-primary-bg text-white pt-[7.875rem] pb-40 bg-[url(/hero-background.svg)] bg-center bg-no-repeat bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
   <div class="py-8 lg:py-16 flex items-center px-6">
     <div class="text-center mx-auto inline-block">
-      <h1 class="text-3xl lg:text-6xl leading-tight max-w-3xl font-bold tracking-tighter mt-6 mx-auto font-ubuntu">kgateway is:</h1>
+      <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most mature and widely deployed Envoy-based gateway in the market today is now a CNCF project</h1>
+      <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">kgateway is:</h2>
     </div>
   </div>
 
@@ -53,7 +54,7 @@ description: ""
   <h2 class="text-primary-text text-[2.5rem] leading-[2.75rem] font-semibold font-heading tracking-tight">
       About kgateway
     </h2>
-    <div class="flex gap-8 flex-wrap justify-center text-xl px-4">
+    <div class="flex gap-8 flex-wrap justify-center text-l lg:text-xl px-4">
       <p class="text-primary-text max-w-4xl mx-auto">kgateway is the most mature and widely deployed Envoy-based gateway in the market today. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls, to advanced AI gateway use cases for safety, security, and governance when integrating applications with third-party LLMs. kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
       <p class="text-primary-text max-w-4xl mx-auto">kgateway was launched in 2018 as <b>Gloo</b>. Since then, the project has steadily evolved to become the most trusted and feature-rich API gateway for Kubernetes, processing billions of API requests for many of the world's biggest companies.</p>
     </div>
