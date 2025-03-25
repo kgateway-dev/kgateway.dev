@@ -3,25 +3,25 @@
 {{ if $data }}
   <section id="community-quotes" class="py-[4.375rem] md:py-50 px-4 md:px-12 xl:px-25 bg-card-bg">
     <div class="flex flex-col gap-[3.125rem] md:gap-[6.9375rem] items-center max-w-[1440px] mx-auto">
-      <h2 class="text-center md:text-left text-primary-text font-primary text-[2.1875rem] md:text-[2.5rem] leading-[2.75rem] font-semibold">
+      <h2 class="text-center md:text-left text-primary-text font-heading text-[2.1875rem] md:text-[2.5rem] leading-[2.75rem] font-semibold tracking-tight">
         Quotes from the community
       </h2>
       <div class="flex flex-col md:flex-row gap-8 flex-wrap justify-center">
         {{ range $data }}
-          <div class="flex flex-col justify-between gap-[2.3125rem] bg-white p-[1.5625rem] md:p-[2.8125rem] w-full md:w-[37.75rem]">
-            <p class="text-primary-text font-primary text-xl md:text-[1.5625rem] leading-[2.1875rem]">“{{ .quote }}”</p>
+          <div class="flex flex-col justify-between gap-[2.3125rem] bg-white p-[1.5625rem] md:p-[2.8125rem] w-full md:w-[37.75rem] rounded-xl">
+            <p class="text-primary-text text-xl md:text-[1.5625rem] leading-[2.1875rem]">“{{ .quote }}”</p>
             <div class="flex gap-5">
               {{ if .avatarPath }}
                 <div class="w-[3.61819rem] h-[3.69594rem] bg-primary-bg bg-[url({{ .avatarPath }})] bg-cover bg-no-repeat rounded-full"></div>
               {{ end }}
               <div class="flex flex-col">
                 {{ if .name }}
-                  <span class="font-primary text-primary-text font-bold text-lg leading-[1.575rem]">
+                  <span class="font-heading text-primary-text font-bold text-lg leading-[1.575rem]">
                     {{ .name }}
                   </span>
                 {{ end }}
                 {{ if .role }}
-                  <span class="font-primary text-secondary-text md:text-lg md:leading-[1.575rem]">
+                  <span class="font-heading text-secondary-text md:text-lg md:leading-[1.575rem]">
                     {{ .role }}
                   </span>
                 {{ end }}

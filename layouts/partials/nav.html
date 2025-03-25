@@ -92,27 +92,27 @@
   <div class="flex max-w-[1440px] mx-auto content-center items-center justify-between gap-6">
     <div class="flex items-center gap-8">
       <a href="/">{{ partial "utils/icon.html" (dict "name" "logo" "attributes" "id='logo'" ) }}</a>
-      <a class="link flex items-center gap-2 whitespace-nowrap font-primary text-secondary-link" href="https://github.com/kgateway-dev/kgateway">
+      <a class="link flex items-center gap-2 whitespace-nowrap text-secondary-link" href="https://github.com/kgateway-dev/kgateway">
         {{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }} GitHub
       </a>
-      <a class="link flex items-center whitespace-nowrap font-primary text-secondary-link" href="/slack">
+      <a class="link flex items-center whitespace-nowrap text-secondary-link" href="/slack">
         {{ partial "utils/icon.html" (dict "name" "slack" "attributes" "class='fill-secondary-link w-10 h-10'") }}
         Slack
       </a>
     </div>
     <div class="flex flex-grow lg:flex-grow-0 items-center align-center justify-between lg:gap-8 xl:gap-[3.5625rem]">
       <div class="dropdown">
-        <button class="link whitespace-nowrap font-primary text-secondary-link" href="/resources">Resources {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
-        <div class="dropdown-content rounded-xl bg-white absolute">
-          <a href="/resources/labs" class="rounded-xl text-primary-text px-4 py-3 block hover:text-primary-bg text-center">Labs</a>
-          <a href="/resources/videos" class="rounded-xl text-primary-text px-4 py-3 block hover:text-primary-bg text-center">Videos</a>
+        <button class="link whitespace-nowrap text-secondary-link" href="/resources">Resources {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
+        <div class="dropdown-content rounded-l bg-white absolute">
+          <a href="/resources/labs" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Labs</a>
+          <a href="/resources/videos" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Videos</a>
         </div>
       </div>
-      <a class="link whitespace-nowrap font-primary text-secondary-link" href="/blog">Blog</a>
-      <a class="link whitespace-nowrap font-primary text-secondary-link" href="/docs/quickstart/">Get Started</a>
-      <a class="link whitespace-nowrap font-primary text-secondary-link" href="/docs/about/overview/">Why kgateway?</a>
-      <a class="link whitespace-nowrap font-primary text-secondary-link" href="/docs/">Docs</a>
-      <!-- <a class="font-primary whitespace-nowrap bg-secondary-bg text-white rounded-lg p-5" href="/">Contact Us</a> -->
+      <a class="link whitespace-nowrap text-secondary-link" href="/blog">Blog</a>
+      <a class="link whitespace-nowrap text-secondary-link" href="/docs/quickstart/">Get Started</a>
+      <a class="link whitespace-nowrap text-secondary-link" href="/docs/about/overview/">Why kgateway?</a>
+      <a class="link whitespace-nowrap text-secondary-link" href="/docs/">Docs</a>
+      <!-- <a class="whitespace-nowrap bg-secondary-bg text-white rounded-lg p-5" href="/">Contact Us</a> -->
     </div>
   </div>
 </nav>
@@ -133,13 +133,13 @@
 
 <div class="mobile-nav absolute bg-primary-text w-screen z-40">
   <div class="h-full flex flex-col px-4 items-stretch justify-end w-screen">
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/labs">Labs</a>
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/videos">Videos</a>
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/blog">Blog</a>
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/quickstart/">Get Started</a>
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/about/overview/">Why kgateway?</a>
-    <a class="whitespace-nowrap font-primary text-[1.5625rem] text-white py-5" href="/docs/">Docs</a>
-    <!-- <a class="font-primary whitespace-nowrap text-center text-white rounded-lg mb-10 mt-[3.125rem] p-6 bg-primary-bg font-semibold" href="/">
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/labs">Labs</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/videos">Videos</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/blog">Blog</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/quickstart/">Get Started</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/about/overview/">Why kgateway?</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white py-5" href="/docs/">Docs</a>
+    <!-- <a class="whitespace-nowrap text-center text-white rounded-lg mb-10 mt-[3.125rem] p-6 bg-primary-bg font-semibold" href="/">
       Contact Us
     </a> -->
   </div>

@@ -41,10 +41,10 @@ module.exports = {
             },
             backgroundImage: {
                 'hero-pattern': "url('/hero-pattern.svg')",
-                'izzy': "url(/izzy.png)",
             },
             fontFamily: {
-                'primary': ['Open Sans', 'ui-sans-serif', 'system-ui', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
+                'sans': ['Open Sans', 'ui-sans-serif', 'system-ui', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
+                'heading': ['Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
             }
         },
     },
