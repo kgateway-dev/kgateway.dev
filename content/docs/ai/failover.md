@@ -21,60 +21,9 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you deploy an example `model-failover` app to your cluster. The app simulates a failure scenario for three models from the OpenAI LLM provider.
+In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
 
-1. Deploy the example `model-failover` app. The app simulates a failure scenario for three models from the OpenAI LLM provider. This way, you can check that the request fails over to each model in turn.
-
-   ```shell
-   kubectl apply -f- <<EOF
-   apiVersion: apps/v1
-   kind: Deployment
-   metadata:
-     name: model-failover
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     labels:
-       app: model-failover
-   spec:
-     selector:
-       matchLabels:
-         app: model-failover
-     replicas: 1
-     template:
-       metadata:
-         labels:
-           app: model-failover
-       spec:
-         containers:
-           - name: model-failover
-             image: gcr.io/field-engineering-eu/model-failover:latest
-             imagePullPolicy: IfNotPresent
-             ports:
-               - containerPort: 8080
-   ---
-   apiVersion: v1
-   kind: Service
-   metadata:
-     name: model-failover
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
-     labels:
-       app: model-failover
-   spec:
-     ports:
-     - port: 80
-       targetPort: 8080
-       protocol: TCP
-     selector:
-       app: model-failover
-   EOF
-   ```
-
-2. Verify that the `model-failover` app is running.
-
-   ```shell
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} rollout status deploy model-failover
-   ```
-
-3. Create or update the Backend for your LLM providers. The following example uses the `spec.ai.multi.priorities` setting to configure three pools for the example OpenAI LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. By default, each request is tried 3 times before marked as failed. The Backend uses the `model-failover` app as the destination for requests instead of the actual OpenAI API endpoint. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
    1. OpenAI `gpt-4o` model
    2. OpenAI `gpt-4.0-turbo` model
@@ -95,10 +44,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
        multipool:
          priorities:
          - pool:
-           - hostOverride:
-               host: model-failover.kgateway-system.svc.cluster.local
-               port: 80
-             provider:
+           - provider:
                openai:
                  model: "gpt-4o"
                  authToken:
@@ -106,10 +52,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
                    secretRef:
                      name: openai-secret
          - pool:
-           - hostOverride:
-               host: model-failover.kgateway-system.svc.cluster.local
-               port: 80
-             provider:
+           - provider:
                openai:
                  model: "gpt-4.0-turbo"
                  authToken:
@@ -117,10 +60,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
                    secretRef:
                      name: openai-secret
          - pool:
-           - hostOverride:
-               host: model-failover.kgateway-system.svc.cluster.local
-               port: 80
-             provider:
+           - provider:
                openai:
                  model: "gpt-3.5-turbo"
                  authToken:
@@ -130,7 +70,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    EOF
    ```
 
-4. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -164,63 +104,56 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    EOF
    ```
 
-5. Send a request to observe the failover.
+3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend will automatically use the model from the first pool in the priority order.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{< tab >}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
-     "model": "gpt-4o",
      "messages": [
        {
-         "role": "system",
-         "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
-       },
-       {
          "role": "user",
-         "content": "Compose a poem that explains the concept of recursion in programming."
+         "content": "What is kubernetes?"
        }
-     ]
-   }' | jq
+   ]}' | jq
    ```
    {{< /tab >}}
    {{< tab >}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
-     "model": "gpt-4o",
      "messages": [
        {
-         "role": "system",
-         "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
-       },
-       {
          "role": "user",
-         "content": "Compose a poem that explains the concept of recursion in programming."
+         "content": "What is kubernetes?"
        }
-     ]
-   }'
+   ]}' | jq
    ```
    {{< /tab >}}
    {{< /tabs >}}
-   Example output: Note the example `model-failover` app is configured to return a 429 response to simulate a model failure.
+   
+   Example output: Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
 
-   ```
-   ...
-   < HTTP/1.1 429 Too Many Requests
-   ```
-
-7. Check the logs of the `model-failover` app to verify that the requests were received in the order of priority, starting with the `gpt-4o` model.
-
-   ```shell
-   kubectl logs deploy/model-failover -n {{< reuse "docs/snippets/ns-system.md" >}}
-   ```
-
-   Example output: Notice the 3 log lines that correspond to the initial request (sent to model `gpt-4o`) and the two failover requests (sent to models `gpt-4.0-turbo` and `gpt-3.5-turbo` respectively).
-
-   ```json
-   {"time":"2024-07-01T17:11:23.994822887Z","level":"INFO","msg":"Request received","msg":"{\"messages\":[{\"content\":\"You are a poetic assistant, skilled in explaining complex programming concepts with creative flair.\",\"role\":\"system\"},{\"content\":\"Compose a poem that explains the concept of recursion in programming.\",\"role\":\"user\"}],\"model\":\"gpt-4o\"}"}
-   {"time":"2024-07-01T17:11:24.006768184Z","level":"INFO","msg":"Request received","msg":"{\"messages\":[{\"content\":\"You are a poetic assistant, skilled in explaining complex programming concepts with creative flair.\",\"role\":\"system\"},{\"content\":\"Compose a poem that explains the concept of recursion in programming.\",\"role\":\"user\"}],\"model\":\"gpt-4.0-turbo\"}"}
-   {"time":"2024-07-01T17:11:24.012805385Z","level":"INFO","msg":"Request received","msg":"{\"messages\":[{\"content\":\"You are a poetic assistant, skilled in explaining complex programming concepts with creative flair.\",\"role\":\"system\"},{\"content\":\"Compose a poem that explains the concept of recursion in programming.\",\"role\":\"user\"}],\"model\":\"gpt-3.5-turbo\"}"}
+   ```json {linenos=table,hl_lines=[5],linenostart=1,filename="model-response.json"}
+   {
+     "id": "chatcmpl-BFQ8Lldo9kLC56S1DFVbIonOQll9t",
+     "object": "chat.completion",
+     "created": 1743015077,
+     "model": "gpt-4o-2024-08-06",
+     "choices": [
+       {
+         "index": 0,
+         "message": {
+           "role": "assistant",
+           "content": "Kubernetes is an open-source container orchestration platform designed to automate the deployment, scaling, and management of containerized applications. Originally developed by Google, it is now maintained by the Cloud Native Computing Foundation (CNCF).\n\nKubernetes provides a framework to run distributed systems resiliently. It manages containerized applications across a cluster of machines, offering features such as:\n\n1. **Automatic Bin Packing**: It can optimize resource usage by automatically placing containers based on their resource requirements and constraints while not sacrificing availability.\n\n2. **Self-Healing**: Restarts failed containers, replaces and reschedules containers when nodes die, and kills and reschedules containers that are unresponsive to user-defined health checks.\n\n3. **Horizontal Scaling**: Scales applications and resources up or down automatically, manually, or based on CPU usage.\n\n4. **Service Discovery and Load Balancing**: Exposes containers using DNS names or their own IP addresses and balances the load across them.\n\n5. **Automated Rollouts and Rollbacks**: Automatically manages updates to applications or configurations and can rollback changes if necessary.\n\n6. **Secret and Configuration Management**: Enables you to deploy and update secrets and application configuration without rebuilding your container images and without exposing secrets in your stack configuration and environment variables.\n\n7. **Storage Orchestration**: Allows you to automatically mount the storage system of your choice, whether from local storage, a public cloud provider, or a network storage system.\n\nBy providing these functionalities, Kubernetes enables developers to focus more on creating applications, while the platform handles the complexities of deployment and scaling. It has become a de facto standard for container orchestration, supporting a wide range of cloud platforms and minimizing dependencies on any specific infrastructure.",
+           "refusal": null,
+           "annotations": []
+         },
+         "logprobs": null,
+         "finish_reason": "stop"
+       }
+     ],
+     ...
+   }
    ```
 
 ## Cleanup
@@ -228,8 +161,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
 {{< reuse "docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete secret -n {{< reuse "docs/snippets/ns-system.md" >}} openai-secret
-   kubectl delete backend,deployment,httproute,service -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=model-failover
+   kubectl delete backend,httproute -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=model-failover
    ```
 
 ## Next
