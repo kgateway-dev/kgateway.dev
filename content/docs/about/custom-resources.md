@@ -10,7 +10,7 @@ Learn how the {{< reuse "docs/snippets/product-name.md" >}} and {{< reuse "docs/
 
 The following image illustrates how the {{< reuse "docs/snippets/product-name.md" >}} custom resources interact with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} custom resources to provide advanced routing, traffic management, security, resiliency, and integration capabilities. To learn more about each custom resource, see [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources](#k8s) and [{{< reuse "docs/snippets/product-name.md" >}} resources](#kgateway).
 
-{{< reuse-image src="img/gg-crs.svg" >}}
+{{< reuse-image src="img/kgw-crs-light.svg" >}}
 
 ## Kubernetes Gateway API resources {#k8s}
 
@@ -69,7 +69,6 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 {{< reuse "docs/snippets/product-name-caps.md" >}} uses the following custom resources to attach policies to routes and gateway listeners: 
 
 * [**DirectResponse**](/docs/traffic-management/direct-response/): Directly respond to incoming requests with a custom HTTP response code and body.
-* [**ListenerPolicy**](/docs/about/policies/listeneroption/): Attach policies to all gateway listeners.
 * [**HTTPListenerPolicy**](/docs/about/policies/httplisteneroption/): Apply policies to all HTTP and HTTPS listeners.
 * [**RoutePolicy**](/docs/about/policies/routepolicy/): Attach policies to routes in an HTTPRoute resource.
 

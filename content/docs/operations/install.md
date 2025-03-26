@@ -259,7 +259,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 
 8. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
-   {{< reuse-image src="/img/argo-gg-oss.png" >}}
+   {{< reuse-image src="/img/argo-kgateway.png" >}}
 
 {{% /tab %}}
 {{< /tabs >}}
