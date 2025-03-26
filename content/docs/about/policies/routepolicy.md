@@ -13,9 +13,9 @@ You can apply RouteOption policies to all routes in an HTTPRoute resource or onl
 
 ### Option 1: Attach the policy to all HTTPRoute routes (`targetRefs`)
 
-You can use the `spec.targetRef` section in the RoutePolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 
+You can use the `spec.targetRefs` section in the RoutePolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 
 
-The following example RoutePolicy resource specifies transformation rules. Because the `httpbin` HTTPRoute resource is referenced in the `spec.targetRef` section, the transformation rules are applied to all routes in that HTTPRoute resource. 
+The following example RoutePolicy resource specifies transformation rules. Because the `httpbin` HTTPRoute resource is referenced in the `spec.targetRefs` section, the transformation rules are applied to all routes in that HTTPRoute resource. 
 
 ```yaml {hl_lines=[7,8,9,10]}
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -24,8 +24,8 @@ metadata:
   name: transformation
   namespace: httpbin
 spec:
-  targetRef: 
-    group: gateway.networking.k8s.io
+  targetRefs: 
+  - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: httpbin
   transformation:
@@ -98,9 +98,9 @@ Review how policies are merged if you apply multiple RoutePolicy resources to th
 
 ### `ExtensionRef` vs. `targetRefs`
 
-If you apply two RoutePolicy resources that both specify the same top-level policy type and you attach one RoutePolicy via the `extensionRef` filter and one via the `targetRef` section, only the RoutePolicy resource that is attached via the `extensionRef` filter is applied. The policy that is attached via `targetRef` is ignored. 
+If you apply two RoutePolicy resources that both specify the same top-level policy type and you attach one RoutePolicy via the `extensionRef` filter and one via the `targetRefs` section, only the RoutePolicy resource that is attached via the `extensionRef` filter is applied. The policy that is attached via `targetRefs` is ignored. 
 
-Note that the `targetRef` RoutePolicy resource can augment the `extensionRef` RouteOption if it specifies different top-level policies. <!-- For example, the `extensionRef` RouteOption might define a policy that adds request headers. While you cannot specify additional or other request header rules in the `targetRefs` RouteOption, you can define different policies, such as response headers or fault injection policies.  -->
+Note that the `targetRefs` RoutePolicy resource can augment the `extensionRef` RouteOption if it specifies different top-level policies. <!-- For example, the `extensionRef` RouteOption might define a policy that adds request headers. While you cannot specify additional or other request header rules in the `targetRefs` RouteOption, you can define different policies, such as response headers or fault injection policies.  -->
 
 <!--
 
@@ -112,7 +112,7 @@ Because policies that are attached via `extensionRef` take precedence over polic
 
 ### Multiple `targetRefs` RouteOptions
 
-If you create multiple RoutePolicy resources and attach them to the same route by using the `targetRef` option, only the RoutePolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same RoutePolicy. 
+If you create multiple RoutePolicy resources and attach them to the same route by using the `targetRefs` option, only the RoutePolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same RoutePolicy. 
 
 <!--
 {{% callout type="info" %}}

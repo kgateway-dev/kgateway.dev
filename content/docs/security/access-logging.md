@@ -47,8 +47,8 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
      name: access-logs
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRef:
-       group: gateway.networking.k8s.io
+     targetRefs:
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:

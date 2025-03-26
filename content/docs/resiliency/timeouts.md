@@ -11,32 +11,41 @@ A timeout is the amount of time ([duration](https://protobuf.dev/reference/proto
 
 The time an app needs to process a request can vary a lot which is why applying the same timeout across services can cause a variety of issues. For example, a timeout that is too long can result in excessive latency from waiting for replies from failing services. On the other hand, a timeout that is too short can result in calls failing unnecessarily while waiting for an operation that needs responses from multiple services.
 
-{{% callout type="info" %}}
-Timeouts can be configured for a route by using a RoutePolicy resource. 
-{{% /callout %}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## Set up timeouts {#timeouts}
    
-Use a RoutePolicy resource to specify timeouts for a specific route. 
+Specify timeouts for a specific route. 
 
-1. Create a RoutePolicy resource to specify your timeout rules. In the following example, the request must be completed within 20 seconds.  
+1. Create an HTTPRoute resource to specify your timeout rules. In the following example, the request must be completed within 20 seconds.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
    metadata:
-     name: timeout
-     namespace: httpbin
+     name: httpbin-timeout
    spec:
-     timeout: 20
-     targetRef: 
-       group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
+     hostnames:
+     - timeout.example
+     parentRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+       namespace: kgateway-system
+     rules:
+     - matches: 
+       - path:
+           type: PathPrefix
+           value: /
+       backendRefs:
+       - group: ""
+         kind: Service
+         name: httpbin
+         port: 8000
+       timeouts:
+         request: "20s"
    EOF
    ```
 
@@ -44,12 +53,12 @@ Use a RoutePolicy resource to specify timeouts for a specific route.
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/headers -H "host: www.example.com"
+   curl -vik localhost:8080/headers -H "host: timeout.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -78,11 +87,10 @@ Use a RoutePolicy resource to specify timeouts for a specific route.
       ]
     }
    }
-   
    ```
 
-3. Optional: Remove the RoutePolicy that you created. 
+3. Optional: Remove the HTTPRoute that you created. 
    ```sh
-   kubectl delete routepolicy timeout -n httpbin
+   kubectl delete httproute httpbin-timeout -n httpbin
    ```
 

@@ -8,7 +8,7 @@ next: /docs/about/policies/routeoption
 Learn more about the custom resources that you can use to apply policies in {{< reuse "docs/snippets/product-name.md" >}}. 
 
 
-While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such direct responses, buffer limits, or request and response transformations. Policies allow you to apply intelligent traffic management, resiliency, and security standards to an HTTPRoute or Gateway. 
+While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such direct responses or request and response transformations. Policies allow you to apply intelligent traffic management, resiliency, and security standards to an HTTPRoute or Gateway. 
 
 ## Policy CRDs
 
@@ -16,7 +16,6 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 {{< cards >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
-  {{< card link="/docs/about/policies/listenerpolicy/" title="ListenerPolicy" subtitle="Attach policies to all gateway listeners." >}}
   {{< card link="/docs/about/policies/httplistenerpolicy/" title="HTTPListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
   {{< card link="/docs/about/policies/routepolicy/" title="RoutePolicy" subtitle="Attach policies to all routes in an HTTPRoute resource." >}}
 {{< /cards >}}
@@ -30,9 +29,7 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 | Policy | Applied via |
 | -- | -- | 
 | [Access logging](/docs/security/access-logging) | HTTPListenerPolicy |
-| [Connection buffer limits](/docs/traffic-management/buffering/) | ListenerPolicy | 
 | [Direct response](/docs/traffic-management/direct-response/) | DirectResponse | 
-| [Timeouts](/docs/resiliency/timeouts/) | RoutePolicy | 
 | [Transformations](/docs/traffic-management/transformations) | RoutePolicy | 
 
 <!--
