@@ -143,4 +143,4 @@ By leveraging this extension, organizations can leverage smarter AI traffic rout
 Try [kgateway](kgateway.dev/resources/labs) in our free hands-on labs, get involved in the [community](https://github.com/kgateway-dev/kgateway), and give us feedback for how we can improve!
 
 
-Acknowledgements: Thanks to Daneyon Hansen (Solo.io) for his work on getting Gateway Inference Extension into kgateway, and to the whole community of Inference Extension maintainers!
+_Acknowledgements:_ Thanks to Daneyon Hansen (Solo.io) for his work on getting Gateway Inference Extension into kgateway, and to the whole community of Inference Extension maintainers!
