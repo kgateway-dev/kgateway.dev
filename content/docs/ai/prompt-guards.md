@@ -204,13 +204,6 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
        name: openai
      ai:
        promptGuard:
-         request:
-           customResponse:
-             message: "Rejected due to inappropriate content"
-           regex:
-             action: REJECT
-             builtins:
-             - CREDIT_CARD
          response:
            regex:
              action: MASK
@@ -233,7 +226,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
          "content": "What type of number is 5105105105105100?"
        }
      ]
-   }'
+   }' | jq
    ```
    {{< /tab >}}
 
@@ -247,15 +240,33 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
          "content": "What type of number is 5105105105105100?"
        }
      ]
-   }'
+   }' | jq
    ```
    {{< /tab >}}
 
    {{< /tabs >}}
 
    Example output: 
-   ```json
-   Rejected due to inappropriate content
+   
+   ```json {linenos=table,hl_lines=[11],linenostart=1,filename="model-response.json"}
+   {
+     "id": "chatcmpl-BFSv1H8b9Y32mzjzlG1KQRfzkAE6n",
+     "object": "chat.completion",
+     "created": 1743025783,
+     "model": "gpt-3.5-turbo-0125",
+     "choices": [
+       {
+         "index": 0,
+         "message": {
+           "role": "assistant",
+           "content": "<CREDIT_CARD> is an even number.",
+           "refusal": null,
+           "annotations": []
+         },
+         "logprobs": null,
+         "finish_reason": "stop"
+       }
+   ...
    ```
 
 ## External moderation
