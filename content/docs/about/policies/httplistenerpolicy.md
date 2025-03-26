@@ -25,7 +25,7 @@ metadata:
   name: access-logs
   namespace: kgateway-system
 spec:
-  targetRef:
+  targetRefs:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: http
@@ -49,9 +49,6 @@ spec:
           authority: "%REQ(:AUTHORITY)%"
           backendHost: "%UPSTREAM_HOST%"
           backendCluster: "%UPSTREAM_CLUSTER%"
-  - fileSink:
-      path: /dev/default-access-logs.txt
-      stringFormat: ""
 ```
 
 <!--
