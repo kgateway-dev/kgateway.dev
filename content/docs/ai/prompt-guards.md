@@ -255,36 +255,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
 
    Example output: 
    ```json
-   {
-     "id": "chatcmpl-AE2TvYCl0Y1rLkPajlTEVMBlcooJZ",
-     "object": "chat.completion",
-     "created": 1727909495,
-     "model": "gpt-3.5-turbo-0125",
-     "choices": [
-       {
-         "index": 0,
-         "message": {
-           "role": "assistant",
-           "content": XXXXXXXXXXXXXX100 is an even number.",
-           "refusal": null
-         },
-         "logprobs": null,
-         "finish_reason": "stop"
-       }
-     ],
-     "usage": {
-       "prompt_tokens": 20,
-       "completion_tokens": 11,
-       "total_tokens": 31,
-       "prompt_tokens_details": {
-         "cached_tokens": 0
-       },
-       "completion_tokens_details": {
-         "reasoning_tokens": 0
-       }
-     },
-     "system_fingerprint": null
-   }
+   Rejected due to inappropriate content
    ```
 
 ## External moderation
