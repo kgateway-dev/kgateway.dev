@@ -16,21 +16,3 @@ weight: 400
   {{< card link="transformations" title="Transformations" >}}
   {{< card link="traffic-split" title="Traffic splitting" >}}
 {{< /cards >}}
-
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: RoutePolicy
-metadata:
-  name: transformation
-  namespace: httpbin
-spec:
-  targetRef: 
-    group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: parent
-  transformation:
-    response:
-      set:
-      - name: x-solo-response
-        value: '{{ request_header("x-solo-request") }}' 
-EOF
