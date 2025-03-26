@@ -20,21 +20,7 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
 2. [Authenticate to the LLM](/ai/guides/auth/).
-3. Get the external address of the gateway and save it in an environment variable.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Refactor LLM prompts
 
@@ -142,7 +128,7 @@ In the following example, you explore how to refactor system and user prompts to
 
 Use a RoutePolicy resource to enrich prompts by appending or prepending system and user prompts to each request. This way, you can centrally manage common prompts that you want to add to each request.
 
-1. Create a RoutePolicy resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute. Note that this RoutePolicy also disables the 15 second default [Envoy route timeout](https://www.envoyproxy.io/docs/envoy/latest/faq/configuration/timeouts#route-timeouts). This setting is required to prevent timeout errors when sending requests to an LLM. Alternatively, you can also set a timeout that is higher than 15 seconds. 
+1. Create a RoutePolicy resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF

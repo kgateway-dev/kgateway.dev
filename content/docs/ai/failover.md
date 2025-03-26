@@ -17,6 +17,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
 2. [Authenticate to the LLM](/ai/guides/auth/).
+3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}
 
@@ -73,7 +74,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} rollout status deploy model-failover
    ```
 
-3. Create or update the Backend for your LLM providers. The following example uses the `spec.ai.multi.priorities` setting to configure three pools. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. By default, each request is tried 3 times before marked as failed. The Backend uses the `model-failover` as the destination for requests instead of the actual OpenAI API endpoint. For more information, see the [MultiPool API reference in the Gloo Edge docs](https://docs.solo.io/gloo-edge/main/reference/api/github.com/solo-io/gloo/projects/gloo/api/v1/enterprise/options/ai/ai.proto.sk/#multipool).
+3. Create or update the Backend for your LLM providers. The following example uses the `spec.ai.multi.priorities` setting to configure three pools for the example OpenAI LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. By default, each request is tried 3 times before marked as failed. The Backend uses the `model-failover` app as the destination for requests instead of the actual OpenAI API endpoint. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
    
    1. OpenAI `gpt-4o` model
    2. OpenAI `gpt-4.0-turbo` model
@@ -163,23 +164,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    EOF
    ```
 
-5. Get the external address of the gateway and save it in an environment variable.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{< tab >}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{< /tab >}}
-   {{< tab >}}
-   ```sh
-   kubectl port-forward deployment/ai-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
-   ```
-   {{< /tab >}}
-   {{< /tabs >}}
-
-6. Send a request to observe the failover.
+5. Send a request to observe the failover.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{< tab >}}
@@ -224,7 +209,7 @@ In this example, you deploy an example `model-failover` app to your cluster. The
    < HTTP/1.1 429 Too Many Requests
    ```
 
-8. Check the logs of the `model-failover` app to verify that the requests were received in the order of priority, starting with the `gpt-4o` model.
+7. Check the logs of the `model-failover` app to verify that the requests were received in the order of priority, starting with the `gpt-4o` model.
 
    ```shell
    kubectl logs deploy/model-failover -n {{< reuse "docs/snippets/ns-system.md" >}}

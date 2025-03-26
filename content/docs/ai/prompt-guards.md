@@ -16,27 +16,13 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
 2. [Authenticate to the LLM](/ai/guides/auth/).
-3. Get the external address of the gateway and save it in an environment variable.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Reject unwanted requests
 
 Use the RoutePolicy resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
 
-1. Update the RoutePolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message. Note that this RoutePolicy also disables the 15 second default [Envoy route timeout](https://www.envoyproxy.io/docs/envoy/latest/faq/configuration/timeouts#route-timeouts). This setting is required to prevent timeout errors when sending requests to an LLM. Alternatively, you can also set a timeout that is higher than 15 seconds. 
+1. Update the RoutePolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
 
    ```yaml
    kubectl apply -f - <<EOF

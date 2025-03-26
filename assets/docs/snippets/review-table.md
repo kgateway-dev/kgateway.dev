@@ -1,0 +1,1 @@
+Review the following table to understand this configuration.

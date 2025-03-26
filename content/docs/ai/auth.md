@@ -11,7 +11,8 @@ To configure authentication, you provide the authentication details in the Backe
 ## Before you begin
 
 1. [Set up AI Gateway](/docs/ai/setup/).
-2. Choose from the following configuration options for authentication.
+2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. Choose from the following configuration options for authentication.
    
    * [Inline token](#inline)
    * [Secret reference to an API key](#api-key)
@@ -50,6 +51,8 @@ Provide the token directly in the configuration for the Backend. This option is 
              model: "gpt-3.5-turbo"
    EOF
    ``` 
+
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -92,23 +95,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    EOF
    ```
 
-4. Get the external address of the gateway and save it in an environment variable.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+4. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -234,6 +221,15 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    EOF
    ```
 
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
+
+   | Setting     | Description |
+   |-------------|-------------|
+   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `authToken` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created. |
+   | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
+
 5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
@@ -268,23 +264,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    EOF
    ```
 
-6. Get the external address of the gateway and save it in an environment variable.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-7. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -363,7 +343,7 @@ Pass through an existing token directly from the client or a successful OpenID C
 1. Make sure that your client is set up as follows:
 
    * The client that sends a request to the Backend can authenticate to the LLM provider, such as through an OIDC flow.
-   * The authenticated token is sent in requests to the Backend in an `Authentication` header.
+   * The authenticated token is sent in requests to the Backend in an `Authorization` header.
 
 2. Configure the Backend to use passthrough auth.
 
@@ -387,6 +367,15 @@ Pass through an existing token directly from the client or a successful OpenID C
              model: "gpt-3.5-turbo"
    EOF
    ``` 
+
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
+
+   | Setting     | Description |
+   |-------------|-------------|
+   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `authToken` | Configure the authentication token for OpenAI API. The example uses passthrough authentication. |
+   | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
 3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
@@ -422,10 +411,10 @@ Pass through an existing token directly from the client or a successful OpenID C
    EOF
    ```
 
-4. Trigger your authenticated client to send a request to the Backend, and verify that you get back a successful response. For example, you might instruct your client to send a curl request through the AI Gateway.
+4. Trigger your authenticated client to send a request to the Backend, and verify that you get back a successful response. For example, you might instruct your client to send a curl request through the AI Gateway. Note that the request includes the `Authorization` header, which is required for passthrough authentication.
 
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS:8080/openai" -H "Authorization: Bearer $TOKEN" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
       "messages": [
         {
@@ -482,4 +471,5 @@ Now that you can send requests to an LLM provider, explore the other AI Gateway 
   {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
   {{< card link="prompt-guards" title="Set up prompt guards" >}}
   {{< card link="failover" title="Fail over model traffic" >}}
+  {{< card link="observability" title="Collect AI Gateway metrics" >}}
 {{< /cards >}}

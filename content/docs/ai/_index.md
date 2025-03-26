@@ -61,8 +61,6 @@ The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but 
 * [OpenAI](https://platform.openai.com/docs/overview). You can also use `openai` support for LLM providers that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 * [Vertex AI](https://cloud.google.com/vertex-ai/docs)
 
-Note the following differences in how AI Gateway features function for each provider.
-
 ## Guides
 
 Explore what you can do with AI Gateway in the following guides.
