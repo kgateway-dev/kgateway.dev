@@ -25,7 +25,7 @@ metadata:
   name: bufferlimits
   namespace: kgateway-system
 spec:
-  targetRef:
+  targetRefs:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: http

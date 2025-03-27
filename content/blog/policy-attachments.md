@@ -44,7 +44,7 @@ metadata:
   name: access-logging-json
   namespace: kgateway-system
 spec:
-  targetRef:
+  targetRefs:
     group: gateway.networking.k8s.io
     kind: Gateway
     name: infra-gateway
@@ -73,7 +73,7 @@ metadata:
   name: transformation
   namespace: helloworld
 spec:
-  targetRef: 
+  targetRefs: 
     group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: helloworld

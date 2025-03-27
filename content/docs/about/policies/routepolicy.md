@@ -24,7 +24,7 @@ metadata:
   name: transformation
   namespace: httpbin
 spec:
-  targetRef: 
+  targetRefs: 
     group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: httpbin
