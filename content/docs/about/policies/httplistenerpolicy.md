@@ -49,9 +49,6 @@ spec:
           authority: "%REQ(:AUTHORITY)%"
           backendHost: "%UPSTREAM_HOST%"
           backendCluster: "%UPSTREAM_CLUSTER%"
-  - fileSink:
-      path: /dev/default-access-logs.txt
-      stringFormat: ""
 ```
 
 <!--

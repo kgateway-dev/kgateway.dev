@@ -71,9 +71,6 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
              authority: "%REQ(:AUTHORITY)%"
              backendHost: "%UPSTREAM_HOST%"
              backendCluster: "%UPSTREAM_CLUSTER%"
-     - fileSink:
-         path: /dev/default-access-logs.txt
-         stringFormat: ""
    EOF
    ```
 
@@ -204,8 +201,8 @@ You can set up access logs to write to a file. The following example writes acce
      name: access-logs
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRef:
-       group: gateway.networking.k8s.io
+     targetRefs:
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:
@@ -278,8 +275,8 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
      name: access-logs
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRef:
-       group: gateway.networking.k8s.io
+     targetRefs:
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:

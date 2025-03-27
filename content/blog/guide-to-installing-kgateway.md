@@ -81,7 +81,6 @@ NAME                   SHORTNAMES   APIVERSION                      NAMESPACED  
 directresponses        dr           gateway.kgateway.dev/v1alpha1   true         DirectResponse
 gatewayparameters      gwp          gateway.kgateway.dev/v1alpha1   true         GatewayParameters
 httplistenerpolicies   hlp          gateway.kgateway.dev/v1alpha1   true         HTTPListenerPolicy
-listenerpolicies       lp           gateway.kgateway.dev/v1alpha1   true         ListenerPolicy
 routepolicies          rp           gateway.kgateway.dev/v1alpha1   true         RoutePolicy
 upstreams              up           gateway.kgateway.dev/v1alpha1   true         Upstream
 ```

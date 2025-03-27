@@ -11,7 +11,6 @@ weight: 400
   {{< card link="redirect" title="Redirects" >}}
   {{< card link="rewrite" title="Rewrites" >}}
   {{< card link="route-delegation" title="Route delegation" >}}
-  {{< card link="buffering" title="Buffering" >}}
   {{< card link="header-control" title="Header control" >}}
   {{< card link="transformations" title="Transformations" >}}
   {{< card link="traffic-split" title="Traffic splitting" >}}
