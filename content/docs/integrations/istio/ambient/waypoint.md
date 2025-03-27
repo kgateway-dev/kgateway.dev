@@ -517,8 +517,8 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s RoutePolicy to apply a trans
      name: transformation
      namespace: httpbin
    spec:
-     targetRef: 
-       group: gateway.networking.k8s.io
+     targetRefs: 
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: httpbin2
      transformation:

@@ -26,7 +26,7 @@ metadata:
   namespace: kgateway-system
 spec:
   targetRefs:
-    group: gateway.networking.k8s.io
+  - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
   accessLog:
