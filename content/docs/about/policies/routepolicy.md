@@ -142,7 +142,7 @@ Because policies that are attached via `extensionRef` take precedence over polic
 If you create multiple RoutePolicy resources and attach them to the same HTTPRoute by using the `targetRefs` option, only the RoutePolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same RoutePolicy. 
 
 If you create multiple RoutePolicy resources and attach one to a Gateway and one to an HTTPRoute, the policy is applied as follows: 
-* The RoutePolicy that is applied to the HTTPRoute takes precedence over the RoutePolicy that is applied to the Gateway. That means, that the HTTPRoutes routes are not affected by the gateway-level policy. 
+* The RoutePolicy that is applied to the HTTPRoute takes precedence over the RoutePolicy that is applied to the Gateway. This means that the HTTPRoutes routes are not affected by the gateway-level policy. 
 * The RoutePolicy that is applied to the Gateway is applied to all other routes that the Gateway serves. 
 
 <!--
