@@ -8,7 +8,7 @@ next: /docs/about/policies/routeoption
 Learn more about the custom resources that you can use to apply policies in {{< reuse "docs/snippets/product-name.md" >}}. 
 
 
-While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such direct responses, buffer limits, or request and response transformations. Policies allow you to apply intelligent traffic management, resiliency, and security standards to an HTTPRoute or Gateway. 
+While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such direct responses or request and response transformations. Policies allow you to apply intelligent traffic management, resiliency, and security standards to an HTTPRoute or Gateway. 
 
 ## Policy CRDs
 
@@ -30,7 +30,6 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 | -- | -- | 
 | [Access logging](/docs/security/access-logging) | HTTPListenerPolicy |
 | [Direct response](/docs/traffic-management/direct-response/) | DirectResponse | 
-| [Timeouts](/docs/resiliency/timeouts/) | RoutePolicy | 
 | [Transformations](/docs/traffic-management/transformations) | RoutePolicy | 
 
 <!--

@@ -14,7 +14,7 @@ Learn more about how you can attach policies to HTTP or HTTPS listeners.
 
 ### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`) -->
 
-You can apply a policy to all HTTP and HTTPS listeners that are defined on the gateway by using the `spec.targetRef` section in the HTTPListenerPolicy resource. 
+You can apply a policy to all HTTP and HTTPS listeners that are defined on the gateway by using the `spec.targetRefs` section in the HTTPListenerPolicy resource. 
 
 The following HTTPListenerPolicy resource configures access logs on a Gateway that is named `http`. The policy applies to all the HTTP and HTTPS listeners that are defined on the gateway. 
 
@@ -110,7 +110,7 @@ spec:
 
 ## Conflicting policies
 
-If you create multiple HTTPListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRef` option, only the HTTPListenerPolicy that was last applied is enforced. 
+If you create multiple HTTPListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the HTTPListenerPolicy that was last applied is enforced. 
 
 <!--
 
