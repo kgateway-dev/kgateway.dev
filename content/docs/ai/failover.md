@@ -1,6 +1,6 @@
 ---
 title: Model failover
-weight: 20
+weight: 30
 ---
 
 Prioritize the failover of requests across different models from an LLM provider.
