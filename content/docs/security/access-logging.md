@@ -71,9 +71,6 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
              authority: "%REQ(:AUTHORITY)%"
              backendHost: "%UPSTREAM_HOST%"
              backendCluster: "%UPSTREAM_CLUSTER%"
-     - fileSink:
-         path: /dev/default-access-logs.txt
-         stringFormat: ""
    EOF
    ```
 
