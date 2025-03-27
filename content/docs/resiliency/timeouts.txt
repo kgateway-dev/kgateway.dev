@@ -34,7 +34,7 @@ Use a RoutePolicy resource to specify timeouts for a specific route.
    spec:
      timeout: 20
      targetRefs: 
-       group: gateway.networking.k8s.io
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: httpbin
    EOF

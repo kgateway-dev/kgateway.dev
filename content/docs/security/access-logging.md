@@ -48,7 +48,7 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs:
-       group: gateway.networking.k8s.io
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:
@@ -205,7 +205,7 @@ You can set up access logs to write to a file. The following example writes acce
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs:
-       group: gateway.networking.k8s.io
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:
@@ -279,7 +279,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs:
-       group: gateway.networking.k8s.io
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      accessLog:
