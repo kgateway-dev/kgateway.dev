@@ -4,7 +4,7 @@ weight: 10
 description: Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 ---
 
-To learn more about what local rate limiting is and the differences between local and global rate limiting, see [About local rate limiting](/docs/security/ratelimit/local/).
+Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 
 ## About local rate limiting
 
@@ -18,13 +18,22 @@ For more information about local rate limiting, see the [Envoy documentation](ht
 
 ### Architecture
 
-The following image shows how local rate limiting works in {{< reuse "docs/snippets/product-name.md" >}}. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. Note that limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5*10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. 
+The following image shows how local rate limiting works in {{< reuse "docs/snippets/product-name.md" >}}. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. Note that limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5 x 10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. 
 
 Depending on your setup, each Envoy instance or pod is configured with a number of tokens in a token bucket. To allow a request, a token must be available in the bucket so that it can be assigned to a downstream connection. Token buckets are refilled occasionally as defined in the refill setting of the local rate limiting configuration. If no token is available, the connection is closed immediately, and a 429 HTTP response code is returned to the client. 
 
 When a token is available in the token bucket it can be assigned to an incoming connection. The request is then forwarded to your rate limit server to enforce any global rate limiting settings. For example, the request might be further rate limited based on headers or query parameters. Only requests that are within the local and global rate limits are forwarded to the backend destination in the cluster. 
 
 {{< reuse-image src="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
+
+### Local rate limiting in kgateway
+
+In {{< reuse "docs/snippets/product-name.md" >}}, you use a [RoutePolicy](/docs/about/policies/routepolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
+* **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the RoutePolicy to the route you want to rate limit. For an example, see [Route configuration](#route). 
+* **All routes in an HTTPRoute**: Use the `targetRefs` section in the RoutePolicy to attach the policy to a particular HTTPRoute resource. 
+* **All routes that the Gatewy serves**: Use the `targetRefs` section in the RoutePolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
+
+Note that if you apply a RoutePolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` RoutePolicies](/docs/about/policies/routepolicy/#multiple-targetrefs-routeoptions). 
 
 ## Before you begin
 
@@ -41,7 +50,7 @@ Set up local rate limiting for a particular route.
    kind: RoutePolicy
    metadata:
      name: local-ratelimit
-     namespace: gwtest
+     namespace: httpbin
    spec:
      rateLimit:
        local:
@@ -80,9 +89,9 @@ Set up local rate limiting for a particular route.
        filters:
        - type: ExtensionRef
          extensionRef:
-          name: local-ratelimit
-          group: gateway.kgateway.dev
-          kind: RoutePolicy
+           name: local-ratelimit
+           group: gateway.kgateway.dev
+           kind: RoutePolicy
        backendRefs:
        - name: httpbin
          port: 8000
@@ -105,7 +114,19 @@ Set up local rate limiting for a particular route.
    
    Example output: 
    ```
-   
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   access-control-allow-origin: *
+   < content-length: 0
+   content-length: 0
+   < x-envoy-upstream-service-time: 1
+   x-envoy-upstream-service-time: 1
+   < server: envoy
+   server: envoy
    ```
    
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the route is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the route. 
@@ -139,6 +160,12 @@ Set up local rate limiting for a particular route.
    local_rate_limited      
    ```
    
+5. Remove the resources that you created in this guide. 
+   ```sh
+   kubectl delete routepolicy local-ratelimit -n httpbin
+   kubectl delete httproute httpbin-ratelimit -n httpbin
+   ```
+   
 ## Gateway configuration {#gateway}
 
 Instead of applying local rate limiting to a particular route, you can also apply it to an entire gateway. This way, the local rate limiting settings are applied to all the routes that the gateway serves. 
@@ -150,13 +177,12 @@ Instead of applying local rate limiting to a particular route, you can also appl
    kind: RoutePolicy
    metadata:
      name: local-ratelimit
-     namespace: httpbin
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      targetRefs: 
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      rateLimit:
        local:
          tokenBucket:
@@ -173,7 +199,36 @@ Instead of applying local rate limiting to a particular route, you can also appl
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
    
-3. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. 
+3. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. Verify that the request succeeds.
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{% tab  %}}
+   ```sh
+   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl -vik localhost:8080/status/200 -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
+   Example output: 
+   ```
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   access-control-allow-origin: *
+   < content-length: 0
+   content-length: 0
+   < x-envoy-upstream-service-time: 1
+   x-envoy-upstream-service-time: 1
+   < server: envoy
+   server: envoy
+   ```
 
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the gateway is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the gateway. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
@@ -206,42 +261,8 @@ Instead of applying local rate limiting to a particular route, you can also appl
    local_rate_limited      
    ```
 
-5. If you went through the example of [applying rate limiting to a route](#route), you can send a request to the httpbin app along the `ratelimit.example` domain to verify that this request is also denied with a 429 HTTP response code. Make sure to complete this request before the token bucket is refilled. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
-   ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
+5. Remove the resources that you created in this guide. 
    ```
-   {{% /tab %}}
-   {{% tab %}}
-   ```sh
-   curl -vik localhost:8080/status/200 -H "host: ratelimit.example"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-   Example output:
-   ```
-   ...
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 429 Too Many Requests
-   HTTP/1.1 429 Too Many Requests
-   < x-ratelimit-limit: 1
-   x-ratelimit-limit: 1
-   < x-ratelimit-remaining: 0
-   x-ratelimit-remaining: 0
-   < x-ratelimit-reset: 79
-   x-ratelimit-reset: 79
-   ...
-   Connection #0 to host 34.XXX.XX.XXX left intact
-   local_rate_limited      
+   kubectl delete routepolicy local-ratelimit -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
-## Cleanup
-
-{{< reuse "docs/snippets/cleanup.md" >}}
-
-```sh
-kubectl delete routepolicy local-ratelimit -n httpbin
-kubectl delete httproute httpbin-ratelimit -n httpbin
-```

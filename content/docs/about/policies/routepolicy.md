@@ -1,11 +1,11 @@
 ---
 title: RoutePolicy
 weight: 10
-description: Use a RouteOption resource to attach policies to one, multiple, or all routes in an HTTPRoute resource. 
+description: Use a RouteOption resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
 prev: /docs/about/policies
 ---
 
-Use a RouteOption resource to attach policies to one, multiple, or all routes in an HTTPRoute resource. 
+Use a RouteOption resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
 
 ## Policy attachment {#policy-attachment-routeoption}
 
@@ -92,6 +92,33 @@ spec:
         port: 8000
 ```
 
+### Option 3: Attach the policy to a Gateway (#attach-to-gateway)
+
+Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway services. This way, you can apply global rules and do not have to keep track of new HTTPRoutes that are added in your environment. 
+
+To attach a RoutePolicy to a Gateway, you simply use the `targetRefs` section in the RoutePolicy to reference the Gateway you want the policy to apply to as shown in the following example. 
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: RoutePolicy
+metadata:
+  name: local-ratelimit
+  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+spec:
+  targetRefs: 
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 1
+        tokensPerFill: 1
+        fillInterval: 100s
+EOF
+```
+
 ## Conflicting policies and merging rules
 
 Review how policies are merged if you apply multiple RoutePolicy resources to the same route. 
@@ -100,7 +127,7 @@ Review how policies are merged if you apply multiple RoutePolicy resources to th
 
 If you apply two RoutePolicy resources that both specify the same top-level policy type and you attach one RoutePolicy via the `extensionRef` filter and one via the `targetRefs` section, only the RoutePolicy resource that is attached via the `extensionRef` filter is applied. The policy that is attached via `targetRefs` is ignored. 
 
-Note that the `targetRefs` RoutePolicy resource can augment the `extensionRef` RouteOption if it specifies different top-level policies. <!-- For example, the `extensionRef` RouteOption might define a policy that adds request headers. While you cannot specify additional or other request header rules in the `targetRefs` RouteOption, you can define different policies, such as response headers or fault injection policies.  -->
+Note that the `targetRefs` RoutePolicy resource can augment the `extensionRef` RoutePolicy if it specifies different top-level policies. <!-- For example, the `extensionRef` RouteOption might define a policy that adds request headers. While you cannot specify additional or other request header rules in the `targetRefs` RouteOption, you can define different policies, such as response headers or fault injection policies.  -->
 
 <!--
 
@@ -110,9 +137,13 @@ Because policies that are attached via `extensionRef` take precedence over polic
 
 {{< reuse-image src="img/policy-ov-extensionref-targetref.svg" width="800px" >}} --> 
 
-### Multiple `targetRefs` RouteOptions
+### Multiple `targetRefs` RoutePolicies
 
-If you create multiple RoutePolicy resources and attach them to the same route by using the `targetRefs` option, only the RoutePolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same RoutePolicy. 
+If you create multiple RoutePolicy resources and attach them to the same HTTPRoute by using the `targetRefs` option, only the RoutePolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same RoutePolicy. 
+
+If you create multiple RoutePolicy resources and attach one to a Gateway and one to an HTTPRoute, the policy is applied as follows: 
+* The RoutePolicy that is applied to the HTTPRoute takes precedence over the RoutePolicy that is applied to the Gateway. That means, that the HTTPRoutes routes are not affected by the gateway-level policy. 
+* The RoutePolicy that is applied to the Gateway is applied to all other routes that the Gateway serves. 
 
 <!--
 {{% callout type="info" %}}
@@ -123,12 +154,12 @@ In the following image, you attach two RouteOption resources to route A. One add
 
 {{< reuse-image src="img/policy-ov-multiple-routeoption.svg" width="800" >}} -->
 
-### Multiple `ExtensionRef` RouteOptions
+### Multiple `ExtensionRef` RoutePolicies
 
 If you attach multiple RoutePolicy resources to an HTTPRoute by using the `ExtensionRef` filter, the RoutePolicies are merged as follows: 
 
-* RouteOptions that define different top-level policies are merged and applied to the route. 
-* RouteOptions that define the same top-level policies, such as two transformation policies, are not merged. Instead, the RoutePolicy that is referenced last is applied to the route. 
+* RoutePolicies that define different top-level policies are merged and applied to the route. 
+* RoutePolicies that define the same top-level policies, such as two transformation policies, are not merged. Instead, the RoutePolicy that is referenced last is applied to the route. 
 
 <!--
 In the following image, you have an HTTPRoute that defines two routes (route A and route B). Route A attaches two RouteOption resources via the `ExtensionRef` filter that specify the same top-level header manipulation policy. For route B, two RouteOption resources with different top-level policies (fault injection and CORS) are applied via the `ExtensionRef` filter. 
