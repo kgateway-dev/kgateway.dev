@@ -1,6 +1,6 @@
 ---
 title: Prompt guards
-weight: 30
+weight: 40
 description: Secure access to the LLM and the data that is returned with Web Application Filter and Data Loss Prevention policies. 
 ---
 

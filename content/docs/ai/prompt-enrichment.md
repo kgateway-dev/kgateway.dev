@@ -1,6 +1,6 @@
 ---
 title: Prompt enrichment
-weight: 30
+weight: 40
 description: Effectively manage system and user prompts to improve LLM outputs.
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Function calling
-weight: 30
+weight: 35
 ---
 
 ## About function calling {#about}
@@ -324,3 +324,11 @@ Send a function call to an LLM through AI Gateway. In the following steps, you u
    |-------|-------------|
    | `choices.message.content` | The response includes the content that answers the user's initial query about the weather.  |
    | `choices.finish_reason` | The `stop` finish reason indicates that the response is complete. |
+
+## Next
+
+Explore other AI Gateway features.
+
+* [Fail over traffic](/docs/ai/failover/) across models from the same LLM provider.
+* Set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
+* [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
