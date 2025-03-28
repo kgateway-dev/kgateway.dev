@@ -94,7 +94,7 @@ spec:
 
 ### Option 3: Attach the policy to a Gateway (#attach-to-gateway)
 
-Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway services. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
+Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 
 To attach a TrafficPolicy to a Gateway, you simply use the `targetRefs` section in the TrafficPolicy to reference the Gateway you want the policy to apply to as shown in the following example. 
 
