@@ -136,7 +136,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    {{% tab %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
-   -H "host: delegation.example:8080"
+   -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{% tab %}}
@@ -164,7 +164,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    {{% tab %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/bar \
-   -H "host: delegation.example:8080"
+   -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{% tab %}}
@@ -188,7 +188,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    {{% tab %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/bar \
-   -H "host: delegation.example:8080"
+   -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{% tab %}}
@@ -216,7 +216,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    {{% tab %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/foo \
-   -H "host: delegation.example:8080"
+   -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{% tab %}}
@@ -244,6 +244,7 @@ In this guide you walk through a route delegation example that demonstrates rout
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
+kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
