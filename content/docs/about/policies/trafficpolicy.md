@@ -152,7 +152,7 @@ You cannot attach multiple TrafficPolicy resources to the same route by using th
 
 In the following image, you attach two TrafficPolicy resources to route A. One adds request headers and the other one a fault injection policy. Because only one TrafficPolicy can be applied to a route via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 
-{{< reuse-image src="img/policy-ov-multiple-TrafficPolicy.svg" width="800" >}} -->
+{{< reuse-image src="img/policy-ov-multiple-trafficpolicy.svg" width="800" >}} -->
 
 ### Multiple `ExtensionRef` TrafficPolicies
 
@@ -166,7 +166,7 @@ In the following image, you have an HTTPRoute that defines two routes (route A a
 
 Because you cannot apply two `ExtensionRef` TrafficPolicies with the same top-level policies, only the policy that is referenced first (policy 1, request header `foo`) is enforced. The request header bar in policy 2 is ignored. For route B, both the CORS and fault injection policies are applied, because these TrafficPolicy resources define different top-level policies. 
 
-{{< reuse-image src="img/policy-ov-multiple-TrafficPolicy-extensionref.svg" width="800" >}} -->
+{{< reuse-image src="img/policy-ov-multiple-trafficpolicy-extensionref.svg" width="800" >}} -->
 
 <!--
 

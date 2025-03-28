@@ -17,7 +17,7 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 {{< cards >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
   {{< card link="/docs/about/policies/httplistenerpolicy/" title="HTTPListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
-  {{< card link="/docs/about/policies/TrafficPolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
+  {{< card link="/docs/about/policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
 {{< /cards >}}
 
 
