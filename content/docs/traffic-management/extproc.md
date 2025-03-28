@@ -10,7 +10,7 @@ Modify aspects of an HTTP request or response with an external processing server
 
 Envoy offers multiple filters that you can use to manage, monitor, and secure traffic to your apps. Although Envoy is extensible via C++ and WebAssembly modules, it might not be practical to implement these extensions for all of your apps. You might also have very specific requirements for how to process a request or response to allow traffic routing between different types of apps, such as adding specific headers to new and legacy apps.
 
-With external processing (ExtProc), you can implement an external gRPC processing server that can read and modify all aspects of an HTTP request or response, such as headers, body, and trailers, and add that server to the Envoy filter chain by using the Envoy external processing (ExtProc) filter. The external service can manipulate headers, body, and trailers of a request or response before it is forwarded to an upstream or downstream service. The request or response can also be terminated at any given time.
+With the Envoy external processing (ExtProc) filter, you can implement an external gRPC processing server that can read and modify all aspects of an HTTP request or response, and add that server to the Envoy filter chain. The external service can manipulate headers, body, and trailers of a request or response before it is forwarded to an upstream or downstream service. The request or response can also be terminated at any given time.
 
 With this approach, you have the flexibility to apply your requirements to all types of apps, without the need to run WebAssembly or other custom scripts.
 
