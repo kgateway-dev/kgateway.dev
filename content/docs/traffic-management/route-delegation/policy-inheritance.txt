@@ -11,7 +11,7 @@ Learn how policy inheritance works in a route delegation setup.
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
 {{< callout type="info" >}}
-The example in this guide attaches the RouteOption policies by using the [`targetRefs` attachment setting](/docs/about/policies/routeoption/#option-1-attach-the-policy-to-all-httproute-routes-targetrefs). You might attach RouteOption resources by using the [`extensionRef` filter in the HTTPRoute resource](/docs/about/policies/routeoption/#option-2-attach-the-policy-to-an-individual-route-extensionref) instead. Note that attaching RouteOptions in different ways can result in conflicting policies or policy merging. To learn more about how conflicting RouteOption resources are handled, see [Conflicting policies](/docs/about/policies/routeoption/#conflicting-policies-and-merging-rules) in the RouteOption concepts. 
+The example in this guide attaches the TrafficPolicy policies by using the [`targetRefs` attachment setting](/docs/about/policies/TrafficPolicy/#option-1-attach-the-policy-to-all-httproute-routes-targetrefs). You might attach TrafficPolicy resources by using the [`extensionRef` filter in the HTTPRoute resource](/docs/about/policies/TrafficPolicy/#option-2-attach-the-policy-to-an-individual-route-extensionref) instead. Note that attaching TrafficPolicies in different ways can result in conflicting policies or policy merging. To learn more about how conflicting TrafficPolicy resources are handled, see [Conflicting policies](/docs/about/policies/TrafficPolicy/#conflicting-policies-and-merging-rules) in the TrafficPolicy concepts. 
 {{< /callout >}}
 
 ## Configuration overview
@@ -27,15 +27,15 @@ The following image illustrates the route delegation hierarchy and policy inheri
 * The `parent` HTTPRoute resource delegates traffic as follows: 
   * Requests to`/anything/team1` are delegated to the child HTTPRoute resource `child-team1` in namespace `team1`. 
   * Requests to `/anything/team2` are delegated to the child HTTPRoute resource `child-team2` in namespace `team2`. 
-* The response header `test: bar` is added to all requests to the routes that the parent HTTPRoute serves. This policy is defined in a RouteOption resource that is applied to the parent HTTPRoute by using the `targetRefs` field. 
+* The response header `test: bar` is added to all requests to the routes that the parent HTTPRoute serves. This policy is defined in a TrafficPolicy resource that is applied to the parent HTTPRoute by using the `targetRefs` field. 
 
 **`child-team1` HTTPRoute**: 
 * The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in the `team1` namespace. 
-* The `child-team1` resource inherits the response header policy from the parent HTTPRoute. In addition, a RouteOption resource that specifies a fault injection policy is attached to all `child-team1` routes and aborts all incoming requests with a 418 HTTP response code. 
+* The `child-team1` resource inherits the response header policy from the parent HTTPRoute. In addition, a TrafficPolicy resource that specifies a fault injection policy is attached to all `child-team1` routes and aborts all incoming requests with a 418 HTTP response code. 
 
 **`child-team2` HTTPRoute**: 
 * The child HTTPRoute resource `child-team2` delegates traffic on the `/anything/team2/bar` path to a grandchild HTTPRoute resource in the `team2` namespace. 
-* The `child-team2` resource inherits the response header policy from the parent HTTPRoute. In addition, a RouteOption resource that specifies a prefix rewrite policy is attached to all `child-team2` routes and rewrites prefix paths to `/anything/rewrite`. 
+* The `child-team2` resource inherits the response header policy from the parent HTTPRoute. In addition, a TrafficPolicy resource that specifies a prefix rewrite policy is attached to all `child-team2` routes and rewrites prefix paths to `/anything/rewrite`. 
 
 **`grandchild` HTTPRoute**: 
 * The grandchild HTTPRoute resource `grandchild` matches incoming traffic for the `/anything/team2/bar/.*` regex path and routes that traffic to the httpbin app in the `team2` namespace. 
@@ -88,11 +88,11 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    EOF
    ```
 
-2. Create a RouteOption resource that adds the `test: bar` header to the response and apply this policy to the `parent` HTTPRoute resource by using the `spec.targetRefs` section. 
+2. Create a TrafficPolicy resource that adds the `test: bar` header to the response and apply this policy to the `parent` HTTPRoute resource by using the `spec.targetRefs` section. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
+   kind: TrafficPolicy
    metadata:
     name: parent-remove-header
     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -130,11 +130,11 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    EOF
    ```
 
-4. Create a RouteOption resource that aborts all requests with a 418 HTTP response code and apply this policy to the `child-team1` HTTPRoute resource by using the `spec.targetRefs` section.  
+4. Create a TrafficPolicy resource that aborts all requests with a 418 HTTP response code and apply this policy to the `child-team1` HTTPRoute resource by using the `spec.targetRefs` section.  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
+   kind: TrafficPolicy
    metadata:
      name: child-team1-fault
      namespace: team1
@@ -178,11 +178,11 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    EOF
    ```
 
-6. Create a RouteOption resource that rewrites prefix paths to `/anything/rewrite` apply this policy to the `child-team2` HTTPRoute resource by using the `spec.targetRefs` section.  
+6. Create a TrafficPolicy resource that rewrites prefix paths to `/anything/rewrite` apply this policy to the `child-team2` HTTPRoute resource by using the `spec.targetRefs` section.  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
+   kind: TrafficPolicy
    metadata:
      name: child-team2-rewrite
      namespace: team2
@@ -335,9 +335,9 @@ kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete httproute grandchild -n team2
-kubectl delete routeoption parent-remove-header -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete routeoption child-team1-fault -n team1
-kubectl delete routeoption child-team2-rewrite -n team2
+kubectl delete TrafficPolicy parent-remove-header -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete TrafficPolicy child-team1-fault -n team1
+kubectl delete TrafficPolicy child-team2-rewrite -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
 kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2

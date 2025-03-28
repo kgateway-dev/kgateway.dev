@@ -12,7 +12,7 @@ The following image shows the different components that make up the {{< reuse "d
 
 {{< reuse-image src="img/translation.svg" caption="Kgateway component architecture" >}}
 
-1. The config and secret watcher components in the `kgateway` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, or RoutePolicies.
+1. The config and secret watcher components in the `kgateway` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "docs/snippets/product-name.md" >}} translation engine. 
 3. The translation engine translates Kubernetes Gateway API and {{< reuse "docs/snippets/product-name.md" >}} resources into Envoy configuration. All Envoy configuration is consolidated into an xDS snapshot. 
 4. The reporter receives a status report for every resource that is processed by the translator. 
@@ -48,7 +48,7 @@ The following image shows the different stages of a translation cycle.
 
 2. The next step in the translation cycle is to process all the functions on each Backend. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.
 
-3. In the next step, all [Envoy routes](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route.proto) are generated. Routes are generated for each route rule that is defined on the HTTPRoute and RouteOption resources. When all of the routes are created, the translator processes and aggregates HTTPListenerPolicy resources into [Envoy virtual hosts](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#config-route-v3-virtualhost), and adds them to a new [Envoy HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management) configuration. 
+3. In the next step, all [Envoy routes](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route.proto) are generated. Routes are generated for each route rule that is defined on the HTTPRoute and TrafficPolicy resources. When all of the routes are created, the translator processes and aggregates HTTPListenerPolicy resources into [Envoy virtual hosts](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#config-route-v3-virtualhost), and adds them to a new [Envoy HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management) configuration. 
 
 4. Filter plug-ins are queried for their filter configurations, generating the list of HTTP and TCP Filters that are added to the [Envoy listeners](https://www.envoyproxy.io/docs/envoy/latest/configuration/listeners/listeners).
 

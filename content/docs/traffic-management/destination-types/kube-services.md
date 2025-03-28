@@ -32,6 +32,6 @@ spec:
       - type: ExtensionRef
         extensionRef:
           group: gateway.kgateway.dev
-          kind: RoutePolicy
+          kind: TrafficPolicy
           name: rewrite
 ```

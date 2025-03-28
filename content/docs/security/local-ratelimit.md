@@ -28,12 +28,12 @@ When a token is available in the token bucket it can be assigned to an incoming 
 
 ### Local rate limiting in kgateway
 
-In {{< reuse "docs/snippets/product-name.md" >}}, you use a [RoutePolicy](/docs/about/policies/routepolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
-* **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the RoutePolicy to the route you want to rate limit. For an example, see [Route configuration](#route). 
-* **All routes in an HTTPRoute**: Use the `targetRefs` section in the RoutePolicy to attach the policy to a particular HTTPRoute resource. 
-* **All routes that the Gatewy serves**: Use the `targetRefs` section in the RoutePolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
+In {{< reuse "docs/snippets/product-name.md" >}}, you use a [TrafficPolicy](/docs/about/policies/TrafficPolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
+* **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the TrafficPolicy to the route you want to rate limit. For an example, see [Route configuration](#route). 
+* **All routes in an HTTPRoute**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a particular HTTPRoute resource. 
+* **All routes that the Gatewy serves**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a RoutePolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` RoutePolicies](/docs/about/policies/routepolicy/#multiple-targetrefs-routeoptions). 
+Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](/docs/about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
 
 ## Before you begin
 
@@ -43,11 +43,11 @@ Note that if you apply a RoutePolicy to an HTTPRoute and to a Gateway at the sam
 
 Set up local rate limiting for a particular route. 
 
-1. Create a RoutePolicy with your local rate limiting settings. 
+1. Create a TrafficPolicy with your local rate limiting settings. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: local-ratelimit
      namespace: httpbin
@@ -67,7 +67,7 @@ Set up local rate limiting for a particular route.
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
 
-2. Create an HTTPRoute that limits requests to the httpbin app along the `ratelimit.example` domain. To apply the RoutePolicy that created earlier, you use the `extensionRef` filter. 
+2. Create an HTTPRoute that limits requests to the httpbin app along the `ratelimit.example` domain. To apply the TrafficPolicy that created earlier, you use the `extensionRef` filter. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -91,7 +91,7 @@ Set up local rate limiting for a particular route.
          extensionRef:
            name: local-ratelimit
            group: gateway.kgateway.dev
-           kind: RoutePolicy
+           kind: TrafficPolicy
        backendRefs:
        - name: httpbin
          port: 8000
@@ -162,7 +162,7 @@ Set up local rate limiting for a particular route.
    
 5. Remove the resources that you created in this guide. 
    ```sh
-   kubectl delete routepolicy local-ratelimit -n httpbin
+   kubectl delete TrafficPolicy local-ratelimit -n httpbin
    kubectl delete httproute httpbin-ratelimit -n httpbin
    ```
    
@@ -170,11 +170,11 @@ Set up local rate limiting for a particular route.
 
 Instead of applying local rate limiting to a particular route, you can also apply it to an entire gateway. This way, the local rate limiting settings are applied to all the routes that the gateway serves. 
 
-1. Create a RoutePolicy with your local rate limiting settings. Use the `targetRefs` section to apply the policy to a specific Gateway. The policy automatically applies to all the routes that the Gateway serves. 
+1. Create a TrafficPolicy with your local rate limiting settings. Use the `targetRefs` section to apply the policy to a specific Gateway. The policy automatically applies to all the routes that the Gateway serves. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: local-ratelimit
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -194,7 +194,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
    | Setting | Description |
    | ------- | ----------- |
-   | `targetRef`| Select the Gateway that you want to apply your local rate limiting configuration to. In this example, the policy is applied to all the routes that the `http` gateway serves.  |
+   | `targetRefs`| Select the Gateway that you want to apply your local rate limiting configuration to. In this example, the policy is applied to all the routes that the `http` gateway serves.  |
    | `maxTokens` | The maximum number of tokens that are available to use.   |
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
@@ -263,6 +263,6 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
 5. Remove the resources that you created in this guide. 
    ```
-   kubectl delete routepolicy local-ratelimit -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete TrafficPolicy local-ratelimit -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 

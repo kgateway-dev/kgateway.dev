@@ -23,7 +23,7 @@ Some notable aspects of this pattern worth calling out include:
 
 - **Policy naming convention:** A resource will typically configure some kind of policy, so we are encouraged to use the suffix `Policy` when naming the CRD. For example, the Gateway API defines a [BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/), which allows us to quickly infer that this resource is designed to configure aspects of TLS communication for the connection between a gateway and a backend workload.  
 
-- **Target reference (`targetRef`) in policy attachments:** The resource that a policy attachment affects should be specified via a `targetRef` field. The value of that target reference is contextual. 
+- **Target reference (`targetRefs`) in policy attachments:** The resource that a policy attachment affects should be specified via a `targetRefs` field. The value of that target reference is contextual. 
 
 For a BackendTLSPolicy it's a reference to a service.  But we can imagine other scenarios where the target reference is a route or a gateway, as illustrated below (the extension resources shown in the illustration are just examples):
 
@@ -33,7 +33,7 @@ For a BackendTLSPolicy it's a reference to a service.  But we can imagine other 
 
 The kgateway project comes with different policy types that aim to extend the core capabilities of the Kubernetes Gateway API with advanced traffic management, resiliency, security, and even AI capabilities. You can apply these policies to an HTTPRoute or Gateway. 
 
-Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/reference/api/top-level/httplisteneroptions/). You use the `targetRef` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
+Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/reference/api/#httplistenerpolicy). You use the `targetRefs` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
 
 In the below example resource, the policy attaches to the gateway named `infra-gateway` and specifies "standard output" as the access logging "file sink". It then proceeds to specify the fields that will constitute each log line:
 
@@ -60,15 +60,15 @@ spec:
         response_flags: "%RESPONSE_FLAGS%"
         bytes_received: "%BYTES_RECEIVED%"
 ```
-Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[RoutePolicy](https://kgateway.dev/docs/reference/api/top-level/routepolicies/) API is designed to solve this use case for you.
+Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[TrafficPolicy](https://kgateway.dev/docs/reference/api/#trafficpolicy) API is designed to solve this use case for you.
 
-The structure of a RoutePolicy is very similar to the one of an HTTPListenerPolicy, but you use the `targetRef` section to apply the policy to the routes in an HTTPRoute instead of a Gateway. 
+The structure of a TrafficPolicy is very similar to the one of an HTTPListenerPolicy, but you use the `targetRefs` section to apply the policy to the routes in an HTTPRoute instead of a Gateway. 
 
 Let’s explore the following example, in which you use an Inja template to extract the value of the x-kgateway-request request header and inject that value into the `x-kgateway-response` response header. 
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
-kind: RoutePolicy
+kind: TrafficPolicy
 metadata:
   name: transformation
   namespace: helloworld
