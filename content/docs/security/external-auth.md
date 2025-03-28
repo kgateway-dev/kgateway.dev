@@ -57,6 +57,8 @@ Keep in mind that your external authorization service must conform to the [Envoy
    metadata:
      namespace: kgateway-system
      name: ext-authz
+     labels:
+       app: ext-authz
    spec:
      replicas: 1
      selector:
@@ -302,4 +304,20 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    ```txt
    HTTP/1.1 200 OK
    ...
+   ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+1. Delete the TrafficPolicies for the Gateway and HTTPRoute.    
+
+   ```sh
+   kubectl delete trafficpolicy -A -l app=ext-authz
+   ```
+
+2. Delete the sample external authorization service and GatewayExtension resource.
+
+   ```sh
+   kubectl delete gatewayextension,deployment,service -n kgateway-system -l app=ext-authz
    ```
