@@ -126,7 +126,7 @@ The following image illustrates the route delegation hierarchy:
    EOF
    ```
 
-3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path if the `header2=val2` request header and `query2=val2` query parameter are present in the request. Requests that meet these conditions are forwarded to the httpbin app in the `team2` namespace.
+3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path if the `headerX=valX` request header and `queryX=valX` query parameter are present in the request. Requests that meet these conditions are forwarded to the httpbin app in the `team2` namespace.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
