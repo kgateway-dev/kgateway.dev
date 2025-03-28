@@ -293,7 +293,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    spec:
      targetRefs: 
      - group: gateway.networking.k8s.io
-       kind: HTTRoute
+       kind: HTTPRoute
        name: extproc
      extProc:
        extensionRef:
