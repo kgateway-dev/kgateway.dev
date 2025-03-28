@@ -147,10 +147,6 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
 
 2. Create a TrafficPolicy that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Note that the TrafficPolicy is created in the same namespace as the targeted resource.
 
-   {{< tabs items="Gateway,HTTPRoute" >}}
-   {{% tab %}}
-   Note that the TrafficPolicy is created in the same namespace as the Gateway.
-
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -170,31 +166,6 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
          name: basic-extauth
    EOF
    ```
-   {{% /tab %}}
-   {{% tab %}}
-   Note that the TrafficPolicy is created in the same namespace as the HTTPRoute.
-
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
-   metadata:
-     namespace: httpbin
-     name: route-extauth-policy
-     labels:
-       app: ext-authz
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     extAuth:
-       extensionRef: 
-         name: basic-extauth
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
 3. Repeat your request to the httpbin sample app and verify that the request is denied.
 
