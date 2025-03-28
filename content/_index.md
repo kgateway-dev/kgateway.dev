@@ -15,36 +15,36 @@ description: ""
 
   <div class="flex gap-8 flex-wrap justify-center px-8 md:px-12 xl:px-25">
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/about/overview/#what-is-an-ingress" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-ingress.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An ingress/<br/>edge router for Kubernetes</h3>
         </div>
         <p class="text-primary-text text-center">Powered by Envoy, kgateway is a world-leading Cloud Native ingress.</p>
-      </div>
-      <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      </a>
+      <a href="/docs/about/overview/#what-is-an-api-gateway" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-api-gateway.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An advanced<br/>API gateway</h3>
         </div>
         <p class="text-primary-text text-center px-4">Aggregate web APIs and apply key functions like authentication, authorization and rate limiting in one place</p>
-      </div>
+      </a>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/integrations/istio/ambient/waypoint/" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-waypoint.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">A better<br/>waypoint proxy for<br/>ambient mesh</h3>
         </div>
         <p class="text-primary-text text-center">Use the same stack for east-west management as you do for north-south.</p>
-      </div>
-      <div class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      </a>
+      <a href="/docs/ai/" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-ai.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An AI gateway for securing LLMs</h3>
         </div>
         <p class="text-primary-text text-center">Protect applications, models, and data from inappropriate access, whether you're producing or consuming.</p>
-      </div>
+      </a>
     </div>
   </div>  
 </section>
