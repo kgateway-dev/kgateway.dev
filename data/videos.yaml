@@ -30,3 +30,7 @@
   href: https://youtu.be/NQSADVpcO8M
   thumbnailHref: /thumbnails/policy-attachments.jpg
     
+- description: Deep dive into the unique implementation of kgateway being utilized as a waypoint in Istio ambient mesh.
+  href: https://youtu.be/B8oZ1seIDIM
+  thumbnailHref: /thumbnails/kgateway-waypoint.jpg
+  
