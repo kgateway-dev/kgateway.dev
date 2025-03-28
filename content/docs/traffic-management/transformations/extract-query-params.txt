@@ -12,12 +12,12 @@ The following example walks you through how to use an Inja template to find spec
 
 ## Extract query parameters
    
-1. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you use a regular expression to find the `foo` and `bar` query parameters in the request path and to capture their values. Then, these values are added to the response headers `foo-response` and `bar-response`.  
+1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you use a regular expression to find the `foo` and `bar` query parameters in the request path and to capture their values. Then, these values are added to the response headers `foo-response` and `bar-response`.  
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: transformation
      namespace: httpbin
@@ -32,7 +32,7 @@ The following example walks you through how to use an Inja template to find spec
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -57,7 +57,7 @@ The following example walks you through how to use an Inja template to find spec
          - type: ExtensionRef
            extensionRef:
              group: gateway.kgateway.dev
-             kind: RoutePolicy
+             kind: TrafficPolicy
              name: transformation
    EOF
    ```
@@ -135,10 +135,10 @@ The following example walks you through how to use an Inja template to find spec
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the RoutePolicy resource.
+1. Delete the TrafficPolicy resource.
 
    ```sh
-   kubectl delete RoutePolicy transformation -n httpbin
+   kubectl delete TrafficPolicy transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

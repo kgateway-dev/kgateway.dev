@@ -27,8 +27,8 @@ By default, {{< reuse "docs/snippets/product-name.md" >}} is set up with 1MiB of
      name: bufferlimits
      namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
-     targetRef:
-       group: gateway.networking.k8s.io
+     targetRefs:
+     - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
      perConnectionBufferLimitBytes: 10485760
