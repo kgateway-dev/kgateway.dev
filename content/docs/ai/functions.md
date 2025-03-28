@@ -17,7 +17,7 @@ The LLM has to know several pieces of real-time information that it was not trai
 
 Function calling is a way for you as a developer to extend the capabilities of the LLM with your own external APIs, apps, and data. First, you create _tools_ that extend the capabilities of the LLM with a function, such as `get_weather`. These functions can include _parameters_, or inputs, that are needed to execute the function. For example, the `get_weather` function needs the date and location to get the current weather forecast. The _name_ and _description_ of the tool function and parameters help the LLM decide when to call the tool.
 
-When calling the LLM, you can include the set of tools that the LLM can leverage to answer the user. Based on the user's question, the LLM can respond directly or suggest a tool to call to help answer the question. To get the required parameters for the tool call, the LLM might ask the end user or call other functions like `get_location` or `get_date`, which in turn might pull that information based on system settings on the end user's device.
+Next, when forwarding user requests to the LLM, you can include the set of tools that the LLM can leverage to answer the user. Based on the user's question, the LLM can respond directly or suggest a tool to call to help answer the question. To get the required parameters for the tool call, the LLM might ask the end user or call other functions like `get_location` or `get_date`, which in turn might pull that information based on system settings on the end user's device.
 
 ### Function calling sequence diagram {#diagram}
 
@@ -26,7 +26,7 @@ Consider the following sequence diagram that shows how function calling works.
 ```mermaid
 sequenceDiagram
     autonumber
-    User->>+Gateway: "What's the weather in Columbus?"
+    User->>+Gateway: "What's the weather today?"
     Gateway->>+App: Forward user request
     App->>+Gateway: Send request to LLM with function list
     Gateway->>+LLM: Forward request with function list
@@ -36,24 +36,24 @@ sequenceDiagram
     App->>+Gateway: Send function result to LLM
     Gateway->>+LLM: Forward function result
     LLM-->>-Gateway: Generate final response
-    Gateway-->>-User: "The weather in Columbus is 15°C and cloudy."
+    Gateway-->>-User: "The weather today in Columbus is 15°C and cloudy."
 ```
 
-1. The end user asks about the weather in Columbus.
+1. The end user asks about the weather.
 2. The Gateway routes the request to the App that you set up to handle requests on that host that the end user called.
 3. The App sends the user request to the LLM with a list of available functions that the LLM can use, if needed.
 4. The Gateway forwards the request to the LLM.
-5. Based on this conversation, the LLM suggests to call the `get_weather` function and includes the required parameters to use that function. 
+5. Based on this conversation, the LLM suggests to call the `get_weather` function and includes the required parameters of date and location to use that function. The LLM might get these parameters by using the chat history, asking the end user to provide them, or by suggesting other functions to call before calling the `get_weather` function.
 6. The Gateway returns this suggestion to the App.
-7. The App executes the `get_weather` function with the required parameters to get the current weather in Columbus.
-8. The App returns the current weather in Columbus.
+7. The App executes the `get_weather` function with the required parameters to get the current weather for today in the location, such as Columbus, OH.
+8. The App returns the current weather for todayin Columbus, OH.
 9. The Gateway forwards the function result to the LLM.
 10. The LLM uses the real-time function result from the App in a natural language response and returns this response to the Gateway. 
 11. The Gateway then forwards the response to the end user.
 
 ### Behavior with other AI features {#about-behavior}
 
-Keep in mind the following behaviors when using function calling with other AI Gateway features:
+Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs](/docs/reference/api/#aitrafficpolicy).
 
 * Streaming responses: You can stream responses that call functions.
 * Semantic caching: Function calls are not cached.
@@ -61,7 +61,7 @@ Keep in mind the following behaviors when using function calling with other AI G
 
 ### AI provider differences {#about-providers}
 
-Each AI provider has a different way of handling function calling. For more information, consult your AI provider's documentation.
+Each AI provider has a different way of handling function calling. For example, OpenAI might expect an array of `functions`, while Anthropic expects individual `tools`. Or, the response formats might differ. The capabilities of function calling also differ across providers, with some providing more support for particular cloud providers, others focusing on response time optimization, or others offering more fine-grained control over the response structure. For more information, consult your AI provider's documentation.
 
 * [Anthropic](https://docs.anthropic.com/en/docs/build-with-claude/tool-use/overview)
 * [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/function-calling)
@@ -80,9 +80,13 @@ Each AI provider has a different way of handling function calling. For more info
 
 ## Example of function calling {#function-call}
 
-Send a function call to an LLM through AI Gateway. In the following steps, you use an example `get_weather` function with an OpenAI LLM. Keep in mind that for a real use case, you must develop your own app that is capable of sending requests to the LLM and executing a tool, such as to retrieve the latest weather information for a given location.
+Send a function call to an LLM through AI Gateway. In the following steps, you use an example `get_weather` function with an OpenAI LLM. 
 
-1. Send a request through the AI Gateway to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers).
+{{< callout type="info" >}}
+Keep in mind that for a real use case, you must develop your own app that is capable of sending requests to the LLM and executing a tool, such as to retrieve the latest weather information for a given location.
+{{< /callout >}}
+
+1. Send a request through the AI Gateway to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers). The following example demonstrates a response that you might configure your app to send through the AI Gateway to the LLM.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
