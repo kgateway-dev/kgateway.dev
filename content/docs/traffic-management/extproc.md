@@ -33,6 +33,10 @@ The ExtProc server is a gRPC interface that must be able to respond to events in
 
 To implement your own ExtProc server, make sure that you follow [Envoy's technical specification for an external processor](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor). This guide uses a sample ExtProc server that you can use to try out the ExtProc functionality.
 
+{{% callout type="info" %}}
+ExtProc can be applied to an HTTPRoute. However, it can currently not be applied to a Gateway. 
+{{% /callout %}}
+
 
 ## Before you begin
 
@@ -99,10 +103,11 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep ext-proc-grpc
    ```
-   
-3. Continue with configuring ExtProc for a [route](#route) or [gateway](#gateway). 
+<!--
+3. Continue with configuring ExtProc for a [route](#route) or [gateway](#gateway).
+-->
 
-## Route configuration {#route}
+## Set up ExtProc for a route {#route}
 
 You can enable ExtProc for a particular route in an HTTPRoute resource. 
 
@@ -178,7 +183,7 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
              namespace: httpbin
    EOF
    ```
-   
+ 
 4. Create a ReferenceGrant resource to allow the HTTPRoute to forward traffic to the httpbin app. This resource is required, because the HTTPRoute resource and httpbin app are deployed to different namespaces.
    ```yaml
    kubectl apply -f- <<EOF
@@ -256,7 +261,7 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
        ],
    ...
    ```
-
+<!--
 ## Gateway configuration {#gateway}
 
 You can enable ExtProc for all a Gateway. This way, the ExtProc configuration applies to all the routes that the Gateway serves.
@@ -412,7 +417,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
        ],
    ...
    ```
-   
+-->  
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}

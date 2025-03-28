@@ -30,6 +30,7 @@ Review the policies that you can configure in {{< reuse "docs/snippets/product-n
 | -- | -- | 
 | [Access logging](/docs/security/access-logging) | HTTPListenerPolicy |
 | [Direct response](/docs/traffic-management/direct-response/) | DirectResponse | 
+| [External processing (ExtProc)](/docs/traffic-management/extproc/) | TrafficPolicy | 
 | [Local rate limiting](/docs/security/local-ratelimit/) | TrafficPolicy | 
 | [Transformations](/docs/traffic-management/transformations) | TrafficPolicy | 
 
