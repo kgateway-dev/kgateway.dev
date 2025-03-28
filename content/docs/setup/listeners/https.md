@@ -1,6 +1,6 @@
 ---
 title: HTTPS listeners
-weight: 20
+weight: 10
 ---
 
 Create an HTTPS listener on your API gateway. Then, your API gateway listens for secured HTTPS traffic on the specified port and hostname that you configure. 
