@@ -33,7 +33,7 @@ In {{< reuse "docs/snippets/product-name.md" >}}, you use a [TrafficPolicy](/doc
 * **All routes in an HTTPRoute**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a particular HTTPRoute resource. 
 * **All routes that the Gatewy serves**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPtraffic policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](/docs/about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
+Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](/docs/about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
 
 ## Before you begin
 
@@ -194,7 +194,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
    | Setting | Description |
    | ------- | ----------- |
-   | `targetRef`| Select the Gateway that you want to apply your local rate limiting configuration to. In this example, the policy is applied to all the routes that the `http` gateway serves.  |
+   | `targetRefs`| Select the Gateway that you want to apply your local rate limiting configuration to. In this example, the policy is applied to all the routes that the `http` gateway serves.  |
    | `maxTokens` | The maximum number of tokens that are available to use.   |
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |

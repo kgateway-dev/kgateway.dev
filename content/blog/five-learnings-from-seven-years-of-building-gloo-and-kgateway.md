@@ -43,7 +43,7 @@ In kgateway, we design all of our user facing extensions based on Kubernetes CRD
 
 Another challenge was deciding between many small CRDs or one large CRD. While this may seem like a UX issue, the implications go beyond that. When updating a resource, if it includes a newer EnvoyFilter, applying the changes atomically in Kubernetes becomes difficult.
 
-For example, consider a VirtualService object and an EnvoyFilter that modifies it within a Kubernetes cluster. If both the VirtualService and EnvoyFilter are updated simultaneously, an issue may arise where the new EnvoyFilter applies to the updated VirtualService. If this results in an error, the Kubernetes validation webhook will reject the VirtualService update but still accept the EnvoyFilter. This inconsistency can leave the system in a broken state, applying an incorrect traffic policy.
+For example, consider a VirtualService object and an EnvoyFilter that modifies it within a Kubernetes cluster. If both the VirtualService and EnvoyFilter are updated simultaneously, an issue may arise where the new EnvoyFilter applies to the updated VirtualService. If this results in an error, the Kubernetes validation webhook will reject the VirtualService update but still accept the EnvoyFilter. This inconsistency can leave the system in a broken state, applying an incorrect route policy.
 
 We learned that anything requiring transactional consistency must be in the same CRD. In kgateway, we provide CRDs that allow users to extend routes via extensionRef to custom resources. Since we own these CRDs, we can maintain compatibility and resolve issues effectively.
 

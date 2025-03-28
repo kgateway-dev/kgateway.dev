@@ -76,7 +76,7 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
 
    | Setting | Description |
    | ------- | ----------- |
-   | `targetRef`| Select the Gateway to enable access logging for. The example selects the `http` gateway that you created from the sample app guide. |
+   | `targetRefs`| Select the Gateway to enable access logging for. The example selects the `http` gateway that you created from the sample app guide. |
    | `accessLog` | Configure the details for access logging. You can use multiple `fileSink` configurations for multiple outputs. The example sets up a `fileSink` for standard logging (stdout) in JSON format at `/dev/stdout`. You can also send the access logs to a `grpcService` instead of `fileSink`. |
    | `path` | The path in the gateway proxy to write access logs to, such as `/dev/stdout`. |
    | `jsonFormat` | The structured JSON format to write logs in. For more information about the JSON format dictionaries and command operators you can use, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#format-dictionaries). To format as a string, use the `stringFormat` setting instead. If you omit or leave this setting blank, the [Envoy default format string](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#default-format-string) is used. |
@@ -214,7 +214,7 @@ You can set up access logs to write to a file. The following example writes acce
 
    | Setting | Description |
    | ------- | ----------- |
-   | `targetRef`| Select the Gateway to enable access logging for. The example selects the `http` gateway that you created from the sample app guide. |
+   | `targetRefs`| Select the Gateway to enable access logging for. The example selects the `http` gateway that you created from the sample app guide. |
    | `accessLog` | Configure the details for access logging. You can use multiple `fileSink` configurations for multiple outputs. The example sets up a `fileSink` for string access logs to a text file. You can also send the access logs to a `grpcService` instead of `fileSink`. |
    | `path` | The path in the gateway proxy to write access logs to, such as `/dev/default-access-logs.txt`. Because this value is a file, make sure that the gateway you select mounts a volume with this path. |
    | `jsonFormat` | The structured JSON format to write logs in. For more information about the JSON format dictionaries and command operators you can use, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#format-dictionaries). To format as a string, use the `stringFormat` setting instead. If you omit or leave this setting blank, the [Envoy default format string](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#default-format-string) is used. |
