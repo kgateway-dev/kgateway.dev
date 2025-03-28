@@ -92,7 +92,7 @@ The following image illustrates the route delegation hierarchy:
    EOF
    ```
 
-2. Create the `child-team1` HTTPRoute resource in the `team1` namespace that matches traffic on the `/anything/team1/foo` path prefix if the `header1=val1` and `headerX=valX` request headers and the `query1=val1` and `queryX=valX` query parameters are present in the request. Requests that meet these conditions are forwarded to the httpbin app in the `team1` namespace. 
+2. Create the `child-team1` HTTPRoute resource in the `team1` namespace that matches traffic on the `/anything/team1/foo` path prefix if the `header1=val1` and `headerX=valX` request headers and the `query1=val1` and `queryX=valX` query parameters are present in the request. Requests that meet these conditions are forwarded to the httpbin app in the `team1` namespace.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -126,7 +126,7 @@ The following image illustrates the route delegation hierarchy:
    EOF
    ```
 
-3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact prefix if the `headerX=valX` request header and `queryX=valX` query parameter are present in the request. Requests that meets these conditions are forwarded to the httpbin app in the `team2` namespace. 
+3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path if the `header2=val2` request header and `query2=val2` query parameter are present in the request. Requests that meet these conditions are forwarded to the httpbin app in the `team2` namespace.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -139,7 +139,7 @@ The following image illustrates the route delegation hierarchy:
      - matches:
        - path:
            type: Exact
-           value: /anything/team2/foo
+           value: /anything/team2/bar
          headers:
          - type: Exact
            name: headerX
@@ -158,13 +158,13 @@ The following image illustrates the route delegation hierarchy:
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1 \
-   -H "host: delegation.example:8080" -H "header1: val1"
+   curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1" \
+   -H "host: delegation.example" -H "header1: val1"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -i localhost:8080/anything/team1/foo1?query1=val1 \
+   curl -i "localhost:8080/anything/team1/foo?query1=val1" \
    -H "host: delegation.example" -H "header1: val1"
    ```
    {{% /tab %}}
@@ -182,14 +182,14 @@ The following image illustrates the route delegation hierarchy:
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1&queryX=valX \
-   -H "host: delegation.example:8080" -H "header1: val1" -H "headerX: valX"
+   curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1&queryX=valX" \
+   -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -i localhost:8080/anything/team1/foo1?query1=val1&queryX=valX \
-   -H "host: delegation.example:8080" -H "header1: val1" -H "headerX: valX"
+   curl -i "localhost:8080/anything/team1/foo?query1=val1&queryX=valX" \
+   -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -210,14 +210,14 @@ The following image illustrates the route delegation hierarchy:
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2 \
-   -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"
+   curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2" \
+   -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -i localhost:8080/anything/team2/bar?queryX=valX&query2=val2 \
-   -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"
+   curl -i "localhost:8080/anything/team2/bar?queryX=valX&query2=val2" \
+   -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -235,6 +235,7 @@ The following image illustrates the route delegation hierarchy:
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
+kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
