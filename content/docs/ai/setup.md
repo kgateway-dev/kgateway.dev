@@ -61,7 +61,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
          - name: ai-monitoring
            containerPort: 9092
        service:
-         type: ClusterIP
+         type: LoadBalancer
    EOF
    ```
 
@@ -99,7 +99,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    * Deployment: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
 
    ```sh
-   kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A
+   kubectl get gateway,pods -l app.kubernetes.io/app=ai-gateway -A
    ```
    
    Example output: 
@@ -114,7 +114,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    If you see an error, check the logs of the `kgateway-ai-extension` container.
 
    ```sh
-   kubectl logs -l app.kubernetes.io/name=ai-gateway -n kgateway-system -c kgateway-ai-extension
+   kubectl logs -l app.kubernetes.io/app=ai-gateway -n kgateway-system -c kgateway-ai-extension
    ```
 
 ## Next
