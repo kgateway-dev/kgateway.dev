@@ -133,7 +133,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 1. Install the experimental channel of the Kubernetes Gateway API so that you can use TLSRoutes.
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
 1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain. 
