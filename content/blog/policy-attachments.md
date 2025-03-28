@@ -60,15 +60,15 @@ spec:
         response_flags: "%RESPONSE_FLAGS%"
         bytes_received: "%BYTES_RECEIVED%"
 ```
-Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[RoutePolicy](https://kgateway.dev/docs/reference/api/top-level/routepolicies/) API is designed to solve this use case for you.
+Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[TrafficPolicy](https://kgateway.dev/docs/reference/api/top-level/TrafficPolicies/) API is designed to solve this use case for you.
 
-The structure of a RoutePolicy is very similar to the one of an HTTPListenerPolicy, but you use the `targetRef` section to apply the policy to the routes in an HTTPRoute instead of a Gateway. 
+The structure of a TrafficPolicy is very similar to the one of an HTTPListenerPolicy, but you use the `targetRef` section to apply the policy to the routes in an HTTPRoute instead of a Gateway. 
 
 Let’s explore the following example, in which you use an Inja template to extract the value of the x-kgateway-request request header and inject that value into the `x-kgateway-response` response header. 
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
-kind: RoutePolicy
+kind: TrafficPolicy
 metadata:
   name: transformation
   namespace: helloworld

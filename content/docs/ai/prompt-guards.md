@@ -20,14 +20,14 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Reject unwanted requests
 
-Use the RoutePolicy resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
+Use the TrafficPolicy resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
 
-1. Update the RoutePolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
+1. Update the TrafficPolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
      namespace: kgateway-system
@@ -186,12 +186,12 @@ Use the RoutePolicy resource and the `promptGuard` field to deny requests to the
 
 In the next step, you instruct the AI Gateway to mask credit card numbers that are returned by the LLM.
 
-1. Add the following credit card response matcher to the RoutePolicy resource. This time, use the built-in credit card regex match instead of a custom one.
+1. Add the following credit card response matcher to the TrafficPolicy resource. This time, use the built-in credit card regex match instead of a custom one.
    
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
      namespace: kgateway-system
@@ -273,14 +273,14 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
 
 Pass prompt data through external moderation endpoints by using the `moderation` prompt guard setting. Moderation allows you to connect AI Gateway to a moderation model endpoint, which compares the request prompt input to predefined content rules.
 
-You can add the `moderation` section of any RoutePolicy resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://platform.openai.com/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
+You can add the `moderation` section of any TrafficPolicy resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://platform.openai.com/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
 
-1. Update the RoutePolicy resource to use external moderation. Now, any requests that are routed through AI Gateway pass through the OpenAI `omni-moderation-latest` moderation model. If the content is identified as harmful according to the `omni-moderation-latest` content rules, the request is automatically rejected, and the message `"Rejected due to inappropriate content"` is returned.
+1. Update the TrafficPolicy resource to use external moderation. Now, any requests that are routed through AI Gateway pass through the OpenAI `omni-moderation-latest` moderation model. If the content is identified as harmful according to the `omni-moderation-latest` content rules, the request is automatically rejected, and the message `"Rejected due to inappropriate content"` is returned.
    
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
      namespace: kgateway-system
@@ -384,7 +384,7 @@ You can add the `moderation` section of any RoutePolicy resource, either as a st
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete routepolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
+kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
 ```
 
 ## Next
