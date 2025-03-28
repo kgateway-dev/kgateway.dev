@@ -180,60 +180,112 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    EOF
    ```
 
-3. Get the IP address of your ingress gateway. 
-   ```
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
+3. Verify TLS passthrough traffic for nginx. 
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
+   1. Get the external address of the gateway proxy and save it in an environment variable.external address of the gateway proxy and save it in an environment variable.
+      ```sh 
+      export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+      echo $INGRESS_GW_ADDRESS  
+      ```
+   2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
    
-4. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
+      * **Load balancer IP**: 
+        ```shell
+        curl -vik --resolve "nginx.example.com:8443:${INGRESS_GW_ADDRESS}" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
+        ```
    
-   * **Load balancer IP**: 
-     ```shell
-     curl -vik --resolve "nginx.example.com:8443:${INGRESS_GW_ADDRESS}" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
-     ```
+      * **Load balancer hostname**: 
+        ```shell
+        curl -vik --resolve "nginx.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
+        ```
+        
+      Example output: 
+      ```console
+      * Request completely sent off
+      < HTTP/1.1 200 OK
+      HTTP/1.1 200 OK
+      < Server: nginx/1.27.4
+      Server: nginx/1.27.4
+      ...
+      < 
+
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <title>Welcome to nginx!</title>
+      <style>
+      html { color-scheme: light dark; }
+      body { width: 35em; margin: 0 auto;
+      font-family: Tahoma, Verdana, Arial, sans-serif; }
+      </style>
+      </head>
+      <body>
+      <h1>Welcome to nginx!</h1>
+      <p>If you see this page, the nginx web server is successfully installed and
+      working. Further configuration is required.</p>
+
+      <p>For online documentation and support please refer to
+      <a href="http://nginx.org/">nginx.org</a>.<br/>
+      Commercial support is available at
+      <a href="http://nginx.com/">nginx.com</a>.</p>
+
+      <p><em>Thank you for using nginx.</em></p>
+      </body>
+      </html>
+      * Connection #0 to host nginx.example.com left intact
+      ```
+   {{% /tab %}}
+   {{% tab %}}
+   1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
+      ```sh
+      kubectl port-forward deployment/tls-passthrough -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:8443
+      ```
+   2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
+      ```sh
+      curl -vik localhost:8443/ --cacert example_certs/example.com.crt -H "host: nginx.example.com" 
+      ```
+      
+      Example output: 
+      ```console
+      * Request completely sent off
+      < HTTP/1.1 200 OK
+      HTTP/1.1 200 OK
+      < Server: nginx/1.27.4
+      Server: nginx/1.27.4
+      ...
+      < 
+
+      <!DOCTYPE html>
+      <html>
+      <head>
+      <title>Welcome to nginx!</title>
+      <style>
+      html { color-scheme: light dark; }
+      body { width: 35em; margin: 0 auto;
+      font-family: Tahoma, Verdana, Arial, sans-serif; }
+      </style>
+      </head>
+      <body>
+      <h1>Welcome to nginx!</h1>
+      <p>If you see this page, the nginx web server is successfully installed and
+      working. Further configuration is required.</p>
+
+      <p>For online documentation and support please refer to
+      <a href="http://nginx.org/">nginx.org</a>.<br/>
+      Commercial support is available at
+      <a href="http://nginx.com/">nginx.com</a>.</p>
+
+      <p><em>Thank you for using nginx.</em></p>
+      </body>
+      </html>
+      * Connection #0 to host nginx.example.com left intact
+      ```
+      
+   {{% /tab %}}
+   {{< /tabs >}}
    
-   * **Load balancer hostname**: 
-     ```shell
-     curl -vik --resolve "nginx.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://nginx.example.com:8443/
-     ```
    
-   Example output: 
-   ```
-   * Request completely sent off
-   < HTTP/1.1 200 OK
-   HTTP/1.1 200 OK
-   < Server: nginx/1.27.4
-   Server: nginx/1.27.4
-   ...
-   < 
-
-   <!DOCTYPE html>
-   <html>
-   <head>
-   <title>Welcome to nginx!</title>
-   <style>
-   html { color-scheme: light dark; }
-   body { width: 35em; margin: 0 auto;
-   font-family: Tahoma, Verdana, Arial, sans-serif; }
-   </style>
-   </head>
-   <body>
-   <h1>Welcome to nginx!</h1>
-   <p>If you see this page, the nginx web server is successfully installed and
-   working. Further configuration is required.</p>
-
-   <p>For online documentation and support please refer to
-   <a href="http://nginx.org/">nginx.org</a>.<br/>
-   Commercial support is available at
-   <a href="http://nginx.com/">nginx.com</a>.</p>
-
-   <p><em>Thank you for using nginx.</em></p>
-   </body>
-   </html>
-   * Connection #0 to host nginx.example.com left intact
-   ```
-
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
