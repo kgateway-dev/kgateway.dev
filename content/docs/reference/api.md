@@ -17,7 +17,7 @@ weight: 10
 - [GatewayParameters](#gatewayparameters)
 - [HTTPListenerPolicy](#httplistenerpolicy)
 - [ListenerPolicy](#listenerpolicy)
-- [RoutePolicy](#routepolicy)
+- [TrafficPolicy](#TrafficPolicy)
 
 
 
@@ -67,7 +67,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: openai
-  aiRoutePolicy:
+  aiTrafficPolicy:
       promptEnrichment:
         prepend:
         - role: SYSTEM
@@ -80,7 +80,7 @@ spec:
 
 
 _Appears in:_
-- [AIRoutePolicy](#airoutepolicy)
+- [AITrafficPolicy](#aiTrafficPolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -119,7 +119,7 @@ promptGuard:
 
 
 _Appears in:_
-- [AIRoutePolicy](#airoutepolicy)
+- [AITrafficPolicy](#aiTrafficPolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -127,11 +127,11 @@ _Appears in:_
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
 
 
-#### AIRoutePolicy
+#### AITrafficPolicy
 
 
 
-AIRoutePolicy config is used to configure the behavior of the LLM provider
+AITrafficPolicy config is used to configure the behavior of the LLM provider
 on the level of individual routes. These route settings, such as prompt enrichment,
 retrieval augmented generation (RAG), and semantic caching, are applicable only
 for routes that send requests to an LLM provider backend.
@@ -139,7 +139,7 @@ for routes that send requests to an LLM provider backend.
 
 
 _Appears in:_
-- [RoutePolicySpec](#routepolicyspec)
+- [TrafficPolicySpec](#TrafficPolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -693,7 +693,7 @@ Note: The `field` values correspond to keys in the JSON request body, not fields
 
 
 _Appears in:_
-- [AIRoutePolicy](#airoutepolicy)
+- [AITrafficPolicy](#aiTrafficPolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1156,7 +1156,7 @@ You can target only one object at a time.
 _Appears in:_
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
 - [ListenerPolicySpec](#listenerpolicyspec)
-- [RoutePolicySpec](#routepolicyspec)
+- [TrafficPolicySpec](#TrafficPolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1331,7 +1331,7 @@ _Appears in:_
 _Appears in:_
 - [HTTPListenerPolicy](#httplistenerpolicy)
 - [ListenerPolicy](#listenerpolicy)
-- [RoutePolicy](#routepolicy)
+- [TrafficPolicy](#TrafficPolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1480,7 +1480,7 @@ _Appears in:_
 | `flags` _string array_ |  |  | MinItems: 1 <br /> |
 
 
-#### RoutePolicy
+#### TrafficPolicy
 
 
 
@@ -1493,15 +1493,15 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
-| `kind` _string_ | `RoutePolicy` | | |
+| `kind` _string_ | `TrafficPolicy` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `spec` _[RoutePolicySpec](#routepolicyspec)_ |  |  |  |
+| `spec` _[TrafficPolicySpec](#TrafficPolicyspec)_ |  |  |  |
 | `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
 
-#### RoutePolicySpec
+#### TrafficPolicySpec
 
 
 
@@ -1510,12 +1510,12 @@ _Appears in:_
 
 
 _Appears in:_
-- [RoutePolicy](#routepolicy)
+- [TrafficPolicy](#TrafficPolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `ai` _[AIRoutePolicy](#airoutepolicy)_ |  |  |  |
+| `ai` _[AITrafficPolicy](#aiTrafficPolicy)_ |  |  |  |
 | `transformation` _[TransformationPolicy](#transformationpolicy)_ |  |  |  |
 
 
@@ -1528,7 +1528,7 @@ RouteType is the type of route to the LLM provider API.
 
 
 _Appears in:_
-- [AIRoutePolicy](#airoutepolicy)
+- [AITrafficPolicy](#aiTrafficPolicy)
 
 | Field | Description |
 | --- | --- |
@@ -1763,7 +1763,7 @@ These modifications can be performed on the request and response paths.
 
 
 _Appears in:_
-- [RoutePolicySpec](#routepolicyspec)
+- [TrafficPolicySpec](#TrafficPolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |

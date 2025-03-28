@@ -48,7 +48,7 @@ A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) al
 <!--
 
 {{% callout type="info" %}}
-{{< reuse "docs/snippets/product-name-caps.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a RouteOption resource in `namespace1` and a Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
+{{< reuse "docs/snippets/product-name-caps.md" >}} custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a TrafficPolicy resource in `namespace1` and a Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a {{< reuse "docs/snippets/product-name.md" >}} resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
 {{% /callout %}}-->
 
 ## Kgateway resources {#kgateway}
@@ -70,7 +70,7 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 * [**DirectResponse**](/docs/traffic-management/direct-response/): Directly respond to incoming requests with a custom HTTP response code and body.
 * [**HTTPListenerPolicy**](/docs/about/policies/httplisteneroption/): Apply policies to all HTTP and HTTPS listeners.
-* [**RoutePolicy**](/docs/about/policies/routepolicy/): Attach policies to routes in an HTTPRoute resource.
+* [**TrafficPolicy**](/docs/about/policies/TrafficPolicy/): Attach policies to routes in an HTTPRoute resource.
 
 ### Backends
 
