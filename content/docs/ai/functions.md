@@ -45,8 +45,8 @@ sequenceDiagram
 4. The Gateway forwards the request to the LLM.
 5. Based on this conversation, the LLM suggests to call the `get_weather` function and includes the required parameters of date and location to use that function. The LLM might get these parameters by using the chat history, asking the end user to provide them, or by suggesting other functions to call before calling the `get_weather` function.
 6. The Gateway returns this suggestion to the App.
-7. The App executes the `get_weather` function with the required parameters to get the current weather for today in the location, such as Columbus, OH.
-8. The App returns the current weather for todayin Columbus, OH.
+7. The App executes the `get_weather` function with the required parameters to get the current weather in the location, such as Columbus, OH.
+8. The App returns the current weather in Columbus, OH.
 9. The Gateway forwards the function result to the LLM.
 10. The LLM uses the real-time function result from the App in a natural language response and returns this response to the Gateway. 
 11. The Gateway then forwards the response to the end user.
