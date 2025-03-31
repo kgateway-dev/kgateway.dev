@@ -1,6 +1,6 @@
 ---
 title: Model failover
-weight: 20
+weight: 30
 ---
 
 Prioritize the failover of requests across different models from an LLM provider.
@@ -166,5 +166,8 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 
 ## Next
 
-* Explore how to set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
+Explore other AI Gateway features.
+
+* Pass in [functions](/docs/ai/functions/) to an LLM to request as a step towards agentic AI.
+* Set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
 * [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
