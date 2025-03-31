@@ -14,12 +14,12 @@ Bring your own external authorization service to protect requests that go throug
 sequenceDiagram
     participant Client
     participant Gateway
-    participant Ext Auth Service
+    participant Ext Auth
     participant Backend
 
     Client->>Gateway: 1. HTTP Request
-    Gateway->>Ext Auth Service: 2. Authorization Request
-    Ext Auth Service-->>Gateway: 3. Authorization Decision
+    Gateway->>Ext Auth: 2. Authorization Request
+    Ext Auth-->>Gateway: 3. Authorization Decision
     
     alt Authorized
         Gateway->>Backend: 4. Forward Request
@@ -31,8 +31,8 @@ sequenceDiagram
 ```
 
 1. The Client sends a request to the Gateway.
-2. The Gateway forwards the request to the Ext Auth Service.
-3. The Ext Auth Service makes a decision as to whether the request is authorized, based on headers, parameters, or other credentials.
+2. The Gateway forwards the request to the Ext Auth service.
+3. The Ext Auth service makes a decision as to whether the request is authorized, based on headers, parameters, or other credentials.
 4. If authorized, the Gateway forwards the request to the Backend app, which then sends back a response to the Client through the Gateway.
 5. If not authorized, the Gateway rejects the request and by default returns a 403 Forbidden response to the Client.
 
@@ -42,13 +42,13 @@ sequenceDiagram
 
 ## Bring your own external authorization service {#byo-ext-auth}
 
-First, deploy your own external authorization service as a backend service that is accessible to {{< reuse "docs/snippets/product-name.md" >}}. To do so, you configure a custom GatewayExtension resource that points to your external auth service via gRPC.
+First, deploy your own external authorization service as a backend service that is accessible to {{< reuse "docs/snippets/product-name.md" >}}. To do so, you configure a custom GatewayExtension resource that points to your external authorization service via gRPC.
 
 {{< callout type="info" >}}
 Keep in mind that your external authorization service must conform to the [Envoy external auth proto](https://github.com/envoyproxy/envoy/blob/main/api/envoy/service/auth/v3/external_auth.proto). The external authorization service also configures the conditions for authorizing a request, such as the inclusion of a certain header or other credentials.
 {{< /callout >}}
 
-1. Deploy your external authorization service. The following example uses the [Istio external auth service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes.
+1. Deploy your external authorization service. The following example uses the [Istio external authorization service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes. This service is configured to allow requests with the `x-ext-authz: allow` header.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -108,7 +108,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
    kind: GatewayExtension
    metadata:
      namespace: kgateway-system
-     name: basic-extauth
+     name: basic-ext-auth
      labels:
        app: ext-authz
    spec:
@@ -123,9 +123,9 @@ Keep in mind that your external authorization service must conform to the [Envoy
 
 ## Create external auth policy {#create-policy}
 
-You can apply policy at two levels: the Gateway level or the HTTPRoute level. If you apply policy at both levels, the request must pass both policies to be authorized.
+You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply policy at both levels, the request must pass both policies to be authorized.
 
-1. Send a test request to the httpbin sample app to verify that you do not need authorization.
+1. Send a test request to the httpbin sample app.  Verify that you get back a 200 HTTP response code and that no authorization is required.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -147,7 +147,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    ...
    ```
 
-2. Create a TrafficPolicy that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Note that the TrafficPolicy is created in the same namespace as the targeted resource.
+2. Create a TrafficPolicy that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Create the TrafficPolicy in the same namespace as the targeted resource.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -155,7 +155,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    kind: TrafficPolicy
    metadata:
      namespace: kgateway-system
-     name: gateway-extauth-policy
+     name: gateway-ext-auth-policy
      labels:
        app: ext-authz
    spec:
@@ -165,7 +165,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
        name: http
      extAuth:
        extensionRef: 
-         name: basic-extauth
+         name: basic-ext-auth
    EOF
    ```
 
@@ -184,7 +184,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output: Note the 403 Forbidden response, along with the special `x-ext-authz*` headers that the Istio external auth service adds to the request to explain the decision.
+   Example output: Note the 403 Forbidden response, along with the special `x-ext-authz*` headers that the Istio external authorization service adds to the request to explain the decision.
    
    ```txt
    HTTP/1.1 403 Forbidden
@@ -199,7 +199,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    denied by ext_authz for not found header `x-ext-authz: allow` in the request
    ```
 
-4. Send another request, this time with the `x-ext-authz: allow` header. The Istio external auth service is configured to allow requests with this header.
+4. Send another request, this time with the `x-ext-authz: allow` header. The Istio external authorization service is configured to allow requests with this header. Therefore, the request succeeds.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
@@ -214,7 +214,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output: Note that the request succeeds, and the response includes several `X-Ext-Authz*` headers to explain the decision.
+   Example output: Note that the 200 response with several `X-Ext-Authz*` headers that explain the decision.
 
    ```txt
    HTTP/1.1 200 OK
@@ -271,7 +271,7 @@ You can apply policy at two levels: the Gateway level or the HTTPRoute level. If
    kind: TrafficPolicy
    metadata:
      namespace: httpbin
-     name: route-extauth-policy
+     name: route-ext-auth-policy
      labels:
        app: ext-authz
    spec:
