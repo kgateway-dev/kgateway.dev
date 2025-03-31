@@ -53,12 +53,12 @@ Add headers to incoming requests before they are sent back to the client. If the
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/response-headers -H "host: headers.example"
+curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -131,12 +131,12 @@ Setting headers is similar to adding headers. If the response does not include t
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/response-headers -H "host: headers.example"
+curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -171,12 +171,12 @@ You can remove HTTP headers from a response before the response is sent back to 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/response-headers -H "host: www.example.com"
+curl -vi localhost:8080/response-headers -H "host: www.example.com"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -239,12 +239,12 @@ curl -vik localhost:8080/response-headers -H "host: www.example.com"
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/reesponse-headers -H "host: headers.example"
+curl -vi localhost:8080/reesponse-headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}

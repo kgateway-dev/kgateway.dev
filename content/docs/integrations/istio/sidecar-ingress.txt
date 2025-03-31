@@ -170,12 +170,12 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://${INGRESS_GW_ADDRESS}:8080/headers -H "host: www.example.com:8080"
+   curl -vi http://${INGRESS_GW_ADDRESS}:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -vik localhost:8080/headers -H "host: www.example.com"
+   curl -vi localhost:8080/headers -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -262,13 +262,13 @@ You can exclude a service from requiring to communicate with the gateway proxy v
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://${INGRESS_GW_ADDRESS}:8080/headers \
+   curl -vi http://${INGRESS_GW_ADDRESS}:8080/headers \
     -H "host:disable-automtls.example:8080"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -vik localhost:8080/headers 
+   curl -vi localhost:8080/headers 
     -H "host: disable-automtls.example"
    ```
    {{% /tab %}}
@@ -301,13 +301,13 @@ You can exclude a service from requiring to communicate with the gateway proxy v
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://${INGRESS_GW_ADDRESS}:8080/headers \
+   curl -vi http://${INGRESS_GW_ADDRESS}:8080/headers \
     -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -vik localhost:8080/headers 
+   curl -vi localhost:8080/headers 
     -H "host: www.example.com"
    ```
    {{% /tab %}}

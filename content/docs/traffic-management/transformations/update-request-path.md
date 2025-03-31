@@ -66,14 +66,14 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "foo: bar" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get \
+   curl -vi localhost:8080/get \
    -H "foo: bar" \
    -H "host: www.example.com" \
    ```
@@ -132,13 +132,13 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get \
+   curl -vi localhost:8080/get \
    -H "host: www.example.com" \
    ```
    {{% /tab %}}

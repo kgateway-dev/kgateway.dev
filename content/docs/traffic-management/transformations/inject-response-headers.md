@@ -65,14 +65,14 @@ The following example walks you through how to use an Inja template to extract a
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-solo-request: my custom request header" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/response-headers \
+   curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
    -H "x-solo-request: my custom request header"
    ```

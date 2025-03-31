@@ -1,6 +1,6 @@
 ---
 title: Argo Rollouts
-weight: 510
+weight: 10
 description: Use kgateway with Argo Rollouts. 
 ---
 
@@ -220,7 +220,7 @@ description: Use kgateway with Argo Rollouts.
    
    4. Send a request to the `rollouts-demo` app and verify that you see the `ver: 1.0` response from the stable service.
       ```sh
-      curl -vik localhost:8080/callme -H "host: demo.example.com"
+      curl -vi localhost:8080/callme -H "host: demo.example.com"
       ```
 
       Example output: 

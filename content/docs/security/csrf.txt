@@ -61,11 +61,11 @@ Use a VirtualHostOption resource to define your CSRF rules.
 2. Send a request to the httpbin app. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
    * **LoadBalancer IP address or hostname**
      ```sh
-     curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080"
+     curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080"
      ```
    * **Port-forward for local testing**
      ```sh
-     curl -vik -X POST localhost:8080/post -H "host: www.example.com"
+     curl -vi -X POST localhost:8080/post -H "host: www.example.com"
      ```
    
    Example output: 
@@ -86,11 +86,11 @@ Use a VirtualHostOption resource to define your CSRF rules.
 3. Send another request to the httpbin app. This time, you include the `allowThisOne.solo.io` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
    * **LoadBalancer IP address or hostname**
      ```sh
-     curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080" -H "origin: allowThisOne.solo.io"
+     curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080" -H "origin: allowThisOne.solo.io"
      ```
    * **Port-forward for local testing**
      ```sh
-     curl -vik -X POST localhost:8080/post -H "host: www.example.com" -H "origin: allowThisOne.solo.io"
+     curl -vi -X POST localhost:8080/post -H "host: www.example.com" -H "origin: allowThisOne.solo.io"
      ```
      
    Example output: 
@@ -195,11 +195,11 @@ Use a TrafficPolicy resource to define your CSRF rules.
 3. Send a request to the httpbin app on the `csrf.example` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
    * **LoadBalancer IP address or hostname**
      ```sh
-     curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080"
+     curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080"
      ```
    * **Port-forward for local testing**
      ```sh
-     curl -vik -X POST localhost:8080/post -H "host: csrf.example"
+     curl -vi -X POST localhost:8080/post -H "host: csrf.example"
      ```
    
    Example output: 
@@ -220,11 +220,11 @@ Use a TrafficPolicy resource to define your CSRF rules.
 4. Send another request to the httpbin app. This time, you include the `allowThisOne.solo.io` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
    * **LoadBalancer IP address or hostname**
      ```sh
-     curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080" -H "origin: allowThisOne.solo.io"
+     curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080" -H "origin: allowThisOne.solo.io"
      ```
    * **Port-forward for local testing**
      ```sh
-     curl -vik -X POST localhost:8080/post -H "host: csrf.example" -H "origin: allowThisOne.solo.io"
+     curl -vi -X POST localhost:8080/post -H "host: csrf.example" -H "origin: allowThisOne.solo.io"
      ```
      
    Example output: 

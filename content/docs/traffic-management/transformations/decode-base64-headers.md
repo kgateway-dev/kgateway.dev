@@ -80,14 +80,14 @@ In the following example, you combine multiple Inja functions to accomplish the 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/response-headers \
+   curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
    -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
