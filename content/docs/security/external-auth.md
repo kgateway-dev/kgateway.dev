@@ -123,7 +123,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
 
 ## Create external auth policy {#create-policy}
 
-You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply policy at both levels, the request must pass both policies to be authorized.
+You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply the policy at both levels, the request must pass both policies to be authorized.
 
 1. Send a test request to the httpbin sample app.  Verify that you get back a 200 HTTP response code and that no authorization is required.
 
