@@ -2,11 +2,14 @@
 title: Inference Extension
 weight: 10
 description: Use kgateway with the Inference Extension project.
+next: /docs/integrations/istio/
 ---
 
 Use {{< reuse "docs/snippets/product-name.md" >}} with the Kubernetes Gateway API [Inference Extension project](https://gateway-api-inference-extension.sigs.k8s.io/). This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
 
 ## About Inference Extension {#about}
+
+The Inference Extension project extends the Gateway API with two key resources, an InferencePool and an InferenceModel, as shown in the following diagram.
 
 ```mermaid
 graph TD
@@ -22,8 +25,11 @@ graph TD
     end
 ```
 
-## Kgateway with Inference Extension {#kgateway}
+The InferencePool groups together InferenceModels of LLM workloads into a routable backend resource that the Gateway API can route inference requests to. An InferenceModel represents not just a single LLM model, but a specific configuration including information such as as the version and criticality. The InferencePool uses this information to ensure fair consumption of compute resources across competing LLM workloads and share routing decisions to the Gateway API.
 
+### Kgateway with Inference Extension {#kgateway}
+
+{{< reuse "docs/snippets/product-name-caps.md" >}} integrates with the Inference Extension as a supported Gateway API provider. This way, a {{< reuse "docs/snippets/product-name.md" >}}-created Gateway can route requests to InferencePools, as shown in the following diagram.
 
 ```mermaid
 graph TD
@@ -43,9 +49,11 @@ graph TD
     end
 ```
 
+The Client sends an inference request to get a response from a local LLM workload. The Gateway receives the request and routes to the InferencePool as a backend. Then, the InferencePool selects a specific InferenceModel to route the request to, based on criteria such as the leads-loaded model or highest criticality based. The Gateway can then return the response to the Client.
+
 ## Setup steps {#setup}
 
-Refer to the **Getting started** guide in the Inference Extension docs.
+Refer to the **{{< reuse "docs/snippets/product-name-caps.md" >}}** tabs in the **Getting started** guide in the Inference Extension docs.
 
 {{< cards >}}
   {{< card link="https://gateway-api-inference-extension.sigs.k8s.io/guides/" title="Inference Extension docs" icon="external-link">}}

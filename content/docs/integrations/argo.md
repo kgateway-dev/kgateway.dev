@@ -1,6 +1,6 @@
 ---
 title: Argo Rollouts
-weight: 510
+weight: 10
 description: Use kgateway with Argo Rollouts. 
 ---
 

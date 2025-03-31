@@ -1,6 +1,6 @@
 ---
 title: ExternalDNS and cert-manager
-weight: 520
+weight: 10
 ---
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) and [cert-manager](https://github.com/cert-manager/cert-manager) are two well-known integrations within the Kubernetes ecosystem that can be used in conjunction to automate the creation of TLS certificates. 
