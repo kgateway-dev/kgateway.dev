@@ -154,7 +154,7 @@ Create a Backend that represents your EC2 instance.
        region: $AWS_REGION
        auth:
          type: Secret
-         secret:
+         secretRef:
            name: gateway-tag-group1
    EOF
    ```
