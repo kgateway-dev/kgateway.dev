@@ -243,7 +243,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
       ```
    2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
       ```sh
-      curl -vik localhost:8443/ --cacert example_certs/example.com.crt -H "host: nginx.example.com" 
+      curl -vi --cacert example_certs/example.com.crt --resolve "nginx.example.com:8443:127.0.0.1" https://nginx.example.com:8443
       ```
       
       Example output: 
