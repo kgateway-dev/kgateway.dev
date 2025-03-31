@@ -66,13 +66,13 @@ The following example walks you through how to use an Inja template to find spec
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik "http://$INGRESS_GW_ADDRESS:8080/anything?foo=foo-value&bar=bar-value" \
+   curl -vi "http://$INGRESS_GW_ADDRESS:8080/anything?foo=foo-value&bar=bar-value" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik "localhost:8080/anything?foo=foo-value&bar=bar-value" \
+   curl -vi "localhost:8080/anything?foo=foo-value&bar=bar-value" \
    -H "host: www.example.com"
    ```
    {{% /tab %}}

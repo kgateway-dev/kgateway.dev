@@ -63,12 +63,12 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get -H "host: path.redirect.example"
+   curl -vi localhost:8080/get -H "host: path.redirect.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -90,12 +90,12 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get/headers -H "host: path.redirect.example"
+   curl -vi localhost:8080/get/headers -H "host: path.redirect.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -161,12 +161,12 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get -H "host: path.redirect.example"
+   curl -vi localhost:8080/get -H "host: path.redirect.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -188,12 +188,12 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get/headers -H "host: path.redirect.example"
+   curl -vi localhost:8080/get/headers -H "host: path.redirect.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}

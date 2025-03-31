@@ -148,12 +148,12 @@ In this guide you walk through a basic route delegation example that demonstrate
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/anything/team1/bar -H "host: delegation.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/team1/bar -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/anything/team1/bar -H "host: delegation.example"
+   curl -vi localhost:8080/anything/team1/bar -H "host: delegation.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}

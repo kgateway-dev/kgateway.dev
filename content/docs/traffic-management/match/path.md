@@ -43,12 +43,12 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: match.example"
+   curl -vi localhost:8080/status/200 -H "host: match.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -76,12 +76,12 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/headers -H "host: match.example"
+   curl -vi localhost:8080/headers -H "host: match.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}

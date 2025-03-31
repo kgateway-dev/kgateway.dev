@@ -85,12 +85,12 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: mydomain.com:8080" 
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: mydomain.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: mydomain.com"
+   curl -vi localhost:8080/status/200 -H "host: mydomain.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}

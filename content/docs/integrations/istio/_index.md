@@ -1,6 +1,6 @@
 ---
 title: Istio
-weight: 600
+weight: 10
 description: 
 ---
 
