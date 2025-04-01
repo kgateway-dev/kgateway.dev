@@ -1,6 +1,6 @@
 ---
 title: Sidecar
-weight: 
+weight: 10
 descriptin: Use kgateway as a gateway proxy in an Istio sidecar mesh. 
 ---
 
