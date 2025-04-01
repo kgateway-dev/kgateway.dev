@@ -10,6 +10,7 @@ Integrate {{< reuse "docs/snippets/product-name.md" >}} with common cloud-native
   {{< card link="argo" title="Argo Rollouts" >}}
   {{< card link="aws-elb" title="AWS ELBs" >}}
   {{< card link="external-dns-cert-manager" title="ExternalDNS & Cert Manager"  >}}
+  {{< card link="inference-extension" title="Inference Extension to the Gateway API"  >}}
   {{< card link="istio" title="Ingress to service meshes"  >}}
   {{< card link="/docs/reference/helm/" title="Helm"  >}}
   {{< card link="/docs/quickstart/" title="Kubernetes"  >}}
