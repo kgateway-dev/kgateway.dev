@@ -51,7 +51,7 @@ Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enabl
    open {{< reuse "docs/snippets/product-name.md" >}}.yaml
    ```
    
-2. Add the following values to the Helm value file to enable the Istio integration in {{< reuse "docs/snippets/product-name.md" >}}.
+2. Add the following values to the Helm values file to enable the Istio integration in {{< reuse "docs/snippets/product-name.md" >}}.
    ```yaml
    controller:
      extraEnv:
