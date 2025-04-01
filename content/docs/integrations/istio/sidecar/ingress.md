@@ -102,7 +102,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      kube: 
        istio:
