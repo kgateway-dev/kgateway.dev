@@ -74,7 +74,7 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 
 #### 🧠 KRT-based control plane {#control-plane}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} uses a **brand new control plane** architecture built on the [Kubernetes Runtime Toolkit (KRT)](https://github.com/kubernetes-sigs/kubebuilder). Benefits include:
+{{< reuse "docs/snippets/product-name-caps.md" >}} uses a **brand new control plane** architecture built on the [Kubernetes Declarative Controller Runtime (`krt`)](https://github.com/istio/istio/blob/master/pkg/kube/krt/README.md). Benefits include:
 
 - Improved controller performance and scalability
 - Cleaner reconciliation and modular plugin framework
