@@ -12,7 +12,7 @@ The following example walks you through how to use an Inja template to extract a
 
 ## Inject response headers
    
-1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.
+1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-kgateway-request` request header and populate the value of that header into an `x-kgateway-response` response header.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -25,8 +25,8 @@ The following example walks you through how to use an Inja template to extract a
      transformation:
        response:
          set:
-         - name: x-solo-response
-           value: '{{ request_header("x-solo-request") }}' 
+         - name: x-kgateway-response
+           value: '{{ request_header("x-kgateway-request") }}' 
    EOF
    ```
 
@@ -60,30 +60,30 @@ The following example walks you through how to use an Inja template to extract a
    EOF
    ```
 
-3. Send a request to the httpbin app and include the `x-solo-request` request header.
+3. Send a request to the httpbin app and include the `x-kgateway-request` request header.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
-    -H "x-solo-request: my custom request header" 
+    -H "x-kgateway-request: my custom request header" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
-   -H "x-solo-request: my custom request header"
+   -H "x-kgateway-request: my custom request header"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    In the example output, verify the following:
    
-   * The `x-solo-request` request header is included in the request.
+   * The `x-kgateway-request` request header is included in the request.
    * The request is successful and returns a 200 HTTP response code.
-   * The `x-solo-response` response header is included in the response and has the same value as the `x-solo-request` request header.
+   * The `x-kgateway-response` response header is included in the response and has the same value as the `x-kgateway-request` request header.
 
    ```yaml {linenos=table,hl_lines=[10,14,32],linenostart=1}
    * Host <host-address>:8080 was resolved.
@@ -95,7 +95,7 @@ The following example walks you through how to use an Inja template to extract a
    > Host: www.example.com
    > User-Agent: curl/8.7.1
    > Accept: */*
-   > x-solo-request: my custom request header
+   > x-kgateway-request: my custom request header
    > 
    * Request completely sent off
    < HTTP/1.1 200 OK
@@ -116,8 +116,8 @@ The following example walks you through how to use an Inja template to extract a
    server: envoy
    < x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
    x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
-   < x-solo-response: my custom request header
-   x-solo-response: my custom request header
+   < x-kgateway-response: my custom request header
+   x-kgateway-response: my custom request header
    ```
    
 ## Cleanup

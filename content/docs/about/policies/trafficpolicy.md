@@ -31,8 +31,8 @@ spec:
   transformation:
     response:
       set:
-      - name: x-solo-response
-        value: '{{ request_header("x-solo-request") }}' 
+      - name: x-kgateway-response
+        value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
 ### Option 2: Attach the policy to an individual route (`ExtensionRef`)
@@ -51,8 +51,8 @@ spec:
   transformation:
     response:
       set:
-      - name: x-solo-response
-        value: '{{ request_header("x-solo-request") }}' 
+      - name: x-kgateway-response
+        value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
 To apply the policy to a particular route, you use the `ExtensionRef` filter on the desired HTTPRoute route. In the following example, the TrafficPolicy is applied to the `/anything/path1` route. However, it is not applied to the `/anything/path2` path.   
