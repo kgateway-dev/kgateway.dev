@@ -10,8 +10,12 @@ Learn about the different {{< reuse "docs/snippets/product-name.md" >}} and Kube
 
 The GatewayClass is a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}-native resource that defines the controller that spins up and configures gateway proxies in your environment. 
 
-When you install {{< reuse "docs/snippets/product-name.md" >}}, a default GatewayClass resource is automatically created with the following configuration. 
+When you install {{< reuse "docs/snippets/product-name.md" >}}, two default GatewayClass resources are automatically created with the following configuration. 
 
+{{< tabs items="kgateway,kgateway-waypoint">}}
+
+{{% tab %}}
+The `kgateway` GatewayClass is the standard class that you use for most Gateways.
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
@@ -19,13 +23,23 @@ metadata:
   name: kgateway
 spec:
   controllerName: kgateway.dev/kgateway
-  description: KGateway Controller
-  parametersRef:
-    group: gateway.kgateway.dev
-    kind: GatewayParameters
-    name: kgateway
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  description: Standard class for managing Gateway API ingress traffic.
 ```
+{{% /tab %}}
+
+{{% tab %}}
+The `kgateway-waypoint` GatewayClass is for when you use {{< reuse "docs/snippets/product-name.md" >}} as a waypoint in an Istio Ambient service mesh setup.
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: kgateway-waypoint
+spec:
+  controllerName: kgateway.dev/kgateway
+  description: Specialized class for Istio ambient mesh waypoint proxies.
+```
+{{% /tab %}}
+{{< /tabs >}}
 
 The `kgateway.dev/kgateway` controller implements the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and provides an abstraction of the gateway's underlying infrastructure. The controller watches the resources in your cluster. When a Gateway resource is created that references this GatewayClass, the controller spins up an Envoy-based gateway proxy by using the configuration that is defined in the GatewayParameters resource. The controller also translates other resources, such as HTTPRoute, TrafficPolicy, HTTPListenerPolicy, and more, into valid Envoy configuration, and applies the configuration to the gateway proxies it manages. 
 

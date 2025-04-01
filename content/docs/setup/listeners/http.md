@@ -7,6 +7,14 @@ Create an HTTP listener on your API gateway. Then, your API gateway listens for 
 
 Next, you set up an HTTPRoute resource to route requests through the gateway to backing services in your cluster. HTTPRoutes can refer to any gateway independent of the namespace they are in.
 
+## Before you begin
+
+1. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}}.
+
+2. Deploy a [sample httpbin app](/docs/operations/sample-app/#deploy-app).
+
+## Set up an HTTP listener {#setup-http}
+
 1. Create a gateway resource with an HTTP listener. 
    ```yaml
    kubectl apply -f- <<EOF

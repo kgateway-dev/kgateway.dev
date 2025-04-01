@@ -16,12 +16,8 @@ The configuration that is used to spin up a gateway proxy is stored in several c
 
 The example in this guide uses the GatewayParameters resource to change settings on the gateway proxy. To find other customization examples, see the [Gateway customization guides](/docs/setup/customize/).
 
-1. Optional: Review the default configuration for your gateway proxies. This configuration can help you identify the settings that you want to change or add. 
-   ```sh
-   kubectl get gatewayparameters kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
-   ```
-
-2. Create a GatewayParameters resource to add any custom settings to the gateway. The following example makes the following changes: 
+1. Create a GatewayParameters resource to add any custom settings to the gateway. The following example makes the following changes: 
+   
    * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`). 
    * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`). 
    * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
@@ -53,7 +49,8 @@ The example in this guide uses the GatewayParameters resource to change settings
    EOF
    ```
 
-3. Create a Gateway resource that references your custom GatewayParameters. 
+2. Create a Gateway resource that references your custom GatewayParameters. 
+   
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -78,7 +75,8 @@ The example in this guide uses the GatewayParameters resource to change settings
    EOF
    ```
 
-4. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
+3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
+   
    ```sh
    kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
@@ -88,6 +86,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    {{< /callout >}}
    
    Example output:
+   
    ```yaml {linenos=table,hl_lines=[13,20,21,22],linenostart=1,filename="gateway-pod.yaml"}
    apiVersion: v1
    kind: Pod
@@ -114,13 +113,15 @@ The example in this guide uses the GatewayParameters resource to change settings
    ...
    ```
 
-5. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service. 
+4. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service. 
+   
    ```sh
    kubectl get service custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
    ```
    
    Example output: 
-   ```yaml {linenos=table,hl_lines=[12,36],linenostart=1,filename="gateway-service.yaml"}
+   
+   ```yaml {linenos=table,hl_lines=[10,36],linenostart=1,filename="gateway-service.yaml"}
    apiVersion: v1
    kind: Service
    metadata:
