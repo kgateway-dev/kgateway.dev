@@ -5,7 +5,14 @@ description: Use kgateway with the Inference Extension project.
 next: /docs/integrations/istio/
 ---
 
-Use {{< reuse "docs/snippets/product-name.md" >}} with the Kubernetes Gateway API [Inference Extension project](https://gateway-api-inference-extension.sigs.k8s.io/). This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
+Use {{< reuse "docs/snippets/product-name.md" >}} with the Kubernetes Gateway API Inference Extension project. This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
+
+For more information, see the following resources.
+
+{{< cards >}}
+  {{< card link="https://gateway-api-inference-extension.sigs.k8s.io/" title="Kubernetes Gateway API Inference Extension docs" icon="external-link">}}
+  {{< card link="https://kgateway.dev/blog/deep-dive-inference-extensions/" title="Kgateway deep-dive blog on Inference Extension" icon="external-link">}}
+{{< /cards >}}
 
 ## About Inference Extension {#about}
 
@@ -56,5 +63,5 @@ The Client sends an inference request to get a response from a local LLM workloa
 Refer to the **{{< reuse "docs/snippets/product-name-caps.md" >}}** tabs in the **Getting started** guide in the Inference Extension docs.
 
 {{< cards >}}
-  {{< card link="https://gateway-api-inference-extension.sigs.k8s.io/guides/" title="Inference Extension docs" icon="external-link">}}
+  {{< card link="https://gateway-api-inference-extension.sigs.k8s.io/guides/" title="Inference Extension getting started guide" icon="external-link">}}
 {{< /cards >}}
