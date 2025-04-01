@@ -88,9 +88,9 @@ For more information, see the [Architecture docs](/docs/about/architecture/).
 
 - Drop-in replacement for the stock `istio` GatewayClass
 - Just update your `Gateway` CR to reference `gateway.kgateway.dev` class
-- Provides all {{< reuse "docs/snippets/product-name.md" >}} L7 features (auth, rate limiting, transformations) inside the mesh
+- Provides {{< reuse "docs/snippets/product-name.md" >}} L7 features inside the mesh
 
-This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics.
+This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs](/docs/integrations/istio/ambient/).
 
 ### ⚠️ Breaking changes from Gloo v1 {#changes}
 
