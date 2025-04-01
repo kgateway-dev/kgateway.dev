@@ -60,14 +60,12 @@ udproutes                         gateway.networking.k8s.io/v1alpha2   true     
 
 Next, we’ll install the kgateway controller. This component is responsible for watching Gateway API related resources and configuring Envoy proxies accordingly.
 
-Installation consists of deploying the following helm chart. 
-
-As of March 2025, note that the build we are currently using is v2.0.0-main, which is a nightly build of kgateway, we expect to have a formal generally available (GA) release of kgateway announced by Kubecon EU in April 2025.
+Installation consists of deploying the following Helm charts for the CRD and kgateway control plane, such as with the v2.0.0 release in the following commands. 
 
 ```yaml
-helm install --create-namespace --namespace kgateway-system \
-  --version v2.0.0-main kgateway \
-  oci://ghcr.io/kgateway-dev/charts/kgateway
+helm upgrade -i --create-namespace --namespace kgateway-system --version v2.0.0 kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+
+helm upgrade -i --namespace kgateway-system --version v2.0.0 kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
 ```
 
 Once installation is complete, we can take a peek at kgateway and its additional extensions and policy attachments that support a wider set of advanced traffic management and configuration capabilities.
