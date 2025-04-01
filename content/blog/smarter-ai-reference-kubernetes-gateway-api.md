@@ -80,7 +80,7 @@ This approach ensures that requests to AI/LLM models are distributed efficiently
 You can deploy kgateway with inference extension enabled with the following helm configuration:
 
 ```sh
-helm upgrade -i --namespace kgateway-system --version v2.0.0-main kgateway 
+helm upgrade -i --namespace kgateway-system --version v2.0.0 kgateway 
 oci://cr.kgateway.dev/kgateway-dev/charts/kgateway 
   --set inferenceExtension.enabled=true
 ```
