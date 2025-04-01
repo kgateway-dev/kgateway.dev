@@ -11,7 +11,7 @@ Review the release notes for {{< reuse "docs/snippets/product-name.md" >}}. For 
 
 ### Why 2.0 was needed {#why}
 
-The previous open-source Gloo Gateway project supported a hybrid model, offering both custom Gloo APIs (such as VirtualServices and Upstreams)as well as Gateway API-based extensions. This dual model created challenges in terms of maintainability, user experience, and community alignment.
+The previous open-source Gloo Gateway project supported a hybrid model, offering both custom Gloo APIs (such as VirtualServices and Upstreams) as well as Gateway API-based extensions. This dual model created challenges in terms of maintainability, user experience, and community alignment.
 
 The 2.0 release is a clean break from the legacy Gloo API surface:
 
