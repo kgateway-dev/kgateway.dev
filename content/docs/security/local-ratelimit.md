@@ -255,9 +255,9 @@ Instead of applying local rate limiting to a particular route, you can also appl
    local_rate_limited      
    ```
 
-## Exclude a route from rate limiting {#exclude-route}
+## Disable rate limiting for a route {#disable-route}
 
-Sometimes, you might want to exclude a route from rate limiting. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting the `rateLimit.local` to `{}` in the TrafficPolicy. 
+Sometimes, you might want to disable rate limiting for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting the `rateLimit.local` to `{}` in the TrafficPolicy. 
 
 1. Create a Gateway-level TrafficPolicy to enforce local rate limiting on all routes. For more information, refer to the [Gateway configuration](#gateway).
 
