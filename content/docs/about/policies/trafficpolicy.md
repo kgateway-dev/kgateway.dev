@@ -92,7 +92,7 @@ spec:
         port: 8000
 ```
 
-### Option 3: Attach the policy to a Gateway (#attach-to-gateway)
+### Option 3: Attach the policy to a Gateway {#attach-to-gateway}
 
 Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 
