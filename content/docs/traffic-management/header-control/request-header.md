@@ -53,12 +53,12 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: headers.example"
+curl -vi localhost:8080/headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -90,13 +90,13 @@ curl -vik localhost:8080/headers -H "host: headers.example"
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
 -H "my-header: foo"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: headers.example" \
+curl -vi localhost:8080/headers -H "host: headers.example" \
 -H "my-header: foo" 
 ```
 {{% /tab %}}
@@ -170,12 +170,12 @@ Setting headers is similar to adding headers. If the request does not include th
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: headers.example"
+curl -vi localhost:8080/headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -207,13 +207,13 @@ curl -vik localhost:8080/headers -H "host: headers.example"
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
 -H "my-header: foo"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: headers.example" \
+curl -vi localhost:8080/headers -H "host: headers.example" \
 -H "my-header: foo" 
 ```
 {{% /tab %}}
@@ -252,12 +252,12 @@ You can remove HTTP headers from a request before the request is forwarded to th
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: www.example.com"
+curl -vi localhost:8080/headers -H "host: www.example.com"
 ```
 {{% /tab %}}
    {{< /tabs >}}
@@ -326,12 +326,12 @@ curl -vik localhost:8080/headers -H "host: www.example.com"
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
 {{% tab %}}
 ```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
 {{% tab %}}
 ```sh
-curl -vik localhost:8080/headers -H "host: headers.example"
+curl -vi localhost:8080/headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}

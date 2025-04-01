@@ -14,10 +14,10 @@ weight: 10
 ### Resource Types
 - [Backend](#backend)
 - [DirectResponse](#directresponse)
+- [GatewayExtension](#gatewayextension)
 - [GatewayParameters](#gatewayparameters)
 - [HTTPListenerPolicy](#httplistenerpolicy)
-- [ListenerPolicy](#listenerpolicy)
-- [TrafficPolicy](#TrafficPolicy)
+- [TrafficPolicy](#trafficpolicy)
 
 
 
@@ -38,6 +38,28 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `llm` _[LLMProvider](#llmprovider)_ | The LLM configures the AI gateway to use a single LLM provider backend. |  |  |
 | `multipool` _[MultiPoolConfig](#multipoolconfig)_ | The MultiPool configures the backends for multiple hosts or models from the same provider in one Backend resource. |  |  |
+
+
+#### AIPolicy
+
+
+
+AIPolicy config is used to configure the behavior of the LLM provider
+on the level of individual routes. These route settings, such as prompt enrichment,
+retrieval augmented generation (RAG), and semantic caching, are applicable only
+for routes that send requests to an LLM provider backend.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
+| `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
+| `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
+| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported. | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
 
 
 #### AIPromptEnrichment
@@ -67,7 +89,7 @@ spec:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: openai
-  aiTrafficPolicy:
+  ai:
       promptEnrichment:
         prepend:
         - role: SYSTEM
@@ -80,7 +102,7 @@ spec:
 
 
 _Appears in:_
-- [AITrafficPolicy](#aiTrafficPolicy)
+- [AIPolicy](#aipolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -119,34 +141,12 @@ promptGuard:
 
 
 _Appears in:_
-- [AITrafficPolicy](#aiTrafficPolicy)
+- [AIPolicy](#aipolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `request` _[PromptguardRequest](#promptguardrequest)_ | Prompt guards to apply to requests sent by the client. |  |  |
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
-
-
-#### AITrafficPolicy
-
-
-
-AITrafficPolicy config is used to configure the behavior of the LLM provider
-on the level of individual routes. These route settings, such as prompt enrichment,
-retrieval augmented generation (RAG), and semantic caching, are applicable only
-for routes that send requests to an LLM provider backend.
-
-
-
-_Appears in:_
-- [TrafficPolicySpec](#TrafficPolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
-| `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
-| `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
-| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported. |  | Enum: [CHAT CHAT_STREAMING] <br /> |
 
 
 #### AccessLog
@@ -275,7 +275,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br />Required <br /> |
-| `secret` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Secret references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  | Optional <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  | Optional <br /> |
 
 
 #### AwsAuthType
@@ -440,8 +440,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `AsString` |  |
-| `AsJson` |  |
+| `AsString` | BodyParseBehaviorAsString will parse the body as a string.<br /> |
+| `AsJson` | BodyParseBehaviorAsJSON will parse the body as a json object.<br /> |
 
 
 #### BodyTransformation
@@ -459,6 +459,24 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body. |  |  |
+
+
+#### BufferSettings
+
+
+
+BufferSettings configures how the request body should be buffered.
+
+
+
+_Appears in:_
+- [ExtAuthPolicy](#extauthpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br />Required <br /> |
+| `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the authorization service even if they exceed maxRequestBytes.<br />When unset, the default behavior is false. |  |  |
+| `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />When unset, the default behavior is false. |  |  |
 
 
 #### BuiltIn
@@ -649,6 +667,119 @@ _Appears in:_
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  | Optional <br /> |
 
 
+#### ExtAuthEnabled
+
+_Underlying type:_ _string_
+
+ExtAuthEnabled determines the enabled state of the ExtAuth filter.
+
+_Validation:_
+- Enum: [DisableAll]
+
+_Appears in:_
+- [ExtAuthPolicy](#extauthpolicy)
+
+| Field | Description |
+| --- | --- |
+| `DisableAll` | ExtAuthDisableAll disables all instances of the ExtAuth filter for this route.<br />This is to enable a global disable such as for a health check route.<br /> |
+
+
+#### ExtAuthPolicy
+
+
+
+ExtAuthPolicy configures external authentication for a route.
+This policy will determine the ext auth server to use and how to  talk to it.
+Note that most of these fields are passed along as is to Envoy.
+For more details on particular fields please see the Envoy ExtAuth documentation.
+https://raw.githubusercontent.com/envoyproxy/envoy/f910f4abea24904aff04ec33a00147184ea7cffa/api/envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the ExternalExtension that should be used for authentication. |  |  |
+| `enablement` _[ExtAuthEnabled](#extauthenabled)_ | Enablement determines the enabled state of the ExtAuth filter.<br />When set to "DisableAll", the filter is disabled for this route.<br />When empty, the filter is enabled as long as it is not disabled by another policy. |  | Enum: [DisableAll] <br /> |
+| `failureModeAllow` _boolean_ | FailureModeAllow determines the behavior on authorization service errors.<br />When true, requests will be allowed even if the authorization service fails or returns HTTP 5xx errors.<br />When unset, the default behavior is false. |  |  |
+| `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
+| `clearRouteCache` _boolean_ | ClearRouteCache allows the authorization service to affect routing decisions.<br />When unset, the default behavior is false. |  |  |
+| `metadataContextNamespaces` _string array_ | MetadataContextNamespaces specifies metadata namespaces to pass to the authorization service.<br />Default to allowing jwt info if processing for jwt is configured. | [jwt] |  |
+| `includePeerCertificate` _boolean_ | IncludePeerCertificate determines if the client's X.509 certificate should be sent to the authorization service.<br />When true, the certificate will be included if available.<br />When unset, the default behavior is false. |  |  |
+| `includeTLSSession` _boolean_ | IncludeTLSSession determines if TLS session details should be sent to the authorization service.<br />When true, the SNI name from TLSClientHello will be included if available.<br />When unset, the default behavior is false. |  |  |
+| `emitFilterStateStats` _boolean_ | EmitFilterStateStats determines if per-stream stats should be emitted for access logging.<br />When true and using Envoy gRPC, emits latency, bytes sent/received, and upstream info.<br />When true and not using Envoy gRPC, emits only latency.<br />Stats are only added if a check request is made to the ext_authz service.<br />When unset, the default behavior is false. |  |  |
+
+
+#### ExtAuthProvider
+
+
+
+ExtAuthProvider defines the configuration for an ExtAuth provider.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the authentication. |  | Required <br /> |
+
+
+#### ExtGrpcService
+
+
+
+ExtGrpcService defines the GRPC service that will handle the processing.
+
+
+
+_Appears in:_
+- [ExtAuthProvider](#extauthprovider)
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | BackendRef references the backend GRPC service. |  | Required <br /> |
+| `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
+
+
+#### ExtProcPolicy
+
+
+
+ExtProcPolicy defines the configuration for the Envoy External Processing filter.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  | Required <br /> |
+| `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams |  |  |
+| `failureModeAllow` _boolean_ | FailureModeAllow defines the behavior of the filter when the external processing fails.<br />Defaults to false. |  |  |
+
+
+#### ExtProcProvider
+
+
+
+ExtProcProvider defines the configuration for an ExtProc provider.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the processing. |  | Required <br /> |
+
+
 #### FieldDefault
 
 
@@ -693,7 +824,7 @@ Note: The `field` values correspond to keys in the JSON request body, not fields
 
 
 _Appears in:_
-- [AITrafficPolicy](#aiTrafficPolicy)
+- [AIPolicy](#aipolicy)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -744,6 +875,78 @@ _Appears in:_
 | `responseFlagFilter` _[ResponseFlagFilter](#responseflagfilter)_ |  |  |  |
 | `grpcStatusFilter` _[GrpcStatusFilter](#grpcstatusfilter)_ |  |  |  |
 | `celFilter` _[CELFilter](#celfilter)_ |  |  |  |
+
+
+#### GatewayExtension
+
+
+
+
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `GatewayExtension` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[GatewayExtensionSpec](#gatewayextensionspec)_ |  |  |  |
+| `status` _[GatewayExtensionStatus](#gatewayextensionstatus)_ |  |  |  |
+
+
+#### GatewayExtensionSpec
+
+
+
+GatewayExtensionSpec defines the desired state of GatewayExtension.
+
+
+
+_Appears in:_
+- [GatewayExtension](#gatewayextension)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc Extended] <br />Required <br /> |
+| `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
+| `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
+
+
+#### GatewayExtensionStatus
+
+
+
+GatewayExtensionStatus defines the observed state of GatewayExtension.
+
+
+
+_Appears in:_
+- [GatewayExtension](#gatewayextension)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions is the list of conditions for the GatewayExtension. |  | MaxItems: 8 <br /> |
+
+
+#### GatewayExtensionType
+
+_Underlying type:_ _string_
+
+GatewayExtensionType indicates the type of the GatewayExtension.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description |
+| --- | --- |
+| `ExtAuth` | GatewayExtensionTypeExtAuth is the type for Extauth extensions.<br /> |
+| `ExtProc` | GatewayExtensionTypeExtProc is the type for ExtProc extensions.<br /> |
 
 
 #### GatewayParameters
@@ -849,7 +1052,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `logName` _string_ | name of log stream |  | Required <br /> |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backed (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
 | `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
 | `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
 | `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
@@ -893,7 +1096,7 @@ _Appears in:_
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[HTTPListenerPolicySpec](#httplistenerpolicyspec)_ |  |  |  |
-| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
+| `status` _[SimpleStatus](#simplestatus)_ |  |  |  |
 
 
 #### HTTPListenerPolicySpec
@@ -910,7 +1113,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `compress` _boolean_ |  |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  |  |
 
 
@@ -935,13 +1137,9 @@ _Appears in:_
 
 _Underlying type:_ _string_
 
-EnvoyHeaderName is the name of a header or pseudo header
-Based on gateway api v1.Headername but allows a singular : at the start
 
-_Validation:_
-- MaxLength: 256
-- MinLength: 1
-- Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+
+
 
 _Appears in:_
 - [HeaderTransformation](#headertransformation)
@@ -961,7 +1159,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+| `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
@@ -1105,44 +1303,6 @@ _Appears in:_
 | `hostOverride` _[Host](#host)_ | Send requests to a custom host and port, such as to proxy the request,<br />or to use a different backend that is API-compliant with the Backend version. |  |  |
 
 
-#### ListenerPolicy
-
-
-
-
-
-
-
-
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
-| `kind` _string_ | `ListenerPolicy` | | |
-| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
-| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `spec` _[ListenerPolicySpec](#listenerpolicyspec)_ |  |  |  |
-| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
-
-
-#### ListenerPolicySpec
-
-
-
-
-
-
-
-_Appears in:_
-- [ListenerPolicy](#listenerpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `perConnectionBufferLimitBytes` _integer_ |  |  |  |
-
-
 #### LocalPolicyTargetReference
 
 
@@ -1155,14 +1315,30 @@ You can target only one object at a time.
 
 _Appears in:_
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
-- [ListenerPolicySpec](#listenerpolicyspec)
-- [TrafficPolicySpec](#TrafficPolicyspec)
+- [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  | MaxLength: 253 <br />Pattern: `^$\|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$` <br /> |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br /> |
+
+
+#### LocalRateLimitPolicy
+
+
+
+LocalRateLimitPolicy represents a policy for local rate limiting.
+It defines the configuration for rate limiting using a token bucket mechanism.
+
+
+
+_Appears in:_
+- [RateLimit](#ratelimit)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
 
 
 #### Message
@@ -1320,23 +1496,6 @@ _Appears in:_
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
 
-#### PolicyStatus
-
-
-
-
-
-
-
-_Appears in:_
-- [HTTPListenerPolicy](#httplistenerpolicy)
-- [ListenerPolicy](#listenerpolicy)
-- [TrafficPolicy](#TrafficPolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ |  |  | MaxItems: 8 <br /> |
-| `ancestors` _[PolicyAncestorStatus](#policyancestorstatus) array_ |  |  | MaxItems: 16 <br /> |
 
 
 #### Priority
@@ -1353,6 +1512,27 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `pool` _[LLMProvider](#llmprovider) array_ | A list of LLM provider backends within a single endpoint pool entry. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
+
+
+#### ProcessingMode
+
+
+
+ProcessingMode defines how the filter should interact with the request/response streams
+
+
+
+_Appears in:_
+- [ExtProcPolicy](#extprocpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `requestHeaderMode` _string_ | RequestHeaderMode determines how to handle the request headers | SEND | Enum: [DEFAULT SEND SKIP] <br /> |
+| `responseHeaderMode` _string_ | ResponseHeaderMode determines how to handle the response headers | SEND | Enum: [DEFAULT SEND SKIP] <br /> |
+| `requestBodyMode` _string_ | RequestBodyMode determines how to handle the request body | NONE | Enum: [NONE STREAMED BUFFERED BUFFERED_PARTIAL FULL_DUPLEX_STREAMED] <br /> |
+| `responseBodyMode` _string_ | ResponseBodyMode determines how to handle the response body | NONE | Enum: [NONE STREAMED BUFFERED BUFFERED_PARTIAL FULL_DUPLEX_STREAMED] <br /> |
+| `requestTrailerMode` _string_ | RequestTrailerMode determines how to handle the request trailers | SKIP | Enum: [DEFAULT SEND SKIP] <br /> |
+| `responseTrailerMode` _string_ | ResponseTrailerMode determines how to handle the response trailers | SKIP | Enum: [DEFAULT SEND SKIP] <br /> |
 
 
 #### PromptguardRequest
@@ -1427,6 +1607,22 @@ _Appears in:_
 | `GOOGLE` |  |
 
 
+#### RateLimit
+
+
+
+RateLimit defines a rate limiting policy.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `local` _[LocalRateLimitPolicy](#localratelimitpolicy)_ | Local defines a local rate limiting policy. |  |  |
+
+
 #### Regex
 
 
@@ -1480,45 +1676,6 @@ _Appears in:_
 | `flags` _string array_ |  |  | MinItems: 1 <br /> |
 
 
-#### TrafficPolicy
-
-
-
-
-
-
-
-
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
-| `kind` _string_ | `TrafficPolicy` | | |
-| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
-| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `spec` _[TrafficPolicySpec](#TrafficPolicyspec)_ |  |  |  |
-| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
-
-
-#### TrafficPolicySpec
-
-
-
-
-
-
-
-_Appears in:_
-- [TrafficPolicy](#TrafficPolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `ai` _[AITrafficPolicy](#aiTrafficPolicy)_ |  |  |  |
-| `transformation` _[TransformationPolicy](#transformationpolicy)_ |  |  |  |
-
-
 #### RouteType
 
 _Underlying type:_ _string_
@@ -1528,7 +1685,7 @@ RouteType is the type of route to the LLM provider API.
 
 
 _Appears in:_
-- [AITrafficPolicy](#aiTrafficPolicy)
+- [AIPolicy](#aipolicy)
 
 | Field | Description |
 | --- | --- |
@@ -1618,6 +1775,23 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  | Optional <br /> |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata. |  | Optional <br /> |
+
+
+#### SimpleStatus
+
+
+
+SimpleStatus defines the observed state of the policy.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicy](#httplistenerpolicy)
+- [TrafficPolicy](#trafficpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions is the list of conditions for the policy. |  | MaxItems: 8 <br /> |
 
 
 #### SingleAuthToken
@@ -1732,6 +1906,67 @@ _Appears in:_
 | `vertexai` _[VertexAIConfig](#vertexaiconfig)_ |  |  |  |
 
 
+#### TokenBucket
+
+
+
+TokenBucket defines the configuration for a token bucket rate-limiting mechanism.
+It controls the rate at which tokens are generated and consumed for a specific operation.
+
+
+
+_Appears in:_
+- [LocalRateLimitPolicy](#localratelimitpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
+| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
+| `fillInterval` _string_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  | Format: duration <br /> |
+
+
+#### TrafficPolicy
+
+
+
+
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `TrafficPolicy` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[TrafficPolicySpec](#trafficpolicyspec)_ |  |  |  |
+| `status` _[SimpleStatus](#simplestatus)_ |  |  |  |
+
+
+#### TrafficPolicySpec
+
+
+
+
+
+
+
+_Appears in:_
+- [TrafficPolicy](#trafficpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `ai` _[AIPolicy](#aipolicy)_ | AI is used to configure AI-based policies for the policy. |  |  |
+| `transformation` _[TransformationPolicy](#transformationpolicy)_ | Transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
+| `extProc` _[ExtProcPolicy](#extprocpolicy)_ | ExtProc specifies the external processing configuration for the policy. |  |  |
+| `extAuth` _[ExtAuthPolicy](#extauthpolicy)_ | ExtAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
+| `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
+
+
 #### Transform
 
 
@@ -1750,7 +1985,7 @@ _Appears in:_
 | `set` _[HeaderTransformation](#headertransformation) array_ | Set is a list of headers and the value they should be set to. |  | MaxItems: 16 <br /> |
 | `add` _[HeaderTransformation](#headertransformation) array_ | Add is a list of headers to add to the request and what that value should be set to.<br />If there is already a header with these values then append the value as an extra entry. |  | MaxItems: 16 <br /> |
 | `remove` _string array_ | Remove is a list of header names to remove from the request/response. |  | MaxItems: 16 <br /> |
-| `body` _[BodyTransformation](#bodytransformation)_ | Body controls both how to parse the body and if needed how to set.<br /><br />If empty, body will not be buffered. |  |  |
+| `body` _[BodyTransformation](#bodytransformation)_ | Body controls both how to parse the body and if needed how to set.<br />If empty, body will not be buffered. |  |  |
 
 
 #### TransformationPolicy
@@ -1763,12 +1998,12 @@ These modifications can be performed on the request and response paths.
 
 
 _Appears in:_
-- [TrafficPolicySpec](#TrafficPolicyspec)
+- [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `request` _[Transform](#transform)_ |  |  |  |
-| `response` _[Transform](#transform)_ |  |  |  |
+| `request` _[Transform](#transform)_ | Request is used to modify the request path. |  |  |
+| `response` _[Transform](#transform)_ | Response is used to modify the response path. |  |  |
 
 
 #### VertexAIConfig

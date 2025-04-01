@@ -79,7 +79,8 @@ Take a look at the default metrics that the system outputs.
 If you haven't already, set up other features and start collecting metrics on your AI Gateway usage.
 
 {{< cards >}}
-  {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
-  {{< card link="prompt-guards" title="Set up prompt guards" >}}
-  {{< card link="failover" title="Fail over model traffic" >}}
+  {{< card link="failover" title="Model failover" >}}
+  {{< card link="functions" title="Function calling" >}}
+  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="prompt-guards" title="Prompt guards" >}}
 {{< /cards >}}

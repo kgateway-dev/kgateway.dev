@@ -102,12 +102,12 @@ Set up local rate limiting for a particular route.
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: ratelimit.example"
+   curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -133,12 +133,12 @@ Set up local rate limiting for a particular route.
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: ratelimit.example"
+   curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -203,12 +203,12 @@ Instead of applying local rate limiting to a particular route, you can also appl
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: www.example.com"
+   curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -234,12 +234,12 @@ Instead of applying local rate limiting to a particular route, you can also appl
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: www.example.com"
+   curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -263,6 +263,6 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
 5. Remove the resources that you created in this guide. 
    ```
-   kubectl delete TrafficPolicy local-ratelimit -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete TrafficPolicy local-ratelimit -n httpbin
    ```
 

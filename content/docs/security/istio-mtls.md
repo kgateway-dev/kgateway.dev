@@ -1,6 +1,6 @@
 ---
 title: Istio ambient mesh for mTLS
-weight: 20
+weight: 70
 ---
 
 Refer to the guide in the Integrations section.

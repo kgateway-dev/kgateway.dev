@@ -531,7 +531,7 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s TrafficPolicy to apply a tra
   
 2. Use the client app to send a request to the httpbin2 app and include a base64-encoded value of `transformation test` in the request `x-base64-encoded` header. Verify that you get back a 200 HTTP response code, and that the decoded value is added to the `x-base64-decoded` response header, starting from the 11th character. 
    ```sh
-   kubectl -n httpbin exec deploy/client -- curl -vik http://httpbin2:8000/headers \
+   kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
    ```
    

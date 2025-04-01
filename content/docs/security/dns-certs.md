@@ -1,6 +1,6 @@
 ---
 title: ExternalDNS and Cert-Manager
-weight: 20
+weight: 60
 ---
 
 Refer to the guide in the Integrations section.

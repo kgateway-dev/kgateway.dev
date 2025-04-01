@@ -53,12 +53,12 @@ Specify timeouts for a specific route.
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/headers -H "host: timeout.example"
+   curl -vi localhost:8080/headers -H "host: timeout.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}

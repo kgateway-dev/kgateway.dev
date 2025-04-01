@@ -154,7 +154,7 @@ Create a Backend that represents your EC2 instance.
        region: $AWS_REGION
        auth:
          type: Secret
-         secret:
+         secretRef:
            name: gateway-tag-group1
    EOF
    ```
@@ -193,12 +193,12 @@ Create a Backend that represents your EC2 instance.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/\?code\=500 -H "host: ec2.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/\?code\=500 -H "host: ec2.example:8080"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -vik localhost:8080/\?code\=500 -H "host: ec2.example"
+   curl -vi localhost:8080/\?code\=500 -H "host: ec2.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}

@@ -61,6 +61,8 @@ The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but 
 * [OpenAI](https://platform.openai.com/docs/overview). You can also use `openai` support for LLM providers that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 * [Vertex AI](https://cloud.google.com/vertex-ai/docs)
 
+You can route requests to local LLM workloads that run in your cluster by using the [Gateway API Inference Extension project](/docs/integrations/inference-extension/).
+
 ## Guides
 
 Explore what you can do with AI Gateway in the following guides.
@@ -68,9 +70,11 @@ Explore what you can do with AI Gateway in the following guides.
 {{< cards >}}
   {{< card link="setup" title="Set up AI Gateway" >}}
   {{< card link="auth" title="Authenticate LLM providers" >}}
-  {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
-  {{< card link="prompt-guards" title="Set up prompt guards" >}}
-  {{< card link="failover" title="Fail over model traffic" >}}
-  {{< card link="observability" title="AI observability" >}}
+  {{< card link="failover" title="Model failover" >}}
+  {{< card link="functions" title="Function calling" >}}
+  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="prompt-guards" title="Prompt guards" >}}
+  {{< card link="observability" title="AI Gateway metrics" >}}
   {{< card link="cleanup" title="Cleanup" >}}
+  {{< card link="inference-extension" title="Inference Extension for local LLMs" icon="bookmark" >}}
 {{< /cards >}}

@@ -76,7 +76,7 @@ Create {{% reuse "docs/snippets/product-name.md" %}} `Backend` and `HTTPRoute` r
        accountId: "<account-id>"
        auth:
          type: Secret
-         secret:
+         secretRef:
            name: aws-creds
        lambda:
          functionName: echo

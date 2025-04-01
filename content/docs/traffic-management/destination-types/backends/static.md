@@ -66,12 +66,12 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/posts -H "host: static.example:8080" 
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/posts -H "host: static.example:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/posts -H "host: static.example:8080" 
+   curl -vi localhost:8080/posts -H "host: static.example:8080" 
    ```
    {{% /tab %}}
    {{< /tabs >}}

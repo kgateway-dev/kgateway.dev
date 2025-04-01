@@ -226,13 +226,13 @@ Verify that the policies are correctly inherited along the delegation chain.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/anything/team1/foo \
+   curl -vi localhost:8080/anything/team1/foo \
    -H "host: delegation.example"
    ```
    {{% /tab %}}
@@ -257,13 +257,13 @@ Verify that the policies are correctly inherited along the delegation chain.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar/test \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar/test \
    -H "host: delegation.example:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/anything/team2/bar/test \
+   curl -vi localhost:8080/anything/team2/bar/test \
    -H "host: delegation.example"
    ```
    {{% /tab %}}

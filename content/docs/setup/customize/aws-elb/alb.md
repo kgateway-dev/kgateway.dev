@@ -151,7 +151,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code. 
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:80/headers -H "host: albtest.com:80"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/headers -H "host: albtest.com:80"
    ```
    
    Example output: 

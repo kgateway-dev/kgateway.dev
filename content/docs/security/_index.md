@@ -12,9 +12,11 @@ For example, you might use HTTPS listeners for external client connections, enfo
 
 {{< cards >}}
   {{< card link="access-logging" title="Access logging" >}}
-  {{< card link="backend-tls" title="Backend TLS" >}}
+  {{< card link="external-auth" title="Bring your own external auth" >}}
   {{< card link="local-ratelimit" title="Local rate limiting" >}}
+  {{< card link="backend-tls" title="Backend TLS" >}}
   {{< card link="/docs/setup/listeners/https/" title="HTTPS listener" icon="bookmark">}}
+  {{< card link="/docs/setup/listeners/tls-passthrough/" title="TLS passthrough" icon="bookmark">}}
   {{< card link="/docs/integrations/external-dns-cert-manager/" title="ExternalDNS and Cert-Manager" icon="bookmark">}}
   {{< card link="/docs/integrations/istio/" title="Istio for mTLS" icon="bookmark">}}
 {{< /cards >}}
