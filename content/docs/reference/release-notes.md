@@ -24,7 +24,7 @@ The 2.0 release is a clean break from the legacy Gloo API surface:
 
 These changes ensure that kgateway is a **standards-first** and **community-owned** project moving forward.
 
-### Key Features
+### Key Features {#features}
 
 Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}} offers a host of features designed to make it easy to extend and customize your implementation of the Gateway API.
 
@@ -39,7 +39,7 @@ Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}}
 * [HTTPListenerPolicy](/docs/reference/api/#httplistenerpolicy): Set policies for HTTP listeners, including advanced access logging.
 * [TrafficPolicy](/docs/reference/api/#trafficpolicy): Implement advanced traffic rules such as AI prompt manipulation, local rate limiting, request/response transformations, and external processing control for managing traffic through gateways.
 
-#### 🚦 Traffic management
+#### 🚦 Traffic management {#traffic}
 
 {{< reuse "docs/snippets/product-name-caps.md" >}} gives you sophisticated traffic-handling policies, including:
 
@@ -49,7 +49,7 @@ Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}}
 
 For more information, see the [Traffic management docs](/docs/traffic-management/).
 
-#### 🔐 Secure traffic
+#### 🔐 Secure traffic {#security}
 
 {{< reuse "docs/snippets/product-name-caps.md" >}} provides a comprehensive set of security features, as well as the ability for you to bring your own external authorization service.
 
@@ -59,7 +59,7 @@ For more information, see the [Traffic management docs](/docs/traffic-management
 
 For more information, see the [Security docs](/docs/security/).
 
-#### 🤖 AI Gateway (open sourced)
+#### 🤖 AI Gateway (open sourced) {#ai-gateway}
 
 Enterprise-grade **AI gateway functionality** has been open sourced for the first time, including the following highlights:
 
@@ -72,7 +72,7 @@ Enterprise-grade **AI gateway functionality** has been open sourced for the firs
 
 For more information, see the [AI Gateway docs](/docs/ai/).
 
-#### 🧠 KRT-based control plane
+#### 🧠 KRT-based control plane {#control-plane}
 
 {{< reuse "docs/snippets/product-name-caps.md" >}} uses a **brand new control plane** architecture built on the [Kubernetes Runtime Toolkit (KRT)](https://github.com/kubernetes-sigs/kubebuilder). Benefits include:
 
@@ -82,7 +82,7 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 
 For more information, see the [Architecture docs](/docs/about/architecture/).
 
-#### 🐬 Ambient waypoint integration
+#### 🐬 Ambient waypoint integration {#ambient-waypoint}
 
 {{< reuse "docs/snippets/product-name-caps.md" >}} introduces support for using its Gateway implementation as an **Istio ambient mesh waypoint proxy**:
 
@@ -92,9 +92,9 @@ For more information, see the [Architecture docs](/docs/about/architecture/).
 
 This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics.
 
-### ⚠️ Breaking changes
+### ⚠️ Breaking changes from Gloo v1 {#changes}
 
-Because of the extensive API changes, {{< reuse "docs/snippets/product-name.md" >}} 2.0 requires a fresh installation instead of an upgrade from a previous Gloo v1.x release.
+{{< reuse "docs/snippets/product-name-caps.md" >}} v2 has extensive API changes from Gloo v1, which include the following.
 
 - **CRD group renames:** All CRDs now use the `kgateway.dev` API group
 - **CRD renames and field removals** to ensure clean, vendor-neutral APIs
