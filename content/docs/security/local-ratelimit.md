@@ -347,14 +347,14 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    local_rate_limited      
    ```
 
-4. Create a TrafficPolicy to exclude the HTTPRoute from rate limiting.
+4. Create a TrafficPolicy to disable rate limiting for the HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: TrafficPolicy
    metadata:
-     name: exclude-ratelimit
+     name: disable-ratelimit
      namespace: httpbin
    spec:
      targetRefs:
@@ -402,7 +402,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
 
 ```sh
 kubectl delete TrafficPolicy local-ratelimit -n kgateway-system
-kubectl delete TrafficPolicy exclude-ratelimit -n httpbin
+kubectl delete TrafficPolicy disable-ratelimit -n httpbin
 kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
 ```
