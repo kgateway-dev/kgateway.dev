@@ -59,7 +59,7 @@ _Appears in:_
 | `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
 | `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
 | `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
-| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported. |  | Enum: [CHAT CHAT_STREAMING] <br /> |
+| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported. | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
 
 
 #### AIPromptEnrichment
@@ -1921,7 +1921,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
-| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation.<br />kubebuilder:default:=1 |  |  |
+| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
 | `fillInterval` _string_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  | Format: duration <br /> |
 
 

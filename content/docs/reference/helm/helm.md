@@ -8,7 +8,7 @@ A Helm chart for the kgateway project.
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | controller.extraEnv | object | `{}` |  |
-| controller.image.pullPolicy | string | `"IfNotPresent"` |  |
+| controller.image.pullPolicy | string | `""` |  |
 | controller.image.registry | string | `""` |  |
 | controller.image.repository | string | `"kgateway"` |  |
 | controller.image.tag | string | `""` |  |
