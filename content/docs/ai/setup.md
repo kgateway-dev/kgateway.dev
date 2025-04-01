@@ -99,7 +99,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    * Deployment: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
 
    ```sh
-   kubectl get gateway,pods -l app.kubernetes.io/app=ai-gateway -A
+   kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A
    ```
    
    Example output: 
