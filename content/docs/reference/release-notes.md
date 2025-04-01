@@ -28,25 +28,36 @@ These changes ensure that kgateway is a **standards-first** and **community-owne
 
 Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}} offers a host of features designed to make it easy to extend and customize your implementation of the Gateway API.
 
-#### 🚀 Gateway API Extensions
+#### 🚀 Kgateway custom resources {#kgateway-crs}
 
-kgateway introduces powerful, standards-aligned extensions via custom resources that follow the Gateway API’s policy attachment pattern. Key new resources include:
+{{< reuse "docs/snippets/product-name-caps.md" >}} introduces powerful, standards-aligned extensions via custom resources that follow the Gateway API’s policy attachment pattern. Key new resources include:
 
-- **TrafficPolicy** – advanced request/response transformations, retries, timeouts, and more
-- **HTTPListenerPolicy** – fine-grained configuration of L7 behavior at the listener level
-- **DirectResponse** – configure routes to return custom HTTP responses
-- **RateLimitPolicy** – local rate limiting for Gateway and Route traffic
-- **AccessLogPolicy** – customizable access logging format and output
+* [Backend](/docs/reference/api/#backend): Define routable backends such as AI providers (OpenAI, Azure, Gemini, and more), AWS Lambda functions, or static server for use by Gateways.
+* [DirectResponse](/docs/reference/api/#directresponse): Enable Gateways to directly return immediate HTTP responses, specifying custom status codes and optional response content without contacting backend services.
+* [GatewayExtension](/docs/reference/api/#gatewayextension): Add external authorization (ExtAuth) and external request processing (ExtProc) via gRPC services, extending the Gateway's request handling capabilities.
+* [GatewayParameter](/docs/reference/api/#gatewayparameter): Provide detailed customization of Gateway deployments, including container images, logging, resource allocations, Istio integrations, sidecar configurations, and AI-related extensions.
+* [HTTPListenerPolicy](/docs/reference/api/#httplistenerpolicy): Set policies for HTTP listeners, including advanced access logging.
+* [TrafficPolicy](/docs/reference/api/#trafficpolicy): Implement advanced traffic rules such as AI prompt manipulation, local rate limiting, request/response transformations, and external processing control for managing traffic through gateways.
 
-#### Traffic management
+#### 🚦 Traffic management
 
-* Ext processing
-* Route delegation
+{{< reuse "docs/snippets/product-name-caps.md" >}} gives you sophisticated traffic-handling policies, including:
+
+* **TrafficPolicy** for request transformation and enforcement of security policy such as external authorization and local rate limiting.
+* **External processing (ExtProc)** to modify HTTP requests and responses with an external gRPC processing server.
+* **Route delegation** to manage route and policy configuration in multi-tenant environments.
+
+For more information, see the [Traffic management docs](/docs/traffic-management/).
 
 #### 🔐 Secure traffic
 
-* Rate limiting
-* External authorization
+{{< reuse "docs/snippets/product-name-caps.md" >}} provides a comprehensive set of security features, as well as the ability for you to bring your own external authorization service.
+
+* **TLS support** for a variety of use cases including mTLS with Istio, TLS passthrough, and Backend TLS.
+* **Local rate limiting** as a first line of defense to control the rate of requests to your Gateway.
+* **External authorization** to protect requests that go through your Gateway by using an external service.
+
+For more information, see the [Security docs](/docs/security/).
 
 #### 🤖 AI Gateway (open sourced)
 
@@ -68,6 +79,8 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 - Improved controller performance and scalability
 - Cleaner reconciliation and modular plugin framework
 - Scalability to massive clusters with tens of thousands of routes
+
+For more information, see the [Architecture docs](/docs/about/architecture/).
 
 #### 🕸 Ambient waypoint integration
 
@@ -93,7 +106,3 @@ Because of the extensive API changes, {{< reuse "docs/snippets/product-name.md" 
 ### Feedback and next steps {#next}
 
 We’re excited to collaborate with the community to continue shaping the future of API gateways. [Get started](/docs/quickstart/) with {{< reuse "docs/snippets/product-name.md" >}} 2.0 and [let us know how it goes in the CNCF `#kgateway` Slack](https://cloud-native.slack.com/archives/C080D3PJMS4)!
-
-## Earlier v1 releases
-
-Refer to the [Gloo Gateway documentation](https://docs.solo.io/gloo-edge/latest/reference/changelog/open_source/) and [`gloo` project](https://github.com/solo-io/gloo).
