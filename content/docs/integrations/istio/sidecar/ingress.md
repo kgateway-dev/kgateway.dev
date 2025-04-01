@@ -1,6 +1,6 @@
 ---
 title: Ingress
-weight: 
+weight: 10
 description: Use your kgateway as the ingress gateway to control and secure traffic that enters your service mesh.
 --- 
 
