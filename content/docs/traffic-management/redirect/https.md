@@ -146,9 +146,15 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
    {{% /tab %}}
    {{% tab %}}
-   ```sh
-   curl -vik localhost:443/status/200 -H "host: redirect.example"
-   ```
+   1. Port-forward the gateway proxy service on port 8443.
+      ```sh
+      kubectl port-forward svc/http -n kgateway-system 8443:443
+      ```
+      
+   2. Send an HTTPS request to the `redirect.example` domain. 
+      ```sh
+      curl -vik --connect-to redirect.example:443:localhost:8443 https://redirect.example/status/200
+      ```
    {{% /tab %}}
    {{< /tabs >}}
    

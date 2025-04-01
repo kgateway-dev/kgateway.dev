@@ -24,7 +24,7 @@
 
    Example output:
 
-   ```
+   ```console
    NAME                        READY   STATUS    RESTARTS   AGE
    kgateway-5495d98459-46dpk   1/1     Running   0          19s
    ```
