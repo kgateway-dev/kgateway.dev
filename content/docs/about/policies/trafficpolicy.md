@@ -31,8 +31,8 @@ spec:
   transformation:
     response:
       set:
-      - name: x-solo-response
-        value: '{{ request_header("x-solo-request") }}' 
+      - name: x-kgateway-response
+        value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
 ### Option 2: Attach the policy to an individual route (`ExtensionRef`)
@@ -51,8 +51,8 @@ spec:
   transformation:
     response:
       set:
-      - name: x-solo-response
-        value: '{{ request_header("x-solo-request") }}' 
+      - name: x-kgateway-response
+        value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
 To apply the policy to a particular route, you use the `ExtensionRef` filter on the desired HTTPRoute route. In the following example, the TrafficPolicy is applied to the `/anything/path1` route. However, it is not applied to the `/anything/path2` path.   
@@ -92,7 +92,7 @@ spec:
         port: 8000
 ```
 
-### Option 3: Attach the policy to a Gateway (#attach-to-gateway)
+### Option 3: Attach the policy to a Gateway {#attach-to-gateway}
 
 Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 

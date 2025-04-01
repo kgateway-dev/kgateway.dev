@@ -55,12 +55,11 @@ A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) al
 
 Review the {{< reuse "docs/snippets/product-name.md" >}} resources that you use to bootstrap, configure, and customize your gateway proxy, and the policies that you can leverage to add additional traffic management, resiliency, and security capabilities to your gateway and routes. 
 
-### GatewayParameters and Settings
+### GatewayParameters
 
-When you create a Gateway resource, a default gateway proxy template is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the GatewayParameters resource are used to configure the gateway proxy.
+When you create a Gateway resource, a [default gateway proxy template](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml) is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the [GatewayParameters](#gatewayparameters) resource are used to configure the gateway proxy.
 
 To learn more about the default gateway setup and how these resource interact with each other, see [Default gateway proxy setup](/docs/setup/default/). 
-
 
 ### Policies
 

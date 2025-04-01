@@ -204,12 +204,26 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
    ```
    
 5. Send a request to the httpbin app along the `/headers` path and provide your instructions in the `instruction` header. This example instructs the ExtProc server to add the `extproc: true` header. Verify that you get back a 200 HTTP response and that your response includes the `extproc: true` header. 
+
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+
+   {{< tab >}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: extproc.example" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
    ```
-   
-   Example output: 
-   ```yaml {linenos=table,hl_lines=[10,11],linenostart=1}
+   {{< /tab >}}
+
+   {{< tab >}}
+   ```sh
+   curl -vi http://localhost:8080/headers -H "host: extproc.example" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
+   ```
+   {{< /tab >}}
+
+   {{< /tabs >}}
+
+   Example output:
+
+   ```json {linenos=table,hl_lines=[10,11],linenostart=1}
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -234,13 +248,27 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
    ...
    ```
 
-6. Send a request along the `/get` path. Verify that you get back a 200 HTTP response code. However, because this route is not configured for ExtProc, you do not see the `extproc: true` header in your response. 
+6. Send a request along the `/get` path. Verify that you get back a 200 HTTP response code. However, because this route is not configured for ExtProc, you do not see the `extproc: true` header in your response.
+
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+
+   {{< tab >}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: extproc.example" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
    ```
-   
-   Example output: 
-   ```yaml
+   {{< /tab >}}
+
+   {{< tab >}}
+   ```sh
+   curl -vi http://localhost:8080/get -H "host: extproc.example" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
+   ```
+   {{< /tab >}}
+
+   {{< /tabs >}}
+
+   Example output:
+
+   ```json
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -261,6 +289,7 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
        ],
    ...
    ```
+
 <!--
 ## Gateway configuration {#gateway}
 
