@@ -89,13 +89,13 @@ The following rules are applied during schema validation:
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/status/200 \
+   curl -vi localhost:8080/status/200 \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}
@@ -124,13 +124,13 @@ The following rules are applied during schema validation:
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/direct-response \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/direct-response \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/direct-response \
+   curl -vi localhost:8080/direct-response \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}

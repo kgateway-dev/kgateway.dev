@@ -27,12 +27,12 @@ In the following example, you combine multiple Inja functions to accomplish the 
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-2. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: transformation
      namespace: httpbin
@@ -45,7 +45,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    EOF
    ```
 
-3. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+3. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -70,7 +70,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
          - type: ExtensionRef
            extensionRef:
              group: gateway.kgateway.dev
-             kind: RoutePolicy
+             kind: TrafficPolicy
              name: transformation
    EOF
    ```
@@ -80,14 +80,14 @@ In the following example, you combine multiple Inja functions to accomplish the 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/response-headers \
+   curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
    -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
@@ -123,10 +123,10 @@ In the following example, you combine multiple Inja functions to accomplish the 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the RoutePolicy resource.
+1. Delete the TrafficPolicy resource.
 
    ```sh
-   kubectl delete RoutePolicy transformation -n httpbin
+   kubectl delete TrafficPolicy transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

@@ -69,7 +69,7 @@ The {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} is a common, extensibl
 
 [Learn about the history of the Gateway API](/blog/introduction-to-kubernetes-gateway-api/), or [watch our in-depth video series](/resources/videos/).
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} is fully conformant with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and extends its functionality with custom extension APIs, such as RoutePolicies, HTTPListenerPolicies, and Backends. These custom resources help to centrally configure advanced traffic management, security, and resiliency rules for an HTTPRoute or Gateway listener.
+{{< reuse "docs/snippets/product-name-caps.md" >}} is fully conformant with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and extends its functionality with custom extension APIs, such as TrafficPolicies, ListenerPolicies, and Backends. These custom resources help to centrally configure advanced traffic management, security, and resiliency rules for an HTTPRoute or Gateway listener.
 
 ### Is the Gateway API an API gateway?
 

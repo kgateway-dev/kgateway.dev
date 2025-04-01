@@ -12,12 +12,12 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
 
 ## Update request paths and HTTP methods
    
-1. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you change the request path and HTTP method when a `foo: bar` header is present in the request.   
+1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you change the request path and HTTP method when a `foo: bar` header is present in the request.   
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: transformation
      namespace: httpbin
@@ -32,7 +32,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -57,7 +57,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
          - type: ExtensionRef
            extensionRef:
              group: gateway.kgateway.dev
-             kind: RoutePolicy
+             kind: TrafficPolicy
              name: transformation
    EOF
    ```
@@ -66,14 +66,14 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "foo: bar" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get \
+   curl -vi localhost:8080/get \
    -H "foo: bar" \
    -H "host: www.example.com" \
    ```
@@ -132,13 +132,13 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/get \
+   curl -vi localhost:8080/get \
    -H "host: www.example.com" \
    ```
    {{% /tab %}}
@@ -187,10 +187,10 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the RoutePolicy resource.
+1. Delete the TrafficPolicy resource.
 
    ```sh
-   kubectl delete RoutePolicy transformation -n httpbin
+   kubectl delete TrafficPolicy transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

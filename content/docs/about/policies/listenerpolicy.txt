@@ -11,7 +11,7 @@ You can use a ListenerPolicy resource to attach policies to all gateway listener
 
 Learn more about how you can attach policies to gateway listeners.  
 
-### Option 1: Attach the policy to all listeners on the gateway (`targetRef`) -->
+### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`) -->
 
 You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRef` section in the ListenerPolicy resource. 
 
@@ -25,8 +25,8 @@ metadata:
   name: bufferlimits
   namespace: kgateway-system
 spec:
-  targetRef:
-    group: gateway.networking.k8s.io
+  targetRefs:
+  - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
   perConnectionBufferLimitBytes: 10485760
@@ -93,7 +93,7 @@ spec:
 
 ## Conflicting policies
 
-If you create multiple ListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRef` option, only the ListenerPolicy that was last applied is enforced. 
+If you create multiple ListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the ListenerPolicy that was last applied is enforced. 
 
 <!--
 

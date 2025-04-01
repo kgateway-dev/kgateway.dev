@@ -1,6 +1,6 @@
 ---
 title: TCP listeners
-weight: 30
+weight: 10
 ---
 
 The following guide deploys a sample TCP echo app, sets up a TCP listener on the gateway, and creates a TCPRoute to the sample app.

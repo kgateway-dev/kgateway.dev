@@ -47,7 +47,7 @@ Prompt guards are mechanisms that ensure that prompt-based interactions with a l
 AI Gateway supports chat streaming, which allows the LLM to stream out tokens as they are generated. The way that chat streaming is determined varies by AI provider.
 
 * OpenAI and most AI providers: Most providers send the `is-streaming` boolean as part of the request to determine whether or not a request should receive a streamed response. 
-* Google Gemini and Vertex AI: In contrast, the Gemini and Vertex AI providers change the path to determine streaming, such as the `streamGenerateContent` segment of the path in the Vertex AI streaming endpoint `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=<key>`. To prevent the path you defined in your HTTPRoute from being overwritten by this streaming path, you instead indicate chat streaming for Gemini and Vertex AI by setting `spec.options.ai.routeType=CHAT_STREAMING` in your RouteOptions resource.
+* Google Gemini and Vertex AI: In contrast, the Gemini and Vertex AI providers change the path to determine streaming, such as the `streamGenerateContent` segment of the path in the Vertex AI streaming endpoint `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=<key>`. To prevent the path you defined in your HTTPRoute from being overwritten by this streaming path, you instead indicate chat streaming for Gemini and Vertex AI by setting `spec.options.ai.routeType=CHAT_STREAMING` in your TrafficPolicies resource.
 
 ## Supported LLM providers {#supported-llm-providers}
 
@@ -68,9 +68,10 @@ Explore what you can do with AI Gateway in the following guides.
 {{< cards >}}
   {{< card link="setup" title="Set up AI Gateway" >}}
   {{< card link="auth" title="Authenticate LLM providers" >}}
-  {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
-  {{< card link="prompt-guards" title="Set up prompt guards" >}}
-  {{< card link="failover" title="Fail over model traffic" >}}
-  {{< card link="observability" title="AI observability" >}}
+  {{< card link="failover" title="Model failover" >}}
+  {{< card link="functions" title="Function calling" >}}
+  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="prompt-guards" title="Prompt guards" >}}
+  {{< card link="observability" title="AI Gateway metrics" >}}
   {{< card link="cleanup" title="Cleanup" >}}
 {{< /cards >}}

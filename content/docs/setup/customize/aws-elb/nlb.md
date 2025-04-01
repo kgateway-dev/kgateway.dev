@@ -184,7 +184,7 @@ Keep in mind the following considerations when working with an NLB:
 
 3. Send a request to the httpbin app. 
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:80/headers -H "host: www.nlb.com:80"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/headers -H "host: www.nlb.com:80"
    ```
    
    Example output: 
@@ -230,7 +230,7 @@ Keep in mind the following considerations when working with an NLB:
 
 3. Send a request to the httpbin app. Verify that you see a successful TLS handshake and that you get back a 200 HTTP response code from the httpbin app. 
    ```sh
-   curl -vik --resolve "https.example.com:443:${INGRESS_GW_ADDRESS}" https://https.example.com:443/status/200
+   curl -vi --resolve "https.example.com:443:${INGRESS_GW_ADDRESS}" https://https.example.com:443/status/200
    ```
    
    Example output: 

@@ -506,19 +506,19 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
 
 ### Transformations
 
-Use {{< reuse "docs/snippets/product-name.md" >}}'s RoutePolicy to apply a transformation policy to the httpbin2 app. 
+Use {{< reuse "docs/snippets/product-name.md" >}}'s TrafficPolicy to apply a transformation policy to the httpbin2 app. 
 
-1. Create a RoutePolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
+1. Create a TrafficPolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: transformation
      namespace: httpbin
    spec:
-     targetRef: 
-       group: gateway.networking.k8s.io
+     targetRefs: 
+     - group: gateway.networking.k8s.io
        kind: HTTPRoute
        name: httpbin2
      transformation:
@@ -531,7 +531,7 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s RoutePolicy to apply a trans
   
 2. Use the client app to send a request to the httpbin2 app and include a base64-encoded value of `transformation test` in the request `x-base64-encoded` header. Verify that you get back a 200 HTTP response code, and that the decoded value is added to the `x-base64-decoded` response header, starting from the 11th character. 
    ```sh
-   kubectl -n httpbin exec deploy/client -- curl -vik http://httpbin2:8000/headers \
+   kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
    ```
    
@@ -583,9 +583,9 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s RoutePolicy to apply a trans
    }
    ```
 
-3. Optional: Remove the RoutePolicy that you created in this guide. 
+3. Optional: Remove the TrafficPolicy that you created in this guide. 
    ```sh
-   kubectl delete routepolicy transformation -n httpbin
+   kubectl delete TrafficPolicy transformation -n httpbin
    ```
 
    
@@ -607,5 +607,5 @@ kubectl delete deployment httpbin3 -n httpbin
 kubectl delete serviceaccount client -n httpbin
 kubectl delete service client -n httpbin
 kubectl delete deployment client -n httpbin
-kubectl delete routepolicy transformation -n httpbin
+kubectl delete TrafficPolicy transformation -n httpbin
 ```

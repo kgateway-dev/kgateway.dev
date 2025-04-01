@@ -164,13 +164,13 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   for i in {1..5}; do curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+   for i in {1..5}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: mirror.example:8080"; done
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   for i in {1..5}; do curl -vik localhost:8080/headers \
+   for i in {1..5}; do curl -vi localhost:8080/headers \
    -H "host: mirror.example"; done
    ```
    {{% /tab %}}

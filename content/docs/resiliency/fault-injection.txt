@@ -15,7 +15,7 @@ You can set two following fault injection types in {{< reuse "docs/snippets/prod
 Delays and aborts are independent of one another. When both values are set, your requests are either delayed only, delayed and aborted, or aborted only.
 
 {{< callout emoji="💡" >}}
-Faults can be configured for a route by using a RouteOption resource. Gateway-level faults are not supported.
+Faults can be configured for a route by using a TrafficPolicy resource. Gateway-level faults are not supported.
 {{< /callout >}}
 
 For more information, see the [Fault API](/docs/reference/api/fault/).
@@ -26,13 +26,13 @@ For more information, see the [Fault API](/docs/reference/api/fault/).
 
 ## Aborts {#aborts}
    
-Use a RouteOption resource to abort all incoming requests to a specific route. 
+Use a TrafficPolicy resource to abort all incoming requests to a specific route. 
 
-1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are rejected with a 503 HTTP response code.  
+1. Create a TrafficPolicy custom resource to specify your fault injection rules. In the following example, 50% of all requests are rejected with a 503 HTTP response code.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
+   kind: TrafficPolicy
    metadata:
      name: faults
      namespace: httpbin
@@ -45,7 +45,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
    EOF
    ```
 
-2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
+2. Create an HTTPRoute resource for the httpbin app that references the TrafficPolicy resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -64,7 +64,7 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
            - type: ExtensionRef
              extensionRef:
                group: gateway.solo.io
-               kind: RouteOption
+               kind: TrafficPolicy
                name: faults
          backendRefs:
            - name: httpbin
@@ -109,18 +109,18 @@ Use a RouteOption resource to abort all incoming requests to a specific route.
 4. Optional: Remove the resources that you created. 
    ```sh
    kubectl delete httproute httpbin-faults -n httpbin
-   kubectl delete routeoption faults -n httpbin
+   kubectl delete TrafficPolicy faults -n httpbin
    ```
 
 ## Delays {#delays}
 
-Use a RouteOption resource to deny incoming requests to a specific route. 
+Use a TrafficPolicy resource to deny incoming requests to a specific route. 
 
-1. Create a RouteOption custom resource to specify your fault injection rules. In the following example, 50% of all requests are delayed by 5 seconds.  
+1. Create a TrafficPolicy custom resource to specify your fault injection rules. In the following example, 50% of all requests are delayed by 5 seconds.  
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RouteOption
+   kind: TrafficPolicy
    metadata:
      name: faults
      namespace: httpbin
@@ -133,7 +133,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
    EOF
    ```
 
-2. Create an HTTPRoute resource for the httpbin app that references the RouteOption resource that you created. 
+2. Create an HTTPRoute resource for the httpbin app that references the TrafficPolicy resource that you created. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -152,7 +152,7 @@ Use a RouteOption resource to deny incoming requests to a specific route.
            - type: ExtensionRef
              extensionRef:
                group: gateway.solo.io
-               kind: RouteOption
+               kind: TrafficPolicy
                name: faults
          backendRefs:
            - name: httpbin
@@ -188,6 +188,6 @@ Use a RouteOption resource to deny incoming requests to a specific route.
 4. Optional: Remove the resources that you created. 
    ```sh
    kubectl delete httproute httpbin-faults -n httpbin
-   kubectl delete routeoption faults -n httpbin
+   kubectl delete TrafficPolicy faults -n httpbin
    ```
 

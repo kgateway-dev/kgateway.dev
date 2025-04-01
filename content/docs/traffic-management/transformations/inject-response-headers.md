@@ -12,12 +12,12 @@ The following example walks you through how to use an Inja template to extract a
 
 ## Inject response headers
    
-1. Create a RoutePolicy resource with your transformation rules. Make sure to create the RoutePolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.
+1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-solo-request` request header and populate the value of that header into an `x-solo-response` response header.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: RoutePolicy
+   kind: TrafficPolicy
    metadata:
      name: transformation
      namespace: httpbin
@@ -30,7 +30,7 @@ The following example walks you through how to use an Inja template to extract a
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the RoutePolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -55,7 +55,7 @@ The following example walks you through how to use an Inja template to extract a
          - type: ExtensionRef
            extensionRef:
              group: gateway.kgateway.dev
-             kind: RoutePolicy
+             kind: TrafficPolicy
              name: transformation
    EOF
    ```
@@ -65,14 +65,14 @@ The following example walks you through how to use an Inja template to extract a
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/response-headers \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-solo-request: my custom request header" 
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vik localhost:8080/response-headers \
+   curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
    -H "x-solo-request: my custom request header"
    ```
@@ -124,10 +124,10 @@ The following example walks you through how to use an Inja template to extract a
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the RoutePolicy resource.
+1. Delete the TrafficPolicy resource.
 
    ```sh
-   kubectl delete RoutePolicy transformation -n httpbin
+   kubectl delete TrafficPolicy transformation -n httpbin
    ```
    
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

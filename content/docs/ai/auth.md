@@ -468,8 +468,9 @@ Pass through an existing token directly from the client or a successful OpenID C
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="prompt-enrichment" title="Manage and enrich prompts" >}}
-  {{< card link="prompt-guards" title="Set up prompt guards" >}}
-  {{< card link="failover" title="Fail over model traffic" >}}
-  {{< card link="observability" title="Collect AI Gateway metrics" >}}
+  {{< card link="failover" title="Model failover" >}}
+  {{< card link="functions" title="Function calling" >}}
+  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="prompt-guards" title="Prompt guards" >}}
+  {{< card link="observability" title="AI Gateway metrics" >}}
 {{< /cards >}}
