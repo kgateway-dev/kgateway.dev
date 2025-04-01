@@ -413,6 +413,8 @@ Pass through an existing token directly from the client or a successful OpenID C
 
 4. Trigger your authenticated client to send a request to the Backend, and verify that you get back a successful response. For example, you might instruct your client to send a curl request through the AI Gateway. Note that the request includes the `Authorization` header, which is required for passthrough authentication.
 
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H "Authorization: Bearer $TOKEN" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -427,7 +429,25 @@ Pass through an existing token directly from the client or a successful OpenID C
         }
       ]
     }' | jq
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl "localhost:8080/openai" -H "Authorization: Bearer $TOKEN" -H content-type:application/json -d '{
+      "model": "gpt-3.5-turbo",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a poetic assistant, skilled in explaining complex programming concepts with creative flair."
+        },
+        {
+          "role": "user",
+          "content": "Compose a poem that explains the concept of recursion in programming."
+        }
+      ]
+    }' | jq
    ```
+   {{% /tab %}}
+   {{< /tabs >}}
    
    Example output: 
    ```json
@@ -468,9 +488,9 @@ Pass through an existing token directly from the client or a successful OpenID C
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="failover" title="Model failover" >}}
-  {{< card link="functions" title="Function calling" >}}
-  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="prompt-guards" title="Prompt guards" >}}
-  {{< card link="observability" title="AI Gateway metrics" >}}
+  {{< card link="/docs/ai/failover" title="Model failover" >}}
+  {{< card link="/docs/ai/functions" title="Function calling" >}}
+  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
+  {{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
 {{< /cards >}}
