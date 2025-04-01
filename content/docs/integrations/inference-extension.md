@@ -49,7 +49,7 @@ graph TD
     end
 ```
 
-The Client sends an inference request to get a response from a local LLM workload. The Gateway receives the request and routes to the InferencePool as a backend. Then, the InferencePool selects a specific InferenceModel to route the request to, based on criteria such as the leads-loaded model or highest criticality based. The Gateway can then return the response to the Client.
+The Client sends an inference request to get a response from a local LLM workload. The Gateway receives the request and routes to the InferencePool as a backend. Then, the InferencePool selects a specific InferenceModel to route the request to, based on criteria such as the least-loaded model or highest criticality. The Gateway can then return the response to the Client.
 
 ## Setup steps {#setup}
 
