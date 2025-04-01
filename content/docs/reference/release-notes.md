@@ -61,7 +61,7 @@ For more information, see the [Security docs](/docs/security/).
 
 #### 🤖 AI Gateway (open sourced)
 
-Enterprise-grade AI gateway functionality has been open sourced for the first time, including the following highlights:
+Enterprise-grade **AI gateway functionality** has been open sourced for the first time, including the following highlights:
 
 * Support for multiple LLM providers such as OpenAI, Anthropic, Gemini, and more
 * Model failover within an LLM provider
@@ -74,7 +74,7 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 
 #### 🧠 KRT-based control plane
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} uses a brand new control plane architecture built on the [Kubernetes Runtime Toolkit (KRT)](https://github.com/kubernetes-sigs/kubebuilder). Benefits include:
+{{< reuse "docs/snippets/product-name-caps.md" >}} uses a **brand new control plane** architecture built on the [Kubernetes Runtime Toolkit (KRT)](https://github.com/kubernetes-sigs/kubebuilder). Benefits include:
 
 - Improved controller performance and scalability
 - Cleaner reconciliation and modular plugin framework
@@ -82,7 +82,7 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 
 For more information, see the [Architecture docs](/docs/about/architecture/).
 
-#### 🕸 Ambient waypoint integration
+#### 🐬 Ambient waypoint integration
 
 {{< reuse "docs/snippets/product-name-caps.md" >}} introduces support for using its Gateway implementation as an **Istio ambient mesh waypoint proxy**:
 
@@ -105,4 +105,8 @@ Because of the extensive API changes, {{< reuse "docs/snippets/product-name.md" 
 
 ### Feedback and next steps {#next}
 
-We’re excited to collaborate with the community to continue shaping the future of API gateways. [Get started](/docs/quickstart/) with {{< reuse "docs/snippets/product-name.md" >}} 2.0 and [let us know how it goes in the CNCF `#kgateway` Slack](https://cloud-native.slack.com/archives/C080D3PJMS4)!
+We’re excited to collaborate with the community to continue shaping the future of API gateways! 
+
+* [Get started](/docs/quickstart/) with {{< reuse "docs/snippets/product-name.md" >}} 2.0.
+* Check out the [Community repo](https://github.com/kgateway-dev/community) for more about contributing to {{< reuse "docs/snippets/product-name.md" >}}.
+* Let us know how it goes in the [CNCF `#kgateway` Slack](https://cloud-native.slack.com/archives/C080D3PJMS4)!
