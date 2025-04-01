@@ -140,7 +140,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    
 5. Verify that the gateway proxy is now successfully deployed. You might need to restart the proxy to apply the latest Gateway settings. 
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
    ```
 
 ## Step 3: Verify the integration {#verify}
