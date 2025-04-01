@@ -23,12 +23,12 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
      namespace: httpbin
    spec:
      transformation:
-       response:
+       request:
          set:
-         - name: ":path"
-           value: '{% if request_header("foo") == "bar" %}/post{% else %}{{ request_header(":path") }}{% endif %}'
-         - name: ":method"
-           value: '{% if request_header("foo") == "bar" %}POST{% else %}{{ request_header(":method") }}{% endif %}'
+         - name: :path
+           value: '{% if request_header("foo") == "bar" %}/post{% else %}{{ request_header(":path")}}{% endif %}'
+         - name: :method
+           value: '{% if request_header("foo") == "bar" %}POST{% else %}{{ request_header(":method")}}{% endif %}'
    EOF
    ```
 
@@ -75,7 +75,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    ```sh
    curl -vi localhost:8080/get \
    -H "foo: bar" \
-   -H "host: www.example.com" \
+   -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -139,7 +139,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    {{% tab %}}
    ```sh
    curl -vi localhost:8080/get \
-   -H "host: www.example.com" \
+   -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
