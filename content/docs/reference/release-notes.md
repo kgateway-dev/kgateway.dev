@@ -1,6 +1,6 @@
 ---
 title: Release notes
-weight: 10
+weight: 100
 ---
 
 Review the release notes for {{< reuse "docs/snippets/product-name.md" >}}. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
