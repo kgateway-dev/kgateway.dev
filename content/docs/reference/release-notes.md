@@ -100,6 +100,7 @@ Because of the extensive API changes, {{< reuse "docs/snippets/product-name.md" 
 - **CRD renames and field removals** to ensure clean, vendor-neutral APIs
 - **Control plane** updated to `{{< reuse "docs/snippets/ns-system.md" >}}`
 - **Default Envoy proxy deployment renamed** to remove the `gloo-proxy-` prefix
+- **Gateway ports** default to `80` and `443` to match the Kubernetes Ingress convention, instead of `8080` and `8443`
 - **Removed Gloo Edge API mode**
 - **Removed Gloo-specific tooling** such as the `glooctl` CLI
 
