@@ -202,7 +202,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
    spec:
      gatewayClassName: kgateway
      listeners:
