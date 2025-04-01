@@ -1,7 +1,7 @@
 ---
 title: Ambient
 weight: 10
-description:
+description: Use kgateway as a gateway proxy in an ambient mesh. 
 ---
 
 Use {{< reuse "docs/snippets/product-name.md" >}} as a gateway proxy in an ambient mesh. 

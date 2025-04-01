@@ -8,4 +8,5 @@ Integrate {{< reuse "docs/snippets/product-name.md" >}} with an Istio service me
 
 {{< cards >}}
   {{< card link="ambient" title="Ambient" >}}
+  {{< card link="sidecar" title="Sidecar" >}}
 {{< /cards >}}
