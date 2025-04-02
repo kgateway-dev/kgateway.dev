@@ -296,7 +296,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
      - name: http
        namespace: {{< reuse "docs/snippets/ns-system.md" >}}
      hostnames:
-     - example.com
+     - www.example.com
      rules:
      - matches:
        - path:
