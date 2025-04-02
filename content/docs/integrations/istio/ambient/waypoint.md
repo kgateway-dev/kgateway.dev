@@ -591,7 +591,7 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s TrafficPolicy to apply a tra
 
 ### Istio AuthorizationPolicy
 
-Apply an Istio AuthoriationPolicy to allow access from specific apps only. 
+Apply an Istio AuthorizationPolicy to allow access from specific apps only. 
 
 1. Send a `GET` request from the client to the httpbin2 app. Verify that your request succeeds. 
    ```sh
