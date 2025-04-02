@@ -23,7 +23,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 In this example, you create a Backend with multiple pools for the same LLM provider, as shown in the following diagram. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
 
-{{< reuse-image src="img/aig-model-failover.svg" caption="Figure: Example of model priority with three OpenAI models." >}}
+{{< reuse-image src="img/aig-model-priority.svg" caption="Figure: Example of model priority with three OpenAI models." width="75%">}}
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
