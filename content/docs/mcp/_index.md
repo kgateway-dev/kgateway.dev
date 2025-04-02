@@ -30,7 +30,7 @@ MCP recently introduced the [MCP Authorization spec](https://spec.modelcontextpr
 
 ## About this guide
 
-In this guide, you explore how to configure {{< reuse "docs/snippets/product-name.md" >}} as an MCP gateway to protect access to a sample MCP tool, `convert_to_markdown`. You use a sample MCP server deployment that is exposed on the MCP Gateway. However, you can easily plug in your own MCP server image if you want to. 
+In this guide, you explore how to configure {{< reuse "docs/snippets/product-name.md" >}} as an MCP Gateway to protect access to a sample MCP tool, `convert_to_markdown`. You use a sample MCP server deployment that is exposed on the MCP Gateway. However, you can easily plug in your own MCP server image if you want to. 
 
 {{< reuse-image src="img/mcp-example.svg" width="500px"  >}}
 
