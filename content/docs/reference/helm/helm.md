@@ -1,6 +1,6 @@
 # kgateway
 
-A Helm chart for the kgateway project.
+A Helm chart for the kgateway project
 
 ## Values
 
