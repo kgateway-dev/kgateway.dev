@@ -257,7 +257,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
 ## Disable rate limiting for a route {#disable-route}
 
-Sometimes, you might want to disable rate limiting for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting the `rateLimit.local` to `{}` in the TrafficPolicy. 
+Sometimes, you might want to disable rate limiting for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting `rateLimit.local` to `{}` in the TrafficPolicy. 
 
 1. Create a Gateway-level TrafficPolicy to enforce local rate limiting on all routes. For more information, refer to the [Gateway configuration](#gateway).
 
@@ -282,7 +282,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    EOF
    ```
 
-2. Create an HTTPRoute for the route that you want to exclude from rate limiting, such as `/anything` on the `httpbin` app.
+2. Create an HTTPRoute for the route that you want to exclude from rate limiting, such as `/anything` on the `httpbin` app. Note that because no TrafficPolicy applies to this HTTPRoute yet, the Gateway-level rate limit policy is enforced for the `/anything` route.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -313,12 +313,12 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080" && curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"
+   for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vi localhost:8080/anything -H "host: www.example.com" && curl -vi localhost:8080/anything -H "host: www.example.com"
+   for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -366,17 +366,17 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    EOF
    ```
 
-5. Repeat the request. This time, the request succeeds because the HTTPRoute is excluded from rate limiting.
+5. Repeat the requests. This time, the requests succeed because the HTTPRoute is excluded from rate limiting.
 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080" && curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"
+   for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   curl -vi localhost:8080/anything -H "host: www.example.com" && curl -vi localhost:8080/anything -H "host: www.example.com"
+   for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```
    {{% /tab %}}
    {{< /tabs >}}
