@@ -15,35 +15,35 @@ description: ""
 
   <div class="flex gap-8 flex-wrap justify-center px-8 md:px-12 xl:px-25">
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <a href="/docs/about/overview/#what-is-an-ingress" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
-        <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
-          <img src="/feature-ingress.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An ingress/<br/>edge router for Kubernetes</h3>
-        </div>
-        <p class="text-primary-text text-center">Powered by Envoy, kgateway is a world-leading Cloud Native ingress.</p>
-      </a>
-      <a href="/docs/about/overview/#what-is-an-api-gateway" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/about/overview" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-api-gateway.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An advanced<br/>API gateway</h3>
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An Advanced Ingress Controller and Next-Gen API Gateway</h3>
         </div>
-        <p class="text-primary-text text-center px-4">Aggregate web APIs and apply key functions like authentication, authorization and rate limiting in one place</p>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Aggregate web APIs and apply functions like authentication, authorization and rate limiting in one place.</p>
+      </a>
+      <a href="/docs/ai/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+        <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
+          <img src="/use-case-ai.svg" />
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An AI Gateway that Supports and Secures LLM Usage</h3>
+        </div>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Protect applications, models, and data from inappropriate access.</p>
       </a>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <a href="/docs/integrations/istio/ambient/waypoint/" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/integrations/inference-extension/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
-          <img src="/feature-waypoint.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">A better<br/>waypoint proxy for<br/>ambient mesh</h3>
+          <img src="/feature-ingress.svg" />
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An LLM Gateway utilizing the Inference Extension project</h3>
         </div>
-        <p class="text-primary-text text-center">Use the same stack for east-west management as you do for north-south.</p>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Intelligently route to AI inference workloads and LLMs in your Kubernetes environment.</p>
       </a>
-      <a href="/docs/ai/" class="flex md:flex-col items-center bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/mcp" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
-          <img src="/use-case-ai.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center">An AI gateway for securing LLMs</h3>
+          <img src="/feature-mcp.svg" />
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">A Native Model Context Protocol (MCP) Gateway</h3>
         </div>
-        <p class="text-primary-text text-center">Protect applications, models, and data from inappropriate access, whether you're producing or consuming.</p>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Federate MCP tool servers into a single, scalable, and secure endpoint.</p>
       </a>
     </div>
   </div>  
@@ -55,7 +55,7 @@ description: ""
       About kgateway
     </h2>
     <div class="flex gap-8 flex-wrap justify-center text-l lg:text-xl px-4">
-      <p class="text-primary-text max-w-4xl mx-auto">kgateway is the most mature and widely deployed Envoy-based gateway in the market today. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls, to advanced AI gateway use cases for safety, security, and governance when integrating applications with third-party LLMs. kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
+      <p class="text-primary-text max-w-4xl mx-auto">kgateway is the most mature and widely deployed Envoy-based gateway in the market today. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls, to advanced AI gateway use cases for safety, security, and governance when serving models or integrating applications with third-party LLMs. kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
       <p class="text-primary-text max-w-4xl mx-auto">kgateway was launched in 2018 as <b>Gloo</b>. Since then, the project has steadily evolved to become the most trusted and feature-rich API gateway for Kubernetes, processing billions of API requests for many of the world's biggest companies.</p>
     </div>
   </div>
