@@ -34,6 +34,21 @@ The {{< reuse "docs/snippets/product-name.md" >}} includes the following capabil
 * Transformation of request/response via a super-fast C++ templating filter built on Inja
 * Envoy filters to call AWS Lambda directly, handling the complex security handshaking
 
+## What is the difference between kgateway and Istio?
+
+[Istio](https://istio.io/latest/docs/overview/what-is-istio/) is a service mesh that helps you manage, secure, and observe traffic for service-to-service communication. Although it includes some ingress gateway capabilities to get traffic into the cluster, Istio focuses more on east-west mesh use cases, especially in large, distributed environments. Istio operates the mesh by using either a per-pod sidecar or per-node ztunnel architecture.
+
+The {{< reuse "docs/snippets/product-name.md" >}} project is not a service mesh. Instead {{< reuse "docs/snippets/product-name.md" >}} provides a lightweight control plane to manage Envoy-based API gateways, particularly for north-south edge ingress use cases in any Kubernetes-based environment. 
+
+{{< reuse "docs/snippets/product-name-caps.md" >}} can be deployed complementary to a service mesh like Istio. Istio solves the challenges of service-to-service communication by controlling requests as they flow through the system. {{< reuse "docs/snippets/product-name-caps.md" >}} can be deployed at the edge of the service-mesh boundary, between service meshes, or within the mesh to add the following capabilities:
+
+* Mutual TLS (mTLS) encryption of traffic between the gateway and services
+* Transformation of request/response to decouple backend APIs from frontend
+* Function routing such as AWS Lambda
+* AI Gateway, MCP server, and other unique {{< reuse "docs/snippets/product-name.md" >}} features
+
+For examples, see the [Istio integration guides](/docs/integrations/istio/).
+
 ## What license is kgateway under?
 
 The {{< reuse "docs/snippets/product-name.md" >}} project uses [Apache License 2.0](http://www.apache.org/licenses/).
@@ -58,16 +73,3 @@ The changelog is part of each [GitHub release](https://github.com/kgateway-dev/k
 {{< cards >}}
   {{< card link="https://www.solo.io/products/gloo-gateway/" title="Solo.io" tag= "Enterprise" image="/img/gloo-gateway-ver-light-on-dark.png" icon="external-link">}}
 {{< /cards >}} -->
-
-## Can I use kgateway in a service mesh?
-
-Yes, you can install {{< reuse "docs/snippets/product-name.md" >}} in a service mesh environment, such as Istio.
-
-The {{< reuse "docs/snippets/product-name.md" >}} project is not a service mesh, but can be deployed complementary to a service mesh like Istio. Istio solves the challenges of service-to-service communication by controlling requests as they flow through the system. {{< reuse "docs/snippets/product-name-caps.md" >}} can be deployed at the edge of the service-mesh boundary, between service meshes, or within the mesh to add the following capabilities:
-
-* Mutual TLS (mTLS) encryption of traffic between the gateway and services
-* Transformation of request/response to decouple backend APIs from frontend
-* Function routing such as AWS Lambda
-
-For an example, see the [Istio integration guide](/docs/integrations/istio/ambient-ingress/).
-<!--For examples, see the [Istio integration guides](/docs/integrations/istio/).-->
