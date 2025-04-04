@@ -61,7 +61,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    | `authToken` | Configure the authentication token for OpenAI API. The example uses an inline token. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. AI Gateway automatically rewrites this path to the API path of a supported LLM, such as `/v1/chat/completions` in OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -81,12 +81,6 @@ Provide the token directly in the configuration for the Backend. This option is 
        - path:
            type: PathPrefix
            value: /openai
-       filters:
-       - type: URLRewrite
-         urlRewrite:
-           path:
-             type: ReplaceFullPath
-             replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -230,7 +224,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    | `authToken` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. AI Gateway automatically rewrites this path to the API path of a supported LLM, such as `/v1/chat/completions` in OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -250,12 +244,6 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
        - path:
            type: PathPrefix
            value: /openai
-       filters:
-       - type: URLRewrite
-         urlRewrite:
-           path:
-             type: ReplaceFullPath
-             replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
@@ -377,7 +365,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    | `authToken` | Configure the authentication token for OpenAI API. The example uses passthrough authentication. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend backend that you previously created. AI Gateway automatically rewrites this path to the API path of a supported LLM, such as `/v1/chat/completions` in OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -397,12 +385,6 @@ Pass through an existing token directly from the client or a successful OpenID C
        - path:
            type: PathPrefix
            value: /openai
-       filters:
-       - type: URLRewrite
-         urlRewrite:
-           path:
-             type: ReplaceFullPath
-             replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
          namespace: {{< reuse "docs/snippets/ns-system.md" >}}
