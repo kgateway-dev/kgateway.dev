@@ -33,4 +33,8 @@
 - description: Deep dive into the unique implementation of kgateway being utilized as a waypoint in Istio ambient mesh.
   href: https://youtu.be/B8oZ1seIDIM
   thumbnailHref: /thumbnails/kgateway-waypoint.jpg
+
+- description: Explore how to conduct canary releases with kgateway and Argo
+  href: https://youtu.be/nI52m7S5gLY
+  thumbnailHref: /thumbnails/canary-release.jpg
   
