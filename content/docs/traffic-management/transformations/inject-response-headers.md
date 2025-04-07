@@ -44,7 +44,7 @@ The following example walks you through how to use an Inja template to extract a
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:
@@ -144,7 +144,7 @@ The following example walks you through how to use an Inja template to extract a
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:

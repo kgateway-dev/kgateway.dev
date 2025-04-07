@@ -384,7 +384,7 @@ You can add the `moderation` section of any TrafficPolicy resource, either as a 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
+kubectl delete TrafficPolicy -n kgateway-system -l app=ai-kgateway
 ```
 
 ## Next

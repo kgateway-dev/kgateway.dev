@@ -21,7 +21,7 @@ metadata:
 spec:
   parentRefs:
   - name: http
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+    namespace: kgateway-system
   hostnames:
     - httpbin.example.com
   rules:

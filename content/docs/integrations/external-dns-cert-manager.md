@@ -31,7 +31,7 @@ weight: 10
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "${DOMAIN}"
      rules:
@@ -145,7 +145,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    kind: Issuer
    metadata:
      name: letsencrypt-http
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      acme:
        email: <email_address>
@@ -157,7 +157,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
              gatewayHTTPRoute:
                parentRefs:
                  - name: http
-                   namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+                   namespace: kgateway-system
                    kind: Gateway
    EOF
    ```  
@@ -167,13 +167,13 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    | `acme` | The protocol to use for issuing certificates. In this example, you configure cert-manager to obtain a Let's Encrypt certificate by using the ACME (Automated Certificate Management Environment) protocol. |
    | `email` | Provide an email address where you can receive Let's Encrypt notifications for certificate expiration and account recovery. |
    | `server` | The Let's Encrypt ACME server used for issuing certificates. The value `https://acme-staging-v02.api.letsencrypt.org/directory` uses the Let’s Encrypt staging environment to avoid hitting rate limits during testing. For production setups, use the `https://acme-v02.api.letsencrypt.org/directory` server instead. |
-   | `privateKeySecretRef.name` | Using your email address, cert-manager automatically generates and stores an ACME private account key in a Kubernetes secret of this name. cert-manager then uses this key to authenticate with Let’s Encrypt. This example uses the name `letsencrypt-http-issuer-account-key` in the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. |
+   | `privateKeySecretRef.name` | Using your email address, cert-manager automatically generates and stores an ACME private account key in a Kubernetes secret of this name. cert-manager then uses this key to authenticate with Let’s Encrypt. This example uses the name `letsencrypt-http-issuer-account-key` in the `kgateway-system` namespace. |
    | `solvers.http01` | To automate domain validation and certificate issuance, you use the HTTP-01 challenge. The HTTP-01 challenge is designed to prove that you have control over your domain by requiring you to store a challenge token in your cluster so that Let's Encrypt can validate it. For more information about this challenge, see the [Let's Encrypt documentation](https://letsencrypt.org/docs/challenge-types/#http-01-challenge). |
    | `gatewayHTTPRoute.parentRefs` | The reference to the Gateway resource to solve certificate challenges. This example uses the `http` Gateway that you created in the get started guide. |
 
 3. Verify that your TLS certificates are created successfully. Note that depending on the CA that you use, this process might take a while to complete. 
    ```sh
-   kubectl get issuer letsencrypt-http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get issuer letsencrypt-http -n kgateway-system
    ```
 
    Example output for successfully issued TLS certificates: 
@@ -191,7 +191,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    
 4. Verify that the TLS certificate was added to the secret that you configured in the cert-manager issuer resource. 
    ```sh
-   kubectl get secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get secret letsencrypt-http-issuer-account-key -n kgateway-system -o yaml
    ```
 
 ## Configure an HTTPS listener on your gateway
@@ -205,7 +205,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
      name: http
      annotations:
        cert-manager.io/issuer: letsencrypt-http
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      listeners:
@@ -232,7 +232,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    
 2. Verify that the gateway is configured successfully. You can also review the external address that is assigned to the gateway. 
    ```sh
-   kubectl get gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get gateway http -n kgateway-system
    ```
 
    Example output for an AWS EKS cluster: 
@@ -329,12 +329,12 @@ server: envoy
 
 2. Delete the Issuer resource.
    ```sh
-   kubectl delete Issuer letsencrypt-http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete Issuer letsencrypt-http -n kgateway-system
    ```
 
 3. Delete the `letsencrypt-http-issuer-account-key` secret.
    ```sh
-   kubectl delete secret letsencrypt-http-issuer-account-key -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete secret letsencrypt-http-issuer-account-key -n kgateway-system
    ```
 
 4. Remove cert-manager.

@@ -3,25 +3,25 @@ title: Debug your setup
 weight: 15
 ---
 
-Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/product-name.md" >}} setup.
+Use built-in tools to troubleshoot issues in your kgateway setup.
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} is based on [Envoy proxy](https://www.envoyproxy.io). If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy. In this guide you learn how to use the {{< reuse "docs/snippets/product-name.md" >}} and Envoy debugging tools to troubleshoot misconfigurations on the gateway.
+Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy. In this guide you learn how to use the kgateway and Envoy debugging tools to troubleshoot misconfigurations on the gateway.
 
 ## Debug your gateway setup
 
-1. Make sure that the {{< reuse "docs/snippets/product-name.md" >}} control plane and gateway proxies are running. For any pod that is not running, describe the pod for more details.
+1. Make sure that the kgateway control plane and gateway proxies are running. For any pod that is not running, describe the pod for more details.
    
    ```shell
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
-   <!-- TODO: CLI You can do that by using the `{{< reuse "docs/snippets/cli-name.md" >}} check` [command](/docs/reference/cli/glooctl_check/) that quickly checks the health of {{< reuse "docs/snippets/product-name.md" >}} deployments, pods, and custom resources, and verifies Gloo resource configuration. Any issues that are found are reported back in the CLI output. 
+   <!-- TODO: CLI You can do that by using the `{{< reuse "docs/snippets/cli-name.md" >}} check` [command](/docs/reference/cli/glooctl_check/) that quickly checks the health of kgateway deployments, pods, and custom resources, and verifies Gloo resource configuration. Any issues that are found are reported back in the CLI output. 
    ```sh
    {{< reuse "docs/snippets/cli-name.md" >}} check
    ```
    
    Example output for a misconfigured VirtualHostOption:
    ```console
-   Found rejected VirtualHostOption by '{{< reuse "docs/snippets/ns-system.md" >}}': {{< reuse "docs/snippets/ns-system.md" >}} jwt (Reason: 2 errors occurred:
+   Found rejected VirtualHostOption by 'kgateway-system': kgateway-system jwt (Reason: 2 errors occurred:
 	* invalid virtual host [http~bookinfo_example] while processing plugin enterprise_warning: Could not load configuration for the following Enterprise features: [jwt]
    ```
    -->
@@ -35,7 +35,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
 3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
    
    ```sh
-   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000 &  
+   kubectl port-forward deploy/http -n kgateway-system 19000 &  
    ```
    
    * [http://localhost:19000/](http://localhost:19000/)
@@ -45,7 +45,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
    Common endpoints that can help troubleshoot your setup further, include: 
    | Endpoint | Description| 
    | -- | -- | 
-   | config_dump | Get the configuration that is available in the Envoy proxy. Any {{< reuse "docs/snippets/product-name.md" >}} resources that you create are translated in to Envoy configuration. Depending on whether or not you enabled resource validation, you might have applied invalid configuration that is rejected Envoy. You can also use `{{< reuse "docs/snippets/cli-name.md" >}} proxy dump` to get the Envoy proxy configuration. | 
+   | config_dump | Get the configuration that is available in the Envoy proxy. Any kgateway resources that you create are translated in to Envoy configuration. Depending on whether or not you enabled resource validation, you might have applied invalid configuration that is rejected Envoy. You can also use `{{< reuse "docs/snippets/cli-name.md" >}} proxy dump` to get the Envoy proxy configuration. | 
    | listeners | See the listeners that are configured on your gateway. | 
    | logging | Review the log level that is set for each component. |  
    | stats/prometheus | View metrics that Envoy emitted and sent to the built-in Prometheus instance. |
@@ -54,10 +54,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "docs/snippets/produ
    
    ```bash
    # kgateway control plane
-   kubectl logs -n {{< reuse "docs/snippets/ns-system.md" >}} deployment/kgateway
+   kubectl logs -n kgateway-system deployment/kgateway
    
    # Replace $GATEWAY_NAME with the name of your gateway.
-   kubectl logs -n {{< reuse "docs/snippets/ns-system.md" >}} deployment/$GATEWAY_NAME
+   kubectl logs -n kgateway-system deployment/$GATEWAY_NAME
    ```
    
 <!-- TODO: CLI
@@ -76,7 +76,7 @@ Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that
 -->
 
 <!-- TODO: CLI
-5. Check the proxy configuration that is served by the {{< reuse "docs/snippets/product-name.md" >}} xDS server. When you create {{< reuse "docs/snippets/product-name.md" >}} resources, these resources are translated into Envoy configuration and sent to the xDS server. If {{< reuse "docs/snippets/product-name.md" >}} resources are configured correctly, the configuration must be included in the proxy configuration that is served by the xDS server. 
+5. Check the proxy configuration that is served by the kgateway xDS server. When you create kgateway resources, these resources are translated into Envoy configuration and sent to the xDS server. If kgateway resources are configured correctly, the configuration must be included in the proxy configuration that is served by the xDS server. 
    ```sh
    {{< reuse "docs/snippets/cli-name.md" >}} proxy served-config --name http
    ```
@@ -92,18 +92,18 @@ Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that
    
    You can use the `kubectl logs` command to view logs for individual components. 
    ```bash
-   kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l kgateway=kgateway
+   kubectl logs -f -n kgateway-system -l kgateway=kgateway
    ```
 
-   To follow the logs of other {{< reuse "docs/snippets/product-name.md" >}} components, simply change the value of the `gloo` label as shown in the table below.
+   To follow the logs of other kgateway components, simply change the value of the `gloo` label as shown in the table below.
 
    | Component | Command |
    | ------------- | ------------- |
-   | Gloo control plane | `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l kgateway=kgateway` |
-   | {{< reuse "docs/snippets/product-name.md" >}} proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l gloo=kube-gateway` |
-   | Redis | `kubectl logs -f -n {{< reuse "docs/snippets/ns-system.md" >}} -l gloo=redis` |
+   | Gloo control plane | `kubectl logs -f -n kgateway-system -l kgateway=kgateway` |
+   | kgateway proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n kgateway-system -l gloo=kube-gateway` |
+   | Redis | `kubectl logs -f -n kgateway-system -l gloo=redis` |
 
-7. If you still cannot troubleshoot the issue, capture the logs and the state of {{< reuse "docs/snippets/product-name.md" >}} in a file. 
+7. If you still cannot troubleshoot the issue, capture the logs and the state of kgateway in a file. 
    ```bash
    {{< reuse "docs/snippets/cli-name.md" >}} debug logs -f gloo-logs.log
    {{< reuse "docs/snippets/cli-name.md" >}} debug yaml -f gloo-yamls.yaml

@@ -17,8 +17,8 @@
 
 4. Create a Kubernetes secret to store your server TLS certificate. You create the secret in the same cluster and namespace that the gateway is deployed to.
    ```sh
-   kubectl create secret tls -n {{< reuse "docs/snippets/ns-system.md" >}} https \
+   kubectl create secret tls -n kgateway-system https \
      --key example_certs/gateway.key \
      --cert example_certs/gateway.crt
-   kubectl label secret https gateway=https --namespace {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl label secret https gateway=https --namespace kgateway-system
    ```

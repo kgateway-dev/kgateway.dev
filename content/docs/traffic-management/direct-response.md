@@ -5,7 +5,7 @@ prev: /docs/traffic-management/destination-types
 next: /docs/traffic-management/match
 ---
 
-Use the {{< reuse "docs/snippets/product-name.md" >}} [DirectResponse](/docs/reference/api/top-level/direct-response/) API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
+Use the kgateway [DirectResponse](/docs/reference/api/top-level/direct-response/) API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
 
 ## About direct responses
 
@@ -63,7 +63,7 @@ The following rules are applied during schema validation:
      - direct-response.com
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      rules:
      - matches:
        - path:

@@ -8,20 +8,20 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 ## Before you begin
 
-[Get started](/docs/quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "docs/snippets/product-name.md" >}}.
+[Get started](/docs/quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and kgateway.
 
 ## Enable the AI extension {#ai-extension}
 
-Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installation to use AI Gateway.
+Configure your kgateway Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "docs/snippets/product-name.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade](/docs/operations/upgrade/) kgateway with the AI Gateway extension enabled.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings, update the following command accordingly.
    {{< /callout >}}
 
    ```shell
-   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
         --set gateway.aiExtension.enabled=true \
         --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
@@ -65,7 +65,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    EOF
    ```
 
-2. Create a Gateway that uses the default {{< reuse "docs/snippets/product-name.md" >}} GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step.
+2. Create a Gateway that uses the default kgateway GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -73,7 +73,7 @@ Configure your {{< reuse "docs/snippets/product-name.md" >}} Helm chart installa
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: ai-gateway
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: ai-kgateway
    spec:

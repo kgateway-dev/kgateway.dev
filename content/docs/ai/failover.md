@@ -78,13 +78,13 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    kind: HTTPRoute
    metadata:
      name: model-failover
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: model-failover
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -98,7 +98,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -161,7 +161,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 {{< reuse "docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete backend,httproute -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=model-failover
+   kubectl delete backend,httproute -n kgateway-system -l app=model-failover
    ```
 
 ## Next

@@ -5,14 +5,14 @@ prev: /docs/about/custom-resources
 next: /docs/about/policies/TrafficPolicy
 ---
 
-Learn more about the custom resources that you can use to apply policies in {{< reuse "docs/snippets/product-name.md" >}}. 
+Learn more about the custom resources that you can use to apply policies in kgateway. 
 
 
 While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such direct responses, local rate limiting, or request and response transformations. Policies allow you to apply intelligent traffic management, resiliency, and security standards to an HTTPRoute or Gateway. 
 
 ## Policy CRDs
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} uses the following custom resources to attach policies to routes and gateway listeners. 
+Kgateway uses the following custom resources to attach policies to routes and gateway listeners. 
 
 {{< cards >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
@@ -24,7 +24,7 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 ## Supported policies {#supported-policies}
 
-Review the policies that you can configure in {{< reuse "docs/snippets/product-name.md" >}} and the level at which you can apply them.   
+Review the policies that you can configure in kgateway and the level at which you can apply them.   
 
 | Policy | Applied via |
 | -- | -- | 

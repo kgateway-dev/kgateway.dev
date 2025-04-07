@@ -24,7 +24,7 @@ Install the latest version of `{{< reuse "docs/snippets/cli-name.md" >}}`. Make 
 
 You can download a specific version of `{{< reuse "docs/snippets/cli-name.md" >}}` directly from the GitHub releases page.
 
-1. In your browser, navigate to the [{{< reuse "docs/snippets/product-name.md" >}} project releases](https://github.com/kgateway-dev/kgateway/releases).
+1. In your browser, navigate to the [kgateway project releases](https://github.com/kgateway-dev/kgateway/releases).
 2. Choose the version of `{{< reuse "docs/snippets/cli-name.md" >}}` to install.
 3. Click the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that you want to install.
 4. In the **Assets**, download the `{{< reuse "docs/snippets/cli-name.md" >}}` package that matches your operating system, and follow your operating system procedures for replacing your existing `{{< reuse "docs/snippets/cli-name.md" >}}` binary file with the upgraded version.
@@ -32,12 +32,12 @@ You can download a specific version of `{{< reuse "docs/snippets/cli-name.md" >}
 
 ## Upgrade the CLI
 
-When it's time to upgrade {{< reuse "docs/snippets/product-name.md" >}}, make sure to update the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI version before upgrading.
+When it's time to upgrade kgateway, make sure to update the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI version before upgrading.
 
-You can use the `{{< reuse "docs/snippets/cli-name.md" >}} upgrade` command to upgrade or roll back the `{{< reuse "docs/snippets/cli-name.md" >}}` version. For example, you might change versions during an upgrade process, or when you have multiple versions of {{< reuse "docs/snippets/product-name.md" >}} across clusters that you manage from the same workstation. For more options, run `{{< reuse "docs/snippets/cli-name.md" >}} upgrade --help`.
+You can use the `{{< reuse "docs/snippets/cli-name.md" >}} upgrade` command to upgrade or roll back the `{{< reuse "docs/snippets/cli-name.md" >}}` version. For example, you might change versions during an upgrade process, or when you have multiple versions of kgateway across clusters that you manage from the same workstation. For more options, run `{{< reuse "docs/snippets/cli-name.md" >}} upgrade --help`.
 
 {{< callout type="info" >}}
-Upgrading the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI does _not_ upgrade the {{< reuse "docs/snippets/product-name.md" >}} version that you run in your clusters.
+Upgrading the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI does _not_ upgrade the kgateway version that you run in your clusters.
 {{< /callout >}}
 
 1. Set the version to upgrade `{{< reuse "docs/snippets/cli-name.md" >}}` to in an environment variable. Include the patch version.
@@ -50,7 +50,7 @@ Upgrading the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI does _not_ upgrade
    {{< reuse "docs/snippets/cli-name.md" >}} upgrade --release v${CLI_VERSION}
    ```
 
-3. Verify the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI is installed and running the appropriate version. In the output, the **Client** is your local version. The **Server** is the version that runs in your cluster, and is `undefined` if {{< reuse "docs/snippets/product-name.md" >}} is not installed yet.
+3. Verify the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI is installed and running the appropriate version. In the output, the **Client** is your local version. The **Server** is the version that runs in your cluster, and is `undefined` if kgateway is not installed yet.
    ```bash
    {{< reuse "docs/snippets/cli-name.md" >}} version -o table
    ```
@@ -65,9 +65,9 @@ rm ~/.gloo/bin/{{< reuse "docs/snippets/cli-name.md" >}}
 
 ## Skew policy
 
-Use the same version of the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI as the {{< reuse "docs/snippets/product-name.md" >}} version that you installed in your cluster.
+Use the same version of the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI as the kgateway version that you installed in your cluster.
 
-* Slight skews within minor versions typically work, such as `{{< reuse "docs/snippets/cli-name.md" >}}` 1.18.1 and {{< reuse "docs/snippets/product-name.md" >}} 1.18.0.
+* Slight skews within minor versions typically work, such as `{{< reuse "docs/snippets/cli-name.md" >}}` 1.18.1 and kgateway 1.18.0.
 * Compatibility across beta versions is not guaranteed, even within minor version skews.
 * To resolve bugs in `{{< reuse "docs/snippets/cli-name.md" >}}`, you might have to upgrade the CLI to a specific or latest version.
 
@@ -81,13 +81,13 @@ For more information about each `{{< reuse "docs/snippets/cli-name.md" >}}` comm
 
 ## Other command line tools {#other-cli}
 
-As you use {{< reuse "docs/snippets/product-name.md" >}}, you might need the following common cluster management command line tools on your local system.
+As you use kgateway, you might need the following common cluster management command line tools on your local system.
 
 | CLI tool | Description |
 | -------- | ----------- |
 | Cloud provider CLI | The CLI to interact with your preferred cloud provider, such as `aws` or `gcloud`. You might also have local cluster testing tools such as `kind` or `k3d`. `gcloud`. |
-| [`istioctl`](https://istio.io/latest/docs/setup/getting-started/#download) | The Istio command line tool, if you plan to use the Istio integration in your {{< reuse "docs/snippets/product-name.md" >}} environment. The guides in this documentation use Istio version {{< reuse "docs/versions/istio_patch.md" >}}. To check your installed version, run `istioctl version`. |
+| [`istioctl`](https://istio.io/latest/docs/setup/getting-started/#download) | The Istio command line tool, if you plan to use the Istio integration in your kgateway environment. The guides in this documentation use Istio version {{< reuse "docs/versions/istio_patch.md" >}}. To check your installed version, run `istioctl version`. |
 | [`helm`](https://helm.sh/docs/intro/install/)| The Kubernetes package manager, to customize multiple settings in a {{% reuse "docs/snippets/product-name.md" %}} installation. |
 | [`jq`](https://stedolan.github.io/jq/download/) | Parse JSON output, such as from logs, to get values that you can use in subsequent commands, environment variables, or other contexts. |
-| [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) | The Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use with {{< reuse "docs/snippets/product-name.md" >}}. |
+| [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl) | The Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use with kgateway. |
 | `openssl` | {{< reuse "docs/snippets/cert_openssl.md" >}} |

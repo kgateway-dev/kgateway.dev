@@ -3,7 +3,7 @@ title: AWS Lambda
 weight: 30
 ---
 
-Use {{< reuse "docs/snippets/product-name.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
+Use kgateway to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
 ## About
 
@@ -15,7 +15,7 @@ For more information, see the AWS Lambda documentation on [configuring Lambda fu
 
 ## Lambda access type
 
-Check out the following guides for examples on how to invoke Lambda functions with {{< reuse "docs/snippets/product-name.md" >}}, depending on the type ofauthentication that you want to use.
+Check out the following guides for examples on how to invoke Lambda functions with kgateway, depending on the type ofauthentication that you want to use.
 
 {{< cards >}}
   {{< card link="creds-secret" title="Access AWS Lambda with a credentials secret" >}}

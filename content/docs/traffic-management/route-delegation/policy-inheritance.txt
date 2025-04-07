@@ -60,7 +60,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    kind: HTTPRoute
    metadata:
     name: parent
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+    namespace: kgateway-system
    spec:
     parentRefs:
     - name: http
@@ -95,7 +95,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    kind: TrafficPolicy
    metadata:
     name: parent-remove-header
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+    namespace: kgateway-system
    spec:
     targetRefs:
     - group: gateway.networking.k8s.io
@@ -162,7 +162,7 @@ Set up a parent, child, grandchild route delegation example and explore how poli
    spec:
      parentRefs:
      - name: parent
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
        group: gateway.networking.k8s.io
        kind: HTTPRoute
      rules:
@@ -331,11 +331,11 @@ Verify that the policies are correctly inherited along the delegation chain.
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete httproute parent -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete httproute grandchild -n team2
-kubectl delete TrafficPolicy parent-remove-header -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete TrafficPolicy parent-remove-header -n kgateway-system
 kubectl delete TrafficPolicy child-team1-fault -n team1
 kubectl delete TrafficPolicy child-team2-rewrite -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

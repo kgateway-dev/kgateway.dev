@@ -59,7 +59,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:
@@ -143,7 +143,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:

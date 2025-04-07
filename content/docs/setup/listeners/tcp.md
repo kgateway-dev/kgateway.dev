@@ -67,7 +67,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    kind: Gateway
    metadata:
      name: tcp-gateway
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: tcp-echo
    spec:
@@ -90,7 +90,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
    
    ```sh
-   kubectl get gateway tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get gateway tcp-gateway -n kgateway-system -o yaml
    ```
 
    Example output:
@@ -143,13 +143,13 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    kind: TCPRoute
    metadata:
      name: tcp-route-echo
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: tcp-echo
    spec:
      parentRefs:
        - name: tcp-gateway
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
          sectionName: tcp
      rules:
        - backendRefs:
@@ -162,7 +162,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 5. Verify that the TCPRoute is applied successfully. 
    
    ```sh
-   kubectl get tcproute/tcp-route-echo -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get tcproute/tcp-route-echo -n kgateway-system -o yaml
    ```
 
    Example output:
@@ -201,13 +201,13 @@ Verify that the TCP route to the TCP echo app is working.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} tcp-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system tcp-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/tcp-gateway -n {{< reuse "docs/snippets/ns-system.md" >}} 8000:8000
+   kubectl port-forward deployment/tcp-gateway -n kgateway-system 8000:8000
    ```
    {{% /tab %}}
    {{< /tabs >}}

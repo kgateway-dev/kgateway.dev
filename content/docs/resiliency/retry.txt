@@ -4,11 +4,11 @@ weight: 10
 description: Specify the number of times and duration you want kgateway to try a connection to an unresponsive backend service.
 ---
 
-Specify the number of times and duration you want {{< reuse "docs/snippets/product-name.md" >}} to try a connection to an unresponsive backend service.
+Specify the number of times and duration you want kgateway to try a connection to an unresponsive backend service.
 
 ## About retries
 
-A retry specifies the maximum number of times {{< reuse "docs/snippets/product-name.md" >}} attempts to connect to a backend service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
+A retry specifies the maximum number of times kgateway attempts to connect to a backend service if the initial call fails. Retries can enhance service availability and application performance by making sure that calls don’t fail permanently because of transient problems such as a temporarily overloaded service or network.
 
 To configure retries, you can use the following settings in the TrafficPolicy resource: 
 - `options.retries.retryOn` : The condition under which to retry forwarding the request to the backend service. This setting exposes the [`x-envoy-retry-on` Envoy header](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter#x-envoy-retry-on). 
@@ -51,7 +51,7 @@ Use a TrafficPolicy resource to specify retries for a specific route.
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - retry.example
      rules:
@@ -67,7 +67,7 @@ Use a TrafficPolicy resource to specify retries for a specific route.
    EOF
    ```
 
-3. Send a request to the httpbin app on the `retry.example` domain. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "docs/snippets/product-name.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
+3. Send a request to the httpbin app on the `retry.example` domain. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, kgateway expects requests to the httpbin app to succeed within the set timeout. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh

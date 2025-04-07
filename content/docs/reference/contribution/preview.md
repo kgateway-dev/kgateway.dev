@@ -3,7 +3,7 @@ title: Preview and build locally
 weight: 20
 ---
 
-The {{< reuse "docs/snippets/product-name.md" >}} documentation is built by using the static site generator Hugo. As you write your content, you can locally preview your changes. 
+The kgateway documentation is built by using the static site generator Hugo. As you write your content, you can locally preview your changes. 
 
 ## Before you begin
 

@@ -3,11 +3,11 @@ title: Release notes
 weight: 100
 ---
 
-Review the release notes for {{< reuse "docs/snippets/product-name.md" >}}. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
+Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
 ## v2.0.0
 
-**{{< reuse "docs/snippets/product-name-caps.md" >}} version 2.0.0** is the first official release of the project following its donation to the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/). The donation marks a new chapter for the codebase, which was originally developed as the Gloo project by Solo.io. The 2.0 release introduces foundational changes to the Gloo project that lay the groundwork for a vibrant, open-source ecosystem built around the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/).
+**Kgateway version 2.0.0** is the first official release of the project following its donation to the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/). The donation marks a new chapter for the codebase, which was originally developed as the Gloo project by Solo.io. The 2.0 release introduces foundational changes to the Gloo project that lay the groundwork for a vibrant, open-source ecosystem built around the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/).
 
 ### Why 2.0 was needed {#why}
 
@@ -26,11 +26,11 @@ These changes ensure that kgateway is a **standards-first** and **community-owne
 
 ### Key Features {#features}
 
-Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}} offers a host of features designed to make it easy to extend and customize your implementation of the Gateway API.
+Besides the versioned API changes, kgateway offers a host of features designed to make it easy to extend and customize your implementation of the Gateway API.
 
 #### 🚀 Kgateway custom resources {#kgateway-crs}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} introduces powerful, standards-aligned extensions via custom resources that follow the Gateway API’s policy attachment pattern. Key new resources include:
+Kgateway introduces powerful, standards-aligned extensions via custom resources that follow the Gateway API’s policy attachment pattern. Key new resources include:
 
 * [Backend](/docs/reference/api/#backend): Define routable backends such as AI providers (OpenAI, Azure, Gemini, and more), AWS Lambda functions, or static server for use by Gateways.
 * [DirectResponse](/docs/reference/api/#directresponse): Enable Gateways to directly return immediate HTTP responses, specifying custom status codes and optional response content without contacting backend services.
@@ -41,7 +41,7 @@ Besides the versioned API changes, {{< reuse "docs/snippets/product-name.md" >}}
 
 #### 🚦 Traffic management {#traffic}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} gives you sophisticated traffic-handling policies, including:
+Kgateway gives you sophisticated traffic-handling policies, including:
 
 * **TrafficPolicy** for request transformation and enforcement of security policy such as external authorization and local rate limiting.
 * **External processing (ExtProc)** to modify HTTP requests and responses with an external gRPC processing server.
@@ -51,7 +51,7 @@ For more information, see the [Traffic management docs](/docs/traffic-management
 
 #### 🔐 Secure traffic {#security}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} provides a comprehensive set of security features, as well as the ability for you to bring your own external authorization service.
+Kgateway provides a comprehensive set of security features, as well as the ability for you to bring your own external authorization service.
 
 * **TLS support** for a variety of use cases including mTLS with Istio, TLS passthrough, and Backend TLS.
 * **Local rate limiting** as a first line of defense to control the rate of requests to your Gateway.
@@ -74,7 +74,7 @@ For more information, see the [AI Gateway docs](/docs/ai/).
 
 #### 🧠 KRT-based control plane {#control-plane}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} uses a **brand new control plane** architecture built on the [Kubernetes Declarative Controller Runtime (`krt`)](https://github.com/istio/istio/blob/master/pkg/kube/krt/README.md). Benefits include:
+Kgateway uses a **brand new control plane** architecture built on the [Kubernetes Declarative Controller Runtime (`krt`)](https://github.com/istio/istio/blob/master/pkg/kube/krt/README.md). Benefits include:
 
 - Improved controller performance and scalability
 - Cleaner reconciliation and modular plugin framework
@@ -84,21 +84,21 @@ For more information, see the [Architecture docs](/docs/about/architecture/).
 
 #### 🐬 Ambient waypoint integration {#ambient-waypoint}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} introduces support for using its Gateway implementation as an **Istio ambient mesh waypoint proxy**:
+Kgateway introduces support for using its Gateway implementation as an **Istio ambient mesh waypoint proxy**:
 
 - Drop-in replacement for the stock `istio` GatewayClass
 - Just update your `Gateway` CR to reference `gateway.kgateway.dev` class
-- Provides {{< reuse "docs/snippets/product-name.md" >}} L7 features inside the mesh
+- Provides kgateway L7 features inside the mesh
 
 This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs](/docs/integrations/istio/ambient/).
 
 ### ⚠️ Breaking changes from Gloo v1 {#changes}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} v2 has extensive API changes from Gloo v1, which include the following.
+Kgateway v2 has extensive API changes from Gloo v1, which include the following.
 
 - **CRD group renames:** All CRDs now use the `kgateway.dev` API group
 - **CRD renames and field removals** to ensure clean, vendor-neutral APIs
-- **Control plane** updated to `{{< reuse "docs/snippets/ns-system.md" >}}`
+- **Control plane** updated to `kgateway-system`
 - **Default Envoy proxy deployment renamed** to remove the `gloo-proxy-` prefix
 - **Gateway ports** default to `80` and `443` to match the Kubernetes Ingress convention, instead of `8080` and `8443`
 - **Removed Gloo Edge API mode**
@@ -108,6 +108,6 @@ This way, you get full L7 policy control over **east-west traffic** while using 
 
 We’re excited to collaborate with the community to continue shaping the future of API gateways! 
 
-* [Get started](/docs/quickstart/) with {{< reuse "docs/snippets/product-name.md" >}} 2.0.
-* Check out the [Community repo](https://github.com/kgateway-dev/community) for more about contributing to {{< reuse "docs/snippets/product-name.md" >}}.
+* [Get started](/docs/quickstart/) with kgateway 2.0.
+* Check out the [Community repo](https://github.com/kgateway-dev/community) for more about contributing to kgateway.
 * Let us know how it goes in the [CNCF `#kgateway` Slack](https://cloud-native.slack.com/archives/C080D3PJMS4)!

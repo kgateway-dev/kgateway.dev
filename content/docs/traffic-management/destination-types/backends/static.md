@@ -5,7 +5,7 @@ weight: 10
 
 Route requests to services that listen for incoming traffic on a fixed IP address and port or hostname and port combination by using static Backends.
 
-You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource. Unlike Backends that are dynamically created by using the discovery feature in {{< reuse "docs/snippets/product-name.md" >}}, static Backend resources must be created manually by the user.  
+You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource. Unlike Backends that are dynamically created by using the discovery feature in kgateway, static Backend resources must be created manually by the user.  
 
 ## Before you begin
 
@@ -46,7 +46,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - static.example
      rules:

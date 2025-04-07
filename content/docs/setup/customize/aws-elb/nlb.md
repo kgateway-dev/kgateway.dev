@@ -3,7 +3,7 @@ title: AWS NLB
 weight: 20
 ---
 
-In this guide you explore how to expose the {{< reuse "docs/snippets/product-name.md" >}} proxy with an AWS network load balancer (NLB). The following use cases are covered:
+In this guide you explore how to expose the kgateway proxy with an AWS network load balancer (NLB). The following use cases are covered:
 
 * **NLB HTTP**: Create an HTTP listener on the NLB that exposes an HTTP endpoint on your gateway proxy. Traffic from the NLB to the proxy is not secured. 
 * **TLS passthrough**: Expose an HTTPS endpoint of your gateway with an NLB. The NLB passes through HTTPS traffic to the gateway proxy where the traffic is terminated. 
@@ -16,7 +16,7 @@ Keep in mind the following considerations when working with an NLB:
 ## Before you begin
 
 1. Create or use an existing AWS account. 
-2. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}}, set up a gateway resource, and deploy the httpbin sample app.
+2. Follow the [Get started guide](/docs/quickstart/) to install kgateway, set up a gateway resource, and deploy the httpbin sample app.
 
 ## Step 1: Deploy the AWS Load Balancer controller
 
@@ -31,7 +31,7 @@ Keep in mind the following considerations when working with an NLB:
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      kube: 
        service:
@@ -64,7 +64,7 @@ Keep in mind the following considerations when working with an NLB:
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: aws-cloud
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      infrastructure:
@@ -98,7 +98,7 @@ Keep in mind the following considerations when working with an NLB:
       kind: Gateway
       metadata:
         name: aws-cloud
-        namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+        namespace: kgateway-system
         labels:
           gateway: aws-cloud
       spec:
@@ -128,12 +128,12 @@ Keep in mind the following considerations when working with an NLB:
 
 3. Verify that your gateway is created. 
    ```sh
-   kubectl get gateway aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get gateway aws-cloud -n kgateway-system
    ```
    
 4. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname. 
    ```sh
-   kubectl get services aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get services aws-cloud -n kgateway-system
    ```
    
    Example output: 
@@ -166,7 +166,7 @@ Keep in mind the following considerations when working with an NLB:
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.nlb.com"
      rules:
@@ -178,7 +178,7 @@ Keep in mind the following considerations when working with an NLB:
 
 2. Get the AWS hostname of the NLB. 
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -210,7 +210,7 @@ Keep in mind the following considerations when working with an NLB:
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "https.example.com"
      rules:
@@ -222,7 +222,7 @@ Keep in mind the following considerations when working with an NLB:
 
 2. Get the IP address that is associated with the NLB's AWS hostname. 
    ```sh
-   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n kgateway-system aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_HOSTNAME
    export INGRESS_GW_ADDRESS=$(dig +short ${INGRESS_GW_HOSTNAME} | head -1)
    echo $INGRESS_GW_ADDRESS
@@ -279,10 +279,10 @@ Keep in mind the following considerations when working with an NLB:
 
 1. Delete the Ingress and Gateway resources.
    ```sh
-   kubectl delete gatewayparameters custom-gw-params -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete gateway aws-cloud -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete httproute httpbin-elb -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete secret tls -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete gatewayparameters custom-gw-params -n kgateway-system
+   kubectl delete gateway aws-cloud -n kgateway-system
+   kubectl delete httproute httpbin-elb -n kgateway-system
+   kubectl delete secret tls -n kgateway-system
    ```
 
 2. Delete the AWS IAM resources that you created.

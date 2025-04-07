@@ -4,7 +4,7 @@ weight: 200
 icon: lightbulb
 ---
 
-Learn about {{< reuse "docs/snippets/product-name.md" >}} architecture, features, and benefits.
+Learn about kgateway architecture, features, and benefits.
 
 {{< cards >}}
   {{< card link="overview" title="Overview" >}}

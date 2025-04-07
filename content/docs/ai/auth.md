@@ -69,13 +69,13 @@ Provide the token directly in the configuration for the Backend. This option is 
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -89,7 +89,7 @@ Provide the token directly in the configuration for the Backend. This option is 
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -238,13 +238,13 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -258,7 +258,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -385,13 +385,13 @@ Pass through an existing token directly from the client or a successful OpenID C
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        app: ai-kgateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -405,7 +405,7 @@ Pass through an existing token directly from the client or a successful OpenID C
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF

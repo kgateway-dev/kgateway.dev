@@ -120,4 +120,4 @@ For an example route delegation setup that uses header and query parameters, see
 
 ### Cyclic delegation
 
-Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed in {{< reuse "docs/snippets/product-name.md" >}} as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is ignored and reported as an error.  
+Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed in kgateway as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is ignored and reported as an error.  

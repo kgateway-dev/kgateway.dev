@@ -16,7 +16,7 @@ However, you might have a specific backend workload that uses its own TLS certif
 
 ## Create a backend workload with a TLS certificate {#workload-tls-cert}
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the {{< reuse "docs/snippets/product-name.md" >}} GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
@@ -124,7 +124,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
      - "example.com"
      rules:
@@ -142,13 +142,13 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward svc/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
+   kubectl port-forward svc/http -n kgateway-system 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -188,7 +188,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 3. Enable port-forwarding on the Gateway.
 
    ```sh
-   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/ns-system.md" >}} 19000
+   kubectl port-forward deploy/http -n kgateway-system 19000
    ```
 
 4. In your browser, open the Envoy stats page at [http://127.0.0.1:19000/stats](http://127.0.0.1:19000/stats).
