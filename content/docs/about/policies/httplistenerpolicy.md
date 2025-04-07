@@ -95,7 +95,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
   name: server-name
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  namespace: kgateway-system
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io

@@ -38,7 +38,7 @@ In this guide you walk through a basic route delegation example that demonstrate
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      hostnames:
      - delegation.example
@@ -97,7 +97,7 @@ In this guide you walk through a basic route delegation example that demonstrate
    spec:
      parentRefs:
      - name: parent
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
        group: gateway.networking.k8s.io
        kind: HTTPRoute
      rules:
@@ -115,7 +115,7 @@ In this guide you walk through a basic route delegation example that demonstrate
    ```sh
    kubectl get httproute child-team1 -n team1
    kubectl get httproute child-team2 -n team2
-   kubectl get httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get httproute parent -n kgateway-system
    ```
    
 5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
@@ -219,8 +219,8 @@ In this guide you walk through a basic route delegation example that demonstrate
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway http -n kgateway-system
+kubectl delete httproute parent -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

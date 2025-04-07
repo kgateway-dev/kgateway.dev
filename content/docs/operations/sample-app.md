@@ -15,12 +15,12 @@ flowchart LR
 ```
 
 * The client calls the `www.example.com` hostname that you set up in the Gateway configuration.
-* The {{< reuse "docs/snippets/product-name.md" >}} proxy receives the request. Based on the routing rules that you set up in the Gateway configuration, the {{< reuse "docs/snippets/product-name.md" >}} proxy forwards the traffic to the backend destination, which is the httpbin service. The {{< reuse "docs/snippets/product-name.md" >}} proxy is available from an external LoadBalancer service that is backed by an IP address that your cloud provider typically assigns. For testing in a local cluster where you do not have an external service, you can enable port-forwarding so that the {{< reuse "docs/snippets/product-name.md" >}} proxy listens on the localhost instead.
-* The httpbin service receives and responds to the request. Note that the httpbin service does not have to be publicly exposed because the {{< reuse "docs/snippets/product-name.md" >}} proxy handles the external traffic. Instead, it can have an internal service type, such as ClusterIP.
+* The kgateway proxy receives the request. Based on the routing rules that you set up in the Gateway configuration, the kgateway proxy forwards the traffic to the backend destination, which is the httpbin service. The kgateway proxy is available from an external LoadBalancer service that is backed by an IP address that your cloud provider typically assigns. For testing in a local cluster where you do not have an external service, you can enable port-forwarding so that the kgateway proxy listens on the localhost instead.
+* The httpbin service receives and responds to the request. Note that the httpbin service does not have to be publicly exposed because the kgateway proxy handles the external traffic. Instead, it can have an internal service type, such as ClusterIP.
 
 ## Before you begin
 
-Set up {{< reuse "docs/snippets/product-name.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
+Set up kgateway by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
 
 ## Deploy a sample app {#deploy-app}
 
@@ -66,7 +66,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      listeners:
@@ -82,7 +82,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
 2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
    
    ```sh
-   kubectl get gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get gateway http -n kgateway-system
    ```
 
    Example output: 
@@ -95,7 +95,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
 3. Verify that the gateway proxy pod is running.
 
    ```sh
-   kubectl get po -n {{< reuse "docs/snippets/ns-system.md" >}} -l gateway.networking.k8s.io/gateway-name=http
+   kubectl get po -n kgateway-system -l gateway.networking.k8s.io/gateway-name=http
    ```
 
    Example output:
@@ -127,7 +127,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:
@@ -172,7 +172,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
          group: gateway.networking.k8s.io
          kind: Gateway
          name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
    ```
 
 ## Send a request {#send-request}
@@ -184,7 +184,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -211,7 +211,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 1. Port-forward the gateway proxy `http` pod on port 8080. 
    
    ```sh
-   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
+   kubectl port-forward deployment/http -n kgateway-system 8080:8080
    ```
 
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. 
@@ -261,7 +261,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 
 ## Next steps
 
-Now that you have {{< reuse "docs/snippets/product-name.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
+Now that you have kgateway set up and running, check out the following guides to expand your API gateway capabilities.
 
 - Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 
@@ -287,5 +287,5 @@ Now that you have {{< reuse "docs/snippets/product-name.md" >}} set up and runni
 3. Delete the Gateway.
 
    ```sh
-   kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete gateway http -n kgateway-system
    ```

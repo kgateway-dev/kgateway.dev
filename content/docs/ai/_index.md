@@ -53,7 +53,7 @@ AI Gateway supports chat streaming, which allows the LLM to stream out tokens as
 
 The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers supported by AI Gateway.
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} supports the following AI providers:
+Kgateway supports the following AI providers:
 
 * [Anthropic](https://docs.anthropic.com/en/release-notes/api)
 * [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)

@@ -26,7 +26,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - headers.example
      rules:
@@ -143,7 +143,7 @@ Setting headers is similar to adding headers. If the request does not include th
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - headers.example
      rules:
@@ -300,7 +300,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - headers.example
      rules:

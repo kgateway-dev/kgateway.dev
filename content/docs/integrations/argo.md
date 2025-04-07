@@ -4,7 +4,7 @@ weight: 10
 description: Use kgateway with Argo Rollouts. 
 ---
 
-[Argo Rollouts](https://argoproj.github.io/rollouts/) is a Kubernetes controller that provides advanced deployment capabilities such as blue-green, canary, canary analysis, experimentation, and progressive delivery features to Kubernetes. Because Argo Rollouts supports the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, you can use Argo Rollouts to control how traffic is split and forwarded from the proxies that {{< reuse "docs/snippets/product-name.md" >}} v2 manages to the apps in your cluster. 
+[Argo Rollouts](https://argoproj.github.io/rollouts/) is a Kubernetes controller that provides advanced deployment capabilities such as blue-green, canary, canary analysis, experimentation, and progressive delivery features to Kubernetes. Because Argo Rollouts supports the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, you can use Argo Rollouts to control how traffic is split and forwarded from the proxies that kgateway v2 manages to the apps in your cluster. 
 
 ## Before you begin 
 
@@ -174,7 +174,7 @@ description: Use kgateway with Argo Rollouts.
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
      - "demo.example.com"
      rules:
@@ -197,7 +197,7 @@ description: Use kgateway with Argo Rollouts.
    {{% tab  %}}
    1. Get the external address of the gateway and save it in an environment variable.
       ```sh
-      export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+      export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
       echo $INGRESS_GW_ADDRESS
       ```
    
@@ -215,7 +215,7 @@ description: Use kgateway with Argo Rollouts.
    {{% tab  %}}
    3. Port-forward the `http` pod on port 8080. 
       ```sh
-      kubectl port-forward deployment/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8080:8080
+      kubectl port-forward deployment/http -n kgateway-system 8080:8080
       ```
    
    4. Send a request to the `rollouts-demo` app and verify that you see the `ver: 1.0` response from the stable service.
@@ -289,7 +289,7 @@ description: Use kgateway with Argo Rollouts.
    {{% /tab %}}
    {{< /tabs >}}
 
-Congratulations, you successfully rolled out a new version of your app without downtime by using the HTTP gateway that is managed by {{< reuse "docs/snippets/product-name.md" >}} v2. After a rollout, you typically perform tasks such as the following: 
+Congratulations, you successfully rolled out a new version of your app without downtime by using the HTTP gateway that is managed by kgateway v2. After a rollout, you typically perform tasks such as the following: 
 
 - **Testing**: Conduct thorough testing of your app to ensure that it functions correctly after the rollout.
 - **Monitoring**: Monitor your application to detect any issues that may arise after the rollout. 

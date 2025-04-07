@@ -66,7 +66,7 @@ metadata:
 spec:
   parentRefs:
   - name: http
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+    namespace: kgateway-system
   hostnames:
     - TrafficPolicy.example
   rules:
@@ -104,7 +104,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
   name: local-ratelimit
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  namespace: kgateway-system
 spec:
   targetRefs: 
   - group: gateway.networking.k8s.io
@@ -131,7 +131,7 @@ Note that the `targetRefs` TrafficPolicy resource can augment the `extensionRef`
 
 <!--
 
-In the following image, you have three TrafficPolicy resources that each define a {{< reuse "docs/snippets/product-name.md" >}} policy. One CORS policy (policy 1) is applied to all routes in an HTTPRoute resource via the `targetRefs` section. Another CORS policy (policy 2) and a fault injection policy (policy 3) are applied to only route A by using the `extensionRef` filter in the HTTPRoute resource.  
+In the following image, you have three TrafficPolicy resources that each define a kgateway policy. One CORS policy (policy 1) is applied to all routes in an HTTPRoute resource via the `targetRefs` section. Another CORS policy (policy 2) and a fault injection policy (policy 3) are applied to only route A by using the `extensionRef` filter in the HTTPRoute resource.  
 
 Because policies that are attached via `extensionRef` take precedence over policies that are attached via `targetRefs`, the CORS policy 2 is attached to route A. In addition, the fault injection policy is attached to route A. Route B does not attach any `extensionRef` TrafficPolicies. Because of that, the CORS policy 1 from the `targetRefs` TrafficPolicy is attached to route B. 
 

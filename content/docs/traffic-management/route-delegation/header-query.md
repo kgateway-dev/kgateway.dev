@@ -48,7 +48,7 @@ The following image illustrates the route delegation hierarchy:
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      hostnames:
      - delegation.example
@@ -343,8 +343,8 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway http -n kgateway-system
+kubectl delete httproute parent -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

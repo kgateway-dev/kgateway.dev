@@ -4,12 +4,12 @@ weight: 10
 next: /docs/setup/customize/aws-elb
 ---
 
-The configuration that is used to spin up a gateway proxy is stored in several custom resources, including GatewayParameters, and a gateway proxy template. By default, {{< reuse "docs/snippets/product-name.md" >}} creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration](/docs/setup/default/). You have the following options to change the default configuration for your gateway proxies: 
+The configuration that is used to spin up a gateway proxy is stored in several custom resources, including GatewayParameters, and a gateway proxy template. By default, kgateway creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration](/docs/setup/default/). You have the following options to change the default configuration for your gateway proxies: 
 
 | Option | Description | 
 | -- | -- | 
 | Create your own GatewayParameters resource (recommended) | To adjust the settings on the gateway proxy, you can create your own GatewayParameters resource. This approach allows you to spin up gateway proxies with different configurations. Keep in mind that you must maintain the GatewayParameters resources that you created manually. The values in these resources are not automatically updated during upgrades.  | 
-| Change default GatewayParameters | You can change the values for the default GatewayParameters resource by updating the values in the {{< reuse "docs/snippets/product-name.md" >}} Helm chart. Do not update the values in these resources directly as the values do not persist between upgrades. The values that you set in your Helm chart are automatically applied to the default GatewayParameters resource, and rolled out to the gateway proxies.  |
+| Change default GatewayParameters | You can change the values for the default GatewayParameters resource by updating the values in the kgateway Helm chart. Do not update the values in these resources directly as the values do not persist between upgrades. The values that you set in your Helm chart are automatically applied to the default GatewayParameters resource, and rolled out to the gateway proxies.  |
 | Create self-managed gateways with custom proxy templates | If you want to change the [default gateway proxy template](/docs/setup/default/#gateway-proxy-template) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)](/docs/setup/customize/selfmanaged). | 
 
 ## Customize the gateway proxy 
@@ -33,7 +33,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      kube: 
        service:
@@ -57,7 +57,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: custom
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      infrastructure:
@@ -78,11 +78,11 @@ The example in this guide uses the GatewayParameters resource to change settings
 3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
    
    ```sh
-   kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get pods -l app.kubernetes.io/name=custom -n kgateway-system -o yaml
    ```
    
    {{< callout type="info" >}}
-   If the pod does not come up, try running `kubectl get events -n {{< reuse "docs/snippets/ns-system.md" >}}` to see if the Kubernetes API server logged any failures. If no events are logged, ensure that the `kgateway` GatewayClass is present in your cluster and that the Gateway resource shows an `Accepted` status. 
+   If the pod does not come up, try running `kubectl get events -n kgateway-system` to see if the Kubernetes API server logged any failures. If no events are logged, ensure that the `kgateway` GatewayClass is present in your cluster and that the Gateway resource shows an `Accepted` status. 
    {{< /callout >}}
    
    Example output:
@@ -116,7 +116,7 @@ The example in this guide uses the GatewayParameters resource to change settings
 4. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service. 
    
    ```sh
-   kubectl get service custom -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get service custom -n kgateway-system -o yaml
    ```
    
    Example output: 
@@ -136,7 +136,7 @@ The example in this guide uses the GatewayParameters resource to change settings
        kgateway: kube-gateway
        helm.sh/chart: kgateway-proxy-v{{< reuse "docs/versions/n-patch.md" >}}
      name: custom
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      ownerReferences:
      - apiVersion: gateway.networking.k8s.io/v1
        controller: true
@@ -166,8 +166,8 @@ The example in this guide uses the GatewayParameters resource to change settings
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway custom -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete gatewayparameters custom-gw-params -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway custom -n kgateway-system
+kubectl delete gatewayparameters custom-gw-params -n kgateway-system
 ```
    
    

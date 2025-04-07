@@ -38,11 +38,11 @@ To help determine the right settings for your network environment, consider your
 
 Because closing a TCP connection involves a four-way handshake, you might notice stale connections arise in an unstable network, where one side has been responding but the other side has not detected a response yet. Both sides might listen for events and consider the other nonresponsive, even though one side just missed the events.
 
-An example of this situation can occur between the {{< reuse "docs/snippets/product-name.md" >}} control plane and the Envoy gateway proxy. Envoy might listen for xDS configuration updates but not receive any. Because Envoy thinks that the connection is still alive, it does not try to reconnect to the {{< reuse "docs/snippets/product-name.md" >}} control plane. Even though {{< reuse "docs/snippets/product-name.md" >}} has a default TCP keepalive setting, you might find that you need to update the values. 
+An example of this situation can occur between the kgateway control plane and the Envoy gateway proxy. Envoy might listen for xDS configuration updates but not receive any. Because Envoy thinks that the connection is still alive, it does not try to reconnect to the kgateway control plane. Even though kgateway has a default TCP keepalive setting, you might find that you need to update the values. 
 
 **Load balancer connection tracking**
 
-Similar to the previous example with the {{< reuse "docs/snippets/product-name.md" >}} control plane, the Envoy gateway proxy might miss connections with an external client. This situation happens when the Envoy gateway proxy is directly exposed on the public internet so that external end users can access your services.
+Similar to the previous example with the kgateway control plane, the Envoy gateway proxy might miss connections with an external client. This situation happens when the Envoy gateway proxy is directly exposed on the public internet so that external end users can access your services.
 
 In many production setups, you set up a load balancer between the end users and the gateway proxy, such as an [AWS application load balancer (ALB)](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html).
 
@@ -75,7 +75,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: ListenerPolicy
 metadata:
   name: tcpkeepalive
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  namespace: kgateway-system
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
@@ -110,12 +110,12 @@ EOF
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete listeneroption tcpkeepalive -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete listeneroption tcpkeepalive -n kgateway-system
 ```
 
 ## TCP keepalive on backend connections {#backend}
 
-Backend connections are between the Envoy gateway proxy and your services, such as {{< reuse "docs/snippets/product-name.md" >}}backends, Kubernetes services, external services, OTel collectors, TAP servers, cloud functions, or other destinations.
+Backend connections are between the Envoy gateway proxy and your services, such as kgatewaybackends, Kubernetes services, external services, OTel collectors, TAP servers, cloud functions, or other destinations.
 
 To enable TCP keepalive on backend connections, configure the following [ConnectionConfig](/docs/reference/api/connection/) settings in the
 [Backend](/docs/reference/api/upstream/) resource.

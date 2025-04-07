@@ -1,4 +1,4 @@
-1. Set up {{< reuse "docs/snippets/product-name.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
+1. Set up kgateway by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
 
 2. [Deploy the httpbin sample app](/docs/operations/sample-app/).
 

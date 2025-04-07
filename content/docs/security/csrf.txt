@@ -23,7 +23,7 @@ To learn more about CSRF, you can try out the [CSRF sandbox](https://www.envoypr
 {{% /callout%}}
 
 {{% callout type="info"  %}}
-If you use {{< reuse "docs/snippets/product-name.md" >}} Enterprise, you can also set up a Web Application Firewall that is based on Apache ModSecurity. The filter lets you define CSRF rules in the OWASP Core Rule Set.
+If you use kgateway Enterprise, you can also set up a Web Application Firewall that is based on Apache ModSecurity. The filter lets you define CSRF rules in the OWASP Core Rule Set.
 {{% /callout %}}
 
 ## Set up CSRF 
@@ -35,12 +35,12 @@ Use a VirtualHostOption resource to define your CSRF rules.
 
 1. Create a VirtualHostOption resource to define your CSRF rules. 
    ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/ns-system.md" >}} -f- <<EOF
+   kubectl apply -n kgateway-system -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: VirtualHostOption
    metadata:
      name: csrf
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      options:
        csrf:
@@ -54,7 +54,7 @@ Use a VirtualHostOption resource to define your CSRF rules.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
    EOF
    ```
 
@@ -136,7 +136,7 @@ Use a VirtualHostOption resource to define your CSRF rules.
 
 4. Optional: Remove the resources that you created. 
    ```sh
-   kubectl delete virtualhostoption csrf -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete virtualhostoption csrf -n kgateway-system
    ```
    
 
@@ -176,7 +176,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - csrf.example
      rules:
@@ -282,7 +282,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
 
 1. Port-forward the gateway proxy. 
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/ns-system.md" >}} deploy/http 19000
+   kubectl port-forward -n kgateway-system deploy/http 19000
    ```
 
 2. Open the [`/stats`](http://localhost:19000/stats) endpoint. 

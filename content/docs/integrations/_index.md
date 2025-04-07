@@ -4,7 +4,7 @@ weight: 600
 description: Integrate kgateway with common cloud-native tools.
 ---
 
-Integrate {{< reuse "docs/snippets/product-name.md" >}} with common cloud-native tools.
+Integrate kgateway with common cloud-native tools.
 
 {{< cards >}}
   {{< card link="argo" title="Argo Rollouts" >}}

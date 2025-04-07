@@ -4,7 +4,7 @@ weight: 30
 prev: /docs/setup/customize/aws-elb
 ---
 
-Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/product-name.md" >}}. You do not need to create a Gateway resource, because you create a self-managed Gateway as part of this guide. 
+Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do not need to create a Gateway resource, because you create a self-managed Gateway as part of this guide. 
 
 ## Create a self-managed gateway proxy
 
@@ -15,7 +15,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
    kind: GatewayParameters
    metadata:
      name: self-managed
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      selfManaged: {}
    EOF
@@ -28,7 +28,7 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: self-managed
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      infrastructure:
@@ -48,13 +48,13 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
 
 3. Verify that the Gateway is created.  
    ```sh
-   kubectl get gateway self-managed -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get gateway self-managed -n kgateway-system -o yaml
    ```
 
 4. Verify that no gateway proxy deployment and service were created for your Gateway. The output is blank.
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
-   kubectl get services -n {{< reuse "docs/snippets/ns-system.md" >}} | grep self-managed
+   kubectl get pods -n kgateway-system | grep self-managed
+   kubectl get services -n kgateway-system | grep self-managed
    ```
    
 5. Create your own gateway proxy deployment. Note that this deployment needs to have valid Envoy configuration that includes the correct name and namespace of your Gateway resource to successfully bootstrap your gateway proxy and bind it to the Gateway resource. You can use the following template as a starting point to build your own Envoy configuration. To bind your gateway proxy with the Gateway resource, ensure that you replace `$GATEWAY_NAME` and `$GATEWAY_NAMESPACE` with the name of the Gateway that you created earlier. 
@@ -158,6 +158,6 @@ Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/sni
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gatewayparameters self-managed -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete gateway self-managed -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gatewayparameters self-managed -n kgateway-system
+kubectl delete gateway self-managed -n kgateway-system
 ```

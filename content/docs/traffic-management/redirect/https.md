@@ -148,7 +148,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{% tab %}}
    1. Port-forward the gateway proxy service on port 8443.
       ```sh
-      kubectl port-forward svc/http -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:443
+      kubectl port-forward svc/http -n kgateway-system 8443:443
       ```
       
    2. Send an HTTPS request to the `redirect.example` domain. 

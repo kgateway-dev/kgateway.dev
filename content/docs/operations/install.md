@@ -4,9 +4,9 @@ weight: 5
 description: Install kgateway and related components.
 ---
 
-In this installation guide, you install {{< reuse "docs/snippets/product-name.md" >}} in a Kubernetes cluster, set up an API gateway, deploy a sample app, and access that app through the API gateway.
+In this installation guide, you install kgateway in a Kubernetes cluster, set up an API gateway, deploy a sample app, and access that app through the API gateway.
 
-The guide includes steps to install {{< reuse "docs/snippets/product-name.md" >}} in two ways.
+The guide includes steps to install kgateway in two ways.
 
 {{< tabs items="Helm,Argo CD" >}}
   
@@ -19,7 +19,7 @@ The guide includes steps to install {{< reuse "docs/snippets/product-name.md" >}
 ## Before you begin
 
 {{< callout type="warning" >}}
-{{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "docs/snippets/product-name.md" >}} by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
+{{< reuse "docs/snippets/one-install.md" >}} If you already tried out kgateway by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
 {{< /callout >}}
 
 {{< tabs items="Helm,Argo CD" >}}
@@ -61,7 +61,7 @@ The guide includes steps to install {{< reuse "docs/snippets/product-name.md" >}
 
 ## Install kgateway
 
-Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in your Kubernetes cluster.
+Install the open source kgateway project in your Kubernetes cluster.
 
 {{< tabs items="Helm,Argo CD" >}}
 
@@ -87,13 +87,13 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    ```
    {{< /callout >}}
 
-2. Deploy the {{< reuse "docs/snippets/product-name.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/ns-system.md" >}} namespace and creates the {{< reuse "docs/snippets/product-name.md" >}} CRDs in the cluster.
+2. Deploy the kgateway CRDs by using Helm. This command creates the kgateway-system namespace and creates the kgateway CRDs in the cluster.
 
    ```sh
-   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
-3. Optional: Pull and inspect the {{< reuse "docs/snippets/product-name.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
+3. Optional: Pull and inspect the kgateway Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
    ```sh
    helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
@@ -101,10 +101,10 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    cat kgateway/values.yaml
    ```
       
-4. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm. This command installs the {{< reuse "docs/snippets/product-name.md" >}} control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
+4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
    
    ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
    
@@ -112,16 +112,16 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    ```txt
    NAME: kgateway
    LAST DEPLOYED: Thu Feb 13 14:03:51 2025
-   NAMESPACE: {{< reuse "docs/snippets/ns-system.md" >}}
+   NAMESPACE: kgateway-system
    STATUS: deployed
    REVISION: 1
    TEST SUITE: None
    ```
 
-5. Verify that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+5. Verify that the kgateway control plane is up and running. 
    
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
 
    Example output: 
@@ -170,7 +170,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
 
-4. Create an Argo CD application to deploy the {{% reuse "docs/snippets/product-name.md" %}} CRD Helm chart. 
+4. Create an Argo CD application to deploy the kgateway CRD Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -181,7 +181,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
      namespace: argocd
    spec:
      destination:
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
        server: https://kubernetes.default.svc
      project: default
      source:
@@ -202,7 +202,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
    EOF
    ```
 
-5. Create an Argo CD application to install the {{% reuse "docs/snippets/product-name.md" %}} Helm chart. 
+5. Create an Argo CD application to install the kgateway Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -213,7 +213,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
      namespace: argocd
    spec:
      destination:
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
        server: https://kubernetes.default.svc
      project: default
      source:
@@ -237,7 +237,7 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 6. Verify that the `kgateway` control plane is up and running.
    
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}} 
+   kubectl get pods -n kgateway-system 
    ```
    
    Example output: 
@@ -266,8 +266,8 @@ Install the open source {{< reuse "docs/snippets/product-name.md" >}} project in
 
 ## Next steps
 
-Now that you have {{< reuse "docs/snippets/product-name.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
-- Learn more about [{{< reuse "docs/snippets/product-name.md" >}}, its features and benefits](/docs/about/overview). 
+Now that you have kgateway set up and running, check out the following guides to expand your API gateway capabilities.
+- Learn more about [kgateway, its features and benefits](/docs/about/overview). 
 - [Deploy an API gateway and sample app](/docs/operations/sample-app/) to test out routing to an app.
 - Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 

@@ -143,9 +143,9 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    kind: Gateway
    metadata:
      name: tls-passthrough
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/product-name.md" >}}
+     gatewayClassName: kgateway
      listeners:
      - name: tls
        protocol: TLS
@@ -170,7 +170,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    spec:
      parentRefs:
        - name: tls-passthrough
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
        - backendRefs:
            - group: ""
@@ -185,7 +185,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    {{% tab %}}
    1. Get the external address of the gateway proxy and save it in an environment variable.external address of the gateway proxy and save it in an environment variable.
       ```sh 
-      export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+      export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
       echo $INGRESS_GW_ADDRESS  
       ```
    2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
@@ -239,7 +239,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    {{% tab %}}
    1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
       ```sh
-      kubectl port-forward deployment/tls-passthrough -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:8443
+      kubectl port-forward deployment/tls-passthrough -n kgateway-system 8443:8443
       ```
    2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
       ```sh
@@ -295,7 +295,7 @@ rm -r example_certs
 rm nginx.conf
 kubectl delete configmap nginx-configmap
 kubectl delete tlsroute tlsroute
-kubectl delete gateway tls-passthrough -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway tls-passthrough -n kgateway-system
 kubectl delete deployment my-nginx
 kubectl delete service my-nginx
 kubectl delete secret nginx-server-certs

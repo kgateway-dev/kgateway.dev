@@ -40,7 +40,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent1
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      parentRefs:
      - name: http
@@ -77,7 +77,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent2
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      parentRefs:
      - name: http
@@ -136,7 +136,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    spec:
      parentRefs:
      - name: parent1
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
        group: gateway.networking.k8s.io
        kind: HTTPRoute
      rules:
@@ -255,9 +255,9 @@ In this guide you walk through a route delegation example that demonstrates rout
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent1 -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent2 -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway http -n kgateway-system
+kubectl delete httproute parent1 -n kgateway-system
+kubectl delete httproute parent2 -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

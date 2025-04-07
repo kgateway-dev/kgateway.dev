@@ -4,14 +4,14 @@ weight: 50
 description: Uninstall kgateway and related components.
 ---
 
-If you no longer need your {{< reuse "docs/snippets/product-name.md" >}} environment, you can uninstall the control plane and all gateway proxies. You can also optionally remove related components such as Prometheus and sample apps.
+If you no longer need your kgateway environment, you can uninstall the control plane and all gateway proxies. You can also optionally remove related components such as Prometheus and sample apps.
 
 ## Uninstall kgateway
 
-Remove the {{< reuse "docs/snippets/product-name.md" >}} control plane and gateway proxies.
+Remove the kgateway control plane and gateway proxies.
 
 {{< callout type="info" >}}
-Did you use Argo CD to install {{< reuse "docs/snippets/product-name.md" >}}? Skip to the [Argo CD steps](#argocd).
+Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
 {{< /callout >}}
 
 1. Get all HTTP routes in your environment. 
@@ -50,30 +50,30 @@ Did you use Argo CD to install {{< reuse "docs/snippets/product-name.md" >}}? Sk
    kubectl delete -n <namespace> gateway <gateway-name>
    ```
 
-7. Uninstall {{< reuse "docs/snippets/product-name.md" >}}.
+7. Uninstall kgateway.
    
-   1. Uninstall the {{< reuse "docs/snippets/product-name.md" >}} release.
+   1. Uninstall the kgateway release.
       
       ```sh
-      helm uninstall kgateway -n {{< reuse "docs/snippets/ns-system.md" >}}
+      helm uninstall kgateway -n kgateway-system
       ```
 
-   2. Delete the {{< reuse "docs/snippets/product-name.md" >}} CRDs.
+   2. Delete the kgateway CRDs.
 
       ```sh
-      helm uninstall kgateway-crds -n {{< reuse "docs/snippets/ns-system.md" >}}
+      helm uninstall kgateway-crds -n kgateway-system
       ```
 
-   3. Remove the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. 
+   3. Remove the `kgateway-system` namespace. 
       
       ```sh
-      kubectl delete namespace {{< reuse "docs/snippets/ns-system.md" >}}
+      kubectl delete namespace kgateway-system
       ```
 
    4. Confirm that the CRDs are deleted.
 
       ```sh
-      kubectl get crds | grep {{< reuse "docs/snippets/product-name.md" >}}
+      kubectl get crds | grep kgateway
       ```
 
 8. Remove the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. If you installed a different version or channel of the Kubernetes Gateway API, update the following command accordingly.
@@ -98,14 +98,14 @@ For ArgoCD installations, use the following steps to clean up your environment.
 3. Log in with the `admin` username and `kgateway` password.
 4. Find the application that you want to delete and click **x**. 
 5. Select **Foreground** and click **Ok**. 
-6. Verify that the pods were removed from the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. 
+6. Verify that the pods were removed from the `kgateway-system` namespace. 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
    
    Example output: 
    ```txt
-   No resources found in {{< reuse "docs/snippets/ns-system.md" >}}namespace.
+   No resources found in kgateway-systemnamespace.
    ```
 
 {{% /tab %}}
@@ -120,7 +120,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    argocd login localhost:9999 --username admin --password kgateway --insecure
    ```
    
-3. Delete the {{< reuse "docs/snippets/product-name.md" >}} application.
+3. Delete the kgateway application.
    
    ```sh
    argocd app delete kgateway-oss-helm --cascade --server localhost:9999 --insecure
@@ -132,7 +132,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    application 'kgateway-oss-helm' deleted   
    ```
 
-4. Delete the {{< reuse "docs/snippets/product-name.md" >}} CRD application.
+4. Delete the kgateway CRD application.
    
    ```sh
    argocd app delete kgateway-crds-oss-helm --cascade --server localhost:9999 --insecure
@@ -144,14 +144,14 @@ For ArgoCD installations, use the following steps to clean up your environment.
    application 'kgateway-crds-oss-helm' deleted   
    ```
 
-5. Verify that the pods were removed from the `{{< reuse "docs/snippets/ns-system.md" >}}` namespace. 
+5. Verify that the pods were removed from the `kgateway-system` namespace. 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
    
    Example output: 
    ```txt  
-   No resources found in {{< reuse "docs/snippets/ns-system.md" >}} namespace.
+   No resources found in kgateway-system namespace.
    ```
 {{% /tab %}}
 {{< /tabs >}}

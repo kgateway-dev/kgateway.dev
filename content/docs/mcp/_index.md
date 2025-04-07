@@ -12,7 +12,7 @@ Spin up your own Model Context Protocol (MCP) Gateway to federate any number of 
 
 ### How can kgateway help?
 
-While MCP provides an excellent foundation for interoperability between agents and tools, there are still challenges to address when integrating MCP clients and MCP tool server implementations. {{< reuse "docs/snippets/product-name-caps.md" >}} addresses common friction points in securing, scaling, and integrating MCP clients with tool servers, including:
+While MCP provides an excellent foundation for interoperability between agents and tools, there are still challenges to address when integrating MCP clients and MCP tool server implementations. Kgateway addresses common friction points in securing, scaling, and integrating MCP clients with tool servers, including:
 
 * Simplifying tool onboarding with automated discovery and registration of MCP tool servers.
 * Providing developers with a centralized registry of MCP tools across heterogeneous tool servers regardless of their location.
@@ -30,7 +30,7 @@ MCP recently introduced the [MCP Authorization spec](https://spec.modelcontextpr
 
 ## About this guide
 
-In this guide, you explore how to configure {{< reuse "docs/snippets/product-name.md" >}} as an MCP Gateway to protect access to a sample MCP tool, `convert_to_markdown`. You use a sample MCP server deployment that is exposed on the MCP Gateway. However, you can easily plug in your own MCP server image if you want to. 
+In this guide, you explore how to configure kgateway as an MCP Gateway to protect access to a sample MCP tool, `convert_to_markdown`. You use a sample MCP server deployment that is exposed on the MCP Gateway. However, you can easily plug in your own MCP server image if you want to. 
 
 {{< reuse-image src="img/mcp-example.svg" width="500px"  >}}
 
@@ -41,7 +41,7 @@ In this guide, you explore how to configure {{< reuse "docs/snippets/product-nam
    helm upgrade -i --create-namespace --namespace kgateway-system --version v2.0.0-mcpdemo kgateway-crds oci://us-docker.pkg.dev/developers-369321/gloo-platform-dev/charts/kgateway-crds
    ```
 
-2. Install or upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to add the MCP Gateway capabilities.
+2. Install or upgrade your kgateway installation to add the MCP Gateway capabilities.
    ```sh
    helm upgrade -i --namespace kgateway-system --version v2.0.0-mcpdemo kgateway oci://us-docker.pkg.dev/developers-369321/gloo-platform-dev/charts/kgateway --set controller.image.registry=us-docker.pkg.dev/developers-369321/gloo-platform-dev --set controller.image.tag=2.0.0-mcpdemo --set image.tag=v2.0.0
    ```
@@ -50,13 +50,13 @@ In this guide, you explore how to configure {{< reuse "docs/snippets/product-nam
 
 Use a sample MCP server image to deploy your own MCP Gateway. 
 
-1. Create a GatewayParameters resource that allows you to set up self-managed Gateways. The GatewayParameters resource instructs {{< reuse "docs/snippets/product-name.md" >}} to not automatically spin up a gateway proxy, but instead wait for your custom gateway proxy deployment.  
+1. Create a GatewayParameters resource that allows you to set up self-managed Gateways. The GatewayParameters resource instructs kgateway to not automatically spin up a gateway proxy, but instead wait for your custom gateway proxy deployment.  
    ```yaml
    kubectl apply -f- <<EOF
    kind: GatewayParameters
    apiVersion: gateway.kgateway.dev/v1alpha1
    metadata:
-     name: {{< reuse "docs/snippets/product-name.md" >}}
+     name: kgateway
    spec:
      selfManaged: {}
    EOF
@@ -74,12 +74,12 @@ Use a sample MCP server image to deploy your own MCP Gateway.
      parametersRef:
        group: gateway.kgateway.dev
        kind: GatewayParameters
-       name: {{< reuse "docs/snippets/product-name.md" >}}
+       name: kgateway
        namespace: default
    EOF
    ```
 
-3. Create a Gateway with the custom GatewayClass. The custom GatewayClass instructs {{< reuse "docs/snippets/product-name.md" >}} to not automatically spin up a gateway proxy deployment and to wait for your custom deployment. In this example, you open up an MCP listener on port 8080. 
+3. Create a Gateway with the custom GatewayClass. The custom GatewayClass instructs kgateway to not automatically spin up a gateway proxy deployment and to wait for your custom deployment. In this example, you open up an MCP listener on port 8080. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -342,6 +342,6 @@ kubectl delete service mcp-gateway
 kubectl delete configmap mcp-gateway-config
 kubectl delete gateway mcp-gateway
 kubectl delete gatewayclass mcp
-kubectl delete gatewayparameters {{< reuse "docs/snippets/product-name.md" >}}
+kubectl delete gatewayparameters kgateway
 ```
    

@@ -3,7 +3,7 @@ linkTitle: "Documentation"
 title: Welcome
 ---
 
-Welcome to the documentation for the {{< reuse "docs/snippets/product-name.md" >}} open source project! 
+Welcome to the documentation for the kgateway open source project! 
 
 {{< cards >}}
   {{< card link="quickstart" title="Get started" >}}

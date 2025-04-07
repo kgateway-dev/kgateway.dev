@@ -45,7 +45,7 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
    kind: HTTPListenerPolicy
    metadata:
      name: access-logs
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -111,7 +111,7 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
 3. Get the logs for the gateway pod and verify that you see a stdout JSON entry for each request that you sent to the httpbin app. 
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} logs deployments/http | tail -1 | jq --sort-keys
+   kubectl -n kgateway-system logs deployments/http | tail -1 | jq --sort-keys
    ```
    
    Example output: 
@@ -199,7 +199,7 @@ You can set up access logs to write to a file. The following example writes acce
    kind: HTTPListenerPolicy
    metadata:
      name: access-logs
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -249,7 +249,7 @@ You can set up access logs to write to a file. The following example writes acce
 5. Check the access log file in the gateway pod and verify that you see a string entry for each request that you sent to the httpbin app. 
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} exec -it deploy/http -- cat /dev/default-access-logs.txt
+   kubectl -n kgateway-system exec -it deploy/http -- cat /dev/default-access-logs.txt
    ```
    
    Example output: 
@@ -263,7 +263,7 @@ You can set up access logs to write to a file. The following example writes acce
 
 You send access logs to a gRPC service. This way, you can collect logs from several gateways in a central location that is integrated with an existing log collecting service that you might already use, such as OpenTelemetry. This option performs better than writing to stdout for scalable, high traffic scenarios.
 
-1. Create or get the details of the gRPC service. The following example creates a simple `log-test` service in the {{< reuse "docs/snippets/ns-system.md" >}} namespace that listens on port 50051.
+1. Create or get the details of the gRPC service. The following example creates a simple `log-test` service in the kgateway-system namespace that listens on port 50051.
 
 2. Create an HTTPListenerPolicy resource to define your access logging rules. The following example writes access logs to gRPC service that you created in the previous step. It logs requests that use the `x-my-cool-test-filter` header when the value is `test`. For more Envoy filters, see the [Envoy access log docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto).  
    
@@ -273,7 +273,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
    kind: HTTPListenerPolicy
    metadata:
      name: access-logs
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -349,7 +349,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 5. Get the logs of the gRPC service and verify that you see an entry for the matching requests that you sent to the httpbin app. 
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} logs deployments/log-test | tail -1 | jq --sort-keys
+   kubectl -n kgateway-system logs deployments/log-test | tail -1 | jq --sort-keys
    ```
    
    Example output: 
@@ -381,5 +381,5 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete HTTPListenerPolicy access-logs -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete HTTPListenerPolicy access-logs -n kgateway-system
 ```

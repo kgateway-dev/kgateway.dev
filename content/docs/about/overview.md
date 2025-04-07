@@ -3,11 +3,11 @@ title: Overview
 weight: 10
 ---
 
-Learn more about {{< reuse "docs/snippets/product-name.md" >}}, its architecture, and benefits. 
+Learn more about kgateway, its architecture, and benefits. 
 
 ## About kgateway
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
+Kgateway is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
 
 ### What is an ingress?
 
@@ -15,7 +15,7 @@ An ingress, edge router, or application gateway, is a service that is accessible
 
 Examples of Kubernetes ingresses include ingress-nginx and Contour.
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} includes full Kubernetes ingress functionality, providing its own control plane, using the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api) as its configuration language and Envoy as its proxy server.
+Kgateway includes full Kubernetes ingress functionality, providing its own control plane, using the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api) as its configuration language and Envoy as its proxy server.
 
 ### What are the components of an ingress?
 
@@ -45,7 +45,7 @@ As with most APIs, the Astronomy Picture of the Day API also includes parameters
 
 ### What is an API gateway?
 
-An API gateway is a service that provides centralized gateway functionality for API traffic. The concept that took off as microservices architectures were growing in popularity in the 2005-2015 era, with early vendors such as 3scale, WSO2 and Apigee targeting backends that were run on Java. As Kubernetes became popular, the need arose to offer API gateway functionality that integrated with it. This led to the launch of Gloo, which is the original name of {{< reuse "docs/snippets/product-name.md" >}}.
+An API gateway is a service that provides centralized gateway functionality for API traffic. The concept that took off as microservices architectures were growing in popularity in the 2005-2015 era, with early vendors such as 3scale, WSO2 and Apigee targeting backends that were run on Java. As Kubernetes became popular, the need arose to offer API gateway functionality that integrated with it. This led to the launch of Gloo, which is the original name of kgateway.
 
 In the NASA example, recall that you had to provide an API key to access the service. This is a way of identifying you to the API, which can then be used to enable decision-making.
 
@@ -69,7 +69,7 @@ The {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} is a common, extensibl
 
 [Learn about the history of the Gateway API](/blog/introduction-to-kubernetes-gateway-api/), or [watch our in-depth video series](/resources/videos/).
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} is fully conformant with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and extends its functionality with custom extension APIs, such as TrafficPolicies, ListenerPolicies, and Backends. These custom resources help to centrally configure advanced traffic management, security, and resiliency rules for an HTTPRoute or Gateway listener.
+Kgateway is fully conformant with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and extends its functionality with custom extension APIs, such as TrafficPolicies, ListenerPolicies, and Backends. These custom resources help to centrally configure advanced traffic management, security, and resiliency rules for an HTTPRoute or Gateway listener.
 
 ### Is the Gateway API an API gateway?
 
@@ -79,7 +79,7 @@ The Gateway API is an API which can be used to program an ingress or an API gate
 
 ## Extensions
 
-The {{< reuse "docs/snippets/product-name.md" >}} project provides the following extensions on top of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} to configure advanced routing, security, and resiliency capabilities.
+The kgateway project provides the following extensions on top of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} to configure advanced routing, security, and resiliency capabilities.
 
 {{< cards >}}
   {{< card link="/docs/security/access-logging/" title="Access logging" tag="Security" >}}
@@ -96,6 +96,6 @@ The {{< reuse "docs/snippets/product-name.md" >}} project provides the following
 
 ## Default gateway proxy setup
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} automatically spins up, bootstraps, and manages gateway proxy deployments when you create a Kubernetes Gateway resource. To do that, a combination of {{< reuse "docs/snippets/product-name.md" >}} and Kubernetes resources are used, such as GatewayClass, GatewayParameters, and a gateway proxy template that includes the Envoy configuration that each proxy is bootstrapped with. 
+Kgateway automatically spins up, bootstraps, and manages gateway proxy deployments when you create a Kubernetes Gateway resource. To do that, a combination of kgateway and Kubernetes resources are used, such as GatewayClass, GatewayParameters, and a gateway proxy template that includes the Envoy configuration that each proxy is bootstrapped with. 
 
 To learn more about the default setup and how these resources interact with each other, see the [Default gateway proxy setup](/docs/setup/default/).

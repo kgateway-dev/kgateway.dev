@@ -4,11 +4,11 @@ weight: 20
 description: Upgrade the control plane and any gateway proxies that run in your cluster. 
 ---
 
-You can use this guide to upgrade the version of your {{< reuse "docs/snippets/product-name.md" >}} components, or to apply changes to the components’ configuration settings.
+You can use this guide to upgrade the version of your kgateway components, or to apply changes to the components’ configuration settings.
 
 <!-- TODO upgrade guide when we have a minor version
 ## Considerations
-Consider the following rules before you plan your {{< reuse "docs/snippets/product-name.md" >}} upgrade.
+Consider the following rules before you plan your kgateway upgrade.
 
 ### Testing upgrades
 
@@ -31,19 +31,19 @@ During the upgrade, pods that run the new version of the control plane and proxi
    2. Follow this upgrade guide to upgrade to the latest patch for your current minor version.
    3. Then, you can repeat the steps in this guide to upgrade to the latest patch of the next minor version.
 
-2. Check that your underlying infrastructure platform, such as Kubernetes, and other dependencies run supported versions for the {{< reuse "docs/snippets/product-name.md" >}} version that you want to upgrade to.
+2. Check that your underlying infrastructure platform, such as Kubernetes, and other dependencies run supported versions for the kgateway version that you want to upgrade to.
    1. Review the [supported versions](/docs/reference/versions/) for dependencies such as Kubernetes, Istio, Helm, and more.
    2. Compare the supported version against the versions that you currently use. 
    3. If necessary, upgrade your dependencies, such as consulting your cluster infrastructure provider to upgrade the version of Kubernetes that your cluster runs.
 
-3. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+3. Set the version to upgrade kgateway to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    ```sh
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
 ## Step 2: Upgrade the CLI
 
-1. Upgrade `{{< reuse "docs/snippets/cli-name.md" >}}` to the new version. Note that this command only updates the CLI binary version, and does not upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation.
+1. Upgrade `{{< reuse "docs/snippets/cli-name.md" >}}` to the new version. Note that this command only updates the CLI binary version, and does not upgrade your kgateway installation.
    ```shell
    {{< reuse "docs/snippets/cli-name.md" >}} upgrade --release v${NEW_VERSION}
    ```
@@ -67,11 +67,11 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 ## Prepare to upgrade {#prepare}
 
-Before you upgrade {{< reuse "docs/snippets/product-name.md" >}}, review the following information.
+Before you upgrade kgateway, review the following information.
 
 1. Review the [release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
-2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "docs/snippets/product-name.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
+2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of kgateway that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
 
    {{< tabs items="Kubernetes Gateway API, Kubernetes, Istio" >}}
 {{% tab %}}
@@ -132,16 +132,16 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 
 ## Upgrade kgateway {#kgateway}
 
-1. Set the version to upgrade {{< reuse "docs/snippets/product-name.md" >}} in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+1. Set the version to upgrade kgateway in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    
    ```sh
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-2. Apply the {{< reuse "docs/snippets/product-name.md" >}} CRDs for the upgrade version by using Helm.
+2. Apply the kgateway CRDs for the upgrade version by using Helm.
 
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
 3. Make any changes to your Helm values.
@@ -149,7 +149,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    1. Get the Helm values file for your current version.
       
       ```sh
-      helm get values kgateway -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > kgateway.yaml
+      helm get values kgateway -n kgateway-system -o yaml > kgateway.yaml
       open kgateway.yaml
       ```
 
@@ -163,21 +163,21 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 
    3. Make any changes that you want by editing your `kgateway.yaml` Helm values file or preparing the `--set` flags.
 
-4. Upgrade the {{< reuse "docs/snippets/product-name.md" >}} Helm installation.
+4. Upgrade the kgateway Helm installation.
    {{< callout type="warning" >}}
    Make sure to include your Helm values when you upgrade either as a configuration file or with <code>--set</code> flags. Otherwise, any previous custom values that you set might be overwritten.
    {{< /callout >}}
    
    ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/ns-system.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
      -f kgateway.yaml \
      --version v$NEW_VERSION
    ```
    
-5. Verify that {{< reuse "docs/snippets/product-name.md" >}} runs the upgraded version.
+5. Verify that kgateway runs the upgraded version.
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} get pod -l kgateway=kgateway -ojsonpath='{.items[0].spec.containers[0].image}'
+   kubectl -n kgateway-system get pod -l kgateway=kgateway -ojsonpath='{.items[0].spec.containers[0].image}'
    ```
    
    Example output:
@@ -185,8 +185,8 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    cr.kgateway.dev/kgateway-dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Confirm that the {{< reuse "docs/snippets/product-name.md" >}} control plane is up and running. 
+6. Confirm that the kgateway control plane is up and running. 
    
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```

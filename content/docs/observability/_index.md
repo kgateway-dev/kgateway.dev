@@ -12,7 +12,7 @@ Gain insight into the health and performance of your gateways.
 
 Metrics are essential to gain insight into the health and performance of your gateway proxies. [OpenTelemetry](https://opentelemetry.io/) is a flexible open source framework that provides a set of APIs, libraries, and instrumentation to help capture and export telemetry data, such as metrics. The framework can also be used to collect traces and logs from your apps. Then, you can use observability tools, such as Grafana or Prometheus, to visualize your metrics so that you can analyze the health of your gateway and troubleshoot issues more easily. 
 
-In this guide, you deploy an OpenTelemetry collector that scapes metrics from the {{< reuse "docs/snippets/product-name.md" >}} control plane and data plane gateway proxies. The metrics that are collected by the OpenTelemetry collector are exposed in Prometheus format. To visualize these metrics, you also deploy a Grafana instance that scrapes the metrics from the OpenTelemetry collector.
+In this guide, you deploy an OpenTelemetry collector that scapes metrics from the kgateway control plane and data plane gateway proxies. The metrics that are collected by the OpenTelemetry collector are exposed in Prometheus format. To visualize these metrics, you also deploy a Grafana instance that scrapes the metrics from the OpenTelemetry collector.
 
 ## Before you begin
 
@@ -25,7 +25,7 @@ You can quickly see the raw Prometheus metrics that are automatically exposed on
 1. Port-forward the gateway deployment on port 19000.
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/ns-system.md" >}} port-forward deployment/http 19000
+   kubectl -n kgateway-system port-forward deployment/http 19000
    ```
 
 2. Access the gateway metrics by reviewing the [Prometheus statistics `/stats/prometheus` endpoint](http://localhost:19000/stats/prometheus).
@@ -50,7 +50,7 @@ Deploy the open source OpenTelemetry collector in your cluster.
    helm repo update
    ```
 
-2. Install the OpenTelemetry collector in your cluster. This command sets up pipelines that scrape metrics from the {{< reuse "docs/snippets/product-name.md" >}} control plane and data plane gateway, and exposes them in Prometheus format.
+2. Install the OpenTelemetry collector in your cluster. This command sets up pipelines that scrape metrics from the kgateway control plane and data plane gateway, and exposes them in Prometheus format.
    
    ```sh
    helm upgrade --install opentelemetry-collector open-telemetry/opentelemetry-collector \

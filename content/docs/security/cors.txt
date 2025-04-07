@@ -22,7 +22,7 @@ CORS policies are typically implemented to limit access to server resources for 
 * A JavaScript on a web page at `https://example.com` tries to access the resources by using a different protocol, such as `http://example.com`.
 
 {{% callout type="info" %}} 
-Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in {{< reuse "docs/snippets/product-name.md" >}}. 
+Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in kgateway. 
 {{% /callout %}}
 
 ## Before you begin
@@ -39,7 +39,7 @@ Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Pe
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
-2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in {{< reuse "docs/snippets/product-name.md" >}}.
+2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in kgateway.
    
    ```sh
    kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
@@ -81,7 +81,7 @@ Use the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs to create COR
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - cors.example
      rules:

@@ -75,7 +75,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: ListenerPolicy
 metadata:
   name: access-logs
-  namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+  namespace: kgateway-system
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
