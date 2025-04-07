@@ -11,7 +11,7 @@ TCPRoutes are an experimental feature in the [upstream Kubernetes Gateway API](h
 
 ## Before you begin
 
-1. Follow the [Get started guide](/docs/quickstart) to install {{% reuse "docs/snippets/product-name.md" %}}.
+1. Follow the [Get started guide](/docs/quickstart) to install kgateway.
 
 2. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
 
@@ -84,7 +84,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 
    |Setting|Description|
    |--|--|
-   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up {{% reuse "docs/snippets/product-name.md" %}}, a default gateway class is set up for you. To view the gateway class configuration, see [Gateway classes and types](docs/about/class-type/). |
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you. To view the gateway class configuration, see [Gateway classes and types](docs/about/class-type/). |
    |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure a TCP gateway that listens for incoming traffic on port 8000. The gateway can serve TCPRoutes from any namespace. |
 
 2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 

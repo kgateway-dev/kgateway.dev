@@ -170,7 +170,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
 
-4. Create an Argo CD application to deploy the {{% reuse "docs/snippets/product-name.md" %}} CRD Helm chart. 
+4. Create an Argo CD application to deploy the kgateway CRD Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -202,7 +202,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    EOF
    ```
 
-5. Create an Argo CD application to install the {{% reuse "docs/snippets/product-name.md" %}} Helm chart. 
+5. Create an Argo CD application to install the kgateway Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF

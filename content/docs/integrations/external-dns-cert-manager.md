@@ -314,7 +314,7 @@ server: envoy
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: {{% reuse "docs/snippets/ns-system.md" %}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      listeners:
