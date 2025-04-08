@@ -12,9 +12,9 @@ You can disable transformation for a specific route by setting the `transformati
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Inject response headers
+## Disable transformation on a route {#steps}
    
-1. Create a TrafficPolicy resource with your transformation rules for the entire Gateway. Make sure to create the TrafficPolicy in the same namespace as the Gateway resource. In the following example, you use the value from the `x-kgateway-request` request header and populate the value of that header into an `x-kgateway-response` response header.
+1. Create a TrafficPolicy resource with your transformation rules for the entire Gateway. Make sure to create the TrafficPolicy in the same namespace as the Gateway resource. In the following example, you set an `x-kgateway-request` request header to `hello` and an `x-kgateway-response` response header to `goodbye`.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -29,10 +29,14 @@ You can disable transformation for a specific route by setting the `transformati
        kind: Gateway
        name: http     
      transformation:
+       request:
+         set:
+           - name: x-kgateway-request
+             value: 'hello'       
        response:
          set:
          - name: x-kgateway-response
-           value: '{{ request_header("x-kgateway-request") }}' 
+           value: 'goodbye'
    EOF
    ```
 
@@ -48,7 +52,7 @@ You can disable transformation for a specific route by setting the `transformati
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
      - www.example.com
      rules:
@@ -59,46 +63,35 @@ You can disable transformation for a specific route by setting the `transformati
        backendRefs:
        - name: httpbin
          port: 8000
+         namespace: httpbin
    EOF
    ```
 
-3. Send a request to the httpbin app and include the `x-kgateway-request` request header.
+3. Send a request to the httpbin app along the `/anything` path.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything \
-    -H "host: www.example.com:8080" \
-    -H "x-kgateway-request: my custom request header" 
+    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
    curl -vi localhost:8080/anything \
-   -H "host: www.example.com" \
-   -H "x-kgateway-request: my custom request header"
+   -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    In the example output, verify the following:
    
-   * The `x-kgateway-request` request header is included in the request.
+   * The `x-kgateway-request` header is added and set to `hello`.
    * The request is successful and returns a 200 HTTP response code.
-   * The `x-kgateway-response` response header is included in the response and has the same value as the `x-kgateway-request` request header.
+   * The `x-kgateway-response` header is added and set to `goodbye`.
 
-   ```yaml {linenos=table,hl_lines=[10,14,32],linenostart=1}
-   * Host <host-address>:8080 was resolved.
-   * IPv6: ::1
-   * IPv4: 127.0.0.1
-   *   Trying [::1]:8080...
-   * Connected to <host-address> (::1) port 8080
-   > GET /anything HTTP/1.1
-   > Host: www.example.com
-   > User-Agent: curl/8.7.1
-   > Accept: */*
-   > x-kgateway-request: my custom request header
-   > 
+   ```yaml {linenos=table,hl_lines=[4,18],linenostart=1}
+   ...
    * Request completely sent off
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
@@ -108,21 +101,60 @@ You can disable transformation for a specific route by setting the `transformati
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < date: Wed, 26 Jun 2024 02:54:48 GMT
-   date: Wed, 26 Jun 2024 02:54:48 GMT
-   < content-length: 3
-   content-length: 3
+   < date: Tue, 08 Apr 2025 16:12:49 GMT
+   date: Tue, 08 Apr 2025 16:12:49 GMT
+   < content-length: 636
+   content-length: 636
    < x-envoy-upstream-service-time: 2
    x-envoy-upstream-service-time: 2
+   < x-kgateway-response: goodbye
+   x-kgateway-response: goodbye
    < server: envoy
    server: envoy
-   < x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
-   x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
-   < x-kgateway-response: my custom request header
-   x-kgateway-response: my custom request header
+   < 
+   ```
+   ```json {linenos=table,hl_lines=[25,26,27]}
+   {
+     "args": {},
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Host": [
+         "www.example.com"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Envoy-External-Address": [
+         "127.0.0.1"
+       ],
+       "X-Forwarded-For": [
+         "10.xxx.x.x"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Kgateway-Request": [
+         "hello"
+       ],
+       "X-Request-Id": [
+         "e003a446-d40c-4fac-9402-ab36acd9bd35"
+       ]
+     },
+     "origin": "10.244.0.9",
+     "url": "http://www.example.com/anything",
+     "data": "",
+     "files": null,
+     "form": null,
+     "json": null
+   }
    ```
 
-4. Create a TrafficPolicy to disable transformation for the HTTPRoute.
+4. Create a TrafficPolicy to disable transformation for the HTTPRoute. Create the TrafficPolicy in the same namespace as the HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -137,11 +169,18 @@ You can disable transformation for a specific route by setting the `transformati
        kind: HTTPRoute
        name: httpbin-anything
      transformation:
-       response: {}
+       request:
+         set:
+           - name: x-kgateway-request
+             value: 'abc'       
+       response:
+         set:
+         - name: x-kgateway-response
+           value: 'xyz'
    EOF
    ```
 
-5. Repeat the request. This time, the request header is not transformed to the response header because the HTTPRoute is excluded from transformation.
+5. Repeat the request. This time, the request and response headers are not added because the HTTPRoute is excluded from transformation.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
