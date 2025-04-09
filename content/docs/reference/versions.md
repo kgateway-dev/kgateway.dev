@@ -4,13 +4,15 @@ description: View supported kgateway versions and their release cycle.
 weight: 50
 ---
 
-Review the following information about supported release versions for {{< reuse "docs/snippets/product-name.md" >}} OSS (open source).
+Review the following information about supported release versions for {{< reuse "docs/snippets/product-name.md" >}}.
 
 ## Supported versions
 
-| {{< reuse "docs/snippets/product-name-caps.md" >}} | Kubernetes | Kubernetes Gateway API | Envoy | Helm | Istio`†`|
+| Kgateway | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†`|
 |--------------|------------|-------|------|---------|---------|
 | 2.0.x | 1.27 - 1.31 | 1.2.x | v3 xDS API | >= 3.12 | 1.18 - 1.23 |
+
+`*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.2.1](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.2.1/kgateway).
 
 `†` Istio versions: Istio must run on a compatible version of Kubernetes. For example, Istio 1.22 is tested, but not supported, on Kubernetes 1.26. For more information, see the [Istio docs](https://istio.io/latest/docs/releases/supported-releases/). 
 
@@ -36,26 +38,33 @@ You have two options for specifying the variant for a {{< reuse "docs/snippets/p
 * Specify the image variant for all {{< reuse "docs/snippets/product-name.md" >}} components in the `global.image.variant` Helm field. Supported values include `standard`, and `distroless`. If unset, the default value is `standard`.
 * Specify images for individual components by using variant tags in the `gloo.<component>.deployment.image.tag` field of the component's Helm settings, such as `quay.io/solo-io/gloo:v{{< reuse "docs/versions/n-patch.md" >}}-distroless`. -->
 
-## Release cadence
+## Release cadence {#cadence}
 
 Stable builds for {{< reuse "docs/snippets/product-name.md" >}} are released as minor versions approximately every three months. A stable branch for a minor version, such as {{< reuse "docs/versions/short.md" >}}, is tagged from `main`, and stable builds are supported from that branch.
 
-## Release development
+## Release development {#release}
 
-### Beta release process
+New features for kgateway are developed on `main`. Stable branches are created off of `main` for each minor version, such as `v2.0.x`.
 
-New features for {{< reuse "docs/snippets/product-name.md" >}} are developed on `main`. The latest version is released as a patch off of `main`.
-
-### Stable release process
+### Release process {#release-process}
 
 Development of a quality stable release on `main` typically follows this process:
+
 1. New feature development is suspended on `main`.
 2. Release candidates are created, such as `{{< reuse "docs/versions/short.md" >}}.0-rc1`, `{{< reuse "docs/versions/short.md" >}}.0-rc2`, and so on.
 3. A full suite of tests is performed for each release candidate. Testing includes all documented workflows, a test matrix of all supported platforms, and more.
 4. Documentation for that release is prepared, vetted, and staged.
-5. The stable minor version is released.
+5. The stable minor version is released as part of a stable branch, such as `v2.0.x`.
 6. Feature development on `main` is resumed.
 
-## Additional release information
+### Feature development on main branch {#release-main}
 
-New features are not developed on or backported to stable branches. However, critical patches, bug fixes, and documentation fixes are backported to all actively supported branches.
+Feature development for kgateway is performed on the `main` branch. Upon a merge to `main`, a development build is automatically released. The current development release is `{{< reuse "docs/versions/patch-dev.md" >}}`. 
+
+{{< callout type="warning" >}}
+Development releases are unstable, subject to change, and not recommended for regular usage.
+{{< /callout >}}
+
+### Backports to stable branches {#release-backport}
+
+New features are not developed on or backported to stable branches, such as `v2.0.x`. However, critical patches, bug fixes, and documentation fixes are backported as needed.
