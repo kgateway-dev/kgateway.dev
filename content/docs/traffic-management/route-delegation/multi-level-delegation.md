@@ -41,7 +41,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      hostnames:
      - delegation.example
@@ -244,8 +244,8 @@ In this guide you walk through a route delegation example that demonstrates rout
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway http -n kgateway-system
+kubectl delete httproute parent -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete httproute grandchild -n team2

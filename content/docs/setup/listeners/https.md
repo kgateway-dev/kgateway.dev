@@ -22,7 +22,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    kind: Gateway
    metadata:
      name: https
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
      labels:
        gateway: https
    spec:
@@ -45,14 +45,14 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
    |Setting|Description|
    |--|--|
-   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up {{< reuse "docs/snippets/product-name.md" >}}, a default gateway class is set up for you. |
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you. |
    |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure an HTTPS gateway that listens for incoming traffic on port 443. |
    |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unecrypted request is forwarded to the service in the cluster. |
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the gateway. The gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
 2. Verify that the status of the gateway shows `ACCEPTED`. 
    ```sh
-   kubectl get gateway/https -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml
+   kubectl get gateway/https -n kgateway-system -o yaml
    ```
 
 3. Create an HTTP route for the httpbin app and add it to the HTTPS gateway that you created. 
@@ -69,7 +69,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    spec:
      parentRefs:
        - name: https
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      rules:
        - backendRefs:
            - name: httpbin
@@ -86,13 +86,13 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/ns-system.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward svc/https -n {{< reuse "docs/snippets/ns-system.md" >}} 8443:443
+   kubectl port-forward svc/https -n kgateway-system 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}

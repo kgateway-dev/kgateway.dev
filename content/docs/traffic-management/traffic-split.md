@@ -60,7 +60,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
      - traffic.split.example
      rules:

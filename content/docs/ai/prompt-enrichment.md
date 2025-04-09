@@ -308,7 +308,7 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/ns-system.md" >}} -l app=ai-kgateway
+kubectl delete TrafficPolicy -n kgateway-system -l app=ai-kgateway
 ```
 
 ## Next

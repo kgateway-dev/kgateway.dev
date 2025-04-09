@@ -4,11 +4,11 @@ weight: 20
 prev: /docs/traffic-management/destination-types/kube-services
 ---
 
-Use a Backend resource to define a backing destination that you want {{< reuse "docs/snippets/product-name.md" >}} to route to. A Backend destination is external to the cluster and, as such, cannot be represented as a Kubernetes Service. For more information, see the [Backend API docs](/docs/reference/api/upstream). 
+Use a Backend resource to define a backing destination that you want kgateway to route to. A Backend destination is external to the cluster and, as such, cannot be represented as a Kubernetes Service. For more information, see the [Backend API docs](/docs/reference/api/upstream). 
 
 ## Types
 
-Check out the following guides for examples on how to use the supported Backends types with {{< reuse "docs/snippets/product-name.md" >}}. 
+Check out the following guides for examples on how to use the supported Backends types with kgateway. 
 
 {{< cards >}}
   {{< card link="static" title="Static IP address or hostname" >}}
@@ -32,7 +32,7 @@ metadata:
 spec:
   parentRefs:
   - name: http
-    namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+    namespace: kgateway-system
   hostnames:
     - static.example
      rules:

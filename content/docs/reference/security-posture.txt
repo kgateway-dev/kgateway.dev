@@ -3,7 +3,7 @@ title: Security posture
 weight: 50
 ---
 
-Review the following information about the security posture of the Envoy extensions in {{< reuse "docs/snippets/product-name.md" >}}.
+Review the following information about the security posture of the Envoy extensions in kgateway.
 
 For more information, see the [Envoy threat model](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/threat_model).
 

@@ -46,7 +46,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:
@@ -207,7 +207,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - "www.example.com"
      rules:

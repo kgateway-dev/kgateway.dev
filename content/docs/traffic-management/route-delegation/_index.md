@@ -93,10 +93,18 @@ Child HTTPRoute resources can use prefix, exact, or regex path matchers in their
 Keep in mind that if a child HTTPRoute delegates routing decisions to a grandchild or great-grandchild HTTPRoute, a `PathPrefix` matcher must be used for that route. Check out the [Multi-level delegation](/docs/traffic-management/route-delegation/multi-level-delegation/) guide for an example of how to set up route delegation between a parent, child, and grandchild HTTPRoute. 
 {{< /callout >}}
 
+{{< callout type="info" >}}
+You can optionally set the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation on the child HTTPRoute to inherit all the matchers, headers, and query parameters from the parent. To find an example, see [Header and query match](/docs/traffic-management/route-delegation/header-query/).
+{{< /callout >}}
+
 
 ### Headers, query parameters, HTTP methods
 
 You can specify headers, query parameters, and HTTP method matchers on the parent HTTPRoute resource. However, any child HTTPRoute resource that you delegate traffic to must specify the same header, query parameters, or HTTP method matchers to be considered a valid configuration. You can optionally define additional header, query parameter, or HTTP method matchers on the child.  
+
+{{< callout type="info" >}}
+You can optionally set the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation on the child HTTPRoute to inherit all the matchers, headers, and query parameters from the parent. That way, the headers and query parameters do not need to be defined on the child HTTPRoute.
+{{< /callout >}}
 
 For example, let's say you define the following parent and child HTTPRoute resources: 
 
@@ -104,6 +112,7 @@ For example, let's say you define the following parent and child HTTPRoute resou
 |-------------|---|
 | <ul><li>parent<ul><li>match on <code>/anything/team1</code> and delegate traffic to the <code>child</code> HTTPRoute</li><li>header1: val1</li><li>query1=val1</li></ul></li><li>child<ul><li>match on <code>/anything/team1/foo</code> and route traffic to the httpbin app </li><li>header1: val1</li><li>headerX: valX</li><li>query1=val1</li><li>queryX=valX</li></ul></li></ul> | ✅ </br></br> The headers and query parameters that are specified on the child HTTPRoute are a superset of the header and query parameters that are specified on the parent.  |
 |<ul><li>parent<ul><li>match on <code>/anything/team1</code> and delegate traffic to the <code>child</code> HTTPRoute</li><li>header1: val1</li><li>query1=val1</li></ul></li><li>child<ul><li>match on <code>/anything/team1/foo</code> and route traffic to the httpbin app </li><li>headerX: valX</li><li>queryX=valX</li></ul></li></ul> | ❌ </br></br> The headers and query parameters that are specified on the child HTTPRoute do not include the header and query parameters that are specified on the parent.  |
+|<ul><li>parent<ul><li>match on <code>/anything/team1</code> and delegate traffic to the <code>child</code> HTTPRoute</li><li>header1: val1</li><li>query1=val1</li></ul></li><li>child<ul><li>match on <code>/anything/team1/foo</code> and route traffic to the httpbin app </li><li>headerX: valX</li><li>queryX=valX</li><li><code>delegation.gateway.solo.io/inherit-parent-matcher: "true"</code></li></ul></li></ul> | ✅  </br></br> The headers and query parameters that are specified on the child HTTPRoute do not include the header and query parameters that are specified on the parent. However, the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation is set and allows the child HTTPRoute to inherit the matchers, headers, and query parameters from the parent.  |
 
 {{< callout type="info" >}}
 For an example route delegation setup that uses header and query parameters, see [Header and query match](/docs/traffic-management/route-delegation/header-query/). 
@@ -111,4 +120,4 @@ For an example route delegation setup that uses header and query parameters, see
 
 ### Cyclic delegation
 
-Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed in {{< reuse "docs/snippets/product-name.md" >}} as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is ignored and reported as an error.  
+Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed in kgateway as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is ignored and reported as an error.  

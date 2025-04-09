@@ -5,7 +5,7 @@ description: Use kgateway with the Inference Extension project.
 next: /docs/integrations/istio/
 ---
 
-Use {{< reuse "docs/snippets/product-name.md" >}} with the Kubernetes Gateway API Inference Extension project. This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
+Use kgateway with the Kubernetes Gateway API Inference Extension project. This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
 
 For more information, see the following resources.
 
@@ -36,7 +36,7 @@ The InferencePool groups together InferenceModels of LLM workloads into a routab
 
 ### Kgateway with Inference Extension {#kgateway}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} integrates with the Inference Extension as a supported Gateway API provider. This way, a {{< reuse "docs/snippets/product-name.md" >}}-created Gateway can route requests to InferencePools, as shown in the following diagram.
+Kgateway integrates with the Inference Extension as a supported Gateway API provider. This way, a kgateway-created Gateway can route requests to InferencePools, as shown in the following diagram.
 
 ```mermaid
 graph TD
@@ -60,7 +60,7 @@ The Client sends an inference request to get a response from a local LLM workloa
 
 ## Setup steps {#setup}
 
-Refer to the **{{< reuse "docs/snippets/product-name-caps.md" >}}** tabs in the **Getting started** guide in the Inference Extension docs.
+Refer to the **Kgateway** tabs in the **Getting started** guide in the Inference Extension docs.
 
 {{< cards >}}
   {{< card link="https://gateway-api-inference-extension.sigs.k8s.io/guides/" title="Inference Extension getting started guide" icon="external-link">}}

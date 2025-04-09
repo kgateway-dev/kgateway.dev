@@ -48,7 +48,7 @@ The following image illustrates the route delegation hierarchy:
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      hostnames:
      - delegation.example
@@ -229,14 +229,122 @@ The following image illustrates the route delegation hierarchy:
    server: envoy
    transfer-encoding: chunked
    ```
+   
+## Inherit parent attributes
+
+Instead of requiring the child HTTPRoutes to define the same matchers, headers, and query parameters as the parent HTTPRoute, you can use the `delegation.gateway.solo.io/inherit-parent-matcher: "true"` annotation on the child HTTPRoute to inherit these attributes from the parent. This setting is useful if you want to use paths that are relative to the parent path, or augment the headers and query parameters that are set on the parent. 
+
+1. Update the `child-team2` HTTPRoute to include the `delegation.gateway.solo.io/inherit-parent-matcher: "true"` annotation. This annotation allows the `child-team2` HTTPRoute to inherit the matchers, headers, and query parameters that are defined on the parent.
+
+   The following configuration specifies the `/` prefix path and therefore allows all paths that are relative to the parent's `/anything/team2` prefix matcher. In addition, you augment the header and query parameters from the parent with custom header and query parameters. Note that when you sent requests to the `child-team2` HTTPRoute earlier, these requests failed, because the HTTPRoute did not define the same header and query parameters as the `parent` in addition to the custom values. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: child-team2
+     namespace: team2
+     annotations:
+       delegation.kgateway.dev/inherit-parent-matcher: "true"
+   spec:
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /
+         headers:
+         - type: Exact
+           name: headerX
+           value: valX
+         queryParams:
+         - type: Exact
+           name: queryX
+           value: valX
+       backendRefs:
+       - name: httpbin
+         port: 8000
+   EOF
+   ```
+
+2. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that this time, you get back a 200 HTTP response code, because `child-team2` inherited the matchers, headers, and query parameters from the `parent`. 
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2 \
+   -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl -i localhost:8080/anything/team2/bar?queryX=valX&query2=val2 \
+   -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
+   Example output: 
+   ```
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; encoding=utf-8
+   content-length: 681
+   x-envoy-upstream-service-time: 0
+   server: envoy
+
+   {
+     "args": {
+       "query2": [
+         "val2"
+       ],
+       "queryX": [
+         "valX"
+       ]
+     },
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Header2": [
+         "val2"
+       ],
+       "Headerx": [
+         "valX"
+       ],
+       "Host": [
+         "delegation.example:8080"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "30dfc350-d546-4f53-857d-cb3edab68ebd"
+       ]
+     },
+     "origin": "10.0.64.27:50590",
+     "url": "http://delegation.example:8080/anything/team2/bar?queryX=valX&query2=val2",
+     "data": "",
+     "files": null,
+     "form": null,
+     "json": null
+   }
+   ```
+
+
 
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n {{< reuse "docs/snippets/ns-system.md" >}}
-kubectl delete httproute parent -n {{< reuse "docs/snippets/ns-system.md" >}}
+kubectl delete gateway http -n kgateway-system
+kubectl delete httproute parent -n kgateway-system
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

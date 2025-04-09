@@ -262,15 +262,15 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    httpbin3-77bbdd9b6b-8d8hq                   1/1     Running   0          70m
    ```
 
-5. Label the `httpbin` and `{{< reuse "docs/snippets/ns-system.md" >}}` namespaces to add the httpbin2, httpbin3, and client apps, and the gateway proxy to the ambient mesh. 
+5. Label the `httpbin` and `kgateway-system` namespaces to add the httpbin2, httpbin3, and client apps, and the gateway proxy to the ambient mesh. 
    ```sh
    kubectl label ns httpbin istio.io/dataplane-mode=ambient
-   kubectl label ns {{< reuse "docs/snippets/ns-system.md" >}} istio.io/dataplane-mode=ambient
+   kubectl label ns kgateway-system istio.io/dataplane-mode=ambient
    ```
 
 ## Create a waypoint proxy
 
-You use the `{{< reuse "docs/snippets/product-name.md" >}}-waypoint` GatewayClass to deploy {{< reuse "docs/snippets/product-name.md" >}} as a waypoint proxy in your cluster. 
+You use the `kgateway-waypoint` GatewayClass to deploy kgateway as a waypoint proxy in your cluster. 
    
 1. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
    ```yaml
@@ -278,10 +278,10 @@ You use the `{{< reuse "docs/snippets/product-name.md" >}}-waypoint` GatewayClas
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: {{< reuse "docs/snippets/product-name.md" >}}-waypoint
+     name: kgateway-waypoint
      namespace: httpbin
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/product-name.md" >}}-waypoint
+     gatewayClassName: kgateway-waypoint
      listeners:
      - name: proxy
        port: 15088
@@ -291,18 +291,18 @@ You use the `{{< reuse "docs/snippets/product-name.md" >}}-waypoint` GatewayClas
 
 2. Wait for the waypoint proxy to deploy successfully.
    ```sh
-   kubectl -n httpbin rollout status deploy {{< reuse "docs/snippets/product-name.md" >}}-waypoint
+   kubectl -n httpbin rollout status deploy kgateway-waypoint
    ```
    
    Example output: 
    ```
-   deployment "{{< reuse "docs/snippets/product-name.md" >}}-waypoint" successfully rolled out
+   deployment "kgateway-waypoint" successfully rolled out
    ```
 
 3. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
    ```sh
-   kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint={{< reuse "docs/snippets/product-name.md" >}}-waypoint
-   kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint={{< reuse "docs/snippets/product-name.md" >}}-waypoint
+   kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint=kgateway-waypoint
+   kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint=kgateway-waypoint
    ```
 
 4. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
@@ -506,7 +506,7 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
 
 ### Transformations
 
-Use {{< reuse "docs/snippets/product-name.md" >}}'s TrafficPolicy to apply a transformation policy to the httpbin2 app. 
+Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 app. 
 
 1. Create a TrafficPolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
    ```yaml
@@ -588,7 +588,122 @@ Use {{< reuse "docs/snippets/product-name.md" >}}'s TrafficPolicy to apply a tra
    kubectl delete TrafficPolicy transformation -n httpbin
    ```
 
+
+### Istio AuthorizationPolicy
+
+Apply an Istio AuthorizationPolicy to allow access from specific apps only. 
+
+1. Send a `GET` request from the client to the httpbin2 app. Verify that your request succeeds. 
+   ```sh
+   kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers 
+   ```
    
+   Example output: 
+   ```console 
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; charset=utf-8
+   content-length: 439
+   x-envoy-upstream-service-time: 2
+   server: envoy
+
+   {
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Host": [
+         "httpbin2:8000"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Envoy-External-Address": [
+         "10.0.74.45"
+   ....
+   ```
+
+2. Create an Istio AuthorizationPolicy that denies all `GET` requests to the httpbin2 app. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: security.istio.io/v1
+   kind: AuthorizationPolicy
+   metadata:
+     name: httpbin-authz
+     namespace: httpbin
+   spec:
+    action: DENY
+    rules:
+    - to:
+      - operation:
+          methods: ["GET"]
+          ports: ["8000"]
+    targetRefs:
+    - group: ""
+      kind: Service
+      name: httpbin2
+   EOF
+   ```
+
+3. Repeat the same request that previously succeeded. Verify that this time, you get back a 403 HTTP response code. 
+   ```sh
+   kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers \
+    -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
+   ```
+   
+   Example output: 
+   ```console 
+   * Request completely sent off
+   < HTTP/1.1 403 Forbidden
+   < content-length: 19
+   < content-type: text/plain
+   < server: envoy
+   ```
+
+   
+4. Send a `POST` request to the httpbin2 app that is allowed with the AuthorizationPolicy. Verify that the request succeeds and that you get back a 200 HTTP response code. 
+   ```sh
+   kubectl -n httpbin exec deploy/client -- curl -vi -X POST http://httpbin2:8000/post \
+    -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
+   ```
+   
+   Example output: 
+   ```console
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   < content-type: application/json; charset=utf-8
+   < content-length: 707
+   < x-envoy-upstream-service-time: 2
+   < server: envoy
+   
+   {
+     "args": {},
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+      "Content-Length": [
+         "0"
+       ],
+       "Host": [
+         "httpbin2:8000"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+   ...
+   ```
+
+5. Optional: Remove the Istio AuthoriationPolicy that you created in this guide. 
+   ```sh
+   kubectl delete authorizationpolicy httpbin-authz -n httpbin
+   ```
+
 
 ## Cleanup
 
@@ -608,4 +723,5 @@ kubectl delete serviceaccount client -n httpbin
 kubectl delete service client -n httpbin
 kubectl delete deployment client -n httpbin
 kubectl delete TrafficPolicy transformation -n httpbin
+kubectl delete authorizationpolicy httpbin-authz -n httpbin
 ```

@@ -20,11 +20,11 @@ The open source project Istio is the leading service mesh implementation that of
 
 ### About the kgateway Istio integration
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} comes with an Istio integration that allows you to configure your gateway proxy with an Istio sidecar. The Istio sidecar uses mutual TLS (mTLS) to prove its identity and to secure the connection between your gateway and the services in your Istio service mesh. In addition, you can control and secure the traffic that enters the mesh by applying all the advanced routing, traffic management, security, resiliency, and AI capabilities that {{< reuse "docs/snippets/product-name.md" >}} offers. 
+Kgateway comes with an Istio integration that allows you to configure your gateway proxy with an Istio sidecar. The Istio sidecar uses mutual TLS (mTLS) to prove its identity and to secure the connection between your gateway and the services in your Istio service mesh. In addition, you can control and secure the traffic that enters the mesh by applying all the advanced routing, traffic management, security, resiliency, and AI capabilities that kgateway offers. 
 
 ## About this guide
 
-In this guide, you learn how to use {{< reuse "docs/snippets/product-name.md" >}} as an ingress gateway proxy for the workloads in your Istio service mesh. You explore how to enable the Istio sidecar mesh integration in {{< reuse "docs/snippets/product-name.md" >}}, set up your ingress gateway proxy with a sidecar, and send secure mutual TLS traffic to the httpbin app as illustrated in the following image. 
+In this guide, you learn how to use kgateway as an ingress gateway proxy for the workloads in your Istio service mesh. You explore how to enable the Istio sidecar mesh integration in kgateway, set up your ingress gateway proxy with a sidecar, and send secure mutual TLS traffic to the httpbin app as illustrated in the following image. 
 
 {{< reuse-image src="img/sidecar-ingress.svg" width="800px" >}}
 
@@ -43,30 +43,30 @@ In this guide, you learn how to use {{< reuse "docs/snippets/product-name.md" >}
 
 ## Step 2: Enable the Istio integration in kgateway
 
-Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation to enable the Istio integration. 
+Upgrade your kgateway installation to enable the Istio integration. 
 
-1. Get the Helm values for your current {{< reuse "docs/snippets/product-name.md" >}} installation. 
+1. Get the Helm values for your current kgateway installation. 
    ```sh
-   helm get values {{< reuse "docs/snippets/product-name.md" >}} -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > {{< reuse "docs/snippets/product-name.md" >}}.yaml
-   open {{< reuse "docs/snippets/product-name.md" >}}.yaml
+   helm get values kgateway -n kgateway-system -o yaml > kgateway.yaml
+   open kgateway.yaml
    ```
    
-2. Add the following values to the Helm values file to enable the Istio integration in {{< reuse "docs/snippets/product-name.md" >}}.
+2. Add the following values to the Helm values file to enable the Istio integration in kgateway.
    ```yaml
    controller:
      extraEnv:
        KGW_ENABLE_ISTIO_AUTO_MTLS: true
    ```
    
-3. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation. This upgrade automatically triggers a restart of any existing gateway proxies to inject `istio-proxy` and `sds` containers.
+3. Upgrade your kgateway installation. This upgrade automatically triggers a restart of any existing gateway proxies to inject `istio-proxy` and `sds` containers.
    
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v2.0.0-main {{< reuse "docs/snippets/product-name.md" >}} oci://cr.kgateway.dev/kgateway-dev/charts/{{< reuse "docs/snippets/product-name.md" >}} -f {{< reuse "docs/snippets/product-name.md" >}}.yaml
+   helm upgrade -i --namespace kgateway-system --version v2.0.0-main kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway -f kgateway.yaml
    ```
 
 4. Check that the gateway proxy automatically restarts with two additional containers, `istio-proxy` and `sds`. 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
    
    {{< callout type="warning" >}}
@@ -102,7 +102,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    kind: GatewayParameters
    metadata:
      name: custom-gw-params
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      kube: 
        istio:
@@ -120,7 +120,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      infrastructure:
@@ -140,7 +140,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    
 5. Verify that the gateway proxy is now successfully deployed. You might need to restart the proxy to apply the latest Gateway settings. 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
 
 ## Step 3: Verify the integration {#verify}
@@ -155,7 +155,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
      - istio-sidecar.example
      rules:
@@ -192,7 +192,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
 1. Delete the HTTPRoute and gateway-related resources. 
    ```sh
    kubectl delete httproute bookinfo -n bookinfo
-   kubectl delete gatewayparameters custom-gw-params -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete gatewayparameters custom-gw-params -n kgateway-system
    ```
   
 2. Restore the http Gateway from the getting started tutorial. 
@@ -202,7 +202,7 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      gatewayClassName: kgateway
      listeners:
@@ -215,15 +215,15 @@ If you have a revisionless istiod setup and did not customize the Istio meta clu
    EOF
    ```
 
-3. Get the Helm values for your current {{< reuse "docs/snippets/product-name.md" >}} installation and remove the values that you added in this guide.
+3. Get the Helm values for your current kgateway installation and remove the values that you added in this guide.
    ```sh
-   helm get values {{< reuse "docs/snippets/product-name.md" >}} -n {{< reuse "docs/snippets/ns-system.md" >}} -o yaml > {{< reuse "docs/snippets/product-name.md" >}}.yaml
-   open {{< reuse "docs/snippets/product-name.md" >}}.yaml
+   helm get values kgateway -n kgateway-system -o yaml > kgateway.yaml
+   open kgateway.yaml
    ```
    
-4. Upgrade your {{< reuse "docs/snippets/product-name.md" >}} installation. 
+4. Upgrade your kgateway installation. 
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v2.0.0-main {{< reuse "docs/snippets/product-name.md" >}} oci://cr.kgateway.dev/kgateway-dev/charts/{{< reuse "docs/snippets/product-name.md" >}} -f {{< reuse "docs/snippets/product-name.md" >}}.yaml
+   helm upgrade -i --namespace kgateway-system --version v2.0.0-main kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway -f kgateway.yaml
    ```
 
 5. Follow the Istio documentation to [uninstall Istio](https://istio.io/latest/docs/setup/getting-started/#uninstall) and [remove the Bookinfo sample app](https://istio.io/latest/docs/examples/bookinfo/#cleanup).

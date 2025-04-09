@@ -3,11 +3,11 @@ title: Style guide
 weight: 30
 ---
 
-All documentation contributions in {{< reuse "docs/snippets/product-name.md" >}} must follow general standards to ensure content is clear, concise, and understandable. 
+All documentation contributions in kgateway must follow general standards to ensure content is clear, concise, and understandable. 
 
 ## Language
 
-All documentation content must be written in English. Currently, {{< reuse "docs/snippets/product-name.md" >}} does not support other languages. 
+All documentation content must be written in English. Currently, kgateway does not support other languages. 
 
 ## Sentence case
 
@@ -53,7 +53,7 @@ Avoid "I" and "we" in your content contribution. Instead, phrase sentences in th
 | Do ✅ | Don't ❌ | 
 | -- | -- |
 | In this topic, set up traffic shadowing.| In this topic, we will set up a traffic shadowing. | 
-| With {{< reuse "docs/snippets/product-name.md" >}}, you can set up advanced traffic routing. | We offer advanced traffic routing.| 
+| With kgateway, you can set up advanced traffic routing. | We offer advanced traffic routing.| 
 
 ## Future statements
 

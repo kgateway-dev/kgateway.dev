@@ -8,7 +8,7 @@ Bring your own external authorization service to protect requests that go throug
 
 ## About external auth {#about}
 
-{{< reuse "docs/snippets/product-name-caps.md" >}} lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
+Kgateway lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
 
 ```mermaid
 sequenceDiagram
@@ -42,7 +42,7 @@ sequenceDiagram
 
 ## Bring your own external authorization service {#byo-ext-auth}
 
-First, deploy your own external authorization service as a backend service that is accessible to {{< reuse "docs/snippets/product-name.md" >}}. To do so, you configure a custom GatewayExtension resource that points to your external authorization service via gRPC.
+First, deploy your own external authorization service as a backend service that is accessible to kgateway. To do so, you configure a custom GatewayExtension resource that points to your external authorization service via gRPC.
 
 {{< callout type="info" >}}
 Keep in mind that your external authorization service must conform to the [Envoy external auth proto](https://github.com/envoyproxy/envoy/blob/main/api/envoy/service/auth/v3/external_auth.proto). The external authorization service also configures the conditions for authorizing a request, such as the inclusion of a certain header or other credentials.
@@ -78,7 +78,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
    EOF
    ```
 
-2. Create a Service for the Deployment that {{< reuse "docs/snippets/product-name.md" >}} can access.
+2. Create a Service for the Deployment that kgateway can access.
 
    ```yaml
    kubectl apply -f - <<EOF

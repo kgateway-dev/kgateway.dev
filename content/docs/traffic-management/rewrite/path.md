@@ -32,7 +32,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - rewrite.example
      rules:
@@ -133,7 +133,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      hostnames:
        - rewrite.example
      rules:

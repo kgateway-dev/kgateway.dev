@@ -24,4 +24,8 @@
 
 - title: Understanding kgateway and Gateway API policy attachments
   description: Explore the Gateway API Policy Attachments pattern and learn how policies can extend gateways and routes
-  href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community  
+  href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Canary releases with kgateway, Argo Rollouts & the Gateway API
+  description: Explore how to conduct a canary release with kgateway using Argo RollOuts and the Gateway API pluginq
+  href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community

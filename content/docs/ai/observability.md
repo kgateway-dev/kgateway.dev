@@ -52,7 +52,7 @@ Take a look at the default metrics that the system outputs.
 
 1. In another tab in your terminal, port-forward the `ai-gateway` container of the gateway proxy.
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/ns-system.md" >}} deploy/ai-gateway 9092
+   kubectl port-forward -n kgateway-system deploy/ai-gateway 9092
    ```
 
 2. In the previous tab, run the following command to view the metrics.

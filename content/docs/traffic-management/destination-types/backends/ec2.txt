@@ -60,7 +60,7 @@ Route traffic directly to an AWS EC2 instance.
 
 ## Create AWS credentials
 
-Create AWS credentials for the EC2 instance so that {{< reuse "docs/snippets/product-name.md" >}} can connect to it. 
+Create AWS credentials for the EC2 instance so that kgateway can connect to it. 
 
 {{% callout type="info" %}}
 The following example shows how to use a user's AWS access key ID and secret key to authenticate with AWS, and an AWS role to authorize access to the EC2 instance. This approach is recommended. However, you can also assign the required permissions to your AWS user directly and only use an AWS access key ID and secret key. 
@@ -76,7 +76,7 @@ The following example shows how to use a user's AWS access key ID and secret key
    kind: Secret
    metadata:
      name: gateway-tag-group1
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    type: Opaque
    stringData:
      AWS_ACCESS_KEY_ID: <access_key>
@@ -146,7 +146,7 @@ Create a Backend that represents your EC2 instance.
    metadata:
      annotations:
      name: my-ec2-backend
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      type: AWS
      aws:
@@ -167,7 +167,7 @@ Create a Backend that represents your EC2 instance.
    kind: HTTPRoute
    metadata:
      name: ec2-route
-     namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+     namespace: kgateway-system
    spec:
      hostnames:
      - ec2.example
@@ -175,7 +175,7 @@ Create a Backend that represents your EC2 instance.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+       namespace: kgateway-system
      rules:
      - backendRefs:
        - group: gateway.kgateway.dev
@@ -226,8 +226,8 @@ Create a Backend that represents your EC2 instance.
 1. Remove the Backend and HTTPRoute.
    
    ```sh
-   kubectl delete httproute ec2-route -n {{< reuse "docs/snippets/ns-system.md" >}}
-   kubectl delete backend my-ec2-backend -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl delete httproute ec2-route -n kgateway-system
+   kubectl delete backend my-ec2-backend -n kgateway-system
    ```
 
 2. Delete the AWS role or revoke permissions for your user.  

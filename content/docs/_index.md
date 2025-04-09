@@ -3,7 +3,7 @@ linkTitle: "Documentation"
 title: Welcome
 ---
 
-Welcome to the documentation for the {{< reuse "docs/snippets/product-name.md" >}} open source project! 
+Welcome to the documentation for the kgateway open source project! 
 
 {{< cards >}}
   {{< card link="quickstart" title="Get started" >}}
@@ -12,6 +12,8 @@ Welcome to the documentation for the {{< reuse "docs/snippets/product-name.md" >
   {{< card link="traffic-management" title="Traffic management" >}}
   {{< card link="resiliency" title="Resiliency" >}}
   {{< card link="security" title="Security" >}}
+  {{< card link="ai" title="AI Gateway" >}}
+  {{< card link="mcp" title="MCP Gateway" >}}
   {{< card link="integrations" title="Integrations" >}}
   {{< card link="observability" title="Observability" >}}
   {{< card link="operations" title="Operations" >}}

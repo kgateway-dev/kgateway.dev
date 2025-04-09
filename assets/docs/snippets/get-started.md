@@ -4,22 +4,22 @@
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
 
-3. Deploy the {{< reuse "docs/snippets/product-name.md" >}} CRDs by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
+3. Deploy the kgateway CRDs by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
 
    ```sh
-   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
-4. Install {{< reuse "docs/snippets/product-name.md" >}} by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
+4. Install kgateway by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
 
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/ns-system.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
+   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
    ```
 
 5. Make sure that `kgateway` is running.
 
    ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/ns-system.md" >}}
+   kubectl get pods -n kgateway-system
    ```
 
    Example output:

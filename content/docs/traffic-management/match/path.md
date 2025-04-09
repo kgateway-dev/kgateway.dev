@@ -25,7 +25,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/ns-system.md" >}}
+         namespace: kgateway-system
      hostnames:
        - match.example
      rules:
