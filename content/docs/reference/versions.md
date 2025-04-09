@@ -62,7 +62,7 @@ Development of a quality stable release on `main` typically follows this process
 Feature development for kgateway is performed on the `main` branch. Upon a merge to `main`, a development build is automatically released. The current development release is `{{< reuse "docs/versions/patch-dev.md" >}}`. 
 
 {{< callout type="warning" >}}
-Development releases are unstable, subject to change, and not recommended for regular usage.
+Development releases are unstable, subject to change, and not recommended for production usage.
 {{< /callout >}}
 
 ### Backports to stable branches {#release-backport}
