@@ -264,11 +264,21 @@ With your MCP Gateway in place, you can now test access to the MCP tool.
    ```
 
 2. Install the MCP model inspector tool. 
+   
    ```sh
    npx @modelcontextprotocol/inspector
    ```
-   
-3. [Open the MCP model inspector](http://localhost:5173).
+
+   Example output:
+
+   ```
+   Starting MCP inspector...
+   ⚙️ Proxy server listening on port 6277
+   🔍 MCP Inspector is up and running at http://127.0.0.1:6274 🚀
+   ```
+
+
+3. Open the MCP model inspector at the address from the output of the previous command, such as [http://127.0.0.1:6274](http://127.0.0.1:6274).
 
 4. Connect to the MCP Gateway. 
    1. Switch the **Transport Type** to **SSE**. 
@@ -324,7 +334,7 @@ With your MCP Gateway in place, you can now test access to the MCP tool.
    EOF
    ```
 
-9. Try to use the tool again. Note that this time, the request succeeds, because the MCP Gateway successfully authorized the request. 
+9. To try the tool again, click **Clear**, select the `default/mcp-tool:convert_to_markdown` tool, and click **Run Tool**. Note that this time, the request succeeds, because the MCP Gateway successfully authorized the request. 
 
    {{< reuse-image src="img/mcp-success.png" >}}
    
