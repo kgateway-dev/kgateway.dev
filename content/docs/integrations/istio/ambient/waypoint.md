@@ -262,10 +262,9 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    httpbin3-77bbdd9b6b-8d8hq                   1/1     Running   0          70m
    ```
 
-5. Label the `httpbin` and `kgateway-system` namespaces to add the httpbin2, httpbin3, and client apps, and the gateway proxy to the ambient mesh. 
+5. Label the `httpbin` namespace to add the httpbin2, httpbin3, and client apps to the ambient mesh. 
    ```sh
    kubectl label ns httpbin istio.io/dataplane-mode=ambient
-   kubectl label ns kgateway-system istio.io/dataplane-mode=ambient
    ```
 
 ## Create a waypoint proxy
@@ -343,7 +342,7 @@ You use the `kgateway-waypoint` GatewayClass to deploy kgateway as a waypoint pr
 
 ## Enforce L7 policies with the waypoint {#waypoint-policies}
 
-In this step, you explore how to apply header modification policies to your sample apps. These policies are enforced by the Gloo Gateway waypoint proxy that you created earlier. You can add other Layer 7 policies to the waypoint proxy. For more information, see the [traffic management](/docs/traffic-management), [security](/docs/security), and [resiliency](/docs/resiliency) guides. 
+In this step, you explore how to apply different types of Layer 7 policies to your sample apps. These policies are enforced by the kgateway waypoint proxy that you created earlier. You can add other Layer 7 policies to the waypoint proxy. For more information, see the [traffic management](/docs/traffic-management), [security](/docs/security), and [resiliency](/docs/resiliency) guides. 
 
 ### Header control
 
@@ -508,7 +507,31 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
 
 Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 app. 
 
-1. Create a TrafficPolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
+1. If you have not done so yet, create an HTTPRoute for the httpbin2 app. You use this HTTPRoute to apply your transformation policy in the next step. 
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin2
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: httpbin2
+       kind: Service
+       group: ""
+     rules:
+       - matches:
+         - path:
+             type: PathPrefix
+             value: /
+         backendRefs:
+          - name: httpbin2
+            port: 8000 
+   EOF
+   ```
+
+2. Create a TrafficPolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -529,7 +552,7 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    EOF
    ```
   
-2. Use the client app to send a request to the httpbin2 app and include a base64-encoded value of `transformation test` in the request `x-base64-encoded` header. Verify that you get back a 200 HTTP response code, and that the decoded value is added to the `x-base64-decoded` response header, starting from the 11th character. 
+3. Use the client app to send a request to the httpbin2 app and include a base64-encoded value of `transformation test` in the request `x-base64-encoded` header. Verify that you get back a 200 HTTP response code, and that the decoded value is added to the `x-base64-decoded` response header, starting from the 11th character. 
    ```sh
    kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA=="
@@ -583,11 +606,93 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    }
    ```
 
-3. Optional: Remove the TrafficPolicy that you created in this guide. 
+4. Optional: Remove the TrafficPolicy and HTTPRoute that you created in this guide. 
    ```sh
    kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete httproute httpbin2 -n httpbin
    ```
 
+### Local rate limiting
+
+1. If you have not done so yet, create an HTTPRoute for the httpbin2 app. You use this HTTPRoute to apply your local rate limiting policy in the next step. 
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin2
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: httpbin2
+       kind: Service
+       group: ""
+     rules:
+       - matches:
+         - path:
+             type: PathPrefix
+             value: /
+         backendRefs:
+          - name: httpbin2
+            port: 8000 
+   EOF
+   ```
+   
+2. Create a TrafficPolicy that applies a local rate limiting policy to the httpbin2 app. In this example, only one request is allowed within 30 seconds. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: TrafficPolicy
+   metadata:
+     name: ratelimit
+     namespace: httpbin
+   spec:
+     targetRefs: 
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin2
+     rateLimit:
+       local:
+         tokenBucket:
+           maxTokens: 1
+           tokensPerFill: 1
+           fillInterval: 30s
+   EOF
+   ```
+   
+3. Use the client app to send three requests to the httpbin2 app. Verify that you get back a 200 HTTP response code for the first request, and that the second and third request are denied with a 429 HTTP response code. 
+   ```sh
+   for i in {1..3}; do kubectl -n httpbin exec deploy/client -- curl -vi http://httpbin2:8000/headers ; done
+   ```
+   
+   Example output: 
+   ```
+   * Request completely sent off
+   HTTP/1.1 200 OK
+   < HTTP/1.1 200 OK
+   ...
+   * Request completely sent off
+   HTTP/1.1 429 Too Many Requests
+   content-length: 18
+   content-type: text/plain
+   server: envoy
+   ...
+   local_rate_limited
+   ...
+   * Request completely sent off
+   < HTTP/1.1 429 Too Many Requests
+   < content-length: 18
+   < content-type: text/plain
+   < server: envoy
+   ...  
+   local_rate_limited%    
+   ```
+   
+4. Optional: Remove the TrafficPolicy and HTTPRoute. 
+   ```sh
+   kubectl delete trafficpolicy ratelimit -n httpbin
+   kubectl delete httproute httpbin2 -n httpbin
+   ```
 
 ### Istio AuthorizationPolicy
 
