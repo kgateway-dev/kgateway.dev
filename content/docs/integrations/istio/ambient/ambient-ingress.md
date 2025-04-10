@@ -32,7 +32,7 @@ Set up an ambient mesh in your cluster to secure service-to-service communicatio
 
 To set up kgateway as the ingress gateway for your ambient mesh, you simply add all the namespaces that you want to secure to your ambient mesh, including the namespace that your gateway proxy is deployed to.
 
-1. Add the `kgateway-system` and `httpbin` namespaces to your ambient mesh. Use the same command to add other namespaces in your cluster.  
+1. Add the `httpbin` and optionally the `kgateway-system` namespace to your ambient mesh. The label instructs istiod to configure a ztunnel socket on all the pods in that namespace so that traffic to these pods is secured via mutual TLS (mTLS). If you do not label the `kgateway-system` namespace, the traffic from the gateway proxy to the app is not secured via mTLS.
    ```sh
    kubectl label ns kgateway-system istio.io/dataplane-mode=ambient
    kubectl label ns httpbin istio.io/dataplane-mode=ambient
