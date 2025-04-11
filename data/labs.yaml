@@ -27,5 +27,21 @@
   href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Canary releases with kgateway, Argo Rollouts & the Gateway API
-  description: Explore how to conduct a canary release with kgateway using Argo RollOuts and the Gateway API pluginq
+  description: Explore how to conduct a canary release with kgateway using Argo RollOuts and the Gateway API plugin
   href: https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  
+- title: Deploying kgateway as an AI Gateway
+  description: Learn how to configure GatewayClass for AI gateways and provision kgateway for proxying LLMs
+  href: https://www.solo.io/resources/lab/deploying-kgateway-as-an-ai-gateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Prompt Guards in kgateway 
+  description: Learn the fundementals in ensuring your LLM content's safety with prompt guards in kgateway
+  href: https://www.solo.io/resources/lab/kgateway-ai-lab-prompt-guards?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Prompt Enrichment in kgateway 
+  description: Explore how to manage your system and user prompts in LLMs with kgateway
+  href: https://www.solo.io/resources/lab/kgateway-ai-lab-prompt-enrichment?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Credentials Management in kgateway 
+  description: Learn how to configure authorization and manage credentials across LLM providers with kgateway
+  href: https://www.solo.io/resources/lab/kgateway-ai-lab-credentials-management?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
