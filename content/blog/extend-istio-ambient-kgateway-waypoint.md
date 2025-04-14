@@ -17,7 +17,7 @@ While Istio ambient provides a default waypoint proxy, there are several scenari
 
 Most Istio users have two completely different gateway implementations: proxies for ingress (for "north-south" traffic) and proxies for internal traffic management ("east-west" traffic — in the traditional model, implemented by a mesh of sidecar proxies.
 
-Kubernetes Gateway API is rapidly becoming the standard for networking in Kubernetes, with more than two [dozen](https://gateway-api.sigs.k8s.io/implementations/) projects already supporting it. [Kgateway](kgateway.dev) is a feature-rich, fast and battle-tested gateway that integrates seamlessly with Kubernetes. It extends the Gateway API to provide advanced features like rate limiting, timeouts, header manipulation, and request transformations.
+Kubernetes Gateway API is rapidly becoming the standard for networking in Kubernetes, with [more than two dozen projects](https://gateway-api.sigs.k8s.io/implementations/) already supporting it. [Kgateway](kgateway.dev) is a feature-rich, fast and battle-tested gateway that integrates seamlessly with Kubernetes. It extends the Gateway API to provide advanced features like rate limiting, timeouts, header manipulation, and request transformations.
 
 For applications that need to communicate with external services (like cloud APIs or LLM providers such as OpenAI), traffic control becomes even more critical. In such cases, using kgateway as an egress gateway can help manage costs, API key security, and caching, while ensuring sensitive data isn't leaked.
 
