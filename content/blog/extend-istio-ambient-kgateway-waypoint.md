@@ -25,7 +25,7 @@ Kgateway's support for acting as a waypoint proxy offers users the chance to use
 
 By using kgateway both for ingress/egress and internal service traffic, you create a unified architecture, making it easier to manage and troubleshoot your traffic. With consistent observability, debugging, and operational experiences, you'll reduce the complexity of having multiple gateway solutions.
 
-### B: You need rich L7 features that Istio's default waypoint doesn't support
+### You need rich L7 features that Istio's default waypoint doesn't support
 
 If you aren't using kgateway for north-south traffic, you can still take advantage of its advanced Layer 7 capabilities for east-west traffic in Istio. Kgateway offers first-class APIs for rate limiting, header manipulation, request transformations, external auth and processing — without the headache of EnvoyFilters.
 
