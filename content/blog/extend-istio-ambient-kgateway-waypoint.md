@@ -184,7 +184,7 @@ $ kubectl exec -it deploy/client -- curl http://ollama:80/ -v
 
 To enable access logging for the kgateway-waypoint, you can configure an HTTPListenerPolicy resource. This allows you to log traffic information such as request methods, response codes, bytes received/sent, and more. Here's how to set it up:
 
-**Apply the access logging configuration:**
+#### Apply the access logging configuration
 
 Create the HTTPListenerPolicy resource to enable access logs for the kgateway-waypoint:
 
