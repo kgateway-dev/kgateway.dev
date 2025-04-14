@@ -29,7 +29,7 @@ By using kgateway both for ingress/egress and internal service traffic, you crea
 
 If you aren't using kgateway for north-south traffic, you can still take advantage of its advanced Layer 7 capabilities for east-west traffic in Istio. Kgateway offers first-class APIs for rate limiting, header manipulation, request transformations, external auth and processing — without the headache of EnvoyFilters.
 
-EnvoyFilters — snippets of raw Envoy configuration programmed into Istio — are a common workaround, but they are notoriously difficult to configure and prone to breaking with new releases. Despite being around for five years, the EnvoyFilter API remains in Alpha status, largely due to their fragility, and are not supported in ambient mode at all. By using kgateway, you avoid this issue and gain access to powerful L7 functions via simple, Kubernetes-native APIs.
+EnvoyFilters — snippets of raw Envoy configuration programmed into Istio — are a common workaround, but they are notoriously difficult to configure, and prone to breaking with new releases. Despite being around for five years, the EnvoyFilter API remains in Alpha status, largely due to their fragility, and are not supported in ambient mode at all. By using kgateway, you avoid this issue and gain access to powerful L7 functions via simple, Kubernetes-native APIs.
 
 ## How does it work?
 
