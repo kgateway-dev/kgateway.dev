@@ -235,7 +235,7 @@ After deploying this configuration, check the logs from the kgateway-waypoint po
 
 In this case, the log shows that the client attempted to make a request to the Ollama service but was rate-limited, as indicated by the response_code `429 Too Many Requests` and the response_flags `RL` for rate limiting.
 
-## Demo Video
+## See a Demo
 
 This video demonstrates the rate-limiting example in action:
 
