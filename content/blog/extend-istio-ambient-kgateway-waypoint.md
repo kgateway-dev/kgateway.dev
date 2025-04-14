@@ -241,7 +241,7 @@ This video demonstrates the rate-limiting example in action:
 
 {{< youtube W1Ak4KfLRXY >}}
 
-## Wrapping Up:
+## Wrapping Up
 
 I am super excited that the release of [kgateway 2.0](https://kgateway.dev/docs/reference/release-notes/) brings a new level of extensibility to Istio's ambient architecture. With the ability to seamlessly integrate kgateway as a waypoint proxy, you gain access to powerful Layer 7 functions while maintaining a unified traffic control experience across both north-south and east-west traffic.
 
