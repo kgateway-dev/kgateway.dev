@@ -21,7 +21,7 @@ Kubernetes Gateway API is rapidly becoming the standard for networking in Kubern
 
 For applications that need to communicate with external services (like cloud APIs or LLM providers such as OpenAI), traffic control becomes even more critical. In such cases, using kgateway as an egress gateway can help manage costs, API key security, and caching, while ensuring sensitive data isn't leaked.
 
-Kgateway's support for acting as a waypoint proxy offers users the chance to use a single system for both traffic directions. Even though the Gateway API lets you use the same terminology, there are differences in implementation, scalability, and performance even between projects using the same engine, like Kgateway and the default Istio waypoint. Many organizations already rely on kgateway to manage their north-south (ingress and egress) traffic, and it offers the same capabilities for east-west traffic in ambient mesh.
+Kgateway's support for acting as a waypoint proxy offers users the chance to use a single system for both traffic directions. Even though the Gateway API lets you use the same terminology, there are differences in implementation, scalability, and performance even between projects using the same engine, like Kgateway and the default Istio waypoint. Many organizations already rely on kgateway to manage their north-south traffic, and it offers the same capabilities for east-west traffic in ambient mesh.
 
 By using kgateway both for ingress/egress and internal service traffic, you create a unified architecture, making it easier to manage and troubleshoot your traffic. With consistent observability, debugging, and operational experiences, you'll reduce the complexity of having multiple gateway solutions.
 
