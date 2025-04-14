@@ -103,7 +103,7 @@ default      ollama                10.96.238.187 kgateway-waypoint     1/1
 
 Once configured, you can take full advantage of the L7 features offered by kgateway, such as rate limiting, header manipulation, and request transformation.
 
-### Example: Timeout
+### Example: Timeouts
 
 Requests to LLMs may take longer than usual. You can easily modify the request timeout using an `HTTPRoute` resource.
 
