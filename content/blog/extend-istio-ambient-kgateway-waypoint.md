@@ -31,7 +31,7 @@ If you aren't using kgateway for north-south traffic, you can still take advanta
 
 EnvoyFilters — snippets of raw Envoy configuration programmed into Istio — are a common workaround, but they are notoriously difficult to configure, and prone to breaking with new releases. Despite being around for five years, the EnvoyFilter API remains in Alpha status, largely due to their fragility, and are not supported in ambient mode at all. By using kgateway, you avoid this issue and gain access to powerful L7 functions via simple, Kubernetes-native APIs.
 
-## How does it work?
+## How Does it Work?
 
 [I previously wrote a blog](https://www.solo.io/blog/istio-ambient-waypoint-proxy-deployment-model-explained) about waypoint proxies, where I described how you can make sense of waypoints as gateways. Just as you can swap your gateway with other gateways that implement the same Kubernetes Gateway API, you can similarly bring in your preferred waypoint proxy.
 
@@ -39,7 +39,7 @@ A waypoint proxy is deployed using the Gateway resource, where you specify the `
 
 {{< reuse-image src="blog/extend-istio-ambient-kgateway-waypoint-1.png" width="750px" >}}
 
-By default, Istio's istio-waypoint listens on port `15008`, but kgateway-waypoint uses port `15088` and supports the Proxy Protocol for passing connection information.
+By default, Istio's istio-waypoint listens on port `15008`, but kgateway-waypoint uses port `15088` and supports [the PROXY protocol](https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt) for passing connection information.
 
 Once deployed, the `kgateway-waypoint` controller automatically creates the necessary Kubernetes resources (Deployment and Service) for the waypoint. When Istio detects that this waypoint is being used as part of the data plane flow, it ensures that all client requests within the mesh pass through the waypoint before reaching their destination.
 
@@ -47,7 +47,7 @@ Once deployed, the `kgateway-waypoint` controller automatically creates the nece
 
 ## Seamlessly Integrating the Custom Waypoint into the Request Flow
 
-Istio uses the status field in the Gateway resource to manage the waypoint proxy's integration into the request flow. Here's an example of the `status` section, which includes the waypoint's service VIP (Virtual IP) address:
+Istio uses the `status` field in the Gateway resource to manage the waypoint proxy's integration into the request flow. Here's an example of the `status` section, which includes the waypoint's service VIP (Virtual IP) address:
 
 ```yaml
 status:
@@ -63,7 +63,7 @@ status:
     type: Accepted
 ```
 
-## See it in action:
+## See It In Action
 
 After you have [Istio](https://ambientmesh.io/docs/quickstart/) (v1.25 or newer) and [kgateway](https://github.com/kgateway-dev/kgateway/releases/tag/v2.0.0) (v2.0.0 or newer) installed in your Kubernetes cluster, you can deploy a `kgateway-waypoint` in your namespace using a Kubernetes Gateway resource.
 
@@ -84,7 +84,7 @@ spec:
     protocol: istio.io/PROXY
 ```
 
-Second, to ensure both the client app and ollama StatefulSet services are routed through the `kgateway-waypoint`, label your namespace as follows after making sure the namespace is enrolled in the ambient mesh:
+Second, to ensure both the client app and ollama StatefulSet services are routed through the `kgateway-waypoint`, label your namespace as follows, after making sure the namespace is enrolled in the ambient mesh:
 
 ```yaml
 $ kubectl label ns default istio.io/use-waypoint=kgateway-waypoint
