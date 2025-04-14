@@ -247,4 +247,4 @@ I am super excited that the release of [kgateway 2.0](https://kgateway.dev/docs/
 
 By leveraging Kubernetes Gateway APIs, you can easily configure advanced traffic management features like rate limiting, [request transformation](https://kgateway.dev/docs/traffic-management/transformations/), [external processing (ExtProc)](https://kgateway.dev/docs/traffic-management/extproc/), [external Auth](https://kgateway.dev/docs/security/external-auth/), and more — all without wrestling with complex Envoy filters.
 
-Explore kgateway today, and [reach out on the community slack](https://kgateway.dev/slack/) if you have any questions or need assistance!
+Explore kgateway today, and [reach out on the community Slack](https://kgateway.dev/slack/) if you have any questions or need assistance!
