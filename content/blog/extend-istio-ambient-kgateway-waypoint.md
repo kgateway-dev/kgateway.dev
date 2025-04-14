@@ -13,7 +13,7 @@ But why choose kgateway as your waypoint? Kgateway is the first project that can
 
 While Istio ambient provides a default waypoint proxy, there are several scenarios where kgateway can offer a more powerful alternative:
 
-### A: You are using or plan to use kgateway to control traffic in or out of your cluster
+### You are using or plan to use kgateway to control traffic in or out of your cluster
 
 Most Istio users have two completely different gateway implementations: proxies for ingress (for "north-south" traffic) and proxies for internal traffic management ("east-west" traffic — in the traditional model, implemented by a mesh of sidecar proxies.
 
