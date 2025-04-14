@@ -33,7 +33,7 @@ EnvoyFilters — snippets of raw Envoy configuration programmed into Istio — a
 
 ## How does it work?
 
-I wrote a [blog](https://www.solo.io/blog/istio-ambient-waypoint-proxy-deployment-model-explained) previously on waypoint proxies, where I described how you can make sense of waypoints as gateways. Just as you can swap your gateway with other gateways that implement the same Kubernetes Gateway API, you can also bring in your preferred waypoint proxy similarly.
+[I previously wrote a blog](https://www.solo.io/blog/istio-ambient-waypoint-proxy-deployment-model-explained) about waypoint proxies, where I described how you can make sense of waypoints as gateways. Just as you can swap your gateway with other gateways that implement the same Kubernetes Gateway API, you can similarly bring in your preferred waypoint proxy.
 
 A waypoint proxy is deployed using the Gateway resource, where you specify the `gatewayClassName` to determine which proxy to use. The default class in an ambient mesh is `istio-waypoint`. However, to use kgateway, you simply change the `gatewayClassName` to `kgateway-waypoint`, like so:
 
