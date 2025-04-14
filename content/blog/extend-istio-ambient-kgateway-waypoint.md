@@ -216,7 +216,7 @@ spec:
 EOF
 ```
 
-**Verify the log output:**
+#### Verify the log output
 
 After deploying this configuration, check the logs from the kgateway-waypoint pod to confirm that access logging is working as expected. Here's an example of what the log entry might look like when the rate limit configuration is triggered for your ollama StatefulSet:
 
