@@ -45,3 +45,11 @@
 - title: Credentials Management in kgateway 
   description: Learn how to configure authorization and manage credentials across LLM providers with kgateway
   href: https://www.solo.io/resources/lab/kgateway-ai-lab-credentials-management?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Route Delegation in kgateway
+  description: Explore route delegation in kgateway to enable multi-tenancy, self-service routing, and extended Kubernetes Gateway API capabilities
+  href: https://www.solo.io/resources/lab/route-delegation-in-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+ 
+- title: Gateway API inference extensions with kgateway
+  description: Learn about the Gateway API Inference Extension in kgateway to enable intelligent AI request routing using Kubernetes-native resources and open source tools
+  href: https://www.solo.io/resources/lab/kgateway-lab-gateway-api-inference-extensions-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community

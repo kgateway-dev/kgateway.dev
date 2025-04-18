@@ -34,7 +34,14 @@
   href: https://youtu.be/B8oZ1seIDIM
   thumbnailHref: /thumbnails/kgateway-waypoint.jpg
 
-- description: Explore how to conduct canary releases with kgateway and Argo
+- description: Explore how to conduct canary releases with kgateway and Argo.
   href: https://youtu.be/nI52m7S5gLY
   thumbnailHref: /thumbnails/canary-release.jpg
-  
+
+- description: Get a detailed overview of Gateway API inference extensions using kgateway.
+  href: https://youtu.be/5sAB9_fScMo
+  thumbnailHref: /thumbnails/gatewayapi-inference-extension.jpg
+
+- description: Learn how to implement route delegation in kgateway.
+  href: https://youtu.be/5uUGN4Qn_1c
+  thumbnailHref: /thumbnails/route-delegation.jpg
