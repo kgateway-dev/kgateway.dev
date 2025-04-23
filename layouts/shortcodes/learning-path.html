@@ -4,12 +4,9 @@
 {{ if $path }}
 
 <h2>Lessons</h2>
-
-<ul>
-    {{ range $path.lessons }}
-    <li>
-      <b>{{ .title }}</b><br/>
-      {{ .description }}<br/>
+  {{ range $path.lessons }}
+  <h3>{{ .title }}</h3>
+    <p>{{ .description }}.</p>
       <ul>
       {{ if .blog }}
       <li>
@@ -29,7 +26,6 @@
       </ul>
     </li>
     {{ end }}
-</ul>
 
 </div>
 {{ end }}
