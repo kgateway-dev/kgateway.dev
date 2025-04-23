@@ -1,0 +1,87 @@
+- id: gwapi
+  title: Gateway API
+  description: Learn the Kubernetes Gateway API with kgateway
+  lessons:
+  - title: Introduction to the Gateway API
+    description: Learn about real-world use cases that influenced the development and adoption of the Kubernetes Gateway API
+    blog: introduction-to-kubernetes-gateway-api
+    youtube: kzWgbSTVphs
+  - title: Install kgateway
+    description: Learn to install kgateway
+    blog: guide-to-installing-kgateway
+    youtube: eGo8uJDsBEc
+    lab: install-kgateway-open-source-implementation-of-the-gateway-api
+  - title: Gateway API basics
+    description: Learn to configure Gateway and HTTPRoute resources and expose a service
+    blog: understanding-gateway-api-basics
+    youtube: j89S4tV192g
+    lab: understanding-the-basics-of-kubernetes-gateway-api-with-kgateway
+  - title: Serving HTTPS
+    description: Learn to secure your services with Gateway API and retrofit your configuration to enforce HTTPS traffic
+    blog: configuring-https-routes-gateway-api
+    youtube: cOnL9vjVRvQ
+    lab: configure-https-with-the-gateway-api-and-kgateway
+  - title: Shared gateways
+    description: Learn how to configure a shared gateway for multiple development teams
+    blog: shared-gateways
+    youtube: O3_za6WU_iA
+    lab: configuring-gateways-across-multiple-teams-with-kgateway
+  - title: Routing rules
+    description: Learn HTTP traffic management features including request matching, URL rewriting, traffic splitting and header modification
+    blog: exploring-gateway-api-httproute
+    youtube: CGF3aZXOyxc
+    lab: exploring-httproute-resource-configurations-with-kgateway
+  - title: Service mesh
+    description: Explore how the Gateway API supports, manages and controls internal service mesh traffic
+    blog: supporting-service-mesh-kgateway-gateway-api
+    youtube: c5ZfIUOFb9I
+    lab: gatewayapi-support-for-service-mesh-with-kgateway
+  - title: Policy attachments
+    description: Explore the Gateway API Policy Attachments pattern and learn how policies can extend gateways and routes
+    blog: policy-attachments
+    youtube: NQSADVpcO8M
+    lab: understanding-kgateway-patterns-of-extensions
+  - title: "Canary releases with Argo Rollouts (*)" # missing blog
+    description: Explore how to conduct a canary release with Argo Rollouts and the Gateway API
+    youtube: nI52m7S5gLY
+    lab: understanding-kgateway-patterns-of-extensions
+- id: kgw
+  title: kgateway topics
+  description: Learn features unique to kgateway
+  lessons:
+  - title: "Route delegation (*)" # missing blog
+    description: Explore route delegation in kgateway to enable multi-tenancy, self-service routing, and extended Kubernetes Gateway API capabilities
+    youtube: 5uUGN4Qn_1c
+    lab: route-delegation-in-kgateway
+  - title: Transformations
+    description: Learn how to perform request and response tranformations
+    blog: transformation-in-kgateway
+  - title: "Integration with Istio at ingress (*)" # missing video and lab
+    description: Explore routing requests from Ingress to Istio workloads with mutual TLS
+  - title: "kgateway as a waypoint in Istio (*)" # missing lab
+    description: Learn to use kgateway as a waypoint in your Istio ambient mesh.
+    blog: extend-istio-ambient-kgateway-waypoint
+    youtube: B8oZ1seIDIM
+- id: aigw
+  title: AI Gateway
+  description: Discover the AI Gateway capabilities of the kgateway project
+  lessons:
+  - title: Deploying an AI gateway
+    description: Learn to provision AI gateways for proxying LLMs
+    lab: deploying-kgateway-as-an-ai-gateway
+  - title: LLM Credentials management with AI gateways
+    description: Learn how to manage credentials across LLM providers
+    lab: kgateway-ai-lab-credentials-management
+  - title: Prompt guards
+    description: Learn the fundamentals of ensuring the safety of your LLM content with prompt guards
+    lab: kgateway-ai-lab-prompt-guards
+  - title: Prompt enrichment
+    description: Explore how to manage your system and user prompts in API calls to LLMs
+    lab: kgateway-ai-lab-prompt-enrichment
+  - title: "Model failover (*)" # waiting on fix to kgateway before can add lab
+    description: Learn how to configure failover for calls to LLMs
+  - title: Gateway API Inference extension
+    description: Learn to enable intelligent AI request routing with the Gateway API Inference Extension
+    blog: deep-dive-inference-extensions
+    youtube: 5sAB9_fScMo
+    lab: kgateway-lab-gateway-api-inference-extensions-with-kgateway

@@ -1,0 +1,31 @@
+{{ $id := .Get "id" }}
+{{ $paths := .Site.Data.learningpaths }}
+{{ $path := index (where $paths "id" $id) 0 }}
+{{ if $path }}
+
+<h2>Lessons</h2>
+  {{ range $path.lessons }}
+  <h3>{{ .title }}</h3>
+    <p>{{ .description }}.</p>
+      <ul>
+      {{ if .blog }}
+      <li>
+      <a href="/blog/{{.blog}}">Blog</a><br/>
+      </li>
+      {{ end }}
+      {{ if .youtube }}
+      <li>
+      <a href="https://youtu.be/{{.youtube}}">Video lesson</a><br/>
+      </li>
+      {{ end }}
+      {{ if .lab }}
+      <li>
+      <a href="http://www.solo.io/resources/lab/{{.lab}}?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community">Hands-on Lab</a>
+      </li>
+      {{ end }}
+      </ul>
+    </li>
+    {{ end }}
+
+</div>
+{{ end }}
