@@ -34,6 +34,10 @@ Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/referen
 2. Add an entry to `data/videos.yaml` with a description, href, and thumbnailHref. The thumbnailHref should be `/thumbnails/<your-image-name>`
 3. Verify that the new video appears correctly at http://localhost:1313/resources/videos/
 
+### Modifying a learning path
+1. Edit `data/learningpaths.yaml` as appropriate, for example, to add a lab for a specific lesson that doesn't currently reference one
+2. Verify that the change is reflected, by navigating to http://localhost:1313/learn/ and selecting the corresponding learning path.
+
 ### Adding a Blog
 1. Create a new file in `content/blog`. Use the blog title in [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) as the file name.
 2. Fill out the blog with content in [Markdown](https://www.markdownguide.org/tools/hugo/). You can use other blogs as an example of specific styling/features but more details are below.
