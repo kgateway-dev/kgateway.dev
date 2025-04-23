@@ -35,7 +35,7 @@ Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/referen
 3. Verify that the new video appears correctly at http://localhost:1313/resources/videos/
 
 ### Modifying a learning path
-1. Edit `data/learningpaths.yaml` as appropriate, for example, to add a lab for a specific lesson that doesn't currently reference one
+1. Edit `data/learningpaths.yaml` as appropriate, for example, to add a lab for a specific lesson that doesn't currently reference one.
 2. Verify that the change is reflected, by navigating to http://localhost:1313/learn/ and selecting the corresponding learning path.
 
 ### Adding a Blog
