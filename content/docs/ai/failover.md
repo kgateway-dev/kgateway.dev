@@ -15,8 +15,8 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Before you begin
 
-1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
-2. [Authenticate to the LLM](/ai/guides/auth/).
+1. [Set up AI Gateway](/docs/ai/setup/).
+2. [Authenticate to the LLM](/docs/ai/auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}

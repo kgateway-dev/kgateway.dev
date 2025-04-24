@@ -18,8 +18,8 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 ## Before you begin
 
-1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
-2. [Authenticate to the LLM](/ai/guides/auth/).
+1. [Set up AI Gateway](/docs/ai/setup/).
+2. [Authenticate to the LLM](/docs/ai/auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Refactor LLM prompts

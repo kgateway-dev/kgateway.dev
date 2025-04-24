@@ -7,9 +7,9 @@ Observability helps you understand how your system is performing, identify issue
 
 ## Before you begin
 
-1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
+1. [Set up AI Gateway](/docs/ai/setup/).
 
-2. [Authenticate to the LLM](/ai/guides/auth/).
+2. [Authenticate to the LLM](/docs/ai/auth/).
 
 3. Get the external address of the gateway and save it in an environment variable.
    
