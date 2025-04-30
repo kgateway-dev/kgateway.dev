@@ -12,7 +12,7 @@ However, you might have a specific backend workload that uses its own TLS certif
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "docs/snippets/cert-prereqs.md" >}}
 
 ## Create a backend workload with a TLS certificate {#workload-tls-cert}
 
