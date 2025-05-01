@@ -51,7 +51,9 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
 2. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml
+   kubectl apply -f- <<EOF
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/v2.0.x/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml" >}}
+   EOF
    ```
 
 3. Create the BackendTLSPolicy.
@@ -188,3 +190,14 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    ```sh
    kubectl delete backendtlspolicy,configmap,httproute -A -l app=nginx
    ```
+
+3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.
+
+   {{% callout type="warning" %}}
+   Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
+   {{% /callout %}}
+
+   ```sh
+   kubectl rollout restart -n kgateway-system deployment/kgateway
+   ```
+   
