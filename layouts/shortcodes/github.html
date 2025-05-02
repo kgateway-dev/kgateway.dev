@@ -1,0 +1,7 @@
+{{- $url := .Get "url" -}}
+
+{{- with resources.GetRemote $url -}}
+  {{- .Content -}}
+{{- else -}}
+  <p><strong>Error:</strong> Unable to load code from {{ $url }}</p>
+{{- end -}}

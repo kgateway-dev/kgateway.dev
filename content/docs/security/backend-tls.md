@@ -50,34 +50,9 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
 
 2. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: v1
-   kind: ConfigMap
-   metadata:
-     name: ca
-     labels:
-       app: nginx
-   data:
-     ca.crt: |
-       -----BEGIN CERTIFICATE-----
-       MIIC6zCCAdOgAwIBAgIJAPdgL5W5vugOMA0GCSqGSIb3DQEBCwUAMBYxFDASBgNV
-       BAMMC2V4YW1wbGUuY29tMB4XDTI1MDMxMDIyMDY0OVoXDTI1MDQwOTIyMDY0OVow
-       FjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAw
-       ggEKAoIBAQC46DSkpngZavNVgByw/h7rbKyvgzp2wGDW/fPGL0/rkLcKIsIiNgHH
-       6vA0UPTSI3YsHeu+CnQCEhZWk9KhQ2q8etSynUoizIrj2iuxKTEsL3SJ7cI03cpH
-       iQoMuUqp4L4lA6/YXsLkXjHWtnTLKjsvsrjBFiu96ueoje6B2sfcSlYRFI1WgMgZ
-       QP+LALy9tVtMManIqKVr63BG0884AghF3sPo5ryOEP/1Oc9F6Ivf67JfNjMhuBHa
-       hT500hYyuxzjgUPoMWyX1FQ7NL/OWUJ5EXuSnxpDb7edVDVCz+z199S76wpAKEe0
-       hoJG5Ahw1vWNRRBO8gnsSjLAHEw0nXpvAgMBAAGjPDA6MBYGA1UdEQQPMA2CC2V4
-       YW1wbGUuY29tMAsGA1UdDwQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDATANBgkq
-       hkiG9w0BAQsFAAOCAQEANRIdAdlJgSsgBdUcO7fmAKAZtlUUPWHa1nq5hzxCkdBj
-       hnGBCE4d8tyffTkL4kZ3cQZmDjeb7KiVL9/OBDjbe3coaKrNeFRZ+0XTJtcnRzrB
-       gRpnXAJvYCbq4AIOkGdUfp2mw1fLdoNaoW8snb6RMV/7YrOSmhUa8H9YeiW3bZIh
-       oOhsl5u5DXaInkTUR4ZOVV6UJVsG+JnN71nFGikcKKMGgOC2rpFP658M3jCHX5yx
-       EGqH5JRIpCX9epfIvFeJWJY8u8G4pg3Sryko72RWwUQBQ5HGInO0nYGU1ff/enW6
-       ywK+felXBiCUKrWKFjChgwmrs2bGAUfegKF/TQtvWQ==
-       -----END CERTIFICATE-----
+   ```shell
+   kubectl apply -f- <<EOF
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/v2.0.x/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml" >}}
    EOF
    ```
 
@@ -104,6 +79,8 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
          name: ca
    EOF
    ```
+
+   {{< reuse "docs/snippets/review-table.md" >}}
 
    | Setting | Description |
    |---------|-------------|
@@ -142,7 +119,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
@@ -213,3 +190,14 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    ```sh
    kubectl delete backendtlspolicy,configmap,httproute -A -l app=nginx
    ```
+
+3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.
+
+   {{% callout type="warning" %}}
+   Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
+   {{% /callout %}}
+
+   ```sh
+   kubectl rollout restart -n kgateway-system deployment/kgateway
+   ```
+   

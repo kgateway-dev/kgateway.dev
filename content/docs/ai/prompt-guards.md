@@ -14,8 +14,8 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Before you begin
 
-1. [Set up AI Gateway](/ai/tutorials/setup-gw/).
-2. [Authenticate to the LLM](/ai/guides/auth/).
+1. [Set up AI Gateway](/docs/ai/setup/).
+2. [Authenticate to the LLM](/docs/ai/auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Reject unwanted requests
