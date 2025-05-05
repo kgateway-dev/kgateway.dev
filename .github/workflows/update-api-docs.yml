@@ -127,6 +127,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: kgateway.dev
           commit-message: "docs: Update API documentation"
+          signoff: true
           title: "Update API Documentation"
           body: |
             Automated API documentation update generated on $(date '+%B %d, %Y at %H:%M')
