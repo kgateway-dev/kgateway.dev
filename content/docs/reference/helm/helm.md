@@ -1,6 +1,6 @@
 # kgateway
 
-A Helm chart for the kgateway project.
+A Helm chart for the kgateway project
 
 ## Values
 
@@ -15,6 +15,7 @@ A Helm chart for the kgateway project.
 | controller.logLevel | string | `"info"` |  |
 | controller.replicaCount | int | `1` |  |
 | controller.service.ports.grpc | int | `9977` |  |
+| controller.service.ports.health | int | `9093` |  |
 | controller.service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
