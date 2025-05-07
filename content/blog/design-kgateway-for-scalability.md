@@ -27,7 +27,7 @@ Let’s walk through a few core scenarios to illustrate how kgateway scales to s
 
 ## Core Scalability Scenarios
 
-### 1. When a New Route Is Added
+### When a New Route Is Added
 
 In a production system with thousands of existing routes, adding a new one should be near-instant. Ideally, the route becomes effective within 1 second, without needing a periodic timer or restart. This ensures teams can test and deploy with confidence.
 
