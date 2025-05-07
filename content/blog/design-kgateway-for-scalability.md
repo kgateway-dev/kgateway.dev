@@ -95,7 +95,7 @@ hack/utils/applier/go run main.go apply -f ~/Documents/blogs/kgateway-scale/scal
 curl http://localhost:8080/foo/10000
 ```
 
-6. **Update the 10,000th route**. Send the request with `-v` (verbose); you should see the response header `hello: kgateway` being added:
+6. Update the 10,001st route. Send the request with `-v` (verbose); you should see the response header `hello: kgateway` being added:
 
 ```yaml
 kubectl apply -f - <<EOF
