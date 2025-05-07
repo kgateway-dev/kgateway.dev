@@ -79,8 +79,9 @@ EOF
 4. Clone the [kgateway repo](https://github.com/kgateway-dev/kgateway). From the cloned directory, load 10,000 routes and backends (starting from 0 to 9999). Send a few random requests to confirm routes are effective immediately.
 
 ```bash
+cd hack/utils/applier
 wget https://raw.githubusercontent.com/linsun/gateway-tests/refs/heads/main/scale/routes.yaml
-hack/utils/applier/go run main.go apply -f routes.yaml --iterations 10000
+go run main.go apply -f routes.yaml --iterations 10000
 kubectl port-forward deployment/http -n kgateway-system 8080:8080 &
 curl http://localhost:8080/foo/9
 curl http://localhost:8080/foo/99
