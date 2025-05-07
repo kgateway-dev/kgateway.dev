@@ -9,9 +9,7 @@ With the Kubernetes Gateway API becoming the de facto standard for managing traf
 
 Before comparing features, the most critical consideration is whether a gateway is built on a solid, reliable foundation–the kind of foundation that just works.
 
-
 ## Aren’t All Envoy-Based Gateways the Same?
-
 
 It's a fair question. Many gateways use the Envoy proxy under the hood to enforce routing, security, and other traffic policies. But despite sharing the same data plane, not all gateways are equal—because the **control plane** makes all the difference.
 
@@ -26,7 +24,6 @@ Managing resource dependencies via manual references like `targetRefs` and `exte
 Learning from that experience, we designed **kgateway** using the battle-tested [krt](https://github.com/istio/istio/blob/master/pkg/kube/krt/README.md) framework to handle dependency tracking automatically. Now, only the **affected objects** are re-translated when a change occurs—ensuring fast updates and efficient scaling.
 
 Let’s walk through a few core scenarios to illustrate how kgateway scales to support large teams and applications—starting with a setup of 10,000 routes and backends—and see how kgateway handles new routes, route update, deletion or control plane becomes unavailable.
-
 
 ## Core Scalability Scenarios
 
