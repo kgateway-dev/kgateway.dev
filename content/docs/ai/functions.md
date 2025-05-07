@@ -37,7 +37,7 @@ sequenceDiagram
     Gateway-->>-User: "The weather in Columbus is 15°C and cloudy."
 ```
 
-1. The User asks about the weather today. The request includes a list of tools that the LLM can use to answer the answer the question.
+1. The User asks about the weather today. The request includes a list of tools that the LLM can use to answer the question.
 2. The Gateway routes the request with the tool list to the LLM.
 3. Based on the conversation, the LLM suggests to call the `get_weather` function and includes the required parameters to use that function. The LLM might get these parameters by using the chat history, asking the end user to provide them, or by suggesting other functions to call before calling the `get_weather` function. The Gateway returns this suggestion to the User.
 4. The User invokes the `get_weather` function by sending a request to the App. The request includes the required parameters to execute the function.
