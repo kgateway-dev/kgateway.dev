@@ -51,7 +51,7 @@ The system should remain fully operational when the control plane restarts or sc
 
 ## Test These Scenarios Yourself
 
-1. Install kgateway.
+1. [Install kgateway](https://kgateway.dev/docs/quickstart/).
 
 2. Create the `http` gateway proxy via the Gateway resource below:
 
