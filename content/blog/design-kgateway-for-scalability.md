@@ -53,7 +53,7 @@ The system should remain fully operational when the control plane restarts or sc
 
 1. [Install kgateway](https://kgateway.dev/docs/quickstart/).
 
-2. Create the `http` gateway proxy via the Gateway resource below:
+2. Create the `http` gateway proxy using a Gateway resource:
 
 ```yaml
 $ kubectl apply -f - <<EOF
