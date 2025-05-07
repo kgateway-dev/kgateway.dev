@@ -143,7 +143,7 @@ kubectl delete httproute route-10000
 curl http://localhost:8080/foo/10000
 ```
 
-8. **Delete the kgateway control plane**. The CPU/memory of the Envoy proxy managed by the control plane should remain stable, and all requests should continue to work:
+8. Delete the kgateway control plane. The CPU/memory of the Envoy proxy managed by the control plane should remain stable, and all requests should continue to work:
 
 ```bash
 for i in {2..1009}
