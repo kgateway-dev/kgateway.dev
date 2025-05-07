@@ -74,7 +74,7 @@ spec:
 EOF
 ```
 
-3. **(Optional)** Install the [OpenTelemetry Collector](https://kgateway.dev/docs/observability/#otel) and [kube-prometheus-stack](https://kgateway.dev/docs/observability/#grafana) to observe CPU/memory and Envoy metrics. Make sure your cluster has adequate resources before doing this.
+3. **(Optional)** Install the [OpenTelemetry Collector](https://kgateway.dev/docs/observability/#otel) and [kube-prometheus-stack](https://kgateway.dev/docs/observability/#grafana) to observe CPU, memory and Envoy metrics. (Make sure your cluster has adequate resources if doing this.)
 
 4. Clone the [kgateway repo](https://github.com/kgateway-dev/kgateway). From the cloned directory, load 10,000 routes and backends (starting from 0 to 9999). Send a few random requests to confirm routes are effective immediately.
 
