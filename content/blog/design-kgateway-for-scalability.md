@@ -31,19 +31,19 @@ Let’s walk through a few core scenarios to illustrate how kgateway scales to s
 
 In a production system with thousands of existing routes, adding a new one should be near-instant. Ideally, the route becomes effective within 1 second, without needing a periodic timer or restart. This ensures teams can test and deploy with confidence.
 
-{{< reuse-image src="blog/scalability-add-a-route.gif" width="750px" >}}
+{{< reuse-image src="blog/scalability-add-a-route.gif" width="75%" caption="Watch the full demo in the Test These Scenarios Yourself section below" >}}
 
 ### When a Route Is Updated
 
 Updates to an existing route should not interrupt traffic. The old route should be replaced atomically, and the new route should take effect immediately. Any delay or downtime can lead to outages or security issues—especially in critical systems.
 
-{{< reuse-image src="blog/scalability-modify-a-route.gif" width="750px" >}}
+{{< reuse-image src="blog/scalability-modify-a-route.gif" width="75%" caption="Watch the full demo in the Test These Scenarios Yourself section below" >}}
 
 ### When a Route Is Removed
 
 Removing a route should instantly revoke access. Lingering routes, even for a few seconds, can pose security risks and violate compliance requirements.
 
-{{< reuse-image src="blog/scalability-delete-a-route.gif" width="750px" >}}
+{{< reuse-image src="blog/scalability-delete-a-route.gif" width="75%" caption="Watch the full demo in the Test These Scenarios Yourself section below" >}}
 
 ### When the Control Plane Is Restarted or Scaled
 
