@@ -1,5 +1,5 @@
 ---
-title: Design kgateway for Scalability – Not All Gateways Are Created Equal
+title: Designing kgateway for Scalability – Not All Gateways Are Created Equal
 toc: false
 publishDate: 2025-05-07T00:00:00-00:00
 author: Lin Sun & Yuval Kohavi
