@@ -88,7 +88,7 @@ curl http://localhost:8080/foo/99
 curl http://localhost:8080/foo/9999
 ```
 
-5. **Add the 10,000th route and backend**, and check if the request to the newly added route is effective immediately.
+5. Add the 10,001st route and backend, and check if the request to the newly added route is effective immediately.
 
 ```bash
 hack/utils/applier/go run main.go apply -f ~/Documents/blogs/kgateway-scale/scale/routes.yaml --start 10000 --iterations 1
