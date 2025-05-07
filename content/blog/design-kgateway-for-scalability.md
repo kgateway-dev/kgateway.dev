@@ -11,7 +11,7 @@ Before comparing features, a critical consideration is whether a gateway is buil
 
 ## Aren’t All Envoy-Based Gateways the Same?
 
-It's a fair question. Many gateways use the Envoy proxy under the hood to enforce routing, security, and other traffic policies. But despite sharing the same data plane, not all gateways are equal—because the **control plane** makes all the difference.
+It's a fair question. Many gateways use the Envoy proxy under the hood to enforce routing, security, and other traffic policies. But despite sharing the same data plane, not all gateways are equal: the **control plane** makes all the difference.
 
 The control plane is responsible for translating Kubernetes Gateway API resources into actual Envoy configuration. This translation layer can be simple for a few routes, but when you’re managing 20,000 resources (which will translate into 500,000+ lines of Envoy config), the efficiency and scalability of the control plane become critical—as I noted in a previous [LinkedIn post](https://www.linkedin.com/posts/lin-sun-a9b7a81_from-20000-kubernetes-gateway-resources-activity-7305695363049373696-UVNz?utm_source=share&utm_medium=member_desktop&rcm=ACoAAABLihcBuozqLyftNtauegAdN2-QszsmqQQ).
 
