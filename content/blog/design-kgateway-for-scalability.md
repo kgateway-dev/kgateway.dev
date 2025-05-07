@@ -39,7 +39,7 @@ Updates to an existing route should not interrupt traffic. The old route should 
 
 {{< reuse-image src="blog/scalability-modify-a-route.gif" width="750px" >}}
 
-### 3. When a Route Is Removed
+### When a Route Is Removed
 
 Removing a route should instantly revoke access. Lingering routes, even for a few seconds, can pose security risks and violate compliance requirements.
 
