@@ -33,7 +33,7 @@ In a production system with thousands of existing routes, adding a new one shoul
 
 {{< reuse-image src="blog/scalability-add-a-route.gif" width="750px" >}}
 
-### 2. When a Route Is Updated
+### When a Route Is Updated
 
 Updates to an existing route should not interrupt traffic. The old route should be replaced atomically, and the new route should take effect immediately. Any delay or downtime can lead to outages or security issues—especially in critical systems.
 
