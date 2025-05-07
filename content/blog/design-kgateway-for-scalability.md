@@ -136,7 +136,7 @@ EOF
 curl http://localhost:8080/foo/10000 -v
 ```
 
-7. **Delete the 10,000th route**, and confirm the route is no longer functional:
+7. Delete the 10,001st route, and confirm the route is no longer functional:
 
 ```bash
 kubectl delete httproute route-10000
