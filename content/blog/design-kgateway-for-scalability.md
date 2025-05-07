@@ -23,7 +23,7 @@ Managing resource dependencies via manual references like `targetRefs` and `exte
 
 Learning from that experience, we designed kgateway using the battle-tested [krt](https://github.com/istio/istio/blob/master/pkg/kube/krt/README.md) framework to handle dependency tracking automatically. Now, only affected objects are re-translated when a change occurs—ensuring fast updates and efficient scaling.
 
-Let’s walk through a few core scenarios to illustrate how kgateway scales to support large teams and applications—starting with a setup of 10,000 routes and backends—and see how kgateway handles new routes, route update, deletion or control plane becomes unavailable.
+Let’s walk through a few core scenarios to illustrate how kgateway scales to support large teams and applications, starting with a setup of 10,000 routes and backends, and see how kgateway handles new routes, route update, deletion or control plane becomes unavailable.
 
 ## Core Scalability Scenarios
 
