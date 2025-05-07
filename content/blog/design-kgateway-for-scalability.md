@@ -17,7 +17,7 @@ The control plane is responsible for translating Kubernetes Gateway API resource
 
 ## Designing kgateway for Scalability
 
-When we started building **Gloo** (now **kgateway**) seven years ago, we used a snapshot-based model that recalculated everything on every update—whether it was a new route, an update, or a backend change. This meant even small changes triggered a full control plane recalculation. With Kubernetes, where pods and backends change constantly, this was not scalable.
+When we started building Gloo (now kgateway) seven years ago, we used a snapshot-based model that recalculated everything on every update—whether it was a new route, an update, or a backend change. This meant even small changes triggered a full control plane recalculation. With Kubernetes, where pods and backends change constantly, this was not scalable.
 
 Managing resource dependencies via manual references like `targetRefs` and `extensionRefs` also proved cumbersome. Dependency resolution sometimes failed, creating reliability issues.
 
