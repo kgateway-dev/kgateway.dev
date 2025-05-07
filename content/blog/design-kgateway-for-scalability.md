@@ -5,7 +5,7 @@ publishDate: 2025-05-07T00:00:00-00:00
 author: Lin Sun & Yuval Kohavi
 ---
 
-With the Kubernetes Gateway API becoming the de facto standard for managing traffic into, out of, and within clusters, a growing number of gateways now implement this API. While gateways are often expected to "just work," choosing the right one can have major implications—especially at scale.
+With the Kubernetes Gateway API becoming the de facto standard for managing traffic into, out of, and within clusters, a growing number of gateways now implement this API. While gateways are often thought of as interchangeable, the choice can have major implications—especially in terms of scale.
 
 Before comparing features, the most critical consideration is whether a gateway is built on a solid, reliable foundation–the kind of foundation that just works.
 
