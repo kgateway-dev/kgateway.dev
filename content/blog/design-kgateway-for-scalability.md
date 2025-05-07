@@ -45,7 +45,7 @@ Removing a route should instantly revoke access. Lingering routes, even for a fe
 
 {{< reuse-image src="blog/scalability-delete-a-route.gif" width="750px" >}}
 
-### 4. When the Control Plane Is Restarted or Scaled
+### When the Control Plane Is Restarted or Scaled
 
 The system should remain fully operational when the control plane restarts or scales out. Since the Envoy proxies are already configured, their behavior should not be affected. Once the control plane returns, it should not trigger unnecessary reconfigurations if there’s been no change.
 
