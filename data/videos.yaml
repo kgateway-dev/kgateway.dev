@@ -45,3 +45,7 @@
 - description: Learn how to implement route delegation in kgateway.
   href: https://youtu.be/5uUGN4Qn_1c
   thumbnailHref: /thumbnails/route-delegation.jpg
+
+- description: Explore consumption reporting with kgateway AI
+  href: https://youtu.be/EPQE9jYOvbc
+  thumbnailHref: /thumbnails/consumption-reporting.jpg

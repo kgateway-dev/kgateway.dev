@@ -53,3 +53,7 @@
 - title: Gateway API inference extensions with kgateway
   description: Learn about the Gateway API Inference Extension in kgateway to enable intelligent AI request routing using Kubernetes-native resources and open source tools
   href: https://www.solo.io/resources/lab/kgateway-lab-gateway-api-inference-extensions-with-kgateway?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  
+- title: Consumption Reporting with kgateway AI
+  description: Learn how an AI Gateway like kgateway provides built-in tools for monitoring, reporting, and controlling AI API consumption
+  href: https://www.solo.io/resources/lab/kgateway-ai-lab-consumption-reporting?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
