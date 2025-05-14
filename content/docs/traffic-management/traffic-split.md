@@ -21,7 +21,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
 
 2. Deploy the Hellworld sample apps. 
    ```sh
-   kubectl -n helloworld apply -f https://raw.githubusercontent.com/solo-io/gloo-edge-use-cases/{{< reuse "docs/versions/github-branch.md" >}}/docs/sample-apps/helloworld.yaml
+   kubectl -n helloworld apply -f https://raw.githubusercontent.com/solo-io/gloo-edge-use-cases/main/docs/sample-apps/helloworld.yaml
    ```
 
    Example output: 
