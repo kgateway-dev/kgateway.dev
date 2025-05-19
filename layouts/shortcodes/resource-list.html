@@ -19,7 +19,7 @@
 <section class="px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24">
   <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
     {{ range $.Page.Pages }}
-      <a href="{{ .RelPermalink }}" class="card bg-primary-bg min-h-[15.625rem] rounded-[.625rem] flex flex-col items-center justify-center w-[24.5rem] p-6 gap-4">
+      <a href="{{ .RelPermalink }}" class="card bg-primary-bg min-h-[15.625rem] rounded-[.625rem] flex flex-col items-center justify-center max-w-[24.5rem] sm:w-[24.5rem] p-6 gap-4">
         <h3 class="text-4xl text-white font-bold">
           {{ .LinkTitle }}
         </h3>
