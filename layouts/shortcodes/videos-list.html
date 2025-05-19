@@ -37,7 +37,7 @@
     {{ end }}
   {{ end }}
 
-  <section class="px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
+  <section class="px-6 md:px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
     <!-- {{ if $tags }}
       <div class="flex gap-8 justify-center items-center flex-wrap sm:flex-nowrap">
           <button
@@ -58,11 +58,11 @@
     {{ end }} -->
     <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
       {{ range $data }}
-        <div class='tag-{{ replace .tag " " "" }} w-[386px] card flex flex-col items-start rounded-[.625rem] pb-3 gap-4 justify-between border-2 border-[#6052f6] bg-primary-[#6052f6]'>
+        <div class='tag-{{ replace .tag " " "" }} w-[290px] sm:w-[386px] card flex flex-col items-start rounded-[.625rem] pb-3 gap-4 justify-between border-2 border-[#6052f6] bg-primary-[#6052f6]'>
           {{ if .thumbnailHref }}
-            <div class="bg-primary-[#6052f6] h-[216px] w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat mt-[-2px] ml-[-1px]"></div>
+            <div class="bg-primary-[#6052f6] h-[162px] w-[288px] sm:h-[216px] sm:w-[384px] rounded-[.625rem] bg-[url('{{ .thumbnailHref }}')] bg-contain bg-no-repeat mt-[-2px] ml-[-1px]"></div>
           {{ else }}
-            <div class="thumbnail bg-primary-[#6052f6] min-h-[15.625rem] w-[24.5rem]"></div>
+            <div class="thumbnail bg-primary-[#6052f6] min-h-[15.625rem] max-w-[24.5rem] sm:w-[24.5rem]"></div>
           {{ end }}
           <div class="flex flex-col gap-4 bg-white">
             <p class="text-primary-text px-2">{{ .description }}</p>
