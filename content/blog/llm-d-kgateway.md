@@ -45,5 +45,5 @@ This allows critical requests to be prioritized, while sheddable requests can be
 
 As inference costs dominate AI deployment budgets, intelligent routing becomes an essential component in building efficient, scalable, and cost-effective AI systems.  
 
-Beyond intelligent routing, llm-d delivers a full distributed inference solution by extending vLLM to support disaggregated serving and enhanced prefix caching. The combination of kgateway's sophisticated routing with these compute optimizations creates a system that dramatically improves both performance and cost-efficiency. You can explore this powerful combination [on GitHub](https://github.com/llm-d/llm-d) or [try the tquickstar guides](https://github.com/llm-d/llm-d-deployer/tree/main/quickstart) to deploy it on your Kubernetes cluster. 
+Beyond intelligent routing, llm-d delivers a full distributed inference solution by extending vLLM to support disaggregated serving and enhanced prefix caching. The combination of kgateway's sophisticated routing with these compute optimizations creates a system that dramatically improves both performance and cost-efficiency. You can explore this powerful combination [on GitHub](https://github.com/llm-d/llm-d) or [try the quickstart guides](https://github.com/llm-d/llm-d-deployer/tree/main/quickstart) to deploy it on your Kubernetes cluster. 
 
