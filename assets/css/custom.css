@@ -11,3 +11,50 @@ h6 {
     font-family: 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
+.dropdown-toggle {
+    //margin-bottom: 2px;
+    background: white;
+    color: grey;
+    border: 1px solid white;
+    border-radius: 2px;
+    width: 5%;
+    white-space: nowrap;
+    display: flex;
+
+    padding-left: 1rem;
+    padding-right: 0.25rem;
+}
+
+.dropdown-menu {
+    // transform: translateY(-16.5px) !important;
+    background: white;
+    //inset: -1px auto none (var(--bs-gutter-x)) !important;
+    border: 1px solid white;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 40vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    width: 10vh;
+    li {
+        list-style: none;
+        padding: 0 0 4px 0;
+        ul {
+            padding-left: 2rem;
+        }
+    }
+}
+
+.btn {
+    //padding: 8px 20px;
+    outline: none;
+    text-decoration: none;
+    //letter-spacing: 0.5px;
+    transition: all 0.3s;
+    font-weight: 500;
+    border-radius: 1px;
+    //border: 1px solid #ccc;
+    background-color: white;
+   // cursor: pointer;
+
+}

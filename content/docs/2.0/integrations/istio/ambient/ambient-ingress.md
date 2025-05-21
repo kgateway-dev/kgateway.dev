@@ -142,3 +142,4 @@ To set up kgateway as the ingress gateway for your ambient mesh, you simply add 
 ## Next
 
 Now that you set up kgateway as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies](/docs/about/policies/).  
+f
