@@ -1,6 +1,6 @@
 - id: gwapi
-  title: Gateway API
-  description: Learn the Kubernetes Gateway API with kgateway
+  title: Kubernetes Gateway API Fundamentals
+  description: A comprehensive pathway that introduces and covers all the fundamentals of the Kubernetes Gateway API, featuring hands-on labs, instructional videos, and practical blog examples to accelerate learning.
   lessons:
   - title: Introduction to the Gateway API
     description: Learn about real-world use cases that influenced the development and adoption of the Kubernetes Gateway API
@@ -46,8 +46,8 @@
     youtube: nI52m7S5gLY
     lab: understanding-kgateway-patterns-of-extensions
 - id: kgw
-  title: kgateway topics
-  description: Learn features unique to kgateway
+  title: Kgateway Fundamentals
+  description: Explore the CNCF sandbox project, kgateway—from core concepts to deployment to more complex implementations. This pathway offers an in-depth understanding of how kgateway is purpose-built to address the needs of modern cloud-native environments.
   lessons:
   - title: "Route delegation (*)" # missing blog
     description: Explore route delegation in kgateway to enable multi-tenancy, self-service routing, and extended Kubernetes Gateway API capabilities
@@ -63,8 +63,8 @@
     blog: extend-istio-ambient-kgateway-waypoint
     youtube: B8oZ1seIDIM
 - id: aigw
-  title: AI Gateway
-  description: Discover the AI Gateway capabilities of the kgateway project
+  title: Basics of an AI Gateway 
+  description: In this pathway, explore the fundamentals of managing AI workloads with an AI Gateway. Learn about the essential features needed to secure, route and operate large language models (LLMs) securely as you scale your workloads.
   lessons:
   - title: Deploying an AI gateway
     description: Learn to provision AI gateways for proxying LLMs
