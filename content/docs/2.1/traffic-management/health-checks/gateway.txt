@@ -1,0 +1,90 @@
+---
+title: Gateway health checks
+weight: 10
+---
+
+Enable a health check plugin on your gateway proxy to respond with common HTTP codes.
+
+## About
+Kgateway includes an HTTP health checking plug-in that you can enable for a gateway proxy listener. This plug-in responds to health check requests directly with either a `200 OK` or `503 Service Unavailable` message, depending on the current draining state of Envoy.
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+ 
+## Configure a health check on a gateway
+
+1. Create an HTTPListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: HTTPListenerPolicy
+   metadata:
+     name: healthcheck
+     namespace: kgateway-system
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     options:
+       healthCheck:
+         path: <path>
+   EOF
+   ```
+
+2. To test the health check, drain the Envoy connections by sending an `HTTP POST` request to the `/healthcheck/fail` endpoint of the Envoy admin port.
+   1. Port-forward the `gloo-gateway-http` deployment on port 19000.
+      ```shell
+      kubectl port-forward deploy/http -n kgateway-system 19000 &
+      ```
+   2. Send an `HTTP POST` request to the `/healthcheck/fail` endpoint. This causes Envoy connections to begin draining.
+      ```sh
+      curl -X POST 127.0.0.1:19000/healthcheck/fail
+      ```
+
+3. Send a request to the health check path. Because Envoy is in a draining state, the `503 Service Unavailable` message is returned.
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl -i localhost:8080/<path>
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+4. After you finish testing, resume Envoy connections by sending an `HTTP POST` request to the `/healthcheck/ok` endpoint of the Envoy admin port.
+   ```sh
+   curl -X POST 127.0.0.1:19000/healthcheck/ok
+   ```
+
+5. Send another request to the health check path. Because Envoy is operating normally, the `200 OK` message is returned.
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl -i localhost:8080/<path>
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+6. Stop port-forwarding the `gloo-gateway-http` deployment.
+   ```sh
+   lsof -ti:19000 | xargs kill -9
+   ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete HTTPListenerPolicy healthcheck -n kgateway-system
+```
