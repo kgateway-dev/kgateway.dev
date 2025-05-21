@@ -1,5 +1,5 @@
 ---
-title: llm-d: Distributed Inference Serving on Kubernetes
+title: llm-d - Distributed Inference Serving on Kubernetes
 toc: false
 publishDate: 2025-05-20T10:00:00-00:00
 author: Christian Posta
