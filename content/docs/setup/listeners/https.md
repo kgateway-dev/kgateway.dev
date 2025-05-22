@@ -16,7 +16,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 ## Set up an HTTPS listener
 
 1. Create a gateway resource and configure an HTTPS listener. 
-   ```yaml
+   ```yaml {id="test"}
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
@@ -85,13 +85,13 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 5. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
-   ```sh
+   ```sh {id="test"}
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
-   ```sh
+   ```sh {id="no-test"}
    kubectl port-forward svc/https -n kgateway-system 8443:443
    ```
    {{% /tab %}}
