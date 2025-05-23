@@ -1,4 +1,4 @@
-module github.com/imfing/hextra-starter-template
+module github.com/kgateway-dev/kgateway.dev
 
 go 1.21
 
