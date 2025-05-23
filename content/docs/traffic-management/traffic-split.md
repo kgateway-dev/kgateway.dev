@@ -94,14 +94,14 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    ```
 
 3. Send a few requests to the `/hello` path. Verify that you see responses from all 3 Helloworld apps, and that most responses are returned from `helloworld-v3`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..20}; do curl -i http://$INGRESS_GW_ADDRESS:8080/hello \
    -H "host: traffic.split.example:8080"; done
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    for i in {1..20}; do curl -i localhost:8080/hello \
    -H "host: traffic.split.example"; done
