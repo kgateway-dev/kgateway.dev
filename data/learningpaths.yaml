@@ -41,18 +41,20 @@
     blog: policy-attachments
     youtube: NQSADVpcO8M
     lab: understanding-kgateway-patterns-of-extensions
-  - title: "Canary releases with Argo Rollouts (*)" # missing blog
+  - title: "Canary releases with Argo Rollouts"
     description: Explore how to conduct a canary release with Argo Rollouts and the Gateway API
     youtube: nI52m7S5gLY
     lab: understanding-kgateway-patterns-of-extensions
+    blog: canary-deployments-argo-rollouts
 - id: kgw
   title: kgateway topics
   description: Learn features unique to kgateway
   lessons:
-  - title: "Route delegation (*)" # missing blog
+  - title: "Route delegation"
     description: Explore route delegation in kgateway to enable multi-tenancy, self-service routing, and extended Kubernetes Gateway API capabilities
     youtube: 5uUGN4Qn_1c
     lab: route-delegation-in-kgateway
+    blog: delegation-kgateway
   - title: Transformations
     description: Learn how to perform request and response tranformations
     blog: transformation-in-kgateway
