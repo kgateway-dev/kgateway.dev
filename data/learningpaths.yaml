@@ -37,6 +37,7 @@
   - title: Canary Release with Argo
     youtube: nI52m7S5gLY
     lab: understanding-kgateway-patterns-of-extensions
+    blog: canary-deployments-argo-rollouts
 - id: kgw
   title: Kgateway Fundamentals
   description: Explore the CNCF sandbox project, kgateway—from core concepts to deployment to more complex implementations. This pathway offers an in-depth understanding of how kgateway is purpose-built to address the needs of modern cloud-native environments.
