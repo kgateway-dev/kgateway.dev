@@ -179,8 +179,8 @@ Now that you have an app and a gateway proxy, you can create a route to access t
 
 Now that your httpbin app is running and exposed on the gateway proxy, you can send a request to the app. The steps vary depending on your load balancer setup.
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab %}}
+{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
@@ -207,7 +207,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
    x-envoy-upstream-service-time: 2
    ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Port-forward for local testing"%}}
 1. Port-forward the gateway proxy `http` pod on port 8080. 
    
    ```sh
