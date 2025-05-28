@@ -3,17 +3,10 @@ linkTitle: "Get started"
 title: Get started with kgateway
 weight: 1
 next: /docs/about
+tested: true
 ---
 
 Get started with kgateway, a cloud-native Layer 7 proxy that is based on the [Envoy](https://www.envoyproxy.io/) and [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](https://gateway-api.sigs.k8s.io/) projects.
-
-<!--metadata
-test:
-  - oss-glooctl
-  - oss-helm
-  - enterprise-glooctl
-  - enterprise-helm
--->
 
 ## Before you begin
 
@@ -23,7 +16,7 @@ These quick start steps assume that you have `kubectl` and `helm` installed. For
 
 1. Use a Kubernetes cluster. For quick testing, you can use [Kind](https://kind.sigs.k8s.io/).
 
-   ```sh {id="my-special-id"}
+   ```sh 
    kind create cluster
    ```
 
