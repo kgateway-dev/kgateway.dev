@@ -4,7 +4,7 @@
 
 {{ range site.Params.versions }}
   <li>
-    <a class="dropdow-item text-gray-300 hover:text-white" href="{{ $baseurl }}/docs/{{ .version }}/{{ $cleanPath }}">{{ .version }}</a>
+    <a class="dropdow-item text-gray-300 hover:text-white" href="{{ $baseurl }}docs/{{ .version }}{{ $cleanPath }}">{{ .version }}</a>
   </li>
 {{ end }}
 
