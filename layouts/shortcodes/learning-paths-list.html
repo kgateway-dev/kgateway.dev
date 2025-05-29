@@ -1,38 +1,61 @@
-{{ $data := .Site.Data.learningpaths }}
-{{ $tags := slice }}
-{{ range $data }}
-  {{ $tag := (replace .tag " " "") }}
-  {{ if not (in $tags (dict "tag" $tag "name" .tag)) }}
-    {{ $tags = $tags | append (dict "tag" $tag "name" .tag) }}
-  {{ end }}
-{{ end }}
+<script>
+  function toggle(id) {
+    var wrapper = document.querySelector(`.${id}-content .collapsible`);
+    if (wrapper.style.height === '0px') {
+      var offsetHeight = document.querySelector(`.${id}-content .collapsible ol`).offsetHeight;
+      wrapper.style.height = offsetHeight + 'px';
+      document.querySelector(`.${id}-content button svg`).style.transform = "rotate(180deg)";
+    } else {
+      wrapper.style.height = 0;
+      document.querySelector(`.${id}-content button svg`).style.transform = "none";
+    }
+  }
+</script>
+
+<style>
+  .collapsible {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s ease;
+  }
+
+  button svg {
+    transition: transform 0.5s ease;
+  }
+</style>
 
 <section class="w-10/12 lg:w-1/2 mx-auto py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
-  {{ range $data }}
-    <div class="flex flex-row">
+  {{ range .Site.Data.learningpaths }}
+    <div class="flex flex-row items-start">
       <img class="w-1/3 object-contain" src="{{ .image }}" alt="{{ .title }}" />
       <div class="flex flex-col gap-6 items-start">
         <h2 class="text-primary-text text-3xl font-semibold">{{ .title }}</h2>
         <p class="text-primary-text">{{ .description }}</p>
-        <ol class="list-decimal">
-          {{ range .lessons }}
-            <li class="text-primary-text">
-              <h3>{{ .title }}</h3>
-              {{ if .blog }}
-                <a href="/blog/{{ .blog }}">Blog</a>
-              {{ end }}
-              {{ if .youtube }}
-                {{ if .blog }}|{{ end }}
-                <a href="{{ .video }}">Video</a>
-              {{ end }}
-              {{ if .lab }}
-                {{ if or (.video) (.youtube) }}|{{ end }}
-                <a href="http://www.solo.io/resources/lab/{{ .lab }}">Lab</a>
-              {{ end }}
-            </li>
-          {{ end}}
-        </ol>
-        <button class="text-primary-text">View the track {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
+        <div class="{{.id}}-content">
+          <div class="collapsible" style="height: 0px">
+            <ol class="list-decimal">
+              {{ range .lessons }}
+                <li class="text-primary-text">
+                  <h3>{{ .title }}</h3>
+                  {{ if .blog }}
+                    <a href="/blog/{{ .blog }}">Blog</a>
+                  {{ end }}
+                  {{ if .youtube }}
+                    {{ if .blog }}|{{ end }}
+                    <a href="{{ .video }}">Video</a>
+                  {{ end }}
+                  {{ if .lab }}
+                    {{ if or (.video) (.youtube) }}|{{ end }}
+                    <a href="http://www.solo.io/resources/lab/{{ .lab }}">Lab</a>
+                  {{ end }}
+                </li>
+              {{ end}}
+            </ol>
+          </div>
+          <button class="text-primary-text" onclick="toggle('{{ .id }}')">
+            View the track {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
+          </button>
+        </div>
       </div>
     </div>
   {{ end }}
