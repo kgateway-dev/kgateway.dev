@@ -26,7 +26,7 @@
     blog: exploring-gateway-api-httproute
     youtube: CGF3aZXOyxc
     lab: exploring-httproute-resource-configurations-with-kgateway
-  - title: Service Mesh with Gateway API 
+  - title: Service Mesh with Gateway API
     blog: supporting-service-mesh-kgateway-gateway-api
     youtube: c5ZfIUOFb9I
     lab: gatewayapi-support-for-service-mesh-with-kgateway
