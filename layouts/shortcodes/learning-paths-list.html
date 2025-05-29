@@ -15,7 +15,7 @@
 <style>
   .collapsible {
     height: 0;
-    overflow: hidden;
+    overflow-y: clip;
     transition: height 0.5s ease;
   }
 
@@ -35,24 +35,24 @@
           <div class="collapsible" style="height: 0px">
             <ol class="list-decimal">
               {{ range .lessons }}
-                <li class="text-primary-text">
-                  <h3>{{ .title }}</h3>
+                <li class="text-primary-text py-2 marker:text-lg marker:leading-4 marker:font-medium">
+                  <h3 class="text-lg leading-4 font-medium">{{ .title }}</h3>
                   {{ if .blog }}
-                    <a href="/blog/{{ .blog }}">Blog</a>
+                    <a href="/blog/{{ .blog }}" class="text-primary-bg">Blog</a>
                   {{ end }}
                   {{ if .youtube }}
                     {{ if .blog }}|{{ end }}
-                    <a href="{{ .video }}">Video</a>
+                    <a href="{{ .video }}" class="text-primary-bg">Video</a>
                   {{ end }}
                   {{ if .lab }}
                     {{ if or (.video) (.youtube) }}|{{ end }}
-                    <a href="http://www.solo.io/resources/lab/{{ .lab }}">Lab</a>
+                    <a href="http://www.solo.io/resources/lab/{{ .lab }}" class="text-primary-bg">Lab</a>
                   {{ end }}
                 </li>
               {{ end}}
             </ol>
           </div>
-          <button class="text-primary-text" onclick="toggle('{{ .id }}')">
+          <button class="bg-white rounded-xl py-2 text-[#6458f4] flex flex-row items-end font-semibold gap-1" onclick="toggle('{{ .id }}')">
             View the track {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
           </button>
         </div>
