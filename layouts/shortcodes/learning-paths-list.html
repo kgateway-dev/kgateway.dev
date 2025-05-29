@@ -7,20 +7,33 @@
   {{ end }}
 {{ end }}
 
-<section class="px-10 xl:px-20 2xl:px-50 py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
-  <div class="grid auto-rows-auto grid-flow-row gap-x-8 gap-y-16 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 justify-items-center">
-    {{ range $data }}
-      <div class="bg-white rounded-xl py-2 px-4 text-[#6458f4] flex flex-row items-center font-semibold gap-4">
-        <div class='tag-{{ replace .tag " " "" }} card bg-primary-bg min-h-[15.625rem] rounded-[.625rem] flex flex-col items-start w-[24.5rem] p-6 gap-4 justify-between h-full'>
-          <div class="flex flex-col gap-4">
-            <h3 class="font-heading text-2xl text-white font-bold">
-              {{ .title }}
-            </h3>
-            <p class="text-white">{{ .description }}</p>
-          </div>
-          <a href="{{ .id }}" class="bg-white rounded-xl py-2 px-4 text-[#6458f4] flex flex-row items-center font-semibold gap-4">View the Track</a>
-        </div>
+<section class="w-10/12 lg:w-1/2 mx-auto py-[4.375rem] md:py-24 flex flex-col gap-16 justify-center items-center">
+  {{ range $data }}
+    <div class="flex flex-row">
+      <img class="w-1/3 object-contain" src="{{ .image }}" alt="{{ .title }}" />
+      <div class="flex flex-col gap-6 items-start">
+        <h2 class="text-primary-text text-3xl font-semibold">{{ .title }}</h2>
+        <p class="text-primary-text">{{ .description }}</p>
+        <ol class="list-decimal">
+          {{ range .lessons }}
+            <li class="text-primary-text">
+              <h3>{{ .title }}</h3>
+              {{ if .blog }}
+                <a href="/blog/{{ .blog }}">Blog</a>
+              {{ end }}
+              {{ if .youtube }}
+                {{ if .blog }}|{{ end }}
+                <a href="{{ .video }}">Video</a>
+              {{ end }}
+              {{ if .lab }}
+                {{ if or (.video) (.youtube) }}|{{ end }}
+                <a href="http://www.solo.io/resources/lab/{{ .lab }}">Lab</a>
+              {{ end }}
+            </li>
+          {{ end}}
+        </ol>
+        <button class="text-primary-text">View the track {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
       </div>
-    {{ end }}
-  </div>
+    </div>
+  {{ end }}
 </section>
