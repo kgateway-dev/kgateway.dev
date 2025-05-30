@@ -1,6 +1,8 @@
 ---
-linkTitle: "Documentation alltogether"
+linkTitle: "Docs"
 title: Welcome
+cascade:
+  type: docs
 ---
 
 Welcome to the documentation for the kgateway open source project! 

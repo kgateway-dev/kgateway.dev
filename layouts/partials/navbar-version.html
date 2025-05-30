@@ -1,10 +1,9 @@
 {{ $path := page.RelPermalink }}
-{{ $cleanPath := replaceRE "^/docs/[^/]+/" "/" $path }}
 {{ $baseurl := site.BaseURL }}
 
 {{ range site.Params.versions }}
   <li>
-    <a class="dropdow-item" href="{{ $baseurl }}docs/{{ .version }}{{ $cleanPath }}">{{ .version }}</a>
+    <a class="dropdow-item" href="{{ $baseurl }}{{ .version }}">{{ .version }}</a>
   </li>
 {{ end }}
 

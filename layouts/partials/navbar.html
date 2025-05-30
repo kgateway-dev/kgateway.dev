@@ -45,7 +45,7 @@
         <button class="btn" type="button">
           {{- $pagelink := page.RelPermalink -}}
           {{ $parts := split $pagelink "/" }}
-          {{ $version := index $parts 2 }}
+          {{ $version := index $parts 1 }}
           {{- range site.Params.versions -}}
             {{- if in $version .linkVersion -}}
                {{- printf "%s" $version -}}
