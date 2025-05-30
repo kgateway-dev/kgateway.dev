@@ -44,6 +44,9 @@ Configure your kgateway Helm chart installation to use AI Gateway.
 
 1. Create a GatewayParameters resource which enables an AI extension for the Gateway.
    
+   {{< tabs items="Cloud Provider,Local Environment" >}}
+   {{% tab %}}
+   For AI services in a cloud provider, use a LoadBalancer service. This way, the AI Gateway can be accessed from outside the cluster.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -64,6 +67,31 @@ Configure your kgateway Helm chart installation to use AI Gateway.
          type: LoadBalancer
    EOF
    ```
+   {{% /tab %}}
+   {{% tab %}}
+   For local environments such as Ollama, use a NodePort service. This way, the AI Gateway can be accessed locally.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayParameters
+   metadata:
+     name: ai-gateway
+     namespace: kgateway-system
+     labels:
+       app: ai-kgateway
+   spec:
+     kube:
+       aiExtension:
+         enabled: true
+         ports:
+         - name: ai-monitoring
+           containerPort: 9092
+       service:
+         type: NodePort
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Create a Gateway that uses the default kgateway GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step.
    
@@ -119,4 +147,5 @@ Configure your kgateway Helm chart installation to use AI Gateway.
 
 ## Next
 
-Explore how to [connect the gateway to an LLM provider and successfully authenticate](/docs/ai/auth/) so that you can use AI services.
+* For cloud LLM providers such as OpenAI: [Connect the gateway to an LLM provider and successfully authenticate](/docs/ai/auth/) so that you can use AI services.
+* For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](/docs/ai/ollama/).
