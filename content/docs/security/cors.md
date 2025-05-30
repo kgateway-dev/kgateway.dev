@@ -6,6 +6,10 @@ description: Enforce client-site access controls with cross-origin resource shar
 
 Enforce client-site access controls with cross-origin resource sharing (CORS).
 
+{{% callout type="warning" %}} 
+CORS support is available in version 2.1.x or later.
+{{% /callout %}}
+
 ## About CORS
 
 Cross-Origin Resource Sharing (CORS) is a security feature that is implemented by web browsers and that controls how web pages in one domain can request and interact with resources that are hosted on a different domain. By default, web browsers only allow requests to resources that are hosted on the same domain as the web page that served the original request. Access to web pages or resources that are hosted on a different domain is restricted to prevent potential security vulnerabilities, such as cross-site request forgery (CRSF).
@@ -21,13 +25,29 @@ CORS policies are typically implemented to limit access to server resources for 
 * A JavaScript on a web page at `example.com` tries to access a different port, such as `example.com:3001`.
 * A JavaScript on a web page at `https://example.com` tries to access the resources by using a different protocol, such as `http://example.com`.
 
-{{% callout type="info" %}} 
-Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in kgateway. 
-{{% /callout %}}
+### Configuration options {#options}
+
+You can configure the CORS policy at two levels:
+
+* HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. The policy is applied to all the routes that are defined in the HTTPRoute.This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter).
+* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+
+<!-- merging?
+
+By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the exposeHeaders CORS option by using the corsPolicyMergeSettings field in the VirtualHostOption. Currently, only exposeHeaders is configurable. You cannot merge other CORS options such as allowHeaders or allowOrigin.
+
+For example, you might want to expose the CORS origin header for traffic that reaches any of the gateway listeners with the VirtualHostOption. Additionally, each team or product might have their own headers on a per route basis that you want to expose also, such as product-a. By setting the corsPolicyMergeSettings to UNION, the exposed headers are merged together. This way, both the VirtualHostOption and RouteOption exposeHeaders CORS policies are applied. When the routes are called, the exposed headers from the VirtualHostOption and RouteOption are both returned, such as origin and product-a.
+
+For more information about the supported merge strategies, see the API docs.
+-->
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
+
+{{% callout type="info" %}} 
+Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in kgateway. 
+{{% /callout %}}
 
 ### Set up your environment to test CORS {#setup-env}
 
