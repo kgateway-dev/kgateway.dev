@@ -37,14 +37,14 @@ Dynamic metadata is a powerful feature of Envoy that allows you to attach arbitr
 
 | Dynamic Metadata Field | Description |
 |-----------------------|-------------|
-| `ai.gateway.kgateway.dev:total_tokens` | The total number of tokens used in the request |
-| `ai.gateway.kgateway.dev:prompt_tokens` | The number of tokens used in the prompt |
-| `ai.gateway.kgateway.dev:completion_tokens` | The number of tokens used in the completion |
+| `ai.kgateway.io:total_tokens` | The total number of tokens used in the request |
+| `ai.kgateway.io:prompt_tokens` | The number of tokens used in the prompt |
+| `ai.kgateway.io:completion_tokens` | The number of tokens used in the completion |
 | `envoy.ratelimit:hits_addend` | The number of tokens that were calculated to be rate limited |
-| `ai.gateway.kgateway.dev:model` | The model which was specified by the user in the request |
-| `ai.gateway.kgateway.dev:provider_model` | The model which the LLM provider used and returned in the response |
-| `ai.gateway.kgateway.dev:provider` | The LLM provider being used, such as `OpenAI`, `Anthropic`, etc. |
-| `ai.gateway.kgateway.dev:streaming` | A boolean indicating whether the request was streamed |
+| `ai.kgateway.io:model` | The model which was specified by the user in the request |
+| `ai.kgateway.io:provider_model` | The model which the LLM provider used and returned in the response |
+| `ai.kgateway.io:provider` | The LLM provider being used, such as `OpenAI`, `Anthropic`, etc. |
+| `ai.kgateway.io:streaming` | A boolean indicating whether the request was streamed |
 
 ### Default metrics
 

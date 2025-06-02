@@ -703,13 +703,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the ExternalExtension that should be used for authentication. |  |  |
 | `enablement` _[ExtAuthEnabled](#extauthenabled)_ | Enablement determines the enabled state of the ExtAuth filter.<br />When set to "DisableAll", the filter is disabled for this route.<br />When empty, the filter is enabled as long as it is not disabled by another policy. |  | Enum: [DisableAll] <br /> |
-| `failureModeAllow` _boolean_ | FailureModeAllow determines the behavior on authorization service errors.<br />When true, requests will be allowed even if the authorization service fails or returns HTTP 5xx errors.<br />When unset, the default behavior is false. |  |  |
 | `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
-| `clearRouteCache` _boolean_ | ClearRouteCache allows the authorization service to affect routing decisions.<br />When unset, the default behavior is false. |  |  |
-| `metadataContextNamespaces` _string array_ | MetadataContextNamespaces specifies metadata namespaces to pass to the authorization service.<br />Default to allowing jwt info if processing for jwt is configured. | [jwt] |  |
-| `includePeerCertificate` _boolean_ | IncludePeerCertificate determines if the client's X.509 certificate should be sent to the authorization service.<br />When true, the certificate will be included if available.<br />When unset, the default behavior is false. |  |  |
-| `includeTLSSession` _boolean_ | IncludeTLSSession determines if TLS session details should be sent to the authorization service.<br />When true, the SNI name from TLSClientHello will be included if available.<br />When unset, the default behavior is false. |  |  |
-| `emitFilterStateStats` _boolean_ | EmitFilterStateStats determines if per-stream stats should be emitted for access logging.<br />When true and using Envoy gRPC, emits latency, bytes sent/received, and upstream info.<br />When true and not using Envoy gRPC, emits only latency.<br />Stats are only added if a check request is made to the ext_authz service.<br />When unset, the default behavior is false. |  |  |
+| `contextExtensions` _object (keys:string, values:string)_ | Additional context for the authorization service. |  |  |
 
 
 #### ExtAuthProvider
@@ -761,7 +756,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  | Required <br /> |
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams |  |  |
-| `failureModeAllow` _boolean_ | FailureModeAllow defines the behavior of the filter when the external processing fails.<br />Defaults to false. |  |  |
 
 
 #### ExtProcProvider
@@ -1096,7 +1090,7 @@ _Appears in:_
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[HTTPListenerPolicySpec](#httplistenerpolicyspec)_ |  |  |  |
-| `status` _[SimpleStatus](#simplestatus)_ |  |  |  |
+| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
 
 #### HTTPListenerPolicySpec
@@ -1180,6 +1174,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
 | `port` _[PortNumber](#portnumber)_ | Port is the port to use for the backend. |  | Required <br /> |
+| `insecureSkipVerify` _boolean_ | InsecureSkipVerify allows skipping ssl validation for custom hosts |  | Optional <br /> |
 
 
 #### Image
@@ -1498,6 +1493,23 @@ _Appears in:_
 
 
 
+#### Port
+
+
+
+
+
+
+
+_Appears in:_
+- [Service](#service)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `port` _integer_ | The port number to match on the Gateway |  | Required <br /> |
+| `nodePort` _integer_ | The NodePort to be used for the service. If not specified, a random port<br />will be assigned by the Kubernetes API server. |  | Optional <br /> |
+
+
 #### Priority
 
 
@@ -1754,10 +1766,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Optional <br /> |
+| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br />Optional <br /> |
 | `clusterIP` _string_ | The manually specified IP address of the service, if a randomly assigned<br />IP is not desired. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#choosing-your-own-ip-address<br />and<br />https://kubernetes.io/docs/concepts/services-networking/service/#headless-services<br />on the implications of setting `clusterIP`. |  | Optional <br /> |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  | Optional <br /> |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  | Optional <br /> |
+| `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
 
 
 #### ServiceAccount
@@ -1775,23 +1788,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  | Optional <br /> |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata. |  | Optional <br /> |
-
-
-#### SimpleStatus
-
-
-
-SimpleStatus defines the observed state of the policy.
-
-
-
-_Appears in:_
-- [HTTPListenerPolicy](#httplistenerpolicy)
-- [TrafficPolicy](#trafficpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions is the list of conditions for the policy. |  | MaxItems: 8 <br /> |
 
 
 #### SingleAuthToken
@@ -1943,7 +1939,7 @@ _Appears in:_
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[TrafficPolicySpec](#trafficpolicyspec)_ |  |  |  |
-| `status` _[SimpleStatus](#simplestatus)_ |  |  |  |
+| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
 
 #### TrafficPolicySpec
@@ -2044,7 +2040,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `host` _[Host](#host)_ | Host to send the traffic to. |  | Required <br /> |
+| `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook. |  | Required <br /> |
 | `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook. |  |  |
 
 

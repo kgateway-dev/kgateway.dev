@@ -188,8 +188,8 @@ Install the open source kgateway project in your Kubernetes cluster.
        chart: kgateway-crds
        helm:
          skipCrds: false
-       repoURL: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-       targetRevision: {{< reuse "docs/versions/n-patch.md" >}}
+       repoURL: cr.kgateway.dev/kgateway-dev/charts
+       targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
      syncPolicy:
        automated:
          # Prune resources during auto-syncing (default is false)
@@ -220,8 +220,8 @@ Install the open source kgateway project in your Kubernetes cluster.
        chart: kgateway
        helm:
          skipCrds: false
-       repoURL: oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
-       targetRevision: {{< reuse "docs/versions/n-patch.md" >}}
+       repoURL: cr.kgateway.dev/kgateway-dev/charts
+       targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
      syncPolicy:
        automated:
          # Prune resources during auto-syncing (default is false)
