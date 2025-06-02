@@ -135,7 +135,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
           urlRewrite:
             path:
               type: ReplaceFullPath
-              replaceFullPath: /models
+              replaceFullPath: /v1/models
         backendRefs:
         - name: ollama
           namespace: kgateway-system
