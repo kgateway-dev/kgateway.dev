@@ -57,3 +57,12 @@
 - title: Consumption Reporting with kgateway AI
   description: Learn how an AI Gateway like kgateway provides built-in tools for monitoring, reporting, and controlling AI API consumption
   href: https://www.solo.io/resources/lab/kgateway-ai-lab-consumption-reporting?web&utm_source=organic &utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+
+- title: Kgateway as a Waypoint
+  description: Learn how to use kgateway as a waypoint with Istio Ambient Mesh to manage east-west traffic between workloads
+  href: http://www.solo.io/resources/lab/kgateway-lab-kgateway-as-a-waypoint?&utm_source=website&utm_medium=lab
+
+- title: Integrating kgateway with Istio at Ingress
+  description: Explore how to integrate kgateway's ingress gateway with Ambient Mesh to enable automatic mTLS between ingress gateway and backend workloads
+  href: https://www.solo.io/resources/lab/kgateway-lab-integrating-kgateway-with-istio-at-ingress?&utm_source=website&utm_medium=lab
+  
