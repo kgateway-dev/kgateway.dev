@@ -69,6 +69,7 @@ Explore what you can do with AI Gateway in the following guides.
 
 {{< cards >}}
   {{< card link="setup" title="Set up AI Gateway" >}}
+  {{< card link="ollama" title="Ollama for local LLMs" >}}
   {{< card link="auth" title="Authenticate LLM providers" >}}
   {{< card link="failover" title="Model failover" >}}
   {{< card link="functions" title="Function calling" >}}
