@@ -147,5 +147,6 @@ Configure your kgateway Helm chart installation to use AI Gateway.
 
 ## Next
 
-* For cloud LLM providers such as OpenAI: [Connect the gateway to an LLM provider and successfully authenticate](/docs/ai/auth/) so that you can use AI services.
+* For OpenAI: Continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
+* For other cloud LLM providers such as Gemini: [Review the Cloud LLM providers guide](/docs/ai/cloud-providers/) for provider-specific setup examples.
 * For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](/docs/ai/ollama/).
