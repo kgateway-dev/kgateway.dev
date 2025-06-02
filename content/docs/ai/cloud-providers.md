@@ -13,17 +13,23 @@ Set up cloud LLM providers with AI Gateway.
 
 ## Supported LLM providers {#supported-llm-providers}
 
-The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers supported by AI Gateway.
+The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers that are supported by AI Gateway.
 
 {{< callout type="info" >}}
-The following sections in this guide provide examples tailored to the specific LLM provider. If the provider is not listed, you can adapt the examples to your own provider. Note that some differences might exist, such as different required fields in the Backend resource.
+The following sections in this guide provide examples that are tailored to the specific LLM provider. If the provider is not listed, you can adapt the examples to your own provider. Note that some differences might exist, such as different required fields in the Backend resource.
 {{< /callout >}}
 
 {{< reuse "docs/snippets/llm-providers.md" >}}
 
+## OpenAI {#openai}
+
+OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
+
+To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
+
 ## Gemini {#google}
 
-1. Save your Gemini API key as an environment variable. To retrieve your API key, [log in to the Google AI Studio > API Keys](https://aistudio.google.com/app/apikey).
+1. Save your Gemini API key as an environment variable. To retrieve your API key, [log in to the Google AI Studio and select **API Keys**](https://aistudio.google.com/app/apikey).
 
    ```bash
    export GOOGLE_KEY=<your-api-key>
@@ -181,13 +187,6 @@ The following sections in this guide provide examples tailored to the specific L
      "responseId": "UxQ6aM_sKbjFnvgPocrJaA"
    }
    ```
-
-## OpenAI {#openai}
-
-OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
-
-To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
-
 
 ## Next
 
