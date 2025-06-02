@@ -51,17 +51,9 @@ AI Gateway supports chat streaming, which allows the LLM to stream out tokens as
 
 ## Supported LLM providers {#supported-llm-providers}
 
-The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers supported by AI Gateway.
+Kgateway supports the following LLM providers. For more information, refer to the [LLM providers](/docs/ai/cloud-providers/) guide.
 
-Kgateway supports the following AI providers:
-
-* [Anthropic](https://docs.anthropic.com/en/release-notes/api)
-* [Azure OpenAI](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-* [Gemini](https://ai.google.dev/gemini-api/docs)
-* [OpenAI](https://platform.openai.com/docs/overview). You can also use `openai` support for LLM providers that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
-* [Vertex AI](https://cloud.google.com/vertex-ai/docs)
-
-You can route requests to local LLM workloads that run in your cluster by using the [Gateway API Inference Extension project](/docs/integrations/inference-extension/).
+{{< reuse "docs/snippets/llm-providers.md" >}}
 
 ## Guides
 
@@ -69,6 +61,7 @@ Explore what you can do with AI Gateway in the following guides.
 
 {{< cards >}}
   {{< card link="setup" title="Set up AI Gateway" >}}
+  {{< card link="cloud-providers" title="LLM cloud providers" >}}
   {{< card link="auth" title="Authenticate LLM providers" >}}
   {{< card link="failover" title="Model failover" >}}
   {{< card link="functions" title="Function calling" >}}
