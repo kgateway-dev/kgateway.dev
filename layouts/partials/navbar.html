@@ -48,7 +48,7 @@
           {{ $version := index $parts 1 }}
           {{- range site.Params.versions -}}
             {{- if in $version .linkVersion -}}
-               {{- printf "%s" $version -}}
+               {{- printf "%s" .dropdown -}}
             {{ break }}
             {{- end -}}
           {{- end -}}
