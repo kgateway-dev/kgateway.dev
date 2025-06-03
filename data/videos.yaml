@@ -49,3 +49,11 @@
 - description: Explore consumption reporting with kgateway AI
   href: https://youtu.be/EPQE9jYOvbc
   thumbnailHref: /thumbnails/consumption-reporting.png
+
+- description: Utilizing kgateway as a waypoint
+  href: https://youtu.be/GVl9UbiRjVo
+  thumbnailHref: /thumbnails/kgateway-as-waypoint.jpg
+
+- description: How to integrate kgateway with Istio at Ingress
+  href: https://youtu.be/4G_zNX2nuZ0
+  thumbnailHref: /thumbnails/istio-at-ingress.jpg
