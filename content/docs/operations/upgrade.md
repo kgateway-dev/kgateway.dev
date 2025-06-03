@@ -141,7 +141,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 2. Apply the kgateway CRDs for the upgrade version by using Helm.
 
    ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --namespace kgateway-system --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
 3. Make any changes to your Helm values.
