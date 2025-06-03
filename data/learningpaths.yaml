@@ -58,12 +58,15 @@
   - title: Transformations
     description: Learn how to perform request and response tranformations
     blog: transformation-in-kgateway
-  - title: "Integration with Istio at ingress (*)" # missing video and lab
+  - title: "Integration with Istio at ingress"
     description: Explore routing requests from Ingress to Istio workloads with mutual TLS
-  - title: "kgateway as a waypoint in Istio (*)" # missing lab
+    youtube: 4G_zNX2nuZ0
+    lab: kgateway-lab-integrating-kgateway-with-istio-at-ingress
+  - title: "kgateway as a waypoint in Istio"
     description: Learn to use kgateway as a waypoint in your Istio ambient mesh.
     blog: extend-istio-ambient-kgateway-waypoint
     youtube: B8oZ1seIDIM
+    lab: kgateway-lab-kgateway-as-a-waypoint
 - id: aigw
   title: AI Gateway
   description: Discover the AI Gateway capabilities of the kgateway project
