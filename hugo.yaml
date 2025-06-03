@@ -128,9 +128,9 @@ params:
       
   versions:
   - version: "2.1"
-    dropdown: "2.1 (latest)"
-    linkVersion: "2.1"
-    url: "/2.1"
+    dropdown: "main"
+    linkVersion: "main"
+    url: "/main"
   - version: "2.0"
     dropdown: "2.0"
     linkVersion: "2.0"
