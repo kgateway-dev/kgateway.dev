@@ -207,7 +207,10 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    Example output: Notice that the `access-control-expose-headers` value changes depending on the resources that you created.
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
-   
+
+   {{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
+   {{% tab %}}
+
    ```console {hl_lines=[7,8,9]}
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
@@ -217,12 +220,30 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < x-envoy-upstream-service-time: 7
    < access-control-allow-origin: https://example.com
    < access-control-allow-credentials: true
-   < access-control-expose-headers: Origin, X-HTTPRoute-Header, X-TrafficPolicy-Header
+   < access-control-expose-headers: Origin, X-HTTPRoute-Header
    < server: envoy
    < 
    [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
    ```
-   
+   {{% /tab %}}
+   {{% tab  %}}
+   ```console {hl_lines=[7,8,9]}
+   * Mark bundle as not supporting multiuse
+   < HTTP/1.1 200 OK
+   < content-type: text/xml
+   < date: Mon, 03 Jun 2024 17:05:31 GMT
+   < content-length: 86
+   < x-envoy-upstream-service-time: 7
+   < access-control-allow-origin: https://example.com
+   < access-control-allow-credentials: true
+   < access-control-expose-headers: Origin, X-TrafficPolicy-Header
+   < server: envoy
+   < 
+   [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
 2. Send another request to the Petstore app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
    
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
@@ -257,9 +278,18 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
+{{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
+{{% tab %}}
+```sh
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
+kubectl delete httproute petstore-cors -n default
+```
+{{% /tab %}}
+{{% tab  %}}
 ```sh
 kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
 kubectl delete httproute petstore-cors -n default
 kubectl delete trafficpolicy petstore-cors -n default
 ```
-   
+{{% /tab %}}
+{{< /tabs >}}
