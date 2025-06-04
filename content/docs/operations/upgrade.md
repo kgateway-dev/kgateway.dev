@@ -77,6 +77,7 @@ Before you upgrade kgateway, review the following information.
 {{% tab %}}
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel. The following {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} features require experimental.
    
+   * CORS policies for HTTPRoutes.
    * TCPRoutes to set up a TCP listener on your Gateway.
 
 2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
