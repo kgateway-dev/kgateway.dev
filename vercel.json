@@ -5,5 +5,11 @@
     }
   },
   "buildCommand": "hugo --gc --minify",
-  "installCommand": "yum install -y golang; npm i"
+  "installCommand": "yum install -y golang; npm i",
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "/2.0"
+    }
+  ]
 }
