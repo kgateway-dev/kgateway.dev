@@ -7,7 +7,7 @@ description: Enforce client-site access controls with cross-origin resource shar
 Enforce client-site access controls with cross-origin resource sharing (CORS).
 
 {{% callout type="warning" %}} 
-CORS support is available in version 2.1.x or later.
+{{< reuse "docs/versions/warn-2-1-only.md" >}}
 {{% /callout %}}
 
 ## About CORS
@@ -32,15 +32,6 @@ You can configure the CORS policy at two levels:
 * HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. The policy is applied to all the routes that are defined in the HTTPRoute.This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
 * TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
 
-<!-- merging?
-
-By default, the configuration of the RouteOption takes precedence over the VirtualHostOption. However, you can change this behavior for the exposeHeaders CORS option by using the corsPolicyMergeSettings field in the VirtualHostOption. Currently, only exposeHeaders is configurable. You cannot merge other CORS options such as allowHeaders or allowOrigin.
-
-For example, you might want to expose the CORS origin header for traffic that reaches any of the gateway listeners with the VirtualHostOption. Additionally, each team or product might have their own headers on a per route basis that you want to expose also, such as product-a. By setting the corsPolicyMergeSettings to UNION, the exposed headers are merged together. This way, both the VirtualHostOption and RouteOption exposeHeaders CORS policies are applied. When the routes are called, the exposed headers from the VirtualHostOption and RouteOption are both returned, such as origin and product-a.
-
-For more information about the supported merge strategies, see the API docs.
--->
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -53,10 +44,10 @@ Some apps, such as `httpbin`, have built-in CORS policies that allow all origins
 
 Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Petstore app to test CORS policies.
 
-1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use CORS.
+1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} at version 1.3.0 or later so that you can use CORS.
 
    ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
    ```
 
 2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in kgateway.
@@ -89,7 +80,7 @@ Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Pe
 
 Create a CORS policy for the Petstore app in an HTTPRoute or TrafficPolicy.
 
-{{< tabs items="HTTPRoute,TrafficPolicy" >}}
+{{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab %}}
 Create an HTTPRoute resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com/` and `*.example.com` origins.
 
@@ -131,7 +122,7 @@ EOF
 ```
 {{% /tab %}}
 {{% tab %}}
-1. Create a TrafficPolicy resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com/` and `*.example.com` origins.
+1. Create a TrafficPolicy resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com` and `*.example.com` origins.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -183,7 +174,6 @@ EOF
                group: gateway.kgateway.dev
                kind: TrafficPolicy
                name: petstore-cors
-               namespace: default
          backendRefs:
            - name: petstore
              port: 8080
@@ -203,21 +193,20 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    {{% tab  %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/api/pets -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
+    -H "Origin: https://example.com" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
    curl -v -X GET localhost:8080/api/pets -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
+    -H "Origin: https://example.com" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    Example output: Notice that the `access-control-expose-headers` value changes depending on the resources that you created.
-   * If you created only an HTTPRoute, you see the `Origin` and `X-HTTPRoute-Header` headers.
-   * If you created only a TrafficPolicy or both a TrafficPolicy and HTTPRoute, you see the `Origin` and `X-TrafficPolicy-Header` headers, because the TrafficPolicy takes precedence. 
-   * If you created both options and also configured the `corsPolicyMergeSettings` on the TrafficPolicy with a `UNION` merge strategy, then you see all the `Origin`, `X-HTTPRoute-Header`, and `X-TrafficPolicy-Header` headers.
+   * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
+   * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
    
    ```console {hl_lines=[7,8,9]}
    * Mark bundle as not supporting multiuse
@@ -226,7 +215,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < date: Mon, 03 Jun 2024 17:05:31 GMT
    < content-length: 86
    < x-envoy-upstream-service-time: 7
-   < access-control-allow-origin: https://example.com/
+   < access-control-allow-origin: https://example.com
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-HTTPRoute-Header, X-TrafficPolicy-Header
    < server: envoy
