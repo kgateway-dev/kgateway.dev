@@ -109,8 +109,8 @@ spec:
               - POST
               - OPTIONS               
             allowOrigins:
-              - "https://example.com"
-              - "https://*.example.com"
+              - "https://example.com/"
+              - "https://*.example.com/"
             exposeHeaders:
             - Origin
             - X-HTTPRoute-Header
@@ -143,8 +143,8 @@ EOF
          - "POST"
          - "OPTIONS"               
        allowOrigins:
-         - "https://example.com"
-         - "https://*.example.com"
+         - "https://example.com/"
+         - "https://*.example.com/"
        exposeHeaders:
        - "Origin"
        - "X-TrafficPolicy-Header"
@@ -193,13 +193,13 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    {{% tab  %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/api/pets -H "host: cors.example:8080" \
-    -H "Origin: https://example.com" -H "Access-Control-Request-Method: GET"
+    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
    curl -v -X GET localhost:8080/api/pets -H "host: cors.example:8080" \
-    -H "Origin: https://example.com" -H "Access-Control-Request-Method: GET"
+    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -218,7 +218,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < date: Mon, 03 Jun 2024 17:05:31 GMT
    < content-length: 86
    < x-envoy-upstream-service-time: 7
-   < access-control-allow-origin: https://example.com
+   < access-control-allow-origin: https://example.com/
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-HTTPRoute-Header
    < server: envoy
@@ -234,7 +234,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < date: Mon, 03 Jun 2024 17:05:31 GMT
    < content-length: 86
    < x-envoy-upstream-service-time: 7
-   < access-control-allow-origin: https://example.com
+   < access-control-allow-origin: https://example.com/
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-TrafficPolicy-Header
    < server: envoy
