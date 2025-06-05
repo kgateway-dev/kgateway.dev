@@ -29,68 +29,37 @@ CORS policies are typically implemented to limit access to server resources for 
 
 You can configure the CORS policy at two levels:
 
-* HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. The policy is applied to all the routes that are defined in the HTTPRoute.This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
-* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+* HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
+* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. You can attach a TrafficPolicy to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+
+### Known limitations {#limitations}
+
+The CORS filter supports only exact matches, not wildcard matchers. This limitation applies to both the HTTPRoute and TrafficPolicy. For example, you cannot set the `allowOrigins` field to `https://*.example.com/` or `allowHeaders` to `X-Custom-*`.
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
-
-{{% callout type="info" %}} 
-Some apps, such as `httpbin`, have built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you might configure in kgateway. 
-{{% /callout %}}
-
-### Set up your environment to test CORS {#setup-env}
-
-Set up the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs and the Petstore app to test CORS policies.
-
-1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} at version 1.3.0 or later so that you can use CORS.
+4. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} at version 1.3.0 or later so that you can use CORS.
 
    ```shell
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
    ```
 
-2. Deploy the sample Petstore app. You cannot use the sample httpbin app, because httpbin has built-in CORS policies that allow all origins. These policies take precedence over CORS policies that you configure in kgateway.
-   
-   ```sh
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/main/assets/docs/examples/petstore.yaml
-   ```
-   
-   Example output: 
-   
-   ```console
-   deployment.apps/petstore created
-   service/petstore created
-   ```
-
-3. Verify that the Petstore app is up and running. 
-   
-   ```sh
-   kubectl get pods   
-   ```
-   
-   Example output: 
-   ```console                                                                              
-   NAME                        READY   STATUS    RESTARTS   AGE
-   petstore-66cddd5bb4-x7vdd   1/1     Running   0          26s
-   ```
-
-
 ## Set up CORS policies
 
-Create a CORS policy for the Petstore app in an HTTPRoute or TrafficPolicy.
+Create a CORS policy for the httpbin app in an HTTPRoute or TrafficPolicy.
 
 {{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab %}}
-Create an HTTPRoute resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com/` and `*.example.com` origins.
+Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: petstore-cors
-  namespace: default
+  name: httpbin-cors
+  namespace: httpbin
 spec:
   parentRefs:
     - name: http
@@ -110,27 +79,26 @@ spec:
               - OPTIONS               
             allowOrigins:
               - "https://example.com/"
-              - "https://*.example.com/"
             exposeHeaders:
             - Origin
             - X-HTTPRoute-Header
             maxAge: 86400
       backendRefs:
-        - name: petstore
-          port: 8080
+        - name: httpbin
+          port: 8000
 EOF
 ```
 {{% /tab %}}
 {{% tab %}}
-1. Create a TrafficPolicy resource for the Petstore app that applies a CORS filter. The following example allows requests from the `example.com` and `*.example.com` origins.
+1. Create a TrafficPolicy resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: TrafficPolicy
    metadata:
-     name: petstore-cors
-     namespace: default
+     name: httpbin-cors
+     namespace: httpbin
    spec:
      cors:
        allowCredentials: true
@@ -144,7 +112,6 @@ EOF
          - "OPTIONS"               
        allowOrigins:
          - "https://example.com/"
-         - "https://*.example.com/"
        exposeHeaders:
        - "Origin"
        - "X-TrafficPolicy-Header"
@@ -152,15 +119,15 @@ EOF
    EOF
    ```
 
-2. Attach the TrafficPolicy to a route or Gateway. The following example create an HTTPRoute for the Petstore app that has the TrafficPolicy attached. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+2. Attach the TrafficPolicy to a route or Gateway. The following example create an HTTPRoute for the httpbin app that has the TrafficPolicy attached. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
-     name: petstore-cors
-     namespace: default
+     name: httpbin-cors
+     namespace: httpbin
    spec:
      parentRefs:
        - name: http
@@ -173,10 +140,10 @@ EOF
              extensionRef:
                group: gateway.kgateway.dev
                kind: TrafficPolicy
-               name: petstore-cors
+               name: httpbin-cors
          backendRefs:
-           - name: petstore
-             port: 8080
+           - name: httpbin
+             port: 8000
    EOF
    ```
 
@@ -187,18 +154,18 @@ EOF
 
 Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you can test the policies.
 
-1. Send a request to the Petstore app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
+1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
    
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab  %}}
    ```sh
-   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/api/pets -H "host: cors.example:8080" \
+   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -v -X GET localhost:8080/api/pets -H "host: cors.example:8080" \
+   curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
@@ -222,8 +189,6 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-HTTPRoute-Header
    < server: envoy
-   < 
-   [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
    ```
    {{% /tab %}}
    {{% tab  %}}
@@ -239,23 +204,59 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < access-control-expose-headers: Origin, X-TrafficPolicy-Header
    < server: envoy
    < 
-   [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Send another request to the Petstore app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
+   ```json
+   {
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Access-Control-Request-Method": [
+         "GET"
+       ],
+       "Host": [
+         "cors.example:8080"
+       ],
+       "Origin": [
+         "https://example.com"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Envoy-External-Address": [
+         "127.0.0.1"
+       ],
+       "X-Forwarded-For": [
+         "10.xxx.xx.x"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "bce0d16b-e1fa-427d-a246-79acd36b4f3e"
+       ]
+     }
+   }
+   ```
+
+2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
    
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/api/pets -H "host: cors.example:8080" \
+   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
    {{% tab  %}}
    ```sh
-   curl -v -X GET localhost:8080/api/pets -H "host: cors.example:8080" \
+   curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
@@ -271,9 +272,45 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < x-envoy-upstream-service-time: 3
    < server: envoy
    < 
-   [{"id":1,"name":"Dog","status":"available"},{"id":2,"name":"Cat","status":"pending"}]
    ```
-   
+
+   ```json
+   {
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Access-Control-Request-Method": [
+         "GET"
+       ],
+       "Host": [
+         "cors.example:8080"
+       ],
+       "Origin": [
+         "https://notallowed.com"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Envoy-External-Address": [
+         "127.0.0.1"
+       ],
+       "X-Forwarded-For": [
+         "10.xxx.xx.x"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "bce0d16b-e1fa-427d-a246-79acd36b4f3e"
+       ]
+     }
+   }
+   ```
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
@@ -281,15 +318,13 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 {{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab %}}
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
-kubectl delete httproute petstore-cors -n default
+kubectl delete httproute httpbin-cors -n httpbin
 ```
 {{% /tab %}}
 {{% tab  %}}
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
-kubectl delete httproute petstore-cors -n default
-kubectl delete trafficpolicy petstore-cors -n default
+kubectl delete httproute httpbin-cors -n httpbin
+kubectl delete trafficpolicy httpbin-cors -n httpbin
 ```
 {{% /tab %}}
 {{< /tabs >}}
