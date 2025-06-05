@@ -7,6 +7,7 @@ A Helm chart for the kgateway project
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| agentGateway.enabled | bool | `false` |  |
 | controller.extraEnv | object | `{}` |  |
 | controller.image.pullPolicy | string | `""` |  |
 | controller.image.registry | string | `""` |  |
@@ -17,6 +18,8 @@ A Helm chart for the kgateway project
 | controller.service.ports.grpc | int | `9977` |  |
 | controller.service.ports.health | int | `9093` |  |
 | controller.service.type | string | `"ClusterIP"` |  |
+| deploymentAnnotations | object | `{}` |  |
+| discoveryNamespaceSelectors | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.registry | string | `"cr.kgateway.dev/kgateway-dev"` |  |

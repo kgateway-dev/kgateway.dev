@@ -13,6 +13,7 @@ weight: 10
 
 ### Resource Types
 - [Backend](#backend)
+- [BackendConfigPolicy](#backendconfigpolicy)
 - [DirectResponse](#directresponse)
 - [GatewayExtension](#gatewayextension)
 - [GatewayParameters](#gatewayparameters)
@@ -205,6 +206,23 @@ _Appears in:_
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
 
 
+#### AgentGateway
+
+
+
+Configuration of the AgentGateway integration
+
+
+
+_Appears in:_
+- [KubernetesProxyConfig](#kubernetesproxyconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enabled` _boolean_ | Whether to enable the extension. |  | Optional <br /> |
+| `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  | Optional <br /> |
+
+
 #### AiExtension
 
 
@@ -259,6 +277,25 @@ _Appears in:_
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Anthropic API.<br />This token is automatically sent in the `x-api-key` header of the request. |  | Required <br /> |
 | `apiVersion` _string_ | Optional: A version header to pass to the Anthropic API.<br />For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |  |  |
 | `model` _string_ | Optional: Override the model name.<br />If unset, the model name is taken from the request.<br />This setting can be useful when testing model failover scenarios. |  |  |
+
+
+#### AuthHeaderOverride
+
+
+
+AuthHeaderOverride allows customization of the default Authorization header sent to the LLM Provider.
+The default header is `Authorization: Bearer <token>`. HeaderName can change the Authorization
+header name and Prefix can change the Bearer prefix
+
+
+
+_Appears in:_
+- [LLMProvider](#llmprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `prefix` _string_ |  |  |  |
+| `headerName` _string_ |  |  |  |
 
 
 #### AwsAuth
@@ -372,6 +409,49 @@ _Appears in:_
 | `status` _[BackendStatus](#backendstatus)_ |  |  |  |
 
 
+#### BackendConfigPolicy
+
+
+
+
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `BackendConfigPolicy` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[BackendConfigPolicySpec](#backendconfigpolicyspec)_ |  |  |  |
+| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
+
+
+#### BackendConfigPolicySpec
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicy](#backendconfigpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
+| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  |  |
+| `perConnectionBufferLimitBytes` _integer_ | Soft limit on size of the cluster's connections read and write buffers.<br />If unspecified, an implementation defined default is applied (1MiB). |  |  |
+| `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
+| `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
+| `http1ProtocolOptions` _[Http1ProtocolOptions](#http1protocoloptions)_ | Additional options when handling HTTP1 requests upstream. |  |  |
+
+
 #### BackendSpec
 
 
@@ -385,10 +465,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used. |  | Enum: [AI AWS Static] <br />Required <br /> |
+| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used. |  | Enum: [AI AWS Static DynamicForwardProxy] <br />Required <br /> |
 | `ai` _[AIBackend](#aibackend)_ | AI is the AI backend configuration. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 | `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration. |  |  |
 | `static` _[StaticBackend](#staticbackend)_ | Static is the static backend configuration. |  |  |
+| `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | DynamicForwardProxy is the dynamic forward proxy backend configuration. |  |  |
 
 
 #### BackendStatus
@@ -423,6 +504,7 @@ _Appears in:_
 | `AI` | BackendTypeAI is the type for AI backends.<br /> |
 | `AWS` | BackendTypeAWS is the type for AWS backends.<br /> |
 | `Static` | BackendTypeStatic is the type for static backends.<br /> |
+| `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
 
 
 #### BodyParseBehavior
@@ -517,6 +599,27 @@ _Appears in:_
 | `match` _string_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true.<br />see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  |  |
 
 
+#### CommonHttpProtocolOptions
+
+
+
+CommonHttpProtocolOptions are options that are applicable to both HTTP1 and HTTP2 requests.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  |  |
+| `maxHeadersCount` _integer_ | Specifies the maximum number of headers that the connection will accept.<br />If not specified, the default of 100 is used. Requests that exceed this limit will receive<br />a 431 response for HTTP/1.x and cause a stream reset for HTTP/2. |  |  |
+| `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  |  |
+| `headersWithUnderscoresAction` _[HeadersWithUnderscoresAction](#headerswithunderscoresaction)_ | Action to take when a client request with a header name containing underscore characters is received.<br />If this setting is not specified, the value defaults to ALLOW.<br />Note: upstream responses are not affected by this setting. |  | Enum: [Allow RejectRequest DropHeader] <br /> |
+| `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  |  |
+
+
 #### ComparisonFilter
 
 _Underlying type:_ _[struct{Op Op "json:\"op,omitempty\""; Value uint32 "json:\"value,omitempty\""}](#struct{op-op-"json:\"op,omitempty\"";-value-uint32-"json:\"value,omitempty\""})_
@@ -529,6 +632,19 @@ Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v
 _Appears in:_
 - [DurationFilter](#durationfilter)
 - [StatusCodeFilter](#statuscodefilter)
+
+
+
+#### CorsPolicy
+
+
+
+
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
 
 
 
@@ -628,6 +744,22 @@ Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v
 _Appears in:_
 - [FilterType](#filtertype)
 
+
+
+#### DynamicForwardProxyBackend
+
+
+
+DynamicForwardProxyBackend is the dynamic forward proxy backend configuration.
+
+
+
+_Appears in:_
+- [BackendSpec](#backendspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enableTls` _boolean_ | EnableTls enables TLS. When true, the backend will be configured to use TLS. System CA will be used for validation.<br />The hostname will be used for SNI and auto SAN validation. |  | Optional <br /> |
 
 
 #### EnvoyBootstrap
@@ -734,6 +866,7 @@ ExtGrpcService defines the GRPC service that will handle the processing.
 _Appears in:_
 - [ExtAuthProvider](#extauthprovider)
 - [ExtProcProvider](#extprocprovider)
+- [RateLimitProvider](#ratelimitprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -905,9 +1038,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc Extended] <br />Required <br /> |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit Extended] <br />Required <br /> |
 | `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
 | `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
+| `rateLimit` _[RateLimitProvider](#ratelimitprovider)_ | RateLimit configuration for RateLimit extension type. |  |  |
 
 
 #### GatewayExtensionStatus
@@ -941,6 +1075,7 @@ _Appears in:_
 | --- | --- |
 | `ExtAuth` | GatewayExtensionTypeExtAuth is the type for Extauth extensions.<br /> |
 | `ExtProc` | GatewayExtensionTypeExtProc is the type for ExtProc extensions.<br /> |
+| `RateLimit` | GatewayExtensionTypeRateLimit is the type for RateLimit extensions.<br /> |
 
 
 #### GatewayParameters
@@ -1106,8 +1241,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  |  |
+| `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
 
 
 #### HeaderFilter
@@ -1125,6 +1262,23 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  | Required <br /> |
+
+
+#### HeaderFormat
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [Http1ProtocolOptions](#http1protocoloptions)
+
+| Field | Description |
+| --- | --- |
+| `ProperCaseHeaderKeyFormat` |  |
+| `PreserveCaseHeaderKeyFormat` |  |
 
 
 #### HeaderName
@@ -1157,6 +1311,25 @@ _Appears in:_
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
+#### HeadersWithUnderscoresAction
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Allow RejectRequest DropHeader]
+
+_Appears in:_
+- [CommonHttpProtocolOptions](#commonhttpprotocoloptions)
+
+| Field | Description |
+| --- | --- |
+| `Allow` | Allow headers with underscores. This is the default behavior.<br /> |
+| `RejectRequest` | Reject client request. HTTP/1 requests are rejected with the 400 status. HTTP/2 requests<br />end with the stream reset. The "httpN.requests_rejected_with_underscores_in_headers" counter<br />is incremented for each rejected request.<br /> |
+| `DropHeader` | Drop the header with name containing underscores. The header is dropped before the filter chain is<br />invoked and as such filters will not see dropped headers. The<br />"httpN.dropped_headers_with_underscores" is incremented for each dropped header.<br /> |
+
+
 #### Host
 
 
@@ -1175,6 +1348,24 @@ _Appears in:_
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
 | `port` _[PortNumber](#portnumber)_ | Port is the port to use for the backend. |  | Required <br /> |
 | `insecureSkipVerify` _boolean_ | InsecureSkipVerify allows skipping ssl validation for custom hosts |  | Optional <br /> |
+
+
+#### Http1ProtocolOptions
+
+
+
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-http1protocoloptions) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enableTrailers` _boolean_ | Enables trailers for HTTP/1. By default the HTTP/1 codec drops proxied trailers.<br />Note: Trailers must also be enabled at the gateway level in order for this option to take effect |  |  |
+| `headerFormat` _[HeaderFormat](#headerformat)_ | The format of the header key. |  | Enum: [ProperCaseHeaderKeyFormat PreserveCaseHeaderKeyFormat] <br /> |
+| `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging. When this option is false, then Envoy will terminate<br />HTTP/1.1 connections upon receiving an invalid HTTP message. However,<br />when this option is true, then Envoy will leave the HTTP/1.1 connection<br />open where possible. |  |  |
 
 
 #### Image
@@ -1277,6 +1468,7 @@ _Appears in:_
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  | Optional <br /> |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  | Optional <br /> |
 | `aiExtension` _[AiExtension](#aiextension)_ | Configuration for the AI extension. |  | Optional <br /> |
+| `agentGateway` _[AgentGateway](#agentgateway)_ | Configure the AgentGateway integration |  | Optional <br /> |
 | `floatingUserId` _boolean_ | Used to unset the `runAsUser` values in security contexts. |  |  |
 
 
@@ -1296,27 +1488,73 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `provider` _[SupportedLLMProvider](#supportedllmprovider)_ | The LLM provider type to configure. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 | `hostOverride` _[Host](#host)_ | Send requests to a custom host and port, such as to proxy the request,<br />or to use a different backend that is API-compliant with the Backend version. |  |  |
+| `pathOverride` _[PathOverride](#pathoverride)_ | TODO: Consolidate all Override options into ProviderOverride.<br />Overrides the default API path for the LLM provider.<br />Allows routing requests to a custom API endpoint path. |  | MinProperties: 1 <br /> |
+| `authHeaderOverride` _[AuthHeaderOverride](#authheaderoverride)_ | Customizes the Authorization header sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
 
 #### LocalPolicyTargetReference
 
 
 
-Select the object to attach the policy to.
+Select the object to attach the policy by Group, Kind, and Name.
 The object must be in the same namespace as the policy.
 You can target only one object at a time.
 
 
 
 _Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+
+
+#### LocalPolicyTargetReferenceWithSectionName
+
+
+
+Select the object to attach the policy by Group, Kind, Name and SectionName.
+The object must be in the same namespace as the policy.
+You can target only one object at a time.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+| `sectionName` _[SectionName](#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
+
+
+#### LocalPolicyTargetSelector
+
+
+
+Select the object to attach the policy by Group, Kind, and its labels.
+The object must be in the same namespace as the policy and match the
+specified labels.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
 - [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  | MaxLength: 253 <br />Pattern: `^$\|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$` <br /> |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br /> |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
 
 
 #### LocalRateLimitPolicy
@@ -1445,6 +1683,26 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  | Required <br /> |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request.<br />This setting can be useful when setting up model failover within the same LLM provider. |  |  |
+
+
+#### PathOverride
+
+
+
+PathOverride configures the AI gateway to use a custom path for LLM provider chat-completion API requests.
+It allows overriding the default API path with a custom one.
+This is useful when you need to route requests to a different API endpoint while maintaining
+compatibility with the original provider's API structure.
+
+_Validation:_
+- MinProperties: 1
+
+_Appears in:_
+- [LLMProvider](#llmprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `fullPath` _string_ | FullPath specifies the custom API path to use for the LLM provider requests.<br />This path will replace the default API path for the provider. |  |  |
 
 
 #### Pod
@@ -1633,6 +1891,101 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `local` _[LocalRateLimitPolicy](#localratelimitpolicy)_ | Local defines a local rate limiting policy. |  |  |
+| `global` _[RateLimitPolicy](#ratelimitpolicy)_ | Global defines a global rate limiting policy using an external service. |  |  |
+
+
+#### RateLimitDescriptor
+
+
+
+RateLimitDescriptor defines a descriptor for rate limiting.
+A descriptor is a group of entries that form a single rate limit rule.
+
+
+
+_Appears in:_
+- [RateLimitPolicy](#ratelimitpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `entries` _[RateLimitDescriptorEntry](#ratelimitdescriptorentry) array_ | Entries are the individual components that make up this descriptor.<br />When translated to Envoy, these entries combine to form a single descriptor. |  | MinItems: 1 <br /> |
+
+
+#### RateLimitDescriptorEntry
+
+
+
+RateLimitDescriptorEntry defines a single entry in a rate limit descriptor.
+Only one entry type may be specified.
+
+
+
+_Appears in:_
+- [RateLimitDescriptor](#ratelimitdescriptor)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[RateLimitDescriptorEntryType](#ratelimitdescriptorentrytype)_ | Type specifies what kind of rate limit descriptor entry this is. |  | Enum: [Generic Header RemoteAddress Path] <br /> |
+| `generic` _[RateLimitDescriptorEntryGeneric](#ratelimitdescriptorentrygeneric)_ | Generic contains the configuration for a generic key-value descriptor entry.<br />This field must be specified when Type is Generic. |  |  |
+| `header` _string_ | Header specifies a request header to extract the descriptor value from.<br />This field must be specified when Type is Header. |  |  |
+
+
+
+
+#### RateLimitDescriptorEntryType
+
+_Underlying type:_ _string_
+
+RateLimitDescriptorEntryType defines the type of a rate limit descriptor entry.
+
+_Validation:_
+- Enum: [Generic Header RemoteAddress Path]
+
+_Appears in:_
+- [RateLimitDescriptorEntry](#ratelimitdescriptorentry)
+
+| Field | Description |
+| --- | --- |
+| `Generic` | RateLimitDescriptorEntryTypeGeneric represents a generic key-value descriptor entry.<br /> |
+| `Header` | RateLimitDescriptorEntryTypeHeader represents a descriptor entry that extracts its value from a request header.<br /> |
+| `RemoteAddress` | RateLimitDescriptorEntryTypeRemoteAddress represents a descriptor entry that uses the client's IP address as its value.<br /> |
+| `Path` | RateLimitDescriptorEntryTypePath represents a descriptor entry that uses the request path as its value.<br /> |
+
+
+#### RateLimitPolicy
+
+
+
+RateLimitPolicy defines a global rate limiting policy using an external service.
+
+
+
+_Appears in:_
+- [RateLimit](#ratelimit)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `descriptors` _[RateLimitDescriptor](#ratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting.<br />These values are passed to the rate limit service which applies configured limits based on them.<br />Each descriptor represents a single rate limit rule with one or more entries. |  | MinItems: 1 <br /> |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
+
+
+#### RateLimitProvider
+
+
+
+RateLimitProvider defines the configuration for a RateLimit service provider.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the rate limiting. |  | Required <br /> |
+| `domain` _string_ | Domain identifies a rate limiting configuration for the rate limit service.<br />All rate limit requests must specify a domain, which enables the configuration<br />to be per application without fear of overlap (e.g., "api", "web", "admin"). |  | Required <br /> |
+| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />When true, requests are not limited if the rate limit service is unavailable. | false |  |
+| `timeout` _[Duration](#duration)_ | Timeout for requests to the rate limit service. | 20ms |  |
 
 
 #### Regex
@@ -1902,6 +2255,24 @@ _Appears in:_
 | `vertexai` _[VertexAIConfig](#vertexaiconfig)_ |  |  |  |
 
 
+#### TCPKeepalive
+
+
+
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#envoy-v3-api-msg-config-core-v3-tcpkeepalive) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `keepAliveProbes` _integer_ | Maximum number of keep-alive probes to send before dropping the connection. |  |  |
+| `keepAliveTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds a connection needs to be idle before keep-alive probes start being sent. |  |  |
+| `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  |  |
+
+
 #### TokenBucket
 
 
@@ -1918,7 +2289,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
 | `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
-| `fillInterval` _string_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  | Format: duration <br /> |
+| `fillInterval` _[Duration](#duration)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
 
 
 #### TrafficPolicy
@@ -1955,12 +2326,14 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetRefs` _[LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `ai` _[AIPolicy](#aipolicy)_ | AI is used to configure AI-based policies for the policy. |  |  |
 | `transformation` _[TransformationPolicy](#transformationpolicy)_ | Transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
 | `extProc` _[ExtProcPolicy](#extprocpolicy)_ | ExtProc specifies the external processing configuration for the policy. |  |  |
 | `extAuth` _[ExtAuthPolicy](#extauthpolicy)_ | ExtAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
+| `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 
 
 #### Transform
@@ -2000,6 +2373,22 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `request` _[Transform](#transform)_ | Request is used to modify the request path. |  |  |
 | `response` _[Transform](#transform)_ | Response is used to modify the response path. |  |  |
+
+
+#### UpgradeConfig
+
+
+
+UpgradeConfig represents configuration for HTTP upgrades.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enabledUpgrades` _string array_ | List of upgrade types to enable (e.g. "websocket", "CONNECT", etc.) |  | MinItems: 1 <br /> |
 
 
 #### VertexAIConfig
