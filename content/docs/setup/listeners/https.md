@@ -9,53 +9,146 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 {{< reuse "docs/snippets/cert-prereqs.md" >}}
 
+4. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
+
+   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
 ## Create a TLS certificate
 
 {{< reuse "docs/snippets/listeners-https-create-cert.md" >}}
 
-## Set up an HTTPS listener
+## Set up an HTTPS listener {#setup-https}
 
-1. Create a gateway resource and configure an HTTPS listener. 
+1. Create a gateway resource with an HTTPS listener.
+
+   {{< tabs items="Gateway listeners,ListenerSets" >}}
+   {{% tab %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: https
+     name: my-https-gateway
      namespace: kgateway-system
      labels:
-       gateway: https
+       example: httpbin-https
    spec:
      gatewayClassName: kgateway
      listeners:
-       - name: https
-         port: 443
-         protocol: HTTPS
-         hostname: https.example.com
-         tls:
-           mode: Terminate
-           certificateRefs:
-             - name: https
-               kind: Secret
-         allowedRoutes:
-           namespaces:
-             from: All
+     - protocol: HTTPS
+       port: 443
+       hostname: https.example.com
+       name: https
+       tls:
+         mode: Terminate
+         certificateRefs:
+           - name: https
+             kind: Secret
+       allowedRoutes:
+         namespaces:
+           from: All
    EOF
    ```
 
+   {{< reuse "docs/snippets/review-table.md" >}}
+
    |Setting|Description|
-   |--|--|
-   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you. |
-   |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure an HTTPS gateway that listens for incoming traffic on port 443. |
-   |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unecrypted request is forwarded to the service in the cluster. |
+   |---|---|
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you.  |
+   |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure an HTTPS gateway that listens for incoming traffic for the `https.example.com` domain on port 443. The gateway can serve HTTP routes from any namespace. |
+   |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unencrypted request is forwarded to the service in the cluster. |
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the gateway. The gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
-2. Verify that the status of the gateway shows `ACCEPTED`. 
+   {{% /tab %}}
+   {{% tab %}}
+   1. Create a Gateway that enables the attachment of ListenerSets.
+
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: Gateway
+      metadata:
+        name: my-https-gateway
+        namespace: kgateway-system
+        labels:
+          example: httpbin-https
+      spec:
+        gatewayClassName: kgateway
+        allowedListeners:
+          namespaces:
+            from: All        
+        listeners:
+        - protocol: HTTPS
+          port: 80
+          name: https
+          allowedRoutes:
+            namespaces:
+              from: All
+      EOF
+      ```
+
+      {{< reuse "docs/snippets/review-table.md" >}}
+
+      |Setting|Description|
+      |---|---|
+      |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you.  |
+      |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
+      |`spec.listeners`| Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later. |
+
+   2. Create a ListenerSet that configures an HTTPS listener for the Gateway.
+
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: gateway.networking.x-k8s.io/v1alpha1
+      kind: XListenerSet
+      metadata:
+        name: my-https-listenerset
+        namespace: httpbin
+        labels:
+          example: httpbin-https
+      spec:
+        parentRef:
+          name: my-https-gateway
+          namespace: kgateway-system
+          kind: Gateway
+          group: gateway.networking.k8s.io
+        listeners:
+        - protocol: HTTPS
+          port: 443
+          hostname: https.example.com
+          name: https-listener-set
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: https
+                kind: Secret
+          allowedRoutes:
+            namespaces:
+              from: All
+      EOF
+      ```
+
+      {{< reuse "docs/snippets/review-table.md" >}}
+
+      |Setting|Description|
+      |--|--|
+      |`spec.parentRef`|The name of the Gateway to attach the ListenerSet to. |
+      |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure an HTTPS gateway that listens for incoming traffic for the `https.example.com` domain on port 443. The gateway can serve HTTP routes from any namespace. |
+      |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unencrypted request is forwarded to the service in the cluster. |
+      |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the gateway. The gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
+
+   {{% /tab %}}
+   {{< /tabs >}}
+
+2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
    ```sh
-   kubectl get gateway/https -n kgateway-system -o yaml
+   kubectl get gateway my-https-gateway -n kgateway-system -o yaml
    ```
 
-3. Create an HTTP route for the httpbin app and add it to the HTTPS gateway that you created. 
+3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
+   
+   {{< tabs items="Gateway listeners,ListenerSets" >}}
+   {{% tab %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -64,11 +157,10 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
      name: httpbin-https
      namespace: httpbin
      labels:
-       example: httpbin-route
-       gateway: https
+       example: httpbin-https
    spec:
      parentRefs:
-       - name: https
+       - name: my-https-gateway
          namespace: kgateway-system
      rules:
        - backendRefs:
@@ -76,28 +168,130 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
              port: 8000
    EOF
    ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-https
+     namespace: httpbin
+     labels:
+       example: httpbin-https
+   spec:
+     parentRefs:
+       - name: my-https-listenerset
+         namespace: httpbin
+         kind: XListenerSet
+         group: gateway.networking.x-k8s.io
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
-4. Verify that the HTTP route is applied successfully. 
+4. Verify that the HTTPRoute is applied successfully. 
    ```sh
    kubectl get httproute/httpbin-https -n httpbin -o yaml
    ```
 
-5. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
+   Example output: Notice in the `status` section that the parentRef is either the Gateway or the ListenerSet, depending on how you attached the HTTPRoute.
+
+   ```yaml
+   ...
+   status:
+     parents:
+     - conditions:
+       - lastTransitionTime: "2025-04-29T20:48:51Z"
+         message: ""
+         observedGeneration: 3
+         reason: Accepted
+         status: "True"
+         type: Accepted
+       - lastTransitionTime: "2025-04-29T20:48:51Z"
+         message: ""
+         observedGeneration: 3
+         reason: ResolvedRefs
+         status: "True"
+         type: ResolvedRefs
+       controllerName: kgateway.dev/kgateway
+     parentRef:
+       group: gateway.networking.k8s.io
+       kind: Gateway
+       name: my-https-gateway
+       namespace: kgateway-system
+   ```
+
+5. Verify that the listener now has a route attached.
+
+   {{< tabs items="Gateway listeners,ListenerSet (experimental)" >}}
+   {{% tab %}}   
+
+   ```sh
+   kubectl get gateway -n kgateway-system my-https-gateway -o yaml
+   ```
+
+   Example output:
+
+   ```yaml
+   ...
+   listeners:
+   - attachedRoutes: 1
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+
+   ```sh
+   kubectl get xlistenerset -n httpbin my-https-listenerset -o yaml
+   ```
+
+   Example output:
+
+   ```yaml
+   ...
+   listeners:
+   - attachedRoutes: 1
+   ```
+
+   Note that because the HTTPRoute is attached to the ListenerSet, the Gateway does not show the route in its status.
+
+   ```sh
+   kubectl get gateway -n kgateway-system my-https-gateway -o yaml
+   ```
+
+   Example output:
+
+   ```yaml
+   ...
+   listeners:
+   - attachedRoutes: 0
+   ```
+
+   If you create another HTTPRoute that attaches to the Gateway and uses the same listener as the ListenerSet, then the route is reported in the status of both the Gateway (attachedRoutes: 1) and the ListenerSet (attachedRoutes: 2).
+
+   {{% /tab %}}
+   {{< /tabs >}}
+
+6. Get the external address of the gateway and save it in an environment variable.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system my-https-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward svc/https -n kgateway-system 8443:443
+   kubectl port-forward deployment/my-https-gateway -n kgateway-system 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Send a request to the httpbin app and verify that you see the TLS handshake and you get back a 200 HTTP response code. 
+7. Send a request to the httpbin app and verify that you see the TLS handshake and you get back a 200 HTTP response code. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
@@ -155,12 +349,17 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Remove the HTTP route for the httpbin app, the HTTPS gateway, and the Kubernetes secret that holds the TLS certificate and key.
-   ```sh
-   kubectl delete httproute,gateway,secret -A -l gateway=https
-   ```
-
-2. Remove the `example_certs` directory that stores your TLS credentials. 
-   ```sh
-   rm -rf example_certs
-   ```
+{{< tabs items="Gateway listeners,ListenerSet (experimental)" >}}
+{{% tab %}}
+```sh
+kubectl delete -A gateways,httproutes,secret -l example=httpbin-https
+rm -rf example_certs
+```
+{{% /tab %}}
+{{% tab %}}
+```sh
+kubectl delete -A gateways,httproutes,xlistenersets,secret -l example=httpbin-https
+rm -rf example_certs
+```
+{{% /tab %}}
+{{< /tabs >}}
