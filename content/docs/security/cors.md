@@ -119,7 +119,7 @@ EOF
    EOF
    ```
 
-2. Attach the TrafficPolicy to a route or Gateway. The following example create an HTTPRoute for the httpbin app that has the TrafficPolicy attached. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+2. Attach the TrafficPolicy to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the TrafficPolicy attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -189,6 +189,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-HTTPRoute-Header
    < server: envoy
+   ...
    ```
    {{% /tab %}}
    {{% tab  %}}
@@ -203,47 +204,11 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < access-control-allow-credentials: true
    < access-control-expose-headers: Origin, X-TrafficPolicy-Header
    < server: envoy
-   < 
+   <
+   ...
    ```
    {{% /tab %}}
    {{< /tabs >}}
-
-   ```json
-   {
-     "headers": {
-       "Accept": [
-         "*/*"
-       ],
-       "Access-Control-Request-Method": [
-         "GET"
-       ],
-       "Host": [
-         "cors.example:8080"
-       ],
-       "Origin": [
-         "https://example.com"
-       ],
-       "User-Agent": [
-         "curl/8.7.1"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Envoy-External-Address": [
-         "127.0.0.1"
-       ],
-       "X-Forwarded-For": [
-         "10.xxx.xx.x"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "bce0d16b-e1fa-427d-a246-79acd36b4f3e"
-       ]
-     }
-   }
-   ```
 
 2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
    
@@ -272,43 +237,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    < x-envoy-upstream-service-time: 3
    < server: envoy
    < 
-   ```
-
-   ```json
-   {
-     "headers": {
-       "Accept": [
-         "*/*"
-       ],
-       "Access-Control-Request-Method": [
-         "GET"
-       ],
-       "Host": [
-         "cors.example:8080"
-       ],
-       "Origin": [
-         "https://notallowed.com"
-       ],
-       "User-Agent": [
-         "curl/8.7.1"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Envoy-External-Address": [
-         "127.0.0.1"
-       ],
-       "X-Forwarded-For": [
-         "10.xxx.xx.x"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "bce0d16b-e1fa-427d-a246-79acd36b4f3e"
-       ]
-     }
-   }
+   ...
    ```
 
 ## Cleanup

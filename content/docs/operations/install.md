@@ -98,10 +98,10 @@ Install the open source kgateway project in your Kubernetes cluster.
    ```sh
    helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
    tar -xvf kgateway-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
-   cat kgateway/values.yaml
+   open kgateway/values.yaml
    ```
       
-4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
+4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
    
    ```sh
    helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
