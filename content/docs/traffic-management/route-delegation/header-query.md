@@ -14,7 +14,7 @@ For example, if the parent HTTPRoute resource specifies the `header` header, the
 
 The following image illustrates the route delegation hierarchy:
 
-{{< reuse-image src="img//route-delegation-header-query.svg" >}} 
+{{< reuse-image src="img/route-delegation-header-query.svg" >}} 
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource delegates traffic as follows: 
