@@ -15,6 +15,8 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
 
 3. {{% reuse "docs/snippets/prereq-listenerset.md" %}}
 
+   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+   
 ## Set up an HTTP listener {#setup-http}
 
 1. Create a gateway resource with an HTTP listener. 
