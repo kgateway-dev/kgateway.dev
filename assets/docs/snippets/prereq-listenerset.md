@@ -1,0 +1,1 @@
+Decide whether to set up an HTTP listener inline on the Gateway resource or as a separate ListenerSet resource. Note that ListenerSets are an **experimental feature in the upstream Kubernetes Gateway API project**, and subject to change. For more information, see the [Listener overview](/docs/setup/listeners/).
