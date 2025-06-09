@@ -31,7 +31,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
 * The `parent1` HTTPRoute resource serves traffic for the `delegation-parent1.example` domain and delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
 * The `parent2` HTTPRoute resource serves traffic for the `delegation-parent2.example` domain and also delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
 * In addition, the `parent2` HTTPRoute specifies the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation, which allows a child HTTPRoute to override policies that are applied to `parent2`. To override a parent policy, you must create a TrafficPolicy that defines the same top-level policy as the parent and attach that policy to the child. Keep in mind that any policy that is defined on the parent and not overridden by a child, is still inherited and applied to the child. 
-* The `parent1` HTTPRoute resource does specify this annotation and therefore does not allow a child HTTPRoute to override policies that are set on `parent1`. 
+* The `parent1` HTTPRoute resource does not include this annotation and therefore does not allow a child HTTPRoute to override policies that are set on `parent1`. 
 * A TrafficPolicy defines a transformation and local rate limiting policy and is applied to both `parent1` and `parent2` HTTPRoutes via the `targetRefs` option. 
 
 **`child-team1` HTTPRoute**: 
