@@ -78,8 +78,9 @@ Before you upgrade kgateway, review the following information.
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel, which is required for the following features.
    
    * BackendTLSPolicy to configure TLS settings for the connection between a gateway and a backend workload.
-   * TCPRoutes to set up a TCP listener on your Gateway.
+   * CORS policies for HTTPRoutes.
    * ListenerSets to configure listeners separately from the Gateway.
+   * TCPRoutes to set up a TCP listener on your Gateway.
 
 2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
    
@@ -143,7 +144,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 2. Apply the kgateway CRDs for the upgrade version by using Helm.
 
    ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --namespace kgateway-system --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
 3. Make any changes to your Helm values.
