@@ -100,7 +100,7 @@ To use this feature, you must install the Kubernetes Gateway API experimental ch
 
 Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a TrafficPolicy to an HTTPRoute rule by using the TrafficPolicy's `targetRefs.sectionName` option. 
 
-You can also use this attachment option alongside the `extensionRef` filter, however policies that are attached via the `extensionRef` filter take precedence over policies that are attached via the `targetRefs.sectionName` option. For more information, see [Conflicting policies and merging rules](#conflicting-policies-and-merging-rules). 
+You can also use this attachment option alongside the `extensionRef` filter. However, policies that are attached via the `extensionRef` filter take precedence over policies that are attached via the `targetRefs.sectionName` option. For more information, see [Conflicting policies and merging rules](#conflicting-policies-and-merging-rules). 
 
 The following HTTPRoute defines two HTTPRoute rules that both route traffic to the httpbin app. 
 ```yaml
