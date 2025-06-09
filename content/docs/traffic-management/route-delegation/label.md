@@ -10,7 +10,7 @@ description: Use labels to delegate traffic from a parent HTTPRoute to different
 
 In this example, you learn how to use labels to delegate traffic. The parent HTTPRoute defines the labels that must be present on the child HTTPRoute to allow traffic to be forwarded. 
 
-You typically configure the parent to find an HTTPRoute with a specific label in a specific namespace. However, you can also use a wildcard for the namespace when you have multiple HTTPRoutes in different namespaces that can all receive delegated traffic. This configuration can significantly simplify your route delegation setup as it allows you to quickly add new child HTTPRoutes to the delegation chain without changing the parent HTTPRoute configuration. 
+You typically configure the parent to find an HTTPRoute with a specific label in a specific namespace. However, you can also use a wildcard for the namespace when you have multiple HTTPRoutes in different namespaces that can all receive delegated traffic. This configuration can significantly simplify your route delegation setup, as it allows you to quickly add new child HTTPRoutes to the delegation chain without changing the parent HTTPRoute configuration. 
 
 {{< tabs items="Specific namespace,Wildcard namespace" >}}
 {{% tab %}}
