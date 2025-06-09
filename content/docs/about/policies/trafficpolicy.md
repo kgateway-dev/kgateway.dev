@@ -98,7 +98,7 @@ spec:
 To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 {{% /callout %}}
 
-Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a TrafficPolicy to an HTTPRoute rule by using the TrafficPolicie's `targetRefs.sectionName` option. 
+Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a TrafficPolicy to an HTTPRoute rule by using the TrafficPolicy's `targetRefs.sectionName` option. 
 
 You can also use this attachment option alongside the `extensionRef` filter, however policies that are attached via the `extensionRef` filter take precedence over policies that are attached via the `targetRefs.sectionName` option. For more information, see [Conflicting policies and merging rules](#conflicting-policies-and-merging-rules). 
 
