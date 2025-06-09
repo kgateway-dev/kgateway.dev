@@ -39,14 +39,20 @@ Review some of the benefits that you can achieve with route delegation:
 | Optimize traffic flows| Route delegation can be used to distribute traffic load across multiple paths or nodes in the cluster, which can improve network performance and reliability. |
 |Easier updates with limited blast radius| Individual teams can easily update the routing configuration for their apps and manage the policies for their routes. If errors are introduced, the blast radius is limited to the set of routes that were changed. | 
 
-<!--
 ## Policy inheritance
+
+Review how policies are inherited along the route delegation chain. 
+
+For more information, see the [Policy inheritance](/docs/traffic-management/route-delegation/inheritance/) guides. 
+
+### Native Gateway API policies
+
+{{< reuse "docs/snippets/policy-inheritance-native.md" >}}
+
+### kgateway policies
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-For an example, see the [Policy inheritance](/docs/traffic-management/route-delegation/policy-inheritance/) guide. 
-
--->
 ## Limitations
 
 The current route delegation model imposes a few restrictions on how routes can be delegated. If a rule is violated, the corresponding rule is removed from the route. 

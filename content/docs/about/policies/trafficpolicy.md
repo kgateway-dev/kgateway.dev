@@ -272,7 +272,17 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 
 ### Policy inheritance and overrides in delegation setups {#delegation}
 
+The way policies are inherited along the route delegation chain depends on the type of policy that you want to apply. 
+
+#### Native Gateway API policies
+
+{{< reuse "docs/snippets/policy-inheritance-native.md" >}}
+
+For an example, see the policy inheritance guide for [Native Gateway API policies](/docs/traffic-management/route-delegation/inheritance/native-policies/) guide. 
+
+#### kgateway policies
+
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-For an example, see the [Policy inheritance](/docs/traffic-management/route-delegation/policy-inheritance/) guide. 
+For an example, see the policy inheritance guide for [kgateway policies](/docs/traffic-management/route-delegation/inheritance/kgateway-policies/) guide. 
 
