@@ -28,7 +28,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: my-https-gateway
+     name: https
      namespace: kgateway-system
      labels:
        example: httpbin-https
@@ -68,7 +68,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
       apiVersion: gateway.networking.k8s.io/v1
       kind: Gateway
       metadata:
-        name: my-https-gateway
+        name: https
         namespace: kgateway-system
         labels:
           example: httpbin-https
@@ -103,12 +103,12 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
       kind: XListenerSet
       metadata:
         name: my-https-listenerset
-        namespace: httpbin
+        namespace: kgateway-system
         labels:
           example: httpbin-https
       spec:
         parentRef:
-          name: my-https-gateway
+          name: https
           namespace: kgateway-system
           kind: Gateway
           group: gateway.networking.k8s.io
@@ -142,7 +142,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
    ```sh
-   kubectl get gateway my-https-gateway -n kgateway-system -o yaml
+   kubectl get gateway https -n kgateway-system -o yaml
    ```
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
@@ -160,7 +160,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
        example: httpbin-https
    spec:
      parentRefs:
-       - name: my-https-gateway
+       - name: https
          namespace: kgateway-system
      rules:
        - backendRefs:
@@ -182,7 +182,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    spec:
      parentRefs:
        - name: my-https-listenerset
-         namespace: httpbin
+         namespace: kgateway-system
          kind: XListenerSet
          group: gateway.networking.x-k8s.io
      rules:
@@ -222,7 +222,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
      parentRef:
        group: gateway.networking.k8s.io
        kind: Gateway
-       name: my-https-gateway
+       name: https
        namespace: kgateway-system
    ```
 
@@ -232,7 +232,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    {{% tab %}}   
 
    ```sh
-   kubectl get gateway -n kgateway-system my-https-gateway -o yaml
+   kubectl get gateway -n kgateway-system https -o yaml
    ```
 
    Example output:
@@ -246,7 +246,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    {{% tab %}}
 
    ```sh
-   kubectl get xlistenerset -n httpbin my-https-listenerset -o yaml
+   kubectl get xlistenerset -n kgateway-system my-https-listenerset -o yaml
    ```
 
    Example output:
@@ -260,7 +260,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    Note that because the HTTPRoute is attached to the ListenerSet, the Gateway does not show the route in its status.
 
    ```sh
-   kubectl get gateway -n kgateway-system my-https-gateway -o yaml
+   kubectl get gateway -n kgateway-system https -o yaml
    ```
 
    Example output:
@@ -280,13 +280,13 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system my-https-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab %}}
    ```sh
-   kubectl port-forward deployment/my-https-gateway -n kgateway-system 8443:443
+   kubectl port-forward svc/https -n kgateway-system 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
