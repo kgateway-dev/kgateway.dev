@@ -261,7 +261,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    
 ## Use wildcard namespaces {#wildcard}
 
-Instead of routing to an HTTPRoute with a specific label in a specific namespace, you can use a wildcard for the namespace. This configuration can streamline your route delegation setup as it allows you to easily add new child HTTPRoutes to the delegation chain. 
+Instead of routing to an HTTPRoute with a specific label in a specific namespace, you can use a wildcard for the namespace. This configuration can streamline your route delegation setup, as it allows you to easily add new child HTTPRoutes to the delegation chain. 
 
 1. Update the `parent` HTTPRoute to delegate traffic to all child HTTPRoutes with the `wildcard` label. 
    ```yaml
