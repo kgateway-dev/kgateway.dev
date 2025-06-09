@@ -136,7 +136,7 @@ spec:
 EOF
 ```
 
-To apply a TrafficPolicy to a specific HTTPRoute rule (`rule1`), use the TrafficPolicie's `targetRefs.sectionName` option as shown in the following example. 
+To apply a TrafficPolicy to a specific HTTPRoute rule (`rule1`), use the TrafficPolicy's `targetRefs.sectionName` option as shown in the following example. 
 
 ```yaml
 kubectl apply -f- <<EOF
