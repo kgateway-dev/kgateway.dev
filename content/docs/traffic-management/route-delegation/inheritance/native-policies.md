@@ -191,7 +191,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    }
    ```
    
-5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code and that the `X-Envoy-Expected-Rq-Timeout-Ms` header is set to 30000 milliseconds (30s) as defined on the `child-team2` HTTPRoute. The timeout setting that was defined on the `parent` was not applied and overridden by the timeout setting on the `child-team2` HTTPRoute. 
+5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code and that the `X-Envoy-Expected-Rq-Timeout-Ms` header is set to 30000 milliseconds (30s) as defined on the `child-team2` HTTPRoute. The timeout setting of 20s that was defined on the `parent` was not applied and overridden by the timeout setting of 30s on the `child-team2` HTTPRoute. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
