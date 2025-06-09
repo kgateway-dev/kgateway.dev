@@ -16,10 +16,14 @@ TCPRoutes are an experimental feature in the [upstream Kubernetes Gateway API](h
 2. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
 
    ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
    ```
 
-3. Deploy the sample TCP echo app.
+3. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
+
+   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
+4. Deploy the sample TCP echo app.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -59,6 +63,8 @@ TCPRoutes are an experimental feature in the [upstream Kubernetes Gateway API](h
 
 Create a TCP listener so that the gateway can route TCP traffic. In the following example, all TCP streams on port 8000 of the gateway are forwarded to port 1025 of the example TCP echo service.
 
+{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{% tab %}}
 1. Create a Gateway resource with a TCP listener. 
    
    ```yaml
@@ -82,13 +88,87 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    EOF
    ```
 
+   {{< reuse "docs/snippets/review-table.md" >}}
+
    |Setting|Description|
    |--|--|
    |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you. To view the gateway class configuration, see [Gateway classes and types](docs/about/class-type/). |
    |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure a TCP gateway that listens for incoming traffic on port 8000. The gateway can serve TCPRoutes from any namespace. |
 
+{{% /tab %}}
+{{% tab %}}
+1. Create a Gateway that enables the attachment of ListenerSets.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     name: tcp-gateway
+     namespace: kgateway-system
+     labels:
+       app: tcp-echo
+   spec:
+     gatewayClassName: kgateway
+     allowedListeners:
+       namespaces:
+         from: All
+     listeners:
+     - protocol: TCP
+       port: 80
+       name: generic-tcp
+       allowedRoutes:
+         kinds:
+         - kind: TCPRoute
+   EOF
+   ```
+
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   |Setting|Description|
+   |---|---|
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you. |
+   |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
+   |`spec.listeners`|Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on port 80, which differs from port 8000 in the ListenerSet that you create later.|
+
+2. Create a ListenerSet that configures a TCP listener for the Gateway.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.x-k8s.io/v1alpha1
+   kind: XListenerSet
+   metadata:
+     name: my-tcp-listenerset
+     namespace: kgateway-system
+     labels:
+       app: tcp-echo
+   spec:
+     parentRef:
+       name: tcp-gateway
+       namespace: kgateway-system
+       kind: Gateway
+       group: gateway.networking.k8s.io
+     listeners:
+     - protocol: TCP
+       port: 8000
+       name: tcp-listener-set
+       allowedRoutes:
+         kinds:
+         - kind: TCPRoute
+   EOF
+   ```
+
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRef`|The name of the Gateway to attach the ListenerSet to. |
+   |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure a TCP listener for port 8000. The gateway can serve TCPRoutes from any namespace. |
+
+{{% /tab %}}
+{{< /tabs >}}
+
 2. Check the status of the gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the gateway is accepted and does not conflict with other gateway configuration. 
-   
    ```sh
    kubectl get gateway tcp-gateway -n kgateway-system -o yaml
    ```
@@ -135,29 +215,58 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    EOF
    ```
 
-4. Create a TCPRoute for the TCP echo app that is served by the gateway that you created.
-   
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha2
-   kind: TCPRoute
-   metadata:
-     name: tcp-route-echo
-     namespace: kgateway-system
-     labels:
-       app: tcp-echo
-   spec:
-     parentRefs:
-       - name: tcp-gateway
-         namespace: kgateway-system
-         sectionName: tcp
-     rules:
-       - backendRefs:
-           - name: tcp-echo
-             namespace: default
-             port: 1025
-   EOF
-   ```
+## Create a TCPRoute
+
+{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{% tab %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-echo
+  namespace: kgateway-system
+  labels:
+    app: tcp-echo
+spec:
+  parentRefs:
+    - name: tcp-gateway
+      namespace: kgateway-system
+      sectionName: tcp
+  rules:
+    - backendRefs:
+        - name: tcp-echo
+          namespace: default
+          port: 1025
+EOF
+```
+{{% /tab %}}
+{{% tab %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: tcp-route-echo
+  namespace: kgateway-system
+  labels:
+    app: tcp-echo
+spec:
+  parentRefs:
+    - name: my-tcp-listenerset
+      namespace: kgateway-system
+      kind: XListenerSet
+      group: gateway.networking.x-k8s.io
+      sectionName: tcp-listener-set
+  rules:
+    - backendRefs:
+        - name: tcp-echo
+          namespace: default
+          port: 1025
+EOF
+```
+{{% /tab %}}
+{{< /tabs >}}
 
 5. Verify that the TCPRoute is applied successfully. 
    
