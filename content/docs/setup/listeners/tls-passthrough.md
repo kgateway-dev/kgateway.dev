@@ -10,6 +10,10 @@ Set up a TLS listener on the Gateway that serves one or more hosts and passes TL
 
 {{< reuse "docs/snippets/cert-prereqs.md" >}}
 
+4. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
+
+   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
 ## Deploy an nginx server that is configured for HTTPS traffic
 
 Deploy a sample nginx server and configure the server for HTTPS traffic. 
@@ -127,16 +131,14 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
    my-nginx-c4c49df8f-2bkws    1/1     Running   0          34s
    ```
 
-## Set up TLS passthrough 
+## Set up TLS passthrough
 
-To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you create a Gateway and configure it for TLS passthrough. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway. 
+To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either a Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
-1. Install the experimental channel of the Kubernetes Gateway API so that you can use TLSRoutes.
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
+{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{% tab %}}
+1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain.
 
-1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -159,133 +161,242 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    EOF
    ```
 
-2. Create a TLSRoute resource that forwards incoming TLS traffic to the nginx server. 
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   |Setting|Description|
+   |---|---|
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway.|
+   |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure a TLS passthrough gateway that listens for incoming traffic for the `nginx.example.com` domain on port 8443. The gateway can serve TLS routes from any namespace.|
+   |`spec.listeners.tls.mode`|The TLS mode for incoming requests. In this example, TLS requests are passed through to the backend service without being terminated at the gateway.|
+
+{{% /tab %}}
+{{% tab %}}
+1. Create a Gateway that enables the attachment of ListenerSets.
+
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha2
-   kind: TLSRoute
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
    metadata:
-     name: tlsroute
-     namespace: default
+     name: tls-passthrough
+     namespace: kgateway-system
    spec:
-     parentRefs:
-       - name: tls-passthrough
-         namespace: kgateway-system
-     rules:
-       - backendRefs:
-           - group: ""
-             kind: Service
-             name: my-nginx
-             port: 443
+     gatewayClassName: kgateway
+     allowedListeners:
+       namespaces:
+         from: All
+     listeners:
+     - protocol: TLS
+       port: 80
+       name: generic-tls
+       allowedRoutes:
+         namespaces:
+           from: All
    EOF
    ```
 
-3. Verify TLS passthrough traffic for nginx. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
-   1. Get the external address of the gateway proxy and save it in an environment variable.external address of the gateway proxy and save it in an environment variable.
-      ```sh 
-      export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-      echo $INGRESS_GW_ADDRESS  
-      ```
-   2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   |Setting|Description|
+   |---|---|
+   |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway.|
+   |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
+   |`spec.listeners`|Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later.|
+
+2. Create a ListenerSet that configures a TLS passthrough listener for the Gateway.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.x-k8s.io/v1alpha1
+   kind: XListenerSet
+   metadata:
+     name: my-tls-listenerset
+     namespace: kgateway-system
+   spec:
+     parentRef:
+       name: tls-passthrough
+       namespace: kgateway-system
+       kind: Gateway
+       group: gateway.networking.k8s.io
+     listeners:
+     - protocol: TLS
+       port: 8443
+       hostname: nginx.example.com
+       name: tls-listener-set
+       tls:
+         mode: Passthrough
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   |Setting|Description|
+   |--|--|
+   |`spec.parentRef`|The name of the Gateway to attach the ListenerSet to.|
+   |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure a TLS passthrough listener for the `nginx.example.com` domain on port 8443.|
+   |`spec.listeners.tls.mode`|The TLS mode for incoming requests. TLS requests are passed through to the backend service without being terminated at the gateway.|
+
+{{% /tab %}}
+{{< /tabs >}}
+
+## Create a TLSRoute
+
+{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{% tab %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute
+  namespace: default
+spec:
+  parentRefs:
+    - name: tls-passthrough
+      namespace: kgateway-system
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: my-nginx
+          port: 443
+EOF
+```
+{{% /tab %}}
+{{% tab %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
+metadata:
+  name: tlsroute
+  namespace: default
+spec:
+  parentRefs:
+    - name: my-tls-listenerset
+      namespace: kgateway-system
+      kind: XListenerSet
+      group: gateway.networking.x-k8s.io
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: my-nginx
+          port: 443
+EOF
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+## Verify TLS passthrough traffic for nginx
+
+{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab %}}
+1. Get the external address of the gateway proxy and save it in an environment variable.external address of the gateway proxy and save it in an environment variable.
+   ```sh 
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS  
+   ```
+2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
+
+   * **Load balancer IP**: 
+     ```shell
+     curl -vik --resolve "nginx.example.com:8443:${INGRESS_GW_ADDRESS}" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
+     ```
    
-      * **Load balancer IP**: 
-        ```shell
-        curl -vik --resolve "nginx.example.com:8443:${INGRESS_GW_ADDRESS}" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
-        ```
+   * **Load balancer hostname**: 
+     ```shell
+     curl -vik --resolve "nginx.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
+     ```
+     
+   Example output: 
+   ```console
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < Server: nginx/1.27.4
+   Server: nginx/1.27.4
+   ...
+   < 
+
+   <!DOCTYPE html>
+   <html>
+   <head>
+   <title>Welcome to nginx!</title>
+   <style>
+   html { color-scheme: light dark; }
+   body { width: 35em; margin: 0 auto;
+   font-family: Tahoma, Verdana, Arial, sans-serif; }
+   </style>
+   </head>
+   <body>
+   <h1>Welcome to nginx!</h1>
+   <p>If you see this page, the nginx web server is successfully installed and
+   working. Further configuration is required.</p>
+
+   <p>For online documentation and support please refer to
+   <a href="http://nginx.org/">nginx.org</a>.<br/>
+   Commercial support is available at
+   <a href="http://nginx.com/">nginx.com</a>.</p>
+
+   <p><em>Thank you for using nginx.</em></p>
+   </body>
+   </html>
+   * Connection #0 to host nginx.example.com left intact
+   ```
+{{% /tab %}}
+{{% tab %}}
+1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
+   ```sh
+   kubectl port-forward deployment/tls-passthrough -n kgateway-system 8443:8443
+   ```
+2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
+   ```sh
+   curl -vi --cacert example_certs/example.com.crt --resolve "nginx.example.com:8443:127.0.0.1" https://nginx.example.com:8443
+   ```
    
-      * **Load balancer hostname**: 
-        ```shell
-        curl -vik --resolve "nginx.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" --cacert example_certs/example.com.crt https://nginx.example.com:8443/
-        ```
-        
-      Example output: 
-      ```console
-      * Request completely sent off
-      < HTTP/1.1 200 OK
-      HTTP/1.1 200 OK
-      < Server: nginx/1.27.4
-      Server: nginx/1.27.4
-      ...
-      < 
+   Example output: 
+   ```console
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < Server: nginx/1.27.4
+   Server: nginx/1.27.4
+   ...
+   < 
 
-      <!DOCTYPE html>
-      <html>
-      <head>
-      <title>Welcome to nginx!</title>
-      <style>
-      html { color-scheme: light dark; }
-      body { width: 35em; margin: 0 auto;
-      font-family: Tahoma, Verdana, Arial, sans-serif; }
-      </style>
-      </head>
-      <body>
-      <h1>Welcome to nginx!</h1>
-      <p>If you see this page, the nginx web server is successfully installed and
-      working. Further configuration is required.</p>
+   <!DOCTYPE html>
+   <html>
+   <head>
+   <title>Welcome to nginx!</title>
+   <style>
+   html { color-scheme: light dark; }
+   body { width: 35em; margin: 0 auto;
+   font-family: Tahoma, Verdana, Arial, sans-serif; }
+   </style>
+   </head>
+   <body>
+   <h1>Welcome to nginx!</h1>
+   <p>If you see this page, the nginx web server is successfully installed and
+   working. Further configuration is required.</p>
 
-      <p>For online documentation and support please refer to
-      <a href="http://nginx.org/">nginx.org</a>.<br/>
-      Commercial support is available at
-      <a href="http://nginx.com/">nginx.com</a>.</p>
+   <p>For online documentation and support please refer to
+   <a href="http://nginx.org/">nginx.org</a>.<br/>
+   Commercial support is available at
+   <a href="http://nginx.com/">nginx.com</a>.</p>
 
-      <p><em>Thank you for using nginx.</em></p>
-      </body>
-      </html>
-      * Connection #0 to host nginx.example.com left intact
-      ```
-   {{% /tab %}}
-   {{% tab %}}
-   1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
-      ```sh
-      kubectl port-forward deployment/tls-passthrough -n kgateway-system 8443:8443
-      ```
-   2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
-      ```sh
-      curl -vi --cacert example_certs/example.com.crt --resolve "nginx.example.com:8443:127.0.0.1" https://nginx.example.com:8443
-      ```
-      
-      Example output: 
-      ```console
-      * Request completely sent off
-      < HTTP/1.1 200 OK
-      HTTP/1.1 200 OK
-      < Server: nginx/1.27.4
-      Server: nginx/1.27.4
-      ...
-      < 
-
-      <!DOCTYPE html>
-      <html>
-      <head>
-      <title>Welcome to nginx!</title>
-      <style>
-      html { color-scheme: light dark; }
-      body { width: 35em; margin: 0 auto;
-      font-family: Tahoma, Verdana, Arial, sans-serif; }
-      </style>
-      </head>
-      <body>
-      <h1>Welcome to nginx!</h1>
-      <p>If you see this page, the nginx web server is successfully installed and
-      working. Further configuration is required.</p>
-
-      <p>For online documentation and support please refer to
-      <a href="http://nginx.org/">nginx.org</a>.<br/>
-      Commercial support is available at
-      <a href="http://nginx.com/">nginx.com</a>.</p>
-
-      <p><em>Thank you for using nginx.</em></p>
-      </body>
-      </html>
-      * Connection #0 to host nginx.example.com left intact
-      ```
-      
-   {{% /tab %}}
-   {{< /tabs >}}
+   <p><em>Thank you for using nginx.</em></p>
+   </body>
+   </html>
+   * Connection #0 to host nginx.example.com left intact
+   ```
    
-   
+{{% /tab %}}
+{{< /tabs >}}
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
