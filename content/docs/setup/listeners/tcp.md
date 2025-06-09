@@ -3,10 +3,10 @@ title: TCP listeners
 weight: 10
 ---
 
-The following guide deploys a sample TCP echo app, sets up a TCP listener on the gateway, and creates a TCPRoute to the sample app.
+The following guide deploys a sample TCP echo app, sets up a TCP listener on the gateway, and creates a [TCPRoute](https://gateway-api.sigs.k8s.io/guides/tcp) to the sample app.
 
 {{% callout type="warning" %}}
-TCPRoutes are an experimental feature in the [upstream Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/guides/tcp), and are subject to change.
+{{< reuse "docs/versions/warn-experimental.md" >}}
 {{% /callout %}}
 
 ## Before you begin
@@ -97,6 +97,11 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 
 {{% /tab %}}
 {{% tab %}}
+
+{{% callout type="warning" %}}
+{{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+{{% /callout %}}
+
 1. Create a Gateway that enables the attachment of ListenerSets.
 
    ```yaml

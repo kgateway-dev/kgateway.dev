@@ -19,7 +19,7 @@ Most examples in both the [kgateway](/docs/setup/listeners/) and Kubernetes Gate
 ## ListenerSets (experimental) {#listenersets}
 
 {{% callout type="warning" %}}
-ListenerSets are an experimental feature in the [upstream Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/geps/gep-1713/), and are subject to change.
+{{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
 {{% /callout %}}
 
 With ListenerSets, you can group together listeners that have their own unique configuration, such as different protocols, ports, hostnames, or TLS settings. Then, the ListenerSets refers to a Gateway, which can be in a different namespace than the ListenerSet. The same Gateway can also have multiple ListenerSets.

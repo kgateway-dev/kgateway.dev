@@ -171,6 +171,11 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 {{% /tab %}}
 {{% tab %}}
+
+{{% callout type="warning" %}}
+{{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+{{% /callout %}}
+
 1. Create a Gateway that enables the attachment of ListenerSets.
 
    ```yaml

@@ -6,6 +6,10 @@ description: Configure TLS to terminate for a specific backend workload.
 
 Configure TLS to terminate for a specific backend workload.
 
+{{% callout type="warning" %}}
+{{< reuse "docs/versions/warn-experimental.md" >}}
+{{% /callout %}}
+
 When you configure an [HTTPS listener](/docs/setup/listeners/https), the Gateway terminates the TLS connection and decrypts the traffic. The Gateway then routes the decrypted traffic to the backend service.
 
 However, you might have a specific backend workload that uses its own TLS certificate. In this case, you can configure the Gateway to originate a TLS connection that terminates at the backend service by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
