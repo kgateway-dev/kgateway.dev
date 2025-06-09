@@ -11,11 +11,11 @@ Use a TrafficPolicy resource to attach policies to one, multiple, or all routes 
 
 You can apply TrafficPolicy policies to all routes in an HTTPRoute resource or only to specific routes. 
 
-### Option 1: Attach the policy to all HTTPRoute routes (`targetRefs`)
+### All HTTPRoute routes {#attach-to-all-routes}
 
 You can use the `spec.targetRefs` section in the TrafficPolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 
 
-The following example TrafficPolicy resource specifies transformation rules. Because the `httpbin` HTTPRoute resource is referenced in the `spec.targetRefs` section, the transformation rules are applied to all routes in that HTTPRoute resource. 
+The following example TrafficPolicy resource specifies transformation rules that are applied to all routes in the `httpbin` HTTPRoute resource. 
 
 ```yaml {hl_lines=[7,8,9,10]}
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -35,7 +35,7 @@ spec:
         value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
-### Option 2: Attach the policy to an individual route (`ExtensionRef`)
+### Individual route {#attach-to-route}
 
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
@@ -92,14 +92,81 @@ spec:
         port: 8000
 ```
 
-### Option 3: Attach the policy to a Gateway {#attach-to-gateway}
+### HTTPRoute rule {#attach-to-rule}
+
+{{% callout type="info" %}}
+To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+{{% /callout %}}
+
+Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a TrafficPolicy to an HTTPRoute rule by using the TrafficPolicy's `targetRefs.sectionName` option. 
+
+You can also use this attachment option alongside the `extensionRef` filter. However, policies that are attached via the `extensionRef` filter take precedence over policies that are attached via the `targetRefs.sectionName` option. For more information, see [Conflicting policies and merging rules](#conflicting-policies-and-merging-rules). 
+
+The following HTTPRoute defines two HTTPRoute rules that both route traffic to the httpbin app. 
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin
+  namespace: httpbin
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+    - TrafficPolicy.example
+  rules:
+  - name: rule0
+    matches:
+    - path:
+        type: PathPrefix
+        value: /anything/path1
+    backendRefs:
+    - name: httpbin
+      port: 8000
+  - name: rule1
+    matches:
+    - path:
+        type: PathPrefix
+        value: /anything/path2
+    backendRefs:
+      - name: httpbin
+        port: 8000
+EOF
+```
+
+To apply a TrafficPolicy to a specific HTTPRoute rule (`rule1`), use the TrafficPolicy's `targetRefs.sectionName` option as shown in the following example. 
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: local-ratelimit
+  namespace: kgateway-system
+spec:
+  targetRefs: 
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+    sectionName: rule1
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 1
+        tokensPerFill: 1
+        fillInterval: 100s
+EOF
+```
+
+### Gateway {#attach-to-gateway}
 
 Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 
 To attach a TrafficPolicy to a Gateway, you simply use the `targetRefs` section in the TrafficPolicy to reference the Gateway you want the policy to apply to as shown in the following example. 
 
 ```yaml
-kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
@@ -116,69 +183,106 @@ spec:
         maxTokens: 1
         tokensPerFill: 1
         fillInterval: 100s
-EOF
 ```
 
-## Conflicting policies and merging rules
+### Gateway listener {#attach-to-listener}
 
-Review how policies are merged if you apply multiple TrafficPolicy resources to the same route. 
+Instead of applying a TrafficPolicy to all the routes that the Gateway serves, you can select specific Gateway listeners by using the `targetRefs.sectionName` option. 
 
-### `ExtensionRef` vs. `targetRefs`
+The following Gateway resource defines two listeners, an HTTP (`http`) and HTTPS (`https`) listener. 
 
-If you apply two TrafficPolicy resources that both specify the same top-level policy type and you attach one TrafficPolicy via the `extensionRef` filter and one via the `targetRefs` section, only the TrafficPolicy resource that is attached via the `extensionRef` filter is applied. The policy that is attached via `targetRefs` is ignored. 
+```yaml
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: http
+  namespace: kgateway-system
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 8080
+    allowedRoutes:
+      namespaces:
+        from: All
+  - name: https
+    port: 443
+    protocol: HTTPS
+    tls:
+      mode: Terminate
+      certificateRefs:
+        - name: https
+          kind: Secret
+    allowedRoutes:
+      namespaces:
+        from: All
+```
 
-Note that the `targetRefs` TrafficPolicy resource can augment the `extensionRef` TrafficPolicy if it specifies different top-level policies. <!-- For example, the `extensionRef` TrafficPolicy might define a policy that adds request headers. While you cannot specify additional or other request header rules in the `targetRefs` TrafficPolicy, you can define different policies, such as response headers or fault injection policies.  -->
+To apply the policy to only the `https` listener, you specify the listener name in the `spec.targetRefs.sectionName` field in the TrafficPolicy resource as shown in the following example. 
 
-<!--
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: local-ratelimit
+  namespace: kgateway-system
+spec:
+  targetRefs: 
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+    sectionName: https
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 1
+        tokensPerFill: 1
+        fillInterval: 100s
+```
 
-In the following image, you have three TrafficPolicy resources that each define a kgateway policy. One CORS policy (policy 1) is applied to all routes in an HTTPRoute resource via the `targetRefs` section. Another CORS policy (policy 2) and a fault injection policy (policy 3) are applied to only route A by using the `extensionRef` filter in the HTTPRoute resource.  
+## Policy priority and merging rules
 
-Because policies that are attached via `extensionRef` take precedence over policies that are attached via `targetRefs`, the CORS policy 2 is attached to route A. In addition, the fault injection policy is attached to route A. Route B does not attach any `extensionRef` TrafficPolicies. Because of that, the CORS policy 1 from the `targetRefs` TrafficPolicy is attached to route B. 
+If you apply multiple TrafficPolicies by using different attachment options, policies are merged based on specificy and priority. The following rules apply:
 
-{{< reuse-image src="img/policy-ov-extensionref-targetref.svg" width="800px" >}} --> 
+* If you apply multiple TrafficPolicies that define the same top-level policy, the policies are not merged and only the oldest policy is enforced. Policies with a later timestamp are ignored. 
+* TrafficPolicies that define different top-level policies are merged and are enforced in combination. 
+* In addition to the timestamp, the attachment option of a policy determines the policy priority. In general, more specific policy targets have higher priority and take precedence over less specific policies. For example, a policy targeting an individual route has higher priority than a policy targeting all the routes in an HTTPRoute resource. However, keep in mind that these rules might be different in a route delegation setup. For more information, see [Policy inheritance and overrides in delegation setups](#delegation). 
+* Lower priority policies can augment higher priority policies by defining other top-level policies. For example, if you already attached a local rate limiting policy to a Gateway listener by using the `targetRefs.sectionName` option, you can add another TrafficPolicy that defines a transformation policy and apply that policy to the entire Gateway. 
+* Native Kubernetes Gateway API policies have higher priority than any kgateway policies that must be attached via the `targetRefs` or `extensionRef` option.
 
-### Multiple `targetRefs` TrafficPolicies
+### Priority order
 
-If you create multiple TrafficPolicy resources and attach them to the same HTTPRoute by using the `targetRefs` option, only the TrafficPolicy that was last created is applied. To apply multiple policies to the same route, define the rules in the same TrafficPolicy. 
+Review the following Gateway and HTTPRoute policy priorities, sorted from highest to lowest. 
 
-If you create multiple TrafficPolicy resources and attach one to a Gateway and one to an HTTPRoute, the policy is applied as follows: 
-* The TrafficPolicy that is applied to the HTTPRoute takes precedence over the TrafficPolicy that is applied to the Gateway. This means that the HTTPRoutes routes are not affected by the gateway-level policy. 
-* The TrafficPolicy that is applied to the Gateway is applied to all other routes that the Gateway serves. 
+**Gateway**: 
 
-<!--
-{{% callout type="info" %}}
-You cannot attach multiple TrafficPolicy resources to the same route by using the `targetRefs` option, *even if* they define different top-level policies. To add multiple policies, define them in the same TrafficPolicy resource.
-{{% /callout %}}
+| Priority | Attachment option | Description | 
+| -- | -- | -- | 
+| 1 | [Gateway listener policy](#attach-to-listener) | A TrafficPolicy references a Gateway listener by using the `targetRefs.sectionName` field has the highest priority. Note that if you have multiple Gateway listener policies that define the same top-level policy, only the one with the oldest timestamp is applied. |
+| 2 | [Gateway policy](#attach-to-gateway) | A TrafficPolicy references a Gateway in the `targetRefs` section has the lowest priority. This policy can still augment any higher priority policies by defining different top-level policies. Note that if you have multiple Gateway policies that all define the same top-level policy, only the one with the oldest timestamp is applied. |
 
-In the following image, you attach two TrafficPolicy resources to route A. One adds request headers and the other one a fault injection policy. Because only one TrafficPolicy can be applied to a route via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
+**HTTPRoute**: 
 
-{{< reuse-image src="img/policy-ov-multiple-trafficpolicy.svg" width="800" >}} -->
+| Priority | Attachment option | Description | 
+| -- | -- | -- | 
+| 1 | [Individual HTTPRoute policy](#attach-to-route) | A TrafficPolicy that is attached to an individual route by using the `extensionRef` filter in the HTTPRoute has the highest priority. Note that if you have multiple HTTPRoute policies that are attached via the `extensionRef` option and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
+| 2 | [HTTPRoute rule policy](#attach-to-rule) | A TrafficPolicy that is attached to an HTTPRoute rule by using the `targetRefs.sectionName` option has a lower priority. This policy can still augment any `extensionRef` policies by defining different top-level policies. Note that if you have multiple HTTPRoute rule policies and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
+| 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A TrafficPolicy that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple HTTPRoute rule policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
 
-### Multiple `ExtensionRef` TrafficPolicies
+### Policy inheritance and overrides in delegation setups {#delegation}
 
-If you attach multiple TrafficPolicy resources to an HTTPRoute by using the `ExtensionRef` filter, the TrafficPolicies are merged as follows: 
+The way policies are inherited along the route delegation chain depends on the type of policy that you want to apply. 
 
-* TrafficPolicies that define different top-level policies are merged and applied to the route. 
-* TrafficPolicies that define the same top-level policies, such as two transformation policies, are not merged. Instead, the TrafficPolicy that is referenced last is applied to the route. 
+#### Native Gateway API policies
 
-<!--
-In the following image, you have an HTTPRoute that defines two routes (route A and route B). Route A attaches two TrafficPolicy resources via the `ExtensionRef` filter that specify the same top-level header manipulation policy. For route B, two TrafficPolicy resources with different top-level policies (fault injection and CORS) are applied via the `ExtensionRef` filter. 
+{{< reuse "docs/snippets/policy-inheritance-native.md" >}}
 
-Because you cannot apply two `ExtensionRef` TrafficPolicies with the same top-level policies, only the policy that is referenced first (policy 1, request header `foo`) is enforced. The request header bar in policy 2 is ignored. For route B, both the CORS and fault injection policies are applied, because these TrafficPolicy resources define different top-level policies. 
+For an example, see the policy inheritance guide for [Native Gateway API policies](/docs/traffic-management/route-delegation/inheritance/native-policies/). 
 
-{{< reuse-image src="img/policy-ov-multiple-trafficpolicy-extensionref.svg" width="800" >}} -->
+#### kgateway policies
 
-<!--
+{{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-## Policy inheritance rules when using route delegation
+For an example, see the policy inheritance guide for [kgateway policies](/docs/traffic-management/route-delegation/inheritance/kgateway-policies/). 
 
-Policies that are defined in a TrafficPolicy resource and that are applied to a parent HTTPRoute resource are automatically inherited by all the child or grandchild HTTPRoutes along the route delegation chain. The following rules apply: 
-
-* Only policies that are specified in a TrafficPolicy resource can be inherited by a child HTTPRoute. For inheritance to take effect, you must use the `spec.targetRefs` field in the TrafficPolicy resource to apply the TrafficPolicy resource to the parent HTTPRoute resource. Any child or grandchild HTTPRoute that the parent delegates traffic to inherits these policies. 
-* Child TrafficPolicy resources cannot override policies that are defined in a TrafficPolicy resource that is applied to a parent HTTPRoute. If the child HTTPRoute sets a policy that is already defined on the parent HTTPRoute, the setting on the parent HTTPRoute takes precedence and the setting on the child is ignored. For example, if the parent HTTPRoute defines a data loss prevention policy, the child HTTPRoute cannot change these settings or disable that policy.
-* Child HTTPRoutes can augment the inherited settings by defining TrafficPolicy fields that were not already set on the parent HTTPRoute. 
-* Policies are inherited along the complete delegation chain, with parent policies having a higher priority than their respective children.
-
-For an example, see the [Policy inheritance](/docs/traffic-management/route-delegation/policy-inheritance/) guide. 
-
--->
