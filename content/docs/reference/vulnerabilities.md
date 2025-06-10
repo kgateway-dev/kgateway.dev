@@ -15,7 +15,7 @@ The kgateway project appreciates the efforts of our users in helping us to disco
 
 ### 📨 Where to report
 
-To report a security vulnerability, email the private Google group `k8s-gateway-vulnerability-reports@googlegroups.com`.
+To report a security vulnerability, email the private Google group `kgateway-vulnerability-reports@googlegroups.com`.
 
 ### ✅ When to send a report
 
@@ -71,7 +71,7 @@ On the day for the remediation to be disclosed, the kgateway team takes steps th
 
 You can join a distribution list to get early disclosures of security vulnerability. This way, you can take action earlier in the process to help remediate the vulnerability and mitigate its effects in your environments.
 
-To request membership in the early disclosure group, email the private Google group `k8s-gateway-vulnerability-reports@googlegroups.com`. In your request, indicate how you meet the following membership criteria.
+To request membership in the early disclosure group, email the private Google group `kgateway-vulnerability-reports@googlegroups.com`. In your request, indicate how you meet the following membership criteria.
 
 #### Membership criteria
 
@@ -91,4 +91,4 @@ Membership in the [Envoy security group](https://github.com/envoyproxy/envoy/blo
 
 ## Updates and questions
 
-The kgateway team reserves the right to change this process. The kgateway team’s security processes are reviewed regularly to ensure compliance with industry standards and the current security landscape. For questions or additional details, email the private Google group `k8s-gateway-vulnerability-reports@googlegroups.com`.
+The kgateway team reserves the right to change this process. The kgateway team’s security processes are reviewed regularly to ensure compliance with industry standards and the current security landscape. For questions or additional details, email the private Google group `kgateway-vulnerability-reports@googlegroups.com`.
