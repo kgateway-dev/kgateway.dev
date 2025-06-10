@@ -75,12 +75,10 @@ Before you upgrade kgateway, review the following information.
 
    {{< tabs items="Kubernetes Gateway API, Kubernetes, Istio" >}}
 {{% tab %}}
-1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes). In particular, check if you need to install the experimental channel, which is required for the following features.
-   
-   * 1.2+: BackendTLSPolicy to configure TLS settings for the connection between a gateway and a backend workload.
-   * 1.3+: CORS policies for HTTPRoutes.
-   * 1.3+: ListenerSets to configure listeners separately from the Gateway.
-   * 1.2+: TCPRoutes to set up a TCP listener on your Gateway.
+1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
+
+   * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes).
+   * Check if you need to install the [experimental channel for the features that you want to use](/docs/reference/versions/#experimental-features).
 
 2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
    
@@ -90,7 +88,7 @@ Before you upgrade kgateway, review the following information.
      kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
      ```
    
-   * Experimental channel:
+   * Experimental channel: Note that some CRDs are prefixed with `X` to indicate that the entire CRD is experimental and subject to change.
      
      ```sh
      kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
