@@ -19,7 +19,7 @@ Most examples in both the [kgateway](/docs/setup/listeners/) and Kubernetes Gate
 ## ListenerSets (experimental) {#listenersets}
 
 {{% callout type="warning" %}}
-{{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
+{{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}} As such, the ListenerSet CRD is prefixed with `X` to indicate that it is experimental.
 {{% /callout %}}
 
 With ListenerSets, you can group together listeners that have their own unique configuration, such as different protocols, ports, hostnames, or TLS settings. Then, the ListenerSet refers to a Gateway, which can be in a different namespace than the ListenerSet. The same Gateway can also have multiple ListenerSets.
