@@ -135,7 +135,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 
 To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
-{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
 {{% tab %}}
 1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain.
 
@@ -206,7 +206,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    |---|---|
    |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway.|
    |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
-   |`spec.listeners`|Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later.|
+   |`spec.listeners`|{{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later.|
 
 2. Create a ListenerSet that configures a TLS passthrough listener for the Gateway.
 
@@ -249,7 +249,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 ## Create a TLSRoute
 
-{{< tabs items="Gateway listeners,ListenerSets" >}}
+{{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
 {{% tab %}}
 ```yaml
 kubectl apply -f- <<EOF

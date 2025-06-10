@@ -21,7 +21,7 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
 
 1. Create a gateway resource with an HTTP listener. 
    
-   {{< tabs items="Gateway listeners,ListenerSets" >}}
+   {{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
    {{% tab %}}
    ```yaml
    kubectl apply -f- <<EOF
@@ -91,7 +91,7 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
       |---|---|
       |`spec.gatewayClassName`|The name of the Kubernetes gateway class that you want to use to configure the gateway. When you set up kgateway, a default gateway class is set up for you.  |
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
-      |`spec.listeners`| Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on port 80, which differs from port 8080 in the ListenerSet that you create later. |
+      |`spec.listeners`| {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8080 in the ListenerSet that you create later. |
 
    2. Create a ListenerSet that configures an HTTP listener for the Gateway.
 
@@ -138,7 +138,7 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway that you created.
    
-   {{< tabs items="Gateway listeners,ListenerSets" >}}
+   {{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
    {{% tab %}}
    ```yaml
    kubectl apply -f- <<EOF
