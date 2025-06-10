@@ -115,6 +115,9 @@ jobs:
               # Remove badge line and following empty line 
               # (might be replaced by helm docs template in the future)
               sed -i '/!\[Version:/,/^$/d' "content/docs/reference/helm/${file}.md"
+
+              # Remove backticks from the Default column in the table
+              sed -i 's/| `\([^`]*\)` |/| \1 |/g' "content/docs/reference/helm/${file}.md"
             done
 
             echo "=== Debug: After creating index file ==="
