@@ -133,7 +133,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 
 ## Set up TLS passthrough
 
-To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either a Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
+To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
 {{< tabs items="Gateway listeners,ListenerSets" >}}
 {{% tab %}}

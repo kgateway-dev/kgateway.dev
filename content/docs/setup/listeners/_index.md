@@ -7,8 +7,8 @@ Set up listeners on your API gateway. A listener configures how your API gateway
 
 In the Kubernetes Gateway API, you can create listeners in two main ways:
 
-1. Inline as part of the Gateway resource.
-2. As a separate resource called a ListenerSet.
+* Inline as part of the Gateway resource.
+* As a separate resource called a ListenerSet.
 
 ## Inline on the Gateway {#inline}
 
@@ -22,7 +22,7 @@ Most examples in both the [kgateway](/docs/setup/listeners/) and Kubernetes Gate
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
 {{% /callout %}}
 
-With ListenerSets, you can group together listeners that have their own unique configuration, such as different protocols, ports, hostnames, or TLS settings. Then, the ListenerSets refers to a Gateway, which can be in a different namespace than the ListenerSet. The same Gateway can also have multiple ListenerSets.
+With ListenerSets, you can group together listeners that have their own unique configuration, such as different protocols, ports, hostnames, or TLS settings. Then, the ListenerSet refers to a Gateway, which can be in a different namespace than the ListenerSet. The same Gateway can also have multiple ListenerSets.
 
 Similar to Gateways, ListenerSets can have a maximum of 64 listeners. However, because you can attach multiple ListenerSets to a single Gateway, now a single Gateway can have more than 64 listeners. Keep in mind that more listeners can impact how long it takes to propagate configuration changes on the Gateway. If you have more than 1,000 listeners, consider attaching ListenerSets to multiple Gateways.
 
