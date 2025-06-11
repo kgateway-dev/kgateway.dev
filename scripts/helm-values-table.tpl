@@ -2,6 +2,6 @@
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
 {{- range .Values }}
-| {{ .Name }} | {{ .Type }} | {{ .Description | markdownify | nindent 0 }} | {{ .Default | toJson }} |
+| {{ .Name }} | {{ .Type }} | {{ .Description }} | {{ .Default | toJson }} |
 {{- end }}
 {{- end -}}
