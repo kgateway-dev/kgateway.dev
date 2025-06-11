@@ -150,6 +150,25 @@ _Appears in:_
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
 
 
+#### AWSLambdaPayloadTransformMode
+
+_Underlying type:_ _string_
+
+AWSLambdaPayloadTransformMode defines the transformation mode for the payload in the request
+before it is sent to the AWS Lambda function.
+
+_Validation:_
+- Enum: [None Envoy]
+
+_Appears in:_
+- [AwsLambda](#awslambda)
+
+| Field | Description |
+| --- | --- |
+| `None` | AWSLambdaPayloadTransformNone indicates that the payload will not be transformed using Envoy's<br />built-in transformation before it is sent to the Lambda function.<br />Note: Transformation policies configured on the route will still apply.<br /> |
+| `Envoy` | AWSLambdaPayloadTransformEnvoy indicates that the payload will be transformed using Envoy's<br />built-in transformation. Refer to<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_lambda_filter#configuration-as-a-listener-filter<br />for more details on how Envoy transforms the payload.<br /> |
+
+
 #### AccessLog
 
 
@@ -367,6 +386,7 @@ _Appears in:_
 | `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br />Required <br /> |
 | `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br />Optional <br /> |
 | `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". |  | Optional <br />Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
+| `payloadTransformMode` _[AWSLambdaPayloadTransformMode](#awslambdapayloadtransformmode)_ | PayloadTransformation specifies payload transformation mode before it is sent to the Lambda function.<br />Defaults to Envoy. | Envoy | Enum: [None Envoy] <br /> |
 
 
 #### AzureOpenAIConfig
