@@ -52,3 +52,11 @@ Scanning: /Users/yourname/kgateway.dev/content/docs/listeners
 ⚠️ Missing cards in content/docs/listeners/_index.md: {'errors'}
 ❌ Extra cards in content/docs/listeners/_index.md that don’t match any local .md file, valid subdirectory, or valid relative path: {'typp', '../../invalid/path'}
 ```
+
+## helm-values-table.tpl
+
+A template to generate a table of Helm values from a YAML file.
+
+This template is used by the `/github/workflows/update-api-docs.yml` GitHub Action to generate a table of Helm values from the `kgateway/install/helm/kgateway/values.yaml` file.
+
+The Action uses the [`helm-docs`](https://github.com/norwoodj/helm-docs) tool to generate the table.

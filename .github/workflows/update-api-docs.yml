@@ -113,6 +113,7 @@ jobs:
               IFS=: read -r dir file <<< "$chart"
               go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 \
                 --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/$dir" \
+                --template-files "$GITHUB_WORKSPACE/kgateway.dev/scripts/helm-values-table.tpl" \
                 --dry-run > "content/docs/reference/helm/${file}.md"
 
               # Remove badge line and following empty line 
