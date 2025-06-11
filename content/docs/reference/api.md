@@ -150,6 +150,25 @@ _Appears in:_
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
 
 
+#### AWSLambdaPayloadTransformMode
+
+_Underlying type:_ _string_
+
+AWSLambdaPayloadTransformMode defines the transformation mode for the payload in the request
+before it is sent to the AWS Lambda function.
+
+_Validation:_
+- Enum: [None Envoy]
+
+_Appears in:_
+- [AwsLambda](#awslambda)
+
+| Field | Description |
+| --- | --- |
+| `None` | AWSLambdaPayloadTransformNone indicates that the payload will not be transformed using Envoy's<br />built-in transformation before it is sent to the Lambda function.<br />Note: Transformation policies configured on the route will still apply.<br /> |
+| `Envoy` | AWSLambdaPayloadTransformEnvoy indicates that the payload will be transformed using Envoy's<br />built-in transformation. Refer to<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_lambda_filter#configuration-as-a-listener-filter<br />for more details on how Envoy transforms the payload.<br /> |
+
+
 #### AccessLog
 
 
@@ -367,6 +386,7 @@ _Appears in:_
 | `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br />Required <br /> |
 | `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br />Optional <br /> |
 | `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". |  | Optional <br />Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
+| `payloadTransformMode` _[AWSLambdaPayloadTransformMode](#awslambdapayloadtransformmode)_ | PayloadTransformation specifies payload transformation mode before it is sent to the Lambda function.<br />Defaults to Envoy. | Envoy | Enum: [None Envoy] <br /> |
 
 
 #### AzureOpenAIConfig
@@ -451,6 +471,7 @@ _Appears in:_
 | `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
 | `http1ProtocolOptions` _[Http1ProtocolOptions](#http1protocoloptions)_ | Additional options when handling HTTP1 requests upstream. |  |  |
 | `sslConfig` _[SSLConfig](#sslconfig)_ | SSLConfig contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
+| `loadBalancerConfig` _[LoadBalancerConfig](#loadbalancerconfig)_ | LoadBalancerConfig contains the options necessary to configure the load balancer. |  |  |
 
 
 #### BackendSpec
@@ -1493,6 +1514,107 @@ _Appears in:_
 | `authHeaderOverride` _[AuthHeaderOverride](#authheaderoverride)_ | Customizes the Authorization header sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
 
+#### LoadBalancerConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `healthyPanicThreshold` _integer_ | HealthyPanicThreshold configures envoy's panic threshold percentage between 0-100. Once the number of non-healthy hosts<br />reaches this percentage, envoy disregards health information.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/panic_threshold.html). |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `updateMergeWindow` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | This allows batch updates of endpoints health/weight/metadata that happen during a time window.<br />this help lower cpu usage when endpoint change rate is high. defaults to 1 second.<br />Set to 0 to disable and have changes applied immediately. |  |  |
+| `leastRequest` _[LoadBalancerLeastRequestConfig](#loadbalancerleastrequestconfig)_ | LeastRequest configures the least request load balancer type. |  |  |
+| `roundRobin` _[LoadBalancerRoundRobinConfig](#loadbalancerroundrobinconfig)_ | RoundRobin configures the round robin load balancer type. |  |  |
+| `ringHash` _[LoadBalancerRingHashConfig](#loadbalancerringhashconfig)_ | RingHash configures the ring hash load balancer type. |  |  |
+| `maglev` _[LoadBalancerMaglevConfig](#loadbalancermaglevconfig)_ | Maglev configures the maglev load balancer type. |  |  |
+| `random` _[LoadBalancerRandomConfig](#loadbalancerrandomconfig)_ | Random configures the random load balancer type. |  |  |
+| `localityConfigType` _[LocalityConfigType](#localityconfigtype)_ | LocalityConfigType specifies the locality config type to use.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/common/v3/common.proto#envoy-v3-api-msg-extensions-load-balancing-policies-common-v3-localitylbconfig |  | Enum: [WeightedLb] <br /> |
+| `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
+| `closeConnectionsOnHostSetChange` _boolean_ | If set to true, the load balancer will drain connections when the host set changes.<br /><br />Ring Hash or Maglev can be used to ensure that clients with the same key<br />are routed to the same upstream host.<br />Distruptions can cause new connections with the same key as existing connections<br />to be routed to different hosts.<br />Enabling this feature will cause the load balancer to drain existing connections<br />when the host set changes, ensuring that new connections with the same key are<br />consistently routed to the same host.<br />Connections are not immediately closed, but are allowed to drain<br />before being closed. |  |  |
+
+
+#### LoadBalancerLeastRequestConfig
+
+
+
+LoadBalancerLeastRequestConfig configures the least request load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. |  |  |
+| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
+
+
+#### LoadBalancerMaglevConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+
+
+#### LoadBalancerRandomConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+
+
+#### LoadBalancerRingHashConfig
+
+
+
+LoadBalancerRingHashConfig configures the ring hash load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. |  |  |
+| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. |  |  |
+
+
+#### LoadBalancerRoundRobinConfig
+
+
+
+LoadBalancerRoundRobinConfig configures the round robin load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
+
+
 #### LocalPolicyTargetReference
 
 
@@ -1573,6 +1695,22 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
+
+
+#### LocalityConfigType
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description |
+| --- | --- |
+| `WeightedLb` | https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/locality_weight#locality-weighted-load-balancing<br />Locality weighted load balancing enables weighting assignments across different zones and geographical locations by using explicit weights.<br />This field is required to enable locality weighted load balancing.<br /> |
 
 
 #### Message
@@ -2243,6 +2381,25 @@ _Appears in:_
 | `Inline` | Inline provides the token directly in the configuration for the Backend.<br /> |
 | `SecretRef` | SecretRef provides the token directly in the configuration for the Backend.<br /> |
 | `Passthrough` | Passthrough the existing token. This token can either<br />come directly from the client, or be generated by an OIDC flow<br />early in the request lifecycle. This option is useful for<br />backends which have federated identity setup and can re-use<br />the token from the client.<br />Currently, this token must exist in the `Authorization` header.<br /> |
+
+
+#### SlowStartConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerLeastRequestConfig](#loadbalancerleastrequestconfig)
+- [LoadBalancerRoundRobinConfig](#loadbalancerroundrobinconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `window` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Represents the size of slow start window.<br />If set, the newly created host remains in slow start mode starting from its creation time<br />for the duration of slow start window. |  |  |
+| `aggression` _string_ | This parameter controls the speed of traffic increase over the slow start window. Defaults to 1.0,<br />so that endpoint would get linearly increasing amount of traffic.<br />When increasing the value for this parameter, the speed of traffic ramp-up increases non-linearly.<br />The value of aggression parameter should be greater than 0.0.<br />By tuning the parameter, is possible to achieve polynomial or exponential shape of ramp-up curve.<br /><br />During slow start window, effective weight of an endpoint would be scaled with time factor and aggression:<br />`new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))`,<br />where `time_factor=(time_since_start_seconds / slow_start_time_seconds)`.<br /><br />As time progresses, more and more traffic would be sent to endpoint, which is in slow start window.<br />Once host exits slow start, time_factor and aggression no longer affect its weight. |  |  |
+| `minWeightPercent` _integer_ | Minimum weight percentage of an endpoint during slow start. |  |  |
 
 
 #### StaticBackend
