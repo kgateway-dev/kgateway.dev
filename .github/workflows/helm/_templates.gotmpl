@@ -1,3 +1,11 @@
+{{- define "main" -}}
+# {{ .Chart.Name }}
+
+{{ .Chart.Description }}
+
+{{ template "valuesTable" . }}
+{{- end -}}
+
 {{- define "valuesTable" -}}
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|

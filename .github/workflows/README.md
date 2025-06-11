@@ -50,6 +50,15 @@ Process to generate markdown content from source files:
 7. Review and merge the PR
 8. Upon merge, the docs should be automatically built and published
 
+### helm/_templates.gotmpl
+
+A template to generate a table of Helm values from a YAML file.
+
+This template is used by the `/github/workflows/update-api-docs.yml` GitHub Action to generate a table of Helm values from the `kgateway/install/helm/kgateway/values.yaml` file.
+
+The Action uses the [`helm-docs`](https://github.com/norwoodj/helm-docs) tool to generate the table.
+
+
 ## card-check.yml
 
 This workflow is used to check the `_index.md` docs files to make sure that the cards include the right links to subpages in that directory.
