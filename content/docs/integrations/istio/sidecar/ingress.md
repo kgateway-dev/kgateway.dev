@@ -27,6 +27,7 @@ Kgateway comes with an Istio integration that allows you to configure your gatew
 In this guide, you learn how to use kgateway as an ingress gateway proxy for the workloads in your Istio service mesh. You explore how to enable the Istio sidecar mesh integration in kgateway, set up your ingress gateway proxy with a sidecar, and send secure mutual TLS traffic to the httpbin app as illustrated in the following image. 
 
 {{< reuse-image src="img/sidecar-ingress.svg" width="800px" >}}
+{{< reuse-image-dark srcDark="img/sidecar-ingress.svg" width="800px" >}}
 
 ## Before you begin
 

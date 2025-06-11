@@ -91,16 +91,24 @@ The content of `product-name.md` is as follows:
 ```
 kgateway
 ```
+
 The resulting content in the web page will be rendered as:
 ```markdown
 The guide includes steps to install kgateway in three ways.
-### reuse-image
-Similar to the reuse shortcode, the reuse-image shortcode is used to display images in the documentation. Images are stored in the `assets/img` folder.
+```
+### reuse-image and reuse-image-dark {#reuse-image}
 
-The following example shows the example syntax for using this shortcode: 
+Similar to the reuse shortcode, the reuse-image and reuse-image-dark shortcodes are used to display images in the documentation. Images are stored in the `assets/img` folder.
+
+{{< callout type="warning" >}}
+You must use both shortcodes together to display an image. This way, the image is displayed in both light and dark mode. If you do not have a different image file, still include both shortcodes with the same `src` image file.
+{{< /callout >}}
+
+The following example shows the example syntax for using this shortcode:
 
 ```markdown
 {{</* reuse-image src="img/translation.svg" */>}}
+{{</* reuse-image-dark src="img/translation-dark.svg" */>}}
 ```
 
 To support different screen sizes, make sure to use images of type `.svg` only. 

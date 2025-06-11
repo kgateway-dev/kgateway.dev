@@ -25,6 +25,7 @@ Depending on your setup, each Envoy instance or pod is configured with a number 
 When a token is available in the token bucket it can be assigned to an incoming connection. The request is then forwarded to your rate limit server to enforce any global rate limiting settings. For example, the request might be further rate limited based on headers or query parameters. Only requests that are within the local and global rate limits are forwarded to the backend destination in the cluster. 
 
 {{< reuse-image src="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
+{{< reuse-image-dark srcDark="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
 
 ### Local rate limiting in kgateway
 
