@@ -18,6 +18,7 @@ You typically configure the parent to find an HTTPRoute with a specific label in
 Explore an example for delegating traffic to an HTTPRoute with a specific label in a specific namespace. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [HTTPRoutes in specific namespaces](#specific-namespace). 
 
 {{< reuse-image src="img/route-delegation-labels.svg" >}} 
+{{< reuse-image-dark srcDark="img/route-delegation-labels-dark.svg" >}} 
 
 `parent` HTTPRoute: </br>
 * The parent HTTPRoute resource delegates traffic as follows:
@@ -38,6 +39,7 @@ Explore an example for delegating traffic to an HTTPRoute with a specific label 
 Learn how to use a wildcard for the namespace to streamline your route delegation setup. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [Use wildcard namespaces](#wildcard). 
 
 {{< reuse-image src="img/route-delegation-labels-wildcard.svg" >}} 
+{{< reuse-image-dark srcDark="img/route-delegation-labels-wildcard-dark.svg" >}} 
 
 `parent` HTTPRoute: </br>
 * The parent HTTPRoute resource delegates traffic as follows:

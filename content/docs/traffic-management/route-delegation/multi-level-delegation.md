@@ -11,6 +11,7 @@ Create a 3-level route delegation hierarchy with a parent, child, and grandchild
 In this guide you walk through a route delegation example that demonstrates route delegation from a parent HTTPRoute resource to a child HTTPRoute resource, and from a child HTTPRoute resource to a grandchild HTTPRoute resource. The following image illustrates the route delegation hierarchy:
 
 {{< reuse-image src="img//route-delegation-multi-level.svg" >}} 
+{{< reuse-image-dark srcDark="img//route-delegation-multi-level.svg" >}} 
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource `parent` delegates traffic as follows: 

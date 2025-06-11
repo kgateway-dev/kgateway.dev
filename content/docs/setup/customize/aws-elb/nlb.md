@@ -56,6 +56,7 @@ Keep in mind the following considerations when working with an NLB:
    Create a simple NLB that accepts HTTP traffic on port 80 and forwards this traffic to the HTTP listener on your gateway proxy. 
 
    {{< reuse-image src="/img/elb-http.svg" >}}
+   {{< reuse-image-dark srcDark="/img/elb-http.svg" >}}
 
    This Gateway resource references the custom GatewayParameters resource that you created.
    ```yaml
@@ -87,6 +88,7 @@ Keep in mind the following considerations when working with an NLB:
    Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminate TLS traffic at the gateway proxy for added security. 
 
    {{< reuse-image src="/img/elb-tls-passthrough.svg" >}}
+   {{< reuse-image-dark srcDark="/img/elb-tls-passthrough.svg" >}}
 
    1. Create a self-signed TLS certificate to configure your gateway proxy with an HTTPS listener. 
       {{< reuse "docs/snippets/listeners-https-create-cert.md" >}}

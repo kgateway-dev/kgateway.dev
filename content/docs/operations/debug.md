@@ -41,6 +41,7 @@ Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience
    * [http://localhost:19000/](http://localhost:19000/)
 
    {{< reuse-image src="img/gateway-admin-interface.png" caption="Figure: Debugging interface of the gateway proxy.">}}
+   {{< reuse-image-dark srcDark="img/gateway-admin-interface.png" caption="Figure: Debugging interface of the gateway proxy.">}}
    
    Common endpoints that can help troubleshoot your setup further, include: 
    | Endpoint | Description| 

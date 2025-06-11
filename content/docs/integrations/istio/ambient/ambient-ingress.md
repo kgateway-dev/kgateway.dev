@@ -19,6 +19,7 @@ In this guide, you learn how to use kgateway as the ingress gateway to route tra
 This guide assumes that you run your ambient mesh in a single cluster and want to use kgateway as the ingress gateway to protect your ambient mesh services. 
 
 {{< reuse-image src="img/ambient-ingress.svg" width="600px" caption="kgateway as an ingress gateway to your ambient mesh" >}}
+{{< reuse-image-dark srcDark="img/ambient-ingress.svg" width="600px" caption="kgateway as an ingress gateway to your ambient mesh" >}}
 
 ## Before you begin
 

@@ -11,6 +11,7 @@ Set up route delegation for a child HTTPRoute resource that can receive traffic 
 In this guide you walk through a route delegation example that demonstrates route delegation between two parent HTTPRoute and two child HTTPRoute resources that forward traffic to an httpbin sample app. The following image illustrates the route delegation hierarchy:
 
 {{< reuse-image src="img//route-delegation-multi-parent.svg" >}} 
+{{< reuse-image-dark srcDark="img//route-delegation-multi-parent.svg" >}} 
 
 **`parent1` and `parent2` HTTPRoutes**: 
 * The parent HTTPRoute resource `parent1` serves traffic for the `delegation-parent1.example` domain. 

@@ -25,6 +25,7 @@ In this guide you walk through a route delegation example where a child HTTPRout
 The following image illustrates the route delegation hierarchy and policy inheritance:
 
 {{< reuse-image src="img/route-delegation-inheritance-kgateway.svg" >}}
+{{< reuse-image-dark srcDark="img/route-delegation-inheritance-kgateway-dark.svg" >}}
 <!-- https://app.excalidraw.com/s/AKnnsusvczX/9uktq3x1i63-->
 
 **`parent1` and `parent2` HTTPRoutes**: 
