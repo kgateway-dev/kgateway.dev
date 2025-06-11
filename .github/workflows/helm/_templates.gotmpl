@@ -1,15 +1,28 @@
-{{- define "main" -}}
-# {{ .Chart.Name }}
+{{ define "chart.valuesTable" }}
+{{ if .Sections.Sections }}
+  {{- range .Sections.Sections }}
+### {{ .SectionName }}
 
-{{ .Chart.Description }}
-
-{{ template "valuesTable" . }}
-{{- end -}}
-
-{{- define "valuesTable" -}}
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
-{{- range .Values }}
-| {{ .Name }} | {{ .Type }} | {{ .Description }} | {{ .Default | toJson }} |
-{{- end }}
-{{- end -}}
+  {{- range .SectionItems }}
+| {{ .Key }} | {{ .Type }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} |
+  {{- end }}
+  {{- end }}
+  {{ if .Sections.DefaultSection.SectionItems }}
+### {{ .Sections.DefaultSection.SectionName }}
+
+| Key | Type | Description | Default |
+|-----|------|-------------|---------|
+  {{- range .Sections.DefaultSection.SectionItems }}
+| {{ .Key }} | {{ .Type }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} |
+  {{- end }}
+  {{- end }}
+{{ else }}
+| Key | Type | Description | Default |
+|-----|------|-------------|---------|
+  {{- range .Values }}
+| {{ .Key }} | {{ .Type }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} |
+  {{- end }}
+{{ end }}
+{{ end }}
