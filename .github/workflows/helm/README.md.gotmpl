@@ -43,11 +43,13 @@ Review the following scrollable table of key, type, description, and default val
 | {{ .Key }} | {{ .Type }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} |
   {{- end }}
   {{- end }}
-{{ else }}
+{{ else if .Values }}
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
   {{- range .Values }}
 | {{ .Key }} | {{ .Type }} | {{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }} | {{ if .Default }}{{ .Default }}{{ else }}{{ .AutoDefault }}{{ end }} |
   {{- end }}
+{{ else }}
+_No configurable values._
 {{ end }}
 {{ end }}
