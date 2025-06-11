@@ -2,3 +2,9 @@
 
 A Helm chart for the kgateway project CRDs
 
+## Values
+
+Review the following scrollable table of key, type, description, and default values for the Helm chart settings.
+
+_No configurable values._
+
