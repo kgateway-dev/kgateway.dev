@@ -24,6 +24,8 @@
   {{- range .Sections.Sections }}
 ### {{ .SectionName }}
 
+Review the following scrollable table of key, type, description, and default values for the Helm chart settings.
+
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
   {{- range .SectionItems }}
@@ -32,6 +34,8 @@
   {{- end }}
   {{ if .Sections.DefaultSection.SectionItems }}
 ### {{ .Sections.DefaultSection.SectionName }}
+
+Review the following scrollable table of key, type, description, and default values for the Helm chart settings.
 
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
