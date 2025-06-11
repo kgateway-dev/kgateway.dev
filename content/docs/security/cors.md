@@ -7,7 +7,7 @@ description: Enforce client-site access controls with cross-origin resource shar
 Enforce client-site access controls with cross-origin resource sharing (CORS).
 
 {{% callout type="warning" %}} 
-{{< reuse "docs/versions/warn-2-1-only.md" >}}
+{{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
 {{% /callout %}}
 
 ## About CORS

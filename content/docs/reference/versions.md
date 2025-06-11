@@ -68,3 +68,14 @@ Development releases are unstable, subject to change, and not recommended for pr
 ### Backports to stable branches {#release-backport}
 
 New features are not developed on or backported to stable branches, such as `v2.0.x`. However, critical patches, bug fixes, and documentation fixes are backported as needed.
+
+## Experimental features in Gateway API {#experimental-features}
+
+The following features are experimental in the upstream Kubernetes Gateway API project, and are subject to change.
+
+| Feature | Minimum Gateway API version |
+| --- | --- |
+| [ListenerSets](/docs/setup/listeners/#listenersets) | 1.3 |
+| [TCPRoutes](/docs/setup/listeners/tcp/) | 1.3 |
+| [BackendTLSPolicy](/docs/security/backend-tls/) | 1.2 |
+| [CORS policies](/docs/security/cors/) | 1.2 |
