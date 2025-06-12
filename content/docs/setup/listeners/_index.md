@@ -99,6 +99,7 @@ For more information about ListenerSets, see the [Kubernetes Gateway API docs](h
 {{< cards >}}
   {{< card link="http" title="HTTP listener" >}}
   {{< card link="https" title="HTTPS listener" >}}
+  {{< card link="sni" title="SNI listener" >}}
   {{< card link="tcp" title="TCP listener" >}}
   {{< card link="tls-passthrough" title="TLS passthrough" >}}
 {{< /cards >}}
