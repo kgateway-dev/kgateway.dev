@@ -200,7 +200,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
       |--|--|
       |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the gateway. When you set up kgateway, a default GatewayClass is set up for you. To view the GatewayClass configuration, see [Default Gateway setup](/docs/setup/default/). |
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
-      | `spec.listeners` | Optionally, you can configure a listener that is specific to the Gateway. Note that due to a [Gateway API limitation](https://gateway-api.sigs.k8s.io/geps/gep-1713/#gateway-changes), you must configure at least one listener on the Gateway resource, even if the listener is not used and is a "dummy" listener. This dummy listener cannot conflict with the listener that you configure in the ListenerSet, such as using the same port or name. In this example, the dummy listener is configured on HTTP port 80, which differs from the HTTPS port 443 in the ListenerSet that you create later. |
+      | `spec.listeners` | {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on HTTP port 80, which differs from the HTTPS port 443 in the ListenerSet that you create later. |
    
    2. Create a ListenerSet that configures an HTTPS listener for each app that the Gateway serves.
 
