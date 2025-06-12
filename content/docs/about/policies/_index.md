@@ -15,6 +15,7 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 Kgateway uses the following custom resources to attach policies to routes and gateway listeners. 
 
 {{< cards >}}
+  {{< card link="/docs/about/policies/backendconfigpolicy/" title="BackendConfigPolicy" subtitle="Configure connection settings to an upstream service." >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
   {{< card link="/docs/about/policies/httplistenerpolicy/" title="HTTPListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
   {{< card link="/docs/about/policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
@@ -29,6 +30,7 @@ Review the policies that you can configure in kgateway and the level at which yo
 | Policy | Applied via |
 | -- | -- | 
 | [Access logging](/docs/security/access-logging) | HTTPListenerPolicy |
+| [Backend connection config](/docs/resiliency/connection)| BackendConfigPolicy | 
 | [Direct response](/docs/traffic-management/direct-response/) | DirectResponse | 
 | [External authorization](/docs/security/external-auth) | GatewayExtension and TrafficPolicy |
 | [External processing (ExtProc)](/docs/traffic-management/extproc/) | TrafficPolicy | 
