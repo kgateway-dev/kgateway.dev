@@ -282,7 +282,7 @@ For more information, see the Helm reference docs.
 
 ### Namespace discovery {#namespace-discovery}
 
-You can limit the namespaces that kgateway discovers to watch for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit kgateway to only watch a specific namespace for gateway configuration.
+You can limit the namespaces that kgateway watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit kgateway to only watch a specific namespace for gateway configuration.
 
 Namespace selectors are a list of matched expressions or labels.
 
@@ -291,7 +291,7 @@ Namespace selectors are a list of matched expressions or labels.
 
 Each entry in the list is disjunctive (OR semantics). This means that a namespace is selected if it matches any selector.
 
-You can also used matched expressions and labels together in the same entry, which is conjunctive (AND semantics).
+You can also use matched expressions and labels together in the same entry, which is conjunctive (AND semantics).
 
 The following example selects namespaces for discovery that meet the following conditions:
 
