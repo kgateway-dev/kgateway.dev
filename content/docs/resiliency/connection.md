@@ -1,17 +1,20 @@
 ---
-title: Backend connection config
+title: HTTP connection settings
 weight: 10 
-description: Configure and manage the connections to an upstream service. 
+description: Configure and manage HTTP connections to an upstream service. 
 ---
 
-Configure and manage the connections to an upstream service. 
+Configure and manage HTTP connections to an upstream service. 
 
-## About backend connections
+{{% callout type="warning" %}} 
+{{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
+{{% /callout %}}
 
-The BackendConfigPolicy allows you to define settings for a connection to an upstream service. These settings include general settings, such as connection timeouts or the maximum number of connections that an upstream service can receive. But it also allows you to configure TCP keepalive to identiy and handle stale connections. 
+## Supported HTTP connection settings
+
+You can use a BackendConfigPolicy to apply HTTP connection settings to a service in your cluster. These settings include general settings, such as connection timeouts or the maximum number of connections that an upstream service can receive. But you can also configure settings for HTTP/2 and HTTP/1 requests. 
 
 * [General connection settings](#general-settings)
-* [TCP keepalive](#keepalive)
 * [HTTP protocol options](#http)
 * [Additional HTTP 1.0 protocol options](#http1)
 
@@ -38,36 +41,6 @@ spec:
 | -- | -- | 
 | `connectTimeout` | The timeout for new network connections to an upstream service. | 
 | `perConnectionBufferLimitBytes` | Set the size of the read and write buffer per connection. By default, kgateway is set up with 1MiB of request read and write buffer for each connection. For large requests that must be buffered and that exceed the default buffer limit, kgateway either disconnects the connection to the downstream service if headers were already sent, or returns a 500 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that you want to allow to be buffered between the gateway and the downstream service. | 
-
-
-### TCP keepalive {#keepalive}
-
-With keepalive, the kernel sends probe packets with only an acknowledgement flag (ACK) to the TCP socket of the destination after the connection was idle for a specific amount of time. This way, the connection does not have to be re-established repeatedly, which could otherwise lead to latency spikes. If the destination returns the packet with an acknowledgement flag (ACK), the connection is determined to be alive. If not, the probe can fail a certain number of times before the connection is considered stale. kgateway can then close the stale connection, which can help avoid longer timeouts and retries on broken or stale connections. 
-
-You can use the BackendConfigPolicy to keep connections alive and avoid 503 errors. 
-
-| Setting | Description | 
-| -- | -- | 
-| `keepAliveProbes` | The maximum number of keepalive probes to send without a response before a connection is considered stale. | 
-| `keepAliveTime` | The number of seconds a connection needs to be idle before keep-alive probes are sent. |
-| `keepAliveInterval` | The number of seconds between keep-alive probes.  | 
-
-```yaml
-kind: BackendConfigPolicy
-apiVersion: gateway.kgateway.dev/v1alpha1
-metadata:
-  name: httpbin-policy
-  namespace: gwtest
-spec:
-  targetRefs:
-    - name: httpbin
-      group: ""
-      kind: Service
-  tcpKeepalive:
-    keepAliveProbes: 3
-    keepAliveTime: 30s
-    keepAliveInterval: 5s
-```
 
 ### HTTP protocol options {#http}
 
@@ -98,7 +71,7 @@ spec:
 | `maxHeadersCount` | The maximum number of headers that can be sent in a connection. If unconfigured, the number defaults to 100. Requests that exceed this limit receive a 431 response for HTTP/1.x and cause a stream reset for HTTP/2. | 
 | `maxStreamDuration` | The total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream is reset independent of any other timeouts. If not specified, this value is not set. | 
 | `maxRequestsPerConnection` | The maximum number of requests that can be sent per connection. | 
-| `headersWithUnderscoresAction` | The action to take when a client request with a header name is received that includes underscore characters. If not specified, the value defaults to `ALLOW`. | 
+| `headersWithUnderscoresAction` | The action to take when a client request with a header name is received that includes underscore characters. Supported values include `Allow`, `RejectRequest`, and `DropHeader`. If `RejectRequest` is specified, the request is rejected with a 400 HTTP response code and the `httpN.requests_rejected_with_underscores_in_headers` header is incremented for each rejected request. When `DropHeader` is specified, the header is dropped and not included in any filter chain. In addition, the `“httpN.dropped_headers_with_underscores` header is incremnented for every header that is dropped. If not specified, the value defaults to `ALLOW`. | 
 
 #### Additional HTTP 1.0 protocol options {#http1}
 
@@ -155,10 +128,6 @@ spec:
        maxStreamDuration: 30s
        maxRequestsPerConnection: 100 
        headersWithUnderscoresAction: RejectRequest
-     tcpKeepalive:
-       keepAliveProbes: 3
-       keepAliveTime: 30s
-       keepAliveInterval: 5s
      http1ProtocolOptions:
        enableTrailers: true
        overrideStreamErrorOnInvalidHttpMessage: true
@@ -185,11 +154,6 @@ spec:
       "per_connection_buffer_limit_bytes": 1024,
       "metadata": {},
       "upstream_connection_options": {
-       "tcp_keepalive": {
-        "keepalive_probes": 3,
-        "keepalive_time": 30,
-        "keepalive_interval": 5
-       }
       },
       "typed_extension_protocol_options": {
        "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
@@ -217,8 +181,8 @@ spec:
         }
        }
       }
-    ...
-    ```
+   ...
+   ```
     
 ## Cleanup
 
