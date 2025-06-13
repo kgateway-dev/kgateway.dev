@@ -4,7 +4,7 @@ weight: 10
 description: 
 ---
 
-Use a BackendConfigPolicy resource to configure connection settings for an upstream service.  
+Use a BackendConfigPolicy resource to configure connection settings for a backend.  
 
 {{% callout type="warning" %}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
@@ -12,9 +12,9 @@ Use a BackendConfigPolicy resource to configure connection settings for an upstr
 
 ## Policy attachment {#policy-attachment-backendconfigpolicy}
 
-You can apply BackendConfigPolicies to specifc backends, backends with a specific label, or a global service. 
+You can apply BackendConfigPolicies to individual backend services, any backend that matches a specific label, or a global service in your ambient mesh.
 
-### Specific backend {#attach-to-backend}
+### Individual backend {#attach-to-backend}
 
 You can use the `spec.targetRefs` section in the BackendConfigPolicy resource to apply policies to a specific backend, such as a Kubernetes Service or a Backend resource. 
 
