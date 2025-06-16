@@ -1,6 +1,6 @@
 ---
 title: Path 
-weight: 421
+weight: 10
 description: Match the targeted path of an incoming request against specific path criteria. 
 ---
 

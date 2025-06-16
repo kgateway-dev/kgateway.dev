@@ -1,6 +1,6 @@
 ---
 title: Host
-weight: 421
+weight: 10
 description: Expose a route on multiple hosts. 
 ---
 

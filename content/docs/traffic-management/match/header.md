@@ -1,6 +1,6 @@
 ---
 title: Header 
-weight: 422
+weight: 10
 description: Specify a set of headers which incoming requests must match in entirety.
 ---
 

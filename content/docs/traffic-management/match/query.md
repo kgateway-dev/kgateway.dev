@@ -1,6 +1,6 @@
 ---
 title: Query parameter
-weight: 424
+weight: 10
 description: Specify a set of URL query parameters which requests must match in entirety.
 ---
 
