@@ -1,1 +1,1 @@
-kgateway-namespace
+kgateway-system
