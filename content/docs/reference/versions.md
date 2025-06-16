@@ -79,3 +79,10 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | [TCPRoutes](/docs/setup/listeners/tcp/) | 1.3 |
 | [BackendTLSPolicy](/docs/security/backend-tls/) | 1.2 |
 | [CORS policies](/docs/security/cors/) | 1.2 |
+| [Retries](/docs/resiliency/timeouts/#retries) | 1.2 |
+
+**Sample command for version {{< reuse "docs/versions/k8s-gw-version.md" >}}**: Note that some CRDs are prefixed with `X` to indicate that the entire CRD is experimental and subject to change.
+     
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+```  
