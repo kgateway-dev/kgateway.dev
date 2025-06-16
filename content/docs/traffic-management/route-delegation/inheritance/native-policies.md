@@ -7,7 +7,7 @@ description: Learn how policy inheritance works in a route delegation setup.
 Learn how policy inheritance and overrides work for Kubernetes Gateway API-native policies in a route delegation setup. 
 
 {{% callout type="info" %}} 
-Want to learn more about policy inheritance and overrides for kgateway policies? See [kgateway policies](/docs/traffic-management/route-delegation/inheritance/kgateway-policies/). 
+Want to learn more about policy inheritance and overrides for kgateway policies? See [kgateway policies](../kgateway-policies/). 
 {{% /callout %}}
 {{% callout type="warning" %}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}}
@@ -56,7 +56,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    kind: HTTPRoute
    metadata:
     name: parent
-    namespace: kgateway-system
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
     parentRefs:
     - name: http
@@ -119,7 +119,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    spec:
      parentRefs:
      - name: parent
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
        group: gateway.networking.k8s.io
        kind: HTTPRoute
      rules:
@@ -254,8 +254,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n kgateway-system
-kubectl delete httproute parent -n kgateway-system
+kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

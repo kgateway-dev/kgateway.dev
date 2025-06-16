@@ -22,8 +22,8 @@ Explore an example for delegating traffic to an HTTPRoute with a specific label 
 
 `parent` HTTPRoute: </br>
 * The parent HTTPRoute resource delegates traffic as follows:
-  * Requests to `/anything/team1` are delegated to the child HTTPRoute resource `child-team1` in namespace `team1` with the `delegation.kgateway.dev/label: team1` label.
-  * Requests to `/anything/team2` are delegated to the child HTTPRoute resource `child-team2` in namespace `team2` with the `delegation.kgateway.dev/label: team2` label.
+  * Requests to `/anything/team1` are delegated to the child HTTPRoute resource `child-team1` in namespace `team1` with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team1` label.
+  * Requests to `/anything/team2` are delegated to the child HTTPRoute resource `child-team2` in namespace `team2` with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team2` label.
 
 `child-team1` HTTPRoute: </br>
 
@@ -43,15 +43,15 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
 
 `parent` HTTPRoute: </br>
 * The parent HTTPRoute resource delegates traffic as follows:
-  * Requests to `/` are delegated to all child HTTPRoute resources with the `delegation.kgateway.dev/label: wildcard` label. The `/` matcher is used so that the child HTTPRoutes can define any path prefix that they want to match traffic on.
+  * Requests to `/` are delegated to all child HTTPRoute resources with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard` label. The `/` matcher is used so that the child HTTPRoutes can define any path prefix that they want to match traffic on.
 
 `child-team1` HTTPRoute: </br>
 
-* The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in the `team1` namespace. The HTTPRoute is configured with the `delegation.kgateway.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
+* The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in the `team1` namespace. The HTTPRoute is configured with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
 
 `child-team2` HTTPRoute:
 
-* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace. The HTTPRoute is configured with the `delegation.kgateway.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
+* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace. The HTTPRoute is configured with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
 {{% /tab %}}
 
 {{< /tabs >}}
@@ -63,15 +63,15 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
 ## HTTPRoutes in specific namespaces {#specific-namespace}
 
 1. Create the parent HTTPRoute resource that matches incoming traffic on the `delegation.example` domain. The HTTPRoute resource specifies two routes: 
-   * Route 1 matches traffic on the path prefix `/anything/team1` and delegates traffic to the HTTPRoute with the `delegation.kgateway.dev/label: team1` label. 
-   * Route 2 matches traffic on the path prefix `/anything/team2` and delegates traffic to the HTTPRoute with the `delegation.kgateway.dev/label: team2` label. 
+   * Route 1 matches traffic on the path prefix `/anything/team1` and delegates traffic to the HTTPRoute with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team1` label. 
+   * Route 2 matches traffic on the path prefix `/anything/team2` and delegates traffic to the HTTPRoute with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team2` label. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
     name: parent
-    namespace: kgateway-system
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
     parentRefs:
     - name: http
@@ -85,7 +85,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
       backendRefs:
       # Delegate to routes with the label delegation.gateway.solo.io/label:team1
       # in the team1 namespace
-      - group: delegation.kgateway.dev
+      - group: delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev
         kind: label 
         name: team1
         namespace: team1
@@ -96,14 +96,14 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
       backendRefs:
       # Delegate to routes with the label delegation.gateway.solo.io/label:team2
       # in the team2 namespace
-      - group: delegation.kgateway.dev
+      - group: delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev
         kind: label 
         name: team2
         namespace: team2
    EOF
    ```
 
-2. Create the `child-team1` HTTPRoute resource in the `team1` namespace that matches traffic on the `/anything/team1/foo` path prefix. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.kgateway.dev/label: team1` label that you defined on the `parent` HTTPRoute. 
+2. Create the `child-team1` HTTPRoute resource in the `team1` namespace that matches traffic on the `/anything/team1/foo` path prefix. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team1` label that you defined on the `parent` HTTPRoute. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -112,7 +112,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
      name: child-team1
      namespace: team1
      labels: 
-       delegation.kgateway.dev/label: team1
+       delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team1
    spec:
      rules:
      - matches:
@@ -125,7 +125,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    EOF
    ```
 
-3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact prefix. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.kgateway.dev/label: team2` label that you defined on the `parent` HTTPRoute. 
+3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact prefix. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team2` label that you defined on the `parent` HTTPRoute. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -134,7 +134,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
      name: child-team2
      namespace: team2
      labels: 
-       delegation.kgateway.dev/label: team2
+       delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: team2
    spec:
      rules:
      - matches:
@@ -148,8 +148,8 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    ```
       
 5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080" 
@@ -204,14 +204,14 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    ```
 
 6. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer"  %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
@@ -270,7 +270,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    kind: HTTPRoute
    metadata:
     name: parent
-    namespace: kgateway-system
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
     parentRefs:
     - name: http
@@ -282,14 +282,14 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
           type: PathPrefix
           value: /
       backendRefs:
-      - group: delegation.kgateway.dev
+      - group: delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev
         kind: label
         name: wildcard
         namespace: all
    EOF
    ```
 
-2. Update the `child-team1` HTTPRoute to add the `delegation.kgateway.dev/label: wildcard` label so that the `parent` HTTPRoute can delegate traffic to this route. 
+2. Update the `child-team1` HTTPRoute to add the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard` label so that the `parent` HTTPRoute can delegate traffic to this route. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -298,7 +298,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
      name: child-team1
      namespace: team1
      labels: 
-       delegation.kgateway.dev/label: wildcard
+       delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard
    spec:
      rules:
      - matches:
@@ -311,7 +311,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    EOF
    ```
 
-3. Update the `child-team2` HTTPRoute to also add the `delegation.kgateway.dev/label: wildcard` label. 
+3. Update the `child-team2` HTTPRoute to also add the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard` label. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -320,7 +320,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
      name: child-team2
      namespace: team2
      labels: 
-       delegation.kgateway.dev/label: wildcard
+       delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/label: wildcard
    spec:
      rules:
      - matches:
@@ -334,7 +334,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
@@ -390,7 +390,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
@@ -450,7 +450,7 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httproute parent -n kgateway-system
+kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/main/policy-demo/httpbin.yaml

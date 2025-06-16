@@ -31,7 +31,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - path.redirect.example
      rules:
@@ -60,13 +60,13 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    |`spec.rules.filters.requestRedirect.statusCode`| The HTTP status code that you want to return to the client in case of a redirect. For non-permanent redirects, use the 302 HTTP response code. |
 
 2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and the `path.redirect.example:8080/status/200` redirect location. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get -H "host: path.redirect.example"
    ```
@@ -87,13 +87,13 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    ```
 
 3. Send another request to the httpbin app on the `path.redirect.example` domain. This time, you send the request to the `/get/headers` path. Verify that you get back a 302 HTTP response code and the redirect location `path.redirect.example:8080/status/200/headers`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get/headers -H "host: path.redirect.example"
    ```
@@ -129,7 +129,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - path.redirect.example
      rules:
@@ -158,13 +158,13 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    |`spec.rules.filters.requestRedirect.statusCode`| The HTTP status code that you want to return to the client in case of a redirect. For non-permanent redirects, use the 302 HTTP response code. |
 
 2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and the redirect location `path.redirect.example:8080/status/200`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get -H "host: path.redirect.example"
    ```
@@ -185,17 +185,17 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    ```
 
 3. Send another request to the httpbin app on the `path.redirect.example` domain. This time, you send the request to the `/get/headers` path. Verify that you get back a 302 HTTP response code and the same redirect location as in the previous example (`path.redirect.example:8080/status/200`). 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get/headers -H "host: path.redirect.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get/headers -H "host: path.redirect.example"
    ```
-   {{% /tab %}}
+   {{% /tab  %}}
    {{< /tabs >}}
 
    Example output: 
