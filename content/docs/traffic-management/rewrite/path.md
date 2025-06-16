@@ -32,7 +32,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - rewrite.example
      rules:
@@ -61,13 +61,13 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 2. Send a request to the httpbin app along the `/headers` path on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that your request is rewritten to the `/anything` path. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: rewrite.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: rewrite.example"
    ```
@@ -87,13 +87,13 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    ```
 
 3. Send another request to the httpbin app. This time, you send it along the `/headers/200` path on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that your request path is rewritten to `/anything/200`.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers/200 -H "host: rewrite.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers/200 -H "host: rewrite.example"
    ```
@@ -112,11 +112,6 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    ...
    ```
 
-4. Optional: Clean up the HTTPRoute that you created. 
-   ```sh
-   kubectl delete httproute httpbin-rewrite -n httpbin
-   ```
-
 ### Rewrite full path
 
 1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to `/anything`. 
@@ -133,7 +128,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - rewrite.example
      rules:
@@ -162,13 +157,13 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app along the `/headers` path on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that your request is rewritten to the `/anything` path. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: rewrite.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: rewrite.example"
    ```
@@ -188,13 +183,13 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    ```
 
 4. Send another request to the httpbin app. This time, you send it along the `/headers/200` path on the `rewrite.example` domain. Verify that you also get back a 200 HTTP response code and that the full path is rewritten to the `/anything` path. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers/200 -H "host: rewrite.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers/200 -H "host: rewrite.example"
    ```
@@ -212,8 +207,11 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    "json": null
    ...
    ```
+   
+## Cleanup
 
-5. Optional: Clean up the HTTPRoute that you created. 
-   ```sh
-   kubectl delete httproute httpbin-rewrite -n httpbin
-   ```
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete httproute httpbin-rewrite -n httpbin
+```
