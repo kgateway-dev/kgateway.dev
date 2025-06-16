@@ -222,19 +222,9 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
          - path:
              type: RegularExpression
              value: \/.*my-path.*
-         backendRefs:
-         - name: httpbin
-           namespace: httpbin
-           port: 8000
-       - matches:  
          - path:
              type: RegularExpression
              value: /anything/stores/[^/]+?/entities
-         backendRefs:
-         - name: httpbin
-           namespace: httpbin
-           port: 8000
-       - matches:  
          - path:
              type: RegularExpression
              value: /anything/(dogs|cats)/\\d[.]\\d.*

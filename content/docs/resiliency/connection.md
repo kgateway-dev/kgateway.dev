@@ -97,8 +97,8 @@ spec:
 | Setting | Description | 
 | -- | -- | 
 | `enableTrailers` | Enables trailers for HTTP/1 requests. Trailers are headers that are sent after the request body is sent. By default, the HTTP/1 codec drops proxied trailers. | 
-| `overrideStreamErrorOnInvalidHttpMessage` | When set to false, kgateway terminates HTTP/1.1 connections when an invalid HTTP message is received, such as malformatted headers. When set to true, kgateway leaves the HTTP/1.1 connection open where possible. | 
-| `headerFormat` | By default, kgateway normalizes header keys to lowercase. Set to `PreserveCaseHeaderKeyFormat` to preserve the original casing after the request is proxied. Set to `properCaseHeaderKeyFormat` to capitalize the first character and any character following a special character if it’s an alpha character. For example, `content-type` becomes `Content-Type`, and `foo$b#$are` becomes `Foo$B#$Are`. |
+| `overrideStreamErrorOnInvalidHttpMessage` | When set to false, the proxy terminates HTTP/1.1 connections when an invalid HTTP message is received, such as malformatted headers. When set to true, the proxy leaves the HTTP/1.1 connection open where possible. | 
+| `headerFormat` | By default, the proxy normalizes header keys to lowercase. Set to `PreserveCaseHeaderKeyFormat` to preserve the original casing after the request is proxied. Set to `properCaseHeaderKeyFormat` to capitalize the first character and any character following a special character if it’s an alpha character. For example, `content-type` becomes `Content-Type`, and `foo$b#$are` becomes `Foo$B#$Are`. |
 
 
 ## Before you begin
@@ -137,7 +137,7 @@ spec:
 
 2. Port-forward the gateway proxy on port 19000. 
    ```sh
-   kubectl port-forward deployment/http -n kgateway-system 19000
+   kubectl port-forward deployment/{{< reuse "docs/snippets/default-proxy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 19000
    ```
    
 3. Get the configuration of your gateway proxy as a config dump. 
