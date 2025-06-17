@@ -195,7 +195,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    ```sh
    curl -vi localhost:8080/get/headers -H "host: path.redirect.example"
    ```
-   {{% /tab  %}}
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 

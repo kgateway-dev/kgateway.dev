@@ -133,7 +133,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 6. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
@@ -185,7 +185,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 8. Send another request to the `delegation.example` domain. This time, you use the `/anything/team2/grandchild/bar` path that is configured on the `grandchild` HTTPRoute resource. Verify that you get back a 200 HTTP response code.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/bar \
@@ -213,7 +213,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 9. Send another request to the `delegation.example` domain along the `/anything/team2/grandchild/foo` path. Because the grandchild HTTPRoute resource uses a regular expression to match incoming traffic, you can use any valid endpoint in the httpbin app to route traffic to the httpbin app in the `team2` namespace.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/foo \

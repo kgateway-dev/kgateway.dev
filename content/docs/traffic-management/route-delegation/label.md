@@ -204,8 +204,8 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    ```
 
 6. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer"  %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
@@ -334,8 +334,8 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080" 
@@ -390,8 +390,8 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 

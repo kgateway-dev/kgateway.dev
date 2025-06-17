@@ -184,7 +184,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
