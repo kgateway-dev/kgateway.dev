@@ -12,8 +12,8 @@ In this example, you learn how to use labels to delegate traffic. The parent HTT
 
 You typically configure the parent to find an HTTPRoute with a specific label in a specific namespace. However, you can also use a wildcard for the namespace when you have multiple HTTPRoutes in different namespaces that can all receive delegated traffic. This configuration can significantly simplify your route delegation setup, as it allows you to quickly add new child HTTPRoutes to the delegation chain without changing the parent HTTPRoute configuration. 
 
-{{< tabs items="Specific namespace,Wildcard namespace" >}}
-{{% tab %}}
+{{< tabs items="Specific namespace,Wildcard namespace" tabTotal="2" >}}
+{{% tab tabName="Specific namespace" %}}
 
 Explore an example for delegating traffic to an HTTPRoute with a specific label in a specific namespace. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [HTTPRoutes in specific namespaces](#specific-namespace). 
 
@@ -34,7 +34,7 @@ Explore an example for delegating traffic to an HTTPRoute with a specific label 
 * The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace.
 
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Wildcard namespace" %}}
 
 Learn how to use a wildcard for the namespace to streamline your route delegation setup. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [Use wildcard namespaces](#wildcard). 
 

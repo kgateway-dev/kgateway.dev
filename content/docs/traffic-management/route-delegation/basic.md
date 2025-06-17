@@ -10,8 +10,8 @@ Set up basic route delegation between a parent and two child HTTPRoute resources
 
 In this guide you walk through a basic route delegation example that demonstrates route delegation between a parent HTTPRoute resource and two child HTTPRoute resources that forward traffic to an httpbin sample app. The following image illustrates the resulting route delegation hierarchy:
 
-{{< reuse-image src="img//route-delegation-basic.svg" >}} 
-{{< reuse-image-dark srcDark="img//route-delegation-basic.svg" >}} 
+{{< reuse-image src="img/route-delegation-basic.svg" >}} 
+{{< reuse-image-dark srcDark="img/route-delegation-basic.svg" >}} 
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource delegates traffic as follows: 
@@ -120,13 +120,13 @@ In this guide you walk through a basic route delegation example that demonstrate
    ```
    
 5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo -H "host: delegation.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo -H "host: delegation.example"
    ```
