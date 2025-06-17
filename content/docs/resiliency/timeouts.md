@@ -6,7 +6,7 @@ description: Set a maximum time for the gateway to handle a request.
 
 Set a maximum time for the gateway to handle a request.
 
-The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries](/docs/resiliency/retry/) to ensure that your apps are available even if they are temporarily unavailable.
+The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries](../retry/) to ensure that your apps are available even if they are temporarily unavailable.
 
 ## About
 
@@ -53,8 +53,8 @@ Specify timeouts for a specific route.
    ```
 
 2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, kgateway expects requests to the httpbin app to succeed within the set timeout. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
    ```

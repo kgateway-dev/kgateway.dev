@@ -6,7 +6,7 @@ description: Specify the number of times and duration for the gateway to try a c
 
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 
-The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts](/docs/resiliency/timeouts/) to ensure that your apps are available even if they are temporarily unavailable.
+The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts](../timeouts/) to ensure that your apps are available even if they are temporarily unavailable.
 
 {{% callout type="warning" %}} 
 {{< reuse "docs/versions/warn-experimental.md" >}}
@@ -103,7 +103,7 @@ To use retries, you need to install the experimental channel. You can also set u
    EOF
    ```
 
-3. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide](/docs/security/access-logging/) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#response-flags).
+3. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide](../../security/access-logging/) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#response-flags).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -175,7 +175,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
    | Field | Description |
    |-------|-------------|
    | `hostnames` | The hostnames to match the request, such as `retry.example`. |
-   | `parentRefs` | The gateway to which the request is sent. In this example, you select that `http` gateway that you set up before you began. |
+   | `parentRefs` | The gateway to which the request is sent. In this example, you select the `http` gateway that you set up before you began. |
    | `rules` | The rules to apply to requests. |
    | `matches` | The path to match the request. In this example, you match any requests to the reviews app with `/`. |
    | `path` | The path to match the request. In this example, you match the request to the `/reviews/1` path. |
@@ -186,8 +186,8 @@ Set up retries to the reviews app on the HTTPRoute resource.
 
 2. Send a request to the reviews app. Verify that the request succeeds.
  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:8080"
    ```
@@ -210,7 +210,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
 3. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name={{< reuse "docs/snippets/default-proxy.md" >}} | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field is `-`, which means that the request was not retried.
@@ -239,8 +239,8 @@ Simulate a failure for the reviews app so that you can verify that the request i
 
 2. Send another request to the reviews app. This time, the request fails.
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:80"
    ```
@@ -263,7 +263,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Check the gateway's access logs to verify that the request was retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name={{< reuse "docs/snippets/default-proxy.md" >}} | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field now has values as follows:
