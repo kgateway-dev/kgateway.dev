@@ -25,7 +25,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
      rules:
@@ -40,13 +40,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
    
 2. Send a request to the `/status/200` path of the httpbin app on the `match.example` domain. Verify that you get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing"  %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: match.example"
    ```
@@ -73,13 +73,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send another request to the httpbin app. This time, use the `/headers` path. Because this path is not specified in the HTTPRoute, the request fails and a 404 HTTP response code is returned. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: match.example"
    ```
@@ -112,7 +112,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
      rules:
@@ -127,13 +127,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
    
 2. Send a request to the `/anything/team1` path of the httpbin app on the `match.example` domain. Verify that you get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/team1 -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/anything/team1 -H "host: match.example"
    ```
@@ -160,13 +160,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send another request to the httpbin app. This time, use the `/headers` path. Because this path is not specified in the HTTPRoute, the request fails and a 404 HTTP response code is returned. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: match.example"
    ```
@@ -214,7 +214,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "match.example"
      rules:
@@ -222,19 +222,9 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
          - path:
              type: RegularExpression
              value: \/.*my-path.*
-         backendRefs:
-         - name: httpbin
-           namespace: httpbin
-           port: 8000
-       - matches:  
          - path:
              type: RegularExpression
              value: /anything/stores/[^/]+?/entities
-         backendRefs:
-         - name: httpbin
-           namespace: httpbin
-           port: 8000
-       - matches:  
          - path:
              type: RegularExpression
              value: /anything/(dogs|cats)/\\d[.]\\d.*
@@ -251,15 +241,15 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    * `/anything/dogs/3.0-game` matches the regex pattern `/anything/(dogs|cats)/\\d[.]\\d.*`
    
    Verify that the requests succeed and that you get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/this-is-my-path-1 -H "host: match.example:8080"
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/entities -H "host: match.example:8080"
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/dogs/3.0-game -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/anything/this-is-my-path-1 -H "host: match.example"
    curl -vi localhost:8080/anything/stores/us/entities -H "host: match.example"
@@ -293,15 +283,15 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    * `/anything/birds/1.1-game` does not match the regex pattern `/anything/(dogs|cats)/\\d[.]\\d.*`
    
    Verify that all requests fail with a 404 HTTP response code, because the path does not match the regex pattern that you defined. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: match.example:8080"
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/south/entities -H "host: match.example:8080"
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/birds/1.1-game -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/anything -H "host: match.example"
    curl -vi localhost:8080/anything/stores/us/south/entities -H "host: match.example"

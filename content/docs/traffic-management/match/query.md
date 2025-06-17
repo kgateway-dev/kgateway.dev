@@ -25,7 +25,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
      rules:
@@ -41,8 +41,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 2. Send a request to the `/status/200` path of the httpbin app on the `match.example` domain without any query parameters. Verify that your request is not forwarded to the httpbin app because no matching query parameter is found. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080"
    ```
@@ -68,13 +68,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send a request to the `/status/200` path of the httpbin app on the `match.example` domain. This time, you provide the `user=me` query parameter. Verify that your request now succeeds and that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "http://$INGRESS_GW_ADDRESS:8080/status/200?user=me" -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi "localhost:8080/status/200?user=me" -H "host: match.example"
    ```
