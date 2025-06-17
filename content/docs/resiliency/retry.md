@@ -111,7 +111,7 @@ To use retries, you need to install the experimental channel. You can also set u
    kind: HTTPListenerPolicy
    metadata:
      name: access-logs
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -151,7 +151,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches: 
        - path:
@@ -186,13 +186,13 @@ Set up retries to the reviews app on the HTTPRoute resource.
 
 2. Send a request to the reviews app. Verify that the request succeeds.
  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/reviews/1 -H "host: retry.example"
    ```
@@ -210,7 +210,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
 3. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
-   kubectl logs -n kgateway-system -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field is `-`, which means that the request was not retried.
@@ -239,13 +239,13 @@ Simulate a failure for the reviews app so that you can verify that the request i
 
 2. Send another request to the reviews app. This time, the request fails.
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:80"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/reviews/1 -H "host: retry.example"
    ```
@@ -263,7 +263,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Check the gateway's access logs to verify that the request was retried.
    
    ```sh
-   kubectl logs -n kgateway-system -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field now has values as follows:
@@ -304,5 +304,5 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Delete the access log policy.
 
    ```sh
-   kubectl delete httplistenerpolicy access-logs -n kgateway-system
+   kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
