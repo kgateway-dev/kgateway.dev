@@ -42,7 +42,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      hostnames:
      - delegation.example
@@ -133,14 +133,14 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 6. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo \
    -H "host: delegation.example"
@@ -161,14 +161,14 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 7. Send another request to the `delegation.example` domain along the `/anything/team1/bar` path. Verify that you get back a 404 HTTP response code, because this route is not specified in the child HTTPRoute resource `child-team1`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/bar \
    -H "host: delegation.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/bar \
    -H "host: delegation.example"
@@ -185,14 +185,14 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 8. Send another request to the `delegation.example` domain. This time, you use the `/anything/team2/grandchild/bar` path that is configured on the `grandchild` HTTPRoute resource. Verify that you get back a 200 HTTP response code.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/bar \
    -H "host: delegation.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/grandchild/bar \
    -H "host: delegation.example"
@@ -213,14 +213,14 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 9. Send another request to the `delegation.example` domain along the `/anything/team2/grandchild/foo` path. Because the grandchild HTTPRoute resource uses a regular expression to match incoming traffic, you can use any valid endpoint in the httpbin app to route traffic to the httpbin app in the `team2` namespace.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/grandchild/foo \
    -H "host: delegation.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/grandchild/foo \
    -H "host: delegation.example"
@@ -245,8 +245,8 @@ In this guide you walk through a route delegation example that demonstrates rout
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n kgateway-system
-kubectl delete httproute parent -n kgateway-system
+kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete httproute grandchild -n team2

@@ -31,7 +31,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
 **`parent1` and `parent2` HTTPRoutes**: 
 * The `parent1` HTTPRoute resource serves traffic for the `delegation-parent1.example` domain and delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
 * The `parent2` HTTPRoute resource serves traffic for the `delegation-parent2.example` domain and also delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
-* In addition, the `parent2` HTTPRoute specifies the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation, which allows a child HTTPRoute to override policies that are applied to `parent2`. To override a parent policy, you must create a TrafficPolicy that defines the same top-level policy as the parent and attach that policy to the child. Keep in mind that any policy that is defined on the parent and not overriden by a child, is still inherited ad applied to the child. 
+* In addition, the `parent2` HTTPRoute specifies the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/inherited-policy-priority: PreferChild` annotation, which allows a child HTTPRoute to override policies that are applied to `parent2`. To override a parent policy, you must create a TrafficPolicy that defines the same top-level policy as the parent and attach that policy to the child. Keep in mind that any policy that is defined on the parent and not overriden by a child, is still inherited ad applied to the child. 
 * The `parent1` HTTPRoute resource does specify this annotation and therefore does not allow a child HTTPRoute to override policies that are set on `parent1`. 
 * A TrafficPolicy defines a transformation and local rate limiting policy and is applied to both `parent1` and `parent2` HTTPRoutes via the `targetRefs` option. 
 
@@ -56,11 +56,11 @@ The following image illustrates the route delegation hierarchy and policy inheri
    kind: HTTPRoute
    metadata:
      name: parent1
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
      - "delegation-parent1.example"
      rules:
@@ -76,7 +76,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    EOF
    ```
 
-2. Create the `parent2` HTTPRoute resource that matches incoming traffic on the `delegation-parent2.example` domain. The HTTPRoute resource specifies the same route as the `parent1` HTTPRoute. However, the `parent2` HTTPRoute sets the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation that allows any child HTTPRoute to override policies that are set on the `parent2` HTTPRoute. 
+2. Create the `parent2` HTTPRoute resource that matches incoming traffic on the `delegation-parent2.example` domain. The HTTPRoute resource specifies the same route as the `parent1` HTTPRoute. However, the `parent2` HTTPRoute sets the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/inherited-policy-priority: PreferChild` annotation that allows any child HTTPRoute to override policies that are set on the `parent2` HTTPRoute. 
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -84,13 +84,13 @@ The following image illustrates the route delegation hierarchy and policy inheri
    kind: HTTPRoute
    metadata:
      name: parent2
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      annotations:
-      delegation.kgateway.dev/inherited-policy-priority: PreferChild
+      delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/inherited-policy-priority: PreferChild
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
      - "delegation-parent2.example"
      rules:
@@ -117,7 +117,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    kind: TrafficPolicy
    metadata:
      name: parent-policy
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -261,7 +261,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    local_rate_limited%
    ```     
 
-8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute resource has the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation set, the child HTTPRoute can override any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
+8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute resource has the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/inherited-policy-priority: PreferChild` annotation set, the child HTTPRoute can override any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
 
    Verify that you see the custom `X-Child-Team1` header in your response. 
    {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
@@ -346,9 +346,9 @@ The following image illustrates the route delegation hierarchy and policy inheri
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n kgateway-system
-kubectl delete httproute parent1 -n kgateway-system
-kubectl delete httproute parent2 -n kgateway-system
+kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent1 -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent2 -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
 kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

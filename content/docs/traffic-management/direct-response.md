@@ -5,7 +5,7 @@ prev: /docs/traffic-management/destination-types
 next: /docs/traffic-management/match
 ---
 
-Use the kgateway [DirectResponse](/docs/reference/api/top-level/direct-response/) API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
+Use the DirectResponse API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
 
 ## About direct responses
 
@@ -63,7 +63,7 @@ The following rules are applied during schema validation:
      - direct-response.com
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -86,8 +86,8 @@ The following rules are applied during schema validation:
    ```
    
 3. Send a request to the httpbin app along the `/status/200` path on the `direct-response.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 \
    -H "host: direct-response.com:8080"
@@ -121,8 +121,8 @@ The following rules are applied during schema validation:
    ```
    
 4. Send another request along the `/direct-response` path. Verify that you get back the direct response message that you defined in the DirectResponse resource. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/direct-response \
    -H "host: direct-response.com:8080"

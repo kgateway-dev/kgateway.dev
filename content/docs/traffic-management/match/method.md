@@ -1,6 +1,6 @@
 ---
 title: HTTP method 
-weight: 423
+weight: 10
 description: Specify an HTTP method, such as POST, GET, PUT, PATCH, or DELETE, to match requests against.
 ---
 Specify an HTTP method, such as POST, GET, PUT, PATCH, or DELETE, to match requests against.
