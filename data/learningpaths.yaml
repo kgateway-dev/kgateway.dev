@@ -49,6 +49,8 @@
   - title: Understanding Transformations
     blog: transformation-in-kgateway
   - title: Integrating with Istio at ingress
+    youtube: https://youtu.be/4G_zNX2nuZ0
+    lab: https://www.solo.io/resources/lab/kgateway-lab-integrating-kgateway-with-istio-at-ingress
   - title: Implementing kgateway as a waypoint
     blog: extend-istio-ambient-kgateway-waypoint
     youtube: B8oZ1seIDIM
@@ -66,6 +68,7 @@
   - title: Prompt Enrichment in kgateway
     lab: kgateway-ai-lab-prompt-enrichment
   - title: Model Failover
+    lab: https://www.solo.io/resources/lab/gloo-ai-gateway-rate-limiting-model-failover
   - title: Gateway API Inference Extensions with kgateway
     blog: deep-dive-inference-extensions
     youtube: 5sAB9_fScMo
