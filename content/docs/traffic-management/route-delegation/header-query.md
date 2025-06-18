@@ -14,7 +14,8 @@ For example, if the parent HTTPRoute resource specifies the `header` header, the
 
 The following image illustrates the route delegation hierarchy:
 
-{{< reuse-image src="img//route-delegation-header-query.svg" >}} 
+{{< reuse-image src="img/route-delegation-header-query.svg" >}}
+{{< reuse-image-dark srcDark="img/route-delegation-header-query.svg" >}}
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource delegates traffic as follows: 
@@ -48,7 +49,7 @@ The following image illustrates the route delegation hierarchy:
    kind: HTTPRoute
    metadata:
      name: parent
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      hostnames:
      - delegation.example
@@ -155,14 +156,14 @@ The following image illustrates the route delegation hierarchy:
    ```
       
 5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path with the `header1=val1` request header and the `query1=val1` query parameter. Verify that you get back a 404 HTTP response code. Although you included the header and query parameters that are defined on the parent HTTPRoute resource, the headers and query parameters that the child HTTPRoute resource matches on are missing in your request.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1" \
    -H "host: delegation.example" -H "header1: val1"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team1/foo?query1=val1" \
    -H "host: delegation.example" -H "header1: val1"
@@ -179,14 +180,14 @@ The following image illustrates the route delegation hierarchy:
    ```
    
 6. Send another request to the `delegation.example` domain along the `/anything/team1/foo` path. This time, you include all of the header and query parameters that the parent and child HTTPRoute resources defined. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1&queryX=valX" \
    -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team1/foo?query1=val1&queryX=valX" \
    -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
@@ -207,14 +208,14 @@ The following image illustrates the route delegation hierarchy:
    ```
 
 7. Send another request to the `delegation.example` domain along the `/anything/team2/bar` path that is configured on the `child-team2` HTTPRoute resource and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that you get back a 404 HTTP response code. Because the `child-team2` HTTPRoute resource does not specify the same header and query matchers as the parent HTTPRoute resource, the routing configuration is considered invalid. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
@@ -245,7 +246,7 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
      name: child-team2
      namespace: team2
      annotations:
-       delegation.kgateway.dev/inherit-parent-matcher: "true"
+       delegation.{{< reuse "docs/snippets/annotation-name.md"  >}}.dev/inherit-parent-matcher: "true"
    spec:
      rules:
      - matches:
@@ -267,14 +268,14 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
    ```
 
 2. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that this time, you get back a 200 HTTP response code, because `child-team2` inherited the matchers, headers, and query parameters from the `parent`. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2 \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar?queryX=valX&query2=val2 \
    -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"
@@ -343,8 +344,8 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n kgateway-system
-kubectl delete httproute parent -n kgateway-system
+kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

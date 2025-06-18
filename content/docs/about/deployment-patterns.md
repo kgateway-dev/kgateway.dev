@@ -12,6 +12,7 @@ The flexibility of kgateway allows you to deploy it in a way that best serves yo
 The following image shows a kgateway proxy that serves as a single ingress API gateway to the workloads in a Kubernetes cluster. The gateway is centrally managed by the kgateway control plane and configured to match and forward traffic based on the traffic management, resiliency, and security rules that you define. 
 
 {{% reuse-image src="img/pattern-simple-ingress.svg" width="400px" caption="Kgateway as a simple ingress"  %}}
+{{% reuse-image-dark srcDark="img/pattern-simple-ingress.svg" width="400px" caption="Kgateway as a simple ingress"  %}}
 
 This setup is a great way to get started with kgateway, and is suitable for smaller environments where all workloads run in a single cluster and traffic is balanced between services. However, in larger environments or environments where you have both high traffic and low traffic services, consider adding [multiple gateway proxies to distribute traffic load more evenly](#sharded-gateway). 
 
@@ -20,6 +21,7 @@ This setup is a great way to get started with kgateway, and is suitable for smal
 In larger environments or environments where you have both high traffic and low traffic services, you can isolate services from each other and protect against noisy neighbors by using a sharded gateway. With a sharded gateway architecture, you typically have multiple gateway proxies that split up the traffic for different services in the cluster as depicted in the following image. 
 
 {{% reuse-image src="img/pattern-sharded-gateway.svg" width="400px" caption="Kgateway as a sharded gateway" %}}
+{{% reuse-image-dark srcDark="img/pattern-sharded-gateway.svg" width="400px" caption="Kgateway as a sharded gateway" %}}
 
 All gateway proxies are managed by the kgateway control plane. However, one gateway proxy manages traffic for the workloads in the `foo` and `bar` namespaces. The second gateway proxy is a dedicated API gateway for the workloads in the `extra` namespace. Both gateway proxies are exposed directly on the edge. 
 
@@ -33,10 +35,12 @@ The following image shows a kgateway proxy that serves as the main ingress endpo
 The second layer of gateway proxies can apply additional traffic management, resiliency, and security policies to incoming traffic for specific apps. You also shard the second layer of proxies to better account for high and low traffic services to avoid noisy neighbor problems. All gateway proxies are managed by the same kgateway control plane.
 
 {{% reuse-image src="img/pattern-central-ingress-gloo.svg" width="600px"  %}}
+{{% reuse-image-dark srcDark="img/pattern-central-ingress-gloo.svg" width="600px"  %}}
 
 Depending on your existing setup, you might want to use a different type of proxy as your central ingress endpoint. For example, you might have an HAProxy or AWS NLB/ALB instance that all traffic must go through. Kgateway can be paired with these types of proxies as depicted in the following image. 
 
 {{% reuse-image src="img/pattern-central-ingress-any.svg" width="600px"  %}}
+{{% reuse-image-dark srcDark="img/pattern-central-ingress-any.svg" width="600px"  %}}
 
 ## API gateway for a service mesh
 
@@ -47,6 +51,7 @@ You can deploy kgateway as an ingress, egress, or waypoint proxy gateway for the
 The following image shows a kgateway proxy that is exposed on the edge and serves traffic for the ambient mesh. Services in the mesh communicate with each other via mutual TLS (mTLS). 
 
 {{% reuse-image src="img/ambient-ingress.svg" width="600px"  %}}
+{{% reuse-image-dark srcDark="img/ambient-ingress.svg" width="600px"  %}}
 
 For more information, see the guides for using kgateway as an [ingress gateway](/docs/integrations/istio/ambient/ambient-ingress/) or [waypoint proxy](/docs/integrations/istio/ambient/waypoint/) for your ambient mesh. 
 
@@ -55,5 +60,6 @@ For more information, see the guides for using kgateway as an [ingress gateway](
 You can deploy kgateway with an Istio sidecar to route traffic to services in an Istio sidecar mesh. The following image shows a kgateway proxy that is exposed on the edge and serves traffic for the sidecar mesh. Services in the mesh communicate with each other via mutual TLS (mTLS) by using the istio-proxy sidecar that is injected into the app. The sidecar is represented with the Envoy logo in the image. 
 
 {{< reuse-image src="img/sidecar-ingress.svg" width="800px" >}}
+{{< reuse-image-dark srcDark="img/sidecar-ingress.svg" width="800px" >}}
 
 For more information, see the guide for using kgateway as an [ingress gateway](/docs/integrations/istio/sidecar/ingress/) to your sidecar mesh. 

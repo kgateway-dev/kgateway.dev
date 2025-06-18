@@ -1,6 +1,6 @@
 ---
 title: HTTP method 
-weight: 423
+weight: 10
 description: Specify an HTTP method, such as POST, GET, PUT, PATCH, or DELETE, to match requests against.
 ---
 Specify an HTTP method, such as POST, GET, PUT, PATCH, or DELETE, to match requests against.
@@ -24,7 +24,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
      rules:
@@ -37,13 +37,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 2. Send a GET request to the httpbin app on the `match.example` domain. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: match.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get -H "host: match.example"
    ```
@@ -99,13 +99,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send another request to the httpbin app on the `match.example` domain. This time, you use the `POST` method. Verify that your request is not forwarded to the httpbin app and that you get back a 404 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: match.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi -X POST localhost:8080/post -H "host: match.example"
    ```

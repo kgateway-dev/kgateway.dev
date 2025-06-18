@@ -1,0 +1,1 @@
+This feature is available in kgateway version 2.1.x or later.

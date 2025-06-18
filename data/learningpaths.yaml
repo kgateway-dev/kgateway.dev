@@ -49,11 +49,12 @@
   - title: Understanding Transformations
     blog: transformation-in-kgateway
   - title: Integrating with Istio at ingress
-    youtube: https://youtu.be/4G_zNX2nuZ0
-    lab: https://www.solo.io/resources/lab/kgateway-lab-integrating-kgateway-with-istio-at-ingress
+    youtube: 4G_zNX2nuZ0
+    lab: kgateway-lab-integrating-kgateway-with-istio-at-ingress
   - title: Implementing kgateway as a waypoint
     blog: extend-istio-ambient-kgateway-waypoint
     youtube: B8oZ1seIDIM
+    lab: kgateway-lab-kgateway-as-a-waypoint
 - id: aigw
   title: Basics of an AI Gateway 
   description: In this pathway, explore the fundamentals of managing AI workloads with an AI Gateway. Learn about the essential features needed to secure, route and operate large language models (LLMs) securely as you scale your workloads.

@@ -11,6 +11,7 @@ Set up route delegation for a child HTTPRoute resource that can receive traffic 
 In this guide you walk through a route delegation example that demonstrates route delegation between two parent HTTPRoute and two child HTTPRoute resources that forward traffic to an httpbin sample app. The following image illustrates the route delegation hierarchy:
 
 {{< reuse-image src="img//route-delegation-multi-parent.svg" >}} 
+{{< reuse-image-dark srcDark="img//route-delegation-multi-parent.svg" >}} 
 
 **`parent1` and `parent2` HTTPRoutes**: 
 * The parent HTTPRoute resource `parent1` serves traffic for the `delegation-parent1.example` domain. 
@@ -40,7 +41,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent1
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
      - name: http
@@ -77,7 +78,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    kind: HTTPRoute
    metadata:
      name: parent2
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
      - name: http
@@ -136,7 +137,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    spec:
      parentRefs:
      - name: parent1
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
        group: gateway.networking.k8s.io
        kind: HTTPRoute
      rules:
@@ -151,13 +152,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 6. Send a request to the `delegation-parent1.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo -H "host: delegation-parent1.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo -H "host: delegation-parent1.example"
    ```
@@ -177,13 +178,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 7. Send another request to the `delegation-parent1.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
@@ -203,13 +204,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 8. Now, send a request to the `delegation-parent2.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo -H "host: delegation-parent2.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo -H "host: delegation-parent2.example"
    ```
@@ -229,13 +230,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 9. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the request fails and you get back a 404 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar -H "host: delegation-parent2.example"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar  -H "host: delegation-parent2.example"
    ```
@@ -255,9 +256,9 @@ In this guide you walk through a route delegation example that demonstrates rout
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway http -n kgateway-system
-kubectl delete httproute parent1 -n kgateway-system
-kubectl delete httproute parent2 -n kgateway-system
+kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent1 -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute parent2 -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml

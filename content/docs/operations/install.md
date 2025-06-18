@@ -95,13 +95,17 @@ Install the open source kgateway project in your Kubernetes cluster.
 
 3. Optional: Pull and inspect the kgateway Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
+   {{< callout type="info" >}}
+   For common values that you might want to update, see [Installation settings](#installation-settings).
+   {{< /callout >}}
+
    ```sh
    helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
    tar -xvf kgateway-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
-   cat kgateway/values.yaml
+   open kgateway/values.yaml
    ```
       
-4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f values.yaml` flag.
+4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
    
    ```sh
    helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
@@ -170,7 +174,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
 
-4. Create an Argo CD application to deploy the kgateway CRD Helm chart. 
+5. Create an Argo CD application to deploy the kgateway CRD Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -202,7 +206,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    EOF
    ```
 
-5. Create an Argo CD application to install the kgateway Helm chart. 
+6. Create an Argo CD application to install the kgateway Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -234,7 +238,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    EOF
    ```
    
-6. Verify that the `kgateway` control plane is up and running.
+7. Verify that the `kgateway` control plane is up and running.
    
    ```sh
    kubectl get pods -n kgateway-system 
@@ -251,18 +255,61 @@ Install the open source kgateway project in your Kubernetes cluster.
    kgateway-resource-rollout-cleanup-nj4t8   0/1     Completed   0          39s
    ```
 
-7. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
+8. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
    
    ```sh
    kubectl get gatewayclass kgateway
    ```
 
-8. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
+9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
    {{< reuse-image src="/img/argo-kgateway.png" >}}
 
 {{% /tab %}}
 {{< /tabs >}}
+
+## Installation settings {#installation-settings}
+
+You can update several installation settings in your Helm values file. For example, you can update the namespace, update the resource limits and requests, or enable extensions such as for AI.
+
+### Helm reference docs {#helm-docs}
+
+For more information, see the Helm reference docs.
+
+{{< cards >}}
+  {{< card link="/docs/reference/helm/helm/" title="Helm reference docs" >}}
+{{< /cards >}}
+
+### Namespace discovery {#namespace-discovery}
+
+You can limit the namespaces that kgateway watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit kgateway to only watch a specific namespace for gateway configuration.
+
+Namespace selectors are a list of matched expressions or labels.
+
+* `matchExpressions`: Use this field for more complex selectors where you want to specify an operator such as `In` or `NotIn`.
+* `matchLabels`: Use this field for simple selectors where you want to specify a label key-value pair.
+
+Each entry in the list is disjunctive (OR semantics). This means that a namespace is selected if it matches any selector.
+
+You can also use matched expressions and labels together in the same entry, which is conjunctive (AND semantics).
+
+The following example selects namespaces for discovery that meet the following conditions:
+
+* The namespace has the label `prod=enabled` and the label `version=v2`.
+* The namespace has the label `version=v3`.
+
+```yaml
+discoveryNamespaceSelectors:
+- matchExpressions:
+  - key: environment
+    operator: In
+    values:
+    - prod
+  matchLabels:
+    version: v2
+- matchLabels:
+    version: v3
+```
 
 ## Next steps
 

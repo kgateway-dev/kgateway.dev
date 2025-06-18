@@ -13,6 +13,7 @@ weight: 10
 
 ### Resource Types
 - [Backend](#backend)
+- [BackendConfigPolicy](#backendconfigpolicy)
 - [DirectResponse](#directresponse)
 - [GatewayExtension](#gatewayextension)
 - [GatewayParameters](#gatewayparameters)
@@ -149,6 +150,25 @@ _Appears in:_
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
 
 
+#### AWSLambdaPayloadTransformMode
+
+_Underlying type:_ _string_
+
+AWSLambdaPayloadTransformMode defines the transformation mode for the payload in the request
+before it is sent to the AWS Lambda function.
+
+_Validation:_
+- Enum: [None Envoy]
+
+_Appears in:_
+- [AwsLambda](#awslambda)
+
+| Field | Description |
+| --- | --- |
+| `None` | AWSLambdaPayloadTransformNone indicates that the payload will not be transformed using Envoy's<br />built-in transformation before it is sent to the Lambda function.<br />Note: Transformation policies configured on the route will still apply.<br /> |
+| `Envoy` | AWSLambdaPayloadTransformEnvoy indicates that the payload will be transformed using Envoy's<br />built-in transformation. Refer to<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_lambda_filter#configuration-as-a-listener-filter<br />for more details on how Envoy transforms the payload.<br /> |
+
+
 #### AccessLog
 
 
@@ -205,6 +225,23 @@ _Appears in:_
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
 
 
+#### AgentGateway
+
+
+
+Configuration of the AgentGateway integration
+
+
+
+_Appears in:_
+- [KubernetesProxyConfig](#kubernetesproxyconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enabled` _boolean_ | Whether to enable the extension. |  |  |
+| `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  |  |
+
+
 #### AiExtension
 
 
@@ -218,12 +255,12 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `enabled` _boolean_ | Whether to enable the extension. |  | Optional <br /> |
-| `image` _[Image](#image)_ | The extension's container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  | Optional <br /> |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  | Optional <br /> |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  | Optional <br /> |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The extension's container environment variables. |  | Optional <br /> |
-| `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#containerport-v1-core) array_ | The extension's container ports. |  | Optional <br /> |
+| `enabled` _boolean_ | Whether to enable the extension. |  |  |
+| `image` _[Image](#image)_ | The extension's container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The extension's container environment variables. |  |  |
+| `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#containerport-v1-core) array_ | The extension's container ports. |  |  |
 | `stats` _[AiExtensionStats](#aiextensionstats)_ | Additional stats config for AI Extension.<br />This config can be useful for adding custom labels to the request metrics.<br /><br />Example:<br />stats:<br />&nbsp;&nbsp;customLabels:<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "subject"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:sub"<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "issuer"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:iss"<br /> |  |  |
 
 
@@ -256,9 +293,49 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Anthropic API.<br />This token is automatically sent in the `x-api-key` header of the request. |  | Required <br /> |
+| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Anthropic API.<br />This token is automatically sent in the `x-api-key` header of the request. |  |  |
 | `apiVersion` _string_ | Optional: A version header to pass to the Anthropic API.<br />For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |  |  |
 | `model` _string_ | Optional: Override the model name.<br />If unset, the model name is taken from the request.<br />This setting can be useful when testing model failover scenarios. |  |  |
+
+
+#### AppProtocol
+
+_Underlying type:_ _string_
+
+AppProtocol defines the application protocol to use when communicating with the backend.
+
+_Validation:_
+- Enum: [http2 grpc grpc-web kubernetes.io/h2c kubernetes.io/ws]
+
+_Appears in:_
+- [StaticBackend](#staticbackend)
+
+| Field | Description |
+| --- | --- |
+| `http2` | AppProtocolHttp2 is the http2 app protocol.<br /> |
+| `grpc` | AppProtocolGrpc is the grpc app protocol.<br /> |
+| `grpc-web` | AppProtocolGrpcWeb is the grpc-web app protocol.<br /> |
+| `kubernetes.io/h2c` | AppProtocolKubernetesH2C is the kubernetes.io/h2c app protocol.<br /> |
+| `kubernetes.io/ws` | AppProtocolKubernetesWs is the kubernetes.io/ws app protocol.<br /> |
+
+
+#### AuthHeaderOverride
+
+
+
+AuthHeaderOverride allows customization of the default Authorization header sent to the LLM Provider.
+The default header is `Authorization: Bearer <token>`. HeaderName can change the Authorization
+header name and Prefix can change the Bearer prefix
+
+
+
+_Appears in:_
+- [LLMProvider](#llmprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `prefix` _string_ |  |  |  |
+| `headerName` _string_ |  |  |  |
 
 
 #### AwsAuth
@@ -274,8 +351,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br />Required <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  | Optional <br /> |
+| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
 
 
 #### AwsAuthType
@@ -307,10 +384,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br />Required <br /> |
-| `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the authentication method will be inferred from the<br />environment (e.g. instance metadata, EKS Pod Identity, environment variables, etc.)<br />This may not work in all environments, so it is recommended to specify an authentication method.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  | Optional <br /> |
-| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  | Optional <br /> |
-| `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Optional <br />Pattern: `^[a-z0-9-]+$` <br /> |
+| `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
+| `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the authentication method will be inferred from the<br />environment (e.g. instance metadata, EKS Pod Identity, environment variables, etc.)<br />This may not work in all environments, so it is recommended to specify an authentication method.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
+| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
+| `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 
 
 #### AwsLambda
@@ -326,10 +403,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `endpointURL` _string_ | EndpointURL is the URL or domain for the Lambda service. This is primarily<br />useful for testing and development purposes. When omitted, the default<br />lambda hostname will be used. |  | MaxLength: 2048 <br />Optional <br />Pattern: `^https?://[-a-zA-Z0-9@:%.+~#?&/=]+$` <br /> |
-| `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br />Required <br /> |
-| `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br />Optional <br /> |
-| `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". |  | Optional <br />Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
+| `endpointURL` _string_ | EndpointURL is the URL or domain for the Lambda service. This is primarily<br />useful for testing and development purposes. When omitted, the default<br />lambda hostname will be used. |  | MaxLength: 2048 <br />Pattern: `^https?://[-a-zA-Z0-9@:%.+~#?&/=]+$` <br /> |
+| `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br /> |
+| `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br /> |
+| `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". |  | Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
+| `payloadTransformMode` _[AWSLambdaPayloadTransformMode](#awslambdapayloadtransformmode)_ | PayloadTransformation specifies payload transformation mode before it is sent to the Lambda function.<br />Defaults to Envoy. | Envoy | Enum: [None Envoy] <br /> |
 
 
 #### AzureOpenAIConfig
@@ -345,10 +423,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Azure OpenAI API.<br />This token is automatically sent in the `api-key` header of the request. |  | Required <br /> |
-| `endpoint` _string_ | The endpoint for the Azure OpenAI API to use, such as `my-endpoint.openai.azure.com`.<br />If the scheme is included, it is stripped. |  | MinLength: 1 <br />Required <br /> |
-| `deploymentName` _string_ | The name of the Azure OpenAI model deployment to use.<br />For more information, see the [Azure OpenAI model docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models). |  | MinLength: 1 <br />Required <br /> |
-| `apiVersion` _string_ | The version of the Azure OpenAI API to use.<br />For more information, see the [Azure OpenAI API version reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#api-specs). |  | MinLength: 1 <br />Required <br /> |
+| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Azure OpenAI API.<br />This token is automatically sent in the `api-key` header of the request. |  |  |
+| `endpoint` _string_ | The endpoint for the Azure OpenAI API to use, such as `my-endpoint.openai.azure.com`.<br />If the scheme is included, it is stripped. |  | MinLength: 1 <br /> |
+| `deploymentName` _string_ | The name of the Azure OpenAI model deployment to use.<br />For more information, see the [Azure OpenAI model docs](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models). |  | MinLength: 1 <br /> |
+| `apiVersion` _string_ | The version of the Azure OpenAI API to use.<br />For more information, see the [Azure OpenAI API version reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#api-specs). |  | MinLength: 1 <br /> |
 
 
 #### Backend
@@ -372,6 +450,51 @@ _Appears in:_
 | `status` _[BackendStatus](#backendstatus)_ |  |  |  |
 
 
+#### BackendConfigPolicy
+
+
+
+
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `BackendConfigPolicy` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[BackendConfigPolicySpec](#backendconfigpolicyspec)_ |  |  |  |
+| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
+
+
+#### BackendConfigPolicySpec
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicy](#backendconfigpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
+| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  |  |
+| `perConnectionBufferLimitBytes` _integer_ | Soft limit on size of the cluster's connections read and write buffers.<br />If unspecified, an implementation defined default is applied (1MiB). |  |  |
+| `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
+| `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
+| `http1ProtocolOptions` _[Http1ProtocolOptions](#http1protocoloptions)_ | Additional options when handling HTTP1 requests upstream. |  |  |
+| `sslConfig` _[SSLConfig](#sslconfig)_ | SSLConfig contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
+| `loadBalancerConfig` _[LoadBalancerConfig](#loadbalancerconfig)_ | LoadBalancerConfig contains the options necessary to configure the load balancer. |  |  |
+
+
 #### BackendSpec
 
 
@@ -385,10 +508,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used. |  | Enum: [AI AWS Static] <br />Required <br /> |
+| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used. |  | Enum: [AI AWS Static DynamicForwardProxy] <br /> |
 | `ai` _[AIBackend](#aibackend)_ | AI is the AI backend configuration. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 | `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration. |  |  |
 | `static` _[StaticBackend](#staticbackend)_ | Static is the static backend configuration. |  |  |
+| `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | DynamicForwardProxy is the dynamic forward proxy backend configuration. |  |  |
 
 
 #### BackendStatus
@@ -423,6 +547,7 @@ _Appears in:_
 | `AI` | BackendTypeAI is the type for AI backends.<br /> |
 | `AWS` | BackendTypeAWS is the type for AWS backends.<br /> |
 | `Static` | BackendTypeStatic is the type for static backends.<br /> |
+| `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
 
 
 #### BodyParseBehavior
@@ -474,7 +599,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br />Required <br /> |
+| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br /> |
 | `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the authorization service even if they exceed maxRequestBytes.<br />When unset, the default behavior is false. |  |  |
 | `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />When unset, the default behavior is false. |  |  |
 
@@ -517,6 +642,27 @@ _Appears in:_
 | `match` _string_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true.<br />see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  |  |
 
 
+#### CommonHttpProtocolOptions
+
+
+
+CommonHttpProtocolOptions are options that are applicable to both HTTP1 and HTTP2 requests.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  |  |
+| `maxHeadersCount` _integer_ | Specifies the maximum number of headers that the connection will accept.<br />If not specified, the default of 100 is used. Requests that exceed this limit will receive<br />a 431 response for HTTP/1.x and cause a stream reset for HTTP/2. |  |  |
+| `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  |  |
+| `headersWithUnderscoresAction` _[HeadersWithUnderscoresAction](#headerswithunderscoresaction)_ | Action to take when a client request with a header name containing underscore characters is received.<br />If this setting is not specified, the value defaults to ALLOW.<br />Note: upstream responses are not affected by this setting. |  | Enum: [Allow RejectRequest DropHeader] <br /> |
+| `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  |  |
+
+
 #### ComparisonFilter
 
 _Underlying type:_ _[struct{Op Op "json:\"op,omitempty\""; Value uint32 "json:\"value,omitempty\""}](#struct{op-op-"json:\"op,omitempty\"";-value-uint32-"json:\"value,omitempty\""})_
@@ -529,6 +675,19 @@ Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v
 _Appears in:_
 - [DurationFilter](#durationfilter)
 - [StatusCodeFilter](#statuscodefilter)
+
+
+
+#### CorsPolicy
+
+
+
+
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
 
 
 
@@ -599,8 +758,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `status` _integer_ | StatusCode defines the HTTP status code to return for this route. |  | Maximum: 599 <br />Minimum: 200 <br />Required <br /> |
-| `body` _string_ | Body defines the content to be returned in the HTTP response body.<br />The maximum length of the body is restricted to prevent excessively large responses. |  | MaxLength: 4096 <br />Optional <br /> |
+| `status` _integer_ | StatusCode defines the HTTP status code to return for this route. |  | Maximum: 599 <br />Minimum: 200 <br /> |
+| `body` _string_ | Body defines the content to be returned in the HTTP response body.<br />The maximum length of the body is restricted to prevent excessively large responses. |  | MaxLength: 4096 <br /> |
 
 
 #### DirectResponseStatus
@@ -630,6 +789,22 @@ _Appears in:_
 
 
 
+#### DynamicForwardProxyBackend
+
+
+
+DynamicForwardProxyBackend is the dynamic forward proxy backend configuration.
+
+
+
+_Appears in:_
+- [BackendSpec](#backendspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enableTls` _boolean_ | EnableTls enables TLS. When true, the backend will be configured to use TLS. System CA will be used for validation.<br />The hostname will be used for SNI and auto SAN validation. |  |  |
+
+
 #### EnvoyBootstrap
 
 
@@ -644,8 +819,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  | Optional <br /> |
-| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />		componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  | Optional <br /> |
+| `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
+| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />		componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 
 
 #### EnvoyContainer
@@ -661,10 +836,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `bootstrap` _[EnvoyBootstrap](#envoybootstrap)_ | Initial envoy configuration. |  | Optional <br /> |
-| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: gloo-envoy-wrapper (OSS) / gloo-ee-envoy-wrapper (EE)<br />	tag: <gloo version> (OSS) / <gloo-ee version> (EE)<br />	pullPolicy: IfNotPresent |  | Optional <br /> |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  | Optional <br /> |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  | Optional <br /> |
+| `bootstrap` _[EnvoyBootstrap](#envoybootstrap)_ | Initial envoy configuration. |  |  |
+| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: gloo-envoy-wrapper (OSS) / gloo-ee-envoy-wrapper (EE)<br />	tag: <gloo version> (OSS) / <gloo-ee version> (EE)<br />	pullPolicy: IfNotPresent |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 
 
 #### ExtAuthEnabled
@@ -720,7 +895,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the authentication. |  | Required <br /> |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the authentication. |  |  |
 
 
 #### ExtGrpcService
@@ -734,10 +909,11 @@ ExtGrpcService defines the GRPC service that will handle the processing.
 _Appears in:_
 - [ExtAuthProvider](#extauthprovider)
 - [ExtProcProvider](#extprocprovider)
+- [RateLimitProvider](#ratelimitprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](#backendref)_ | BackendRef references the backend GRPC service. |  | Required <br /> |
+| `backendRef` _[BackendRef](#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 
 
@@ -754,7 +930,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  | Required <br /> |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  |  |
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams |  |  |
 
 
@@ -771,7 +947,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the processing. |  | Required <br /> |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the processing. |  |  |
 
 
 #### FieldDefault
@@ -822,8 +998,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `field` _string_ | The name of the field. |  | MinLength: 1 <br />Required <br /> |
-| `value` _string_ | The field default value, which can be any JSON Data Type. |  | MinLength: 1 <br />Required <br /> |
+| `field` _string_ | The name of the field. |  | MinLength: 1 <br /> |
+| `value` _string_ | The field default value, which can be any JSON Data Type. |  | MinLength: 1 <br /> |
 | `override` _boolean_ | Whether to override the field's value if it already exists.<br />Defaults to false. | false |  |
 
 
@@ -840,7 +1016,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `path` _string_ | the file path to which the file access logging service will sink |  | Required <br /> |
+| `path` _string_ | the file path to which the file access logging service will sink |  |  |
 | `stringFormat` _string_ | the format string by which envoy will format the log lines<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-strings |  |  |
 | `jsonFormat` _[RawExtension](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#rawextension-runtime-pkg)_ | the format object by which to envoy will emit the logs in a structured way.<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-dictionaries |  |  |
 
@@ -905,9 +1081,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc Extended] <br />Required <br /> |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit Extended] <br /> |
 | `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
 | `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
+| `rateLimit` _[RateLimitProvider](#ratelimitprovider)_ | RateLimit configuration for RateLimit extension type. |  |  |
 
 
 #### GatewayExtensionStatus
@@ -941,6 +1118,7 @@ _Appears in:_
 | --- | --- |
 | `ExtAuth` | GatewayExtensionTypeExtAuth is the type for Extauth extensions.<br /> |
 | `ExtProc` | GatewayExtensionTypeExtProc is the type for ExtProc extensions.<br /> |
+| `RateLimit` | GatewayExtensionTypeRateLimit is the type for RateLimit extensions.<br /> |
 
 
 #### GatewayParameters
@@ -980,8 +1158,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `kube` _[KubernetesProxyConfig](#kubernetesproxyconfig)_ | The proxy will be deployed on Kubernetes. |  | Optional <br /> |
-| `selfManaged` _[SelfManagedGateway](#selfmanagedgateway)_ | The proxy will be self-managed and not auto-provisioned. |  | Optional <br /> |
+| `kube` _[KubernetesProxyConfig](#kubernetesproxyconfig)_ | The proxy will be deployed on Kubernetes. |  |  |
+| `selfManaged` _[SelfManagedGateway](#selfmanagedgateway)_ | The proxy will be self-managed and not auto-provisioned. |  |  |
 
 
 #### GatewayParametersStatus
@@ -1010,9 +1188,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Gemini API.<br />This token is automatically sent in the `key` query parameter of the request. |  | Required <br /> |
-| `model` _string_ | The Gemini model to use.<br />For more information, see the [Gemini models docs](https://ai.google.dev/gemini-api/docs/models/gemini). |  | Required <br /> |
-| `apiVersion` _string_ | The version of the Gemini API to use.<br />For more information, see the [Gemini API version docs](https://ai.google.dev/gemini-api/docs/api-versions). |  | Required <br /> |
+| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Gemini API.<br />This token is automatically sent in the `key` query parameter of the request. |  |  |
+| `model` _string_ | The Gemini model to use.<br />For more information, see the [Gemini models docs](https://ai.google.dev/gemini-api/docs/models/gemini). |  |  |
+| `apiVersion` _string_ | The version of the Gemini API to use.<br />For more information, see the [Gemini API version docs](https://ai.google.dev/gemini-api/docs/api-versions). |  |  |
 
 
 #### GracefulShutdownSpec
@@ -1028,8 +1206,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `enabled` _boolean_ | Enable grace period before shutdown to finish current requests while Envoy health checks fail to e.g. notify external load balancers. *NOTE:* This will not have any effect if you have not defined health checks via the health check filter |  | Optional <br /> |
-| `sleepTimeSeconds` _integer_ | Time (in seconds) for the preStop hook to wait before allowing Envoy to terminate |  | Optional <br /> |
+| `enabled` _boolean_ | Enable grace period before shutdown to finish current requests while Envoy health checks fail to e.g. notify external load balancers. *NOTE:* This will not have any effect if you have not defined health checks via the health check filter |  |  |
+| `sleepTimeSeconds` _integer_ | Time (in seconds) for the preStop hook to wait before allowing Envoy to terminate |  |  |
 
 
 #### GrpcService
@@ -1045,8 +1223,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `logName` _string_ | name of log stream |  | Required <br /> |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `logName` _string_ | name of log stream |  |  |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
 | `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
 | `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
@@ -1106,8 +1284,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  |  |
+| `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
 
 
 #### HeaderFilter
@@ -1124,7 +1304,24 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  | Required <br /> |
+| `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  |  |
+
+
+#### HeaderFormat
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [Http1ProtocolOptions](#http1protocoloptions)
+
+| Field | Description |
+| --- | --- |
+| `ProperCaseHeaderKeyFormat` |  |
+| `PreserveCaseHeaderKeyFormat` |  |
 
 
 #### HeaderName
@@ -1157,6 +1354,25 @@ _Appears in:_
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
+#### HeadersWithUnderscoresAction
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Allow RejectRequest DropHeader]
+
+_Appears in:_
+- [CommonHttpProtocolOptions](#commonhttpprotocoloptions)
+
+| Field | Description |
+| --- | --- |
+| `Allow` | Allow headers with underscores. This is the default behavior.<br /> |
+| `RejectRequest` | Reject client request. HTTP/1 requests are rejected with the 400 status. HTTP/2 requests<br />end with the stream reset. The "httpN.requests_rejected_with_underscores_in_headers" counter<br />is incremented for each rejected request.<br /> |
+| `DropHeader` | Drop the header with name containing underscores. The header is dropped before the filter chain is<br />invoked and as such filters will not see dropped headers. The<br />"httpN.dropped_headers_with_underscores" is incremented for each dropped header.<br /> |
+
+
 #### Host
 
 
@@ -1173,8 +1389,26 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
-| `port` _[PortNumber](#portnumber)_ | Port is the port to use for the backend. |  | Required <br /> |
-| `insecureSkipVerify` _boolean_ | InsecureSkipVerify allows skipping ssl validation for custom hosts |  | Optional <br /> |
+| `port` _[PortNumber](#portnumber)_ | Port is the port to use for the backend. |  |  |
+| `insecureSkipVerify` _boolean_ | InsecureSkipVerify allows skipping ssl validation for custom hosts |  |  |
+
+
+#### Http1ProtocolOptions
+
+
+
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-http1protocoloptions) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enableTrailers` _boolean_ | Enables trailers for HTTP/1. By default the HTTP/1 codec drops proxied trailers.<br />Note: Trailers must also be enabled at the gateway level in order for this option to take effect |  |  |
+| `headerFormat` _[HeaderFormat](#headerformat)_ | The format of the header key. |  | Enum: [ProperCaseHeaderKeyFormat PreserveCaseHeaderKeyFormat] <br /> |
+| `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging. When this option is false, then Envoy will terminate<br />HTTP/1.1 connections upon receiving an invalid HTTP message. However,<br />when this option is true, then Envoy will leave the HTTP/1.1 connection<br />open where possible. |  |  |
 
 
 #### Image
@@ -1194,11 +1428,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `registry` _string_ | The image registry. |  | Optional <br /> |
-| `repository` _string_ | The image repository (name). |  | Optional <br /> |
-| `tag` _string_ | The image tag. |  | Optional <br /> |
-| `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  | Optional <br /> |
-| `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  | Optional <br /> |
+| `registry` _string_ | The image registry. |  |  |
+| `repository` _string_ | The image repository (name). |  |  |
+| `tag` _string_ | The image tag. |  |  |
+| `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
+| `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
 
 
 #### InjaTemplate
@@ -1228,13 +1462,13 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  | Optional <br /> |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  | Optional <br /> |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  | Optional <br /> |
-| `logLevel` _string_ | Log level for istio-proxy. Options include "info", "debug", "warning", and "error".<br />Default level is info Default is "warning". |  | Optional <br /> |
-| `istioDiscoveryAddress` _string_ | The address of the istio discovery service. Defaults to "istiod.istio-system.svc:15012". |  | Optional <br /> |
-| `istioMetaMeshId` _string_ | The mesh id of the istio mesh. Defaults to "cluster.local". |  | Optional <br /> |
-| `istioMetaClusterId` _string_ | The cluster id of the istio cluster. Defaults to "Kubernetes". |  | Optional <br /> |
+| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `logLevel` _string_ | Log level for istio-proxy. Options include "info", "debug", "warning", and "error".<br />Default level is info Default is "warning". |  |  |
+| `istioDiscoveryAddress` _string_ | The address of the istio discovery service. Defaults to "istiod.istio-system.svc:15012". |  |  |
+| `istioMetaMeshId` _string_ | The mesh id of the istio mesh. Defaults to "cluster.local". |  |  |
+| `istioMetaClusterId` _string_ | The cluster id of the istio cluster. Defaults to "Kubernetes". |  |  |
 
 
 #### IstioIntegration
@@ -1250,8 +1484,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  | Optional <br /> |
-| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  | Optional <br /> |
+| `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
+| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
 
 
 #### KubernetesProxyConfig
@@ -1268,15 +1502,16 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `deployment` _[ProxyDeployment](#proxydeployment)_ | Use a Kubernetes deployment as the proxy workload type. Currently, this is the only<br />supported workload type. |  | Optional <br /> |
-| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy. |  | Optional <br /> |
-| `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  | Optional <br /> |
-| `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  | Optional <br /> |
-| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  | Optional <br /> |
-| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the Envoy pod. |  | Optional <br /> |
-| `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  | Optional <br /> |
-| `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  | Optional <br /> |
-| `aiExtension` _[AiExtension](#aiextension)_ | Configuration for the AI extension. |  | Optional <br /> |
+| `deployment` _[ProxyDeployment](#proxydeployment)_ | Use a Kubernetes deployment as the proxy workload type. Currently, this is the only<br />supported workload type. |  |  |
+| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy. |  |  |
+| `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
+| `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
+| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  |  |
+| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the Envoy pod. |  |  |
+| `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
+| `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
+| `aiExtension` _[AiExtension](#aiextension)_ | Configuration for the AI extension. |  |  |
+| `agentGateway` _[AgentGateway](#agentgateway)_ | Configure the AgentGateway integration |  |  |
 | `floatingUserId` _boolean_ | Used to unset the `runAsUser` values in security contexts. |  |  |
 
 
@@ -1296,27 +1531,174 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `provider` _[SupportedLLMProvider](#supportedllmprovider)_ | The LLM provider type to configure. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 | `hostOverride` _[Host](#host)_ | Send requests to a custom host and port, such as to proxy the request,<br />or to use a different backend that is API-compliant with the Backend version. |  |  |
+| `pathOverride` _[PathOverride](#pathoverride)_ | TODO: Consolidate all Override options into ProviderOverride.<br />Overrides the default API path for the LLM provider.<br />Allows routing requests to a custom API endpoint path. |  | MinProperties: 1 <br /> |
+| `authHeaderOverride` _[AuthHeaderOverride](#authheaderoverride)_ | Customizes the Authorization header sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
+
+
+#### LoadBalancerConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `healthyPanicThreshold` _integer_ | HealthyPanicThreshold configures envoy's panic threshold percentage between 0-100. Once the number of non-healthy hosts<br />reaches this percentage, envoy disregards health information.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/panic_threshold.html). |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `updateMergeWindow` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | This allows batch updates of endpoints health/weight/metadata that happen during a time window.<br />this help lower cpu usage when endpoint change rate is high. defaults to 1 second.<br />Set to 0 to disable and have changes applied immediately. |  |  |
+| `leastRequest` _[LoadBalancerLeastRequestConfig](#loadbalancerleastrequestconfig)_ | LeastRequest configures the least request load balancer type. |  |  |
+| `roundRobin` _[LoadBalancerRoundRobinConfig](#loadbalancerroundrobinconfig)_ | RoundRobin configures the round robin load balancer type. |  |  |
+| `ringHash` _[LoadBalancerRingHashConfig](#loadbalancerringhashconfig)_ | RingHash configures the ring hash load balancer type. |  |  |
+| `maglev` _[LoadBalancerMaglevConfig](#loadbalancermaglevconfig)_ | Maglev configures the maglev load balancer type. |  |  |
+| `random` _[LoadBalancerRandomConfig](#loadbalancerrandomconfig)_ | Random configures the random load balancer type. |  |  |
+| `localityConfigType` _[LocalityConfigType](#localityconfigtype)_ | LocalityConfigType specifies the locality config type to use.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/common/v3/common.proto#envoy-v3-api-msg-extensions-load-balancing-policies-common-v3-localitylbconfig |  | Enum: [WeightedLb] <br /> |
+| `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
+| `closeConnectionsOnHostSetChange` _boolean_ | If set to true, the load balancer will drain connections when the host set changes.<br /><br />Ring Hash or Maglev can be used to ensure that clients with the same key<br />are routed to the same upstream host.<br />Distruptions can cause new connections with the same key as existing connections<br />to be routed to different hosts.<br />Enabling this feature will cause the load balancer to drain existing connections<br />when the host set changes, ensuring that new connections with the same key are<br />consistently routed to the same host.<br />Connections are not immediately closed, but are allowed to drain<br />before being closed. |  |  |
+
+
+#### LoadBalancerLeastRequestConfig
+
+
+
+LoadBalancerLeastRequestConfig configures the least request load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. |  |  |
+| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
+
+
+#### LoadBalancerMaglevConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+
+
+#### LoadBalancerRandomConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+
+
+#### LoadBalancerRingHashConfig
+
+
+
+LoadBalancerRingHashConfig configures the ring hash load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. |  |  |
+| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. |  |  |
+
+
+#### LoadBalancerRoundRobinConfig
+
+
+
+LoadBalancerRoundRobinConfig configures the round robin load balancer type.
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
 
 
 #### LocalPolicyTargetReference
 
 
 
-Select the object to attach the policy to.
+Select the object to attach the policy by Group, Kind, and Name.
 The object must be in the same namespace as the policy.
 You can target only one object at a time.
 
 
 
 _Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+
+
+#### LocalPolicyTargetReferenceWithSectionName
+
+
+
+Select the object to attach the policy by Group, Kind, Name and SectionName.
+The object must be in the same namespace as the policy.
+You can target only one object at a time.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+| `sectionName` _[SectionName](#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
+
+
+#### LocalPolicyTargetSelector
+
+
+
+Select the object to attach the policy by Group, Kind, and its labels.
+The object must be in the same namespace as the policy and match the
+specified labels.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
 - [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  | MaxLength: 253 <br />Pattern: `^$\|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$` <br /> |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br /> |
+| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
 
 
 #### LocalRateLimitPolicy
@@ -1334,6 +1716,22 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
+
+
+#### LocalityConfigType
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerConfig](#loadbalancerconfig)
+
+| Field | Description |
+| --- | --- |
+| `WeightedLb` | https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/locality_weight#locality-weighted-load-balancing<br />Locality weighted load balancing enables weighting assignments across different zones and geographical locations by using explicit weights.<br />This field is required to enable locality weighted load balancing.<br /> |
 
 
 #### Message
@@ -1424,7 +1822,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br />Required <br /> |
+| `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
 
 
 
@@ -1443,8 +1841,28 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  | Required <br /> |
+| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  |  |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request.<br />This setting can be useful when setting up model failover within the same LLM provider. |  |  |
+
+
+#### PathOverride
+
+
+
+PathOverride configures the AI gateway to use a custom path for LLM provider chat-completion API requests.
+It allows overriding the default API path with a custom one.
+This is useful when you need to route requests to a different API endpoint while maintaining
+compatibility with the original provider's API structure.
+
+_Validation:_
+- MinProperties: 1
+
+_Appears in:_
+- [LLMProvider](#llmprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `fullPath` _string_ | FullPath specifies the custom API path to use for the LLM provider requests.<br />This path will replace the default API path for the provider. |  |  |
 
 
 #### Pod
@@ -1460,17 +1878,17 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Pod object metadata. |  | Optional <br /> |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata. |  | Optional <br /> |
-| `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  | Optional <br /> |
-| `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  | Optional <br /> |
-| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  | Optional <br /> |
-| `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  | Optional <br /> |
-| `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  | Optional <br /> |
-| `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  | Optional <br /> |
-| `terminationGracePeriodSeconds` _integer_ | If specified, the pod's termination grace period in seconds. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#pod-v1-core<br />for details |  | Optional <br /> |
-| `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  | Optional <br /> |
-| `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  | Optional <br /> |
+| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Pod object metadata. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata. |  |  |
+| `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
+| `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
+| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
+| `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
+| `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
+| `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  |  |
+| `terminationGracePeriodSeconds` _integer_ | If specified, the pod's termination grace period in seconds. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#pod-v1-core<br />for details |  |  |
+| `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
+| `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 
 
 #### PolicyAncestorStatus
@@ -1506,8 +1924,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `port` _integer_ | The port number to match on the Gateway |  | Required <br /> |
-| `nodePort` _integer_ | The NodePort to be used for the service. If not specified, a random port<br />will be assigned by the Kubernetes API server. |  | Optional <br /> |
+| `port` _integer_ | The port number to match on the Gateway |  |  |
+| `nodePort` _integer_ | The NodePort to be used for the service. If not specified, a random port<br />will be assigned by the Kubernetes API server. |  |  |
 
 
 #### Priority
@@ -1600,7 +2018,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `replicas` _integer_ | The number of desired pods. Defaults to 1. |  | Optional <br /> |
+| `replicas` _integer_ | The number of desired pods. Defaults to 1. |  |  |
 
 
 #### Publisher
@@ -1633,6 +2051,101 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `local` _[LocalRateLimitPolicy](#localratelimitpolicy)_ | Local defines a local rate limiting policy. |  |  |
+| `global` _[RateLimitPolicy](#ratelimitpolicy)_ | Global defines a global rate limiting policy using an external service. |  |  |
+
+
+#### RateLimitDescriptor
+
+
+
+RateLimitDescriptor defines a descriptor for rate limiting.
+A descriptor is a group of entries that form a single rate limit rule.
+
+
+
+_Appears in:_
+- [RateLimitPolicy](#ratelimitpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `entries` _[RateLimitDescriptorEntry](#ratelimitdescriptorentry) array_ | Entries are the individual components that make up this descriptor.<br />When translated to Envoy, these entries combine to form a single descriptor. |  | MinItems: 1 <br /> |
+
+
+#### RateLimitDescriptorEntry
+
+
+
+RateLimitDescriptorEntry defines a single entry in a rate limit descriptor.
+Only one entry type may be specified.
+
+
+
+_Appears in:_
+- [RateLimitDescriptor](#ratelimitdescriptor)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[RateLimitDescriptorEntryType](#ratelimitdescriptorentrytype)_ | Type specifies what kind of rate limit descriptor entry this is. |  | Enum: [Generic Header RemoteAddress Path] <br /> |
+| `generic` _[RateLimitDescriptorEntryGeneric](#ratelimitdescriptorentrygeneric)_ | Generic contains the configuration for a generic key-value descriptor entry.<br />This field must be specified when Type is Generic. |  |  |
+| `header` _string_ | Header specifies a request header to extract the descriptor value from.<br />This field must be specified when Type is Header. |  |  |
+
+
+
+
+#### RateLimitDescriptorEntryType
+
+_Underlying type:_ _string_
+
+RateLimitDescriptorEntryType defines the type of a rate limit descriptor entry.
+
+_Validation:_
+- Enum: [Generic Header RemoteAddress Path]
+
+_Appears in:_
+- [RateLimitDescriptorEntry](#ratelimitdescriptorentry)
+
+| Field | Description |
+| --- | --- |
+| `Generic` | RateLimitDescriptorEntryTypeGeneric represents a generic key-value descriptor entry.<br /> |
+| `Header` | RateLimitDescriptorEntryTypeHeader represents a descriptor entry that extracts its value from a request header.<br /> |
+| `RemoteAddress` | RateLimitDescriptorEntryTypeRemoteAddress represents a descriptor entry that uses the client's IP address as its value.<br /> |
+| `Path` | RateLimitDescriptorEntryTypePath represents a descriptor entry that uses the request path as its value.<br /> |
+
+
+#### RateLimitPolicy
+
+
+
+RateLimitPolicy defines a global rate limiting policy using an external service.
+
+
+
+_Appears in:_
+- [RateLimit](#ratelimit)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `descriptors` _[RateLimitDescriptor](#ratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting.<br />These values are passed to the rate limit service which applies configured limits based on them.<br />Each descriptor represents a single rate limit rule with one or more entries. |  | MinItems: 1 <br /> |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
+
+
+#### RateLimitProvider
+
+
+
+RateLimitProvider defines the configuration for a RateLimit service provider.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the rate limiting. |  |  |
+| `domain` _string_ | Domain identifies a rate limiting configuration for the rate limit service.<br />All rate limit requests must specify a domain, which enables the configuration<br />to be per application without fear of overlap (e.g., "api", "web", "admin"). |  |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />When true, requests are not limited if the rate limit service is unavailable. | false |  |
+| `timeout` _[Duration](#duration)_ | Timeout for requests to the rate limit service. | 20ms |  |
 
 
 #### Regex
@@ -1705,6 +2218,66 @@ _Appears in:_
 | `CHAT_STREAMING` | Stream responses to a client, which allows the LLM to stream out tokens as they are generated.<br /> |
 
 
+#### SSLConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
+| `sslFiles` _[SSLFiles](#sslfiles)_ | File paths to certificates local to the proxy. |  |  |
+| `sni` _string_ | The SNI domains that should be considered for TLS connection |  |  |
+| `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
+| `sslParameters` _[SSLParameters](#sslparameters)_ | General TLS parameters. See the [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto#extensions-transport-sockets-tls-v3-tlsparameters)<br />for more information on the meaning of these values. |  |  |
+| `alpnProtocols` _string array_ | Set Application Level Protocol Negotiation<br />If empty, defaults to ["h2", "http/1.1"]. |  |  |
+| `allowRenegotiation` _boolean_ | Allow Tls renegotiation, the default value is false.<br />TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary. |  |  |
+| `oneWayTLS` _boolean_ | If the SSL config has the ca.crt (root CA) provided, kgateway uses it to perform mTLS by default.<br />Set oneWayTls to true to disable mTLS in favor of server-only TLS (one-way TLS), even if kgateway has the root CA.<br />If unset, defaults to false. |  |  |
+
+
+#### SSLFiles
+
+
+
+
+
+
+
+_Appears in:_
+- [SSLConfig](#sslconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tlsCertificate` _string_ |  |  |  |
+| `tlsKey` _string_ |  |  |  |
+| `rootCA` _string_ |  |  |  |
+
+
+#### SSLParameters
+
+
+
+
+
+
+
+_Appears in:_
+- [SSLConfig](#sslconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tlsMinVersion` _[TLSVersion](#tlsversion)_ | Minimum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `tlsMaxVersion` _[TLSVersion](#tlsversion)_ | Maximum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `cipherSuites` _string array_ |  |  |  |
+| `ecdhCurves` _string array_ |  |  |  |
+
+
 #### SdsBootstrap
 
 
@@ -1718,7 +2291,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `logLevel` _string_ | Log level for SDS. Options include "info", "debug", "warn", "error", "panic" and "fatal".<br />Default level is "info". |  | Optional <br /> |
+| `logLevel` _string_ | Log level for SDS. Options include "info", "debug", "warn", "error", "panic" and "fatal".<br />Default level is "info". |  |  |
 
 
 #### SdsContainer
@@ -1734,10 +2307,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `image` _[Image](#image)_ | The SDS container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  | Optional <br /> |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  | Optional <br /> |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  | Optional <br /> |
-| `bootstrap` _[SdsBootstrap](#sdsbootstrap)_ | Initial SDS container configuration. |  | Optional <br /> |
+| `image` _[Image](#image)_ | The SDS container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `bootstrap` _[SdsBootstrap](#sdsbootstrap)_ | Initial SDS container configuration. |  |  |
 
 
 #### SelfManagedGateway
@@ -1766,10 +2339,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br />Optional <br /> |
-| `clusterIP` _string_ | The manually specified IP address of the service, if a randomly assigned<br />IP is not desired. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#choosing-your-own-ip-address<br />and<br />https://kubernetes.io/docs/concepts/services-networking/service/#headless-services<br />on the implications of setting `clusterIP`. |  | Optional <br /> |
-| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  | Optional <br /> |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  | Optional <br /> |
+| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br /> |
+| `clusterIP` _string_ | The manually specified IP address of the service, if a randomly assigned<br />IP is not desired. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#choosing-your-own-ip-address<br />and<br />https://kubernetes.io/docs/concepts/services-networking/service/#headless-services<br />on the implications of setting `clusterIP`. |  |  |
+| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  |  |
 | `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
 
 
@@ -1786,8 +2359,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  | Optional <br /> |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata. |  | Optional <br /> |
+| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata. |  |  |
 
 
 #### SingleAuthToken
@@ -1831,6 +2404,25 @@ _Appears in:_
 | `Passthrough` | Passthrough the existing token. This token can either<br />come directly from the client, or be generated by an OIDC flow<br />early in the request lifecycle. This option is useful for<br />backends which have federated identity setup and can re-use<br />the token from the client.<br />Currently, this token must exist in the `Authorization` header.<br /> |
 
 
+#### SlowStartConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [LoadBalancerLeastRequestConfig](#loadbalancerleastrequestconfig)
+- [LoadBalancerRoundRobinConfig](#loadbalancerroundrobinconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `window` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Represents the size of slow start window.<br />If set, the newly created host remains in slow start mode starting from its creation time<br />for the duration of slow start window. |  |  |
+| `aggression` _string_ | This parameter controls the speed of traffic increase over the slow start window. Defaults to 1.0,<br />so that endpoint would get linearly increasing amount of traffic.<br />When increasing the value for this parameter, the speed of traffic ramp-up increases non-linearly.<br />The value of aggression parameter should be greater than 0.0.<br />By tuning the parameter, is possible to achieve polynomial or exponential shape of ramp-up curve.<br /><br />During slow start window, effective weight of an endpoint would be scaled with time factor and aggression:<br />`new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))`,<br />where `time_factor=(time_since_start_seconds / slow_start_time_seconds)`.<br /><br />As time progresses, more and more traffic would be sent to endpoint, which is in slow start window.<br />Once host exits slow start, time_factor and aggression no longer affect its weight. |  |  |
+| `minWeightPercent` _integer_ | Minimum weight percentage of an endpoint during slow start. |  |  |
+
+
 #### StaticBackend
 
 
@@ -1845,6 +2437,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `hosts` _[Host](#host) array_ | Hosts is a list of hosts to use for the backend. |  | MinItems: 1 <br /> |
+| `appProtocol` _[AppProtocol](#appprotocol)_ | AppProtocol is the application protocol to use when communicating with the backend. |  | Enum: [http2 grpc grpc-web kubernetes.io/h2c kubernetes.io/ws] <br />Optional <br /> |
 
 
 #### StatsConfig
@@ -1860,10 +2453,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `enabled` _boolean_ | Whether to expose metrics annotations and ports for scraping metrics. |  | Optional <br /> |
-| `routePrefixRewrite` _string_ | The Envoy stats endpoint to which the metrics are written |  | Optional <br /> |
-| `enableStatsRoute` _boolean_ | Enables an additional route to the stats cluster defaulting to /stats |  | Optional <br /> |
-| `statsRoutePrefixRewrite` _string_ | The Envoy stats endpoint with general metrics for the additional stats route |  | Optional <br /> |
+| `enabled` _boolean_ | Whether to expose metrics annotations and ports for scraping metrics. |  |  |
+| `routePrefixRewrite` _string_ | The Envoy stats endpoint to which the metrics are written |  |  |
+| `enableStatsRoute` _boolean_ | Enables an additional route to the stats cluster defaulting to /stats |  |  |
+| `statsRoutePrefixRewrite` _string_ | The Envoy stats endpoint with general metrics for the additional stats route |  |  |
 
 
 #### StatusCodeFilter
@@ -1902,6 +2495,45 @@ _Appears in:_
 | `vertexai` _[VertexAIConfig](#vertexaiconfig)_ |  |  |  |
 
 
+#### TCPKeepalive
+
+
+
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/address.proto#envoy-v3-api-msg-config-core-v3-tcpkeepalive) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `keepAliveProbes` _integer_ | Maximum number of keep-alive probes to send before dropping the connection. |  |  |
+| `keepAliveTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds a connection needs to be idle before keep-alive probes start being sent. |  |  |
+| `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  |  |
+
+
+#### TLSVersion
+
+_Underlying type:_ _string_
+
+TLSVersion defines the TLS version.
+
+_Validation:_
+- Enum: [AUTO 1.0 1.1 1.2 1.3]
+
+_Appears in:_
+- [SSLParameters](#sslparameters)
+
+| Field | Description |
+| --- | --- |
+| `AUTO` |  |
+| `1.0` |  |
+| `1.1` |  |
+| `1.2` |  |
+| `1.3` |  |
+
+
 #### TokenBucket
 
 
@@ -1918,7 +2550,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
 | `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
-| `fillInterval` _string_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  | Format: duration <br /> |
+| `fillInterval` _[Duration](#duration)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
 
 
 #### TrafficPolicy
@@ -1955,12 +2587,14 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetRefs` _[LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `ai` _[AIPolicy](#aipolicy)_ | AI is used to configure AI-based policies for the policy. |  |  |
 | `transformation` _[TransformationPolicy](#transformationpolicy)_ | Transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
 | `extProc` _[ExtProcPolicy](#extprocpolicy)_ | ExtProc specifies the external processing configuration for the policy. |  |  |
 | `extAuth` _[ExtAuthPolicy](#extauthpolicy)_ | ExtAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
+| `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 
 
 #### Transform
@@ -2002,6 +2636,22 @@ _Appears in:_
 | `response` _[Transform](#transform)_ | Response is used to modify the response path. |  |  |
 
 
+#### UpgradeConfig
+
+
+
+UpgradeConfig represents configuration for HTTP upgrades.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enabledUpgrades` _string array_ | List of upgrade types to enable (e.g. "websocket", "CONNECT", etc.) |  | MinItems: 1 <br /> |
+
+
 #### VertexAIConfig
 
 
@@ -2017,11 +2667,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Vertex AI API.<br />This token is automatically sent in the `key` header of the request. |  | Required <br /> |
-| `model` _string_ | The Vertex AI model to use.<br />For more information, see the [Vertex AI model docs](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models). |  | MinLength: 1 <br />Required <br /> |
-| `apiVersion` _string_ | The version of the Vertex AI API to use.<br />For more information, see the [Vertex AI API reference](https://cloud.google.com/vertex-ai/docs/reference#versions). |  | MinLength: 1 <br />Required <br /> |
-| `projectId` _string_ | The ID of the Google Cloud Project that you use for the Vertex AI. |  | MinLength: 1 <br />Required <br /> |
-| `location` _string_ | The location of the Google Cloud Project that you use for the Vertex AI. |  | MinLength: 1 <br />Required <br /> |
+| `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Vertex AI API.<br />This token is automatically sent in the `key` header of the request. |  |  |
+| `model` _string_ | The Vertex AI model to use.<br />For more information, see the [Vertex AI model docs](https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models). |  | MinLength: 1 <br /> |
+| `apiVersion` _string_ | The version of the Vertex AI API to use.<br />For more information, see the [Vertex AI API reference](https://cloud.google.com/vertex-ai/docs/reference#versions). |  | MinLength: 1 <br /> |
+| `projectId` _string_ | The ID of the Google Cloud Project that you use for the Vertex AI. |  | MinLength: 1 <br /> |
+| `location` _string_ | The location of the Google Cloud Project that you use for the Vertex AI. |  | MinLength: 1 <br /> |
 | `modelPath` _string_ | Optional: The model path to route to. Defaults to the Gemini model path, `generateContent`. |  |  |
 | `publisher` _[Publisher](#publisher)_ | The type of publisher model to use. Currently, only Google is supported. |  | Enum: [GOOGLE] <br /> |
 
@@ -2040,7 +2690,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook. |  | Required <br /> |
+| `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook. |  |  |
 | `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook. |  |  |
 
 

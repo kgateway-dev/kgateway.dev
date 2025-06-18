@@ -21,6 +21,8 @@ You can create an HTTPRoute and scope it to the waypoint proxy by referencing th
 {{% /callout %}}
 
 {{< reuse-image src="img/waypoint.svg" width="600px" caption="kgateway as a waypoint proxy in your ambient mesh" >}}
+{{< reuse-image-dark srcDark="img/waypoint.svg" width="600px" caption="kgateway as a waypoint proxy in your ambient mesh" >}}
+
 
 ## Set up an ambient mesh
 

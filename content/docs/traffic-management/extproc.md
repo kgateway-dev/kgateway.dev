@@ -19,6 +19,7 @@ With this approach, you have the flexibility to apply your requirements to all t
 The following diagram shows an example for how request header manipulation works when an external processing server is used. 
 
 {{< reuse-image src="img/extproc.svg" width="400" caption="Request header manipulation with external processing" >}}
+{{< reuse-image-dark srcDark="img/extproc.svg" width="400" caption="Request header manipulation with external processing" >}}
 
 1. The downstream service sends a request with headers to the Envoy gateway. 
 2. The gateway extracts the header information and sends it to the external processing server. 

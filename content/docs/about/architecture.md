@@ -11,6 +11,8 @@ Learn more about the components that make up kgateway. These components work tog
 The following image shows the different components that make up the kgateway control and data plane. These components work together to translate gateway custom resources into Envoy configuration. The Envoy configuration controls the behavior of the gateway proxies that serve your apps.
 
 {{< reuse-image src="img/translation.svg" caption="Kgateway component architecture" >}}
+{{< reuse-image-dark srcDark="img/translation-dark.svg" caption="Kgateway component architecture" >}}
+
 
 1. The config and secret watcher components in the `kgateway` pod watch the cluster for new Kubernetes Gateway API and kgateway resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the kgateway translation engine. 
@@ -43,6 +45,7 @@ The kgateway translator receives snapshots of all the Kubernetes Gateway API, Ku
 The following image shows the different stages of a translation cycle. 
 
 {{< reuse-image src="img/translation-loop.svg" caption="Kgateway translation cycle" >}}
+{{< reuse-image-dark srcDark="img/translation-loop-dark.svg" caption="Kgateway translation cycle" >}}
 
 1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
 

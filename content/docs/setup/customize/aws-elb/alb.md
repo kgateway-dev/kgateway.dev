@@ -141,6 +141,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    3. Find and open the ALB that was created for you, with a name such as `k8s-gateway-alb-<hash>`. Note that it might take a few minutes for the ALB to provision.
    4. On the **Resource map** tab, verify that the load balancer points to healthy EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
       {{< reuse-image src="img/alb.png" >}}
+      {{< reuse-image-dark srcDark="img/alb.png" >}}
 
 ## Step 3: Test the ALB
 

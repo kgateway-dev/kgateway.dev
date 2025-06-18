@@ -6,13 +6,13 @@
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "docs/snippets/default-proxy.md" >}} -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"  %}}
    ```sh
-   kubectl port-forward deployment/http -n kgateway-system 8080:8080
+   kubectl port-forward deployment/{{< reuse "docs/snippets/default-proxy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
