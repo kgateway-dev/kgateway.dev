@@ -10,13 +10,13 @@ Review the following diagram to understand the setup.
 
 ```mermaid
 flowchart LR
-    A[client] -->|example.com| B[{{< reuse "/docs/snippets/kgateway.md" >}} proxy]
+    A[client] -->|example.com| B[gateway proxy]
     B --> C[httpbin backend]
 ```
 
 * The client calls the `www.example.com` hostname that you set up in the Gateway configuration.
-* The {{< reuse "/docs/snippets/kgateway.md" >}} proxy receives the request. Based on the routing rules that you set up in the Gateway configuration, the {{< reuse "/docs/snippets/kgateway.md" >}} proxy forwards the traffic to the backend destination, which is the httpbin service. The {{< reuse "/docs/snippets/kgateway.md" >}} proxy is available from an external LoadBalancer service that is backed by an IP address that your cloud provider typically assigns. For testing in a local cluster where you do not have an external service, you can enable port-forwarding so that the {{< reuse "/docs/snippets/kgateway.md" >}} proxy listens on the localhost instead.
-* The httpbin service receives and responds to the request. Note that the httpbin service does not have to be publicly exposed because the {{< reuse "/docs/snippets/kgateway.md" >}} proxy handles the external traffic. Instead, it can have an internal service type, such as ClusterIP.
+* The gateway proxy receives the request. Based on the routing rules that you set up in the Gateway configuration, the gateway proxy forwards the traffic to the backend destination, which is the httpbin service. The gateway proxy is available from an external LoadBalancer service that is backed by an IP address that your cloud provider typically assigns. For testing in a local cluster where you do not have an external service, you can enable port-forwarding so that the gateway proxy listens on the localhost instead.
+* The httpbin service receives and responds to the request. Note that the httpbin service does not have to be publicly exposed because the gateway proxy handles the external traffic. Instead, it can have an internal service type, such as ClusterIP.
 
 ## Before you begin
 
