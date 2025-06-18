@@ -210,7 +210,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
 3. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name={{< reuse "docs/snippets/default-proxy.md" >}} | tail -1 | jq
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name={{< reuse "docs/snippets/default-proxy.md" >}} | tail -1
    ```
 
    Example output: Note that the `response_flags` field is `-`, which means that the request was not retried.
