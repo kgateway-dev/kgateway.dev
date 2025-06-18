@@ -14,8 +14,8 @@ For example, if the parent HTTPRoute resource specifies the `header` header, the
 
 The following image illustrates the route delegation hierarchy:
 
-{{< reuse-image src="img/route-delegation-header-query.svg" >}}
-{{< reuse-image-dark srcDark="img/route-delegation-header-query.svg" >}}
+{{< reuse-image src="img/route-delegation-header-query.svg" width="800" >}}
+{{< reuse-image-dark srcDark="img/route-delegation-header-query-dark.svg" width="800" >}}
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource delegates traffic as follows: 
@@ -26,7 +26,8 @@ The following image illustrates the route delegation hierarchy:
 * The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path if the `header1: val1` and `headerX: valX` request headers and `query1=val1` and `queryX=valX` query parameters are present in the request. Requests that match these conditions are forwarded to the httpbin app in namespace `team1`. Note that the headers and query parameters are a superset of the headers and query parameters that the parent HTTPRoute resource defines.
 
 **`child-team2` HTTPRoute**: 
-* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact prefix path if the `headerX: valX` request header and `queryX=valX` query parameter are present in the request. Because the child HTTPRoute resource does not specify the same header and query parameters that the parent HTTPRoute specified, the route is considered invalid. 
+* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact prefix path if the `headerX: valX` request header and `queryX=valX` query parameter are present in the request. Because the child HTTPRoute resource does not specify the same header and query parameters that the parent HTTPRoute specified, the route is considered invalid.
+* You later apply a different version of the `child-team2` HTTPRoute that specifies the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation. This annotation allows the HTTPRoute to inherit the matchers, headers, and query parameters from the parent. Because of that, the route is considered valid and traffic can be routed to the httpbin app in the team2 namespace.
 
 ## Before you begin
 
@@ -233,9 +234,9 @@ The following image illustrates the route delegation hierarchy:
    
 ## Inherit parent attributes
 
-Instead of requiring the child HTTPRoutes to define the same matchers, headers, and query parameters as the parent HTTPRoute, you can use the `delegation.gateway.solo.io/inherit-parent-matcher: "true"` annotation on the child HTTPRoute to inherit these attributes from the parent. This setting is useful if you want to use paths that are relative to the parent path, or augment the headers and query parameters that are set on the parent. 
+Instead of requiring the child HTTPRoutes to define the same matchers, headers, and query parameters as the parent HTTPRoute, you can use the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation on the child HTTPRoute to inherit these attributes from the parent. This setting is useful if you want to use paths that are relative to the parent path, or augment the headers and query parameters that are set on the parent. 
 
-1. Update the `child-team2` HTTPRoute to include the `delegation.gateway.solo.io/inherit-parent-matcher: "true"` annotation. This annotation allows the `child-team2` HTTPRoute to inherit the matchers, headers, and query parameters that are defined on the parent.
+1. Update the `child-team2` HTTPRoute to include the `delegation.kgateway.dev/inherit-parent-matcher: "true"` annotation. This annotation allows the `child-team2` HTTPRoute to inherit the matchers, headers, and query parameters that are defined on the parent.
 
    The following configuration specifies the `/` prefix path and therefore allows all paths that are relative to the parent's `/anything/team2` prefix matcher. In addition, you augment the header and query parameters from the parent with custom header and query parameters. Note that when you sent requests to the `child-team2` HTTPRoute earlier, these requests failed, because the HTTPRoute did not define the same header and query parameters as the `parent` in addition to the custom values. 
    ```yaml
@@ -246,7 +247,7 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
      name: child-team2
      namespace: team2
      annotations:
-       delegation.{{< reuse "docs/snippets/annotation-name.md"  >}}.dev/inherit-parent-matcher: "true"
+       delegation.kgateway.dev/inherit-parent-matcher: "true"
    spec:
      rules:
      - matches:
@@ -271,13 +272,13 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2 \
+   curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -i localhost:8080/anything/team2/bar?queryX=valX&query2=val2 \
+   curl -i "localhost:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
@@ -348,7 +349,7 @@ kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
-kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
-kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
+kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2
 ```

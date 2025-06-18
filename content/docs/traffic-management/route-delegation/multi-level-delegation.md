@@ -11,7 +11,7 @@ Create a 3-level route delegation hierarchy with a parent, child, and grandchild
 In this guide you walk through a route delegation example that demonstrates route delegation from a parent HTTPRoute resource to a child HTTPRoute resource, and from a child HTTPRoute resource to a grandchild HTTPRoute resource. The following image illustrates the route delegation hierarchy:
 
 {{< reuse-image src="img//route-delegation-multi-level.svg" >}} 
-{{< reuse-image-dark srcDark="img//route-delegation-multi-level.svg" >}} 
+{{< reuse-image-dark srcDark="img//route-delegation-multi-level-dark.svg" >}} 
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource `parent` delegates traffic as follows: 
@@ -250,8 +250,8 @@ kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
 kubectl delete httproute grandchild -n team2
-kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
-kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
+kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2
 ```
 

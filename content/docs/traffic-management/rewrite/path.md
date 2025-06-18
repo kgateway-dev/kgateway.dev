@@ -75,7 +75,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    {{< /tabs >}}
    
    Example output: 
-   ```
+   ```console {hl_lines=[3]}
    ...
    "origin": "10.0.9.36:50660",
    "url": "http://rewrite.example:8080/anything",
@@ -101,7 +101,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    {{< /tabs >}}
    
    Example output: 
-   ```
+   ```console {hl_lines=[3]}
    ...
    "origin": "10.0.9.36:50660",
    "url": "http://rewrite.example:8080/anything/200",
@@ -171,7 +171,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    {{< /tabs >}}
    
    Example output: 
-   ```
+   ```console {hl_lines=[3]}
    ...
    "origin": "10.0.9.36:50660",
    "url": "http://rewrite.example:8080/anything",
@@ -197,7 +197,7 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    {{< /tabs >}}
    
    Example output: 
-   ```
+   ```console {hl_lines=[3]}
    ...
    "origin": "10.0.9.36:50660",
    "url": "http://rewrite.example:8080/anything",
