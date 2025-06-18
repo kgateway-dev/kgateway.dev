@@ -137,7 +137,7 @@ spec:
 
 2. Port-forward the gateway proxy on port 19000. 
    ```sh
-   kubectl port-forward deployment/{{< reuse "docs/snippets/default-proxy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 19000
+   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000
    ```
    
 3. Get the configuration of your gateway proxy as a config dump. 
