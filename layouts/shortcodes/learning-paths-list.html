@@ -44,7 +44,7 @@
                   {{ end }}
                   {{ if .youtube }}
                     {{ if .blog }}|{{ end }}
-                    <a href="{{ .video }}" class="text-primary-bg">Video</a>
+                    <a href="https://youtu.be/{{ .youtube }}" class="text-primary-bg">Video</a>
                   {{ end }}
                   {{ if .lab }}
                     {{ if or (.video) (.youtube) }}|{{ end }}
