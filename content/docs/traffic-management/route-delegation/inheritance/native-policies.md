@@ -136,8 +136,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    ```
 
 4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code and that the `X-Envoy-Expected-Rq-Timeout-Ms` header is set to 10000 milliseconds (10s) as defined on the `parent` HTTPRoute.
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080" 
@@ -193,8 +193,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    ```
 
 5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code and that the `X-Envoy-Expected-Rq-Timeout-Ms` header is set to 30000 milliseconds (30s) as defined on the `child-team2` HTTPRoute. The timeout setting of 20s that was defined on the `parent` was not applied and overridden by the timeout setting of 30s on the `child-team2` HTTPRoute. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 

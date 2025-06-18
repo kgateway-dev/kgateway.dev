@@ -7,7 +7,7 @@ description: Learn how policy inheritance and overrides work for kgateway polici
 Learn how policy inheritance and overrides work for kgateway policies in a route delegation setup.
 
 {{% callout type="info" %}} 
-Want to learn more about policy inheritance and overrides for Kubernetes Gateway API-native policies? See [K8s GW API-native policies](/docs/traffic-management/route-delegation/inheritance/native-policies/). 
+Want to learn more about policy inheritance and overrides for Kubernetes Gateway API-native policies? See [K8s GW API-native policies](../native-policies/). 
 {{% /callout %}}
 
 {{% callout type="warning" %}} 
@@ -182,8 +182,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    ```
 
 6. Send a request to the httpbin app on the `delegation.parent1.example` domain. Because the `parent1` HTTPRoute does not allow a child HTTPRoute to override the policies, the child HTTPRoute inherits the policies that are set on the `parent1` HTTPRoute. The TrafficPolicy that you created earlier and applied to the `child-team1` HTTPRoute is ignored. Verify that you see the `X-Parent-Policy` header in your response.
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation-parent1.example:8080" 
@@ -235,8 +235,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    ```
 
 7. Send another request to the `delegation.parent1.example` domain. Verify that this time the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation-parent1.example:8080" 
@@ -264,8 +264,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
 8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute resource has the `delegation.{{< reuse "docs/snippets/annotation-name.md" >}}.dev/inherited-policy-priority: PreferChild` annotation set, the child HTTPRoute can override any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
 
    Verify that you see the custom `X-Child-Team1` header in your response. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation-parent2.example:8080" 
@@ -315,8 +315,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    ```
 
 9. Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation-parent2.example:8080" 
