@@ -385,7 +385,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
-| `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the authentication method will be inferred from the<br />environment (e.g. instance metadata, EKS Pod Identity, environment variables, etc.)<br />This may not work in all environments, so it is recommended to specify an authentication method.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
+| `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the following credential providers are tried in order, stopping when one<br />of them returns an access key ID and a secret access key (the session token is optional):<br />1. Environment variables: when the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN are set.<br />2. AssumeRoleWithWebIdentity API call: when the environment variables AWS_WEB_IDENTITY_TOKEN_FILE and AWS_ROLE_ARN are set.<br />3. EKS Pod Identity: when the environment variable AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE is set.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
 | `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
 | `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 
@@ -491,8 +491,8 @@ _Appears in:_
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
 | `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
 | `http1ProtocolOptions` _[Http1ProtocolOptions](#http1protocoloptions)_ | Additional options when handling HTTP1 requests upstream. |  |  |
-| `sslConfig` _[SSLConfig](#sslconfig)_ | SSLConfig contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
-| `loadBalancerConfig` _[LoadBalancerConfig](#loadbalancerconfig)_ | LoadBalancerConfig contains the options necessary to configure the load balancer. |  |  |
+| `tls` _[TLS](#tls)_ | TLS contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
+| `loadBalancer` _[LoadBalancer](#loadbalancer)_ | LoadBalancer contains the options necessary to configure the load balancer. |  |  |
 
 
 #### BackendSpec
@@ -640,6 +640,26 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `match` _string_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true.<br />see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  |  |
+
+
+#### CSRFPolicy
+
+
+
+CSRFPolicy can be used to set percent of requests for which the CSRF filter is enabled,
+enable shadow-only mode where policies will be evaluated and tracked, but not enforced and
+add additional source origins that will be allowed in addition to the destination origin.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `percentageEnabled` _integer_ | Specifies the percentage of requests for which the CSRF filter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `percentageShadowed` _integer_ | Specifies that CSRF policies will be evaluated and tracked, but not enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
 
 
 #### CommonHttpProtocolOptions
@@ -1535,7 +1555,7 @@ _Appears in:_
 | `authHeaderOverride` _[AuthHeaderOverride](#authheaderoverride)_ | Customizes the Authorization header sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
 
-#### LoadBalancerConfig
+#### LoadBalancer
 
 
 
@@ -1555,7 +1575,7 @@ _Appears in:_
 | `ringHash` _[LoadBalancerRingHashConfig](#loadbalancerringhashconfig)_ | RingHash configures the ring hash load balancer type. |  |  |
 | `maglev` _[LoadBalancerMaglevConfig](#loadbalancermaglevconfig)_ | Maglev configures the maglev load balancer type. |  |  |
 | `random` _[LoadBalancerRandomConfig](#loadbalancerrandomconfig)_ | Random configures the random load balancer type. |  |  |
-| `localityConfigType` _[LocalityConfigType](#localityconfigtype)_ | LocalityConfigType specifies the locality config type to use.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/common/v3/common.proto#envoy-v3-api-msg-extensions-load-balancing-policies-common-v3-localitylbconfig |  | Enum: [WeightedLb] <br /> |
+| `localityType` _[LocalityType](#localitytype)_ | LocalityType specifies the locality config type to use.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/common/v3/common.proto#envoy-v3-api-msg-extensions-load-balancing-policies-common-v3-localitylbconfig |  | Enum: [WeightedLb] <br /> |
 | `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
 | `closeConnectionsOnHostSetChange` _boolean_ | If set to true, the load balancer will drain connections when the host set changes.<br /><br />Ring Hash or Maglev can be used to ensure that clients with the same key<br />are routed to the same upstream host.<br />Distruptions can cause new connections with the same key as existing connections<br />to be routed to different hosts.<br />Enabling this feature will cause the load balancer to drain existing connections<br />when the host set changes, ensuring that new connections with the same key are<br />consistently routed to the same host.<br />Connections are not immediately closed, but are allowed to drain<br />before being closed. |  |  |
 
@@ -1569,12 +1589,12 @@ LoadBalancerLeastRequestConfig configures the least request load balancer type.
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. |  |  |
-| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
+| `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
 
 
 #### LoadBalancerMaglevConfig
@@ -1586,7 +1606,7 @@ _Appears in:_
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 
 
@@ -1599,7 +1619,7 @@ _Appears in:_
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 
 
@@ -1612,7 +1632,7 @@ LoadBalancerRingHashConfig configures the ring hash load balancer type.
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1629,11 +1649,11 @@ LoadBalancerRoundRobinConfig configures the round robin load balancer type.
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `slowStartConfig` _[SlowStartConfig](#slowstartconfig)_ | SlowStartConfig configures the slow start configuration for the load balancer. |  |  |
+| `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
 
 
 #### LocalPolicyTargetReference
@@ -1718,7 +1738,7 @@ _Appears in:_
 | `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
 
 
-#### LocalityConfigType
+#### LocalityType
 
 _Underlying type:_ _string_
 
@@ -1727,7 +1747,7 @@ _Underlying type:_ _string_
 
 
 _Appears in:_
-- [LoadBalancerConfig](#loadbalancerconfig)
+- [LoadBalancer](#loadbalancer)
 
 | Field | Description |
 | --- | --- |
@@ -1843,6 +1863,25 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  |  |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request.<br />This setting can be useful when setting up model failover within the same LLM provider. |  |  |
+
+
+#### Parameters
+
+
+
+
+
+
+
+_Appears in:_
+- [TLS](#tls)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tlsMinVersion` _[TLSVersion](#tlsversion)_ | Minimum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `tlsMaxVersion` _[TLSVersion](#tlsversion)_ | Maximum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `cipherSuites` _string array_ |  |  |  |
+| `ecdhCurves` _string array_ |  |  |  |
 
 
 #### PathOverride
@@ -2218,66 +2257,6 @@ _Appears in:_
 | `CHAT_STREAMING` | Stream responses to a client, which allows the LLM to stream out tokens as they are generated.<br /> |
 
 
-#### SSLConfig
-
-
-
-
-
-
-
-_Appears in:_
-- [BackendConfigPolicySpec](#backendconfigpolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
-| `sslFiles` _[SSLFiles](#sslfiles)_ | File paths to certificates local to the proxy. |  |  |
-| `sni` _string_ | The SNI domains that should be considered for TLS connection |  |  |
-| `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
-| `sslParameters` _[SSLParameters](#sslparameters)_ | General TLS parameters. See the [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto#extensions-transport-sockets-tls-v3-tlsparameters)<br />for more information on the meaning of these values. |  |  |
-| `alpnProtocols` _string array_ | Set Application Level Protocol Negotiation<br />If empty, defaults to ["h2", "http/1.1"]. |  |  |
-| `allowRenegotiation` _boolean_ | Allow Tls renegotiation, the default value is false.<br />TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary. |  |  |
-| `oneWayTLS` _boolean_ | If the SSL config has the ca.crt (root CA) provided, kgateway uses it to perform mTLS by default.<br />Set oneWayTls to true to disable mTLS in favor of server-only TLS (one-way TLS), even if kgateway has the root CA.<br />If unset, defaults to false. |  |  |
-
-
-#### SSLFiles
-
-
-
-
-
-
-
-_Appears in:_
-- [SSLConfig](#sslconfig)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `tlsCertificate` _string_ |  |  |  |
-| `tlsKey` _string_ |  |  |  |
-| `rootCA` _string_ |  |  |  |
-
-
-#### SSLParameters
-
-
-
-
-
-
-
-_Appears in:_
-- [SSLConfig](#sslconfig)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `tlsMinVersion` _[TLSVersion](#tlsversion)_ | Minimum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
-| `tlsMaxVersion` _[TLSVersion](#tlsversion)_ | Maximum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
-| `cipherSuites` _string array_ |  |  |  |
-| `ecdhCurves` _string array_ |  |  |  |
-
-
 #### SdsBootstrap
 
 
@@ -2404,7 +2383,7 @@ _Appears in:_
 | `Passthrough` | Passthrough the existing token. This token can either<br />come directly from the client, or be generated by an OIDC flow<br />early in the request lifecycle. This option is useful for<br />backends which have federated identity setup and can re-use<br />the token from the client.<br />Currently, this token must exist in the `Authorization` header.<br /> |
 
 
-#### SlowStartConfig
+#### SlowStart
 
 
 
@@ -2473,6 +2452,27 @@ _Appears in:_
 
 
 
+#### StringMatcher
+
+
+
+Specifies the way to match a string.
+
+
+
+_Appears in:_
+- [CSRFPolicy](#csrfpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `exact` _string_ | The input string must match exactly the string specified here.<br />Example: abc matches the value abc |  |  |
+| `prefix` _string_ | The input string must have the prefix specified here.<br />Note: empty prefix is not allowed, please use regex instead.<br />Example: abc matches the value abc.xyz |  |  |
+| `suffix` _string_ | The input string must have the suffix specified here.<br />Note: empty prefix is not allowed, please use regex instead.<br />Example: abc matches the value xyz.abc |  |  |
+| `contains` _string_ | The input string must contain the substring specified here.<br />Example: abc matches the value xyz.abc.def |  |  |
+| `safeRegex` _string_ | The input string must match the Google RE2 regular expression specified here.<br />See https://github.com/google/re2/wiki/Syntax for the syntax. |  |  |
+| `ignoreCase` _boolean_ | If true, indicates the exact/prefix/suffix/contains matching should be<br />case insensitive. This has no effect on the regex match.<br />For example, the matcher data will match both input string Data and data if this<br />option is set to true. | false |  |
+
+
 #### SupportedLLMProvider
 
 
@@ -2513,6 +2513,47 @@ _Appears in:_
 | `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  |  |
 
 
+#### TLS
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
+| `tlsFiles` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
+| `sni` _string_ | The SNI domains that should be considered for TLS connection |  |  |
+| `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
+| `parameters` _[Parameters](#parameters)_ | General TLS parameters. See the [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto#extensions-transport-sockets-tls-v3-tlsparameters)<br />for more information on the meaning of these values. |  |  |
+| `alpnProtocols` _string array_ | Set Application Level Protocol Negotiation<br />If empty, defaults to ["h2", "http/1.1"]. |  |  |
+| `allowRenegotiation` _boolean_ | Allow Tls renegotiation, the default value is false.<br />TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary. |  |  |
+| `oneWayTLS` _boolean_ | If the TLS config has the ca.crt (root CA) provided, kgateway uses it to perform mTLS by default.<br />Set oneWayTls to true to disable mTLS in favor of server-only TLS (one-way TLS), even if kgateway has the root CA.<br />If unset, defaults to false. |  |  |
+
+
+#### TLSFiles
+
+
+
+
+
+
+
+_Appears in:_
+- [TLS](#tls)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tlsCertificate` _string_ |  |  |  |
+| `tlsKey` _string_ |  |  |  |
+| `rootCA` _string_ |  |  |  |
+
+
 #### TLSVersion
 
 _Underlying type:_ _string_
@@ -2523,7 +2564,7 @@ _Validation:_
 - Enum: [AUTO 1.0 1.1 1.2 1.3]
 
 _Appears in:_
-- [SSLParameters](#sslparameters)
+- [Parameters](#parameters)
 
 | Field | Description |
 | --- | --- |
@@ -2595,6 +2636,7 @@ _Appears in:_
 | `extAuth` _[ExtAuthPolicy](#extauthpolicy)_ | ExtAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
+| `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
 
 
 #### Transform
