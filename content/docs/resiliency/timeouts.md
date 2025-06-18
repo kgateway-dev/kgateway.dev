@@ -52,7 +52,7 @@ Specify timeouts for a specific route.
    EOF
    ```
 
-2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, kgateway expects requests to the httpbin app to succeed within the set timeout. 
+2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "/docs/snippets/kgateway.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
