@@ -156,8 +156,8 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
    
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
@@ -212,8 +212,8 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
    
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"

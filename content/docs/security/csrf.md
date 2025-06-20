@@ -41,10 +41,6 @@ Use a TrafficPolicy resource to define your CSRF rules.
      name: csrf
      namespace: httpbin
    spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin-csrf
      csrf:
        percentageEnabled: 100
        additionalOrigins:
@@ -79,7 +75,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
        - filters:
            - type: ExtensionRef
              extensionRef:
-               group: gateway.example.com
+               group: gateway.kgateway.dev
                kind: TrafficPolicy
                name: csrf
          backendRefs:
@@ -90,8 +86,8 @@ Use a TrafficPolicy resource to define your CSRF rules.
    
 3. Send a request to the httpbin app on the `csrf.example` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
 
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080"
    ```
@@ -113,8 +109,8 @@ Use a TrafficPolicy resource to define your CSRF rules.
 
 4. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
    
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080" -H "origin: allowThisOne.example.com"
    ```
