@@ -16,3 +16,9 @@
    ```
    {{% /tab %}}
    {{< /tabs >}}
+
+4. Install the experimental channel of the Kubernetes Gateway API to use this feature.
+
+   ```shell
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+   ```

@@ -8,9 +8,9 @@ Specify the number of times and duration for the gateway to try a connection to 
 
 The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts](../timeouts/) to ensure that your apps are available even if they are temporarily unavailable.
 
-{{% callout type="warning" %}} 
+{{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-experimental.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 ## About
 
