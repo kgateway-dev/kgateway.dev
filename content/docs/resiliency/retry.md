@@ -184,7 +184,64 @@ Set up retries to the reviews app on the HTTPRoute resource.
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
    | `timeouts` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
 
-2. Send a request to the reviews app. Verify that the request succeeds.
+2. Verify that the gateway proxy is configured to retry the request.
+
+   1. Port-forward the gateway proxy on port 19000.
+
+      ```sh
+      kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000
+      ```
+
+   2. Get the configuration of your gateway proxy as a config dump.
+
+      ```sh
+      curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
+      ```
+
+   3. Open the config dump and find the route configuration for the `kube_default_reviews_9080` Envoy cluster on the `listener~8080~retry_example` virtual host. Verify that the retry policy is set as you configured it.
+      
+      Example `jq` command:
+      
+      ```sh
+      jq '.configs[] | select(."@type" == "type.googleapis.com/envoy.admin.v3.RoutesConfigDump") | .dynamic_route_configs[].route_config.virtual_hosts[] | select(.routes[].route.cluster == "kube_default_reviews_9080")' gateway-config.json
+      ```
+
+      Example output:
+      ```json
+      {
+        "name": "listener~8080~retry_example",
+        "domains": [
+          "retry.example"
+        ],
+        "routes": [
+          {
+            "match": {
+              "prefix": "/"
+            },
+            "route": {
+              "cluster": "kube_default_reviews_9080",
+              "timeout": "20s",
+              "retry_policy": {
+                "retry_on": "gateway-error,connect-failure,reset",
+                "num_retries": 3,
+                "per_try_timeout": "1s",
+                "retriable_status_codes": [
+                  404
+                ],
+                "retry_back_off": {
+                  "base_interval": "0.025s"
+                }
+              },
+              "cluster_not_found_response_code": "INTERNAL_SERVER_ERROR"
+            },
+            "name": "listener~8080~retry_example-route-0-httproute-retry-default-0-0-matcher-0"
+          }
+        ]
+      }
+      ...
+      ```
+
+3. Send a request to the reviews app. Verify that the request succeeds.
  
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -207,7 +264,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
    {"id": "1","podname": "reviews-v1-598b896c9d-l7d8l","clustername": "null","reviews": [{  "reviewer": "Reviewer1",  "text": "An extremely entertaining play by Shakespeare. The slapstick humour is refreshing!"},{  "reviewer": "Reviewer2",  "text": "Absolutely fun and entertaining. The play lacks thematic depth when compared to other plays by Shakespeare."}]}
    ```
 
-3. Check the gateway's access logs to verify that the request was not retried.
+4. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
    kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1
