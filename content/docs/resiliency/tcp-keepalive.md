@@ -6,9 +6,9 @@ description: Manage idle and stale connections with TCP keepalive.
 
 Manage idle and stale connections with TCP keepalive.
 
-{{% callout type="warning" %}} 
+{{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 ## About TCP keepalive
 

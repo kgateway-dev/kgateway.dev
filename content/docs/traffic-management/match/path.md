@@ -202,7 +202,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      * The request path must start with `/anything/`, followed by either `dogs/` or `cats/`.
      * `\\d` matches a single digit.
      * `[.]` matches a literal period.
-     * `\\d.*` matches a single digit followed by any character.
+     * `\\d.*` matches a single digit followed by zero or any character.
      * Allowed pattern: `/anything/dogs/3.0-game`, not allowed: `/anything/birds`
    ```yaml
    kubectl apply -f- <<EOF
