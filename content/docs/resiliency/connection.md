@@ -6,9 +6,9 @@ description: Configure and manage HTTP connections to an upstream service.
 
 Configure and manage HTTP connections to an upstream service. 
 
-{{% callout type="warning" %}} 
+{{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 ## Supported HTTP connection settings
 
