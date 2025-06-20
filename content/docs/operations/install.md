@@ -4,22 +4,26 @@ weight: 5
 description: Install kgateway and related components.
 ---
 
-In this installation guide, you install kgateway in a Kubernetes cluster, set up an API gateway, deploy a sample app, and access that app through the API gateway.
+In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >}} in a Kubernetes cluster, set up an API gateway, deploy a sample app, and access that app through the API gateway.
 
-The guide includes steps to install kgateway in two ways.
+The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} in two ways.
 
 {{< tabs items="Helm,Argo CD" >}}
   
-  {{% tab %}}[Helm](https://helm.sh/) is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.{{% /tab %}}
+  {{% tab %}}
+  [Helm](https://helm.sh/) is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.
+  {{% /tab %}}
   
-  {{% tab %}}[Argo CD](https://argoproj.github.io/cd/) is a declarative continuous delivery tool that is especially popular for large, production-level installations at scale. This approach incorporates Helm configuration files.{{% /tab %}}
+  {{% tab %}}
+  [Argo CD](https://argoproj.github.io/cd/) is a declarative continuous delivery tool that is especially popular for large, production-level installations at scale. This approach incorporates Helm configuration files.
+  {{% /tab %}}
 
 {{< /tabs >}}
 
 ## Before you begin
 
 {{< callout type="warning" >}}
-{{< reuse "docs/snippets/one-install.md" >}} If you already tried out kgateway by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
+{{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
 {{< /callout >}}
 
 {{< tabs items="Helm,Argo CD" >}}
@@ -61,11 +65,15 @@ The guide includes steps to install kgateway in two ways.
 
 ## Install kgateway
 
-Install the open source kgateway project in your Kubernetes cluster.
+Install {{< reuse "/docs/snippets/kgateway.md" >}} in your Kubernetes cluster. Choose from the following installation options:
 
-{{< tabs items="Helm,Argo CD" >}}
+* [Helm](#helm)
+* [Argo CD](#argo-cd)
 
-{{% tab %}}
+### Helm
+
+Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
+
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
@@ -87,13 +95,13 @@ Install the open source kgateway project in your Kubernetes cluster.
    ```
    {{< /callout >}}
 
-2. Deploy the kgateway CRDs by using Helm. This command creates the kgateway-system namespace and creates the kgateway CRDs in the cluster.
+2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
 
    ```sh
-   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
 
-3. Optional: Pull and inspect the kgateway Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
+3. Optional: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
    {{< callout type="info" >}}
    For common values that you might want to update, see [Installation settings](#installation-settings).
@@ -105,10 +113,10 @@ Install the open source kgateway project in your Kubernetes cluster.
    open kgateway/values.yaml
    ```
       
-4. Install kgateway by using Helm. This command installs the kgateway control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
+4. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
    
    ```sh
-   helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
    
@@ -116,16 +124,16 @@ Install the open source kgateway project in your Kubernetes cluster.
    ```txt
    NAME: kgateway
    LAST DEPLOYED: Thu Feb 13 14:03:51 2025
-   NAMESPACE: kgateway-system
+   NAMESPACE: {{< reuse "docs/snippets/namespace.md" >}}
    STATUS: deployed
    REVISION: 1
    TEST SUITE: None
    ```
 
-5. Verify that the kgateway control plane is up and running. 
+5. Verify that the control plane is up and running. 
    
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
    Example output: 
@@ -134,12 +142,15 @@ Install the open source kgateway project in your Kubernetes cluster.
    kgateway-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-6. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
+6. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
    ```sh
-   kubectl get gatewayclass kgateway
+   kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
-{{% /tab %}}
-{{% tab %}}
+
+### Argo CD
+
+Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
+
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
    
    ```sh
@@ -174,7 +185,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
 
-5. Create an Argo CD application to deploy the kgateway CRD Helm chart. 
+5. Create an Argo CD application to deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRD Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -185,7 +196,7 @@ Install the open source kgateway project in your Kubernetes cluster.
      namespace: argocd
    spec:
      destination:
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
        server: https://kubernetes.default.svc
      project: default
      source:
@@ -206,7 +217,7 @@ Install the open source kgateway project in your Kubernetes cluster.
    EOF
    ```
 
-6. Create an Argo CD application to install the kgateway Helm chart. 
+6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -217,7 +228,7 @@ Install the open source kgateway project in your Kubernetes cluster.
      namespace: argocd
    spec:
      destination:
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
        server: https://kubernetes.default.svc
      project: default
      source:
@@ -238,10 +249,10 @@ Install the open source kgateway project in your Kubernetes cluster.
    EOF
    ```
    
-7. Verify that the `kgateway` control plane is up and running.
+7. Verify that the control plane is up and running.
    
    ```sh
-   kubectl get pods -n kgateway-system 
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} 
    ```
    
    Example output: 
@@ -255,22 +266,19 @@ Install the open source kgateway project in your Kubernetes cluster.
    kgateway-resource-rollout-cleanup-nj4t8   0/1     Completed   0          39s
    ```
 
-8. Verify that the `kgateway` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
+8. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
    
    ```sh
-   kubectl get gatewayclass kgateway
+   kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
 
 9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
    {{< reuse-image src="/img/argo-kgateway.png" >}}
 
-{{% /tab %}}
-{{< /tabs >}}
-
 ## Installation settings {#installation-settings}
 
-You can update several installation settings in your Helm values file. For example, you can update the namespace, update the resource limits and requests, or enable extensions such as for AI.
+You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
 
 ### Helm reference docs {#helm-docs}
 
@@ -282,7 +290,7 @@ For more information, see the Helm reference docs.
 
 ### Namespace discovery {#namespace-discovery}
 
-You can limit the namespaces that kgateway watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit kgateway to only watch a specific namespace for gateway configuration.
+You can limit the namespaces that {{< reuse "/docs/snippets/kgateway.md" >}} watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit {{< reuse "/docs/snippets/kgateway.md" >}} to only watch a specific namespace for gateway configuration.
 
 Namespace selectors are a list of matched expressions or labels.
 
