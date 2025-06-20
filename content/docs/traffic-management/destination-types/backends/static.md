@@ -5,7 +5,7 @@ weight: 10
 
 Route requests to services that listen for incoming traffic on a fixed IP address and port or hostname and port combination by using static Backends.
 
-You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource. Unlike Backends that are dynamically created by using the discovery feature in kgateway, static Backend resources must be created manually by the user.  
+You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource. Unlike Backends that are dynamically created by using the discovery feature in {{< reuse "/docs/snippets/kgateway.md" >}}, static Backend resources must be created manually by the user.  
 
 ## Before you begin
 
@@ -46,7 +46,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - static.example
      rules:
@@ -63,13 +63,13 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 3. Send a request to your Backend and verify that you get back a 200 HTTP response code and a list of posts. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/posts -H "host: static.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/posts -H "host: static.example:8080" 
    ```
