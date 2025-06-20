@@ -38,12 +38,7 @@ The CORS filter supports only exact matches, not wildcard matchers. This limitat
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
-4. Install the experimental channel of the Kubernetes Gateway API at version 1.3.0 or later so that you can use CORS.
-
-   ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
-   ```
+{{< reuse "docs/snippets/prereq-x-channel.md" >}}
 
 ## Set up CORS policies
 
