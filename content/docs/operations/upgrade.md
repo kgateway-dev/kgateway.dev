@@ -141,9 +141,17 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 
 2. Apply the kgateway CRDs for the upgrade version by using Helm.
 
-   ```sh
-   helm upgrade -i --namespace kgateway-system --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-   ```
+   1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
+
+      ```sh
+      helm template --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds --output-dir ./helm
+      ```
+
+   2. Upgrade the CRDs in your cluster:
+
+      ```sh
+      helm upgrade -i --namespace kgateway-system --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+      ```
 
 3. Make any changes to your Helm values.
    
