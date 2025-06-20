@@ -63,7 +63,7 @@ metadata:
 spec:
   parentRefs:
     - name: http
-      namespace: kgateway-system
+      namespace: {{< reuse "docs/snippets/namespace.md" >}}
   hostnames:
     - cors.example
   rules:
@@ -131,7 +131,7 @@ EOF
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - cors.example
      rules:
