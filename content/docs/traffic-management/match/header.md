@@ -109,7 +109,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      * `[.]` matches a literal period.
      * `\\d.*` matches a single digit followed by zero or any character.
      * Allowed pattern: `3.0-game`, not allowed: `30`
-   * `Bearer\s.*`: The value of the `Authorization` request header must be `Bearer` followed by a space (`/s`), followed by zero or any characters (`.*`).
+   * `Bearer\s.*`: The value of the `Authorization` request header must be `Bearer` followed by a space (`\s`), followed by zero or any characters (`.*`).
      * Allowed pattern: `Bearer 123`, not allowed: `Bearer` 
    ```yaml
    kubectl apply -f- <<EOF
