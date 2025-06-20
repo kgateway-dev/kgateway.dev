@@ -6,12 +6,12 @@ description: Learn how policy inheritance works in a route delegation setup.
 
 Learn how policy inheritance and overrides work for Kubernetes Gateway API-native policies in a route delegation setup. 
 
-{{% callout type="info" %}} 
+{{< callout type="info" >}} 
 Want to learn more about policy inheritance and overrides for kgateway policies? See [kgateway policies](../kgateway-policies/). 
-{{% /callout %}}
-{{% callout type="warning" %}} 
-{{< reuse "docs/versions/warn-2-1-only.md" >}}
-{{% /callout %}}
+{{< /callout >}}
+{{< callout type="warning" >}} 
+{{< reuse "docs/versions/warn-2-1-only.md" >}} 
+{{< /callout >}}
 
 ## About policy inheritance
 
@@ -23,8 +23,8 @@ In this guide you walk through a route delegation example where a child HTTPRout
 
 The following image illustrates the route delegation hierarchy and policy inheritance:
 
-{{< reuse-image src="img/route-delegation-inheritance-native.svg" >}}
-{{< reuse-image-dark srcDark="img/route-delegation-inheritance-native-dark.svg" >}}
+{{< reuse-image src="img/route-delegation-inheritance-native.svg" width="700px" >}}
+{{< reuse-image-dark srcDark="img/route-delegation-inheritance-native-dark.svg" width="700px" >}}
 <!-- https://app.excalidraw.com/s/AKnnsusvczX/9uktq3x1i63-->
 
 **`parent` HTTPRoute**: 
@@ -258,7 +258,7 @@ kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute parent -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute child-team1 -n team1
 kubectl delete httproute child-team2 -n team2
-kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
-kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/httpbin.yaml
+kubectl delete -n team1 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
+kubectl delete -n team2 -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/main/assets/docs/examples/httpbin.yaml
 kubectl delete namespaces team1 team2
 ```
