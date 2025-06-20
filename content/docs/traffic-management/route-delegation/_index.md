@@ -6,6 +6,7 @@ weight: 60
 Change the host header or prefix path in requests. 
 
 {{< cards >}}
+  {{< card link="overview" title="Route delegation overview" >}}
   {{< card link="basic" title="Basic example" >}}
   {{< card link="label" title="Delegation via labels" >}}
   {{< card link="multi-parent" title="Multiple parents" >}}
