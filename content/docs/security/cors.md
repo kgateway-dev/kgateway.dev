@@ -30,7 +30,7 @@ CORS policies are typically implemented to limit access to server resources for 
 You can configure the CORS policy at two levels:
 
 * HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
-* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. You can attach a TrafficPolicy to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. You can attach a TrafficPolicy to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
 
 ### Known limitations {#limitations}
 
@@ -39,7 +39,7 @@ The CORS filter supports only exact matches, not wildcard matchers. This limitat
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
-4. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} at version 1.3.0 or later so that you can use CORS.
+4. Install the experimental channel of the Kubernetes Gateway API at version 1.3.0 or later so that you can use CORS.
 
    ```shell
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
@@ -49,8 +49,8 @@ The CORS filter supports only exact matches, not wildcard matchers. This limitat
 
 Create a CORS policy for the httpbin app in an HTTPRoute or TrafficPolicy.
 
-{{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-{{% tab %}}
+{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
+{{% tab tabName="CORS in HTTPRoute" %}}
 Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
 ```yaml
@@ -89,7 +89,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="CORS in TrafficPolicy" %}}
 1. Create a TrafficPolicy resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml
@@ -119,7 +119,7 @@ EOF
    EOF
    ```
 
-2. Attach the TrafficPolicy to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the TrafficPolicy attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+2. Attach the TrafficPolicy to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the TrafficPolicy attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
 
    ```yaml
    kubectl apply -f- <<EOF
