@@ -10,9 +10,13 @@ The guide includes steps to install kgateway in two ways.
 
 {{< tabs items="Helm,Argo CD" >}}
   
-  {{% tab %}}[Helm](https://helm.sh/) is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.{{% /tab %}}
+  {{% tab %}}
+  [Helm](https://helm.sh/) is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.
+  {{% /tab %}}
   
-  {{% tab %}}[Argo CD](https://argoproj.github.io/cd/) is a declarative continuous delivery tool that is especially popular for large, production-level installations at scale. This approach incorporates Helm configuration files.{{% /tab %}}
+  {{% tab %}}
+  [Argo CD](https://argoproj.github.io/cd/) is a declarative continuous delivery tool that is especially popular for large, production-level installations at scale. This approach incorporates Helm configuration files.
+  {{% /tab %}}
 
 {{< /tabs >}}
 
@@ -61,11 +65,13 @@ The guide includes steps to install kgateway in two ways.
 
 ## Install kgateway
 
-Install the open source kgateway project in your Kubernetes cluster.
+Install the open source kgateway project in your Kubernetes cluster. Choose from the following installation options:
 
-{{< tabs items="Helm,Argo CD" >}}
+* [Helm](#helm)
+* [Argo CD](#argo-cd)
 
-{{% tab %}}
+### Helm
+
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
@@ -138,8 +144,9 @@ Install the open source kgateway project in your Kubernetes cluster.
    ```sh
    kubectl get gatewayclass kgateway
    ```
-{{% /tab %}}
-{{% tab %}}
+
+### Argo CD
+
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
    
    ```sh
@@ -264,9 +271,6 @@ Install the open source kgateway project in your Kubernetes cluster.
 9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
    {{< reuse-image src="/img/argo-kgateway.png" >}}
-
-{{% /tab %}}
-{{< /tabs >}}
 
 ## Installation settings {#installation-settings}
 
