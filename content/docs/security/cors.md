@@ -63,7 +63,7 @@ metadata:
 spec:
   parentRefs:
     - name: http
-      namespace: kgateway-system
+      namespace: {{< reuse "docs/snippets/namespace.md" >}}
   hostnames:
     - cors.example
   rules:
@@ -131,7 +131,7 @@ EOF
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - cors.example
      rules:
@@ -156,14 +156,14 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
@@ -175,8 +175,8 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
-   {{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
+   {{% tab tabName="CORS in HTTPRoute" %}}
 
    ```console {hl_lines=[7,8,9]}
    * Mark bundle as not supporting multiuse
@@ -192,7 +192,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    ...
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="CORS in TrafficPolicy" %}}
    ```console {hl_lines=[7,8,9]}
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
@@ -212,14 +212,14 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
@@ -244,13 +244,13 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-{{% tab %}}
+{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
+{{% tab tabName="CORS in HTTPRoute" %}}
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 ```
 {{% /tab %}}
-{{% tab  %}}
+{{% tab tabName="CORS in TrafficPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 kubectl delete trafficpolicy httpbin-cors -n httpbin
