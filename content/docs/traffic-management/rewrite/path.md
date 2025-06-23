@@ -14,9 +14,9 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 ## Rewrite prefix path
 
-Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite either an entire path or path prefixes. 
+Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite path prefixes. 
 
-### Rewrite prefix path
+### In-custer services
 
 1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to the `/anything` prefix path. 
     
@@ -112,7 +112,118 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    ...
    ```
 
-### Rewrite full path
+### External services
+
+1. Create a Backend that represents your external service. The following example creates a Backend for the `httpbin.org` domain. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: httpbin
+     namespace: default
+   spec:
+     type: Static
+     static:
+       hosts:
+         - host: httpbin.org
+           port: 80
+   EOF
+   ```
+   
+2. Create an HTTPRoute resource that matches incoming traffic on the `/headers` path for the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a different domain, you use the `URLRewrite` filter to rewrite the hostname from `external-rewrite.example` to `httpbin.org`. In addition, you rewrite the `/headers` path prefix to `/anything`. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: backend-rewrite
+     namespace: default
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - external-rewrite.example
+     rules:
+        - matches:
+          - path:
+              type: PathPrefix
+              value: /headers
+          filters:
+          - type: URLRewrite
+            urlRewrite:
+              hostname: "httpbin.org"
+              path: 
+                type: ReplacePrefixMatch
+                replacePrefixMatch: /anything   
+          backendRefs:
+          - name: httpbin
+            kind: Backend
+            group: gateway.kgateway.dev
+   EOF
+   ```
+
+2. Send a request to the `external-rewrite.example` domain on the `/headers` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: external-rewrite.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: external-rewrite.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
+   Example output: 
+   ```console {hl_lines=[2,3,25,34]}
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < content-type: application/json
+   content-type: application/json
+   < content-length: 268
+   content-length: 268
+   < server: envoy
+   server: envoy
+   < access-control-allow-origin: *
+   access-control-allow-origin: *
+   < access-control-allow-credentials: true
+   access-control-allow-credentials: true
+   < x-envoy-upstream-service-time: 2416
+   x-envoy-upstream-service-time: 2416
+   < 
+
+   {
+     "args": {}, 
+     "data": "", 
+    "files": {}, 
+     "form": {}, 
+     "headers": {
+       "Accept": "*/*", 
+       "Host": "httpbin.org", 
+       "User-Agent": "curl/8.7.1", 
+       "X-Amzn-Trace-Id": "Root=1-68599cdc-5d3c0d9a1ac2aa482effb24b", 
+       "X-Envoy-Expected-Rq-Timeout-Ms": "15000", 
+       "X-Envoy-External-Address": "10.0.15.215", 
+       "X-Envoy-Original-Path": "/"
+     }, 
+     "json": null, 
+     "method": "GET", 
+     "url": "http://httpbin.org/anything"
+   }
+   ```
+
+
+## Rewrite full path
+
+Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite full paths. 
+
+### In-cluster services
 
 1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to `/anything`. 
     
@@ -207,6 +318,109 @@ Path rewrites use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/referen
    "json": null
    ...
    ```
+
+### External services
+
+1. Create a Backend that represents your external service. The following example creates a Backend for the `httpbin.org` domain. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: httpbin
+     namespace: default
+   spec:
+     type: Static
+     static:
+       hosts:
+         - host: httpbin.org
+           port: 80
+   EOF
+   ```
+   
+2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a different domain, you use the `URLRewrite` filter to rewrite the hostname from `external-rewrite.example` to `httpbin.org`. In addition, you rewrite any existing paths to `/anything`. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: backend-rewrite
+     namespace: default
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - external-rewrite.example
+     rules:
+        - filters:
+          - type: URLRewrite
+            urlRewrite:
+              hostname: "httpbin.org"
+              path:
+                type: ReplaceFullPath
+                replaceFullPath: /anything 
+          backendRefs:
+          - name: httpbin
+            kind: Backend
+            group: gateway.kgateway.dev
+   EOF
+   ```
+
+2. Send a request to the `external-rewrite.example` domain on the `/header` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/header -H "host: external-rewrite.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/header -H "host: external-rewrite.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
+   Example output: 
+   ```console {hl_lines=[2,3,25,34]}
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < content-type: application/json
+   content-type: application/json
+   < content-length: 268
+   content-length: 268
+   < server: envoy
+   server: envoy
+   < access-control-allow-origin: *
+   access-control-allow-origin: *
+   < access-control-allow-credentials: true
+   access-control-allow-credentials: true
+   < x-envoy-upstream-service-time: 2416
+   x-envoy-upstream-service-time: 2416
+   < 
+
+   {
+     "args": {}, 
+     "data": "", 
+    "files": {}, 
+     "form": {}, 
+     "headers": {
+       "Accept": "*/*", 
+       "Host": "httpbin.org", 
+       "User-Agent": "curl/8.7.1", 
+       "X-Amzn-Trace-Id": "Root=1-68599cdc-5d3c0d9a1ac2aa482effb24b", 
+       "X-Envoy-Expected-Rq-Timeout-Ms": "15000", 
+       "X-Envoy-External-Address": "10.0.15.215", 
+       "X-Envoy-Original-Path": "/"
+     }, 
+     "json": null, 
+     "method": "GET", 
+     "url": "http://httpbin.org/anything"
+   }
+   ```
+
    
 ## Cleanup
 
