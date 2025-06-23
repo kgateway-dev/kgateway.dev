@@ -679,7 +679,6 @@ _Appears in:_
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  |  |
 | `maxHeadersCount` _integer_ | Specifies the maximum number of headers that the connection will accept.<br />If not specified, the default of 100 is used. Requests that exceed this limit will receive<br />a 431 response for HTTP/1.x and cause a stream reset for HTTP/2. |  |  |
 | `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  |  |
-| `headersWithUnderscoresAction` _[HeadersWithUnderscoresAction](#headerswithunderscoresaction)_ | Action to take when a client request with a header name containing underscore characters is received.<br />If this setting is not specified, the value defaults to ALLOW.<br />Note: upstream responses are not affected by this setting. |  | Enum: [Allow RejectRequest DropHeader] <br /> |
 | `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  |  |
 
 
@@ -1372,25 +1371,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
-
-
-#### HeadersWithUnderscoresAction
-
-_Underlying type:_ _string_
-
-
-
-_Validation:_
-- Enum: [Allow RejectRequest DropHeader]
-
-_Appears in:_
-- [CommonHttpProtocolOptions](#commonhttpprotocoloptions)
-
-| Field | Description |
-| --- | --- |
-| `Allow` | Allow headers with underscores. This is the default behavior.<br /> |
-| `RejectRequest` | Reject client request. HTTP/1 requests are rejected with the 400 status. HTTP/2 requests<br />end with the stream reset. The "httpN.requests_rejected_with_underscores_in_headers" counter<br />is incremented for each rejected request.<br /> |
-| `DropHeader` | Drop the header with name containing underscores. The header is dropped before the filter chain is<br />invoked and as such filters will not see dropped headers. The<br />"httpN.dropped_headers_with_underscores" is incremented for each dropped header.<br /> |
 
 
 #### Host
