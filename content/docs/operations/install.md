@@ -95,48 +95,51 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    ```
    {{< /callout >}}
 
-2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
+2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
 
-   * with the `v`
-   ```sh
-   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
-   ```
+   1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
-   * without the `v`
-   ```sh
-   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
-   ```
+      ```sh
+      helm template --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
+      ```
 
-3. Optional: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
+   2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
+      ```sh
+      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+      ```
+
+3. Install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart.
+
+   1. **Optional**: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
-   {{< callout type="info" >}}
-   For common values that you might want to update, see [Installation settings](#installation-settings).
-   {{< /callout >}}
+      {{< callout type="info" >}}
+      For common values that you might want to update, see [Installation settings](#installation-settings).
+      {{< /callout >}}
 
-   ```sh
-   helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}}
-   tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
-   open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
-   ```
+      ```sh
+      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}}
+      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
+      open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+      ```
       
-4. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
-   
-   ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-   --version v{{< reuse "docs/versions/n-patch.md" >}}
-   ```
-   
-   Example output: 
-   ```txt
-   NAME: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
-   LAST DEPLOYED: Thu Feb 13 14:03:51 2025
-   NAMESPACE: {{< reuse "docs/snippets/namespace.md" >}}
-   STATUS: deployed
-   REVISION: 1
-   TEST SUITE: None
-   ```
+   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
+      
+      ```sh
+      helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+      --version v{{< reuse "docs/versions/n-patch.md" >}}
+      ```
+      
+      Example output: 
+      ```txt
+      NAME: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
+      LAST DEPLOYED: Thu Feb 13 14:03:51 2025
+      NAMESPACE: {{< reuse "docs/snippets/namespace.md" >}}
+      STATUS: deployed
+      REVISION: 1
+      TEST SUITE: None
+      ```
 
-5. Verify that the control plane is up and running. 
+4. Verify that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -148,7 +151,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-6. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
+5. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
    ```sh
    kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
@@ -190,7 +193,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 4. Log in with the `admin` username and `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` password.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
-   {{< reuse-image-dark src="img/argocd-welcome.png" >}}
+   {{< reuse-image-dark srcDark="img/argocd-welcome.png" >}}
 
 5. Create an Argo CD application to deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRD Helm chart. 
    
@@ -199,7 +202,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    apiVersion: argoproj.io/v1alpha1
    kind: Application
    metadata:
-     name: {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-oss-helm
+     name: {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-helm
      namespace: argocd
    spec:
      destination:
@@ -282,7 +285,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
    {{< reuse-image src="img/argo-app.png" >}}
-   {{< reuse-image-dark src="img/argo-app.png" >}}
+   {{< reuse-image-dark srcDark="img/argo-app.png" >}}
 
 ## Installation settings {#installation-settings}
 

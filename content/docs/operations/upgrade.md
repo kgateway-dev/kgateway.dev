@@ -4,7 +4,7 @@ weight: 20
 description: Upgrade the control plane and any gateway proxies that run in your cluster. 
 ---
 
-You can use this guide to upgrade the version of your kgateway components, or to apply changes to the components’ configuration settings.
+You can use this guide to upgrade the version of your {{< reuse "/docs/snippets/kgateway.md" >}} components, or to apply changes to the components’ configuration settings.
 
 <!-- TODO upgrade guide when we have a minor version
 ## Considerations
@@ -67,14 +67,14 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 ## Prepare to upgrade {#prepare}
 
-Before you upgrade kgateway, review the following information.
+Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the following information.
 
-1. Review the [release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
+1. Review the [kgateway release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
-2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of kgateway that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
+2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
 
-   {{< tabs items="Kubernetes Gateway API, Kubernetes, Istio" >}}
-{{% tab %}}
+   {{< tabs tabTotal="3" items="Kubernetes Gateway API, Kubernetes, Istio" >}}
+{{% tab tabName="Kubernetes Gateway API" %}}
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
 
    * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes).
@@ -119,10 +119,10 @@ Before you upgrade kgateway, review the following information.
    httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	experimental
    ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Kubernetes" %}}
 For Kubernetes upgrades, consult your cloud infrastructure provider.
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Istio" %}}
 For Istio upgrades, consult the docs based on the way that you installed Istio. Example providers:
 
 * [Upstream Istio](https://istio.io/latest/docs/setup/upgrade/)
@@ -131,26 +131,26 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 {{% /tab %}}
    {{< /tabs >}}
 
-## Upgrade kgateway {#kgateway}
+## Upgrade {#upgrade-steps}
 
-1. Set the version to upgrade kgateway in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+1. Set the version to upgrade {{< reuse "/docs/snippets/kgateway.md" >}} in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    
    ```sh
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-2. Apply the kgateway CRDs for the upgrade version by using Helm.
+2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
 
    1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
       ```sh
-      helm template --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds --output-dir ./helm
+      helm template --version v$NEW_VERSION {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
       ```
 
    2. Upgrade the CRDs in your cluster:
 
       ```sh
-      helm upgrade -i --namespace kgateway-system --version v$NEW_VERSION kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+      helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v$NEW_VERSION {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
       ```
 
 3. Make any changes to your Helm values.
@@ -158,19 +158,19 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    1. Get the Helm values file for your current version.
       
       ```sh
-      helm get values kgateway -n kgateway-system -o yaml > kgateway.yaml
-      open kgateway.yaml
+      helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
+      open {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
       ```
 
    2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a values file for the upgrade version by pulling and inspecting the Helm chart locally.
       
       ```sh
-      helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v$NEW_VERSION
-      tar -xvf kgateway-v$NEW_VERSION.tgz
-      open kgateway/values.yaml
+      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v$NEW_VERSION
+      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v$NEW_VERSION.tgz
+      open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
 
-   3. Make any changes that you want by editing your `kgateway.yaml` Helm values file or preparing the `--set` flags.
+   3. Make any changes that you want by editing your `{{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml` Helm values file or preparing the `--set` flags.
 
 4. Upgrade the kgateway Helm installation.
    {{< callout type="warning" >}}
@@ -178,24 +178,24 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    {{< /callout >}}
    
    ```sh
-   helm upgrade -i -n kgateway-system kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     -f kgateway.yaml \
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml \
      --version v$NEW_VERSION
    ```
    
-5. Verify that kgateway runs the upgraded version.
+5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.
    
    ```sh
-   kubectl -n kgateway-system get pod -l kgateway=kgateway -ojsonpath='{.items[0].spec.containers[0].image}'
+   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} get pod -l app.kubernetes.io/name={{< reuse "/docs/snippets/helm-kgateway.md" >}} -o jsonpath='{.items[0].spec.containers[0].image}'
    ```
    
    Example output:
    ```
-   cr.kgateway.dev/kgateway-dev/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
+   {{< reuse "/docs/snippets/helm-path.md" >}}/{{< reuse "/docs/snippets/helm-kgateway.md" >}}:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Confirm that the kgateway control plane is up and running. 
+6. Confirm that the {{< reuse "/docs/snippets/kgateway.md" >}} control plane is up and running. 
    
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
