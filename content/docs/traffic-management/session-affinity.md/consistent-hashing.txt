@@ -1,0 +1,138 @@
+---
+title: Consistent hashing
+weight: 20
+---
+
+Set up soft session affinity between a client and an upstream service by using consistent hashing algorithms.
+
+## About session affinity 
+Session affinity, also referred to as sticky session, allows you to route requests for a particular session to the same upstream service instance that served the initial request. This setup is particularly useful if you have an upstream service that performs expensive operations and caches the output or data for subsequent requests. With session affinity, you make sure that the expensive operation is performed once and that subsequent requests can be served from the upstream’s cache, which can significantly improve operational cost and response times for your clients.
+
+## About consistent hashing 
+{{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and an upstream service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a header, and hashes this property with the address of an upstream service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same upstream service instance.
+
+{{% callout type="info" %}}
+Consistent hashing is less reliable than a common sticky session implementation, in which the upstream service is encoded in a cookie and affinity can be maintained for as long as the upstream service is available. With consistent hashing, affinity might be lost when an upstream service is added or removed. To set up strong stickiness, see the [Stateful session filter](../session-filter) docs.
+{{% /callout %}}
+
+## Before you begin 
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Set up Ringhash and Maglev hashing 
+
+1. Scale the httpbin app up to 2 instances.
+   ```sh 
+   kubectl scale deployment httpbin -n httpbin --replicas=2
+   ```
+   
+2. Verify that another instance of the httpbin app is created and note the IP addresses of both httpbin instances. In the following example, you have an httpbin instance available at the `10.0.43.175` and `10.0.38.52` IP addresses.
+   ```sh
+   kubectl get pods -n httpbin -o wide
+   ```
+   
+   Example output
+   ```
+   NAME                      READY   STATUS        RESTARTS   AGE    IP            NODE                          NOMINATED NODE   READINESS GATES
+   httpbin-8d557795f-86hzg   3/3     Running       0          54m    10.0.43.175   ip-10-0-34-108.ec2.internal   <none>           <none>
+   httpbin-8d557795f-h8ks9   3/3     Running       0          126m   10.0.38.52    ip-10-0-39-74.ec2.internal    <none>           <none>
+   ```
+
+3. Create a BackendConfigPolicy to configure the Ringhash or Maglev hashing algorithm for the httpbin app. 
+   {{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
+   {{% tab tabName="Ringhash" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: BackendConfigPolicy
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   metadata:
+     name: httpbin-policy
+   spec:
+     targetRefs:
+       - name: httpbin
+         group: ""
+         kind: Service
+     loadBalancer:
+       ringHash:
+         minimumRingSize: 1024
+         maximumRingSize: 2048
+       useHostnameForHashing: true
+       closeConnectionsOnHostSetChange: true
+   EOF
+   ```
+   
+   | Setting | Description | 
+   | -- | -- | 
+   | `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request comes in, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
+   | `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an upstream host. If not set, defaults to using the resolved address of the hostname as the key. | 
+   | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an upstream host whenever hosts are added or removed for a destination.  | 
+   
+   {{% /tab %}}
+   {{% tab tabName="Maglev" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: BackendConfigPolicy
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   metadata:
+     name: httpbin-policy
+   spec:
+     targetRefs:
+       - name: httpbin
+         group: ""
+         kind: Service
+     loadBalancer:
+       maglev: {}
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+4. Send a few requests to the httpbin app. Verify that the request succeeds and that you get back a 200 HTTP response code.  the hashbasedcookie cookie in the set-cookie header of your response. The -c option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
+
+LoadBalancer IP address or hostname
+Port-forward for local testing
+curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+-H "host: httpbin.example:8080"
+Example output:
+
+< set-cookie: hashbasedcookie="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
+set-cookie: hashbasedcookie="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
+< server: envoy
+server: envoy
+<
+
+{
+  "headers": {
+    "Accept": [
+     "*/*"
+    ],
+    "Host": [
+      "httpbin.example:8080"
+    ],
+    "User-Agent": [
+      "curl/8.7.1"
+    ],
+    "X-Envoy-Expected-Rq-Timeout-Ms": [
+      "15000"
+    ],
+    "X-Forwarded-Proto": [
+      "http"
+    ],
+    "X-Request-Id": [
+      "fe080d74-2b6e-4954-8bde-54bed3e71dde"
+    ]
+  }
+}
+Repeat the request a few more times. Include the cookie that you stored in the local file by using the -b option. Make sure to send these requests within the 60 second cookie validity period.
+
+LoadBalancer IP address or hostname
+Port-forward for local testing
+for i in {1..10}; do
+curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+-H "host: httpbin.example:8080"; done
+Get the logs of the httpbin instance that served the initial request. Verify that all subsequent requests were also served by the same instance.
+
+kubectl logs <httpbin-pod> -n httpbin
+info
+After the cookie reaches its TTL (time to live) and expires, the proxy starts choosing a new upstream instance to serve the request.
