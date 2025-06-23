@@ -8,13 +8,13 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
 
 The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} in two ways.
 
-{{< tabs items="Helm,Argo CD" >}}
+{{< tabs tabTotal="2" items="Helm,Argo CD" >}}
   
-  {{% tab %}}
+  {{% tab tabName="Helm" %}}
   [Helm](https://helm.sh/) is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.
   {{% /tab %}}
   
-  {{% tab %}}
+  {{% tab tabName="Argo CD" %}}
   [Argo CD](https://argoproj.github.io/cd/) is a declarative continuous delivery tool that is especially popular for large, production-level installations at scale. This approach incorporates Helm configuration files.
   {{% /tab %}}
 
@@ -26,14 +26,14 @@ The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} i
 {{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
 {{< /callout >}}
 
-{{< tabs items="Helm,Argo CD" >}}
-{{% tab %}}
+{{< tabs tabTotal="2" items="Helm,Argo CD" >}}
+{{% tab tabName="Helm" %}}
 1. Create or use an existing Kubernetes cluster. 
 2. Install the following command-line tools.
    * [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use.
    * [`helm`](https://helm.sh/docs/intro/install/), the Kubernetes package manager.
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Argo CD" %}}
 1. Create or use an existing Kubernetes cluster. 
 2. Install the following command-line tools.
    * [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use.
@@ -50,10 +50,10 @@ The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} i
    kubectl -n argocd rollout status deploy/argocd-repo-server
    kubectl -n argocd rollout status deploy/argocd-server   
    ```
-4. Update the default Argo CD password for the admin user to `kgateway`.
+4. Update the default Argo CD password for the admin user to `{{< reuse "/docs/snippets/helm-kgateway.md" >}}`.
    ```shell
    # bcrypt(password)=$2a$10$g3bspLL4iTNQHxJpmPS0A.MtyOiVvdRk1Ds5whv.qSdnKUmqYVyxa
-   # password: kgateway
+   # password: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
    kubectl -n argocd patch secret argocd-secret \
      -p '{"stringData": {
        "admin.password": "$2a$10$g3bspLL4iTNQHxJpmPS0A.MtyOiVvdRk1Ds5whv.qSdnKUmqYVyxa",
@@ -97,8 +97,14 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
 2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
 
+   * with the `v`
    ```sh
-   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+   ```
+
+   * without the `v`
+   ```sh
+   helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
    ```
 
 3. Optional: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
@@ -108,21 +114,21 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    {{< /callout >}}
 
    ```sh
-   helm pull oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --version v{{< reuse "docs/versions/n-patch.md" >}}
-   tar -xvf kgateway-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
-   open kgateway/values.yaml
+   helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}}
+   tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
+   open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
    ```
       
 4. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
    
    ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
    --version v{{< reuse "docs/versions/n-patch.md" >}}
    ```
    
    Example output: 
    ```txt
-   NAME: kgateway
+   NAME: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
    LAST DEPLOYED: Thu Feb 13 14:03:51 2025
    NAMESPACE: {{< reuse "docs/snippets/namespace.md" >}}
    STATUS: deployed
@@ -139,7 +145,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    Example output: 
    ```txt
    NAME                                  READY   STATUS    RESTARTS   AGE
-   kgateway-78658959cd-cz6jt             1/1     Running   0          12s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
 6. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
@@ -181,9 +187,10 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 3. Open the [Argo CD UI](https://localhost:9999/).
 
-4. Log in with the `admin` username and `kgateway` password.
+4. Log in with the `admin` username and `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` password.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
+   {{< reuse-image-dark src="img/argocd-welcome.png" >}}
 
 5. Create an Argo CD application to deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRD Helm chart. 
    
@@ -192,7 +199,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    apiVersion: argoproj.io/v1alpha1
    kind: Application
    metadata:
-     name: kgateway-crds-oss-helm
+     name: {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-oss-helm
      namespace: argocd
    spec:
      destination:
@@ -200,10 +207,10 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        server: https://kubernetes.default.svc
      project: default
      source:
-       chart: kgateway-crds
+       chart: {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
        helm:
          skipCrds: false
-       repoURL: cr.kgateway.dev/kgateway-dev/charts
+       repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
      syncPolicy:
        automated:
@@ -224,7 +231,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    apiVersion: argoproj.io/v1alpha1
    kind: Application
    metadata:
-     name: kgateway-oss-helm
+     name: {{< reuse "/docs/snippets/helm-kgateway.md" >}}-helm
      namespace: argocd
    spec:
      destination:
@@ -232,10 +239,10 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        server: https://kubernetes.default.svc
      project: default
      source:
-       chart: kgateway
+       chart: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
        helm:
          skipCrds: false
-       repoURL: cr.kgateway.dev/kgateway-dev/charts
+       repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
      syncPolicy:
        automated:
@@ -259,11 +266,11 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    ```txt
    NAME                                      READY   STATUS      RESTARTS   AGE
    gateway-certgen-wfz9z                     0/1     Completed   0          35s
-   kgateway-78f4cc8fc6-6hmsq                 1/1     Running     0          21s
-   kgateway-resource-migration-sx5z4         0/1     Completed   0          48s
-   kgateway-resource-rollout-28gj6           0/1     Completed   0          21s
-   kgateway-resource-rollout-check-tjdp7     0/1     Completed   0          2s
-   kgateway-resource-rollout-cleanup-nj4t8   0/1     Completed   0          39s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78f4cc8fc6-6hmsq                 1/1     Running     0          21s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-resource-migration-sx5z4         0/1     Completed   0          48s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-resource-rollout-28gj6           0/1     Completed   0          21s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-resource-rollout-check-tjdp7     0/1     Completed   0          2s
+   {{< reuse "/docs/snippets/helm-kgateway.md" >}}-resource-rollout-cleanup-nj4t8   0/1     Completed   0          39s
    ```
 
 8. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
@@ -274,7 +281,8 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.
    
-   {{< reuse-image src="/img/argo-kgateway.png" >}}
+   {{< reuse-image src="img/argo-app.png" >}}
+   {{< reuse-image-dark src="img/argo-app.png" >}}
 
 ## Installation settings {#installation-settings}
 
@@ -301,10 +309,10 @@ Each entry in the list is disjunctive (OR semantics). This means that a namespac
 
 You can also use matched expressions and labels together in the same entry, which is conjunctive (AND semantics).
 
-The following example selects namespaces for discovery that meet the following conditions:
+The following example selects namespaces for discovery that meet either of the following conditions:
 
-* The namespace has the label `prod=enabled` and the label `version=v2`.
-* The namespace has the label `version=v3`.
+* The namespace has the label `environment=prod` and the label `version=v2`, or
+* The namespace has the label `version=v3`
 
 ```yaml
 discoveryNamespaceSelectors:
@@ -321,8 +329,8 @@ discoveryNamespaceSelectors:
 
 ## Next steps
 
-Now that you have kgateway set up and running, check out the following guides to expand your API gateway capabilities.
-- Learn more about [kgateway, its features and benefits](/docs/about/overview). 
+Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
+- Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](/docs/about/overview). 
 - [Deploy an API gateway and sample app](/docs/operations/sample-app/) to test out routing to an app.
 - Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 
@@ -332,10 +340,10 @@ Now that you have kgateway set up and running, check out the following guides to
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs items="Helm,Argo CD" >}}
+{{< tabs tabTotal="2" items="Helm,Argo CD" >}}
   
-  {{% tab %}}Follow the [Uninstall guide](/docs/operations/uninstall).{{% /tab %}}
+  {{% tab tabName="Helm" %}}Follow the [Uninstall guide](/docs/operations/uninstall).{{% /tab %}}
   
-  {{% tab %}}Follow the [Uninstall with Argo CD guide](/docs/operations/uninstall#argocd).{{% /tab %}}
+  {{% tab tabName="Argo CD" %}}Follow the [Uninstall with Argo CD guide](/docs/operations/uninstall#argocd).{{% /tab %}}
 
 {{< /tabs >}}

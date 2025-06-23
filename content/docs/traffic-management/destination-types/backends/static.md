@@ -78,7 +78,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    
    Example output: 
    
-   ```
+   ```text
    * Connected to <host> (::1) port 8080
    > GET /posts HTTP/1.1
    > Host: static.example:8080
