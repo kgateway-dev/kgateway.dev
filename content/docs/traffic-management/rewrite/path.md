@@ -121,6 +121,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
    kind: Backend
    metadata:
      name: httpbin
+     namespace: default
    spec:
      type: Static
      static:
@@ -130,7 +131,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
    EOF
    ```
    
-2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a differet domain, you use the `URLRewrite` filter to rewrite the hostname from `external.example` to `httpbin.org`. In addition, you rewrite any existing path prefix to `/anything`. 
+2. Create an HTTPRoute resource that matches incoming traffic on the `/headers` path for the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a different domain, you use the `URLRewrite` filter to rewrite the hostname from `external-rewrite.example` to `httpbin.org`. In addition, you rewrite the `/headers` path prefix to `/anything`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -145,7 +146,11 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
      hostnames:
        - external-rewrite.example
      rules:
-        - filters:
+        - matches:
+          - path:
+              type: PathPrefix
+              value: /headers
+          filters:
           - type: URLRewrite
             urlRewrite:
               hostname: "httpbin.org"
@@ -159,17 +164,17 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
    EOF
    ```
 
-2. Send a request to the `external-rewrite.example` domain on the `/` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
+2. Send a request to the `external-rewrite.example` domain on the `/headers` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/ -H "host: external-rewrite.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: external-rewrite.example:8080"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/ -H "host: external-rewrite.example"
+   curl -vi localhost:8080/headers -H "host: external-rewrite.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -323,6 +328,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
    kind: Backend
    metadata:
      name: httpbin
+     namespace: default
    spec:
      type: Static
      static:
@@ -332,7 +338,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
    EOF
    ```
    
-2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a differet domain, you use the `URLRewrite` filter to rewrite the hostname from `external.example` to `httpbin.org`. In addition, you rewrite any existing paths to `/anything`. 
+2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a different domain, you use the `URLRewrite` filter to rewrite the hostname from `external-rewrite.example` to `httpbin.org`. In addition, you rewrite any existing paths to `/anything`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1

@@ -100,6 +100,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    kind: Backend
    metadata:
      name: httpbin
+     namespace: default
    spec:
      type: Static
      static:
@@ -109,7 +110,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    EOF
    ```
    
-2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a differet domain, you use the `URLRewrite` filter to rewrite the hostname from `external.example` to `httpbin.org`. 
+2. Create an HTTPRoute resource that matches incoming traffic on the `external-rewrite.example` domain and forwards traffic to the Backend that you created. Because the Backend expects a different domain, you use the `URLRewrite` filter to rewrite the hostname from `external-rewrite.example` to `httpbin.org`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
