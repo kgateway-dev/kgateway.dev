@@ -1,5 +1,5 @@
 ---
-title: TCP listeners
+title: TCP
 weight: 10
 ---
 
@@ -63,6 +63,10 @@ The following guide deploys a sample TCP echo app, sets up a TCP listener on the
 
 Create a TCP listener so that the gateway can route TCP traffic. In the following example, all TCP streams on port 8000 of the gateway are forwarded to port 1025 of the example TCP echo service.
 
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+* {{< reuse "docs/versions/warn-2-1-only.md" >}} 
+* You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
 {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
 {{% tab tabName="Gateway listeners" %}}
 1. Create a Gateway resource with a TCP listener. 
@@ -97,10 +101,6 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 
 {{% /tab %}}
 {{% tab tabName="ListenerSets (experimental)" %}}
-
-{{< callout type="warning" >}}
-{{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-{{< /callout >}}
 
 1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -222,8 +222,8 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
 
 ## Create a TCPRoute
 
-{{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
-{{% tab %}}
+{{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2"  >}}
+{{% tab tabName="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -246,7 +246,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="ListenerSets (experimental)" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1alpha2

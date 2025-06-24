@@ -8,7 +8,7 @@ Serve multiple hosts on the same HTTPS listener.
 
 ## About SNI 
 
-Each host comes with its own TLS certificates that the gateway uses to authenticate and authorize client requests.
+Each host comes with its own TLS certificates that the Gateway uses to authenticate and authorize client requests.
 
 Serving multiple hosts on a single listener is also referred to as Server Name Indication (SNI) routing. SNI is an extension to the TLS protocol and allows clients to indicate which hostname they want to connect to at the start of the TLS handshake. After the HTTPS/TLS traffic is accepted at the gateway, the TLS connection is terminated, and the unencrypted HTTP/TCP request is forwarded to the destination.
 
@@ -22,10 +22,6 @@ In this guide, you learn how to set up an HTTPS Gateway that serves two differen
 ## Before you begin
 
 {{< reuse "docs/snippets/cert-prereqs.md" >}}
-
-4. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
-
-   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
 ## Deploy sample apps 
 
@@ -57,13 +53,13 @@ Deploy the Petstore sample app. This app is used alongside the httpbin app from 
 
 Create TLS certificates for the `httpbin.example.com` and `petstore.example.com` domains that are signed by a self-signed root CA.
 
-{{% callout type="warning" %}}
+{{< callout type="warning" >}}
 Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trusted Certificate Authority.
-{{% /callout %}}
+{{< /callout >}}
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 When generating your Envoy certificates, make sure to use encryption algorithms that are supported in Envoy. To learn more about supported algorithms that you can use for your certificates and keys, see the <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ssl#certificate-selection">Envoy documentation</a>. 
-{{% /callout %}}
+{{< /callout >}}
    
 1. Create a root certificate and private key to sign the certificates for your services. 
    ```shell
@@ -111,6 +107,10 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
 ## Set up SNI routing
 
 Set up an SNI Gateway that serves multiple hosts on the same port. 
+
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+* {{< reuse "docs/versions/warn-2-1-only.md" >}} 
+* You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
 1. Create an SNI Gateway. The Gateway defines two hosts on the same HTTPS listener. Each host is configured with the host-specific TLS certificate that you set up earlier. 
 
@@ -162,7 +162,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    |--|--|
    |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you.|
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure two HTTPS listeners. One listener is for the httpbin app and the other is for the petstore app. Each listener refers to a secret that holds the TLS certificate and key for the hostname that the listener is configured for. |
-   |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unencrypted request is forwarded to the service in the cluster. |
+   |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the Gateway and the unencrypted request is forwarded to the service in the cluster. |
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
    {{% /tab %}}
