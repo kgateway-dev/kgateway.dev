@@ -149,24 +149,28 @@ EOF
 
 Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you can test the policies.
 
-1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back CORS headers, such as `access-control-allow-origin`, `access-control-allow-credentials`, and `access-control-expose-headers`. 
+1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
+   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
+    -H "Origin: https://example.com/" \
+    -H "Access-Control-Request-Method: POST" \
+    -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" -H "Access-Control-Request-Method: GET"
+   curl -I -X OPTIONS GET localhost:8080/headers -H "host: cors.example:8080" \
+    -H "Origin: https://example.com/" \
+    -H "Access-Control-Request-Method: POST" \
+    -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: Notice that the `access-control-expose-headers` value changes depending on the resources that you created.
+   Example output: Notice that the `access-control-*` values reflect your CORS policy and change depending on the resources that you created.
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
@@ -174,65 +178,83 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    {{% tab tabName="CORS in HTTPRoute" %}}
 
    ```console {hl_lines=[7,8,9]}
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   < content-type: text/xml
-   < date: Mon, 03 Jun 2024 17:05:31 GMT
-   < content-length: 86
-   < x-envoy-upstream-service-time: 7
-   < access-control-allow-origin: https://example.com/
-   < access-control-allow-credentials: true
-   < access-control-expose-headers: Origin, X-HTTPRoute-Header
-   < server: envoy
+   HTTP/1.1 200 OK
+   x-correlation-id: aaaaaaaa
+   date: Tue, 24 Jun 2025 13:19:53 GMT
+   content-length: 0
+   
+   HTTP/1.1 200 OK
+   access-control-allow-origin: https://example.com/
+   access-control-allow-credentials: true
+   access-control-allow-methods: GET, POST, OPTIONS
+   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-max-age: 86400
+   access-control-expose-headers: Origin, X-HTTPRoute-Header
+   date: Tue, 24 Jun 2025 13:19:53 GMT
+   server: envoy
+   content-length: 0
    ...
    ```
    {{% /tab %}}
    {{% tab tabName="CORS in TrafficPolicy" %}}
    ```console {hl_lines=[7,8,9]}
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   < content-type: text/xml
-   < date: Mon, 03 Jun 2024 17:05:31 GMT
-   < content-length: 86
-   < x-envoy-upstream-service-time: 7
-   < access-control-allow-origin: https://example.com/
-   < access-control-allow-credentials: true
-   < access-control-expose-headers: Origin, X-TrafficPolicy-Header
-   < server: envoy
-   <
-   ...
+   HTTP/1.1 200 OK
+   x-correlation-id: aaaaaaaa
+   date: Tue, 24 Jun 2025 13:19:53 GMT
+   content-length: 0
+   
+   HTTP/1.1 200 OK
+   access-control-allow-origin: https://example.com/
+   access-control-allow-credentials: true
+   access-control-allow-methods: GET, POST, OPTIONS
+   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-max-age: 86400
+   access-control-expose-headers: Origin, X-TrafficPolicy-Header
+   date: Tue, 24 Jun 2025 13:19:53 GMT
+   server: envoy
+   content-length: 0
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back any CORS headers, because `notallowed.com` is not configured as a supported origin.  
+2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed orgin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -v -X GET http://$INGRESS_GW_ADDRESS:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
+   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
+    -H "Origin: https://notallowed.com/" \
+    -H "Access-Control-Request-Method: POST" \
+    -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -v -X GET localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" -H "Access-Control-Request-Method: GET"
+   curl -I -X OPTIONS GET localhost:8080/headers -H "host: cors.example:8080" \
+    -H "Origin: https://notallowed.com/" \
+    -H "Access-Control-Request-Method: POST" \
+    -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    Example output: 
    ```console
-   * Mark bundle as not supporting multiuse
-   < HTTP/1.1 200 OK
-   < content-type: text/xml
-   < date: Mon, 03 Jun 2024 17:20:10 GMT
-   < content-length: 86
-   < x-envoy-upstream-service-time: 3
-   < server: envoy
-   < 
-   ...
+   HTTP/1.1 200 OK
+   x-correlation-id: aaaaaaaa
+   date: Tue, 24 Jun 2025 13:21:20 GMT
+   content-length: 0
+   
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-headers: Origin
+   access-control-allow-methods: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
+   access-control-allow-origin: https://notallowed.com/
+   access-control-max-age: 3600
+   date: Tue, 24 Jun 2025 13:21:20 GMT
+   content-length: 0
+   x-envoy-upstream-service-time: 1
+   server: envoy
    ```
 
 ## Cleanup
