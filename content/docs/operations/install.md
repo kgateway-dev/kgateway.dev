@@ -122,7 +122,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
       
-   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f kgateway/values.yaml` flag.
+   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
       ```sh
       helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -151,7 +151,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-5. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command. 
+5. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
    ```sh
    kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```

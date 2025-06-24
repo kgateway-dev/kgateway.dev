@@ -105,7 +105,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    
    Example output: 
    ```txt
-   No resources found in {{< reuse "docs/snippets/namespace.md" >}}namespace.
+   No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
 
 {{% /tab %}}
