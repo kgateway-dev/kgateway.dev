@@ -10,10 +10,6 @@ Set up a TLS listener on the Gateway that serves one or more hosts and passes TL
 
 {{< reuse "docs/snippets/cert-prereqs.md" >}}
 
-4. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
-
-   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-
 ## Deploy an nginx server that is configured for HTTPS traffic
 
 Deploy a sample nginx server and configure the server for HTTPS traffic. 
@@ -135,6 +131,10 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 
 To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+* {{< reuse "docs/versions/warn-2-1-only.md" >}} 
+* You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
 {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
 {{% tab tabName="Gateway listeners" %}}
 1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain.
@@ -171,10 +171,6 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 {{% /tab %}}
 {{% tab tabName="ListenerSets (experimental)" %}}
-
-{{< callout type="warning" >}}
-{{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-{{< /callout >}}
 
 1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -406,7 +402,10 @@ EOF
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-```shell
+{{< tabs items="Gateway listeners,ListenerSet (experimental)" tabTotal="2" >}}
+{{% tab tabName="Gateway listeners" %}}
+
+```sh
 rm -r example_certs
 rm nginx.conf
 kubectl delete configmap nginx-configmap
@@ -414,7 +413,31 @@ kubectl delete tlsroute tlsroute
 kubectl delete gateway tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete deployment my-nginx
 kubectl delete service my-nginx
-kubectl delete secret nginx-server-certs
+kubectl delete secret nginx-server-certs   
+```
+{{% /tab %}}
+{{% tab tabName="ListenerSet (experimental)" %}}
+```sh
+rm -r example_certs
+rm nginx.conf
+kubectl delete configmap nginx-configmap
+kubectl delete tlsroute tlsroute
+kubectl delete XListenerSet my-tls-listenerset -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete deployment my-nginx
+kubectl delete service my-nginx
+kubectl delete secret nginx-server-certs   
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+2. Remove the `example_certs` directory that stores your TLS credentials. 
+   ```sh
+   rm -rf example_certs
+   ```
+
+```shell
+
 ```
 
 

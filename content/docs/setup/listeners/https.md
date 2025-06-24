@@ -1,5 +1,5 @@
 ---
-title: HTTPS listeners
+title: HTTPS
 weight: 10
 ---
 
@@ -9,15 +9,17 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 {{< reuse "docs/snippets/cert-prereqs.md" >}}
 
-4. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
-
-   **ListenerSets**: {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-
 ## Create a TLS certificate
 
 {{< reuse "docs/snippets/listeners-https-create-cert.md" >}}
 
 ## Set up an HTTPS listener {#setup-https}
+
+Set up an HTTPS listener on your Gateway. 
+
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+* {{< reuse "docs/versions/warn-2-1-only.md" >}} 
+* You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
 1. Create a gateway resource with an HTTPS listener.
 
@@ -61,10 +63,6 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
    {{% /tab %}}
    {{% tab tabName="ListenerSets (experimental)" %}}
-
-   {{< callout type="warning" >}}
-   {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-   {{< /callout >}}
 
    1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -152,8 +150,8 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
    
-   {{< tabs items="Gateway listeners,ListenerSets (experimental)" >}}
-   {{% tab %}}
+   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
+   {{% tab tabName="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -174,7 +172,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
    EOF
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="ListenerSets (experimental)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1

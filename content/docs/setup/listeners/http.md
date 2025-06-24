@@ -1,11 +1,11 @@
 ---
-title: HTTP listeners
+title: HTTP
 weight: 10
 ---
 
-Create an HTTP listener on your API gateway. Then, your API gateway listens for HTTP traffic on the specified port and hostname that you configure. This gateway can be used as the main ingress for the apps in your cluster. You can also create multiple gateways to listen for traffic on different ports and hostnames. 
+Create an HTTP listener on your API Gateway. Then, your API Gateway listens for HTTP traffic on the specified port and hostname that you configure. This Gateway can be used as the main ingress for the apps in your cluster. You can also create multiple Gateways to listen for traffic on different ports and hostnames. 
 
-Next, you set up an HTTPRoute resource to route requests through the gateway to backing services in your cluster. HTTPRoutes can refer to any gateway independent of the namespace they are in.
+Next, you set up an HTTPRoute resource to route requests through the Gateway to backing services in your cluster. HTTPRoutes can refer to any gateway independent of the namespace they are in.
 
 ## Before you begin
 
@@ -13,7 +13,13 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
    
 ## Set up an HTTP listener {#setup-http}
 
-1. Create a gateway resource with an HTTP listener. 
+Set up an HTTP listener on your Gateway. 
+
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+* {{< reuse "docs/versions/warn-2-1-only.md" >}} 
+* You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
+
+1. Create a Gateway resource with an HTTP listener. 
    
    {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
    {{% tab tabName="Gateway listeners" %}}
@@ -48,10 +54,6 @@ Next, you set up an HTTPRoute resource to route requests through the gateway to 
 
    {{% /tab %}}
    {{% tab tabName="ListenerSets (experimental)" %}}
-   
-   {{< callout type="warning" >}}
-   {{< reuse "docs/versions/warn-2-1-only.md" >}} Also, you must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
-   {{< /callout >}}
 
    1. Create a Gateway that enables the attachment of ListenerSets.
       
