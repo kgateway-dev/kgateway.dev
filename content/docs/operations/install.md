@@ -333,11 +333,11 @@ discoveryNamespaceSelectors:
 ## Next steps
 
 Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
-- Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](/docs/about/overview). 
-- [Deploy an API gateway and sample app](/docs/operations/sample-app/) to test out routing to an app.
-- Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
-- Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 
-- Secure your routes with external authentication and rate limiting policies by using the [Security](/docs/security) guides. 
+- Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](../../about/overview). 
+- [Deploy an API gateway and sample app](../sample-app/) to test out routing to an app.
+- Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
+- Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
+- Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides. 
 
 ## Cleanup
 
@@ -345,8 +345,8 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
 
 {{< tabs tabTotal="2" items="Helm,Argo CD" >}}
   
-  {{% tab tabName="Helm" %}}Follow the [Uninstall guide](/docs/operations/uninstall).{{% /tab %}}
+  {{% tab tabName="Helm" %}}Follow the [Uninstall guide](../uninstall).{{% /tab %}}
   
-  {{% tab tabName="Argo CD" %}}Follow the [Uninstall with Argo CD guide](/docs/operations/uninstall#argocd).{{% /tab %}}
+  {{% tab tabName="Argo CD" %}}Follow the [Uninstall with Argo CD guide](../uninstall#argocd).{{% /tab %}}
 
 {{< /tabs >}}
