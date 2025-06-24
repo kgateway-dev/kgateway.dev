@@ -29,7 +29,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 2. Check the HTTPRoutes for the status of the route and any attached policies.
    
    ```sh
-   kubectl get httproute <name> -n <namespace>
+   kubectl get httproutes -A
+   ```
+   ```sh
+   kubectl get httproute <name> -n <namespace> -o yaml
    ```
 
 3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
