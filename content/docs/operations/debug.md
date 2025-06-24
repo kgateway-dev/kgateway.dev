@@ -5,14 +5,14 @@ weight: 15
 
 Use built-in tools to troubleshoot issues in your kgateway setup.
 
-Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy. In this guide you learn how to use the kgateway and Envoy debugging tools to troubleshoot misconfigurations on the gateway.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} is based on [Envoy proxy](https://www.envoyproxy.io). If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy. In this guide you learn how to use the {{< reuse "/docs/snippets/kgateway.md" >}} and Envoy debugging tools to troubleshoot misconfigurations on the gateway.
 
 ## Debug your gateway setup
 
-1. Make sure that the kgateway control plane and gateway proxies are running. For any pod that is not running, describe the pod for more details.
+1. Make sure that the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and gateway proxies are running. For any pod that is not running, describe the pod for more details.
    
    ```shell
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    <!-- TODO: CLI You can do that by using the `{{< reuse "docs/snippets/cli-name.md" >}} check` [command](/docs/reference/cli/glooctl_check/) that quickly checks the health of kgateway deployments, pods, and custom resources, and verifies Gloo resource configuration. Any issues that are found are reported back in the CLI output. 
    ```sh
@@ -21,7 +21,7 @@ Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience
    
    Example output for a misconfigured VirtualHostOption:
    ```console
-   Found rejected VirtualHostOption by 'kgateway-system': kgateway-system jwt (Reason: 2 errors occurred:
+   Found rejected VirtualHostOption by '{{< reuse "docs/snippets/namespace.md" >}}': {{< reuse "docs/snippets/namespace.md" >}} jwt (Reason: 2 errors occurred:
 	* invalid virtual host [http~bookinfo_example] while processing plugin enterprise_warning: Could not load configuration for the following Enterprise features: [jwt]
    ```
    -->
@@ -35,7 +35,7 @@ Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience
 3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
    
    ```sh
-   kubectl port-forward deploy/http -n kgateway-system 19000 &  
+   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000 &  
    ```
    
    * [http://localhost:19000/](http://localhost:19000/)
@@ -54,11 +54,12 @@ Kgateway is based on [Envoy proxy](https://www.envoyproxy.io). If you experience
 4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command. 
    
    ```bash
-   # kgateway control plane
-   kubectl logs -n kgateway-system deployment/kgateway
+   # {{< reuse "/docs/snippets/kgateway.md" >}} control plane
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} deployment/{{< reuse "/docs/snippets/helm-kgateway.md" >}}
    
    # Replace $GATEWAY_NAME with the name of your gateway.
-   kubectl logs -n kgateway-system deployment/$GATEWAY_NAME
+   export GATEWAY_NAME=http
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} deployment/$GATEWAY_NAME
    ```
 
 ## TrafficPolicy not applied {#trafficpolicy}
@@ -124,16 +125,16 @@ Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that
    
    You can use the `kubectl logs` command to view logs for individual components. 
    ```bash
-   kubectl logs -f -n kgateway-system -l kgateway=kgateway
+   kubectl logs -f -n {{< reuse "docs/snippets/namespace.md" >}} -l kgateway=kgateway
    ```
 
    To follow the logs of other kgateway components, simply change the value of the `gloo` label as shown in the table below.
 
    | Component | Command |
    | ------------- | ------------- |
-   | Gloo control plane | `kubectl logs -f -n kgateway-system -l kgateway=kgateway` |
-   | kgateway proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n kgateway-system -l gloo=kube-gateway` |
-   | Redis | `kubectl logs -f -n kgateway-system -l gloo=redis` |
+   | Gloo control plane | `kubectl logs -f -n {{< reuse "docs/snippets/namespace.md" >}} -l kgateway=kgateway` |
+   | kgateway proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n {{< reuse "docs/snippets/namespace.md" >}} -l gloo=kube-gateway` |
+   | Redis | `kubectl logs -f -n {{< reuse "docs/snippets/namespace.md" >}} -l gloo=redis` |
 
 7. If you still cannot troubleshoot the issue, capture the logs and the state of kgateway in a file. 
    ```bash

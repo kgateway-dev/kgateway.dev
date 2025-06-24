@@ -108,7 +108,7 @@ The following example shows the example syntax for using this shortcode:
 
 ```markdown
 {{</* reuse-image src="img/translation.svg" */>}}
-{{</* reuse-image-dark src="img/translation-dark.svg" */>}}
+{{</* reuse-image-dark srcDark="img/translation-dark.svg" */>}}
 ```
 
 To support different screen sizes, make sure to use images of type `.svg` only. 

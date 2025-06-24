@@ -4,14 +4,14 @@ weight: 50
 description: Uninstall kgateway and related components.
 ---
 
-If you no longer need your kgateway environment, you can uninstall the control plane and all gateway proxies. You can also optionally remove related components such as Prometheus and sample apps.
+If you no longer need your {{< reuse "/docs/snippets/kgateway.md" >}} environment, you can uninstall the control plane and all gateway proxies. You can also optionally remove related components such as Prometheus and sample apps.
 
-## Uninstall kgateway
+## Uninstall
 
-Remove the kgateway control plane and gateway proxies.
+Remove the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and gateway proxies.
 
 {{< callout type="info" >}}
-Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
+Did you use Argo CD to install {{< reuse "/docs/snippets/kgateway.md" >}}? Skip to the [Argo CD steps](#argocd).
 {{< /callout >}}
 
 1. Get all HTTP routes in your environment. 
@@ -38,10 +38,10 @@ Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
    kubectl delete -n <namespace> referencegrant <referencegrant-name>
    ```
 
-5. Get all gateways in your environment that are configured by the `kgateway` gateway class. 
+5. Get all gateways in your environment that are configured by the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` gateway class. 
    
    ```sh
-   kubectl get gateways -A | grep kgateway
+   kubectl get gateways -A | grep {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
 
 6. Remove each gateway. 
@@ -50,24 +50,24 @@ Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
    kubectl delete -n <namespace> gateway <gateway-name>
    ```
 
-7. Uninstall kgateway.
+7. Uninstall {{< reuse "/docs/snippets/kgateway.md" >}}.
    
-   1. Uninstall the kgateway release.
+   1. Uninstall the {{< reuse "/docs/snippets/helm-kgateway.md" >}} Helm release.
       
       ```sh
-      helm uninstall kgateway -n kgateway-system
+      helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
       ```
 
-   2. Delete the kgateway CRDs.
+   2. Delete the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs.
 
       ```sh
-      helm uninstall kgateway-crds -n kgateway-system
+      helm uninstall {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
       ```
 
-   3. Remove the `kgateway-system` namespace. 
+   3. Remove the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
       
       ```sh
-      kubectl delete namespace kgateway-system
+      kubectl delete namespace {{< reuse "docs/snippets/namespace.md" >}}
       ```
 
    4. Confirm that the CRDs are deleted.
@@ -76,7 +76,7 @@ Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
       kubectl get crds | grep kgateway
       ```
 
-8. Remove the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} CRDs. If you installed a different version or channel of the Kubernetes Gateway API, update the following command accordingly.
+8. Remove the Kubernetes Gateway API CRDs. If you installed a different version or channel of the Kubernetes Gateway API, update the following command accordingly.
    
    ```sh
    kubectl delete -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
@@ -86,8 +86,8 @@ Did you use Argo CD to install kgateway? Skip to the [Argo CD steps](#argocd).
 
 For ArgoCD installations, use the following steps to clean up your environment.
 
-{{< tabs items="Argo CD UI,Argo CD CLI" >}}
-{{% tab %}}
+{{< tabs tabTotal="2" items="Argo CD UI,Argo CD CLI" >}}
+{{% tab tabName="Argo CD UI" %}}
 1. Port-forward the Argo CD server on port 9999.
    ```sh
    kubectl port-forward svc/argocd-server -n argocd 9999:443
@@ -95,21 +95,21 @@ For ArgoCD installations, use the following steps to clean up your environment.
 
 2. Open the [Argo CD UI](https://localhost:9999/applications).
 
-3. Log in with the `admin` username and `kgateway` password.
+3. Log in with the `admin` username and `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` password.
 4. Find the application that you want to delete and click **x**. 
 5. Select **Foreground** and click **Ok**. 
-6. Verify that the pods were removed from the `kgateway-system` namespace. 
+6. Verify that the pods were removed from the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
    Example output: 
    ```txt
-   No resources found in kgateway-systemnamespace.
+   No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
 
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Argo CD CLI" %}}
 1. Port-forward the Argo CD server on port 9999.
    ```sh
    kubectl port-forward svc/argocd-server -n argocd 9999:443
@@ -117,41 +117,41 @@ For ArgoCD installations, use the following steps to clean up your environment.
    
 2. Log in to the Argo CD UI. 
    ```sh
-   argocd login localhost:9999 --username admin --password kgateway --insecure
+   argocd login localhost:9999 --username admin --password {{< reuse "/docs/snippets/helm-kgateway.md" >}} --insecure
    ```
    
-3. Delete the kgateway application.
+3. Delete the {{< reuse "/docs/snippets/helm-kgateway.md" >}} application.
    
    ```sh
-   argocd app delete kgateway-oss-helm --cascade --server localhost:9999 --insecure
+   argocd app delete {{< reuse "/docs/snippets/helm-kgateway.md" >}}-helm --cascade --server localhost:9999 --insecure
    ```
    
    Example output: 
    ```txt
-   Are you sure you want to delete 'kgateway-oss-helm' and all its resources? [y/n] y
-   application 'kgateway-oss-helm' deleted   
+   Are you sure you want to delete '{{< reuse "/docs/snippets/helm-kgateway.md" >}}-helm' and all its resources? [y/n] y
+   application '{{< reuse "/docs/snippets/helm-kgateway.md" >}}-helm' deleted   
    ```
 
-4. Delete the kgateway CRD application.
+4. Delete the {{< reuse "/docs/snippets/helm-kgateway.md" >}} CRD application.
    
    ```sh
-   argocd app delete kgateway-crds-oss-helm --cascade --server localhost:9999 --insecure
+   argocd app delete {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-helm --cascade --server localhost:9999 --insecure
    ```
    
    Example output: 
    ```txt
-   Are you sure you want to delete 'kgateway-crds-oss-helm' and all its resources? [y/n] y
-   application 'kgateway-crds-oss-helm' deleted   
+   Are you sure you want to delete '{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-helm' and all its resources? [y/n] y
+   application '{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}-helm' deleted   
    ```
 
-5. Verify that the pods were removed from the `kgateway-system` namespace. 
+5. Verify that the pods were removed from the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
    ```sh
-   kubectl get pods -n kgateway-system
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
    Example output: 
    ```txt  
-   No resources found in kgateway-system namespace.
+   No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
 {{% /tab %}}
 {{< /tabs >}}
