@@ -122,13 +122,24 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
       
-   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation options, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
+   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      ```sh
-      helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-      --version v{{< reuse "docs/versions/n-patch.md" >}}
-      ```
-      
+      {{< tabs tabTotal="2" items="Basic installation,Custom values" >}}
+{{% tab tabName="Basic installation" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/n-patch.md" >}}
+```
+{{% /tab %}}
+{{% tab tabName="Custom values" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/n-patch.md" >}} \
+-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /tab %}}
+      {{< /tabs >}}
+
       Example output: 
       ```txt
       NAME: {{< reuse "/docs/snippets/helm-kgateway.md" >}}

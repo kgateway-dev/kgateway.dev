@@ -162,7 +162,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
       open values.yaml
       ```
 
-   2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a values file for the upgrade version by pulling and inspecting the Helm chart locally.
+   2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a `{{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` file for the upgrade version by pulling and inspecting the Helm chart locally.
       
       ```sh
       helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v$NEW_VERSION
@@ -170,7 +170,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
 
-   3. Make any changes that you want by editing your `my-values.yaml` Helm values file or preparing the `--set` flags.
+   3. Make any changes that you want by editing your `values.yaml` Helm values file or preparing the `--set` flags.
 
 4. Upgrade the kgateway Helm installation.
    {{< callout type="warning" >}}
