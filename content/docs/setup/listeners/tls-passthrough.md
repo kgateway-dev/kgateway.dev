@@ -431,15 +431,5 @@ kubectl delete secret nginx-server-certs
 {{% /tab %}}
 {{< /tabs >}}
 
-2. Remove the `example_certs` directory that stores your TLS credentials. 
-   ```sh
-   rm -rf example_certs
-   ```
-
-```shell
-
-```
-
-
 
 
