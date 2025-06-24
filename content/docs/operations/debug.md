@@ -3,7 +3,7 @@ title: Debug your setup
 weight: 15
 ---
 
-Use built-in tools to troubleshoot issues in your kgateway setup.
+Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgateway.md" >}} setup.
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} is based on [Envoy proxy](https://www.envoyproxy.io). If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy. In this guide you learn how to use the {{< reuse "/docs/snippets/kgateway.md" >}} and Envoy debugging tools to troubleshoot misconfigurations on the gateway.
 
@@ -29,7 +29,10 @@ Use built-in tools to troubleshoot issues in your kgateway setup.
 2. Check the HTTPRoutes for the status of the route and any attached policies.
    
    ```sh
-   kubectl get httproute <name> -n <namespace>
+   kubectl get httproutes -A
+   ```
+   ```sh
+   kubectl get httproute <name> -n <namespace> -o yaml
    ```
 
 3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
