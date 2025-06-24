@@ -96,14 +96,14 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
     
 6. Store the credentials for the `httpbin.example.com` domain in a Kubernetes secret. 
    ```shell
-   kubectl create -n kgateway-system secret tls httpbin-credential \
+   kubectl create -n {{< reuse "docs/snippets/namespace.md" >}} secret tls httpbin-credential \
      --key=example_certs/httpbin.example.com.key \
      --cert=example_certs/httpbin.example.com.crt
    ```
 
 7. Store the credentials for the `petstore.example.com` domain in a Kubernetes secret. 
    ```shell
-   kubectl create -n kgateway-system secret tls petstore-credential \
+   kubectl create -n {{< reuse "docs/snippets/namespace.md" >}} secret tls petstore-credential \
      --key=example_certs/petstore.example.com.key \
      --cert=example_certs/petstore.example.com.crt
    ```
@@ -123,11 +123,11 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: sni
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
        gateway: sni
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      listeners:
        - protocol: HTTPS
          port: 443
@@ -160,10 +160,10 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
 
    |Setting|Description|
    |--|--|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the gateway. When you set up kgateway, a default GatewayClass is set up for you. To view the GatewayClass configuration, see [Default Gateway setup](/docs/setup/default/). |
-   |`spec.listeners`|Configure the listeners for this gateway. In this example, you configure two HTTPS listeners. One listener is for the httpbin app and the other is for the petstore app. Each listener refers to a secret that holds the TLS certificate and key for the hostname that the listener is configured for. |
+   |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you.|
+   |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure two HTTPS listeners. One listener is for the httpbin app and the other is for the petstore app. Each listener refers to a secret that holds the TLS certificate and key for the hostname that the listener is configured for. |
    |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the gateway and the unencrypted request is forwarded to the service in the cluster. |
-   |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the gateway. The gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
+   |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
    {{% /tab %}}
    {{% tab tabName="ListenerSet (experimental)" %}}
@@ -176,11 +176,11 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
       kind: Gateway
       metadata:
         name: sni
-        namespace: kgateway-system
+        namespace: {{< reuse "docs/snippets/namespace.md" >}}
         labels:
           gateway: sni
       spec:
-        gatewayClassName: kgateway
+        gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
         allowedListeners:
           namespaces:
             from: All
@@ -198,7 +198,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
       
       |Setting|Description|
       |--|--|
-      |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the gateway. When you set up kgateway, a default GatewayClass is set up for you. To view the GatewayClass configuration, see [Default Gateway setup](/docs/setup/default/). |
+      |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
       | `spec.listeners` | {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on HTTP port 80, which differs from the HTTPS port 443 in the ListenerSet that you create later. |
    
@@ -210,13 +210,13 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
       kind: XListenerSet
       metadata:
         name: sni-listenerset
-        namespace: kgateway-system
+        namespace: {{< reuse "docs/snippets/namespace.md" >}}
         labels:
           gateway: sni
       spec:
         parentRef:
           name: sni
-          namespace: kgateway-system
+          namespace: {{< reuse "docs/snippets/namespace.md" >}}
           kind: Gateway
           group: gateway.networking.k8s.io
         listeners:
@@ -277,7 +277,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    spec:
      parentRefs:
        - name: sni
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "httpbin.example.com"
      rules:
@@ -303,7 +303,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    spec:
      parentRefs:
        - name: sni-listenerset
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          kind: XListenerSet
          group: gateway.networking.x-k8s.io
      hostnames:
@@ -335,7 +335,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    spec:
      parentRefs:
        - name: sni
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "petstore.example.com"
      rules:
@@ -361,7 +361,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    spec:
      parentRefs:
        - name: sni-listenerset
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          kind: XListenerSet
          group: gateway.networking.x-k8s.io
      hostnames:
@@ -379,13 +379,13 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system sni -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} sni -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward svc/sni -n kgateway-system 8443:443
+   kubectl port-forward svc/sni -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -538,9 +538,9 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{% tab tabName="Gateway listeners" %}}
 
    ```sh
-   kubectl delete secret httpbin-credential -n kgateway-system
-   kubectl delete secret petstore-credential -n kgateway-system
-   kubectl delete gateway sni -n kgateway-system
+   kubectl delete secret httpbin-credential -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete secret petstore-credential -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete gateway sni -n {{< reuse "docs/snippets/namespace.md" >}}
    kubectl delete httproute httpbin-https -n httpbin
    kubectl delete httproute petstore-https -n default
    kubectl delete deployment petstore
@@ -549,10 +549,10 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{% /tab %}}
    {{% tab tabName="ListenerSet (experimental)" %}}
    ```sh
-   kubectl delete secret httpbin-credential -n kgateway-system
-   kubectl delete secret petstore-credential -n kgateway-system
-   kubectl delete gateway sni -n kgateway-system
-   kubectl delete xlistenerset sni-listenerset -n kgateway-system
+   kubectl delete secret httpbin-credential -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete secret petstore-credential -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete gateway sni -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete xlistenerset sni-listenerset -n {{< reuse "docs/snippets/namespace.md" >}}
    kubectl delete httproute httpbin-https -n httpbin
    kubectl delete httproute petstore-https -n default
    kubectl delete deployment petstore
