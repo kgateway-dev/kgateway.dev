@@ -144,13 +144,13 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
       ```sh
-      helm template --version v$NEW_VERSION {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
+      helm template --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
       ```
 
    2. Upgrade the CRDs in your cluster:
 
       ```sh
-      helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v$NEW_VERSION {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+      helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
       ```
 
 3. Make any changes to your Helm values.
@@ -165,8 +165,8 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    2. Compare your current Helm chart values with the version that you want to upgrade to. You can get a `{{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` file for the upgrade version by pulling and inspecting the Helm chart locally.
       
       ```sh
-      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v$NEW_VERSION
-      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v$NEW_VERSION.tgz
+      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-{{< reuse "docs/versions/helm-version-upgrade.md" >}}.tgz
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
 
@@ -180,7 +180,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    ```sh
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml \
-     --version v$NEW_VERSION
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
    ```
    
 5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.

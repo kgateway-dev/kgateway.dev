@@ -74,7 +74,8 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} in your Kubernetes cluster. C
 
 Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
-1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. 
+1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}.
+   
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
@@ -87,37 +88,29 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}
-   If you want to use TCPRoutes to set up a TCP listener on your Gateway, you must install the TCPRoute CRD, which is part of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} experimental channel. Use the following command to install the CRDs. 
-   
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-   {{< /callout >}}
+   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](/../../reference/versions/#experimental-features).{{< /callout >}}
 
 2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
 
    1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
       ```sh
-      helm template --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
+      helm template --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} --output-dir ./helm
       ```
 
    2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
       ```sh
-      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
       ```
 
 3. Install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart.
 
    1. **Optional**: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
-      {{< callout type="info" >}}
-      For common values that you might want to update, see [Installation settings](#installation-settings).
-      {{< /callout >}}
+      {{< callout type="info" >}}For common values that you might want to update, see [Installation settings](#installation-settings).{{< /callout >}}
 
       ```sh
-      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version v{{< reuse "docs/versions/n-patch.md" >}}
+      helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}}
       tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
@@ -128,13 +121,13 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
---version v{{< reuse "docs/versions/n-patch.md" >}}
+--version {{< reuse "docs/versions/helm-version-flag.md" >}}
 ```
 {{% /tab %}}
 {{% tab tabName="Custom values" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
---version v{{< reuse "docs/versions/n-patch.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
 {{% /tab %}}
@@ -162,7 +155,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
    {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-5. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
+2. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
    ```sh
    kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
@@ -186,12 +179,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}
-   If you want to use TCPRoutes to set up a TCP listener on your Gateway, you must install the TCPRoute CRD, which is part of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} experimental channel. Use the following command to install the CRDs. 
-   ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-   {{< /callout >}}
+   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](/../../reference/versions/#experimental-features).{{< /callout >}}
    
 2. Port-forward the Argo CD server on port 9999.
    
@@ -225,7 +213,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        helm:
          skipCrds: false
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
-       targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
+       targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:
        automated:
          # Prune resources during auto-syncing (default is false)
@@ -257,7 +245,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        helm:
          skipCrds: false
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
-       targetRevision: v{{< reuse "docs/versions/n-patch.md" >}}
+       targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:
        automated:
          # Prune resources during auto-syncing (default is false)
