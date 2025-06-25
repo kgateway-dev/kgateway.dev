@@ -99,6 +99,53 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TCP Gateway that listens for incoming traffic on port 8000. The Gateway can serve TCPRoutes from any namespace. |
 
+2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
+   ```sh
+   kubectl get gateway tcp-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   ```
+
+   Example output:
+
+   ```console
+   status:
+     addresses:
+     - type: IPAddress
+       value: ${INGRESS_GW_ADDRESS}
+     conditions:
+     - lastTransitionTime: "2024-11-20T16:01:25Z"
+       message: ""
+       observedGeneration: 2
+       reason: Accepted
+       status: "True"
+       type: Accepted
+     - lastTransitionTime: "2024-11-20T16:01:25Z"
+       message: ""
+       observedGeneration: 2
+       reason: Programmed
+       status: "True"
+       type: Programmed
+   ```
+
+3. Create a ReferenceGrant to allow TCPRoutes to reference the tcp-echo service.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: ReferenceGrant
+   metadata:
+     name: allow-tcp-route-to-echo
+     namespace: default
+   spec:
+     from:
+       - group: gateway.networking.k8s.io
+         kind: TCPRoute
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     to:
+       - group: ""
+         kind: Service
+   EOF
+   ```
+
 {{% /tab %}}
 {{% tab tabName="ListenerSets (experimental)" %}}
 
@@ -170,10 +217,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    |`spec.parentRef`|The name of the Gateway to attach the ListenerSet to. |
    |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure a TCP listener for port 8000. The gateway can serve TCPRoutes from any namespace. |
 
-{{% /tab %}}
-{{< /tabs >}}
-
-2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
+3. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
    ```sh
    kubectl get gateway tcp-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
@@ -200,7 +244,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
        type: Programmed
    ```
 
-3. Create a ReferenceGrant to allow TCPRoutes to reference the tcp-echo service.
+4. Create a ReferenceGrant to allow TCPRoutes to reference the tcp-echo service.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -220,60 +264,64 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    EOF
    ```
 
-## Create a TCPRoute
-
-{{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2"  >}}
-{{% tab tabName="Gateway listeners" %}}
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
-metadata:
-  name: tcp-route-echo
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  labels:
-    app: tcp-echo
-spec:
-  parentRefs:
-    - name: tcp-gateway
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-      sectionName: tcp
-  rules:
-    - backendRefs:
-        - name: tcp-echo
-          namespace: default
-          port: 1025
-EOF
-```
-{{% /tab %}}
-{{% tab tabName="ListenerSets (experimental)" %}}
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
-metadata:
-  name: tcp-route-echo
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  labels:
-    app: tcp-echo
-spec:
-  parentRefs:
-    - name: my-tcp-listenerset
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-      kind: XListenerSet
-      group: gateway.networking.x-k8s.io
-      sectionName: tcp-listener-set
-  rules:
-    - backendRefs:
-        - name: tcp-echo
-          namespace: default
-          port: 1025
-EOF
-```
 {{% /tab %}}
 {{< /tabs >}}
 
-5. Verify that the TCPRoute is applied successfully. 
+## Create a TCPRoute
+
+1. Create the TCPRoute resource. 
+   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
+   {{% tab tabName="Gateway listeners" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1alpha2
+   kind: TCPRoute
+   metadata:
+     name: tcp-route-echo
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: tcp-echo
+   spec:
+     parentRefs:
+       - name: tcp-gateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         sectionName: tcp
+     rules:
+       - backendRefs:
+           - name: tcp-echo
+             namespace: default
+             port: 1025
+   EOF
+   ```
+   {{% /tab %}}
+   {{% tab tabName="ListenerSets (experimental)" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1alpha2
+   kind: TCPRoute
+   metadata:
+     name: tcp-route-echo
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: tcp-echo
+   spec:
+     parentRefs:
+       - name: my-tcp-listenerset
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         kind: XListenerSet
+         group: gateway.networking.x-k8s.io
+         sectionName: tcp-listener-set
+     rules:
+       - backendRefs:
+           - name: tcp-echo
+             namespace: default
+             port: 1025
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+2. Verify that the TCPRoute is applied successfully. 
    
    ```sh
    kubectl get tcproute/tcp-route-echo -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
