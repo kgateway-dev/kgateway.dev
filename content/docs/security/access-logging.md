@@ -222,13 +222,13 @@ You can set up access logs to write to a file. The following example writes acce
 
 4. Send a request to the httpbin app on the `www.example.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/status/200 -H "host: www.example.com:8080"
    ```
@@ -296,13 +296,13 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 3. Send a request to the httpbin app on the `www.example.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" -H "x-my-cool-test-filter:test"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/status/200 -H "host: www.example.com:8080" -H "x-my-cool-test-filter:test"
    ```
@@ -322,13 +322,13 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 4. Send another request, this time with the header that you configured in the HTTPListenerPolicy. Verify that your request succeeds and that you get back a 200 HTTP response code.  
    
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" -H "x-my-cool-test-filter:test"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/status/200 -H "host: www.example.com:8080" -H "x-my-cool-test-filter:test"
    ```
@@ -383,3 +383,4 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 ```sh
 kubectl delete HTTPListenerPolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
+
