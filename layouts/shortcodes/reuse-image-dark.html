@@ -3,4 +3,4 @@
 {{ $alt := .Get "alt" }}
 {{ $imageDark := resources.Get $srcDark }}
 {{ $caption := .Get "caption" }}
-<div ><figure><img class="hx-hidden dark:hx-block" src="{{ $imageDark.RelPermalink }}" width="{{ $width }}" alt="{{ $alt }}"/> <figcaption style="font-style:italic">{{ $caption }}</figcaption></figure></div>
+<div ><figure class="hx-hidden dark:hx-block"><img class="hx-hidden dark:hx-block" src="{{ $imageDark.RelPermalink }}" width="{{ $width }}" alt="{{ $alt }}"/> <figcaption style="font-style:italic">{{ $caption }}</figcaption></figure></div>
