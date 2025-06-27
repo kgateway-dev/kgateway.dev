@@ -229,7 +229,7 @@ _Appears in:_
 
 
 
-Configuration of the AgentGateway integration
+AgentGateway configures the AgentGateway integration. If AgentGateway is enabled, Envoy
 
 
 
@@ -240,6 +240,10 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `enabled` _boolean_ | Whether to enable the extension. |  |  |
 | `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  |  |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: IfNotPresent |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The container environment variables. |  |  |
 
 
 #### AiExtension
@@ -384,9 +388,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
 | `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
 | `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the following credential providers are tried in order, stopping when one<br />of them returns an access key ID and a secret access key (the session token is optional):<br />1. Environment variables: when the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN are set.<br />2. AssumeRoleWithWebIdentity API call: when the environment variables AWS_WEB_IDENTITY_TOKEN_FILE and AWS_ROLE_ARN are set.<br />3. EKS Pod Identity: when the environment variable AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE is set.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
-| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
 | `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 
 
@@ -475,7 +479,7 @@ _Appears in:_
 
 
 
-
+BackendConfigPolicySpec defines the desired state of BackendConfigPolicy.
 
 
 
@@ -484,15 +488,17 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ |  |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target references to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | Soft limit on size of the cluster's connections read and write buffers.<br />If unspecified, an implementation defined default is applied (1MiB). |  |  |
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
 | `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
 | `http1ProtocolOptions` _[Http1ProtocolOptions](#http1protocoloptions)_ | Additional options when handling HTTP1 requests upstream. |  |  |
+| `http2ProtocolOptions` _[Http2ProtocolOptions](#http2protocoloptions)_ | Http2ProtocolOptions contains the options necessary to configure HTTP/2 backends.<br />Note: Http2ProtocolOptions can only be applied to HTTP/2 backends.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
 | `tls` _[TLS](#tls)_ | TLS contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
 | `loadBalancer` _[LoadBalancer](#loadbalancer)_ | LoadBalancer contains the options necessary to configure the load balancer. |  |  |
+| `healthCheck` _[HealthCheck](#healthcheck)_ | HealthCheck contains the options necessary to configure the health check. |  |  |
 
 
 #### BackendSpec
@@ -828,7 +834,7 @@ _Appears in:_
 
 
 
-Configuration for the Envoy proxy instance that is provisioned from a
+EnvoyBootstrap configures the Envoy proxy instance that is provisioned from a
 Kubernetes Gateway.
 
 
@@ -846,7 +852,7 @@ _Appears in:_
 
 
 
-Configuration for the container running Envoy.
+EnvoyContainer configures the container running Envoy.
 
 
 
@@ -856,9 +862,10 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `bootstrap` _[EnvoyBootstrap](#envoybootstrap)_ | Initial envoy configuration. |  |  |
-| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: gloo-envoy-wrapper (OSS) / gloo-ee-envoy-wrapper (EE)<br />	tag: <gloo version> (OSS) / <gloo-ee version> (EE)<br />	pullPolicy: IfNotPresent |  |  |
+| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: envoy-wrapper<br />	tag: <kgateway version><br />	pullPolicy: IfNotPresent |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The container environment variables. |  |  |
 
 
 #### ExtAuthEnabled
@@ -1305,7 +1312,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
-| `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  |  |
+| `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
 | `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
 
 
@@ -1373,6 +1380,63 @@ _Appears in:_
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
+#### HealthCheck
+
+
+
+HealthCheck contains the options to configure the health check.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/health_check.proto) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. |  |  |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Interval is the time between health checks. |  |  |
+| `unhealthyThreshold` _integer_ | UnhealthyThreshold is the number of consecutive failed health checks that will be considered<br />unhealthy.<br />Note that for HTTP health checks, if a host responds with a code not in ExpectedStatuses or RetriableStatuses,<br />this threshold is ignored and the host is considered immediately unhealthy. |  |  |
+| `healthyThreshold` _integer_ | HealthyThreshold is the number of healthy health checks required before a host is marked<br />healthy. Note that during startup, only a single successful health check is<br />required to mark a host healthy. |  |  |
+| `http` _[HealthCheckHttp](#healthcheckhttp)_ | Http contains the options to configure the HTTP health check. |  |  |
+| `grpc` _[HealthCheckGrpc](#healthcheckgrpc)_ | Grpc contains the options to configure the gRPC health check. |  |  |
+
+
+#### HealthCheckGrpc
+
+
+
+
+
+
+
+_Appears in:_
+- [HealthCheck](#healthcheck)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `serviceName` _string_ | ServiceName is the optional name of the service to check. |  |  |
+| `authority` _string_ | Authority is the authority header used to make the gRPC health check request.<br />If unset, the name of the cluster this health check is associated<br />with will be used. |  |  |
+
+
+#### HealthCheckHttp
+
+
+
+
+
+
+
+_Appears in:_
+- [HealthCheck](#healthcheck)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `host` _string_ | Host is the value of the host header in the HTTP health check request. If<br />unset, the name of the cluster this health check is associated<br />with will be used. |  |  |
+| `path` _string_ | Path is the HTTP path requested. |  |  |
+| `method` _string_ | Method is the HTTP method to use.<br />If unset, GET is used. |  | Enum: [GET HEAD POST PUT DELETE OPTIONS TRACE PATCH] <br /> |
+
+
 #### Host
 
 
@@ -1411,6 +1475,25 @@ _Appears in:_
 | `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging. When this option is false, then Envoy will terminate<br />HTTP/1.1 connections upon receiving an invalid HTTP message. However,<br />when this option is true, then Envoy will leave the HTTP/1.1 connection<br />open where possible. |  |  |
 
 
+#### Http2ProtocolOptions
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `initialStreamWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | InitialStreamWindowSize is the initial window size for the stream.<br />Valid values range from 65535 (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum).<br />Defaults to 268435456 (256 * 1024 * 1024).<br />Values can be specified with units like "64Ki". |  |  |
+| `initialConnectionWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | InitialConnectionWindowSize is similar to InitialStreamWindowSize, but for the connection level.<br />Same range and default value as InitialStreamWindowSize.<br />Values can be specified with units like "64Ki". |  |  |
+| `maxConcurrentStreams` _integer_ | The maximum number of concurrent streams that the connection can have. |  |  |
+| `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging and headers. When disabled (default), then<br />the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame.<br />When enabled, only the offending stream is terminated. |  |  |
+
+
 #### Image
 
 
@@ -1421,6 +1504,7 @@ for details.
 
 
 _Appears in:_
+- [AgentGateway](#agentgateway)
 - [AiExtension](#aiextension)
 - [EnvoyContainer](#envoycontainer)
 - [IstioContainer](#istiocontainer)
@@ -1453,7 +1537,7 @@ _Appears in:_
 
 
 
-Configuration for the container running the istio-proxy.
+IstioContainer configures the container running the istio-proxy.
 
 
 
@@ -1475,7 +1559,7 @@ _Appears in:_
 
 
 
-Configuration for the Istio integration settings used by a Gloo Gateway's data plane (Envoy proxy instance)
+IstioIntegration configures the Istio integration settings used by a kgateway's data plane (Envoy proxy instance)
 
 
 
@@ -1492,7 +1576,7 @@ _Appears in:_
 
 
 
-Configuration for the set of Kubernetes resources that will be provisioned
+KubernetesProxyConfig configures the set of Kubernetes resources that will be provisioned
 for a given Gateway.
 
 
@@ -1503,7 +1587,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `deployment` _[ProxyDeployment](#proxydeployment)_ | Use a Kubernetes deployment as the proxy workload type. Currently, this is the only<br />supported workload type. |  |  |
-| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy. |  |  |
+| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If AgentGateway is enabled, the EnvoyContainer values will be ignored. |  |  |
 | `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
 | `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
 | `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  |  |
@@ -1511,7 +1595,7 @@ _Appears in:_
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
 | `aiExtension` _[AiExtension](#aiextension)_ | Configuration for the AI extension. |  |  |
-| `agentGateway` _[AgentGateway](#agentgateway)_ | Configure the AgentGateway integration |  |  |
+| `agentGateway` _[AgentGateway](#agentgateway)_ | Configure the AgentGateway integration. If AgentGateway is disabled, the EnvoyContainer values will be used by<br />default to configure the data plane proxy. |  |  |
 | `floatingUserId` _boolean_ | Used to unset the `runAsUser` values in security contexts. |  |  |
 
 
@@ -2028,7 +2112,7 @@ _Appears in:_
 
 
 
-Configuration for the Proxy deployment in Kubernetes.
+ProxyDeployment configures the Proxy deployment in Kubernetes.
 
 
 
@@ -2241,7 +2325,7 @@ _Appears in:_
 
 
 
-Configuration for the SDS instance that is provisioned from a Kubernetes Gateway.
+SdsBootstrap configures the SDS instance that is provisioned from a Kubernetes Gateway.
 
 
 
@@ -2257,7 +2341,7 @@ _Appears in:_
 
 
 
-Configuration for the container running Gloo SDS.
+SdsContainer configures the container running SDS sidecar.
 
 
 
