@@ -9,7 +9,8 @@ Set up cloud LLM providers with AI Gateway.
 ## Before you begin
 
 1. [Set up AI Gateway](../setup/).
-2. Choose a [supported LLM provider](#supported-llm-providers).
+2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. Choose a [supported LLM provider](#supported-llm-providers).
 
 ## Supported LLM providers {#supported-llm-providers}
 
