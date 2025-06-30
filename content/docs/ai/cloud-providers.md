@@ -8,7 +8,7 @@ Set up cloud LLM providers with AI Gateway.
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 2. Choose a [supported LLM provider](#supported-llm-providers).
 
 ## Supported LLM providers {#supported-llm-providers}
@@ -25,7 +25,7 @@ The following sections in this guide provide examples that are tailored to the s
 
 OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 
-To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
+To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
 ## Gemini {#google}
 
@@ -35,7 +35,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    export GOOGLE_KEY=<your-api-key>
    ```
 
-2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](/docs/ai/auth/).
+2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](../auth/).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -43,9 +43,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    kind: Secret
    metadata:
      name: google-secret
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
-       app: ai-kgateway
+       app: ai-gateway
    type: Opaque
    stringData:
      Authorization: $GOOGLE_KEY 
@@ -60,9 +60,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    kind: Backend
    metadata:
      labels:
-       app: ai-kgateway
+       app: ai-gateway
      name: google
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      ai:
        llm:
@@ -95,13 +95,13 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    kind: HTTPRoute
    metadata:       
      name: google
-     namespace: kgateway-system                           
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}                           
      labels:
-       app: ai-kgateway
+       app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -109,7 +109,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
            value: /gemini
        backendRefs:
        - name: google
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -117,8 +117,8 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 
 5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/gemini" -H content-type:application/json  -d '{
      "contents": [                         
@@ -132,7 +132,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
      ]          
    }' | jq  
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/gemini" -H content-type:application/json -d '{
      "contents": [                         
@@ -193,9 +193,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="/docs/ai/failover" title="Model failover" >}}
-  {{< card link="/docs/ai/functions" title="Function calling" >}}
-  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
-  {{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
+  {{< card link="../failover" title="Model failover" >}}
+  {{< card link="../functions" title="Function calling" >}}
+  {{< card link="../prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="../prompt-guards" title="Prompt guards" >}}
+  {{< card link="../observability" title="AI Gateway metrics" >}}
 {{< /cards >}}

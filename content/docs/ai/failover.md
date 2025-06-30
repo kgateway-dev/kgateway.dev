@@ -15,13 +15,13 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
-2. [Authenticate to the LLM](/docs/ai/auth/).
+1. [Set up AI Gateway](../setup/).
+2. [Authenticate to the LLM](../auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](../../reference/api/#multipoolconfig).
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
@@ -37,7 +37,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
      labels:
        app: model-failover
      name: model-failover
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -78,13 +78,13 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    kind: HTTPRoute
    metadata:
      name: model-failover
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
        app: model-failover
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -98,7 +98,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -106,8 +106,8 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 
 3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend will automatically use the model from the first pool in the priority order.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{< tab >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -117,8 +117,8 @@ In this example, you create a Backend with multiple pools for the same LLM provi
        }
    ]}' | jq
    ```
-   {{< /tab >}}
-   {{< tab >}}
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -161,13 +161,13 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 {{< reuse "docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete backend,httproute -n kgateway-system -l app=model-failover
+   kubectl delete backend,httproute -n {{< reuse "docs/snippets/namespace.md" >}} -l app=model-failover
    ```
 
 ## Next
 
 Explore other AI Gateway features.
 
-* Pass in [functions](/docs/ai/functions/) to an LLM to request as a step towards agentic AI.
-* Set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
-* [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
+* Pass in [functions](../functions/) to an LLM to request as a step towards agentic AI.
+* Set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.
+* [Enrich your prompts](../prompt-enrichment/) with system prompts to improve LLM outputs.

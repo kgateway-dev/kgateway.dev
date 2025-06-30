@@ -8,12 +8,12 @@ Instead of a cloud LLM provider, you might want to use a local LLM provider such
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 
 2. As part of the AI Gateway setup, make sure that you set up the GatewayParameters resource to use a NodePort service.
    
    ```sh
-   kubectl get GatewayParameters ai-gateway -n kgateway-system -o jsonpath='{.items[*].spec.kube.service.type}'
+   kubectl get GatewayParameters ai-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.items[*].spec.kube.service.type}'
    ```
 
    Example output:
@@ -82,9 +82,9 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
    kind: Backend
    metadata:
      labels:
-       app: ai-kgateway
+       app: ai-gateway
      name: ollama
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -118,13 +118,13 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
     kind: HTTPRoute
     metadata:
       name: ollama
-      namespace: kgateway-system
+      namespace: {{< reuse "docs/snippets/namespace.md" >}}
       labels:
-        app: ai-kgateway
+        app: ai-gateway
     spec:
       parentRefs:
         - name: ai-gateway
-          namespace: kgateway-system
+          namespace: {{< reuse "docs/snippets/namespace.md" >}}
       rules:
       - matches:
         - path:
@@ -138,7 +138,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
               replaceFullPath: /v1/models
         backendRefs:
         - name: ollama
-          namespace: kgateway-system
+          namespace: {{< reuse "docs/snippets/namespace.md" >}}
           group: gateway.kgateway.dev
           kind: Backend
     EOF
@@ -196,9 +196,9 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="/docs/ai/failover" title="Model failover" >}}
-  {{< card link="/docs/ai/functions" title="Function calling" >}}
-  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
-  {{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
+  {{< card link="failover" title="Model failover" >}}
+  {{< card link="functions" title="Function calling" >}}
+  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="prompt-guards" title="Prompt guards" >}}
+  {{< card link="observability" title="AI Gateway metrics" >}}
 {{< /cards >}}

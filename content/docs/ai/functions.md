@@ -49,7 +49,7 @@ sequenceDiagram
 
 ### Behavior with other AI features {#about-behavior}
 
-Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs](/docs/reference/api/#aitrafficpolicy).
+Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs](../../reference/api/#aitrafficpolicy).
 
 * Streaming responses: You can stream responses that call functions.
 * Semantic caching: Function calls are not cached.
@@ -68,9 +68,9 @@ Each AI provider has a different way of handling function calling. For example, 
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 
-2. [Authenticate to the LLM](/docs/ai/auth/).
+2. [Authenticate to the LLM](../auth/).
 
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
@@ -84,9 +84,9 @@ Keep in mind that for a real use case, you must develop your own app that is cap
 
 1. Send a request through the AI Gateway to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers). The following example demonstrates a response that you might configure your app to send through the AI Gateway to the LLM.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json  -d '{
      "model": "gpt-3.5-turbo",
@@ -120,9 +120,9 @@ Keep in mind that for a real use case, you must develop your own app that is cap
      "stream": false
    }'
    ```
-   {{< /tab >}}
+   {{% /tab %}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json  -d '{
      "model": "gpt-3.5-turbo",
@@ -225,9 +225,9 @@ Keep in mind that for a real use case, you must develop your own app that is cap
    
    * The following example sends another curl through AI Gateway to the LLM to simulate a response that your app might send. Unlike the first request, this request does not suggest a tool call. Instead, you provide the results from executing the suggested function as part of the message, along with the assistant role that called the tool. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H "Content-Type: application/json" -d '{
      "model": "gpt-3.5-turbo",
@@ -259,9 +259,9 @@ Keep in mind that for a real use case, you must develop your own app that is cap
      ]
    }'
    ```
-   {{< /tab >}}
+   {{% /tab %}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H "Content-Type: application/json" -d '{
      "model": "gpt-3.5-turbo",
@@ -329,6 +329,6 @@ Keep in mind that for a real use case, you must develop your own app that is cap
 
 Explore other AI Gateway features.
 
-* [Fail over traffic](/docs/ai/failover/) across models from the same LLM provider.
-* Set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
-* [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
+* [Fail over traffic](../failover/) across models from the same LLM provider.
+* Set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.
+* [Enrich your prompts](../prompt-enrichment/) with system prompts to improve LLM outputs.
