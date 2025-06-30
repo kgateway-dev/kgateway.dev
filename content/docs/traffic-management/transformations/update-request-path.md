@@ -4,7 +4,21 @@ weight: 50
 description: Change the request path and HTTP method when a request header is present. 
 ---
 
-To update the path and HTTP method the `:path` and `:method` pseudo headers are used. 
+Change the request path and HTTP method when a request header is present. To update the path and HTTP method the `:path` and `:method` pseudo headers are used. 
+
+## About pseudo headers 
+
+Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
+
+* Pseudo headers must always start with a colon (`:`).
+* They must appear before regular headers in the HTTP/2 frame.
+* Pseudo headers contain details about the request or response.
+
+Common pseudo headers include:
+* `:method`: The HTTP method that is used, such as GET or POST.
+* `:scheme`: The protocol that is used, such as http or https.
+* `:authority`: The hostname and port number that the request is sent to.
+* `:path`: The path of the request.
 
 ## Before you begin
 
@@ -12,10 +26,12 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
 
 ## Update request paths and HTTP methods
    
-1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you change the request path and HTTP method when a `foo: bar` header is present in the request.   
+1. Create a TrafficPolicy resource with the following transformation rules: 
+   * If the request contains the `foo:bar` header, the request path is rewritten to the `/post` path. In addition, the HTTP method is changed to the `POST` method.  
+   * If the request does not contain the `foo:bar` header, the request path and method do not change. 
 
    ```yaml
-   kubectl apply -f- <<EOF
+   kubectl apply -f- <<EOF  
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: TrafficPolicy
    metadata:
@@ -25,13 +41,13 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
      transformation:
        request:
          set:
-         - name: :path
-           value: '{% if request_header("foo") == "bar" %}/post{% else %}{{ request_header(":path")}}{% endif %}'
-         - name: :method
+         - name: ":path"
+           value: '{% if request_header("foo") == "bar" %}/post{% else %}{{ header(":path") }}{% endif %}'
+         - name: ":method"
            value: '{% if request_header("foo") == "bar" %}POST{% else %}{{ request_header(":method")}}{% endif %}'
    EOF
    ```
-
+   
 2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
@@ -46,7 +62,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -62,16 +78,16 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    EOF
    ```
 
-3. Send a request to the `/get` endpoint of the httpbin app. Include the `foo: bar` request header to trigger the request transformation. Verify that you get back a 200 HTTP response code and that your request path is rewritten to the `/post` endpoint. The `/post` endpoint accepts requests only if the HTTP POST method is used. The 200 HTTP response code therefore also indicates that the HTTP method was successfully changed from GET to POST. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+3. Send a request to the `/get` endpoint of the httpbin app. Include the `foo: bar` request header to trigger the request transformation. Verify that you get back a 200 HTTP response code and that your request path is rewritten to the `/post` endpoint. The `/post` endpoint accepts requests only if the HTTP `POST` method is used. The 200 HTTP response code therefore also indicates that the HTTP method was successfully changed from `GET` to `POST`. 
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "foo: bar" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get \
    -H "foo: bar" \
@@ -129,14 +145,14 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    ```
    
 4. Send another request to the `/get` endpoint of the httpbin app. This time, you omit the `foo: bar` header. Verify that you get back a 200 HTTP response code and that the request path is not rewritten to the `/post` endpoint. The `/get` endpoint accepts requests only if the HTTP GET method is used. A 200 HTTP response code therefore also verifies that the HTTP method was not changed. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get \
    -H "host: www.example.com"
@@ -207,7 +223,7 @@ To update the path and HTTP method the `:path` and `:method` pseudo headers are 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:

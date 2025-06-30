@@ -4,7 +4,7 @@ weight: 40
 description: Automatically decode base64 values in request headers and add the decoded value as a response header. 
 ---
 
-In the following example, you combine multiple Inja functions to accomplish the following tasks: 
+Combine multiple Inja functions to accomplish the following tasks: 
 
 - Extract a base64-encoded value from a specific request header. 
 - Decode the base64-encoded value. 
@@ -39,7 +39,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      transformation:
        response:
-         set:
+         add:
          - name: x-base64-decoded
            value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
    EOF
@@ -59,7 +59,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -77,15 +77,15 @@ In the following example, you combine multiple Inja functions to accomplish the 
 
 4. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
@@ -143,7 +143,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:

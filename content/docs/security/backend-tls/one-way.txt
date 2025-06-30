@@ -237,7 +237,6 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
          - name: httpbin-org
            kind: Backend
            group: gateway.kgateway.dev
-           port: 8443
          filters:
          - type: URLRewrite
            urlRewrite:
@@ -271,3 +270,33 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    kubectl rollout restart -n kgateway-system deployment/kgateway
    ```
    
+
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin-org
+  namespace: default
+spec:
+  parentRefs:
+  - name: http
+    namespace: kgateway-system
+  hostnames:
+  - "httpbin-external.example"
+  rules:
+    - matches:
+      - path:
+          type: PathPrefix
+          value: /external
+      backendRefs:
+      - name: httpbin-org
+        kind: Backend
+        group: gateway.kgateway.dev
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          hostname: httpbin.org
+          path: 
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /
+EOF
