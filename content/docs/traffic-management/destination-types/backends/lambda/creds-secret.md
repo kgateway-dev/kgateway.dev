@@ -1,6 +1,6 @@
 ---
 title: Access AWS Lambda with a credentials secret
-weight: 10
+weight: 20
 ---
 
 Use {{< reuse "/docs/snippets/kgateway.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.

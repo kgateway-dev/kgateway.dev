@@ -1,6 +1,6 @@
 ---
 title: Access AWS Lambda with a service account
-weight: 20
+weight: 30
 ---
 
 Associate an IAM role with a gateway proxy service account, and configure {{< reuse "/docs/snippets/kgateway.md" >}} to use that service account to access AWS Lambda.
@@ -233,7 +233,7 @@ Create an AWS Lambda function to test {{< reuse "/docs/snippets/kgateway.md" >}}
 
 Create `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
-1. Create a Backend resource that references the AWS region, IAM role, and `echo` function that you created.
+1. Create a Backend resource that references the AWS region, ID of the account that contains the IAM role, and `echo` function that you created.
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
