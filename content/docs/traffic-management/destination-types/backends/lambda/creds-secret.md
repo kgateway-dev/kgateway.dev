@@ -3,9 +3,9 @@ title: Access AWS Lambda with a credentials secret
 weight: 10
 ---
 
-Use kgateway to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
+Use {{< reuse "/docs/snippets/kgateway.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
-Note that this guide uses a Kubernetes secret that contains you AWS access key and secret key to invoke Lambda functions. To use AWS IAM roles to control access instead, see [Access AWS Lambda with a service account](/docs/traffic-management/destination-types/backends/lambda/service-accounts/) instead.
+Note that this guide uses a Kubernetes secret that contains you AWS access key and secret key to invoke Lambda functions. To use AWS IAM roles to control access instead, see [Access AWS Lambda with a service account](../traffic-management/destination-types/backends/lambda/service-accounts/) instead.
 
 ## Before you begin
 
@@ -13,13 +13,13 @@ Note that this guide uses a Kubernetes secret that contains you AWS access key a
 
 ## Create an AWS credentials secret
 
-Create a Kubernetes secret that contains your AWS access key and secret key. Kgateway uses this secret to connect to AWS Lambda for authentication and function invocation.
+Create a Kubernetes secret that contains your AWS access key and secret key. {{< reuse "/docs/snippets/kgateway-capital.md" >}} uses this secret to connect to AWS Lambda for authentication and function invocation.
 
 1. Get the access key and secret key for your AWS account. Note that your [AWS credentials](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html) must have the appropriate permissions to interact with AWS Lambda.
 
 2. Create a Kubernetes secret that contains the AWS access key and secret key.
    ```yaml
-   kubectl apply -n kgateway-system -f - << EOF
+   kubectl apply -n {{< reuse "/docs/snippets/namespace.md" >}} -f - << EOF
    apiVersion: v1
    kind: Secret
    metadata:
@@ -34,7 +34,7 @@ Create a Kubernetes secret that contains your AWS access key and secret key. Kga
 
 ## Create a Lambda function
 
-Create an AWS Lambda function to test kgateway routing.
+Create an AWS Lambda function to test {{< reuse "/docs/snippets/kgateway.md" >}} routing.
 
 1. Log in to the AWS console and navigate to the Lambda page.
 
@@ -58,7 +58,7 @@ Create an AWS Lambda function to test kgateway routing.
 
 ## Create a Backend and HTTPRoute
 
-Create kgateway `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
+Create `Backend` and `HTTPRoute` resources to route requests to the Lambda function.
 
 1. In your terminal, create a Backend resource that references the Lambda secret. Update the `region` with your AWS account region, such as `us-east-1`, and update the `accountId`.
    
@@ -68,7 +68,7 @@ Create kgateway `Backend` and `HTTPRoute` resources to route requests to the Lam
    kind: Backend
    metadata:
      name: lambda
-     namespace: kgateway-system
+     namespace: {{< reuse "/docs/snippets/namespace.md" >}}
    spec:
      type: AWS
      aws:
@@ -91,11 +91,11 @@ Create kgateway `Backend` and `HTTPRoute` resources to route requests to the Lam
    kind: HTTPRoute
    metadata:
      name: lambda
-     namespace: kgateway-system
+     namespace: {{< reuse "/docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "/docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -103,21 +103,21 @@ Create kgateway `Backend` and `HTTPRoute` resources to route requests to the Lam
            value: /echo
        backendRefs:
        - name: lambda
-         namespace: kgateway-system
+         namespace: {{< reuse "/docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
    ```
 
-3. Confirm that kgateway correctly routes requests to Lambda by sending a curl request to the `echo` function.
+3. Confirm that {{< reuse "/docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl $INGRESS_GW_ADDRESS:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl localhost:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
@@ -130,7 +130,7 @@ Create kgateway `Backend` and `HTTPRoute` resources to route requests to the Lam
    {"statusCode":200,"body":"Response from AWS Lambda. Here's the request you just sent me: {\"key1\":\"value1\",\"key2\":\"value2\"}"}% 
    ```
 
-At this point, kgateway is routing directly to the `echo` Lambda function!
+At this point, {{< reuse "/docs/snippets/kgateway.md" >}} is routing directly to the `echo` Lambda function!
 
 ## Cleanup
 
@@ -139,14 +139,14 @@ At this point, kgateway is routing directly to the `echo` Lambda function!
 1. Delete the `lambda` HTTPRoute and `lambda` Backend.
    
    ```sh
-   kubectl delete HTTPRoute lambda -n kgateway-system
-   kubectl delete Backend lambda -n kgateway-system
+   kubectl delete HTTPRoute lambda -n {{< reuse "/docs/snippets/namespace.md" >}}
+   kubectl delete Backend lambda -n {{< reuse "/docs/snippets/namespace.md" >}}
    ```
 
 2. Delete the `aws-creds` secret.
    
    ```sh
-   kubectl delete secret aws-creds -n kgateway-system
+   kubectl delete secret aws-creds -n {{< reuse "/docs/snippets/namespace.md" >}}
    ```
 
 3. Use the AWS Lambda console to delete the `echo` test function.
