@@ -18,8 +18,8 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
-2. [Authenticate to the LLM](/docs/ai/auth/).
+1. [Set up AI Gateway](../setup/).
+2. [Authenticate to the LLM](../auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Refactor LLM prompts
@@ -28,9 +28,9 @@ In the following example, you explore how to refactor system and user prompts to
 
 1. Send a request to the AI API with the following prompt: `Parse the unstructured text into CSV format: Seattle, Los Angeles, and Chicago are cities in North America. London, Paris, and Berlin are cities in Europe.` Note that in this prompt, the system prompt is not separated from the user prompt.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
        "model": "gpt-3.5-turbo",
@@ -42,9 +42,9 @@ In the following example, you explore how to refactor system and user prompts to
       ]
      }' | jq -r '.choices[].message.content'
    ```
-   {{< /tab >}}
+   {{% /tab %}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
        "model": "gpt-3.5-turbo",
@@ -56,7 +56,7 @@ In the following example, you explore how to refactor system and user prompts to
       ]
      }' | jq -r '.choices[].message.content'
    ```
-   {{< /tab >}}
+   {{% /tab %}}
 
    {{< /tabs >}}
 
@@ -73,9 +73,9 @@ In the following example, you explore how to refactor system and user prompts to
 
 2. Refactor the request to improve readability and management of the prompt. In the following example, the instructions are separated from the unstructured text. The instructions are added as a system prompt and the unstructured text is added as a user prompt.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -93,7 +93,7 @@ In the following example, you explore how to refactor system and user prompts to
    ```
    {{< /tab >}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -136,9 +136,9 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
    kind: TrafficPolicy
    metadata:
      name: openai-opt
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
-       app: ai-kgateway
+       app: ai-gateway
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -154,9 +154,9 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
 
 2. Send a request without a system prompt. Although the system prompt instructions are missing in the request, the unstructured text in the user prompt is still transformed into structured CSV format. This is because the system prompt is automatically prepended from the TrafficPolicy resource before it is sent to the LLM provider.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -170,7 +170,7 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
    ```
    {{< /tab >}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -200,9 +200,9 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 
 1. Send a request to the AI API and include a custom system prompt that instructs the API to transform unstructured text into JSON format.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -220,7 +220,7 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
    ```
    {{< /tab >}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -262,9 +262,9 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 
 2. Send another request. This time, you do not include a system prompt. Because the default setting in the TrafficPolicy resource is applied, the unstructured text is returned in CSV format.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
-   {{< tab >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -278,7 +278,7 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
    ```
    {{< /tab >}}
 
-   {{< tab >}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
@@ -308,9 +308,9 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n kgateway-system -l app=ai-kgateway
+kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ai-gateway
 ```
 
 ## Next
 
-Explore how to set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
+Explore how to set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.
