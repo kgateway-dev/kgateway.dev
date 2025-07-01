@@ -12,7 +12,7 @@ Use an Inja template to extract a value from a request header and add it as a he
 
 ## Inject response headers
    
-1. Create a TrafficPolicy resource with the folloing transformation rules: 
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the folloing transformation rules: 
    * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
    * `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the `x-podname` response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml and look at the `spec.containers.env` section.
    * `x-season`: Adds a static string value of `summer` to the `x-season` response header.
@@ -21,8 +21,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -43,7 +43,7 @@ Use an Inja template to extract a value from a request header and add it as a he
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -67,8 +67,8 @@ Use an Inja template to extract a value from a request header and add it as a he
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: transformation
    EOF
    ```
@@ -137,10 +137,10 @@ Use an Inja template to extract a value from a request header and add it as a he
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
    
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

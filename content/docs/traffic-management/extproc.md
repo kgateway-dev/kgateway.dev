@@ -129,11 +129,11 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
    EOF
    ```
    
-2. Create a TrafficPolicy that references the GatewayExtension resource that you created earlier. 
+2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that references the GatewayExtension resource that you created earlier. 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: extproc
    spec:
@@ -171,8 +171,8 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: extproc
        - matches: 
           - path:
@@ -454,7 +454,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
 
 ```sh
 kubectl delete httproute extproc -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete trafficpolicy extproc -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} extproc -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete referencegrant allow-httproute-to-httpbin -n httpbin
 kubectl delete gatewayextension ext-proc-extension -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete deployment ext-proc-grpc -n {{< reuse "docs/snippets/namespace.md" >}}

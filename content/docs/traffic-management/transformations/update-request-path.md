@@ -26,14 +26,14 @@ Common pseudo headers include:
 
 ## Update request paths and HTTP methods
    
-1. Create a TrafficPolicy resource with the following transformation rules: 
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules: 
    * If the request contains the `foo:bar` header, the request path is rewritten to the `/post` path. In addition, the HTTP method is changed to the `POST` method.  
    * If the request does not contain the `foo:bar` header, the request path and method do not change. 
 
    ```yaml
    kubectl apply -f- <<EOF  
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -48,7 +48,7 @@ Common pseudo headers include:
    EOF
    ```
    
-2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -72,8 +72,8 @@ Common pseudo headers include:
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: transformation
    EOF
    ```
@@ -203,10 +203,10 @@ Common pseudo headers include:
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

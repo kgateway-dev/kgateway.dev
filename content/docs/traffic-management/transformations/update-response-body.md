@@ -59,14 +59,14 @@ In this guide, you use the following methods to transform a JSON body:
    }
    ```
 
-2. Create a TrafficPolicy resource with your transformation rules: 
+2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules: 
    * A new body is created in the response with the values of the `author`, `title`, and `slides` fields.
    * To extract the values, you use dot notation. Because the response is parsed as a JSON file, no extractors need to be defined. Instead, you can access the fields directly.   
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -76,6 +76,36 @@ In this guide, you use the following methods to transform a JSON body:
          body: 
            parseAs: AsJson
            value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
+   EOF
+   ```
+
+3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+         filters:
+         - type: ExtensionRef
+           extensionRef:
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+             name: transformation
    EOF
    ```
 
@@ -103,12 +133,12 @@ In this guide, you use the following methods to transform a JSON body:
    "title":"Overview","type":"all"}]}
    ```
 
-4. Update the TrafficPolicy resource to replace the `all` pattern with a random string.
+4. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to replace the `all` pattern with a random string.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -166,10 +196,10 @@ In this guide, you use the following methods to transform a JSON body:
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.

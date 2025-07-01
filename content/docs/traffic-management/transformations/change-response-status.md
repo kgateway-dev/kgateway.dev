@@ -13,12 +13,12 @@ Update the response status based on headers being present in a response.
 
 ## Change the response status
 
-1. Create a TrafficPolicy resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -31,7 +31,7 @@ Update the response status based on headers being present in a response.
    EOF
    ```
 
-3. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
+3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -55,8 +55,8 @@ Update the response status based on headers being present in a response.
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: transformation
    EOF
    ```
@@ -153,10 +153,10 @@ Update the response status based on headers being present in a response.
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.
