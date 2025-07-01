@@ -7,22 +7,22 @@ Observability helps you understand how your system is performing, identify issue
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 
-2. [Authenticate to the LLM](/docs/ai/auth/).
+2. [Authenticate to the LLM](../auth/).
 
 3. Get the external address of the gateway and save it in an environment variable.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/ai-gateway -n kgateway-system 8080:8080
+   kubectl port-forward deployment/ai-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -52,7 +52,7 @@ Take a look at the default metrics that the system outputs.
 
 1. In another tab in your terminal, port-forward the `ai-gateway` container of the gateway proxy.
    ```sh
-   kubectl port-forward -n kgateway-system deploy/ai-gateway 9092
+   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} deploy/ai-gateway 9092
    ```
 
 2. In the previous tab, run the following command to view the metrics.
