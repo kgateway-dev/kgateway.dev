@@ -38,7 +38,7 @@ spec:
       remove: []
       body: 
         value: 
-        parseAs:Learn how to return a customized response body and how replace specific values in the body.
+        parseAs:
 ```
 
 When writing your templates, you can take advantage of all the core Inja features, such as loops, conditional logic, and functions. In addition, you can use [custom Inja functions](#custom-inja-functions) to transform request and response metadata more easily.
