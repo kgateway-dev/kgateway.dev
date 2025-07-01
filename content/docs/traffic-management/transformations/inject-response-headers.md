@@ -15,8 +15,8 @@ Use an Inja template to extract a value from a request header and add it as a he
 1. Create a TrafficPolicy resource with the folloing transformation rules: 
    * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
    * `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the `x-podname` response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml and look at the `spec.containers.env` section.
-   * `x-season`: Adds a static string value of summer to the `x-season` response header.
-   * `x-response-raw`: Adds a static string hello value with all escape characters intact.
+   * `x-season`: Adds a static string value of `summer` to the `x-season` response header.
+   * `x-response-raw`: Adds a static string values of `hello` with all escape characters intact.
    * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
    
    ```yaml
@@ -74,8 +74,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    ```
 
 3. Send a request to the httpbin app and include the `x-gateway-request` and `baz` request headers. Verify that you get back a 200 HTTP response code and that the following response headers are included:
-   * `x-podname` with the name of the gateway proxy pod
-   * `x-season` that is set to `summer`
+   * `x-podname` that is set to the name of the gateway proxy pod.
+   * `x-season` that is set to `summer`.
    * `x-gateway-response` that is set to the value of the `x-gateway-request` request header.
    * `x-response-raw` that is set to `hello`.
    * `x-replace` that is set to a random string.

@@ -1,7 +1,6 @@
 ---
 title: Templating language
 weight: 10
-description:
 ---
 
 {{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates are powered by v3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0), which is inspired by the popular Jinja templating language in Python. The template lets you transform headers and body information of a request or response based on the header and body properties themselves. 
@@ -39,7 +38,7 @@ spec:
       remove: []
       body: 
         value: 
-        parseAs:
+        parseAs:Learn how to return a customized response body and how replace specific values in the body.
 ```
 
 When writing your templates, you can take advantage of all the core Inja features, such as loops, conditional logic, and functions. In addition, you can use [custom Inja functions](#custom-inja-functions) to transform request and response metadata more easily.
@@ -95,7 +94,7 @@ You can use Inja functions in combination with Inja templates to modify request 
 
 In the following example, you set response headers in the following ways: 
 * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
-* `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the x-podname response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n kgateway-system -o yaml` and look at the `spec.containers.env` section.
+* `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the x-podname response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml` and look at the `spec.containers.env` section.
 * `x-response-raw`: Adds a static string hello value with all escape characters intact.
 * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
 

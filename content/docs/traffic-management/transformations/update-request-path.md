@@ -10,9 +10,9 @@ Change the request path and HTTP method when a request header is present. To upd
 
 Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
 
-* Pseudo headers must always start with a colon (`:`).
-* They must appear before regular headers in the HTTP/2 frame.
-* Pseudo headers contain details about the request or response.
+* Must always start with a colon (`:`).
+* Must appear before regular headers in the HTTP/2 frame.
+* Contain details about the request or response.
 
 Common pseudo headers include:
 * `:method`: The HTTP method that is used, such as GET or POST.

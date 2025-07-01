@@ -1,7 +1,7 @@
 ---
 title: Change response status
 weight: 75
-description: Update the response status based on fields that are present in the request body.
+description: Update the response status based on headers being present in a response.
 ---
 
 Update the response status based on headers being present in a response.
