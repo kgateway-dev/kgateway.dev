@@ -4,7 +4,7 @@ weight: 40
 description: Automatically decode base64 values in request headers and add the decoded value as a response header. 
 ---
 
-In the following example, you combine multiple Inja functions to accomplish the following tasks: 
+Combine multiple Inja functions to accomplish the following tasks: 
 
 - Extract a base64-encoded value from a specific request header. 
 - Decode the base64-encoded value. 
@@ -27,25 +27,25 @@ In the following example, you combine multiple Inja functions to accomplish the 
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-2. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
    spec:
      transformation:
        response:
-         set:
+         add:
          - name: x-base64-decoded
            value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
    EOF
    ```
 
-3. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
+3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -59,7 +59,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -69,23 +69,23 @@ In the following example, you combine multiple Inja functions to accomplish the 
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: transformation
    EOF
    ```
 
 4. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
@@ -123,10 +123,10 @@ In the following example, you combine multiple Inja functions to accomplish the 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
 
 2. Remove the `extensionRef` filter from the HTTPRoute resource.
@@ -143,7 +143,7 @@ In the following example, you combine multiple Inja functions to accomplish the 
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:

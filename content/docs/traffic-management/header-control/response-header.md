@@ -15,7 +15,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
-1. Create an HTTPRoute resource for the httpbin app with an `ResponseHeaderModifier`. In this example, you want to add the `my-response: kgateway` response header. 
+1. Create an HTTPRoute resource for the httpbin app with an `ResponseHeaderModifier`. In this example, you want to add the `my-response: hello` response header. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -26,7 +26,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -35,7 +35,7 @@ Add headers to incoming requests before they are sent back to the client. If the
              responseHeaderModifier:
                add: 
                - name: my-response
-                 value: kgateway
+                 value: hello
          backendRefs:
            - name: httpbin
              port: 8000
@@ -50,13 +50,13 @@ Add headers to incoming requests before they are sent back to the client. If the
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-{{% tab %}}
+   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -78,8 +78,8 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    content-length: 3
    < x-envoy-upstream-service-time: 0
    x-envoy-upstream-service-time: 0
-   < my-response: kgateway
-   my-response: kgateway
+   < my-response: hello
+   my-response: hello
    < server: envoy
    server: envoy
    ```
@@ -104,7 +104,7 @@ Setting headers is similar to adding headers. If the response does not include t
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -122,19 +122,19 @@ Setting headers is similar to adding headers. If the response does not include t
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` Gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.requestHeaderModifier.set`|The name and value of the response header that you want to set. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-response: custom` header was set. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-{{% tab %}}
+   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -168,13 +168,13 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
 You can remove HTTP headers from a response before the response is sent back to the client. 
 
 1. Send a request to the httpbin app and find the `content-length` header. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-{{% tab %}}
+   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: www.example.com"
 ```
@@ -213,7 +213,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -236,13 +236,13 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-{{% tab %}}
+   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/reesponse-headers -H "host: headers.example"
 ```

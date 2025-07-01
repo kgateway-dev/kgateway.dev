@@ -4,7 +4,7 @@ weight: 20
 description: Extract values from a request header and inject it as a header to your response. 
 ---
 
-The following example walks you through how to use an Inja template to extract a value from a request header and to add this value as a header to your responses. 
+Use an Inja template to extract a value from a request header and add it as a header to your responses. 
 
 ## Before you begin
 
@@ -12,12 +12,17 @@ The following example walks you through how to use an Inja template to extract a
 
 ## Inject response headers
    
-1. Create a TrafficPolicy resource with your transformation rules. Make sure to create the TrafficPolicy in the same namespace as the HTTPRoute resource. In the following example, you use the value from the `x-kgateway-request` request header and populate the value of that header into an `x-kgateway-response` response header.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the folloing transformation rules: 
+   * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
+   * `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the `x-podname` response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml and look at the `spec.containers.env` section.
+   * `x-season`: Adds a static string value of `summer` to the `x-season` response header.
+   * `x-response-raw`: Adds a static string values of `hello` with all escape characters intact.
+   * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -25,12 +30,20 @@ The following example walks you through how to use an Inja template to extract a
      transformation:
        response:
          set:
-         - name: x-kgateway-response
-           value: '{{ request_header("x-kgateway-request") }}' 
+         - name: x-gateway-response
+           value: '{{ request_header("x-gateway-request") }}' 
+         - name: x-podname
+           value: '{{ env("POD_NAME") }}'
+         - name: x-season
+           value: 'summer'
+         - name: x-response-raw
+           value: '{{ raw_string("hello") }}'
+         - name: x-replace
+           value: '{{ replace_with_random(request_header("baz"), "pattern-to-replace") }}'
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the TrafficPolicy to the httpbin route by using an `extensionRef` filter.
+2. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -44,7 +57,7 @@ The following example walks you through how to use an Inja template to extract a
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -54,49 +67,42 @@ The following example walks you through how to use an Inja template to extract a
          filters:
          - type: ExtensionRef
            extensionRef:
-             group: gateway.kgateway.dev
-             kind: TrafficPolicy
+             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
              name: transformation
    EOF
    ```
 
-3. Send a request to the httpbin app and include the `x-kgateway-request` request header.
+3. Send a request to the httpbin app and include the `x-gateway-request` and `baz` request headers. Verify that you get back a 200 HTTP response code and that the following response headers are included:
+   * `x-podname` that is set to the name of the gateway proxy pod.
+   * `x-season` that is set to `summer`.
+   * `x-gateway-response` that is set to the value of the `x-gateway-request` request header.
+   * `x-response-raw` that is set to `hello`.
+   * `x-replace` that is set to a random string.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
-    -H "x-kgateway-request: my custom request header" 
+    -H "x-gateway-request: my custom request header" \
+    -H "baz: pattern-to-replace"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
-   -H "x-kgateway-request: my custom request header"
+   -H "x-gateway-request: my custom request header" \
+   -H "baz: pattern-to-replace"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
-   In the example output, verify the following:
-   
-   * The `x-kgateway-request` request header is included in the request.
-   * The request is successful and returns a 200 HTTP response code.
-   * The `x-kgateway-response` response header is included in the response and has the same value as the `x-kgateway-request` request header.
+   Example output: 
 
-   ```yaml {linenos=table,hl_lines=[10,14,32],linenostart=1}
-   * Host <host-address>:8080 was resolved.
-   * IPv6: ::1
-   * IPv4: 127.0.0.1
-   *   Trying [::1]:8080...
-   * Connected to <host-address> (::1) port 8080
-   > GET /response-headers HTTP/1.1
-   > Host: www.example.com
-   > User-Agent: curl/8.7.1
-   > Accept: */*
-   > x-kgateway-request: my custom request header
-   > 
+   ```console {hl_lines=[3,4,20,21,22,23,24,25,26,27,28,29]}
+   ...
    * Request completely sent off
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
@@ -106,8 +112,6 @@ The following example walks you through how to use an Inja template to extract a
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < date: Wed, 26 Jun 2024 02:54:48 GMT
-   date: Wed, 26 Jun 2024 02:54:48 GMT
    < content-length: 3
    content-length: 3
    < x-envoy-upstream-service-time: 2
@@ -116,18 +120,27 @@ The following example walks you through how to use an Inja template to extract a
    server: envoy
    < x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
    x-envoy-decorator-operation: httpbin.httpbin.svc.cluster.local:8000/*
-   < x-kgateway-response: my custom request header
-   x-kgateway-response: my custom request header
+   < x-envoy-upstream-service-time: 1
+   < x-podname: http-85d5775587-tkxmt
+   x-podname: http-85d5775587-tkxmt
+   < x-replace: zljPMhO86gJCFc69jZ0+kQ
+   x-replace: zljPMhO86gJCFc69jZ0+kQ
+   < x-response-raw: hello
+   x-response-raw: hello
+   < x-gateway-response: my custom request header
+   x-gateway-response: my custom request header
+   < x-season: summer
+   x-season: summer
    ```
    
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicy resource.
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    ```
    
 2. Remove the `extensionRef` filter from the HTTPRoute resource.
@@ -144,7 +157,7 @@ The following example walks you through how to use an Inja template to extract a
    spec:
      parentRefs:
        - name: http
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
