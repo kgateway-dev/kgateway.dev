@@ -67,7 +67,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    }
    EOF
 
-   aws iam create-policy --policy-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy --policy-document file://policy.json 
+   aws iam create-policy --policy-name lambda-policy --policy-document file://policy.json 
    ```
 
 4. Use an IAM role to associate the policy with the Kubernetes service account for the HTTP gateway proxy, which assumes this role to invoke Lambda functions. For more information about these steps, see the [AWS documentation](https://docs.aws.amazon.com/eks/latest/userguide/associate-service-account-role.html).
@@ -95,23 +95,23 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
       }
       EOF
 
-      aws iam create-role --role-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-role --assume-role-policy-document file://role.json
+      aws iam create-role --role-name lambda-role --assume-role-policy-document file://role.json
       ```
    2. Attach the IAM role to the IAM policy. This IAM role for the service account is known as an IRSA.
       ```sh
-      aws iam attach-role-policy --role-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy
+      aws iam attach-role-policy --role-name lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
       ```
    3. Verify that the policy is attached to the role.
       ```sh
-      aws iam list-attached-role-policies --role-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-role
+      aws iam list-attached-role-policies --role-name lambda-role
       ```
       Example output:
       ```json
       {
           "AttachedPolicies": [
               {
-                  "PolicyName": "{{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy",
-                  "PolicyArn": "arn:aws:iam::111122223333:policy/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy"
+                  "PolicyName": "lambda-policy",
+                  "PolicyArn": "arn:aws:iam::111122223333:policy/lambda-policy"
               }
           ]
       }
@@ -134,10 +134,10 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 3. Deploy the Amazon EKS Pod Identity Webhook.
    ```sh
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/{{< reuse "/docs/snippets/shortname.md" >}}-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/{{< reuse "/docs/snippets/shortname.md" >}}-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/{{< reuse "/docs/snippets/shortname.md" >}}-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/{{< reuse "/docs/snippets/shortname.md" >}}-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
    ```
 
 4. Verify that the webhook deployment completes.
@@ -165,7 +165,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
      kube:
        serviceAccount:
          extraAnnotations:
-           eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-role
+           eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda-role
    EOF
    ```
 
@@ -200,7 +200,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    kubectl get gateway http -n {{< reuse "/docs/snippets/namespace.md" >}} -o yaml
    ```
 
-4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-role` annotation.
+4. Verify that the `http` service account has the `eks.amazonaws.com/role-arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda-role` annotation.
    ```sh
    kubectl describe serviceaccount http -n {{< reuse "/docs/snippets/namespace.md" >}}
    ```
@@ -370,7 +370,7 @@ If you no longer need to access Lambda functions from {{< reuse "/docs/snippets/
 
 5. Delete the AWS IAM resources that you created.
    ```sh
-   aws iam detach-role-policy --role-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy
-   aws iam delete-role --role-name {{< reuse "/docs/snippets/shortname.md" >}}-lambda-role
-   aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/{{< reuse "/docs/snippets/shortname.md" >}}-lambda-policy
+   aws iam detach-role-policy --role-name lambda-role --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
+   aws iam delete-role --role-name lambda-role
+   aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
    ```
