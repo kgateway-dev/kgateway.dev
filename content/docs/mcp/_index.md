@@ -4,6 +4,8 @@ weight: 460
 description: Spin up an MCP Gateway with out-of-the-box authorization capabilities to protect your MCP tools. 
 ---
 
+{{< callout type="info" >}}The MCP Proxy used in this example has evolved into the [Agent Gateway](https://agentgateway.dev) project. Look out for updated support in the upcoming kgateway 2.1 release!{{< /callout >}}
+
 Spin up your own Model Context Protocol (MCP) Gateway to federate any number of MCP tool servers into a single MCP endpoint. An MCP Gateway allows you to centrally manage discovery, security, observability, traffic management, and governance of MCP tools, while seamlessly multiplexing requests from MCP clients to upstream MCP tool servers. 
 
 ## About the Model Context Protocol (MCP)
