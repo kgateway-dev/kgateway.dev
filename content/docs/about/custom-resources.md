@@ -64,7 +64,7 @@ To learn more about the default gateway setup and how these resource interact wi
 
 ### Policies
 
-While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such as access logging or transformations. [Policies](/docs/about/policies/overview/) allow you to apply intelligent traffic management, resiliency, and security standards to HTTPRoutes or Gateways.
+While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do simple routing, such as to match, redirect, or rewrite requests, you might want additional capabilities in your API gateway, such as access logging or transformations. [Policies](/docs/about/policies/) allow you to apply intelligent traffic management, resiliency, and security standards to HTTPRoutes or Gateways.
 
 Kgateway uses the following custom resources to attach policies to routes and gateway listeners: 
 
