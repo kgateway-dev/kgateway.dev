@@ -27,6 +27,10 @@ Use an Inja template to extract a value from a request header and add it as a he
      name: transformation
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      transformation:
        response:
          set:
@@ -43,37 +47,7 @@ Use an Inja template to extract a value from a request header and add it as a he
    EOF
    ```
 
-2. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-         filters:
-         - type: ExtensionRef
-           extensionRef:
-             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
-             name: transformation
-   EOF
-   ```
-
-3. Send a request to the httpbin app and include the `x-gateway-request` and `baz` request headers. Verify that you get back a 200 HTTP response code and that the following response headers are included:
+2. Send a request to the httpbin app and include the `x-gateway-request` and `baz` request headers. Verify that you get back a 200 HTTP response code and that the following response headers are included:
    * `x-podname` that is set to the name of the gateway proxy pod.
    * `x-season` that is set to `summer`.
    * `x-gateway-response` that is set to the value of the `x-gateway-request` request header.
@@ -137,33 +111,6 @@ Use an Inja template to extract a value from a request header and add it as a he
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
-
-   ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
-   ```
-   
-2. Remove the `extensionRef` filter from the HTTPRoute resource.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
-   
+```sh
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+```

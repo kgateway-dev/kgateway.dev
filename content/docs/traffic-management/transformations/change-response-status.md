@@ -23,6 +23,10 @@ Update the response status based on headers being present in a response.
      name: transformation
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      transformation:
        response:
          set:
@@ -31,37 +35,7 @@ Update the response status based on headers being present in a response.
    EOF
    ```
 
-3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-         filters:
-         - type: ExtensionRef
-           extensionRef:
-             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
-             name: transformation
-   EOF
-   ```
-
-4. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
+3. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -72,7 +46,7 @@ Update the response status based on headers being present in a response.
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/response-headers?foo=bar \
+   curl -vi "localhost:8080/response-headers?foo=bar" \
    -H "host: www.example.com" 
    ```
    {{% /tab %}}
@@ -105,7 +79,7 @@ Update the response status based on headers being present in a response.
    }
    ```
 
-5. Send another request to the httpbin app. This time, you include the `foo:bar2` query parameter. Verify that you get back a 403 HTTP response code. 
+4. Send another request to the httpbin app. This time, you include the `foo:bar2` query parameter. Verify that you get back a 403 HTTP response code. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -116,7 +90,7 @@ Update the response status based on headers being present in a response.
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/response-headers?foo=bar2 \
+   curl -vi "localhost:8080/response-headers?foo=bar2" \
    -H "host: www.example.com" 
    ```
    {{% /tab %}}
@@ -153,32 +127,6 @@ Update the response status based on headers being present in a response.
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
-
-   ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
-   ```
-
-2. Remove the `extensionRef` filter from the HTTPRoute resource.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
+```sh
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+```

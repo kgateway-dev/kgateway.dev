@@ -37,6 +37,10 @@ Combine multiple Inja functions to accomplish the following tasks:
      name: transformation
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      transformation:
        response:
          add:
@@ -45,37 +49,7 @@ Combine multiple Inja functions to accomplish the following tasks:
    EOF
    ```
 
-3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-         filters:
-         - type: ExtensionRef
-           extensionRef:
-             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
-             name: transformation
-   EOF
-   ```
-
-4. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
+3. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -95,7 +69,7 @@ Combine multiple Inja functions to accomplish the following tasks:
    {{< /tabs >}}
    
    Example output: 
-   ```yaml {linenos=table,hl_lines=[20,21],linenostart=1}
+   ```console {hl_lines=[20,21]}
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
@@ -123,32 +97,6 @@ Combine multiple Inja functions to accomplish the following tasks:
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
-
-   ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
-   ```
-
-2. Remove the `extensionRef` filter from the HTTPRoute resource.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
+```sh
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+```

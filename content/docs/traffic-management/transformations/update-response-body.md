@@ -71,6 +71,10 @@ In this guide, you use the following methods to transform a JSON body:
      name: transformation
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      transformation:
        response:
          body: 
@@ -78,37 +82,7 @@ In this guide, you use the following methods to transform a JSON body:
            value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
    EOF
    ```
-
-3. Update the HTTPRoute resource to apply the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin route by using an `extensionRef` filter.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-         filters:
-         - type: ExtensionRef
-           extensionRef:
-             group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-             kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
-             name: transformation
-   EOF
-   ```
-
+   
 3. Send a request to the `json` endpoint of the httpbin app again. Verify that you see the transformed response body.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -143,6 +117,10 @@ In this guide, you use the following methods to transform a JSON body:
      name: transformation
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      transformation:
        response:
          body: 
@@ -196,33 +174,6 @@ In this guide, you use the following methods to transform a JSON body:
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
-
-   ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
-   ```
-
-2. Remove the `extensionRef` filter from the HTTPRoute resource.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
-
+```sh
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+```

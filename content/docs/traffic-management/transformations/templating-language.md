@@ -77,6 +77,7 @@ Apply transformation templates to add, set, or remode request or response header
 You can add request and response headers with static values. The following example adds the `my-header: static` request header and sets the `foo: bar` response header. 
 
 ```yaml
+
 transformation: 
   request:
     add: 
@@ -99,6 +100,7 @@ In the following example, you set response headers in the following ways:
 * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
 
 ```yaml
+
 transformation:
   response:
     set:
@@ -123,6 +125,7 @@ By default, {{< reuse "docs/snippets/kgateway.md" >}} parses the body as JSON. I
 If your body is not a JSON object, you can instead parse it as plain text, by setting the `parseAs` option to `AsString`. 
 
 ```yaml
+
 transformation:
   response:
     body:
@@ -134,6 +137,7 @@ transformation:
 
 To add a static value to the body, you can use the following transformation template. 
 ```yaml
+
 transformation:
   response:
     body:
@@ -146,6 +150,7 @@ This template results in a `This is my static body` body.
 The following example uses an Inja function to get the `POD_NAME` environment variable from the gateway proxy and returns that value in a custom body string. 
 
 ```yaml 
+
 transformation: 
   response: 
     body: 
@@ -161,6 +166,7 @@ To extract header information and add this information to the body, you can take
 
 The following example uses an Inja function to access the value of a request header. This value is added to a custom body string. 
 ```yaml
+
 transformation: 
   response: 
     body: 
@@ -200,6 +206,7 @@ Assuming a body with the following format:
 
 You can use a transformation template similar to the following to extract the `author`, `title`, and `slides` attributes and add them to the response body.  
 ```yaml
+
 transformation: 
   response: 
     body: 
