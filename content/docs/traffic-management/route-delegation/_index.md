@@ -3,7 +3,7 @@ title: Route delegation
 weight: 60
 ---
 
-Change the host header or prefix path in requests. 
+Manage routing rules more effectively by using multiple connected HTTPRoute resources.
 
 {{< cards >}}
   {{< card link="overview" title="Route delegation overview" >}}
