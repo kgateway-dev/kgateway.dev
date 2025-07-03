@@ -70,16 +70,19 @@ Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} installation to enable t
    The `istio-proxy` container in the gateway proxy looks for a service that is named `istiod` in the `istio-system` namespace to obtain a valid certificate. Depending on how you installed Istio, you might have a revisioned istiod deployment, such as `istiod-main`, or custom names for the Istio meta cluster ID and meta mesh ID. If this is the case, the `istio-proxy` container cannot deploy successfully. Continue with [Revisioned istiod and custom Istio meta mesh settings](#custom-istio-settings) to configure the `istio-proxy` container to use your custom values. 
    {{< /callout >}}
 
-### Update the Istio proxy settings {#custom-istio-settings}
+## Step 3: Update the Istio proxy settings {#custom-istio-settings}
 
-Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository. The steps vary depending on if you used revisioned Istio with custom cluster and mesh IDs or not.
+Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository. The steps vary depending on the following scenarios:
 
-{{< tabs tabTotal="2" items="Revisioned Istio or custom cluster and mesh IDs,Revisionless Istio" >}}
+* Revisioned istiod deployment, such as `istiod-main`; **or** custom cluster or mesh IDs.
+* Revisionless Istio without custom cluster or mesh IDs.
+
+{{< tabs tabTotal="2" items="Revisioned Istio or custom cluster and mesh IDs,Revisionless Istio without custom IDs" >}}
 {{% tab tabName="Revisioned Istio or custom cluster and mesh IDs" %}}
 
 Create a GatewayParameters resource to configure the revisioned istiod service address and any custom values for the Istio meta cluster ID and meta mesh ID.
 
-1. Get the name of the istiod service. Depending on how you set up Istio, you might see a service name with a revision, such as `istiod-main`. **Note**: If you have a revisionless istiod setup and did not customize the Istio meta cluster ID or meta mesh ID, you can skip this step. 
+1. Get the name of the istiod service. Depending on how you set up Istio, you might see a service name with a revision, such as `istiod-main`.
    ```sh
    kubectl get services -n istio-system
    ```
@@ -115,7 +118,7 @@ Create a GatewayParameters resource to configure the revisioned istiod service a
    EOF
    ```  
 {{% /tab %}}
-{{% tab tabName="Revisionless Istio" %}}
+{{% tab tabName="Revisionless Istio without custom IDs" %}}
 Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository.
 ```yaml
 kubectl apply -f- <<EOF
@@ -136,7 +139,7 @@ EOF
 {{% /tab %}}
 {{< /tabs >}}
 
-## Step 3: Create a gateway proxy {#create-gateway-proxy}
+## Step 4: Create a gateway proxy {#create-gateway-proxy}
 
 Create or update a Gateway that includes the Istio proxy.
 
@@ -165,7 +168,7 @@ Create or update a Gateway that includes the Istio proxy.
    EOF
    ```
    
-2. Verify that the gateway proxy is now successfully deployed. You might need to restart the proxy to apply the latest Gateway settings. 
+2. Verify that the gateway proxy is now successfully deployed. 
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http \
      -o jsonpath='{range .items[*]}Pod: {.metadata.name} | Status: {.status.phase}{"\n"}Containers:{"\n"}{range .spec.containers[*]}- {.name}{"\n"}{end}{"\n"}{end}'
@@ -181,7 +184,9 @@ Create or update a Gateway that includes the Istio proxy.
    - istio-proxy
    ```
 
-## Step 4: Verify the integration {#verify}
+   If you do not see the three containers, try restarting the proxy to apply the latest Gateway settings.
+
+## Step 5: Verify the integration {#verify}
 
 1. Create an HTTPRoute to route requests from the gateway proxy to the productpage app. 
    ```yaml
