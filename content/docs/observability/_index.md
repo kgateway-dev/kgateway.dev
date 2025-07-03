@@ -18,6 +18,55 @@ In this guide, you deploy an OpenTelemetry collector that scapes metrics from th
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
+## View control plane metrics {#control-plane-metrics}
+
+By default, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes metrics in Prometheus format. You can use these metrics to monitor the health and performance of your gateway environment. For more information about how metrics are implemented, refer to the [kgateway project developer docs](https://github.com/kgateway-dev/kgateway/tree/main/devel/metrics).
+
+1. Port-forward the control plane deployment on port 9092.
+
+   ```sh
+   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} port-forward deployment/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 19000
+   ```
+
+2. Open your browser to the metrics endpoint: [http://localhost:9092/metrics](http://localhost:9092/metrics).
+
+   Example output:
+
+   ```console
+   # HELP kgateway_collection_gateway_resources Current number of gateway resources managed by the collection
+   # TYPE kgateway_collection_gateway_resources gauge
+   kgateway_collection_gateway_resources{namespace="httpbin",resource="HTTPRoute"} 1
+   kgateway_collection_gateway_resources{namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="Gateway"} 1
+   kgateway_collection_gateway_resources{namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="HTTPRoute"} 1
+   ```
+
+3. Review the following table to understand more about each metric.
+
+   Helpful terms:
+   * Collection: A collection groups together resources of a specific kind, such as Gateways, to help you track them.
+   * Resource: A resource is a Kubernetes object that is managed by the controller.
+   * Controller: The controller is the {{< reuse "/docs/snippets/kgateway.md" >}} control plane deployment.
+   * Translator: The translator converts high-level Kubernetes resources such as Gateways or HTTPRoutes into lower-level intermediate representations (IR) that are used by the underlying gateway proxy data plane.
+   * Syncer: The syncer synchronizes the status of resources between the control plane and the underlying Kubernetes resources, so that their state is accurately reflected.
+
+| Metric | Description |
+|--------|-------------|
+| kgateway_collection_gateway_resources | Current number of gateway resources managed by each collection. Useful for monitoring resource inventory and ensuring expected resources are present.<br><br>Example: `{namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="Gateway"} 1` |
+| kgateway_collection_resources | Current number of resources managed by each collection, broken down by collection, resource type, and namespace. Helps track resource distribution and detect anomalies.<br><br>Example: `{collection="Gateways",name="http",namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="Listeners"} 1` |
+| kgateway_collection_transform_duration_seconds | Histogram of the duration (in seconds) for transforming resources in a collection. Useful for performance monitoring and identifying slow transformations.<br><br>Example: `{collection="Gateways",le="0.025"} 2` |
+| kgateway_collection_transforms_running | Number of resource transforms currently running in each collection. Indicates concurrency and can help detect stuck or overloaded processing.<br><br>Example: `{collection="K8sEndpoints"} 0` |
+| kgateway_collection_transforms_total | Total number of resource transforms performed, labeled by collection and result. Useful for tracking activity and success/failure rates.<br><br>Example: `{collection="Gateways",result="success"} 2` |
+| kgateway_controller_reconcile_duration_seconds | Histogram of the duration (in seconds) for controller reconcile loops, labeled by controller type. Helps identify slow reconciliations and performance bottlenecks.<br><br>Example: `{controller="gateway",le="0.25"} 1` |
+| kgateway_controller_reconciliations_running | Number of controller reconciliations currently running, per controller. Useful for monitoring controller workload and concurrency.<br><br>Example: `{controller="gateway"} 0` |
+| kgateway_controller_reconciliations_total | Total number of controller reconciliations, labeled by controller and result. Tracks controller activity and success/failure rates.<br><br>Example: `{controller="gateway",result="success"} 1` |
+| kgateway_routing_domains | Number of routing domains per listener, labeled by gateway, namespace, and port. Useful for understanding routing configuration and listener coverage.<br><br>Example: `{gateway="http",namespace="{{< reuse "docs/snippets/namespace.md" >}}",port="8080"} 2` |
+| kgateway_status_syncer_resources | Current number of resources managed by each status syncer, labeled by syncer, resource, and namespace. Helps monitor status syncer workload and resource coverage.<br><br>Example: `{name="http",namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="Gateway",syncer="GatewayStatusSyncer"} 1` |
+| kgateway_status_syncer_status_sync_duration_seconds | Histogram of the duration (in seconds) for status sync operations, labeled by syncer. Useful for performance monitoring and identifying slow syncs.<br><br>Example: `{syncer="RouteStatusSyncer",le="0.25"} 1` |
+| kgateway_status_syncer_status_syncs_total | Total number of status syncs performed, labeled by syncer and result. Tracks syncer activity and success/failure rates.<br><br>Example: `{result="success",syncer="PolicyStatusSyncer"} 2` |
+| kgateway_translator_translation_duration_seconds | Histogram of the duration (in seconds) for translation operations, labeled by translator. Useful for monitoring translation performance and identifying slow operations.<br><br>Example: `{translator="TranslateGatewayIR",le="0.01"} 1` |
+| kgateway_translator_translations_running | Number of translation operations currently running, per translator. Indicates translation concurrency and can help detect bottlenecks. <br><br>Example: `{translator="TranslateGatewayProxy"} 0` |
+| kgateway_translator_translations_total | Total number of translation operations performed, labeled by translator and result. Tracks translation activity and success/failure rates.<br><br>Example: `{result="success",translator="TranslateGatewayIR"} 1` |
+
 ## View default metrics in Prometheus {#prometheus-metrics}
 
 You can quickly see the raw Prometheus metrics that are automatically exposed on the gateway proxy by accessing the Prometheus metrics on your gateway.
@@ -25,7 +74,7 @@ You can quickly see the raw Prometheus metrics that are automatically exposed on
 1. Port-forward the gateway deployment on port 19000.
    
    ```sh
-   kubectl -n kgateway-system port-forward deployment/http 19000
+   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} port-forward deployment/http 19000
    ```
 
 2. Access the gateway metrics by reviewing the [Prometheus statistics `/stats/prometheus` endpoint](http://localhost:19000/stats/prometheus).
