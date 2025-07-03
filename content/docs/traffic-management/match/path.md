@@ -188,6 +188,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    
 ## Set up regex matching
 
+Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions to match incoming requests.
+
 1. Create an HTTPRoute resource for the `match.example` domain that uses a regular expression (regex) to match incoming requests. The following regex patterns are defined in the example: 
    * **`\/.*my-path.*`**: 
      * The request path must start with `/`
