@@ -25,7 +25,7 @@ By default, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes
 1. Port-forward the control plane deployment on port 9092.
 
    ```sh
-   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} port-forward deployment/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 19000
+   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} port-forward deployment/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9092
    ```
 
 2. Open your browser to the metrics endpoint: [http://localhost:9092/metrics](http://localhost:9092/metrics).
