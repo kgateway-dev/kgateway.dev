@@ -33,11 +33,11 @@ By default, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes
    Example output:
 
    ```console
-   # HELP kgateway_collection_gateway_resources Current number of gateway resources managed by the collection
-   # TYPE kgateway_collection_gateway_resources gauge
-   kgateway_collection_gateway_resources{namespace="httpbin",resource="HTTPRoute"} 1
-   kgateway_collection_gateway_resources{namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="Gateway"} 1
-   kgateway_collection_gateway_resources{namespace="{{< reuse "docs/snippets/namespace.md" >}}",resource="HTTPRoute"} 1
+   # HELP kgateway_controller_reconciliations_total Total controller reconciliations
+   # TYPE kgateway_controller_reconciliations_total counter
+   kgateway_controller_reconciliations_total{controller="gateway",result="success"} 1
+   kgateway_controller_reconciliations_total{controller="gatewayclass",result="success"} 2
+   kgateway_controller_reconciliations_total{controller="gatewayclass-provisioner",result="success"} 2
    ```
 
 3. Review the following table to understand more about each metric.
@@ -67,9 +67,9 @@ By default, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes
 | kgateway_translator_translations_running | Number of translation operations currently running, per translator. Indicates translation concurrency and can help detect bottlenecks. <br><br>Example: `{translator="TranslateGatewayProxy"} 0` |
 | kgateway_translator_translations_total | Total number of translation operations performed, labeled by translator and result. Tracks translation activity and success/failure rates.<br><br>Example: `{result="success",translator="TranslateGatewayIR"} 1` |
 
-## View default metrics in Prometheus {#prometheus-metrics}
+## View default data planemetrics in Prometheus {#prometheus-metrics}
 
-You can quickly see the raw Prometheus metrics that are automatically exposed on the gateway proxy by accessing the Prometheus metrics on your gateway.
+You can quickly see the raw Prometheus metrics that are automatically exposed in the gateway proxy data planeby accessing the Prometheus metrics on your gateway.
 
 1. Port-forward the gateway deployment on port 19000.
    
