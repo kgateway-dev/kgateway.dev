@@ -18,7 +18,7 @@ For more information about local rate limiting, see the [Envoy documentation](ht
 
 ### Architecture
 
-The following image shows how local rate limiting works in kgateway. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. Note that limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5 x 10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. 
+The following image shows how local rate limiting works in {{< reuse "/docs/snippets/kgateway.md" >}}. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. Note that limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5 x 10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. 
 
 Depending on your setup, each Envoy instance or pod is configured with a number of tokens in a token bucket. To allow a request, a token must be available in the bucket so that it can be assigned to a downstream connection. Token buckets are refilled occasionally as defined in the refill setting of the local rate limiting configuration. If no token is available, the connection is closed immediately, and a 429 HTTP response code is returned to the client. 
 
@@ -27,14 +27,14 @@ When a token is available in the token bucket it can be assigned to an incoming 
 {{< reuse-image src="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
 {{< reuse-image-dark srcDark="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
 
-### Local rate limiting in kgateway
+### Local rate limiting
 
-In kgateway, you use a [TrafficPolicy](/docs/about/policies/TrafficPolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
+In {{< reuse "/docs/snippets/kgateway.md" >}}, you use a [TrafficPolicy](../about/policies/TrafficPolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
 * **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the TrafficPolicy to the route you want to rate limit. For an example, see [Route configuration](#route). 
 * **All routes in an HTTPRoute**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a particular HTTPRoute resource. 
 * **All routes that the Gateway serves**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](/docs/about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
+Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](../../about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
 
 ## Before you begin
 
@@ -79,7 +79,7 @@ Set up local rate limiting for a particular route.
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
      - ratelimit.example
      rules:
@@ -100,13 +100,13 @@ Set up local rate limiting for a particular route.
    ```
 
 3. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
@@ -131,13 +131,13 @@ Set up local rate limiting for a particular route.
    ```
    
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the route is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the route. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
@@ -172,7 +172,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
    kind: TrafficPolicy
    metadata:
      name: local-ratelimit
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      targetRefs: 
      - group: gateway.networking.k8s.io
@@ -195,13 +195,13 @@ Instead of applying local rate limiting to a particular route, you can also appl
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
    
 3. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. Verify that the request succeeds.
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -226,13 +226,13 @@ Instead of applying local rate limiting to a particular route, you can also appl
    ```
 
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the gateway is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the gateway. 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -268,7 +268,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    kind: TrafficPolicy
    metadata:
      name: local-ratelimit
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      targetRefs: 
      - group: gateway.networking.k8s.io
@@ -295,7 +295,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
    spec:
      parentRefs:
      - name: http
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
      - www.example.com
      rules:
@@ -311,13 +311,13 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
 
 3. Send two requests to verify that the route is rate limited due to the Gateway-level TrafficPolicy that allows only 1 request per 100 seconds.
 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```
@@ -369,13 +369,13 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
 
 5. Repeat the requests. This time, the requests succeed because the HTTPRoute is excluded from rate limiting.
 
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```
@@ -402,7 +402,7 @@ Sometimes, you might want to disable rate limiting for a route. For example, you
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete TrafficPolicy local-ratelimit -n kgateway-system
+kubectl delete TrafficPolicy local-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete TrafficPolicy disable-ratelimit -n httpbin
 kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
