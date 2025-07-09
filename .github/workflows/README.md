@@ -8,7 +8,7 @@ This workflow is used to update the API and Helm reference docs for the kgateway
 
 ### API reference
 
-[Published page](https://kgateway.dev/docs/reference/api/)
+[Published page](https://kgateway.dev/docs/main/reference/api/)
 
 Source files: 
 * [Go code in the API directory](https://github.com/kgateway-dev/kgateway/tree/main/api/v1alpha1)
@@ -21,14 +21,14 @@ Process to generate markdown content from source files:
 2. Run `make generated-code`
 3. Open a PR and merge your changes into the code repo
 4. In the kgateway.dev docs repo, manually trigger the Update API Documentation GitHub Action
-5. The Action updates the [markdown source file](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/api.md)
+5. The Action updates the [markdown source file](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/main/reference/api.md)
 6. The Action opens a PR with the updated content
 7. Review and merge the PR
 8. Upon merge, the docs should be automatically built and published
 
 ### Helm reference
 
-[Published page](https://kgateway.dev/docs/reference/helm/)
+[Published page](https://kgateway.dev/docs/main/reference/helm/)
 
 Source files:
 * [Helm files in the code repo](https://github.com/kgateway-dev/kgateway/tree/main/install/helm)
@@ -44,8 +44,8 @@ Process to generate markdown content from source files:
 3. Open a PR and merge your changes into the code repo
 4. In the kgateway.dev docs repo, manually trigger the Update API Documentation GitHub Action
 5. The Action updates the markdown source file conrefs for both Helm charts:
-   * [kgateway values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/helm/helm.md)
-   * [CRD values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/helm/crds.md)
+   * [kgateway values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/main/reference/helm/helm.md)
+   * [CRD values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/main/reference/helm/crds.md)
 6. The Action opens a PR with the updated content
 7. Review and merge the PR
 8. Upon merge, the docs should be automatically built and published

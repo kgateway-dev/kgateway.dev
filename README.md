@@ -23,7 +23,7 @@ When opening a pull request, each of your commits must contain a `Signed-off-by`
 
 ### Contributing to the Documentation
 
-Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/reference/contribution/) for details on adding documentation, previewing locally, and a style guide.
+Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/main/reference/contribution/) for details on adding documentation, previewing locally, and a style guide.
 
 ### Adding a Lab
 1. Add an entry to `data/labs.yaml` with a title, description, and href

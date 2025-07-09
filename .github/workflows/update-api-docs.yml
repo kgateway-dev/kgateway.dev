@@ -50,7 +50,7 @@ jobs:
           echo "=== Debug: Before generating docs ==="
           echo "Looking for API directory:"
           ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
-          ls -la "$GITHUB_WORKSPACE/kgateway.dev/content/docs/reference/api/" || echo "Docs API directory not found!"
+          ls -la "$GITHUB_WORKSPACE/kgateway.dev/content/docs/main/reference/api/" || echo "Docs API directory not found!"
           # Update docs repository
           cd "$GITHUB_WORKSPACE/kgateway.dev"
           echo "Changed to docs repository: $PWD"
@@ -72,13 +72,13 @@ jobs:
           weight: 10
           ---
           
-          '; cat "./out.md" ) > content/docs/reference/api.md
+          '; cat "./out.md" ) > content/docs/main/reference/api.md
 
           # Remove temporary file
           rm -f "./out.md"
 
           # Format generated docs
-          sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/reference/api.md
+          sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/main/reference/api.md
           # Fix formatting issues in the markdown
           sed -i '
           /```yaml<br \/>/ {
@@ -92,9 +92,9 @@ jobs:
             s/      metadataKey:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataKey:/g
             s/```//
             /^\s*$/d
-          }' content/docs/reference/api.md
-          sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/reference/api.md
-          sed -i '/^# API Reference$/,/^$/d' content/docs/reference/api.md
+          }' content/docs/main/reference/api.md
+          sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/main/reference/api.md
+          sed -i '/^# API Reference$/,/^$/d' content/docs/main/reference/api.md
 
       - name: Generate Helm Chart Reference
         run: |
@@ -106,26 +106,26 @@ jobs:
             echo "Changed to docs repository: $PWD"
 
             # Create directory for Helm docs
-            mkdir -p content/docs/reference/helm/
+            mkdir -p content/docs/main/reference/helm/
             
             # Generate Helm Docs with helm-docs
             for chart in "kgateway:helm" "kgateway-crds:crds"; do
               IFS=: read -r dir file <<< "$chart"
               go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 \
                 --chart-search-root "$GITHUB_WORKSPACE/kgateway/install/helm/$dir" \
-                --dry-run > "content/docs/reference/helm/${file}.md"
+                --dry-run > "content/docs/main/reference/helm/${file}.md"
 
               # Remove badge line and following empty line 
               # (might be replaced by helm docs template in the future)
-              sed -i '/!\[Version:/,/^$/d' "content/docs/reference/helm/${file}.md"
+              sed -i '/!\[Version:/,/^$/d' "content/docs/main/reference/helm/${file}.md"
 
               # Remove backticks from the Default column in the table
-              sed -i 's/| `\([^`]*\)` |/| \1 |/g' "content/docs/reference/helm/${file}.md"
+              sed -i 's/| `\([^`]*\)` |/| \1 |/g' "content/docs/main/reference/helm/${file}.md"
             done
 
             echo "=== Debug: After creating index file ==="
             echo "Content directory structure:"
-            ls -la content/docs/reference/helm/
+            ls -la content/docs/main/reference/helm/
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
