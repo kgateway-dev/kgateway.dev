@@ -64,7 +64,7 @@ jobs:
               ignoreTypes:
                 - ".*List$"
             render:
-              kubernetesVersion: 1.33')
+              kubernetesVersion: 1.31')
           
           # Create index file with frontmatter
           (echo '---
