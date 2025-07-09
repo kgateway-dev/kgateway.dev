@@ -127,7 +127,7 @@ params:
       bots: https://searchbot.tryhelix.ai/bots
 
   versions:
-    - version: "2.1"
+    - version: "main"
       dropdown: "main"
       linkVersion: "main"
       url: "/main"

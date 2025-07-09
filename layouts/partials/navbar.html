@@ -45,7 +45,7 @@
         <button class="btn" type="button">
           {{- $pagelink := page.RelPermalink -}}
           {{ $parts := split $pagelink "/" }}
-          {{ $version := index $parts 1 }}
+          {{ $version := index $parts 2 }}
           {{- range site.Params.versions -}}
             {{- if in $version .linkVersion -}}
                {{- printf "%s" .dropdown -}}
@@ -54,7 +54,7 @@
           {{- end -}}
           {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
         </button>
-        <ul class="dropdown-content absolute border-2 rounded-lg px-6 left-[-20%] hx-bg-white dark:hx-bg-dark">
+        <ul class="dropdown-content absolute border-[1px] rounded-lg px-6 right-[50%] translate-x-1/2 hx-bg-white dark:hx-bg-dark">
           {{ partial "navbar-version.html" }} 
         </ul>
     </div>
