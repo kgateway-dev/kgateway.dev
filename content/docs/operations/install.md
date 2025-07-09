@@ -63,7 +63,7 @@ The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} i
 {{% /tab %}}
 {{< /tabs >}}
 
-## Install kgateway
+## Install
 
 Install {{< reuse "/docs/snippets/kgateway.md" >}} in your Kubernetes cluster. Choose from the following installation options:
 
