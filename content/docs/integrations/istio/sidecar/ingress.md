@@ -1,7 +1,6 @@
 ---
 title: Ingress
 weight: 10
-description: Use your kgateway as the ingress gateway to control and secure traffic that enters your service mesh.
 --- 
 
 Use {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway to control and secure traffic that enters your service mesh.
@@ -18,7 +17,7 @@ The open source project Istio is the leading service mesh implementation that of
 * Fine-grained access control and quotas
 * Automatic logs, metrics, and traces for traffic in the service mesh
 
-### About the kgateway Istio integration
+### About the sidecar Istio integration
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} comes with an Istio integration that allows you to configure your gateway proxy with an Istio sidecar. The Istio sidecar uses mutual TLS (mTLS) to prove its identity and to secure the connection between your gateway and the services in your Istio service mesh. In addition, you can control and secure the traffic that enters the mesh by applying all the advanced routing, traffic management, security, resiliency, and AI capabilities that {{< reuse "/docs/snippets/kgateway.md" >}} offers. 
 
@@ -54,7 +53,8 @@ Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} installation to enable t
    ```
    
 2. Add the following values to the Helm values file to enable the Istio integration in {{< reuse "/docs/snippets/kgateway.md" >}}.
-   ```yaml   
+   ```yaml
+
    controller:
      extraEnv:
        KGW_ENABLE_ISTIO_AUTO_MTLS: true
@@ -245,7 +245,7 @@ Create or update a Gateway that includes the Istio proxy.
 
 1. Delete the HTTPRoute and gateway-related resources. 
    ```sh
-   kubectl delete httproute bookinfo -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete httproute bookinfo
    kubectl delete gatewayparameters custom-gw-params -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
   
