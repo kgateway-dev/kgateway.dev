@@ -45,55 +45,40 @@ jobs:
           echo "KUBE_VERSION=$KUBE_VERSION" >> $GITHUB_ENV
 
       - name: Generate API Reference
-        run: |
-          echo "=== Debug: Starting Generate API Reference ==="
-          echo "Current directory: $PWD"
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          echo "Listing GITHUB_WORKSPACE contents:"
-          ls -la $GITHUB_WORKSPACE
-
-          echo "=== Debug: Before generating docs ==="
-          echo "Looking for API directory:"
-          ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
-          ls -la "$GITHUB_WORKSPACE/kgateway.dev/content/docs/reference/api/" || echo "Docs API directory not found!"
-          # Update docs repository
-          cd "$GITHUB_WORKSPACE/kgateway.dev"
-          echo "Changed to docs repository: $PWD"
-          
-          # Generate docs with frontmatter
-          go run github.com/elastic/crd-ref-docs@v0.1.0 \
-            --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
-            --renderer=markdown \
-            --output-path ./ \
-            --config=<(cat <<EOF
-            processor:
-              ignoreTypes:
-                - ".*List$"
-            render:
-              kubernetesVersion: ${KUBE_VERSION}
-              knownTypes:
-                - name: Quantity
-                  package: k8s.io/apimachinery/pkg/api/resource
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
-                - name: Duration
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
-                - name: Time
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
-                - name: ObjectMeta
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#objectmeta-v1-meta
-                - name: LabelSelector
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#labelselector-v1-meta
-                - name: ListMeta
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
-                - name: TypeMeta
-                  package: k8s.io/apimachinery/pkg/apis/meta/v1
-                  link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
-            EOF
+      run: |
+        go run github.com/elastic/crd-ref-docs@v0.1.0 \
+          --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
+          --renderer=markdown \
+          --output-path ./ \
+          --config=<(cat <<EOF
+processor:
+  ignoreTypes:
+    - ".*List$"
+render:
+  kubernetesVersion: ${KUBE_VERSION}
+  knownTypes:
+    - name: Quantity
+      package: k8s.io/apimachinery/pkg/api/resource
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
+    - name: Duration
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
+    - name: Time
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
+    - name: ObjectMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#objectmeta-v1-meta
+    - name: LabelSelector
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#labelselector-v1-meta
+    - name: ListMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
+    - name: TypeMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
+EOF
             )
                   
           # Create index file with frontmatter
