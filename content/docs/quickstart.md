@@ -20,7 +20,7 @@ These quick start steps assume that you have the following already set up:
 
 ## Install
 
-For full installation instructions, see [Install kgateway](/docs/operations/install).
+The following steps get you started with a basic installation. For instructions, see the [installation guide](/docs/operations/install).
 
 {{% reuse "docs/snippets/get-started.md" %}}
 
