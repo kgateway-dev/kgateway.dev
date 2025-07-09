@@ -39,6 +39,11 @@ jobs:
       - name: Set kgateway commit SHA
         run: echo "KGATEWAY_COMMIT=$(cd kgateway && git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      - name: Read max Kubernetes version
+        run: |
+          KUBE_VERSION=$(cat kgateway.dev/assets/docs/versions/max-kube.md | tr -d '\n')
+          echo "KUBE_VERSION=$KUBE_VERSION" >> $GITHUB_ENV
+
       - name: Generate API Reference
         run: |
           echo "=== Debug: Starting Generate API Reference ==="
@@ -64,8 +69,30 @@ jobs:
               ignoreTypes:
                 - ".*List$"
             render:
-              kubernetesVersion: 1.31')
-          
+              kubernetesVersion: ${KUBE_VERSION}
+              knownTypes:
+              - name: Quantity
+                package: k8s.io/apimachinery/pkg/api/resource
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
+              - name: Duration
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
+              - name: Time
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
+              - name: ObjectMeta
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#objectmeta-v1-meta
+              - name: LabelSelector
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#labelselector-v1-meta
+              - name: ListMeta
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
+              - name: TypeMeta
+                package: k8s.io/apimachinery/pkg/apis/meta/v1
+                link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta')
+                  
           # Create index file with frontmatter
           (echo '---
           title: API reference
