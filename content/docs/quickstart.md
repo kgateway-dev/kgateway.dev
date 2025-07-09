@@ -18,7 +18,7 @@ These quick start steps assume that you have the following already set up:
    kind create cluster
    ```
 
-## Install kgateway
+## Install
 
 For full installation instructions, see [Install kgateway](/docs/operations/install).
 
