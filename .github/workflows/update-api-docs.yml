@@ -45,12 +45,8 @@ jobs:
           echo "KUBE_VERSION=$KUBE_VERSION" >> $GITHUB_ENV
 
       - name: Generate API Reference
-      run: |
-        go run github.com/elastic/crd-ref-docs@v0.1.0 \
-          --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
-          --renderer=markdown \
-          --output-path ./ \
-          --config=<(cat <<EOF
+        run: |
+          cat > crd-ref-docs-config.yaml <<EOF
 processor:
   ignoreTypes:
     - ".*List$"
@@ -79,8 +75,13 @@ render:
       package: k8s.io/apimachinery/pkg/apis/meta/v1
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
 EOF
-            )
-                  
+
+          go run github.com/elastic/crd-ref-docs@v0.1.0 \
+            --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
+            --renderer=markdown \
+            --output-path ./ \
+            --config=crd-ref-docs-config.yaml
+
           # Create index file with frontmatter
           (echo '---
           title: API reference
