@@ -9,14 +9,11 @@ Get started with {{< reuse "/docs/snippets/kgateway.md" >}}, a cloud-native Laye
 
 ## Before you begin
 
-These quick start steps assume that you have the following already set up:
+These quick start steps assume that you have a Kubernetes cluster, `kubectl`, and `helm` already set up. For quick testing, you can use [Kind](https://kind.sigs.k8s.io/).
 
-1. Install command line tools for `kubectl` and `helm`.
-2. Use a Kubernetes cluster. For quick testing, you can use [Kind](https://kind.sigs.k8s.io/).
-
-   ```sh
-   kind create cluster
-   ```
+```sh
+kind create cluster
+```
 
 ## Install
 
