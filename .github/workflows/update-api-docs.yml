@@ -47,8 +47,12 @@ jobs:
       - name: Generate API Reference
         run: |
           # Substitute KUBE_VERSION in the config template and write to a temp file
-          envsubst < kgateway.dev/scripts/crd-ref-docs-config.yaml > crd-ref-docs-config.yaml
-          
+          cd "$GITHUB_WORKSPACE/kgateway.dev"
+          envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config.yaml
+
+          # Update docs repository
+          echo "Changed to docs repository: $PWD"          
+
           go run github.com/elastic/crd-ref-docs@v0.1.0 \
             --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
             --renderer=markdown \
