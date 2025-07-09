@@ -20,7 +20,7 @@ flowchart LR
 
 ## Before you begin
 
-Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../quickstart/) or [Installation](/install/) guides.
+Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
 
 ## Deploy a sample app {#deploy-app}
 

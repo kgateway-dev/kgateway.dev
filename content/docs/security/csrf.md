@@ -49,7 +49,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs](../../reference/api/#csrfpolicy).
+   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs](/docs/reference/api/#csrfpolicy).
 
    | Field | Description |
    |-------|-------------|

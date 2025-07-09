@@ -69,13 +69,13 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 
 As part of debugging, you might have noticed that your HTTPRoute or Gateway had an attached TrafficPolicy. The TrafficPolicy's status might say `Accepted` and seem normal. However, when you checked the gateway configuration, the policy is not applied to the selected routes. Review the following common reasons for missing policies.
 
-1. Verify that the TrafficPolicy is attached correctly. For example, you might use label selectors that do not match any HTTPRoute or Gateway. For more information, see [Policy attachment](../../about/policies/trafficpolicy/#policy-attachment-trafficpolicy).
+1. Verify that the TrafficPolicy is attached correctly. For example, you might use label selectors that do not match any HTTPRoute or Gateway. For more information, see [Policy attachment](/docs/about/policies/trafficpolicy/#policy-attachment-trafficpolicy).
 
-2. Confirm that you do not have multiple, conflicting policies. In general, the oldest policy is enforced. For more information, see [Policy priority and merging rules](../../about/policies/trafficpolicy/#policy-priority-and-merging-rules).
+2. Confirm that you do not have multiple, conflicting policies. In general, the oldest policy is enforced. For more information, see [Policy priority and merging rules](/docs/about/policies/trafficpolicy/#policy-priority-and-merging-rules).
 
 3. Determine if you need a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). For example, the TrafficPolicy might rely on a GatewayExtension to enable a feature such as external auth. However, the GatewayExtension might be in a different namespace than the backing external auth service.
 
-   Example ReferenceGrant for [external auth](../../security/external-auth/) GatewayExtension:
+   Example ReferenceGrant for [external auth](/docs/security/external-auth/) GatewayExtension:
 
    * The GrantExtension for external auth, HTTPRoute, and backing Service are in the app namespace, such as `httpbin`.
    * The external auth service is in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace.

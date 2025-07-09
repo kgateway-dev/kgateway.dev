@@ -29,7 +29,7 @@ If you wish to try out any of the below examples yourself, you'll need:
 - A backing workload, such as [httpbin](https://httpbin.org/)
 - A provisioned Gateway and HTTPRoute with a rule to send requests to the workload
 
-You can find the details in the blog posts [Guide to installing kgateway](https://kgateway.dev/blog/guide-to-installing-kgateway/) and [Gateway API basics](https://kgateway.dev/blog/gateway-api-basics/).
+You can find the details in the blog posts [Guide to installing kgateway](https://kgateway.dev/blog/guide-to-installing-kgateway/) and [Understanding Gateway API basics](https://kgateway.dev/blog/understanding-gateway-api-basics/).
 
 ### Example 1: Decode a header value in a request
 

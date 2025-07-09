@@ -180,7 +180,7 @@ Good job! Now you have an OpenTelemetry collector that scrapes and exposes metri
 
 To visualize the metrics that you collect with the OpenTelemetry collector, deploy Grafana as part of the Prometheus stack in your cluster.
 
-1. Deploy Grafana and other Prometheus components in your cluster. The following example uses the [kube-prometheus-stack community Helm chart](https://github.com/prometheus-community/helm-charts/tree/{{< reuse "docs/versions/github-branch.md" >}}/charts/kube-prometheus-stack) to install these components. 
+1. Deploy Grafana and other Prometheus components in your cluster. The following example uses the [kube-prometheus-stack community Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) to install these components. 
    
    ```yaml
    helm repo add prometheus-community https://prometheus-community.github.io/helm-charts

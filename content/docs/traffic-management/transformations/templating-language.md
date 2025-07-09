@@ -50,19 +50,19 @@ When specifying your transformation template, you can leverage custom functions 
 | Function | Description | 
 | -- | -- |
 | `base64_encode(string)` | Encodes the input string to base64. |
-| `base64_decode(string)` | Decodes the input string from base64. For an example, see [Decode base64 headers](../decode-base64-headers/). |
-| `body()` | Returns the request/response body. For an example, see [Update response body](../update-response-body).  | 
+| `base64_decode(string)` | Decodes the input string from base64. For an example, see [Decode base64 headers](/docs/traffic-management/transformations/templating-language/decode-base64-headers/). |
+| `body()` | Returns the request/response body. For an example, see [Update response body](/docs/traffic-management/transformations/templating-language/update-response-body).  | 
 | `context()` | Returns the base JSON context. You can use this context to parse a JSON body that is an array. |
-| `env(env_var_name)` | Returns the value of the environment variable with the given name. Note that because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers](../inject-response-headers/). | 
-| `header(header_name)` | Returns the value of the header with the given name. For an example, see [Change response status](../change-response-status/). |
-| `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers](../inject-response-headers). |
-| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random string. For an example, see [Inject response headers](../inject-response-headers/). |
-| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers](../inject-response-headers/).|
-| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If no `substring_len` is provided or `substring_len is <= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers](../decode-base64-headers/). |
+| `env(env_var_name)` | Returns the value of the environment variable with the given name. Note that because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers](/docs/traffic-management/transformations/templating-language/inject-response-headers/). | 
+| `header(header_name)` | Returns the value of the header with the given name. For an example, see [Change response status](/docs/traffic-management/transformations/templating-language/change-response-status/). |
+| `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers](/docs/traffic-management/transformations/templating-language/inject-response-headers). |
+| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random string. For an example, see [Inject response headers](/docs/traffic-management/transformations/templating-language/inject-response-headers/). |
+| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers](/docs/traffic-management/transformations/templating-language/inject-response-headers/).|
+| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If no `substring_len` is provided or `substring_len is <= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers](/docs/traffic-management/transformations/templating-language/decode-base64-headers/). |
 
 **Other common functions**
 
-You might use default Inja functions, such as `if else` or `if exists`. For an example, see [Change response status](../change-response-status/). 
+You might use default Inja functions, such as `if else` or `if exists`. For an example, see [Change response status](/docs/traffic-management/transformations/templating-language/change-response-status/). 
 
 ## Template attributes
 

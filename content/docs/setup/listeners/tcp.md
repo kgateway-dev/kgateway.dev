@@ -11,7 +11,7 @@ The following guide deploys a sample TCP echo app, sets up a TCP listener on the
 
 ## Before you begin
 
-1. Follow the [Get started guide](../../quickstart) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+1. Follow the [Get started guide](/docs/quickstart) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
 2. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
 
@@ -63,7 +63,7 @@ The following guide deploys a sample TCP echo app, sets up a TCP listener on the
 
 Create a TCP listener so that the gateway can route TCP traffic. In the following example, all TCP streams on port 8000 of the gateway are forwarded to port 1025 of the example TCP echo service.
 
-If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](/docs/setup/listeners/overview/#listenersets).
 * {{< reuse "docs/versions/warn-2-1-only.md" >}} 
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
