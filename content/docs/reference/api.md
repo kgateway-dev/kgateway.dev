@@ -183,7 +183,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `fileSink` _[FileSink](#filesink)_ | Output access logs to local file |  |  |
-| `grpcService` _[GrpcService](#grpcservice)_ | Send access logs to gRPC service |  |  |
+| `grpcService` _[AccessLogGrpcService](#accessloggrpcservice)_ | Send access logs to gRPC service |  |  |
+| `openTelemetry` _[OpenTelemetryAccessLogService](#opentelemetryaccesslogservice)_ | Send access logs to an OTel collector |  |  |
 | `filter` _[AccessLogFilter](#accesslogfilter)_ | Filter access logs configuration |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 
 
@@ -205,6 +206,33 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `andFilter` _[FilterType](#filtertype) array_ | Performs a logical "and" operation on the result of each individual filter.<br />Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-andfilter |  | MaxProperties: 1 <br />MinItems: 2 <br />MinProperties: 1 <br /> |
 | `orFilter` _[FilterType](#filtertype) array_ | Performs a logical "or" operation on the result of each individual filter.<br />Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-orfilter |  | MaxProperties: 1 <br />MinItems: 2 <br />MinProperties: 1 <br /> |
+
+
+#### AccessLogGrpcService
+
+
+
+AccessLogGrpcService represents the gRPC service configuration for access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/grpc/v3/als.proto#envoy-v3-api-msg-extensions-access-loggers-grpc-v3-httpgrpcaccesslogconfig
+
+
+
+_Appears in:_
+- [AccessLog](#accesslog)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+| `logName` _string_ | name of log stream |  | Required <br /> |
+| `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
+| `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
+| `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
 
 
 #### Action
@@ -241,9 +269,9 @@ _Appears in:_
 | `enabled` _boolean_ | Whether to enable the extension. |  |  |
 | `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  |  |
 | `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: IfNotPresent |  |  |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#envvar-v1-core) array_ | The container environment variables. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The container environment variables. |  |  |
 
 
 #### AiExtension
@@ -261,11 +289,12 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `enabled` _boolean_ | Whether to enable the extension. |  |  |
 | `image` _[Image](#image)_ | The extension's container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#envvar-v1-core) array_ | The extension's container environment variables. |  |  |
-| `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#containerport-v1-core) array_ | The extension's container ports. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The extension's container environment variables. |  |  |
+| `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#containerport-v1-core) array_ | The extension's container ports. |  |  |
 | `stats` _[AiExtensionStats](#aiextensionstats)_ | Additional stats config for AI Extension.<br />This config can be useful for adding custom labels to the request metrics.<br /><br />Example:<br />stats:<br />&nbsp;&nbsp;customLabels:<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "subject"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:sub"<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "issuer"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:iss"<br /> |  |  |
+| `tracing` _[AiExtensionTrace](#aiextensiontrace)_ | Additional OTel tracing config for AI Extension. |  |  |
 
 
 #### AiExtensionStats
@@ -284,6 +313,39 @@ _Appears in:_
 | `customLabels` _[CustomLabel](#customlabel) array_ | Set of custom labels to be added to the request metrics.<br />These will be added on each request which goes through the AI Extension. |  |  |
 
 
+#### AiExtensionTrace
+
+
+
+AiExtensionTrace defines the tracing configuration for the AI extension
+
+
+
+_Appears in:_
+- [AiExtension](#aiextension)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `endpoint` _[AbsoluteURI](#absoluteuri)_ | EndPoint specifies the URL of the OTLP Exporter for traces.<br />Example: "http://my-otel-collector.svc.cluster.local:4317"<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_endpoint |  |  |
+| `sampler` _[OTelTracesSampler](#oteltracessampler)_ | Sampler defines the sampling strategy for OpenTelemetry traces.<br />Sampling helps in reducing the volume of trace data by selectively<br />recording only a subset of traces.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  |  |
+| `timeout` _[Duration](#duration)_ | OTLPTimeout specifies timeout configurations for OTLP (OpenTelemetry Protocol) exports.<br />It allows setting general and trace-specific timeouts for sending data.<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_timeout |  |  |
+| `protocol` _[OTLPTracesProtocolType](#otlptracesprotocoltype)_ | OTLPProtocol specifies the protocol to be used for OTLP exports.<br />This determines how tracing data is serialized and transported (e.g., gRPC, HTTP/Protobuf).<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_protocol |  | Enum: [grpc http/protobuf http/json] <br /> |
+| `transportSecurity` _[OTLPTransportSecurityMode](#otlptransportsecuritymode)_ | TransportSecurity controls the TLS (Transport Layer Security) settings when connecting<br />to the tracing server. It determines whether certificate verification should be skipped. |  | Enum: [secure insecure] <br /> |
+
+
+#### AlwaysOnConfig
+
+_Underlying type:_ _[struct{}](#struct{})_
+
+AlwaysOnConfig specified the AlwaysOn samplerc
+
+
+
+_Appears in:_
+- [Sampler](#sampler)
+
+
+
 #### AnthropicConfig
 
 
@@ -300,6 +362,27 @@ _Appears in:_
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Anthropic API.<br />This token is automatically sent in the `x-api-key` header of the request. |  |  |
 | `apiVersion` _string_ | Optional: A version header to pass to the Anthropic API.<br />For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |  |  |
 | `model` _string_ | Optional: Override the model name.<br />If unset, the model name is taken from the request.<br />This setting can be useful when testing model failover scenarios. |  |  |
+
+
+#### AnyValue
+
+
+
+AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives.
+This is limited to string and nested values as OTel only supports them
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [AnyValue](#anyvalue)
+- [KeyAnyValue](#keyanyvalue)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `stringValue` _string_ |  |  |  |
+| `arrayValue` _[AnyValue](#anyvalue) array_ | TODO: Add support for ArrayValue && KvListValue |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 
 
 #### AppProtocol
@@ -356,7 +439,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
 
 
 #### AwsAuthType
@@ -449,7 +532,7 @@ _Appears in:_
 | `kind` _string_ | `Backend` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[BackendSpec](#backendspec)_ |  |  |  |
 | `status` _[BackendStatus](#backendstatus)_ |  |  |  |
 
@@ -470,7 +553,7 @@ _Appears in:_
 | `kind` _string_ | `BackendConfigPolicy` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[BackendConfigPolicySpec](#backendconfigpolicyspec)_ |  |  |  |
 | `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
@@ -490,7 +573,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target references to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
-| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  |  |
+| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | Soft limit on size of the cluster's connections read and write buffers.<br />If unspecified, an implementation defined default is applied (1MiB). |  |  |
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
 | `commonHttpProtocolOptions` _[CommonHttpProtocolOptions](#commonhttpprotocoloptions)_ | Additional options when handling HTTP requests upstream, applicable to<br />both HTTP1 and HTTP2 requests. |  |  |
@@ -534,7 +617,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#condition-v1-meta) array_ | Conditions is the list of conditions for the backend. |  | MaxItems: 8 <br /> |
+| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions is the list of conditions for the backend. |  | MaxItems: 8 <br /> |
 
 
 #### BackendType
@@ -554,6 +637,8 @@ _Appears in:_
 | `AWS` | BackendTypeAWS is the type for AWS backends.<br /> |
 | `Static` | BackendTypeStatic is the type for static backends.<br /> |
 | `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
+
+
 
 
 #### BodyParseBehavior
@@ -590,6 +675,22 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body. |  |  |
+
+
+#### Buffer
+
+
+
+
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxRequestSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | MaxRequestSize sets the maximum size in bytes of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413.<br />Example format: "1Mi", "512Ki", "1Gi" |  |  |
 
 
 #### BufferSettings
@@ -668,6 +769,57 @@ _Appears in:_
 | `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
 
 
+#### CommonAccessLogGrpcService
+
+
+
+Common configuration for gRPC access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/grpc/v3/als.proto#envoy-v3-api-msg-extensions-access-loggers-grpc-v3-commongrpcaccesslogconfig
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [OpenTelemetryAccessLogService](#opentelemetryaccesslogservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+| `logName` _string_ | name of log stream |  | Required <br /> |
+
+
+#### CommonGrpcService
+
+
+
+Common gRPC service configuration created by setting `envoy_grpc“ as the gRPC client
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/grpc_service.proto#envoy-v3-api-msg-config-core-v3-grpcservice
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/grpc_service.proto#envoy-v3-api-msg-config-core-v3-grpcservice-envoygrpc
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+
+
 #### CommonHttpProtocolOptions
 
 
@@ -682,9 +834,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  |  |
+| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  |  |
 | `maxHeadersCount` _integer_ | Specifies the maximum number of headers that the connection will accept.<br />If not specified, the default of 100 is used. Requests that exceed this limit will receive<br />a 431 response for HTTP/1.x and cause a stream reset for HTTP/2. |  |  |
-| `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  |  |
+| `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  |  |
 | `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  |  |
 
 
@@ -714,6 +866,101 @@ _Appears in:_
 _Appears in:_
 - [TrafficPolicySpec](#trafficpolicyspec)
 
+
+
+#### CustomAttribute
+
+
+
+Describes attributes for the active span.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#envoy-v3-api-msg-type-tracing-v3-customtag
+
+_Validation:_
+- MaxProperties: 2
+- MinProperties: 1
+
+_Appears in:_
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | The name of the attribute |  | Required <br /> |
+| `literal` _[CustomAttributeLiteral](#customattributeliteral)_ | A literal attribute value. |  | Optional <br /> |
+| `environment` _[CustomAttributeEnvironment](#customattributeenvironment)_ | An environment attribute value. |  | Optional <br /> |
+| `requestHeader` _[CustomAttributeHeader](#customattributeheader)_ | A request header attribute value. |  | Optional <br /> |
+| `metadata` _[CustomAttributeMetadata](#customattributemetadata)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional <br /> |
+
+
+#### CustomAttributeEnvironment
+
+
+
+Environment type attribute with environment name and default value.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-environment
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Environment variable name to obtain the value to populate the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When the environment variable is not found, the attribute value will be populated with this default value if specified,<br />otherwise no attribute will be populated. |  | Optional <br /> |
+
+
+#### CustomAttributeHeader
+
+
+
+Header type attribute with header name and default value.
+https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-header
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Header name to obtain the value to populate the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When the header does not exist, the attribute value will be populated with this default value if specified,<br />otherwise no attribute will be populated. |  | Optional <br /> |
+
+
+#### CustomAttributeLiteral
+
+
+
+Literal type attribute with a static value.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-literal
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `value` _string_ | Static literal value to populate the attribute value. |  | Required <br /> |
+
+
+#### CustomAttributeMetadata
+
+
+
+Metadata type attribute using MetadataKey to retrieve the protobuf value from Metadata, and populate the attribute value with the canonical JSON representation of it.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-metadata
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `kind` _[MetadataKind](#metadatakind)_ | Specify what kind of metadata to obtain attribute value from |  | Enum: [Request Route Cluster Host] <br />Required <br /> |
+| `metadataKey` _[MetadataKey](#metadatakey)_ | Metadata key to define the path to retrieve the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When no valid metadata is found, the attribute value would be populated with this default value if specified, otherwise no attribute would be populated. |  | Optional <br /> |
 
 
 #### CustomLabel
@@ -765,7 +1012,7 @@ DirectResponse contains configuration for defining direct response routes.
 | `kind` _string_ | `DirectResponse` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[DirectResponseSpec](#directresponsespec)_ |  |  |  |
 | `status` _[DirectResponseStatus](#directresponsestatus)_ |  |  |  |
 
@@ -830,6 +1077,19 @@ _Appears in:_
 | `enableTls` _boolean_ | EnableTls enables TLS. When true, the backend will be configured to use TLS. System CA will be used for validation.<br />The hostname will be used for SNI and auto SAN validation. |  |  |
 
 
+#### EnvironmentResourceDetectorConfig
+
+_Underlying type:_ _[struct{}](#struct{})_
+
+EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
+
+
+
+_Appears in:_
+- [ResourceDetector](#resourcedetector)
+
+
+
 #### EnvoyBootstrap
 
 
@@ -863,9 +1123,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `bootstrap` _[EnvoyBootstrap](#envoybootstrap)_ | Initial envoy configuration. |  |  |
 | `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: envoy-wrapper<br />	tag: <kgateway version><br />	pullPolicy: IfNotPresent |  |  |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
-| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#envvar-v1-core) array_ | The container environment variables. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#envvar-v1-core) array_ | The container environment variables. |  |  |
 
 
 #### ExtAuthEnabled
@@ -902,7 +1162,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | ExtensionRef references the ExternalExtension that should be used for authentication. |  |  |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the ExternalExtension that should be used for authentication. |  |  |
 | `enablement` _[ExtAuthEnabled](#extauthenabled)_ | Enablement determines the enabled state of the ExtAuth filter.<br />When set to "DisableAll", the filter is disabled for this route.<br />When empty, the filter is enabled as long as it is not disabled by another policy. |  | Enum: [DisableAll] <br /> |
 | `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
 | `contextExtensions` _object (keys:string, values:string)_ | Additional context for the authorization service. |  |  |
@@ -956,7 +1216,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  |  |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  |  |
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams |  |  |
 
 
@@ -1044,7 +1304,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `path` _string_ | the file path to which the file access logging service will sink |  |  |
 | `stringFormat` _string_ | the format string by which envoy will format the log lines<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-strings |  |  |
-| `jsonFormat` _[RawExtension](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#rawextension-runtime-pkg)_ | the format object by which to envoy will emit the logs in a structured way.<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-dictionaries |  |  |
+| `jsonFormat` _[RawExtension](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#rawextension-runtime-pkg)_ | the format object by which to envoy will emit the logs in a structured way.<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-dictionaries |  |  |
 
 
 #### FilterType
@@ -1089,7 +1349,7 @@ _Appears in:_
 | `kind` _string_ | `GatewayExtension` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[GatewayExtensionSpec](#gatewayextensionspec)_ |  |  |  |
 | `status` _[GatewayExtensionStatus](#gatewayextensionstatus)_ |  |  |  |
 
@@ -1107,7 +1367,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit Extended] <br /> |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit] <br /> |
 | `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
 | `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
 | `rateLimit` _[RateLimitProvider](#ratelimitprovider)_ | RateLimit configuration for RateLimit extension type. |  |  |
@@ -1126,7 +1386,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#condition-v1-meta) array_ | Conditions is the list of conditions for the GatewayExtension. |  | MaxItems: 8 <br /> |
+| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions is the list of conditions for the GatewayExtension. |  | MaxItems: 8 <br /> |
 
 
 #### GatewayExtensionType
@@ -1165,7 +1425,7 @@ Kubernetes Gateway.
 | `kind` _string_ | `GatewayParameters` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[GatewayParametersSpec](#gatewayparametersspec)_ |  |  |  |
 | `status` _[GatewayParametersStatus](#gatewayparametersstatus)_ |  |  |  |
 
@@ -1236,26 +1496,6 @@ _Appears in:_
 | `sleepTimeSeconds` _integer_ | Time (in seconds) for the preStop hook to wait before allowing Envoy to terminate |  |  |
 
 
-#### GrpcService
-
-
-
-GrpcService represents the gRPC service configuration for access logs.
-
-
-
-_Appears in:_
-- [AccessLog](#accesslog)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `logName` _string_ | name of log stream |  |  |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
-| `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
-| `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
-| `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
-
-
 
 
 #### GrpcStatusFilter
@@ -1292,7 +1532,7 @@ _Appears in:_
 | `kind` _string_ | `HTTPListenerPolicy` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[HTTPListenerPolicySpec](#httplistenerpolicyspec)_ |  |  |  |
 | `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
@@ -1301,7 +1541,7 @@ _Appears in:_
 
 
 
-
+HTTPListenerPolicySpec defines the desired state of a HTTP listener policy.
 
 
 
@@ -1313,7 +1553,12 @@ _Appears in:_
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
+| `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for Envoy's OpenTelemetry tracer.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html |  |  |
 | `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
+| `useRemoteAddress` _boolean_ | UseRemoteAddress determines whether to use the remote address for the original client.<br />When true, Envoy will use the remote address of the connection as the client address.<br />When false, Envoy will use the X-Forwarded-For header to determine the client address.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-use-remote-address |  |  |
+| `xffNumTrustedHops` _integer_ | XffNumTrustedHops is the number of additional ingress proxy hops from the right side of the X-Forwarded-For HTTP header to trust when determining the origin client's IP address.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-xff-num-trusted-hops |  | Minimum: 0 <br /> |
+| `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
+| `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 
 
 #### HeaderFilter
@@ -1380,6 +1625,26 @@ _Appears in:_
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
 
 
+#### HeaderValue
+
+
+
+Header name/value pair.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-headervalue
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [CommonGrpcService](#commongrpcservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Header name. |  | Required <br /> |
+| `value` _string_ | Header value. |  | Optional <br /> |
+
+
 #### HealthCheck
 
 
@@ -1394,8 +1659,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. |  |  |
-| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | Interval is the time between health checks. |  |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. |  |  |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Interval is the time between health checks. |  |  |
 | `unhealthyThreshold` _integer_ | UnhealthyThreshold is the number of consecutive failed health checks that will be considered<br />unhealthy.<br />Note that for HTTP health checks, if a host responds with a code not in ExpectedStatuses or RetriableStatuses,<br />this threshold is ignored and the host is considered immediately unhealthy. |  |  |
 | `healthyThreshold` _integer_ | HealthyThreshold is the number of healthy health checks required before a host is marked<br />healthy. Note that during startup, only a single successful health check is<br />required to mark a host healthy. |  |  |
 | `http` _[HealthCheckHttp](#healthcheckhttp)_ | Http contains the options to configure the HTTP health check. |  |  |
@@ -1488,8 +1753,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `initialStreamWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#quantity-resource-api)_ | InitialStreamWindowSize is the initial window size for the stream.<br />Valid values range from 65535 (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum).<br />Defaults to 268435456 (256 * 1024 * 1024).<br />Values can be specified with units like "64Ki". |  |  |
-| `initialConnectionWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#quantity-resource-api)_ | InitialConnectionWindowSize is similar to InitialStreamWindowSize, but for the connection level.<br />Same range and default value as InitialStreamWindowSize.<br />Values can be specified with units like "64Ki". |  |  |
+| `initialStreamWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | InitialStreamWindowSize is the initial window size for the stream.<br />Valid values range from 65535 (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum).<br />Defaults to 268435456 (256 * 1024 * 1024).<br />Values can be specified with units like "64Ki". |  |  |
+| `initialConnectionWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | InitialConnectionWindowSize is similar to InitialStreamWindowSize, but for the connection level.<br />Same range and default value as InitialStreamWindowSize.<br />Values can be specified with units like "64Ki". |  |  |
 | `maxConcurrentStreams` _integer_ | The maximum number of concurrent streams that the connection can have. |  |  |
 | `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging and headers. When disabled (default), then<br />the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame.<br />When enabled, only the offending stream is terminated. |  |  |
 
@@ -1516,7 +1781,7 @@ _Appears in:_
 | `repository` _string_ | The image repository (name). |  |  |
 | `tag` _string_ | The image tag. |  |  |
 | `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
-| `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
+| `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
 
 
 #### InjaTemplate
@@ -1547,8 +1812,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `logLevel` _string_ | Log level for istio-proxy. Options include "info", "debug", "warning", and "error".<br />Default level is info Default is "warning". |  |  |
 | `istioDiscoveryAddress` _string_ | The address of the istio discovery service. Defaults to "istiod.istio-system.svc:15012". |  |  |
 | `istioMetaMeshId` _string_ | The mesh id of the istio mesh. Defaults to "cluster.local". |  |  |
@@ -1569,7 +1834,9 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
-| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
+| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
+
+
 
 
 #### KubernetesProxyConfig
@@ -1633,7 +1900,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `healthyPanicThreshold` _integer_ | HealthyPanicThreshold configures envoy's panic threshold percentage between 0-100. Once the number of non-healthy hosts<br />reaches this percentage, envoy disregards health information.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/panic_threshold.html). |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `updateMergeWindow` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | This allows batch updates of endpoints health/weight/metadata that happen during a time window.<br />this help lower cpu usage when endpoint change rate is high. defaults to 1 second.<br />Set to 0 to disable and have changes applied immediately. |  |  |
+| `updateMergeWindow` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | This allows batch updates of endpoints health/weight/metadata that happen during a time window.<br />this help lower cpu usage when endpoint change rate is high. defaults to 1 second.<br />Set to 0 to disable and have changes applied immediately. |  |  |
 | `leastRequest` _[LoadBalancerLeastRequestConfig](#loadbalancerleastrequestconfig)_ | LeastRequest configures the least request load balancer type. |  |  |
 | `roundRobin` _[LoadBalancerRoundRobinConfig](#loadbalancerroundrobinconfig)_ | RoundRobin configures the round robin load balancer type. |  |  |
 | `ringHash` _[LoadBalancerRingHashConfig](#loadbalancerringhashconfig)_ | RingHash configures the ring hash load balancer type. |  |  |
@@ -1835,6 +2102,57 @@ _Appears in:_
 | `content` _string_ | String content of the message. |  |  |
 
 
+#### MetadataKey
+
+
+
+MetadataKey provides a way to retrieve values from Metadata using a key and a path.
+
+
+
+_Appears in:_
+- [CustomAttributeMetadata](#customattributemetadata)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | The key name of the Metadata from which to retrieve the Struct |  | Required <br /> |
+| `path` _[MetadataPathSegment](#metadatapathsegment) array_ | The path used to retrieve a specific Value from the Struct. This can be either a prefix or a full path,<br />depending on the use case |  | Required <br /> |
+
+
+#### MetadataKind
+
+_Underlying type:_ _string_
+
+Describes different types of metadata sources.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/metadata/v3/metadata.proto#envoy-v3-api-msg-type-metadata-v3-metadatakind-request
+
+_Validation:_
+- Enum: [Request Route Cluster Host]
+
+_Appears in:_
+- [CustomAttributeMetadata](#customattributemetadata)
+
+| Field | Description |
+| --- | --- |
+| `Request` | Request kind of metadata.<br /> |
+| `Route` | Route kind of metadata.<br /> |
+| `Cluster` | Cluster kind of metadata.<br /> |
+| `Host` | Host kind of metadata.<br /> |
+
+
+#### MetadataPathSegment
+
+_Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
+
+Specifies a segment in a path for retrieving values from Metadata.
+
+
+
+_Appears in:_
+- [MetadataKey](#metadatakey)
+
+
+
 #### Moderation
 
 
@@ -1909,6 +2227,61 @@ _Appears in:_
 | `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
 
 
+#### OTLPTracesProtocolType
+
+_Underlying type:_ _string_
+
+OTLPTracesProtocolType defines the supported protocols for OTLP exporter.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description |
+| --- | --- |
+| `grpc` | OTLPTracesProtocolTypeGrpc specifies OTLP over gRPC protocol.<br />This is typically the most efficient protocol for OpenTelemetry data transfer.<br /> |
+| `http/protobuf` | OTLPTracesProtocolTypeProtobuf specifies OTLP over HTTP with Protobuf serialization.<br />Data is sent via HTTP POST requests with Protobuf message bodies.<br /> |
+| `http/json` | OTLPTracesProtocolTypeJson specifies OTLP over HTTP with JSON serialization.<br />Data is sent via HTTP POST requests with JSON message bodies.<br /> |
+
+
+#### OTLPTransportSecurityMode
+
+_Underlying type:_ _string_
+
+OTLPTransportSecurityMode defines the transport security options for OTLP connections.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description |
+| --- | --- |
+| `secure` | OTLPTransportSecuritySecure enables TLS (client transport security) for OTLP connections.<br />This means the client will verify the server's certificate.<br /> |
+| `insecure` | OTLPTransportSecurityInsecure disables TLS for OTLP connections,<br />meaning certificate verification is skipped. This is generally not recommended<br />for production environments due to security risks.<br /> |
+
+
+#### OTelTracesSampler
+
+
+
+OTelTracesSampler defines the configuration for an OpenTelemetry trace sampler.
+It combines the sampler type with any required arguments for that type.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[OTelTracesSamplerType](#oteltracessamplertype)_ | SamplerType specifies the type of sampler to use (default value: "parentbased_always_on").<br />Refer to OTelTracesSamplerType for available options.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  | Enum: [alwaysOn alwaysOff traceidratio parentbasedAlwaysOn parentbasedAlwaysOff parentbasedTraceidratio] <br /> |
+| `arg` _string_ | SamplerArg provides an argument for the chosen sampler type.<br />For "traceidratio" or "parentbased_traceidratio" samplers: Sampling probability, a number in the [0..1] range,<br />e.g. 0.25. Default is 1.0 if unset.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler_arg |  | Pattern: `^0(\.\d+)?\|1(\.0+)?$` <br /> |
+
+
+
+
 
 
 #### OpenAIConfig
@@ -1927,6 +2300,45 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  |  |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request.<br />This setting can be useful when setting up model failover within the same LLM provider. |  |  |
+
+
+#### OpenTelemetryAccessLogService
+
+
+
+OpenTelemetryAccessLogService represents the OTel configuration for access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto
+
+
+
+_Appears in:_
+- [AccessLog](#accesslog)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[CommonAccessLogGrpcService](#commonaccessloggrpcservice)_ | Send access logs to gRPC service |  | Required <br /> |
+| `body` _string_ | OpenTelemetry LogResource fields, following Envoy access logging formatting. |  | Optional <br /> |
+| `disableBuiltinLabels` _boolean_ | If specified, Envoy will not generate built-in resource labels like log_name, zone_name, cluster_name, node_name. |  | Optional <br /> |
+
+
+#### OpenTelemetryTracingConfig
+
+
+
+OpenTelemetryTracingConfig represents the top-level Envoy's OpenTelemetry tracer.
+See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html
+
+
+
+_Appears in:_
+- [TracingProvider](#tracingprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[CommonGrpcService](#commongrpcservice)_ | Send traces to the gRPC service |  | Required <br /> |
+| `serviceName` _string_ | The name for the service. This will be populated in the ResourceSpan Resource attributes |  | Required <br /> |
+| `resourceDetectors` _[ResourceDetector](#resourcedetector) array_ | An ordered list of resource detectors. Currently supported values are `EnvironmentResourceDetector` |  | MaxProperties: 1 <br />MinProperties: 1 <br />Optional <br /> |
+| `sampler` _[Sampler](#sampler)_ | Specifies the sampler to be used by the OpenTelemetry tracer. This field can be left empty. In this case, the default Envoy sampling decision is used.<br />Currently supported values are `AlwaysOn` |  | MaxProperties: 1 <br />MinProperties: 1 <br />Optional <br /> |
 
 
 #### Parameters
@@ -1983,15 +2395,15 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Pod object metadata. |  |  |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata. |  |  |
-| `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
-| `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
+| `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
+| `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
 | `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
-| `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
-| `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
+| `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
+| `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
 | `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  |  |
 | `terminationGracePeriodSeconds` _integer_ | If specified, the pod's termination grace period in seconds. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#pod-v1-core<br />for details |  |  |
-| `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
-| `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
+| `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
+| `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 
 
 #### PolicyAncestorStatus
@@ -2009,7 +2421,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `ancestorRef` _[ParentReference](#parentreference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
 | `controllerName` _string_ | ControllerName is a domain/path string that indicates the name of the<br />controller that wrote this status. This corresponds with the<br />controllerName field on GatewayClass.<br /><br />Example: "example.net/gateway-controller".<br /><br />The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are<br />valid Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).<br /><br />Controllers MUST populate this field when writing status. Controllers should ensure that<br />entries to status populated with their ControllerName are cleaned up when they are no<br />longer necessary. |  |  |
-| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
+| `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
 
 
@@ -2229,7 +2641,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `descriptors` _[RateLimitDescriptor](#ratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting.<br />These values are passed to the rate limit service which applies configured limits based on them.<br />Each descriptor represents a single rate limit rule with one or more entries. |  | MinItems: 1 <br /> |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
+| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
 
 
 #### RateLimitProvider
@@ -2287,6 +2699,24 @@ _Appears in:_
 | `name` _string_ | An optional name for this match, which can be used for debugging purposes. |  |  |
 
 
+#### ResourceDetector
+
+
+
+ResourceDetector defines the list of supported ResourceDetectors
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `environmentResourceDetector` _[EnvironmentResourceDetectorConfig](#environmentresourcedetectorconfig)_ |  |  |  |
+
+
 #### ResponseFlagFilter
 
 
@@ -2304,6 +2734,26 @@ _Appears in:_
 | `flags` _string array_ |  |  | MinItems: 1 <br /> |
 
 
+#### RetryPolicy
+
+
+
+Specifies the retry policy of remote data source when fetching fails.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [CommonGrpcService](#commongrpcservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `retryBackOff` _[BackoffStrategy](#backoffstrategy)_ | Specifies parameters that control retry backoff strategy.<br />the default base interval is 1000 milliseconds and the default maximum interval is 10 times the base interval. |  | Optional <br /> |
+| `numRetries` _integer_ | Specifies the allowed number of retries. Defaults to 1. |  | Optional <br /> |
+
+
 #### RouteType
 
 _Underlying type:_ _string_
@@ -2319,6 +2769,24 @@ _Appears in:_
 | --- | --- |
 | `CHAT` | The LLM generates the full response before responding to a client.<br /> |
 | `CHAT_STREAMING` | Stream responses to a client, which allows the LLM to stream out tokens as they are generated.<br /> |
+
+
+#### Sampler
+
+
+
+Sampler defines the list of supported Samplers
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `alwaysOnConfig` _[AlwaysOnConfig](#alwaysonconfig)_ |  |  |  |
 
 
 #### SdsBootstrap
@@ -2351,8 +2819,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `image` _[Image](#image)_ | The SDS container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
-| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
-| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `bootstrap` _[SdsBootstrap](#sdsbootstrap)_ | Initial SDS container configuration. |  |  |
 
 
@@ -2369,6 +2837,24 @@ _Appears in:_
 
 
 
+#### ServerHeaderTransformation
+
+_Underlying type:_ _string_
+
+ServerHeaderTransformation determines how the server header is transformed.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description |
+| --- | --- |
+| `Overwrite` | OverwriteServerHeaderTransformation overwrites the server header.<br /> |
+| `AppendIfAbsent` | AppendIfAbsentServerHeaderTransformation appends to the server header if it's not present.<br /> |
+| `PassThrough` | PassThroughServerHeaderTransformation passes through the server header unchanged.<br /> |
+
+
 #### Service
 
 
@@ -2382,7 +2868,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br /> |
+| `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br /> |
 | `clusterIP` _string_ | The manually specified IP address of the service, if a randomly assigned<br />IP is not desired. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#choosing-your-own-ip-address<br />and<br />https://kubernetes.io/docs/concepts/services-networking/service/#headless-services<br />on the implications of setting `clusterIP`. |  |  |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  |  |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  |  |
@@ -2426,7 +2912,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `kind` _[SingleAuthTokenKind](#singleauthtokenkind)_ | Kind specifies which type of authorization token is being used.<br />Must be one of: "Inline", "SecretRef", "Passthrough". |  | Enum: [Inline SecretRef Passthrough] <br /> |
 | `inline` _string_ | Provide the token directly in the configuration for the Backend.<br />This option is the least secure. Only use this option for quick tests such as trying out AI Gateway. |  |  |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | Store the API key in a Kubernetes secret in the same namespace as the Backend.<br />Then, refer to the secret in the Backend configuration. This option is more secure than an inline token,<br />because the API key is encoded and you can restrict access to secrets through RBAC rules.<br />You might use this option in proofs of concept, controlled development and staging environments,<br />or well-controlled prod environments that use secrets. |  |  |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Store the API key in a Kubernetes secret in the same namespace as the Backend.<br />Then, refer to the secret in the Backend configuration. This option is more secure than an inline token,<br />because the API key is encoded and you can restrict access to secrets through RBAC rules.<br />You might use this option in proofs of concept, controlled development and staging environments,<br />or well-controlled prod environments that use secrets. |  |  |
 
 
 #### SingleAuthTokenKind
@@ -2461,7 +2947,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `window` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | Represents the size of slow start window.<br />If set, the newly created host remains in slow start mode starting from its creation time<br />for the duration of slow start window. |  |  |
+| `window` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | Represents the size of slow start window.<br />If set, the newly created host remains in slow start mode starting from its creation time<br />for the duration of slow start window. |  |  |
 | `aggression` _string_ | This parameter controls the speed of traffic increase over the slow start window. Defaults to 1.0,<br />so that endpoint would get linearly increasing amount of traffic.<br />When increasing the value for this parameter, the speed of traffic ramp-up increases non-linearly.<br />The value of aggression parameter should be greater than 0.0.<br />By tuning the parameter, is possible to achieve polynomial or exponential shape of ramp-up curve.<br /><br />During slow start window, effective weight of an endpoint would be scaled with time factor and aggression:<br />`new_weight = weight * max(min_weight_percent, time_factor ^ (1 / aggression))`,<br />where `time_factor=(time_since_start_seconds / slow_start_time_seconds)`.<br /><br />As time progresses, more and more traffic would be sent to endpoint, which is in slow start window.<br />Once host exits slow start, time_factor and aggression no longer affect its weight. |  |  |
 | `minWeightPercent` _integer_ | Minimum weight percentage of an endpoint during slow start. |  |  |
 
@@ -2573,8 +3059,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `keepAliveProbes` _integer_ | Maximum number of keep-alive probes to send before dropping the connection. |  |  |
-| `keepAliveTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | The number of seconds a connection needs to be idle before keep-alive probes start being sent. |  |  |
-| `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  |  |
+| `keepAliveTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds a connection needs to be idle before keep-alive probes start being sent. |  |  |
+| `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  |  |
 
 
 #### TLS
@@ -2590,7 +3076,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
 | `tlsFiles` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
 | `sni` _string_ | The SNI domains that should be considered for TLS connection |  |  |
 | `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
@@ -2654,8 +3140,50 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
-| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
+| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 | Minimum: 1 <br /> |
 | `fillInterval` _[Duration](#duration)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
+
+
+#### Tracing
+
+
+
+Tracing represents the top-level Envoy's tracer.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-tracing
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `provider` _[TracingProvider](#tracingprovider)_ | Provider defines the upstream to which envoy sends traces |  | MaxProperties: 1 <br />MinProperties: 1 <br />Required <br /> |
+| `clientSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be force traced if the x-client-trace-id header is set. Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `randomSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be randomly selected for trace generation, if not requested by the client or not forced. Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `overallSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be traced after all other sampling checks have been applied (client-directed, force tracing, random sampling). Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `verbose` _boolean_ | Whether to annotate spans with additional data. If true, spans will include logs for stream events. Defaults to false |  | Optional <br /> |
+| `maxPathTagLength` _integer_ | Maximum length of the request path to extract and include in the HttpUrl tag. Used to truncate lengthy request paths to meet the needs of a tracing backend. Default: 256 |  | Optional <br /> |
+| `attributes` _[CustomAttribute](#customattribute) array_ | A list of attributes with a unique name to create attributes for the active span. |  | MaxProperties: 2 <br />MinProperties: 1 <br />Optional <br /> |
+| `spawnUpstreamSpan` _boolean_ | Create separate tracing span for each upstream request if true. Defaults to false<br />Link to envoy docs for more info |  | Optional <br /> |
+
+
+#### TracingProvider
+
+
+
+TracingProvider defines the list of providers for tracing
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `openTelemetry` _[OpenTelemetryTracingConfig](#opentelemetrytracingconfig)_ | Tracing contains various settings for Envoy's OTel tracer. |  |  |
 
 
 #### TrafficPolicy
@@ -2674,7 +3202,7 @@ _Appears in:_
 | `kind` _string_ | `TrafficPolicy` | | |
 | `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
 | `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
-| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[TrafficPolicySpec](#trafficpolicyspec)_ |  |  |  |
 | `status` _[PolicyStatus](#policystatus)_ |  |  |  |
 
@@ -2683,7 +3211,7 @@ _Appears in:_
 
 
 
-
+TrafficPolicySpec defines the desired state of a traffic policy.
 
 
 
@@ -2701,6 +3229,7 @@ _Appears in:_
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
+| `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 
 
 #### Transform
