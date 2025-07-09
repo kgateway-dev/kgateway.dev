@@ -183,7 +183,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `fileSink` _[FileSink](#filesink)_ | Output access logs to local file |  |  |
-| `grpcService` _[GrpcService](#grpcservice)_ | Send access logs to gRPC service |  |  |
+| `grpcService` _[AccessLogGrpcService](#accessloggrpcservice)_ | Send access logs to gRPC service |  |  |
+| `openTelemetry` _[OpenTelemetryAccessLogService](#opentelemetryaccesslogservice)_ | Send access logs to an OTel collector |  |  |
 | `filter` _[AccessLogFilter](#accesslogfilter)_ | Filter access logs configuration |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 
 
@@ -205,6 +206,33 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `andFilter` _[FilterType](#filtertype) array_ | Performs a logical "and" operation on the result of each individual filter.<br />Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-andfilter |  | MaxProperties: 1 <br />MinItems: 2 <br />MinProperties: 1 <br /> |
 | `orFilter` _[FilterType](#filtertype) array_ | Performs a logical "or" operation on the result of each individual filter.<br />Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-orfilter |  | MaxProperties: 1 <br />MinItems: 2 <br />MinProperties: 1 <br /> |
+
+
+#### AccessLogGrpcService
+
+
+
+AccessLogGrpcService represents the gRPC service configuration for access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/grpc/v3/als.proto#envoy-v3-api-msg-extensions-access-loggers-grpc-v3-httpgrpcaccesslogconfig
+
+
+
+_Appears in:_
+- [AccessLog](#accesslog)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+| `logName` _string_ | name of log stream |  | Required <br /> |
+| `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
+| `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
+| `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
 
 
 #### Action
@@ -266,6 +294,7 @@ _Appears in:_
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#envvar-v1-core) array_ | The extension's container environment variables. |  |  |
 | `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#containerport-v1-core) array_ | The extension's container ports. |  |  |
 | `stats` _[AiExtensionStats](#aiextensionstats)_ | Additional stats config for AI Extension.<br />This config can be useful for adding custom labels to the request metrics.<br /><br />Example:<br />stats:<br />&nbsp;&nbsp;customLabels:<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "subject"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:sub"<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "issuer"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:iss"<br /> |  |  |
+| `tracing` _[AiExtensionTrace](#aiextensiontrace)_ | Additional OTel tracing config for AI Extension. |  |  |
 
 
 #### AiExtensionStats
@@ -284,6 +313,39 @@ _Appears in:_
 | `customLabels` _[CustomLabel](#customlabel) array_ | Set of custom labels to be added to the request metrics.<br />These will be added on each request which goes through the AI Extension. |  |  |
 
 
+#### AiExtensionTrace
+
+
+
+AiExtensionTrace defines the tracing configuration for the AI extension
+
+
+
+_Appears in:_
+- [AiExtension](#aiextension)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `endpoint` _[AbsoluteURI](#absoluteuri)_ | EndPoint specifies the URL of the OTLP Exporter for traces.<br />Example: "http://my-otel-collector.svc.cluster.local:4317"<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_endpoint |  |  |
+| `sampler` _[OTelTracesSampler](#oteltracessampler)_ | Sampler defines the sampling strategy for OpenTelemetry traces.<br />Sampling helps in reducing the volume of trace data by selectively<br />recording only a subset of traces.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  |  |
+| `timeout` _[Duration](#duration)_ | OTLPTimeout specifies timeout configurations for OTLP (OpenTelemetry Protocol) exports.<br />It allows setting general and trace-specific timeouts for sending data.<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_timeout |  |  |
+| `protocol` _[OTLPTracesProtocolType](#otlptracesprotocoltype)_ | OTLPProtocol specifies the protocol to be used for OTLP exports.<br />This determines how tracing data is serialized and transported (e.g., gRPC, HTTP/Protobuf).<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_protocol |  | Enum: [grpc http/protobuf http/json] <br /> |
+| `transportSecurity` _[OTLPTransportSecurityMode](#otlptransportsecuritymode)_ | TransportSecurity controls the TLS (Transport Layer Security) settings when connecting<br />to the tracing server. It determines whether certificate verification should be skipped. |  | Enum: [secure insecure] <br /> |
+
+
+#### AlwaysOnConfig
+
+_Underlying type:_ _[struct{}](#struct{})_
+
+AlwaysOnConfig specified the AlwaysOn samplerc
+
+
+
+_Appears in:_
+- [Sampler](#sampler)
+
+
+
 #### AnthropicConfig
 
 
@@ -300,6 +362,27 @@ _Appears in:_
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Anthropic API.<br />This token is automatically sent in the `x-api-key` header of the request. |  |  |
 | `apiVersion` _string_ | Optional: A version header to pass to the Anthropic API.<br />For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |  |  |
 | `model` _string_ | Optional: Override the model name.<br />If unset, the model name is taken from the request.<br />This setting can be useful when testing model failover scenarios. |  |  |
+
+
+#### AnyValue
+
+
+
+AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives.
+This is limited to string and nested values as OTel only supports them
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [AnyValue](#anyvalue)
+- [KeyAnyValue](#keyanyvalue)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `stringValue` _string_ |  |  |  |
+| `arrayValue` _[AnyValue](#anyvalue) array_ | TODO: Add support for ArrayValue && KvListValue |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 
 
 #### AppProtocol
@@ -556,6 +639,8 @@ _Appears in:_
 | `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
 
 
+
+
 #### BodyParseBehavior
 
 _Underlying type:_ _string_
@@ -590,6 +675,22 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body. |  |  |
+
+
+#### Buffer
+
+
+
+
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxRequestSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#quantity-resource-api)_ | MaxRequestSize sets the maximum size in bytes of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413.<br />Example format: "1Mi", "512Ki", "1Gi" |  |  |
 
 
 #### BufferSettings
@@ -668,6 +769,57 @@ _Appears in:_
 | `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
 
 
+#### CommonAccessLogGrpcService
+
+
+
+Common configuration for gRPC access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/grpc/v3/als.proto#envoy-v3-api-msg-extensions-access-loggers-grpc-v3-commongrpcaccesslogconfig
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [OpenTelemetryAccessLogService](#opentelemetryaccesslogservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+| `logName` _string_ | name of log stream |  | Required <br /> |
+
+
+#### CommonGrpcService
+
+
+
+Common gRPC service configuration created by setting `envoy_grpc“ as the gRPC client
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/grpc_service.proto#envoy-v3-api-msg-config-core-v3-grpcservice
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/grpc_service.proto#envoy-v3-api-msg-config-core-v3-grpcservice-envoygrpc
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  | Required <br /> |
+| `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  | Optional <br /> |
+| `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Optional <br /> |
+| `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  | Optional <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | The timeout for the gRPC request. This is the timeout for a specific request |  | Optional <br /> |
+| `initialMetadata` _[HeaderValue](#headervalue) array_ | Additional metadata to include in streams initiated to the GrpcService.<br />This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |  | Optional <br /> |
+| `retryPolicy` _[RetryPolicy](#retrypolicy)_ | Indicates the retry policy for re-establishing the gRPC stream.<br />If max interval is not provided, it will be set to ten times the provided base interval |  | Optional <br /> |
+
+
 #### CommonHttpProtocolOptions
 
 
@@ -714,6 +866,101 @@ _Appears in:_
 _Appears in:_
 - [TrafficPolicySpec](#trafficpolicyspec)
 
+
+
+#### CustomAttribute
+
+
+
+Describes attributes for the active span.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#envoy-v3-api-msg-type-tracing-v3-customtag
+
+_Validation:_
+- MaxProperties: 2
+- MinProperties: 1
+
+_Appears in:_
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | The name of the attribute |  | Required <br /> |
+| `literal` _[CustomAttributeLiteral](#customattributeliteral)_ | A literal attribute value. |  | Optional <br /> |
+| `environment` _[CustomAttributeEnvironment](#customattributeenvironment)_ | An environment attribute value. |  | Optional <br /> |
+| `requestHeader` _[CustomAttributeHeader](#customattributeheader)_ | A request header attribute value. |  | Optional <br /> |
+| `metadata` _[CustomAttributeMetadata](#customattributemetadata)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  | Optional <br /> |
+
+
+#### CustomAttributeEnvironment
+
+
+
+Environment type attribute with environment name and default value.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-environment
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Environment variable name to obtain the value to populate the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When the environment variable is not found, the attribute value will be populated with this default value if specified,<br />otherwise no attribute will be populated. |  | Optional <br /> |
+
+
+#### CustomAttributeHeader
+
+
+
+Header type attribute with header name and default value.
+https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-header
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Header name to obtain the value to populate the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When the header does not exist, the attribute value will be populated with this default value if specified,<br />otherwise no attribute will be populated. |  | Optional <br /> |
+
+
+#### CustomAttributeLiteral
+
+
+
+Literal type attribute with a static value.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-literal
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `value` _string_ | Static literal value to populate the attribute value. |  | Required <br /> |
+
+
+#### CustomAttributeMetadata
+
+
+
+Metadata type attribute using MetadataKey to retrieve the protobuf value from Metadata, and populate the attribute value with the canonical JSON representation of it.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/tracing/v3/custom_tag.proto#type-tracing-v3-customtag-metadata
+
+
+
+_Appears in:_
+- [CustomAttribute](#customattribute)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `kind` _[MetadataKind](#metadatakind)_ | Specify what kind of metadata to obtain attribute value from |  | Enum: [Request Route Cluster Host] <br />Required <br /> |
+| `metadataKey` _[MetadataKey](#metadatakey)_ | Metadata key to define the path to retrieve the attribute value. |  | Required <br /> |
+| `defaultValue` _string_ | When no valid metadata is found, the attribute value would be populated with this default value if specified, otherwise no attribute would be populated. |  | Optional <br /> |
 
 
 #### CustomLabel
@@ -828,6 +1075,19 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `enableTls` _boolean_ | EnableTls enables TLS. When true, the backend will be configured to use TLS. System CA will be used for validation.<br />The hostname will be used for SNI and auto SAN validation. |  |  |
+
+
+#### EnvironmentResourceDetectorConfig
+
+_Underlying type:_ _[struct{}](#struct{})_
+
+EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
+
+
+
+_Appears in:_
+- [ResourceDetector](#resourcedetector)
+
 
 
 #### EnvoyBootstrap
@@ -1107,7 +1367,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit Extended] <br /> |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit] <br /> |
 | `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
 | `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
 | `rateLimit` _[RateLimitProvider](#ratelimitprovider)_ | RateLimit configuration for RateLimit extension type. |  |  |
@@ -1236,26 +1496,6 @@ _Appears in:_
 | `sleepTimeSeconds` _integer_ | Time (in seconds) for the preStop hook to wait before allowing Envoy to terminate |  |  |
 
 
-#### GrpcService
-
-
-
-GrpcService represents the gRPC service configuration for access logs.
-
-
-
-_Appears in:_
-- [AccessLog](#accesslog)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `logName` _string_ | name of log stream |  |  |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
-| `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
-| `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
-| `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
-
-
 
 
 #### GrpcStatusFilter
@@ -1301,7 +1541,7 @@ _Appears in:_
 
 
 
-
+HTTPListenerPolicySpec defines the desired state of a HTTP listener policy.
 
 
 
@@ -1313,7 +1553,12 @@ _Appears in:_
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
+| `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for Envoy's OpenTelemetry tracer.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html |  |  |
 | `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
+| `useRemoteAddress` _boolean_ | UseRemoteAddress determines whether to use the remote address for the original client.<br />When true, Envoy will use the remote address of the connection as the client address.<br />When false, Envoy will use the X-Forwarded-For header to determine the client address.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-use-remote-address |  |  |
+| `xffNumTrustedHops` _integer_ | XffNumTrustedHops is the number of additional ingress proxy hops from the right side of the X-Forwarded-For HTTP header to trust when determining the origin client's IP address.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-xff-num-trusted-hops |  | Minimum: 0 <br /> |
+| `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
+| `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 
 
 #### HeaderFilter
@@ -1378,6 +1623,26 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
 | `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
+
+
+#### HeaderValue
+
+
+
+Header name/value pair.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-headervalue
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [CommonGrpcService](#commongrpcservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Header name. |  | Required <br /> |
+| `value` _string_ | Header value. |  | Optional <br /> |
 
 
 #### HealthCheck
@@ -1570,6 +1835,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
 | `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
+
+
 
 
 #### KubernetesProxyConfig
@@ -1835,6 +2102,57 @@ _Appears in:_
 | `content` _string_ | String content of the message. |  |  |
 
 
+#### MetadataKey
+
+
+
+MetadataKey provides a way to retrieve values from Metadata using a key and a path.
+
+
+
+_Appears in:_
+- [CustomAttributeMetadata](#customattributemetadata)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | The key name of the Metadata from which to retrieve the Struct |  | Required <br /> |
+| `path` _[MetadataPathSegment](#metadatapathsegment) array_ | The path used to retrieve a specific Value from the Struct. This can be either a prefix or a full path,<br />depending on the use case |  | Required <br /> |
+
+
+#### MetadataKind
+
+_Underlying type:_ _string_
+
+Describes different types of metadata sources.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/metadata/v3/metadata.proto#envoy-v3-api-msg-type-metadata-v3-metadatakind-request
+
+_Validation:_
+- Enum: [Request Route Cluster Host]
+
+_Appears in:_
+- [CustomAttributeMetadata](#customattributemetadata)
+
+| Field | Description |
+| --- | --- |
+| `Request` | Request kind of metadata.<br /> |
+| `Route` | Route kind of metadata.<br /> |
+| `Cluster` | Cluster kind of metadata.<br /> |
+| `Host` | Host kind of metadata.<br /> |
+
+
+#### MetadataPathSegment
+
+_Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
+
+Specifies a segment in a path for retrieving values from Metadata.
+
+
+
+_Appears in:_
+- [MetadataKey](#metadatakey)
+
+
+
 #### Moderation
 
 
@@ -1909,6 +2227,61 @@ _Appears in:_
 | `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
 
 
+#### OTLPTracesProtocolType
+
+_Underlying type:_ _string_
+
+OTLPTracesProtocolType defines the supported protocols for OTLP exporter.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description |
+| --- | --- |
+| `grpc` | OTLPTracesProtocolTypeGrpc specifies OTLP over gRPC protocol.<br />This is typically the most efficient protocol for OpenTelemetry data transfer.<br /> |
+| `http/protobuf` | OTLPTracesProtocolTypeProtobuf specifies OTLP over HTTP with Protobuf serialization.<br />Data is sent via HTTP POST requests with Protobuf message bodies.<br /> |
+| `http/json` | OTLPTracesProtocolTypeJson specifies OTLP over HTTP with JSON serialization.<br />Data is sent via HTTP POST requests with JSON message bodies.<br /> |
+
+
+#### OTLPTransportSecurityMode
+
+_Underlying type:_ _string_
+
+OTLPTransportSecurityMode defines the transport security options for OTLP connections.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description |
+| --- | --- |
+| `secure` | OTLPTransportSecuritySecure enables TLS (client transport security) for OTLP connections.<br />This means the client will verify the server's certificate.<br /> |
+| `insecure` | OTLPTransportSecurityInsecure disables TLS for OTLP connections,<br />meaning certificate verification is skipped. This is generally not recommended<br />for production environments due to security risks.<br /> |
+
+
+#### OTelTracesSampler
+
+
+
+OTelTracesSampler defines the configuration for an OpenTelemetry trace sampler.
+It combines the sampler type with any required arguments for that type.
+
+
+
+_Appears in:_
+- [AiExtensionTrace](#aiextensiontrace)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `type` _[OTelTracesSamplerType](#oteltracessamplertype)_ | SamplerType specifies the type of sampler to use (default value: "parentbased_always_on").<br />Refer to OTelTracesSamplerType for available options.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  | Enum: [alwaysOn alwaysOff traceidratio parentbasedAlwaysOn parentbasedAlwaysOff parentbasedTraceidratio] <br /> |
+| `arg` _string_ | SamplerArg provides an argument for the chosen sampler type.<br />For "traceidratio" or "parentbased_traceidratio" samplers: Sampling probability, a number in the [0..1] range,<br />e.g. 0.25. Default is 1.0 if unset.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler_arg |  | Pattern: `^0(\.\d+)?\|1(\.0+)?$` <br /> |
+
+
+
+
 
 
 #### OpenAIConfig
@@ -1927,6 +2300,45 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the OpenAI API.<br />This token is automatically sent in the `Authorization` header of the<br />request and prefixed with `Bearer`. |  |  |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request.<br />This setting can be useful when setting up model failover within the same LLM provider. |  |  |
+
+
+#### OpenTelemetryAccessLogService
+
+
+
+OpenTelemetryAccessLogService represents the OTel configuration for access logs.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/access_loggers/open_telemetry/v3/logs_service.proto
+
+
+
+_Appears in:_
+- [AccessLog](#accesslog)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[CommonAccessLogGrpcService](#commonaccessloggrpcservice)_ | Send access logs to gRPC service |  | Required <br /> |
+| `body` _string_ | OpenTelemetry LogResource fields, following Envoy access logging formatting. |  | Optional <br /> |
+| `disableBuiltinLabels` _boolean_ | If specified, Envoy will not generate built-in resource labels like log_name, zone_name, cluster_name, node_name. |  | Optional <br /> |
+
+
+#### OpenTelemetryTracingConfig
+
+
+
+OpenTelemetryTracingConfig represents the top-level Envoy's OpenTelemetry tracer.
+See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html
+
+
+
+_Appears in:_
+- [TracingProvider](#tracingprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `grpcService` _[CommonGrpcService](#commongrpcservice)_ | Send traces to the gRPC service |  | Required <br /> |
+| `serviceName` _string_ | The name for the service. This will be populated in the ResourceSpan Resource attributes |  | Required <br /> |
+| `resourceDetectors` _[ResourceDetector](#resourcedetector) array_ | An ordered list of resource detectors. Currently supported values are `EnvironmentResourceDetector` |  | MaxProperties: 1 <br />MinProperties: 1 <br />Optional <br /> |
+| `sampler` _[Sampler](#sampler)_ | Specifies the sampler to be used by the OpenTelemetry tracer. This field can be left empty. In this case, the default Envoy sampling decision is used.<br />Currently supported values are `AlwaysOn` |  | MaxProperties: 1 <br />MinProperties: 1 <br />Optional <br /> |
 
 
 #### Parameters
@@ -2287,6 +2699,24 @@ _Appears in:_
 | `name` _string_ | An optional name for this match, which can be used for debugging purposes. |  |  |
 
 
+#### ResourceDetector
+
+
+
+ResourceDetector defines the list of supported ResourceDetectors
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `environmentResourceDetector` _[EnvironmentResourceDetectorConfig](#environmentresourcedetectorconfig)_ |  |  |  |
+
+
 #### ResponseFlagFilter
 
 
@@ -2304,6 +2734,26 @@ _Appears in:_
 | `flags` _string array_ |  |  | MinItems: 1 <br /> |
 
 
+#### RetryPolicy
+
+
+
+Specifies the retry policy of remote data source when fetching fails.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
+
+
+
+_Appears in:_
+- [AccessLogGrpcService](#accessloggrpcservice)
+- [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
+- [CommonGrpcService](#commongrpcservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `retryBackOff` _[BackoffStrategy](#backoffstrategy)_ | Specifies parameters that control retry backoff strategy.<br />the default base interval is 1000 milliseconds and the default maximum interval is 10 times the base interval. |  | Optional <br /> |
+| `numRetries` _integer_ | Specifies the allowed number of retries. Defaults to 1. |  | Optional <br /> |
+
+
 #### RouteType
 
 _Underlying type:_ _string_
@@ -2319,6 +2769,24 @@ _Appears in:_
 | --- | --- |
 | `CHAT` | The LLM generates the full response before responding to a client.<br /> |
 | `CHAT_STREAMING` | Stream responses to a client, which allows the LLM to stream out tokens as they are generated.<br /> |
+
+
+#### Sampler
+
+
+
+Sampler defines the list of supported Samplers
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [OpenTelemetryTracingConfig](#opentelemetrytracingconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `alwaysOnConfig` _[AlwaysOnConfig](#alwaysonconfig)_ |  |  |  |
 
 
 #### SdsBootstrap
@@ -2367,6 +2835,24 @@ _Appears in:_
 _Appears in:_
 - [GatewayParametersSpec](#gatewayparametersspec)
 
+
+
+#### ServerHeaderTransformation
+
+_Underlying type:_ _string_
+
+ServerHeaderTransformation determines how the server header is transformed.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description |
+| --- | --- |
+| `Overwrite` | OverwriteServerHeaderTransformation overwrites the server header.<br /> |
+| `AppendIfAbsent` | AppendIfAbsentServerHeaderTransformation appends to the server header if it's not present.<br /> |
+| `PassThrough` | PassThroughServerHeaderTransformation passes through the server header unchanged.<br /> |
 
 
 #### Service
@@ -2654,8 +3140,50 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
-| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 |  |
+| `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 | Minimum: 1 <br /> |
 | `fillInterval` _[Duration](#duration)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
+
+
+#### Tracing
+
+
+
+Tracing represents the top-level Envoy's tracer.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-tracing
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `provider` _[TracingProvider](#tracingprovider)_ | Provider defines the upstream to which envoy sends traces |  | MaxProperties: 1 <br />MinProperties: 1 <br />Required <br /> |
+| `clientSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be force traced if the x-client-trace-id header is set. Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `randomSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be randomly selected for trace generation, if not requested by the client or not forced. Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `overallSampling` _integer_ | Target percentage of requests managed by this HTTP connection manager that will be traced after all other sampling checks have been applied (client-directed, force tracing, random sampling). Defaults to 100% |  | Maximum: 100 <br />Minimum: 0 <br />Optional <br /> |
+| `verbose` _boolean_ | Whether to annotate spans with additional data. If true, spans will include logs for stream events. Defaults to false |  | Optional <br /> |
+| `maxPathTagLength` _integer_ | Maximum length of the request path to extract and include in the HttpUrl tag. Used to truncate lengthy request paths to meet the needs of a tracing backend. Default: 256 |  | Optional <br /> |
+| `attributes` _[CustomAttribute](#customattribute) array_ | A list of attributes with a unique name to create attributes for the active span. |  | MaxProperties: 2 <br />MinProperties: 1 <br />Optional <br /> |
+| `spawnUpstreamSpan` _boolean_ | Create separate tracing span for each upstream request if true. Defaults to false<br />Link to envoy docs for more info |  | Optional <br /> |
+
+
+#### TracingProvider
+
+
+
+TracingProvider defines the list of providers for tracing
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `openTelemetry` _[OpenTelemetryTracingConfig](#opentelemetrytracingconfig)_ | Tracing contains various settings for Envoy's OTel tracer. |  |  |
 
 
 #### TrafficPolicy
@@ -2683,7 +3211,7 @@ _Appears in:_
 
 
 
-
+TrafficPolicySpec defines the desired state of a traffic policy.
 
 
 
@@ -2701,6 +3229,7 @@ _Appears in:_
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
+| `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 
 
 #### Transform
