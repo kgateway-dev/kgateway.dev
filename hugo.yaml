@@ -125,3 +125,13 @@ params:
     urls:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
+
+  versions:
+    - version: "2.1"
+      dropdown: "main"
+      linkVersion: "main"
+      url: "/main"
+    - version: "2.0"
+      dropdown: "2.0"
+      linkVersion: "2.0"
+      url: "/2.0"
