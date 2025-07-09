@@ -8,13 +8,13 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 ## Before you begin
 
-[Get started](../../quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/docs/snippets/kgateway.md" >}}.
+[Get started](/docs/quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/docs/snippets/kgateway.md" >}}.
 
 ## Enable the AI extension {#ai-extension}
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](../../operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
@@ -155,6 +155,6 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 
 ## Next
 
-* For OpenAI: Continue with the [Authenticate to the LLM](../auth/) guide.
-* For other cloud LLM providers such as Gemini: [Review the Cloud LLM providers guide](../cloud-providers/) for provider-specific setup examples.
-* For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](../ollama/).
+* For OpenAI: Continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
+* For other cloud LLM providers such as Gemini: [Review the Cloud LLM providers guide](/docs/ai/cloud-providers/) for provider-specific setup examples.
+* For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](/docs/ai/ollama/).

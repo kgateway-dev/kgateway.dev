@@ -81,7 +81,7 @@ To use ListenerSets, you must have the following environment:
    kubectl apply --kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.3.0"
    ```
 
-2. Follow the [Get Started guide](../../quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+2. Follow the [Get Started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
 3. If you already have a {{< reuse "docs/snippets/kgateway.md" >}} installation, restart the `{{< reuse "docs/snippets/kgateway.md" >}}` pod to pick up the new CRDs.
 

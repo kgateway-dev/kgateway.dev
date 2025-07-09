@@ -13,7 +13,7 @@ To contribute new documentation to kgateway, follow these steps:
 - Follow the review process until your contribution is merged.
 
 {{< callout type="info" >}}
-Looking to contribute code to kgateway? See the [contributing guide in the Community repo](https://github.com/kgateway-dev/community/blob/{{< reuse "docs/versions/github-branch.md" >}}/CONTRIBUTING.md).
+Looking to contribute code to kgateway? See the [contributing guide in the Community repo](https://github.com/kgateway-dev/community/blob/main/CONTRIBUTING.md).
 {{< /callout >}}
 
 ## Audience and intended use {#audience}
@@ -75,7 +75,7 @@ If you want to add a folder or "twistie" to the left-hand navigation of the docs
 
 ## Hugo shortcodes {#shortcodes}
 
-As mentioned earlier, the documentation in the kgateway project is built by using the static site generator Hugo. Hugo uses reusable templates, commonly referred to as shortcodes, to display, style, and render site elements, such as tables, videos, or cards and to manage the content for these elements more easily. Supported shortcodes can be found in the [kgateway project repo](https://github.com/kgateway-dev/kgateway.dev/tree/{{< reuse "docs/versions/github-branch.md" >}}/layouts/shortcodes) as well as the [Hextra Hugo theme](https://github.com/imfing/hextra/tree/{{< reuse "docs/versions/github-branch.md" >}}/exampleSite/content/docs/guide/shortcodes). 
+As mentioned earlier, the documentation in the kgateway project is built by using the static site generator Hugo. Hugo uses reusable templates, commonly referred to as shortcodes, to display, style, and render site elements, such as tables, videos, or cards and to manage the content for these elements more easily. Supported shortcodes can be found in the [kgateway project repo](https://github.com/kgateway-dev/kgateway.dev/tree/main/layouts/shortcodes) as well as the [Hextra Hugo theme](https://github.com/imfing/hextra/tree/main/exampleSite/content/docs/guide/shortcodes). 
 
 Review common shortcodes that you find throughout the documentation: 
 
@@ -121,13 +121,13 @@ Use the cards shortcode to display a card in the documentation that links to a s
 Example card: 
 
 {{< cards >}}
-{{< card link="/quickstart" title="Get started" >}}
+{{< card link="/docs/quickstart" title="Get started" >}}
 {{< /cards >}}
 
 Shortcode syntax
 ```markdown
 {{</* cards */>}}
-{{</* card link="/quickstart" title="Get started" */>}}
+{{</* card link="/docs/quickstart" title="Get started" */>}}
 {{</* /cards */>}}
 ```
 

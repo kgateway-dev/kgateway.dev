@@ -25,7 +25,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
    
    {{< callout type="info" >}}
-   For other settings, see the [GatewayParameters API docs](/docs/reference/api/#gatewayparametersspec) or check out the [Gateway customization guides](../).
+   For other settings, see the [GatewayParameters API docs](/docs/reference/api/#gatewayparametersspec) or check out the [Gateway customization guides](/docs/setup/customize/).
    {{< /callout >}}
    
    ```yaml

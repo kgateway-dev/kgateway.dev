@@ -126,7 +126,7 @@ For Kubernetes upgrades, consult your cloud infrastructure provider.
 For Istio upgrades, consult the docs based on the way that you installed Istio. Example providers:
 
 * [Upstream Istio](https://istio.io/latest/docs/setup/upgrade/)
-* [Gloo Mesh Enterprise](https://docs.solo.io/gloo-mesh-enterprise/latest/istio/upgrade/)
+* [Gloo Operator](https://docs.solo.io/gloo-mesh-enterprise/latest/istio/operator/upgrade/)
 
 {{% /tab %}}
    {{< /tabs >}}

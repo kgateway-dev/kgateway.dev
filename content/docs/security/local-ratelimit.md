@@ -29,12 +29,12 @@ When a token is available in the token bucket it can be assigned to an incoming 
 
 ### Local rate limiting
 
-In {{< reuse "/docs/snippets/kgateway.md" >}}, you use a [TrafficPolicy](../about/policies/TrafficPolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
+In kgateway, you use a [TrafficPolicy](/docs/about/policies/trafficpolicy/) to set up local rate limiting for your routes. You can choose between the following attachment options: 
 * **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the TrafficPolicy to the route you want to rate limit. For an example, see [Route configuration](#route). 
 * **All routes in an HTTPRoute**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a particular HTTPRoute resource. 
 * **All routes that the Gateway serves**: Use the `targetRefs` section in the TrafficPolicy to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](../../about/policies/TrafficPolicy/#multiple-targetrefs-TrafficPolicies). 
+Note that if you apply a TrafficPolicy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` TrafficPolicies](/docs/about/policies/trafficpolicy/#multiple-targetrefs-TrafficPolicies). 
 
 ## Before you begin
 

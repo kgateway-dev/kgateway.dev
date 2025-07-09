@@ -71,7 +71,7 @@ spec:
       request: 24h
 ```
 
-Instead of forwarding the request to an Envoy [upstream cluster](https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/upstream) (which happens for typical API services), the Gateway invokes an [inference-aware endpoint selection extension](https://github.com/kubernetes-sigs/gateway-api-inference-extension/tree/main/pkg/epp). This extension evaluates the live state of model-serving instances by watching [prometheus metrics](https://docs.vllm.ai/en/latest/serving/metrics.html), considering factors such as LLM queue depth, available GPU memory, and whether the required adapters are preloaded. Based on these real-time metrics, it selects the most optimal model server pod for the request, ensuring better resource utilization and lower latency. Once a routing decision is made, the request is forwarded to the chosen pod, and the response is streamed back to the client.
+Instead of forwarding the request to an Envoy [upstream cluster](https://www.envoyproxy.io/docs/envoy/latest/configuration/upstream/upstream) (which happens for typical API services), the Gateway invokes an [inference-aware endpoint selection extension](https://github.com/kubernetes-sigs/gateway-api-inference-extension/tree/main/pkg/epp). This extension evaluates the live state of model-serving instances by watching [prometheus metrics](https://docs.vllm.ai/en/stable/usage/metrics.html), considering factors such as LLM queue depth, available GPU memory, and whether the required adapters are preloaded. Based on these real-time metrics, it selects the most optimal model server pod for the request, ensuring better resource utilization and lower latency. Once a routing decision is made, the request is forwarded to the chosen pod, and the response is streamed back to the client.
 
 This approach ensures that requests to AI/LLM models are distributed efficiently across available GPUs, preventing overload on specific instances while maximizing overall system performance. By introducing inference-aware logic into the routing layer, Kubernetes can optimize both latency and GPU utilization far beyond what traditional load-balancing or scheduling techniques allow.
 
@@ -140,7 +140,7 @@ AI workloads on Kubernetes demand more than basic HTTP routing—LLMs require in
 
 By leveraging this extension, organizations can leverage smarter AI traffic routing in their Kubernetes environments, ensuring that GPU infrastructure is used as effectively as possible. With kgateway’s support for Gateway API inference extension, developers and platform operators alike can take advantage of these capabilities to streamline AI workloads. 
 
-Try [kgateway](kgateway.dev/resources/labs) in our free hands-on labs, get involved in the [community](https://github.com/kgateway-dev/kgateway), and give us feedback for how we can improve!
+Try [kgateway](https://kgateway.dev/resources/labs) in our free hands-on labs, get involved in the [community](https://github.com/kgateway-dev/kgateway), and give us feedback for how we can improve!
 
 
 _Acknowledgements:_ Thanks to Daneyon Hansen (Solo.io) for his work on getting Gateway Inference Extension into kgateway, and to the whole community of Inference Extension maintainers!

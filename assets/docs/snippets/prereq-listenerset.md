@@ -1,1 +1,1 @@
-Decide whether to set up a listener inline on the Gateway resource or as a separate ListenerSet resource. For more information, see the [Listener overview](../../../setup/listeners/overview).
+Decide whether to set up a listener inline on the Gateway resource or as a separate ListenerSet resource. For more information, see the [Listener overview](/docs/setup/listeners/overview).

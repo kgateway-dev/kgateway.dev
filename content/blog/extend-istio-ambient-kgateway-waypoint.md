@@ -17,7 +17,7 @@ While Istio ambient provides a default waypoint proxy, there are several scenari
 
 Most Istio users have two completely different gateway implementations: proxies for ingress (for "north-south" traffic) and proxies for internal service-to-service traffic ("east-west" traffic — in the traditional model, implemented by a mesh of sidecar proxies).
 
-Kubernetes Gateway API is rapidly becoming the standard for networking in Kubernetes, with [more than two dozen projects](https://gateway-api.sigs.k8s.io/implementations/) already supporting it. [Kgateway](kgateway.dev) is a feature-rich, fast and battle-tested gateway that integrates seamlessly with Kubernetes. It extends the Gateway API to provide advanced features like rate limiting, timeouts, header manipulation, and request transformations.
+Kubernetes Gateway API is rapidly becoming the standard for networking in Kubernetes, with [more than two dozen projects](https://gateway-api.sigs.k8s.io/implementations/) already supporting it. [Kgateway](https://kgateway.dev/) is a feature-rich, fast and battle-tested gateway that integrates seamlessly with Kubernetes. It extends the Gateway API to provide advanced features like rate limiting, timeouts, header manipulation, and request transformations.
 
 For applications that need to communicate with external services (like cloud APIs or LLM providers such as OpenAI), traffic control becomes even more critical. In such cases, using kgateway as an egress gateway can help manage costs, API key security, and caching, while ensuring sensitive data isn't leaked.
 
@@ -67,7 +67,7 @@ status:
 
 After you have [Istio](https://ambientmesh.io/docs/quickstart/) (v1.25 or newer) and [kgateway](https://github.com/kgateway-dev/kgateway/releases/tag/v2.0.0) (v2.0.0 or newer) installed in your Kubernetes cluster, you can deploy a `kgateway-waypoint` in your namespace using a Kubernetes Gateway resource.
 
-Let's assume you already have a [client](https://raw.githubusercontent.com/linsun/gen-ai-demo/refs/heads/main/kubernetes/client.yaml) app and an [Ollama](https://raw.githubusercontent.com/linsun/gen-ai-demo/refs/heads/main/kubernetes/ollama-sfset.yaml) StatefulSet running in the same namespace. To integrate kgateway as the waypoint proxy, follow these steps:
+Let's assume you already have a [client](https://raw.githubusercontent.com/linsun/gen-ai-demo/refs/heads/main/kubernetes/client.yaml) app and an [Ollama](https://raw.githubusercontent.com/linsun/gen-ai-demo/2299fee3220225149cf59f4d318e5310348f45c0/kubernetes/ollama-sfset.yaml) StatefulSet running in the same namespace. To integrate kgateway as the waypoint proxy, follow these steps:
 
 First, create the Gateway resource to deploy `kgateway-waypoint` within your namespace:
 
