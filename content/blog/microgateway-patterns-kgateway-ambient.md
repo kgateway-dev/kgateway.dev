@@ -3,6 +3,7 @@ title: Microgateway Patterns with kgateway and Ambient
 toc: false
 publishDate: 2025-04-04T00:00:00-00:00
 author: Ram Vennam
+excludeSearch: true
 ---
 
 # Microgateway Patterns with kgateway and Ambient

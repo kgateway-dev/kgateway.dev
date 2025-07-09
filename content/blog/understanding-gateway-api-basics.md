@@ -3,6 +3,7 @@ title: Understanding Gateway API Basics
 toc: false
 publishDate: 2025-04-05T00:00:00-00:00
 author: James Ilse 
+excludeSearch: true
 ---
 
 # Understanding Gateway API Basics
