@@ -2,6 +2,7 @@
 title: Learning paths
 toc: false
 description: kgateway learning paths
+excludeSearch: true
 ---
 
 <section class="bg-primary-bg text-white pb-[4.375rem] lg:pb-28 px-4 lg:px-12 xl:px-25 bg-[url(/hero-background.svg)] bg-center bg-no-repeat pt-[9.875rem] lg:pt-50 bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
