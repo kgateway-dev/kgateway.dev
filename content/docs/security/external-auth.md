@@ -148,7 +148,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    
    ```txt
    HTTP/1.1 200 OK
-   .
+   ...
    ```
 
 2. Create a TrafficPolicy that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Create the TrafficPolicy in the same namespace as the targeted resource.
@@ -222,7 +222,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
    ```txt
    HTTP/1.1 200 OK
-   .
+   ...
    ```
    ```json {hl_lines=[18,19,21,22,24,25,27,28]}
    {
@@ -307,7 +307,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    
    ```txt
    HTTP/1.1 200 OK
-   .
+   ...
    ```
 
 ## Cleanup
