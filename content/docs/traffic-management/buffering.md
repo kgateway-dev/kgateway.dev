@@ -131,7 +131,7 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 ## Set up buffer limits per route
 
-You can configure connection buffer limits using a {{< reuse "/docs/snippets/trafficpolicy.md" >}} to control how much data can be buffered per connection at the level of individual routes. This can provide more fine-grained control than applying the buffer limit at the Gateway, or can provide a method of overriding a beffer limit at the level of the Gateway.
+You can configure connection buffer limits using a {{< reuse "/docs/snippets/trafficpolicy.md" >}} to control how much data can be buffered per connection at the level of individual routes. This can provide more fine-grained control than applying the buffer limit at the Gateway, or can provide a method of overriding a buffer limit at the level of the Gateway.
 
 1. If you did not already, create a {{< reuse "/docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
    ```yaml
