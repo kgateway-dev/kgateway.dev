@@ -39,33 +39,28 @@ jobs:
       - name: Set kgateway commit SHA
         run: echo "KGATEWAY_COMMIT=$(cd kgateway && git rev-parse --short HEAD)" >> $GITHUB_ENV
 
+      - name: Read max Kubernetes version
+        run: |
+          KUBE_VERSION=$(cat kgateway.dev/assets/docs/versions/max-kube.md | tr -d '\n')
+          echo "KUBE_VERSION=$KUBE_VERSION" >> $GITHUB_ENV
+
       - name: Generate API Reference
         run: |
-          echo "=== Debug: Starting Generate API Reference ==="
-          echo "Current directory: $PWD"
-          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
-          echo "Listing GITHUB_WORKSPACE contents:"
-          ls -la $GITHUB_WORKSPACE
-
-          echo "=== Debug: Before generating docs ==="
-          echo "Looking for API directory:"
-          ls -la "$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" || echo "API directory not found!"
-          ls -la "$GITHUB_WORKSPACE/kgateway.dev/content/docs/reference/api/" || echo "Docs API directory not found!"
-          # Update docs repository
+          # Substitute KUBE_VERSION in the config template and write to a temp file
           cd "$GITHUB_WORKSPACE/kgateway.dev"
+          envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config.yaml
+
           echo "Changed to docs repository: $PWD"
-          
-          # Generate docs with frontmatter
+
           go run github.com/elastic/crd-ref-docs@v0.1.0 \
             --source-path="$GITHUB_WORKSPACE/kgateway/api/v1alpha1/" \
             --renderer=markdown \
             --output-path ./ \
-            --config=<(echo 'processor:
-              ignoreTypes:
-                - ".*List$"
-            render:
-              kubernetesVersion: 1.33')
-          
+            --config=crd-ref-docs-config.yaml
+
+          # Remove the temporary config file so it is not included in the PR
+          rm -f crd-ref-docs-config.yaml
+
           # Create index file with frontmatter
           (echo '---
           title: API reference

@@ -1,0 +1,27 @@
+processor:
+  ignoreTypes:
+    - ".*List$"
+render:
+  kubernetesVersion: ${KUBE_VERSION}
+  knownTypes:
+    - name: Quantity
+      package: k8s.io/apimachinery/pkg/api/resource
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
+    - name: Duration
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
+    - name: Time
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
+    - name: ObjectMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#objectmeta-v1-meta
+    - name: LabelSelector
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#labelselector-v1-meta
+    - name: ListMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
+    - name: TypeMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
