@@ -19,7 +19,7 @@ kind create cluster
 
 The following steps get you started with a basic installation. For instructions, see the [installation guide](/docs/operations/install).
 
-{{% reuse "docs/snippets/get-started.md" %}}
+{{< reuse "docs/snippets/get-started.md" >}}
 
 Good job! You now have the {{< reuse "/docs/snippets/kgateway.md" >}} control plane running in your cluster.
 
