@@ -1,5 +1,5 @@
 ---
-linkTitle: "Documentation"
+linkTitle: "main Documentation"
 title: Welcome
 ---
 
