@@ -39,11 +39,11 @@ spec:
 
 | Setting | Description |
 | ------- | ----------- |
-| `grpc` | Optional configuration for a gRPC healthcheck. The example omits this field because the Backend is not a gRPC service. |
+| `grpc` | Optional configuration for a gRPC health check. The example omits this field because the Backend is not a gRPC service. |
 | `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `grpc.serviceName` | Optional: Name of the gRPC service to check. |
 | `healthyThreshold` | The number of successful health checks required before a Backend is marked as healthy. Note that during startup, only a single successful health check is required to mark a Backend healthy. |
-| `http` | Configuration for an HTTP healthcheck. |
+| `http` | Configuration for an HTTP health check. |
 | `http.host` | The host header in the HTTP health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `http.path` | The path on your app that you want {{< reuse "/docs/snippets/kgateway.md" >}} to send the health check request to. |
 | `http.method` | The HTTP method for the health check to use. If unset, defaults to GET. |
@@ -51,7 +51,7 @@ spec:
 | `timeout` | The time to wait for a health check response. If the timeout is reached, the health check is considered unsuccessful. |
 | `unhealthyThreshold` | The number of unsuccessful health checks required before a Backend is marked unhealthy. Note that for HTTP health checking, if a Backend responds with `503 Service Unavailable`, this threshold is ignored and the Backend is immediately considered unhealthy. |
 
-## Verify the healthcheck configuration {#verify}
+## Verify the health check configuration {#verify}
 
 To try out an active health check policy, you can follow these steps to create a BackendConfigPolicy for the httpbin sample app and check the endpoint status in the Envoy service directory.
 
