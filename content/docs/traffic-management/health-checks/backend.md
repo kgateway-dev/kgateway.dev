@@ -11,7 +11,7 @@ Health checks periodically and automatically assess the readiness of the Backend
 
 {{< reuse "docs/snippets/prereq.md" >}}
  
-## Configure a health check for a Backend
+## Configure a health check for a Backend {#backend}
 
 In the `healthCheck` section of a BackendConfigPolicy resource, specify settings for how you want the health check to perform for a Backend or Kubernetes service. The following example configures a simple set of HTTP health check settings for a service to get you started.
 
@@ -39,19 +39,19 @@ spec:
 
 | Setting | Description |
 | ------- | ----------- |
-| `grpc` | Configuration for a GRPC healthcheck. |
-| `grpc.authority` | The authority header in the gRPC health check request. If unset, deafults to the name of the Backend that this health check is associated with. |
+| `grpc` | Optional configuration for a gRPC healthcheck. The example omits this field because the Backend is not a gRPC service. |
+| `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `grpc.serviceName` | Optional: Name of the gRPC service to check. |
 | `healthyThreshold` | The number of successful health checks required before a Backend is marked as healthy. Note that during startup, only a single successful health check is required to mark a Backend healthy. |
 | `http` | Configuration for an HTTP healthcheck. |
-| `http.host` | The host header in the HTTP health check request. If unset, deafults to the name of the Backend that this health check is associated with. |
+| `http.host` | The host header in the HTTP health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `http.path` | The path on your app that you want {{< reuse "/docs/snippets/kgateway.md" >}} to send the health check request to. |
 | `http.method` | The HTTP method for the health check to use. If unset, defaults to GET. |
 | `interval` | The amount of time between sending health checks to the Backend. You can increase this value to ensure that you don't overload your Backend service. |
 | `timeout` | The time to wait for a health check response. If the timeout is reached, the health check is considered unsuccessful. |
 | `unhealthyThreshold` | The number of unsuccessful health checks required before a Backend is marked unhealthy. Note that for HTTP health checking, if a Backend responds with `503 Service Unavailable`, this threshold is ignored and the Backend is immediately considered unhealthy. |
 
-## Example configuration and verification
+## Verify the healthcheck configuration {#verify}
 
 To try out an active health check policy, you can follow these steps to create a BackendConfigPolicy for the httpbin sample app and check the endpoint status in the Envoy service directory.
 
@@ -92,7 +92,7 @@ To try out an active health check policy, you can follow these steps to create a
       httpbin_httpbin::10.XX.X.XX:8080::health_flags::/failed_active_hc
       ```
 
-3. You can also check the Envoy logs for health check failures.
+3. Check the Envoy logs for health check failures.
    1. Get the logs for the `http` gateway deployment.
       ```shell
       kubectl logs -f deploy/http -n {{< reuse "/docs/snippets/namespace.md" >}} > gateway-proxy.log
