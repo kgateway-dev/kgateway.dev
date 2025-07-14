@@ -39,9 +39,6 @@ spec:
 
 | Setting | Description |
 | ------- | ----------- |
-| `grpc` | Optional configuration for a gRPC health check. The example omits this field because the Backend is not a gRPC service. |
-| `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
-| `grpc.serviceName` | Optional: Name of the gRPC service to check. |
 | `healthyThreshold` | The number of successful health checks required before a Backend is marked as healthy. Note that during startup, only a single successful health check is required to mark a Backend healthy. |
 | `http` | Configuration for an HTTP health check. |
 | `http.host` | The host header in the HTTP health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
@@ -50,6 +47,9 @@ spec:
 | `interval` | The amount of time between sending health checks to the Backend. You can increase this value to ensure that you don't overload your Backend service. |
 | `timeout` | The time to wait for a health check response. If the timeout is reached, the health check is considered unsuccessful. |
 | `unhealthyThreshold` | The number of unsuccessful health checks required before a Backend is marked unhealthy. Note that for HTTP health checking, if a Backend responds with `503 Service Unavailable`, this threshold is ignored and the Backend is immediately considered unhealthy. |
+| `grpc` | Optional configuration for a gRPC health check. The example omits this field because the Backend is not a gRPC service. |
+| `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
+| `grpc.serviceName` | Optional: Name of the gRPC service to check. The example omits this field because the Backend is not a gRPC service. |
 
 ## Verify the health check configuration {#verify}
 
