@@ -78,30 +78,7 @@ To try out an active health check policy, you can follow these steps to create a
    EOF
    ```
 
-2. If you haven't already, create an HTTPRoute resource for httpbin.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin
-     namespace: httpbin
-     labels:
-       example: httpbin-route
-   spec:
-     parentRefs:
-       - name: http
-         namespace: kgateway-system
-     hostnames:
-       - "www.example.com"
-     rules:
-       - backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
-
-3. Check the endpoint in the Envoy service directory.
+2. Check the endpoint in the Envoy service directory.
    1. Port-forward the `http` gateway deployment on port 19000.
       ```shell
       kubectl port-forward deploy/http -n {{< reuse "/docs/snippets/namespace.md" >}} 19000 &
@@ -110,12 +87,12 @@ To try out an active health check policy, you can follow these steps to create a
       ```sh
       curl -X GET 127.0.0.1:19000/clusters
       ```
-   3. In the output, search for `/failed_active_hc/failed_outlier_check`. For example, you might see a line such as the following. This indicates that the Backend failed its active health check.
+   3. In the output, search for `/failed_active_hc`, which indicates that the Backend failed its active health check. For example, you might see a line such as the following.
       ```
-      httpbin_httpbin::10.XX.X.XX:8080::health_flags::/failed_active_hc/failed_outlier_check
+      httpbin_httpbin::10.XX.X.XX:8080::health_flags::/failed_active_hc
       ```
 
-4. You can also check the Envoy logs for health check failures.
+3. You can also check the Envoy logs for health check failures.
    1. Get the logs for the `http` gateway deployment.
       ```shell
       kubectl logs -f deploy/http -n {{< reuse "/docs/snippets/namespace.md" >}} > gateway-proxy.log
