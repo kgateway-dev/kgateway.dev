@@ -4,9 +4,11 @@ weight: 10
 description:
 ---
 
-## About simple load balancing 
+Decide how to load balance incoming requests to backend services.
 
-{{< reuse "docs/snippets/kgateway-capital.md" >}} supports multiple load balancing algorithms for selecting upstream services to forward incoming requests to. By default, incoming requests are forwarded to the instance with the least requests. You can change this behavior and instead use a round robin algorithm to forward the request to an upstream service. 
+## About simple load balancing
+
+{{< reuse "docs/snippets/kgateway-capital.md" >}} supports multiple load balancing algorithms for selecting backend services to forward incoming requests to. By default, incoming requests are forwarded to the instance with the least requests. You can change this behavior and instead use a round robin algorithm to forward the request to a backend service. 
 
 ### Least request
 
@@ -17,11 +19,11 @@ The [least request load balancer algorithm](https://www.envoyproxy.io/docs/envoy
 
 ### Round robin
 
-The [round robin load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects an upstream host in a round robin order. If a `localityType` is also defined, a weighted round robin algorithm is used, in which higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
+The [round robin load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects a backend host in a round robin order. If a `localityType` is also defined, a weighted round robin algorithm is used, in which higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
 
 ### Random
 
-The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects a random host that is available. This load balancing algorithm usually performs better than the round robin algorithm if no health checks are configured for the upstream host. 
+The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects a random host that is available. This load balancing algorithm usually performs better than the round robin algorithm if no health checks are configured for the backend host. 
 
 ## Other load balancing options
 
@@ -33,14 +35,13 @@ All settings in this section can be set only in conjunction with a simple load b
 
 ### Healthy panic threshold 
 
-By default, Gloo Mesh Gateway only considers services that are healthy and available when load balancing incoming requests among upstream services. In the case that the number of healthy upstream services becomes too low, you can instruct Gloo Mesh Gateway to disregard the upstream health status and either load balance requests among all or no hosts by using the healthy_panic_threshold setting. If not set, the threshold defaults to 50%. To disable panic mode, set this field to 0.
+By default, Gloo Mesh Gateway only considers services that are healthy and available when load balancing incoming requests among backend services. In the case that the number of healthy backend services becomes too low, you can instruct Gloo Mesh Gateway to disregard the backend health status and either load balance requests among all or no hosts by using the healthy_panic_threshold setting. If not set, the threshold defaults to 50%. To disable panic mode, set this field to 0.
 
 To learn more about this setting and when to use it, see the Envoy documentation.
 
 ### Update merge window 
 
 Sometimes, your deployments might have health checks and metadata updates that use a lot of CPU and memory. In such cases, you can use the update_merge_window setting. This way, Gloo Mesh Gateway merges all updates together within a specific timeframe. For more information about this setting, see the Envoy documentation. If not set, the update merge window defaults to 1000ms. To disable the update merge window, set this field to 0s.
-
 
 ## Before you begin
 
