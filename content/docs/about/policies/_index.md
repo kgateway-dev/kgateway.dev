@@ -37,17 +37,68 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Local rate limiting](/docs/security/local-ratelimit/) | TrafficPolicy | 
 | [Transformations](/docs/traffic-management/transformations) | TrafficPolicy | 
 
-<!--
+## Policy merging {#policy-merging}
 
-## Policy inheritance rules when using route delegation
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} lets you define how policies are merged when they are applied to a parent and child resource. 
 
-Policies that are defined in a TrafficPolicy resource and that are applied to a parent HTTPRoute resource are automatically inherited by all the child or grandchild HTTPRoutes along the route delegation chain. The following rules apply: 
+Parent-child hierarchies might be:
 
-* Only policies that are specified in a TrafficPolicy resource can be inherited by a child HTTPRoute. For inheritance to take effect, you must use the `spec.targetRefs` field in the TrafficPolicy resource to apply the TrafficPolicy resource to the parent HTTPRoute resource. Any child or grandchild HTTPRoute that the parent delegates traffic to inherits these policies. 
-* Child TrafficPolicy resources cannot override policies that are defined in a TrafficPolicy resource that is applied to a parent HTTPRoute. If the child HTTPRoute sets a policy that is already defined on the parent HTTPRoute, the setting on the parent HTTPRoute takes precedence and the setting on the child is ignored. For example, if the parent HTTPRoute defines a data loss prevention policy, the child HTTPRoute cannot change these settings or disable that policy.
-* Child HTTPRoutes can augment the inherited settings by defining TrafficPolicy fields that were not already set on the parent HTTPRoute. 
-* Policies are inherited along the complete delegation chain, with parent policies having a higher priority than their respective children.
+* Resources that target or serve other resources, such as Gateway > ListenerSet > HTTPRoute > Route rule.
+* Routes that are delegated, such as Parent HTTPRoute A > Child HTTPRoute B > Grandchild HTTPRoute C.
 
-For an example, see the [Policy inheritance](/docs/traffic-management/route-delegation/policy-inheritance/) guide.
+Policy merging applies to the following policies:
 
---> 
+* Native Kubernetes Gateway API policies, such as rewrites, timeouts, or retries.
+* {{< reuse "/docs/snippets/kgateway-capital.md" >}} TrafficPolicy.
+
+Resources that are higher in the parent-child hierarchy can use a special annotation to define how child resources inherit policies. This way, parent resources such as a Gateway or HTTPRoute can decide whether child resources can override the parent policies or not.
+
+### Merging annotation {#merging-annotation}
+
+The annotation on the parent resource is: `kgateway.dev/inherited-policy-priority`.
+
+The annotation takes four values:
+
+- `ShallowMergePreferChild` (default): Child policies take precedence over parent policies and the policies are shallow merged.
+- `ShallowMergePreferParent`: Parent policies take precedence over child policies and the policies are shallow merged.
+- `DeepMergePreferChild`: Child policies take precedence over parent policies and the policies are deep merged.
+- `DeepMergePreferParent`: Parent policies take precedence over child policies and the policies are deep merged.
+
+### Shallow or deep merging {#shallow-deep-merging}
+
+Merging ensures that policies from parent and child resources are combined without conflicts, using either _shallow_ or _deep_ strategies.
+
+**Shallow merging** means that the policies are merged at the top level. Only the top-level fields of the policies are considered for merging. If a field is present in both parent and child policies, the value from the higher priority policy is used. Priority is typically determined by specificity and creation time. The more specific (such as HTTPRoute rule over all the routes in the HTTPRoute) and older (created-first) policy takes precedence. Consider the following shallow merge scenario:
+
+* Parent policy adds a `x-season=summer` header.
+* Child policy adds `x-season=winter` and `x-holiday=christmas` headers.
+* Merging annotation is `ShallowMergePreferChild`.
+
+Resulting merged policy: The parent's `x-season` header is not included in the merged policy because the strategy is `ShallowMergePreferChild`.
+
+| Header | Value | Source |
+| -- | -- | -- |
+| `x-season` | `winter` | Child |
+| `x-holiday` | `christmas` | Child |
+
+**Deep merging** means that values from both parent and child policies can be combined. Currently, only [Transformation rules of a TrafficPolicy](/docs/traffic-management/transformations) can be deep merged. Consider the following deep merge scenario:
+
+* Parent policy adds an `x-season=summer` header.
+* Child policy adds `x-season=winter` and `x-holiday=christmas` headers.
+* Grandchild policy adds `x-season=spring`, `x-holiday=easter`, `x-discount=10%` headers.
+* Merging annotation is `DeepMergePreferParent`.
+
+Resulting merged policy's headers: The child and grandchild policies do not override the parent's `x-season` header, but their other headers included because the strategy is `DeepMergePreferParent`.
+
+| Header | Value | Source |
+| -- | -- | -- |
+| `x-season` | `summer` | Parent |
+| `x-holiday` | `christmas` | Child |
+| `x-discount` | `10%` | Grandchild |
+
+### Merging examples {#merging-examples}
+
+For more information, check out the following guides:
+
+* TrafficPolicy's [Policy priority and merging rules](/docs/about/policies/trafficpolicy/#policy-priority-and-merging-rules)
+* [Policy inheritance and overrides](/docs/traffic-management/route-delegation/inheritance/) for both Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} policies.
