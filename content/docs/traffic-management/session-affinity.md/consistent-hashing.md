@@ -11,7 +11,7 @@ Session affinity, also referred to as sticky session, allows you to route reques
 
 ## About consistent hashing
 
-{{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and a backend service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a header, and hashes this property with the address of a backend service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same backend service instance.
+{{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and a backend service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a cookie or header, and hashes this property with the address of a backend service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same backend service instance.
 
 {{% callout type="info" %}}
 Consistent hashing is less reliable than a "strong" or "sticky" session affinity implementation, such as session persistence, in which the backend service is encoded in a cookie and affinity can be maintained for as long as the backend service is available. With consistent hashing, affinity might be lost when an instance is added or removed from the backend service's pool, or if the gateway proxy restarts. To set up strong stickiness, see the [Session persistence](../session-persistence) docs.
@@ -21,9 +21,169 @@ Consistent hashing is less reliable than a "strong" or "sticky" session affinity
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up Ringhash and Maglev hashing
+## Configure session affinity with consistent hashing
 
-Define the Ringhash or Maglev hashing algorithm that you want to use for your backend app in a BackendConfigPolicy. Then, configure and apply the policy to the backend app's HHTPRoute by creating a TrafficPolicy.
+First, define the Ringhash or Maglev hashing algorithm that you want to use for your backend app in a `BackendConfigPolicy`. Then, define the request property to hash in a {{< reuse "docs/snippets/trafficpolicy.md" >}} that you apply to the backend app's HTTPRoute.
+
+### Define Ringhash or Maglev hashing
+
+In the `loadBalancer` section of a BackendConfigPolicy resource, specify settings for either the Ringhash or Maglev hashing algorithm.
+
+{{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
+{{% tab tabName="Ringhash" %}}
+```yaml
+kind: BackendConfigPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+metadata:
+  name: httpbin-ringhash-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: ""
+      kind: Service
+  loadBalancer:
+    ringHash:
+      minimumRingSize: 1024
+      maximumRingSize: 2048
+    useHostnameForHashing: true
+    closeConnectionsOnHostSetChange: true
+```
+
+{{< reuse "/docs/snippets/review-table.md" >}}
+
+| Setting | Description | 
+| -- | -- | 
+| `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request comes in, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
+| `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+| `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
+| `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an backend host whenever hosts are added or removed for a destination.  | 
+
+{{% /tab %}}
+{{% tab tabName="Maglev" %}}
+Note that no further settings for Maglev are required.
+
+```yaml
+kind: BackendConfigPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+metadata:
+  name: httpbin-maglev-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: ""
+      kind: Service
+  loadBalancer:
+    maglev: {}
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+### Define request properties
+
+Define the request property to use, such as a header, cookie, or source IP address, in the `hashPolicies` section of a {{< reuse "docs/snippets/trafficpolicy.md" >}}. The algorithm hashes this property with the address of a backend service instance that served the initial request. The {{< reuse "docs/snippets/trafficpolicy.md" >}} references the backend app's HTTPRoute to apply the hashing algorithm to requests for that backend app.
+
+The `header`, `cookie`, and `sourceIP` hash policies are mutually exclusive, in that a request can only have one property that the algorithm uses for hashing. However, you can define multiple different hash policies within one {{< reuse "docs/snippets/trafficpolicy.md" >}} by using the `terminal` field for each hash policy. If a policy has the `terminal: true` setting and the policy is matched, any subsequent hash policies are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys.
+
+{{< tabs tabTotal="3" items="Header,Cookie,SourceIP" >}}
+{{% tab tabName="Header" %}}
+```yaml
+kubectl apply -f- <<EOF
+kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+metadata:
+  name: httpbin-header-hash-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: gateway.networking.k8s.io
+      kind: HTTPRoute
+  hashPolicies:
+    - header:
+        name: "x-user-id"
+      terminal: true
+    - header:
+        name: "x-session-id"
+      terminal: false
+EOF
+```
+
+{{< reuse "/docs/snippets/review-table.md" >}}
+
+| Setting | Description | 
+| -- | -- | 
+| `header.name` | The expected header name to create the hash with. |
+| `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
+{{% /tab %}}
+{{% tab tabName="Cookie" %}}
+```yaml
+kubectl apply -f- <<EOF
+kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+metadata:
+  name: httpbin-cookie-hash-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: gateway.networking.k8s.io
+      kind: HTTPRoute
+  hashPolicies:
+    - cookie:
+        name: "session-id"
+        path: "/api"
+        ttl: 30m
+        attributes:
+          httpOnly: "true"
+          secure: "true"
+          sameSite: "Strict"
+      terminal: true
+EOF
+```
+
+{{< reuse "/docs/snippets/review-table.md" >}}
+
+| Setting | Description | 
+| -- | -- | 
+| `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
+| `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
+| `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
+| `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attirbutes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+| `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
+{{% /tab %}}
+{{% tab tabName="SourceIP" %}}
+```yaml
+kubectl apply -f- <<EOF
+kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+metadata:
+  name: httpbin-sourceip-hash-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: gateway.networking.k8s.io
+      kind: HTTPRoute
+  hashPolicies:
+    - sourceIP: {}
+      terminal: true
+EOF
+```
+
+{{< reuse "/docs/snippets/review-table.md" >}}
+
+| Setting | Description | 
+| -- | -- | 
+| `sourceIP` | Hash based on the source IP address of the request. |
+| `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
+{{% /tab %}}
+{{< /tabs >}}
+
+## Verify the session affinity configuration {#verify}
+
+To try out session affinity with consistent hashing, you can follow these steps to first define a Ringhash hashing algorithm in a BackendConfigPolicy for the httpbin sample app. Then, you define cookie settings to hash in a {{< reuse "docs/snippets/trafficpolicy.md" >}} that you apply to httpbin's HTTPRoute.
 
 1. Scale the httpbin app up to 2 instances.
    ```sh 
@@ -42,15 +202,14 @@ Define the Ringhash or Maglev hashing algorithm that you want to use for your ba
    httpbin-8d557795f-h8ks9   3/3     Running       0          126m   10.0.38.52    ip-10-0-39-74.ec2.internal    <none>           <none>
    ```
 
-3. Create a BackendConfigPolicy to configure the Ringhash or Maglev hashing algorithm for the httpbin app. 
-   {{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
-   {{% tab tabName="Ringhash" %}}
+3. Create a BackendConfigPolicy to configure the following Ringhash hashing algorithm for the httpbin app.
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
    apiVersion: gateway.kgateway.dev/v1alpha1
    metadata:
-     name: httpbin-policy
+     name: httpbin-ringhash-policy
+     namespace: httpbin
    spec:
      targetRefs:
        - name: httpbin
@@ -64,81 +223,109 @@ Define the Ringhash or Maglev hashing algorithm that you want to use for your ba
        closeConnectionsOnHostSetChange: true
    EOF
    ```
-   
-   | Setting | Description | 
-   | -- | -- | 
-   | `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request comes in, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
-   | `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
-   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
-   | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an backend host whenever hosts are added or removed for a destination.  | 
-   
-   {{% /tab %}}
-   {{% tab tabName="Maglev" %}}
+
+4. Create the following {{< reuse "docs/snippets/trafficpolicy.md" >}}, which defines the `session-id` cookie as the request property to hash with the address of an httpbin backend instance, and applies to the `hhtpbin` HTTPRoute.
    ```yaml
    kubectl apply -f- <<EOF
-   kind: BackendConfigPolicy
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
    metadata:
-     name: httpbin-policy
+     name: httpbin-cookie-hash-policy
+     namespace: httpbin
    spec:
      targetRefs:
        - name: httpbin
-         group: ""
-         kind: Service
-     loadBalancer:
-       maglev: {}
+         group: gateway.networking.k8s.io
+         kind: HTTPRoute
+     hashPolicies:
+       - cookie:
+           name: "session-id"
+           path: "/api"
+           ttl: 30m
+           attributes:
+             httpOnly: "true"
+             secure: "true"
+             sameSite: "Strict"
+         terminal: true
    EOF
+   ```
+
+5. Send a request to the httpbin app and verify that you see the `session-id` cookie in the `set-cookie` header of your response. The `-c` option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
+   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   ```sh
+   curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+   -H "host: httpbin.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -i -c cookie-jar -k localhost:8080/headers \
+   -H "host: httpbin.example:8080"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}} 
+   
+   Example output: 
+   ```
+   < set-cookie: session-id="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
+   set-cookie: session-id="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
+   < server: envoy
+   server: envoy
+   < 
+
+   {
+     "headers": {
+       "Accept": [
+        "*/*"
+       ],
+       "Host": [
+         "httpbin.example:8080"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "fe080d74-2b6e-4954-8bde-54bed3e71dde"
+       ]
+     }
+   }
+   ```
+
+6. Repeat the request a few more times. Include the cookie that you stored in the local file by using the `-b` option. Make sure to send these requests within the 30 minute cookie validity period.
+   {{< tabs tabTotal= "2" >}}
+   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   ```sh
+   for i in {1..10}; do
+   curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+   -H "host: httpbin.example:8080"; done
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   for i in {1..10}; do
+   curl -i -b cookie-jar -k localhost:8080/headers \
+   -H "host: htttpbin.example:8080"; done
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-4. Apply the hashing algorithm in your BckendConfigPolicy to the HTTPRoute for your app by creating a TrafficPolicy.
+7. Get the logs of the httpbin instance that served the initial request. Verify that all subsequent requests were also served by the same instance.
+   ```sh
+   kubectl logs <httpbin-pod> -n httpbin
+   ```
 
-5. Send a few requests to the httpbin app. Verify that the request succeeds and that you get back a 200 HTTP response code.  the hashbasedcookie cookie in the set-cookie header of your response. The -c option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
+## Cleanup
 
-LoadBalancer IP address or hostname
-Port-forward for local testing
-curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
--H "host: httpbin.example:8080"
-Example output:
+{{< reuse "docs/snippets/cleanup.md" >}}
 
-< set-cookie: hashbasedcookie="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
-set-cookie: hashbasedcookie="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
-< server: envoy
-server: envoy
-<
-
-{
-  "headers": {
-    "Accept": [
-     "*/*"
-    ],
-    "Host": [
-      "httpbin.example:8080"
-    ],
-    "User-Agent": [
-      "curl/8.7.1"
-    ],
-    "X-Envoy-Expected-Rq-Timeout-Ms": [
-      "15000"
-    ],
-    "X-Forwarded-Proto": [
-      "http"
-    ],
-    "X-Request-Id": [
-      "fe080d74-2b6e-4954-8bde-54bed3e71dde"
-    ]
-  }
-}
-Repeat the request a few more times. Include the cookie that you stored in the local file by using the -b option. Make sure to send these requests within the 60 second cookie validity period.
-
-LoadBalancer IP address or hostname
-Port-forward for local testing
-for i in {1..10}; do
-curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
--H "host: httpbin.example:8080"; done
-Get the logs of the httpbin instance that served the initial request. Verify that all subsequent requests were also served by the same instance.
-
-kubectl logs <httpbin-pod> -n httpbin
-info
-After the cookie reaches its TTL (time to live) and expires, the proxy starts choosing a new backend instance to serve the request.
+```sh
+kubectl delete BackendConfigPolicy httpbin-ringhash-policy -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cookie-hash-policy -n httpbin
+```
