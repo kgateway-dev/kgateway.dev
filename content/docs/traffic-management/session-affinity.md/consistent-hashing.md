@@ -14,7 +14,7 @@ Session affinity, also referred to as sticky session, allows you to route reques
 {{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and a backend service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a cookie or header, and hashes this property with the address of a backend service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same backend service instance.
 
 {{% callout type="info" %}}
-Consistent hashing is less reliable than a "strong" or "sticky" session affinity implementation, such as session persistence, in which the backend service is encoded in a cookie and affinity can be maintained for as long as the backend service is available. With consistent hashing, affinity might be lost when an instance is added or removed from the backend service's pool, or if the gateway proxy restarts. To set up strong stickiness, see the [Session persistence](../session-persistence) docs.
+Consistent hashing is less reliable than a "strong" or "sticky" session affinity implementation, such as session persistence, in which the backend service is encoded in a cookie or header and affinity can be maintained for as long as the backend service is available. With consistent hashing, affinity might be lost when an instance is added or removed from the backend service's pool, or if the gateway proxy restarts. To set up strong stickiness, see the [Session persistence](../session-persistence) docs.
 {{% /callout %}}
 
 ## Before you begin 
@@ -35,11 +35,11 @@ In the `loadBalancer` section of a BackendConfigPolicy resource, specify setting
 kind: BackendConfigPolicy
 apiVersion: gateway.kgateway.dev/v1alpha1
 metadata:
-  name: httpbin-ringhash-policy
-  namespace: httpbin
+  name: example-ringhash-policy
+  namespace: default
 spec:
   targetRefs:
-    - name: httpbin
+    - name: example-app
       group: ""
       kind: Service
   loadBalancer:
@@ -67,11 +67,11 @@ Note that no further settings for Maglev are required.
 kind: BackendConfigPolicy
 apiVersion: gateway.kgateway.dev/v1alpha1
 metadata:
-  name: httpbin-maglev-policy
-  namespace: httpbin
+  name: example-maglev-policy
+  namespace: default
 spec:
   targetRefs:
-    - name: httpbin
+    - name: example-app
       group: ""
       kind: Service
   loadBalancer:
@@ -93,11 +93,11 @@ kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
 metadata:
-  name: httpbin-header-hash-policy
-  namespace: httpbin
+  name: example-header-hash-policy
+  namespace: default
 spec:
   targetRefs:
-    - name: httpbin
+    - name: example-route
       group: gateway.networking.k8s.io
       kind: HTTPRoute
   hashPolicies:
@@ -123,11 +123,11 @@ kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
 metadata:
-  name: httpbin-cookie-hash-policy
-  namespace: httpbin
+  name: example-cookie-hash-policy
+  namespace: default
 spec:
   targetRefs:
-    - name: httpbin
+    - name: example-route
       group: gateway.networking.k8s.io
       kind: HTTPRoute
   hashPolicies:
@@ -159,11 +159,11 @@ kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
 metadata:
-  name: httpbin-sourceip-hash-policy
-  namespace: httpbin
+  name: example-sourceip-hash-policy
+  namespace: default
 spec:
   targetRefs:
-    - name: httpbin
+    - name: example-route
       group: gateway.networking.k8s.io
       kind: HTTPRoute
   hashPolicies:
@@ -325,7 +325,13 @@ To try out session affinity with consistent hashing, you can follow these steps 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-```sh
-kubectl delete BackendConfigPolicy httpbin-ringhash-policy -n httpbin
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cookie-hash-policy -n httpbin
-```
+1. Scale the httpbin app back down.
+   ```sh 
+   kubectl scale deployment httpbin -n httpbin --replicas=1
+   ```
+
+2. Delete the resources that you created.
+   ```sh
+   kubectl delete BackendConfigPolicy httpbin-ringhash-policy -n httpbin
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cookie-hash-policy -n httpbin
+   ```

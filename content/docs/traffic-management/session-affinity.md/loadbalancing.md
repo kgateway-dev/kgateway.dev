@@ -125,3 +125,5 @@ Define the load balancing algorithm that you want to use for your backend app in
 
 TODO does simply load balancing require a trafficpolicy on the route?
 Apply the load balancing algorithm to the backend app's HTTPRoute by creating a {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+
+Testing: The load balancing algorithms are kind of hard to test with the exception of round robin. But random and least request will be harder. So we might need to show the Envoy configuration as a proof instead.
