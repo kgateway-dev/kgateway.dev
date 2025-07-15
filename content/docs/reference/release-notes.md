@@ -24,12 +24,6 @@ To maintain the previous default behavior of 2.0, update your annotations to `kg
 
 To learn more about delegation, see the [Route delegation docs](/docs/traffic-management/route-delegation/).
 
-#### HTTPListenerPolicy and TrafficPolicy {#v2.1-httplistenerpolicy-trafficpolicy}
-
-The `HTTPListenerPolicy` and `TrafficPolicy` resources are now merged into a single `Policy` resource.
-
-This update includes the following changes:
-
 <!-- TODO release 2.1
 
 ### ⚒️ Installation changes {#v2.1-installation-changes}
@@ -130,7 +124,7 @@ Kgateway introduces support for using its Gateway implementation as an **Istio a
 
 This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs](/docs/integrations/istio/ambient/).
 
-### ⚠️ Breaking changes from Gloo v1 {#changes}
+### 🔥 Breaking changes from Gloo v1 {#changes}
 
 Kgateway v2 has extensive API changes from Gloo v1, which include the following.
 
