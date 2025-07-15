@@ -35,7 +35,7 @@ spec:
     unhealthyThreshold: 1
 ```
 
-{{< reuse "/docs/snippets/review-table.md" >}} For more information about all of the settings that you can configure, see the [reference documentation](/docs/reference/api/health_check).
+{{< reuse "/docs/snippets/review-table.md" >}}
 
 | Setting | Description |
 | ------- | ----------- |
