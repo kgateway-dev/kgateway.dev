@@ -72,7 +72,7 @@ Merging ensures that policies from parent and child resources are combined witho
 
 * Parent policy adds a `x-season=summer` header.
 * Child policy adds `x-season=winter` and `x-holiday=christmas` headers.
-* Merging annotation is `ShallowMergePreferChild`.
+* Merging annotation is the default value, `ShallowMergePreferChild`.
 
 Resulting merged policy: The parent's `x-season` header is not included in the merged policy because the strategy is `ShallowMergePreferChild`.
 
@@ -88,12 +88,12 @@ Resulting merged policy: The parent's `x-season` header is not included in the m
 * Grandchild policy adds `x-season=spring`, `x-holiday=easter`, `x-discount=10%` headers.
 * Merging annotation is `DeepMergePreferParent`.
 
-Resulting merged policy's headers: The child and grandchild policies do not override the parent's `x-season` header, but their other headers included because the strategy is `DeepMergePreferParent`.
+Resulting merged policy's headers: The child and grandchild values merge with the parent's, with the parent's value ordered first because it takes precedence.
 
 | Header | Value | Source |
 | -- | -- | -- |
-| `x-season` | `summer` | Parent |
-| `x-holiday` | `christmas` | Child |
+| `x-season` | `summer,winter,spring` | Parent, Child, Grandchild |
+| `x-holiday` | `christmas,easter` | Child, Grandchild |
 | `x-discount` | `10%` | Grandchild |
 
 ### Merging examples {#merging-examples}
