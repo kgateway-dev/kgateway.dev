@@ -3,27 +3,23 @@ title: Consistent hashing
 weight: 20
 ---
 
-Set up soft session affinity between a client and a backend service by using consistent hashing algorithms.
+Set up soft session affinity between a client and an upstream service by using consistent hashing algorithms.
 
-## About session affinity
+## About session affinity 
+Session affinity, also referred to as sticky session, allows you to route requests for a particular session to the same upstream service instance that served the initial request. This setup is particularly useful if you have an upstream service that performs expensive operations and caches the output or data for subsequent requests. With session affinity, you make sure that the expensive operation is performed once and that subsequent requests can be served from the upstream’s cache, which can significantly improve operational cost and response times for your clients.
 
-Session affinity, also referred to as sticky session, allows you to route requests for a particular session to the same backend service instance that served the initial request. This setup is particularly useful if you have a backend service that performs expensive operations and caches the output or data for subsequent requests. With session affinity, you make sure that the expensive operation is performed once and that subsequent requests can be served from the backend’s cache, which can significantly improve operational cost and response times for your clients.
-
-## About consistent hashing
-
-{{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and a backend service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a header, and hashes this property with the address of a backend service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same backend service instance.
+## About consistent hashing 
+{{< reuse "docs/snippets/kgateway-capital.md" >}} allows you to set up soft session affinity between a client and an upstream service by using the [Ringhash](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html) or [Maglev](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev) consistent hashing algorithm. The hashing algorithm uses a property of the request, such as a header, and hashes this property with the address of an upstream service instance that served the initial request. In subsequent requests, as long as the client sends the same header, the request is routed to the same upstream service instance.
 
 {{% callout type="info" %}}
-Consistent hashing is less reliable than a "strong" or "sticky" session affinity implementation, such as session persistence, in which the backend service is encoded in a cookie and affinity can be maintained for as long as the backend service is available. With consistent hashing, affinity might be lost when an instance is added or removed from the backend service's pool, or if the gateway proxy restarts. To set up strong stickiness, see the [Session persistence](../session-persistence) docs.
+Consistent hashing is less reliable than a common sticky session implementation, in which the upstream service is encoded in a cookie and affinity can be maintained for as long as the upstream service is available. With consistent hashing, affinity might be lost when an upstream service is added or removed. To set up strong stickiness, see the [Stateful session filter](../session-filter) docs.
 {{% /callout %}}
 
 ## Before you begin 
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up Ringhash and Maglev hashing
-
-Define the Ringhash or Maglev hashing algorithm that you want to use for your backend app in a BackendConfigPolicy. Then, configure and apply the policy to the backend app's HHTPRoute by creating a TrafficPolicy.
+## Set up Ringhash and Maglev hashing 
 
 1. Scale the httpbin app up to 2 instances.
    ```sh 
@@ -69,8 +65,8 @@ Define the Ringhash or Maglev hashing algorithm that you want to use for your ba
    | -- | -- | 
    | `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request comes in, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
    | `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
-   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
-   | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an backend host whenever hosts are added or removed for a destination.  | 
+   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an upstream host. If not set, defaults to using the resolved address of the hostname as the key. | 
+   | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an upstream host whenever hosts are added or removed for a destination.  | 
    
    {{% /tab %}}
    {{% tab tabName="Maglev" %}}
@@ -92,9 +88,7 @@ Define the Ringhash or Maglev hashing algorithm that you want to use for your ba
    {{% /tab %}}
    {{< /tabs >}}
 
-4. Apply the hashing algorithm in your BckendConfigPolicy to the HTTPRoute for your app by creating a TrafficPolicy.
-
-5. Send a few requests to the httpbin app. Verify that the request succeeds and that you get back a 200 HTTP response code.  the hashbasedcookie cookie in the set-cookie header of your response. The -c option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
+4. Send a few requests to the httpbin app. Verify that the request succeeds and that you get back a 200 HTTP response code.  the hashbasedcookie cookie in the set-cookie header of your response. The -c option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
 
 LoadBalancer IP address or hostname
 Port-forward for local testing
@@ -141,4 +135,4 @@ Get the logs of the httpbin instance that served the initial request. Verify tha
 
 kubectl logs <httpbin-pod> -n httpbin
 info
-After the cookie reaches its TTL (time to live) and expires, the proxy starts choosing a new backend instance to serve the request.
+After the cookie reaches its TTL (time to live) and expires, the proxy starts choosing a new upstream instance to serve the request.
