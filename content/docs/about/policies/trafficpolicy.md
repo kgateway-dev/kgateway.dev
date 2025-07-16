@@ -243,7 +243,9 @@ spec:
 
 ## Policy priority and merging rules
 
-If you apply multiple TrafficPolicies by using different attachment options, policies are merged based on specificy and priority. The following rules apply:
+If you apply multiple TrafficPolicies by using different attachment options, policies are merged based on specificy and priority. 
+
+By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging](/docs/about/policies/#policy-merging).
 
 * If you apply multiple TrafficPolicies that define the same top-level policy, the policies are not merged and only the oldest policy is enforced. Policies with a later timestamp are ignored. 
 * TrafficPolicies that define different top-level policies are merged and are enforced in combination. 
