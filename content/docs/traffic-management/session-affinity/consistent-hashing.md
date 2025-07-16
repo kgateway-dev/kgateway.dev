@@ -275,7 +275,7 @@ To try out session affinity with consistent hashing, you can follow these steps 
    date: Wed, 16 Jul 2025 17:20:40 GMT
    content-length: 445
    x-envoy-upstream-service-time: 0
-   set-cookie: Session-A="Cg8xMC4yNDQuMC42OjgwODA="; HttpOnly
+   set-cookie: session-id="Cg8xMC4yNDQuMC42OjgwODA="; HttpOnly
    server: envoy
    ...
    ```
