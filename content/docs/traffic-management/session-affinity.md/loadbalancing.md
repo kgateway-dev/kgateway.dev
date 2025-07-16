@@ -32,10 +32,6 @@ Learn about other load balancing options that you can set in the load balancer p
 All settings in this section can be set only in conjunction with a simple load balancing mode or consistent hash algorithm.
 {{% /callout %}}
 
-### Locality type
-
-TODO
-
 ### Healthy panic threshold 
 
 By default, {{< reuse "docs/snippets/kgateway.md" >}} only considers services that are healthy and available when load balancing incoming requests among backend services. In the case that the number of healthy backend services becomes too low, you can instruct {{< reuse "docs/snippets/kgateway.md" >}} to disregard the backend health status and either load balance requests among all or no hosts by using the `healthy_panic_threshold` setting. If not set, the threshold defaults to 50%. To disable panic mode, set this field to 0.
@@ -80,7 +76,10 @@ Define the load balancing algorithm that you want to use for your backend app in
    | Setting | Description |
    | -- | -- |
    | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Deafults to 2. |
-   | `slowStart` | TODO |
+   | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
+   | `slowStart.window` | The duration of the slow start window. If set, any newly created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.agression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
+   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab tabName="Round robin" %}}
    ```yaml
@@ -108,7 +107,10 @@ Define the load balancing algorithm that you want to use for your backend app in
 
    | Setting | Description |
    | -- | -- |
-   | `slowStart` | TODO |
+   | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
+   | `slowStart.window` | The duration of the slow start window. If set, any newly created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.agression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
+   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab tabName="Random" %}}
    ```yaml
@@ -129,8 +131,6 @@ Define the load balancing algorithm that you want to use for your backend app in
    ```
    {{% /tab %}}
    {{< /tabs >}}
-
-Testing: The load balancing algorithms are kind of hard to test with the exception of round robin. But random and least request will be harder. So we might need to show the Envoy configuration as a proof instead.
 
 2. Verify that your configuration is applied by reviewing the Envoy configuration. 
    1. Port forward the `http` deployment on port 19000. 
