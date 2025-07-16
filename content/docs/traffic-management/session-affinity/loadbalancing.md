@@ -68,6 +68,10 @@ Define the load balancing algorithm that you want to use for your backend app in
      loadBalancer:
        leastRequest:
          choiceCount: 3
+         slowStart:
+           window: 10s
+           aggression: "1.5"
+           minWeightPercent: 10
    EOF
    ```
 
