@@ -327,7 +327,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    }
    ```
 
-9.  Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
+9. Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
