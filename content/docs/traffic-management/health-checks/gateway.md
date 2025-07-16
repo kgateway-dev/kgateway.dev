@@ -88,7 +88,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    Example output:
    ```console
    HTTP/1.1 200 OK
-   x-envoy-upstream-healthchecked-cluster: http.kgateway-system
+   x-envoy-upstream-healthchecked-cluster: http.{{< reuse "/docs/snippets/namespace.md" >}}
    date: Wed, 16 Jul 2025 16:37:13 GMT
    server: envoy
    content-length: 0

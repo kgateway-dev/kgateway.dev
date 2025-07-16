@@ -27,7 +27,10 @@ First, define the Ringhash or Maglev hashing algorithm that you want to use for 
 
 ### Define Ringhash or Maglev hashing
 
-In the `loadBalancer` section of a BackendConfigPolicy resource, specify settings for either the Ringhash or Maglev hashing algorithm.
+In the `loadBalancer` section of a BackendConfigPolicy resource, specify settings for either the Ringhash or Maglev hashing algorithm. 
+
+* **Ringhash**: You can tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup.
+* **Maglev**: You use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning.
 
 {{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
 {{% tab tabName="Ringhash" %}}
@@ -61,7 +64,7 @@ spec:
 
 {{% /tab %}}
 {{% tab tabName="Maglev" %}}
-Note that no further settings for Maglev are required.
+Note that no further settings for Maglev are required because it uses a fixed table size.
 
 ```yaml
 kind: BackendConfigPolicy
@@ -176,7 +179,7 @@ EOF
 
 | Setting | Description | 
 | -- | -- | 
-| `sourceIP` | Hash based on the source IP address of the request. No further configuraion is required. |
+| `sourceIP` | Hash based on the source IP address of the request. No further configuration is required. |
 | `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
 {{% /tab %}}
 {{< /tabs >}}

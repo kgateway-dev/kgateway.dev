@@ -19,7 +19,7 @@ In session persistence, a client directly provides information, such as a header
 
 In session persistence, the backend service is encoded in a cookie or header and affinity can be maintained for as long as the backend service is available. This makes session persistence more reliable than [session affinity through consistent hashing](../consistent-hashing), or "weak" session affinity, in which affinity might be lost when a backend service is added or removed, or if the gateway proxy restarts.
 
-However, note that session persistence and session affinity can functionally work together in your kgateway setup. If you define both session persistence and session affinity through consistent hashing, the gateway proxy makes the following routing decisions for incoming requests:
+However, note that session persistence and session affinity can functionally work together in your {{< reuse "/docs/snippets/kgateway.md" >}} setup. If you define both session persistence and session affinity through consistent hashing, the gateway proxy makes the following routing decisions for incoming requests:
 - If the request contains a session persistence identity in a cookie or header, route the request directly to the backend that it previously established a session with.
 - If no session persistence identity is present, load balance the request according to the defined session affinity configuration, along with any [load balancing configuration](../loadbalancing).
 
