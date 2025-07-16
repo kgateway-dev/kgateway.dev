@@ -12,17 +12,21 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v2.1-breaking-changes}
 
-#### Route delegation annotation and default behavior {#v2.1-delegation-annotation}
+#### Route delegation annotation for policy merging {#v2.1-delegation-policy-merging}
 
-The route delegation feature is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
+The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
 
 * The annotation is renamed from `delegation.kgateway.dev/inherited-policy-priority` to the simpler `kgateway.dev/inherited-policy-priority`.
-* Now, four values are accepted: `ShallowMergePreferParent`, `ShallowMergePreferChild`, `DeepMergePreferParent`, and `DeepMergePreferChild`. Deep merges apply only to Transformation policies.
+* Now, four values are accepted: `ShallowMergePreferParent`, `ShallowMergePreferChild`, `DeepMergePreferParent`, and `DeepMergePreferChild`. Deep merges apply only to the transformation filter in a TrafficPolicy.
 * The default behavior of parent route policies taking precedence over child routes policies is reversed. Now, child routes take precedence, which aligns better with the precedence defaults across other resources in the kgateway and Gateway APIs.
 
 To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`.
 
-To learn more about delegation, see the [Route delegation docs](/docs/traffic-management/route-delegation/).
+To learn more about policy merging, see the [Policy merging](/docs/about/policies/#policy-merging) docs.
+
+Note that this change does not impact the other delegation annotations:
+* `delegation.kgateway.dev/inherit-parent-matcher`
+* `delegation.kgateway.dev/label`
 
 <!-- TODO release 2.1
 
