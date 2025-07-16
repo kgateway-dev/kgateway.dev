@@ -1,5 +1,0 @@
----
-title: Session affinity
-weight: 115
-description: 
----

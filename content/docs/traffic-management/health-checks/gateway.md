@@ -55,6 +55,17 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    {{% /tab %}}
    {{< /tabs >}}
 
+   Example output:
+   ```console
+   HTTP/1.1 503 Service Unavailable
+   x-envoy-upstream-healthchecked-cluster: http.{{< reuse "/docs/snippets/namespace.md" >}}
+   x-envoy-immediate-health-check-fail: true
+   date: Wed, 16 Jul 2025 16:35:12 GMT
+   server: envoy
+   connection: close
+   content-length: 0
+   ```
+
 4. After you finish testing, resume Envoy connections by sending an `HTTP POST` request to the `/healthcheck/ok` endpoint of the Envoy admin port.
    ```sh
    curl -X POST 127.0.0.1:19000/healthcheck/ok
@@ -73,6 +84,15 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    ```
    {{% /tab %}}
    {{< /tabs >}}
+
+   Example output:
+   ```console
+   HTTP/1.1 200 OK
+   x-envoy-upstream-healthchecked-cluster: http.{{< reuse "/docs/snippets/namespace.md" >}}
+   date: Wed, 16 Jul 2025 16:37:13 GMT
+   server: envoy
+   content-length: 0
+   ```
 
 6. Stop port-forwarding the `http` deployment.
    ```sh
