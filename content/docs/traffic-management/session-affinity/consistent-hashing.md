@@ -7,7 +7,7 @@ Set up soft session affinity between a client and a backend service by using con
 
 ## About session affinity
 
-Session affinity, also referred to as sticky session, allows you to route requests for a particular session to the same backend service instance that served the initial request. This setup is particularly useful if you have a backend service that performs expensive operations and caches the output or data for subsequent requests. With session affinity, you make sure that the expensive operation is performed once and that subsequent requests can be served from the backend’s cache, which can significantly improve operational cost and response times for your clients.
+Session affinity allows you to route requests for a particular session to the same backend service instance that served the initial request. This setup is particularly useful if you have a backend service that performs expensive operations and caches the output or data for subsequent requests. With session affinity, you make sure that the expensive operation is performed once and that subsequent requests can be served from the backend’s cache, which can significantly improve operational cost and response times for your clients.
 
 ## About consistent hashing
 
@@ -54,10 +54,10 @@ spec:
 
 | Setting | Description | 
 | -- | -- | 
-| `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request comes in, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
+| `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
 | `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
-| `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to an backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
-| `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to an backend host whenever hosts are added or removed for a destination.  | 
+| `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
+| `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
 
 {{% /tab %}}
 {{% tab tabName="Maglev" %}}
@@ -176,7 +176,7 @@ EOF
 
 | Setting | Description | 
 | -- | -- | 
-| `sourceIP` | Hash based on the source IP address of the request. |
+| `sourceIP` | Hash based on the source IP address of the request. No further configuraion is required. |
 | `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
 {{% /tab %}}
 {{< /tabs >}}
@@ -185,24 +185,24 @@ EOF
 
 To try out session affinity with consistent hashing, you can follow these steps to first define a Ringhash hashing algorithm in a BackendConfigPolicy for the httpbin sample app. Then, you define cookie settings to hash in a {{< reuse "docs/snippets/trafficpolicy.md" >}} that you apply to httpbin's HTTPRoute.
 
-1. Scale the httpbin app up to 2 instances.
+1. Scale the httpbin app up to two instances.
    ```sh 
    kubectl scale deployment httpbin -n httpbin --replicas=2
    ```
    
-2. Verify that another instance of the httpbin app is created and note the IP addresses of both httpbin instances. In the following example, you have an httpbin instance available at the `10.0.43.175` and `10.0.38.52` IP addresses.
+2. Verify that another instance of the httpbin app is created.
    ```sh
-   kubectl get pods -n httpbin -o wide
+   kubectl get pods -n httpbin
    ```
    
-   Example output
+   Example output:
    ```
-   NAME                      READY   STATUS        RESTARTS   AGE    IP            NODE                          NOMINATED NODE   READINESS GATES
-   httpbin-8d557795f-86hzg   3/3     Running       0          54m    10.0.43.175   ip-10-0-34-108.ec2.internal   <none>           <none>
-   httpbin-8d557795f-h8ks9   3/3     Running       0          126m   10.0.38.52    ip-10-0-39-74.ec2.internal    <none>           <none>
+   NAME                      READY   STATUS        RESTARTS   AGE
+   httpbin-8d557795f-86hzg   3/3     Running       0          54s
+   httpbin-8d557795f-h8ks9   3/3     Running       0          26m
    ```
 
-3. Create a BackendConfigPolicy to configure the following Ringhash hashing algorithm for the httpbin app.
+3. Create a BackendConfigPolicy to configure the following Ringhash algorithm for the httpbin app.
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
@@ -224,7 +224,7 @@ To try out session affinity with consistent hashing, you can follow these steps 
    EOF
    ```
 
-4. Create the following {{< reuse "docs/snippets/trafficpolicy.md" >}}, which defines the `session-id` cookie as the request property to hash with the address of an httpbin backend instance, and applies to the `hhtpbin` HTTPRoute.
+4. Create the following {{< reuse "docs/snippets/trafficpolicy.md" >}}, which defines the `session-id` cookie as the request property to hash with the address of an httpbin backend instance, and applies to the `httpbin` HTTPRoute.
    ```yaml
    kubectl apply -f- <<EOF
    kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
@@ -255,70 +255,63 @@ To try out session affinity with consistent hashing, you can follow these steps 
    {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
-   -H "host: httpbin.example:8080"
+   -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i -c cookie-jar -k localhost:8080/headers \
-   -H "host: httpbin.example:8080"
+   -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{< /tabs >}} 
    
    Example output: 
-   ```
-   < set-cookie: session-id="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
-   set-cookie: session-id="298b1ac340fdea97"; Max-Age=60; Path=/; HttpOnly
-   < server: envoy
+   ```console {hl_lines=[8]}
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; encoding=utf-8
+   date: Wed, 16 Jul 2025 17:20:40 GMT
+   content-length: 445
+   x-envoy-upstream-service-time: 0
+   set-cookie: Session-A="Cg8xMC4yNDQuMC42OjgwODA="; HttpOnly
    server: envoy
-   < 
-
-   {
-     "headers": {
-       "Accept": [
-        "*/*"
-       ],
-       "Host": [
-         "httpbin.example:8080"
-       ],
-       "User-Agent": [
-         "curl/8.7.1"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "fe080d74-2b6e-4954-8bde-54bed3e71dde"
-       ]
-     }
-   }
+   ...
    ```
 
 6. Repeat the request a few more times. Include the cookie that you stored in the local file by using the `-b` option. Make sure to send these requests within the 30 minute cookie validity period.
-   {{< tabs tabTotal= "2" >}}
+   {{< tabs tabTotal= "2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
    {{% tab tabName="LoadBalancer IP address or hostname" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
-   -H "host: httpbin.example:8080"; done
+   -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k localhost:8080/headers \
-   -H "host: htttpbin.example:8080"; done
+   -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-7. Get the logs of the httpbin instance that served the initial request. Verify that all subsequent requests were also served by the same instance.
+7. Check the logs of each httpbin instance. Verify that only one of the instances served all 10 of the subsequent requests that you made.
    ```sh
-   kubectl logs <httpbin-pod> -n httpbin
+   kubectl logs -n httpbin <httpbin-pod>
+   ```
+
+   Example output for one pod, in which all 10 subsequent requests (timestamps at `17:20`) are served after the previous 1 request (timestamp at `17:17`):
+   ```
+   Defaulted container "httpbin" out of: httpbin, curl
+   go-httpbin listening on http://0.0.0.0:8080
+   time="2025-07-16T17:17:09.8479" status=200 method="GET" uri="/headers" size_bytes=440 duration_ms=0.10 user_agent="curl/8.7.1" client_ip=10.244.0.7
+   time="2025-07-16T17:20:32.1077" status=200 method="GET" uri="/headers" size_bytes=445 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
+   time="2025-07-16T17:20:40.7017" status=200 method="GET" uri="/headers" size_bytes=445 duration_ms=0.05 user_agent="curl/8.7.1" client_ip=10.244.0.7
+   time="2025-07-16T17:20:49.5744" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
+   ...
    ```
 
 ## Cleanup

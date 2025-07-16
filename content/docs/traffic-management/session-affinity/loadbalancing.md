@@ -58,8 +58,8 @@ Define the load balancing algorithm that you want to use for your backend app in
    kind: BackendConfigPolicy
    apiVersion: gateway.kgateway.dev/v1alpha1
    metadata:
-     name: httpbin-policy
-     namespce: httpbin
+     name: httpbin-lb-policy
+     namespace: httpbin
    spec:
      targetRefs:
        - name: httpbin
@@ -77,7 +77,7 @@ Define the load balancing algorithm that you want to use for your backend app in
    | -- | -- |
    | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Deafults to 2. |
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
-   | `slowStart.window` | The duration of the slow start window. If set, any newly created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.window` | The duration of the slow start window. If set, a newly-created backend endpoint remains in slow start mode from its creation time until the duration of the slow start window has elapsed. |
    | `slowStart.agression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
@@ -87,8 +87,8 @@ Define the load balancing algorithm that you want to use for your backend app in
    kind: BackendConfigPolicy
    apiVersion: gateway.kgateway.dev/v1alpha1
    metadata:
-     name: httpbin-policy
-     namespce: httpbin
+     name: httpbin-lb-policy
+     namespace: httpbin
    spec:
      targetRefs:
        - name: httpbin
@@ -108,7 +108,7 @@ Define the load balancing algorithm that you want to use for your backend app in
    | Setting | Description |
    | -- | -- |
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
-   | `slowStart.window` | The duration of the slow start window. If set, any newly created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.window` | The duration of the slow start window. If set, any newly-created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
    | `slowStart.agression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
@@ -118,8 +118,8 @@ Define the load balancing algorithm that you want to use for your backend app in
    kind: BackendConfigPolicy
    apiVersion: gateway.kgateway.dev/v1alpha1
    metadata:
-     name: httpbin-policy
-     namespce: httpbin
+     name: httpbin-lb-policy
+     namespace: httpbin
    spec:
      targetRefs:
        - name: httpbin
@@ -141,13 +141,43 @@ Define the load balancing algorithm that you want to use for your backend app in
       ```sh
       open http://localhost:19000/config_dump
       ```
-   3. Find the listener filters and verify that proxy protocol is enabled for all of the gateway listeners. You see a listener filter that looks similar to the following. 
-      ```yaml
-      "listener_filters": [
-        {
-         "name": "envoy.filters.listener.proxy_protocol",
-         "typed_config": {
-          "@type": "type.googleapis.com/envoy.extensions.filters.listener.proxy_protocol.v3.ProxyProtocol"
+   3. Search for the `dynamic_warming_clusters` section, and verify that the policy that you set is listed int the `lb_policy` field. For example, the following shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`.
+      ```json
+      "dynamic_warming_clusters": [
+       {
+        "version_info": "10665027509180737706",
+        "cluster": {
+         "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
+         "name": "kube_httpbin_httpbin_8000",
+         "type": "EDS",
+         "eds_cluster_config": {
+          "eds_config": {
+           "ads": {},
+           "resource_api_version": "V3"
+          }
+         },
+         "connect_timeout": "5s",
+         "lb_policy": "LEAST_REQUEST",
+         "metadata": {},
+         "common_lb_config": {
+          "consistent_hashing_lb_config": {}
+         },
+         "ignore_health_on_host_removal": true,
+         "least_request_lb_config": {
+          "choice_count": 3
          }
         },
+      ...
       ```
+   4. Stop port-forwarding the `http` deployment.
+      ```sh
+      lsof -ti:19000 | xargs kill -9
+      ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete BackendConfigPolicy httpbin-lb-policy -n httpbin
+```
