@@ -28,18 +28,26 @@ The following image illustrates the route delegation hierarchy and policy inheri
 {{< reuse-image-dark srcDark="img/route-delegation-inheritance-kgateway-dark.svg" >}}
 <!-- https://app.excalidraw.com/s/AKnnsusvczX/9uktq3x1i63-->
 
-**`parent1` and `parent2` HTTPRoutes**: 
-* The `parent1` HTTPRoute resource serves traffic for the `delegation-parent1.example` domain and delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
-* The `parent2` HTTPRoute resource serves traffic for the `delegation-parent2.example` domain and also delegates traffic on the `/anything/team1` prefix path to the child HTTPRoute resource `child-team1` in namespace `team1`. 
-* In addition, the `parent2` HTTPRoute specifies the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation, which allows a child HTTPRoute to override policies that are applied to `parent2`. To override a parent policy, you must create a TrafficPolicy that defines the same top-level policy as the parent and attach that policy to the child. Keep in mind that any policy that is defined on the parent and not overriden by a child, is still inherited ad applied to the child. 
-* The `parent1` HTTPRoute resource does specify this annotation and therefore does not allow a child HTTPRoute to override policies that are set on `parent1`. 
-* A TrafficPolicy defines a transformation and local rate limiting policy and is applied to both `parent1` and `parent2` HTTPRoutes via the `targetRefs` option. 
+**Parent HTTPRoutes**:
 
-**`child-team1` HTTPRoute**: 
-* The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in the `team1` namespace. 
-* A TrafficPolicy defines a transformation policy and is applied to the `child-team1` HTTPRoute via the `targetRefs` option. 
+| HTTPRoute | Delegation | Policy merge strategy |
+| --- | --- | --- |
+| `parent1` | Delegates to the `child-team1` HTTPRoute in `team1` namespace on the `/anything/team1` prefix path for the `delegation-parent1.example` domain. | `ShallowMergePreferParent`, so that policies of the parent HTTPRoute override the policies of the child HTTPRoute. |
+| `parent2` | Delegates to the `child-team1` HTTPRoute in `team1` namespace on the `/anything/team1` prefix path for the `delegation-parent2.example` domain. | `ShallowMergePreferChild`, (the default behavior) so that policies of the child HTTPRoute override the policies of the parent HTTPRoute. |
 
+**Child HTTPRoute**:
 
+| HTTPRoute | Delegation | Policy merge strategy |
+| --- | --- | --- |
+| `child-team1` | Matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in the `team1` namespace. | Policies are merged depending on the parent HTTPRoute's policy merge strategy for the delegated route. |
+
+**TrafficPolicies**:
+
+| TrafficPolicy | TargetRefs | Description |
+| --- | --- | --- |
+| Transformation Policy 1 | `parent1` and `parent2` HTTPRoutes | Policy 1 is inherited for the `delegation-parent1.example` domain, but overridden by the child policy for the `delegation-parent2.example` domains. |
+| Local rate limit Policy 2 | `parent1` and `parent2` HTTPRoutes | Policy 2 is inherited by both delegated routes because the child does not override the parent policy. |
+| Transformation Policy 3 | `child-team1` HTTPRoute | Policy 3 does not apply to the `delegation-parent1.example` domain because that route's annotation overrides the default child inheritance with the `ShallowMergePreferParent` annotation. However, Policy 3 applies to the `delegation-parent2.example` domain because the child policy merge strategy is the default `ShallowMergePreferChild`. |
 
 ## Before you begin
 
@@ -49,6 +57,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
 
 1. Create the `parent1` HTTPRoute resource that matches incoming traffic on the `delegation-parent1.example` domain. The HTTPRoute resource specifies the following route:
    * `/anything/team1`: The routing decision is delegated to a child HTTPRoute resource in the `team1` namespace.
+   * `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`: Overrides the default policy inheritance behavior so that parent policies take precedence over child policies.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -57,6 +66,8 @@ The following image illustrates the route delegation hierarchy and policy inheri
    metadata:
      name: parent1
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     annotations:
+      kgateway.dev/inherited-policy-priority: ShallowMergePreferParent
    spec:
      parentRefs:
      - name: http
@@ -76,7 +87,9 @@ The following image illustrates the route delegation hierarchy and policy inheri
    EOF
    ```
 
-2. Create the `parent2` HTTPRoute resource that matches incoming traffic on the `delegation-parent2.example` domain. The HTTPRoute resource specifies the same route as the `parent1` HTTPRoute. However, the `parent2` HTTPRoute sets the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation that allows any child HTTPRoute to override policies that are set on the `parent2` HTTPRoute. 
+2. Create the `parent2` HTTPRoute resource that matches incoming traffic on the `delegation-parent2.example` domain.
+   * `anything/team1`: The routing decision is delegated to the same child HTTPRoute resource in the `team1` namespace.
+   * `kgateway.dev/inherited-policy-priority: ShallowMergePreferChild`: Keeps the default behavior, so that policies of the child HTTPRoute override the policies of the parent HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -181,7 +194,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    EOF
    ```
 
-6. Send a request to the httpbin app on the `delegation.parent1.example` domain. Because the `parent1` HTTPRoute does not allow a child HTTPRoute to override the policies, the child HTTPRoute inherits the policies that are set on the `parent1` HTTPRoute. The TrafficPolicy that you created earlier and applied to the `child-team1` HTTPRoute is ignored. Verify that you see the `X-Parent-Policy` header in your response.
+6. Send a request to the httpbin app on the `delegation.parent1.example` domain. Because the `parent1` HTTPRoute annotation lets parent policies override the child policies, the child HTTPRoute inherits the policies that are set on the `parent1` HTTPRoute. The TrafficPolicy that you created earlier and applied to the `child-team1` HTTPRoute is ignored. Verify that you see the `X-Parent-Policy` header in your response.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -261,7 +274,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    local_rate_limited%
    ```     
 
-8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute resource has the `delegation.kgateway.dev/inherited-policy-priority: PreferChild` annotation set, the child HTTPRoute can override any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
+8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute annotation keeps the default policy merging behavior, the child HTTPRoute overrides any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
 
    Verify that you see the custom `X-Child-Team1` header in your response. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
@@ -314,7 +327,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    }
    ```
 
-9. Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
+9.  Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
