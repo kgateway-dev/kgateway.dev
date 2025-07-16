@@ -11,10 +11,10 @@ Decide how to load balance incoming requests to backend services.
 
 ### Least request
 
-The [least request load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) that generally selects the host with the fewest requests. The following rules apply: 
+The [least request load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) generally selects the host with the fewest requests. The following rules apply: 
 
 * If no `localityType` is set, send the request to the host with the fewest requests. 
-* If `localityType` is set, a weighted round robin approach is used, in which  higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
+* If `localityType` is set, a weighted round robin approach is used, in which higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
 
 ### Round robin
 
@@ -26,13 +26,15 @@ The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest
 
 ## Other load balancing options
 
-TODO no idea if these are supported
-
 Learn about other load balancing options that you can set in the load balancer policy.
 
 {{% callout type="info" %}}
 All settings in this section can be set only in conjunction with a simple load balancing mode or consistent hash algorithm.
 {{% /callout %}}
+
+### Locality type
+
+TODO
 
 ### Healthy panic threshold 
 
@@ -44,21 +46,13 @@ To learn more about this setting and when to use it, see the [Envoy documentatio
 
 Sometimes, your deployments might have health checks and metadata updates that use a lot of CPU and memory. In such cases, you can use the `update_merge_window` setting. This way, {{< reuse "docs/snippets/kgateway.md" >}} merges all updates together within a specific timeframe. For more information about this setting, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto#config-cluster-v3-cluster-commonlbconfig). If not set, the update merge window defaults to 1000ms. To disable the update merge window, set this field to 0s.
 
-### Warm up duration 
-
-If you have new upstream services that need time to get ready for traffic, use the `warmupDurationSecs` setting. This way, {{< reuse "docs/snippets/kgateway.md" >}} gradually increases the amount of traffic for the service. This setting is effective in scaling events, such as when new replicas are added to handle increased load. However, if all services start at the same time, this setting might not be as effective as all endpoints receive the same amount of requests.
-
-Note that the `warmupDurationSecs` field can only be set if the [load balancing mode](#about-simple-load-balancing) is set to `roundRobin` or `leastRequest`. 
-
-To learn more about this setting, see the [Istio Destination Rule documentation](https://istio.io/latest/docs/reference/config/networking/destination-rule/). 
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## Set up a load balancing algorithm
 
-Define the load balancing algorithm that you want to use for your backend app in a BackendConfigPolicy. Then, apply the algorithm to the backend app's HTTPRoute by creating a {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+Define the load balancing algorithm that you want to use for your backend app in a BackendConfigPolicy.
 
 1. Create a BackendConfigPolicy to configure your load balancing algorithm for the httpbin app. 
    {{< tabs tabTotal="3" items="Least requests,Round robin,Random" >}}
@@ -80,6 +74,13 @@ Define the load balancing algorithm that you want to use for your backend app in
          choiceCount: 3
    EOF
    ```
+
+   {{< reuse "/docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Deafults to 2. |
+   | `slowStart` | TODO |
    {{% /tab %}}
    {{% tab tabName="Round robin" %}}
    ```yaml
@@ -96,14 +97,20 @@ Define the load balancing algorithm that you want to use for your backend app in
          kind: Service
      loadBalancer:
        roundRobin:
-         slowStartConfig:
+         slowStart:
            window: 10s
            aggression: "1.5"
            minWeightPercent: 10
    EOF
    ```
+
+   {{< reuse "/docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `slowStart` | TODO |
    {{% /tab %}}
-   {{% tab tabName="Round robin" %}}
+   {{% tab tabName="Random" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
@@ -123,7 +130,24 @@ Define the load balancing algorithm that you want to use for your backend app in
    {{% /tab %}}
    {{< /tabs >}}
 
-TODO does simply load balancing require a trafficpolicy on the route?
-Apply the load balancing algorithm to the backend app's HTTPRoute by creating a {{< reuse "docs/snippets/trafficpolicy.md" >}}.
-
 Testing: The load balancing algorithms are kind of hard to test with the exception of round robin. But random and least request will be harder. So we might need to show the Envoy configuration as a proof instead.
+
+2. Verify that your configuration is applied by reviewing the Envoy configuration. 
+   1. Port forward the `http` deployment on port 19000. 
+      ```sh
+      kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000 & 
+      ```
+   2. Open the `config_dump` endpoint. 
+      ```sh
+      open http://localhost:19000/config_dump
+      ```
+   3. Find the listener filters and verify that proxy protocol is enabled for all of the gateway listeners. You see a listener filter that looks similar to the following. 
+      ```yaml
+      "listener_filters": [
+        {
+         "name": "envoy.filters.listener.proxy_protocol",
+         "typed_config": {
+          "@type": "type.googleapis.com/envoy.extensions.filters.listener.proxy_protocol.v3.ProxyProtocol"
+         }
+        },
+      ```
