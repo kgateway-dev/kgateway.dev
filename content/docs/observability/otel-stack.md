@@ -473,8 +473,6 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    metadata:
      name: logging-policy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       lab: otel-integration
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -523,8 +521,6 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    metadata:
      name: tracing-policy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       lab: otel-integration
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
