@@ -20,7 +20,7 @@ flowchart LR
 
 ## Before you begin
 
-Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../quickstart/) or [Installation](/install/) guides.
+Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
 
 ## Deploy a sample app {#deploy-app}
 
@@ -141,7 +141,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
    |--|--|
    |`spec.parentRefs`|The name and namespace of the Gateway resource that serves the route. In this example, you use the `http` Gateway that you created earlier.  |
    |`spec.hostnames`|A list of hostnames that the route is exposed on. In the example, the route is exposed on `www.example.com`. |
-   |`spec.rules.backendRefs`| The Kubernetes service that serves the incoming request. In this example, requests to `www.example.com` are forwarded to the httpbin app on port 9000. Note that you must create the HTTPRoute in the same namespace as the service that serves that route. To create the HTTPRoute resource in a different namespace, you must create a ReferenceGrant resource to allow the HTTPRoute to forward requests to a service in a different namespace. For more information, see the [Kubernetes API Gateway documentation](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). |
+   |`spec.rules.backendRefs`| The Kubernetes service that serves the incoming request. In this example, requests to `www.example.com` are forwarded to the httpbin app on port 8000. Note that you must create the HTTPRoute in the same namespace as the service that serves that route. To create the HTTPRoute resource in a different namespace, you must create a ReferenceGrant resource to allow the HTTPRoute to forward requests to a service in a different namespace. For more information, see the [Kubernetes API Gateway documentation](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). |
 
 2. Verify that the HTTPRoute is applied successfully. 
    

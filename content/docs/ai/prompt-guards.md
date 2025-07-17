@@ -14,8 +14,8 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Before you begin
 
-1. [Set up AI Gateway](../setup/).
-2. [Authenticate to the LLM](../auth/).
+1. [Set up AI Gateway](/docs/ai/setup/).
+2. [Authenticate to the LLM](/docs/ai/auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Reject unwanted requests
@@ -389,4 +389,4 @@ kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l ap
 
 ## Next
 
-[Enrich your prompts](../prompt-enrichment/) with system prompts to improve LLM outputs.
+[Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.

@@ -85,7 +85,6 @@ The kgateway project provides the following extensions on top of the {{< reuse "
   {{< card link="/docs/security/access-logging/" title="Access logging" tag="Security" >}}
   {{< card link="/docs/setup/customize/aws-elb/" title="AWS ALB and NLB" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/buffering/" title="Buffering" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
   {{< card link="/docs/traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
   {{< card link="/docs/setup/customize/" title="Gateway customization" tag="Setup" >}}

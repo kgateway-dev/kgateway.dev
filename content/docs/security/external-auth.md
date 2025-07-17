@@ -8,7 +8,7 @@ Bring your own external authorization service to protect requests that go throug
 
 ## About external auth {#about}
 
-Kgateway lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
 
 ```mermaid
 sequenceDiagram
@@ -49,7 +49,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
 {{< /callout >}}
 
 {{< callout type="info" >}}
-Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `kgateway-system` namespace, and the TrafficPolicy, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](../../operations/debug/#trafficpolicy) troubleshooting docs.
+Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `{{< reuse "docs/snippets/namespace.md" >}}` namespace, and the TrafficPolicy, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
 {{< /callout >}}
 
 1. Deploy your external authorization service. The following example uses the [Istio external authorization service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes. This service is configured to allow requests with the `x-ext-authz: allow` header.
@@ -59,7 +59,7 @@ Note that in the following example, resources are created in the same namespace 
    apiVersion: apps/v1
    kind: Deployment
    metadata:
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: ext-authz
      labels:
        app: ext-authz
@@ -82,14 +82,14 @@ Note that in the following example, resources are created in the same namespace 
    EOF
    ```
 
-2. Create a Service for the Deployment that kgateway can access.
+2. Create a Service for the Deployment that {{< reuse "/docs/snippets/kgateway.md" >}} can access.
 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: v1
    kind: Service
    metadata:
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: ext-authz
      labels:
        app: ext-authz
@@ -104,14 +104,14 @@ Note that in the following example, resources are created in the same namespace 
    EOF
    ```
 
-3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](../../operations/debug/#trafficpolicy) troubleshooting docs.
+3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayExtension
    metadata:
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: basic-ext-auth
      labels:
        app: ext-authz
@@ -131,13 +131,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 1. Send a test request to the httpbin sample app.  Verify that you get back a 200 HTTP response code and that no authorization is required.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -158,7 +158,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: TrafficPolicy
    metadata:
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: gateway-ext-auth-policy
      labels:
        app: ext-authz
@@ -175,13 +175,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 3. Repeat your request to the httpbin sample app and verify that the request is denied.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -205,13 +205,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 4. Send another request, this time with the `x-ext-authz: allow` header. The Istio external authorization service is configured to allow requests with this header. Therefore, the request succeeds.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080" -H "x-ext-authz: allow"
    ```  
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com" -H "x-ext-authz: allow"
    ```
@@ -290,13 +290,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 6. Send a request without the `x-ext-authz` header and verify that you get back a 200 OK response. This time, the TrafficPolicy with the disabled external authorization service takes precedence so that the request is allowed through.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -323,5 +323,5 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 2. Delete the sample external authorization service and GatewayExtension resource.
 
    ```sh
-   kubectl delete gatewayextension,deployment,service -n kgateway-system -l app=ext-authz
+   kubectl delete gatewayextension,deployment,service -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ext-authz
    ```

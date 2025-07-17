@@ -1,4 +1,4 @@
-1. Follow the [Get started guide](../../../quickstart/) to install kgateway.
+1. Follow the [Get started guide](/docs/quickstart/) to install kgateway.
 
 2. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces.
 

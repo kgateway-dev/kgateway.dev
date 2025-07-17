@@ -17,7 +17,7 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 Set up an HTTPS listener on your Gateway. 
 
-If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](../overview/#listenersets).
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](/docs/setup/listeners/overview/#listenersets).
 * {{< reuse "docs/versions/warn-2-1-only.md" >}} 
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 

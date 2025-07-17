@@ -8,8 +8,9 @@ Set up cloud LLM providers with AI Gateway.
 
 ## Before you begin
 
-1. [Set up AI Gateway](../setup/).
-2. Choose a [supported LLM provider](#supported-llm-providers).
+1. [Set up AI Gateway](/docs/ai/setup/).
+2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. Choose a [supported LLM provider](#supported-llm-providers).
 
 ## Supported LLM providers {#supported-llm-providers}
 
@@ -25,7 +26,7 @@ The following sections in this guide provide examples that are tailored to the s
 
 OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 
-To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
+To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
 
 ## Gemini {#google}
 
@@ -35,7 +36,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    export GOOGLE_KEY=<your-api-key>
    ```
 
-2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](../auth/).
+2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](/docs/ai/auth/).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -193,9 +194,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="../failover" title="Model failover" >}}
-  {{< card link="../functions" title="Function calling" >}}
-  {{< card link="../prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="../prompt-guards" title="Prompt guards" >}}
-  {{< card link="../observability" title="AI Gateway metrics" >}}
+  {{< card link="/docs/ai/failover" title="Model failover" >}}
+  {{< card link="/docs/ai/functions" title="Function calling" >}}
+  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
+  {{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
 {{< /cards >}}

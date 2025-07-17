@@ -54,7 +54,9 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    | logging | Review the log level that is set for each component. |  
    | stats/prometheus | View metrics that Envoy emitted and sent to the built-in Prometheus instance. |
 
-4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command. 
+4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command.
+
+   * If you have not already, [set the log level for the Envoy gateway proxy to `debug`](#gateway-debug-logging).
    
    ```bash
    # {{< reuse "/docs/snippets/kgateway.md" >}} control plane
@@ -65,17 +67,146 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} deployment/$GATEWAY_NAME
    ```
 
+## Set gateway proxy debug logging {#gateway-debug-logging}
+
+You can set the log level for the Envoy proxy to get more detailed logs. Envoy log level options include `trace`, `debug`, `info`, `warn`, `error`, `critical`, and `off`. The default log level is `info`. For more information, see [Debugging Envoy](https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy).
+
+1. Create a GatewayParameters resource to add any custom settings to the gateway. For other settings, see the [GatewayParameters API docs](../../reference/api/#gatewayparametersspec) or check out the [Gateway customization guides](../../setup/customize/).
+   
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayParameters
+   metadata:
+     name: debug-gateway
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     kube: 
+       envoyContainer:
+         bootstrap:
+           logLevel: debug
+   EOF
+   ```
+
+2. Create a Gateway resource that references your custom GatewayParameters. 
+   
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: debug-gateway
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     gatewayClassName: kgateway
+     infrastructure:
+       parametersRef:
+         name: debug-gateway
+         group: gateway.kgateway.dev
+         kind: GatewayParameters       
+     listeners:
+     - protocol: HTTP
+       port: 80
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
+   
+   ```sh
+   kubectl get pods -l app.kubernetes.io/name=debug-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   ```
+   
+4. Create an HTTPRoute that routes traffic to your app through the debug gateway. The following example assumes that you set up the [sample `httpbin` app](../../operations/sample-app/).
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     parentRefs:
+       - name: debug-gateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - "debug.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+5. Get the address of the debug gateway proxy.
+
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} debug-gateway -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing"%}} 
+   ```sh
+   kubectl port-forward deployment/debug-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+6. Send traffic through the debug gateway proxy.
+
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: debug.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing"%}}
+   ```sh
+   curl -i localhost:8080/headers -H "host: debug.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+7. Review the debug logs for the gateway proxy.
+
+   ```sh
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l app.kubernetes.io/name=debug-gateway
+   ```
+
+   Example output:
+
+   ```console
+   [2025-07-08 18:59:13.234][34][debug][pool] [external/envoy/source/common/conn_pool/conn_pool_base.cc:254] [Tags: "ConnectionId":"2"] destroying stream: 0 active remaining, readyForStream false, currentUnusedCapacity 1
+   [2025-07-08 18:59:14.240][34][debug][connection] [external/envoy/source/common/network/connection_impl.cc:774] [Tags: "ConnectionId":"1"] remote close
+   [2025-07-08 18:59:14.241][34][debug][connection] [external/envoy/source/common/network/connection_impl.cc:314] [Tags: "ConnectionId":"1"] closing socket: 0
+   [2025-07-08 18:59:14.243][34][debug][conn_handler] [external/envoy/source/common/listener_manager/active_stream_listener_base.cc:136] [Tags: "ConnectionId":"1"] adding to cleanup list
+   [2025-07-08 18:59:14.244][1][debug][main] [external/envoy/source/server/server.cc:245] flushing stats
+   [2025-07-08 18:59:18.232][34][debug][connection] [external/envoy/source/common/network/connection_impl.cc:774] [Tags: "ConnectionId":"2"] remote close
+   [2025-07-08 18:59:18.233][34][debug][connection] [external/envoy/source/common/network/connection_impl.cc:314] [Tags: "ConnectionId":"2"] closing socket: 0
+   [2025-07-08 18:59:18.233][34][debug][client] [external/envoy/source/common/http/codec_client.cc:107] [Tags: "ConnectionId":"2"] disconnect. resetting 0 pending requests
+   [2025-07-08 18:59:18.234][34][debug][pool] [external/envoy/source/common/conn_pool/conn_pool_base.cc:532] [Tags: "ConnectionId":"2"] client disconnected, failure reason: 
+   [2025-07-08 18:59:18.235][34][debug][pool] [external/envoy/source/common/conn_pool/conn_pool_base.cc:500] invoking 1 idle callback(s) - is_draining_for_deletion_=false
+   ```
+
 ## TrafficPolicy not applied {#trafficpolicy}
 
 As part of debugging, you might have noticed that your HTTPRoute or Gateway had an attached TrafficPolicy. The TrafficPolicy's status might say `Accepted` and seem normal. However, when you checked the gateway configuration, the policy is not applied to the selected routes. Review the following common reasons for missing policies.
 
-1. Verify that the TrafficPolicy is attached correctly. For example, you might use label selectors that do not match any HTTPRoute or Gateway. For more information, see [Policy attachment](../../about/policies/trafficpolicy/#policy-attachment-trafficpolicy).
+1. Verify that the TrafficPolicy is attached correctly. For example, you might use label selectors that do not match any HTTPRoute or Gateway. For more information, see [Policy attachment](/docs/about/policies/trafficpolicy/#policy-attachment-trafficpolicy).
 
-2. Confirm that you do not have multiple, conflicting policies. In general, the oldest policy is enforced. For more information, see [Policy priority and merging rules](../../about/policies/trafficpolicy/#policy-priority-and-merging-rules).
+2. Confirm that you do not have multiple, conflicting policies. In general, the oldest policy is enforced. For more information, see [Policy priority and merging rules](/docs/about/policies/trafficpolicy/#policy-priority-and-merging-rules).
 
 3. Determine if you need a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). For example, the TrafficPolicy might rely on a GatewayExtension to enable a feature such as external auth. However, the GatewayExtension might be in a different namespace than the backing external auth service.
 
-   Example ReferenceGrant for [external auth](../../security/external-auth/) GatewayExtension:
+   Example ReferenceGrant for [external auth](/docs/security/external-auth/) GatewayExtension:
 
    * The GrantExtension for external auth, HTTPRoute, and backing Service are in the app namespace, such as `httpbin`.
    * The external auth service is in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace.

@@ -1,10 +1,9 @@
 ---
 title: Waypoint proxy
 weight: 20
-description: Enforce Layer 7 policies for the apps in your ambient mesh by using kgateway as a waypoint proxy.
 ---
 
-Enforce Layer 7 policies for the apps in your ambient mesh by using kgateway as a waypoint proxy.
+Enforce Layer 7 policies for the apps in your ambient mesh by using {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy.
 
 ## About ambient mesh
 
@@ -14,19 +13,18 @@ To learn more about ambient, see the [ambient mesh documentation](https://ambien
 
 ## About this guide
 
-In this guide, you learn how to set up kgateway as a waypoint proxy for multiple apps in your ambient mesh. To demonstrate the Layer 7 capabilities of the waypoint proxy, you deploy the three sample apps `client`, `httpbin2`, and `httpbin3` to your cluster. The `client` app sends in-mesh traffic to `httpbin2` and `httpbin3`. To apply Layer 7 policies, you create HTTPRoute resources for the `httpbin2` and `httpbin3` apps that define the policies that you want to apply to each app. Because the HTTPRoute is scoped to a particular service, when the `client` app sends a request to that service, only the policies that are defined for that service are enforced by the waypoint proxy. 
+In this guide, you learn how to set up {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy for multiple apps in your ambient mesh. To demonstrate the Layer 7 capabilities of the waypoint proxy, you deploy the three sample apps `client`, `httpbin2`, and `httpbin3` to your cluster. The `client` app sends in-mesh traffic to `httpbin2` and `httpbin3`. To apply Layer 7 policies, you create HTTPRoute resources for the `httpbin2` and `httpbin3` apps that define the policies that you want to apply to each app. Because the HTTPRoute is scoped to a particular service, when the `client` app sends a request to that service, only the policies that are defined for that service are enforced by the waypoint proxy. 
 
-{{% callout type="info" %}}
-You can create an HTTPRoute and scope it to the waypoint proxy by referencing the waypoint proxy in the `parentRef` section. This way, the policies that are defined in the HTTPRoute are automatically applied to all services in the waypoint proxy namespace. 
-{{% /callout %}}
+{{< callout type="info" >}}
+You can create an HTTPRoute and scope it to the waypoint proxy by referencing the waypoint proxy in the `parentRef` section. This way, the policies that are defined in the HTTPRoute are automatically applied to all services in the waypoint proxy namespace.
+{{< /callout >}}
 
-{{< reuse-image src="img/waypoint.svg" width="600px" caption="kgateway as a waypoint proxy in your ambient mesh" >}}
-{{< reuse-image-dark srcDark="img/waypoint.svg" width="600px" caption="kgateway as a waypoint proxy in your ambient mesh" >}}
-
+{{< reuse-image src="img/waypoint.svg" width="600px" caption="Waypoint proxy for Layer 7 policy application in an ambient mesh" >}}
+{{< reuse-image-dark srcDark="img/waypoint.svg" width="600px" caption="Waypoint proxy for Layer 7 policy application in an ambient mesh" >}}
 
 ## Set up an ambient mesh
 
-Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io quickstart documentation](https://ambientmesh.io/docs/quickstart/).
+{{< reuse "docs/snippets/setup-ambient-mesh.md" >}}
 
 ## Deploy sample apps
 
@@ -38,8 +36,8 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    ```
    
 2. Deploy the httpbin2, httpbin3, and client sample apps. 
-   {{< tabs items="httpbin2,httpbin3,client" >}}
-   {{% tab  %}}
+   {{< tabs tabTotal="3" items="httpbin2,httpbin3,client" >}}
+   {{% tab tabName="httpbin2" %}}
    ```yaml
    kubectl apply -f - <<EOF                                                  
    apiVersion: v1
@@ -118,7 +116,7 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    EOF
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="httpbin3" %}}
    ```yaml
    kubectl apply -f - <<EOF                                                  
    apiVersion: v1
@@ -197,7 +195,7 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    EOF
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="client" %}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: v1
@@ -271,18 +269,18 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
 
 ## Create a waypoint proxy
 
-You use the `kgateway-waypoint` GatewayClass to deploy kgateway as a waypoint proxy in your cluster. 
-   
+Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deploy {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy in your cluster. 
+  
 1. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: kgateway-waypoint
+     name: {{< reuse "/docs/snippets/waypoint-class.md" >}}
      namespace: httpbin
    spec:
-     gatewayClassName: kgateway-waypoint
+     gatewayClassName: {{< reuse "/docs/snippets/waypoint-class.md" >}}
      listeners:
      - name: proxy
        port: 15088
@@ -292,18 +290,18 @@ You use the `kgateway-waypoint` GatewayClass to deploy kgateway as a waypoint pr
 
 2. Wait for the waypoint proxy to deploy successfully.
    ```sh
-   kubectl -n httpbin rollout status deploy kgateway-waypoint
+   kubectl -n httpbin rollout status deploy {{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
    
    Example output: 
    ```
-   deployment "kgateway-waypoint" successfully rolled out
+   deployment "{{< reuse "/docs/snippets/waypoint-class.md" >}}" successfully rolled out
    ```
 
 3. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
    ```sh
-   kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint=kgateway-waypoint
-   kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint=kgateway-waypoint
+   kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
+   kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
 
 4. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
@@ -344,7 +342,7 @@ You use the `kgateway-waypoint` GatewayClass to deploy kgateway as a waypoint pr
 
 ## Enforce L7 policies with the waypoint {#waypoint-policies}
 
-In this step, you explore how to apply different types of Layer 7 policies to your sample apps. These policies are enforced by the kgateway waypoint proxy that you created earlier. You can add other Layer 7 policies to the waypoint proxy. For more information, see the [traffic management](/docs/traffic-management), [security](/docs/security), and [resiliency](/docs/resiliency) guides. 
+In this step, you explore how to apply different types of Layer 7 policies to your sample apps. These policies are enforced by the {{< reuse "/docs/snippets/kgateway.md" >}} waypoint proxy that you created earlier. You can add other Layer 7 policies to the waypoint proxy. For more information, see the [traffic management](../../../../traffic-management), [security](../../../../security), and [resiliency](../../../../resiliency) guides. 
 
 ### Header control
 
@@ -428,7 +426,7 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
    ```
    
    Example output: 
-   ```console {linenos=table,hl_lines=[7,8,13,14],linenostart=1,filename="Console output"}
+   ```console {hl_lines=[7,8,13,14]}
    {
      "args": {},
      "headers": {
@@ -470,7 +468,7 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
    ```
    
    Example output: 
-   ```console {linenos=table,hl_lines=[10,11,13,14,22,23],linenostart=1,filename="Console output"}
+   ```console {hl_lines=[10,11,13,14,22,23]}
    {
      "args": {},
      "headers": {
@@ -507,7 +505,7 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
 
 ### Transformations
 
-Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 app. 
+Use {{< reuse "/docs/snippets/kgateway.md" >}}'s {{< reuse "/docs/snippets/trafficpolicy.md" >}} to apply a transformation policy to the httpbin2 app. 
 
 1. If you have not done so yet, create an HTTPRoute for the httpbin2 app. You use this HTTPRoute to apply your transformation policy in the next step. 
    ```yaml
@@ -533,11 +531,11 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    EOF
    ```
 
-2. Create a TrafficPolicy that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
+2. Create a {{< reuse "/docs/snippets/trafficpolicy.md" >}} that applies a transformation policy to the httpbin2 app. In this example, the base64-encoded value from the `x-base64-encoded` header is decoded and added to the `x-base64-decoded` header, starting from the 11th character. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "/docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "/docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -561,7 +559,7 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    ```
    
    Example output: 
-   ```console {linenos=table,hl_lines=[8,25,26],linenostart=1,filename="Console output"}
+   ```console {hl_lines=[8,25,26]}
    < HTTP/1.1 200 OK
    ...
    access-control-allow-credentials: true
@@ -608,9 +606,9 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    }
    ```
 
-4. Optional: Remove the TrafficPolicy and HTTPRoute that you created in this guide. 
+4. Optional: Remove the {{< reuse "/docs/snippets/trafficpolicy.md" >}} and HTTPRoute that you created in this guide. 
    ```sh
-   kubectl delete TrafficPolicy transformation -n httpbin
+   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
    kubectl delete httproute httpbin2 -n httpbin
    ```
 
@@ -640,11 +638,11 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    EOF
    ```
    
-2. Create a TrafficPolicy that applies a local rate limiting policy to the httpbin2 app. In this example, only one request is allowed within 30 seconds. 
+2. Create a {{< reuse "/docs/snippets/trafficpolicy.md" >}} that applies a local rate limiting policy to the httpbin2 app. In this example, only one request is allowed within 30 seconds. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "/docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "/docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: ratelimit
      namespace: httpbin
@@ -690,9 +688,9 @@ Use kgateway's TrafficPolicy to apply a transformation policy to the httpbin2 ap
    local_rate_limited%    
    ```
    
-4. Optional: Remove the TrafficPolicy and HTTPRoute. 
+4. Optional: Remove the {{< reuse "/docs/snippets/trafficpolicy.md" >}} and HTTPRoute. 
    ```sh
-   kubectl delete trafficpolicy ratelimit -n httpbin
+   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} ratelimit -n httpbin
    kubectl delete httproute httpbin2 -n httpbin
    ```
 
@@ -770,7 +768,6 @@ Apply an Istio AuthorizationPolicy to allow access from specific apps only.
    < content-type: text/plain
    < server: envoy
    ```
-
    
 4. Send a `POST` request to the httpbin2 app that is allowed with the AuthorizationPolicy. Verify that the request succeeds and that you get back a 200 HTTP response code. 
    ```sh
@@ -811,7 +808,6 @@ Apply an Istio AuthorizationPolicy to allow access from specific apps only.
    kubectl delete authorizationpolicy httpbin-authz -n httpbin
    ```
 
-
 ## Cleanup
 
 Delete the resources that you created in this guide. 
@@ -819,7 +815,7 @@ Delete the resources that you created in this guide.
 ```sh
 kubectl delete HTTPRoute httpbin3 -n httpbin
 kubectl delete HTTPRoute httpbin2 -n httpbin
-kubectl delete gateway kgateway-waypoint -n httpbin
+kubectl delete gateway {{< reuse "/docs/snippets/waypoint-class.md" >}} -n httpbin
 kubectl delete serviceaccount httpbin2 -n httpbin
 kubectl delete service httpbin2 -n httpbin
 kubectl delete deployment httpbin2 -n httpbin
@@ -829,6 +825,6 @@ kubectl delete deployment httpbin3 -n httpbin
 kubectl delete serviceaccount client -n httpbin
 kubectl delete service client -n httpbin
 kubectl delete deployment client -n httpbin
-kubectl delete TrafficPolicy transformation -n httpbin
+kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 kubectl delete authorizationpolicy httpbin-authz -n httpbin
 ```

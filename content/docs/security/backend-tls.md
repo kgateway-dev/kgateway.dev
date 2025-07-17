@@ -20,13 +20,13 @@ However, you might have a specific backend workload that uses its own TLS certif
 
 ## Create a backend workload with a TLS certificate {#workload-tls-cert}
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/backendtls/inputs).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
 
 2. Verify that the NGINX server is running.
@@ -56,7 +56,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
 
    ```shell
    kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/v2.0.x/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml" >}}
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml" >}}
    EOF
    ```
 
@@ -183,10 +183,11 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the NGINX server.
+1. Delete the NGINX server and CA ConfigMap.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml
    ```
    
 2. Delete the routing resources that your created for the NGINX server.

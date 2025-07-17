@@ -18,13 +18,14 @@ The example in this guide uses the GatewayParameters resource to change settings
 
 1. Create a GatewayParameters resource to add any custom settings to the gateway. The following example makes the following changes: 
    
+   * The Envoy log level is set to `debug` (default value: `info`).
    * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`). 
    * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`). 
    * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
    
    {{< callout type="info" >}}
-   For other settings, see the [GatewayParameters proto file](https://github.com/solo-io/gloo/blob/{{< reuse "docs/versions/github-branch.md" >}}/projects/gateway2/api/v1alpha1/gateway_parameters_types.go) or check out the [Gateway customization guides](../).
+   For other settings, see the [GatewayParameters API docs](/docs/reference/api/#gatewayparametersspec) or check out the [Gateway customization guides](/docs/setup/customize/).
    {{< /callout >}}
    
    ```yaml
@@ -36,6 +37,9 @@ The example in this guide uses the GatewayParameters resource to change settings
      namespace: kgateway-system
    spec:
      kube: 
+       envoyContainer:
+         bootstrap:
+           logLevel: debug       
        service:
          type: NodePort
          extraLabels: 

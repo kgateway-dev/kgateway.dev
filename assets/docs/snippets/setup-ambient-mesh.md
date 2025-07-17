@@ -1,0 +1,1 @@
+Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io quickstart documentation](https://ambientmesh.io/docs/quickstart/).

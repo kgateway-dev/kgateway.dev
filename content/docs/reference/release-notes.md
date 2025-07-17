@@ -5,6 +5,42 @@ weight: 100
 
 Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
+## v2.1.0
+
+<!-- TODO release 2.1 
+For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.1.0).-->
+
+### 🔥 Breaking changes {#v2.1-breaking-changes}
+
+#### Route delegation annotation for policy merging {#v2.1-delegation-policy-merging}
+
+The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
+
+* The annotation is renamed from `delegation.kgateway.dev/inherited-policy-priority` to the simpler `kgateway.dev/inherited-policy-priority`.
+* Now, four values are accepted: `ShallowMergePreferParent`, `ShallowMergePreferChild`, `DeepMergePreferParent`, and `DeepMergePreferChild`. Deep merges apply only to the transformation filter in a TrafficPolicy.
+* The default behavior of parent route policies taking precedence over child routes policies is reversed. Now, child routes take precedence, which aligns better with the precedence defaults across other resources in the kgateway and Gateway APIs.
+
+To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`.
+
+To learn more about policy merging, see the [Policy merging](/docs/about/policies/#policy-merging) docs.
+
+Note that this change does not impact the other delegation annotations:
+* `delegation.kgateway.dev/inherit-parent-matcher`
+* `delegation.kgateway.dev/label`
+
+<!-- TODO release 2.1
+
+### ⚒️ Installation changes {#v2.1-installation-changes}
+
+### 🌟 New features {#v2.1-new-features}
+
+### 🔄 Feature changes {#v2.1-feature-changes}
+
+### 🗑️ Deprecated or removed features {#v2.1-removed-features}
+
+### 🚧 Known issues {#v2.1-known-issues}
+-->
+
 ## v2.0.0
 
 **Kgateway version 2.0.0** is the first official release of the project following its donation to the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/). The donation marks a new chapter for the codebase, which was originally developed as the Gloo project by Solo.io. The 2.0 release introduces foundational changes to the Gloo project that lay the groundwork for a vibrant, open-source ecosystem built around the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/).
@@ -92,7 +128,7 @@ Kgateway introduces support for using its Gateway implementation as an **Istio a
 
 This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs](/docs/integrations/istio/ambient/).
 
-### ⚠️ Breaking changes from Gloo v1 {#changes}
+### 🔥 Breaking changes from Gloo v1 {#changes}
 
 Kgateway v2 has extensive API changes from Gloo v1, which include the following.
 
