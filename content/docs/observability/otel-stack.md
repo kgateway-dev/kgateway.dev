@@ -17,12 +17,12 @@ For more information about observability, see the [Overview](/docs/observability
 
 Review the following diagram to understand the architecture of the observability stack.
 
-The gateway proxy acts as the primary telemetry generator, while the OTel Collector serves as the central routing hub for all observability data.
+The gateway proxy acts as the primary telemetry generator, while the OTel Collectors serve as the central routing hub for all observability data.
 
 ```mermaid
 flowchart TD
     A["1- Application Traffic"] --> B["2- Gateway proxy"]
-    B --> C["3- OTel Collector"]
+    B --> C["3- OTel Collectors"]
     C --> D["4- Storage Backends"]
     D --> D1["Logs (Loki)"]
     D --> D2["Traces (Tempo)"]
@@ -34,8 +34,8 @@ flowchart TD
 Architecture data flow:
 1. **Application Traffic**: Applications send requests to the gateway proxy.
 2. **Gateway Processing**: The gateway proxy processes requests and generates telemetry data in the form of logs, traces, and metrics.
-3. **Telemetry Collection**: The OTel Collector receives telemetry data from the gateway proxy.
-4. **Data Storage**: The OTel Collector routes data to the appropriate storage backends:
+3. **Telemetry Collection**: The OTel Collectors receive telemetry data from the gateway proxy.
+4. **Data Storage**: The OTel Collectors route data to the appropriate storage backends:
    - **Logs** go to Loki for log aggregation and storage.
    - **Traces** go to Tempo for distributed tracing storage.
    - **Metrics** go to Prometheus for time-series metrics storage.
@@ -580,13 +580,13 @@ To verify that your setup is working, generate sample traffic and review the log
    
 3. Generate traffic for the httpbin app. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..5}; do curl -v http://$INGRESS_GW_ADDRESS:8080/status/418 -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="Port-forward for local testing" %}} %}} %}}
    ```sh
    for i in {1..5}; do curl -v localhost:8080/status/418 -H "host: www.example.com:8080"; done
    ```
@@ -629,13 +629,13 @@ To verify that your setup is working, generate sample traffic and review the log
 
 6. Open Grafana and log in to Grafana by using the username `admin` and password `prom-operator`. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab tabName="Port-forward for local testing" %}} %}} %}}
    1. Port-forward the Grafana service to your local machine.
       ```sh
       kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
