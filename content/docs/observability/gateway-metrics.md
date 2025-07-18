@@ -5,7 +5,7 @@ weight: 20
 
 By default, {{< reuse "/docs/snippets/kgateway.md" >}} exposes metrics in Prometheus format for the data plane of each gateway proxy. You can use these metrics to monitor the health and performance of your gateway environment.
 
-## View default data planemetrics in Prometheus {#prometheus-metrics}
+## View default data plane metrics in Prometheus {#prometheus-metrics}
 
 The following steps show you how to quickly view the metrics endpoint of the gateway proxy deployment. To integrate the Prometheus metrics into your observability stack, see the [OpenTelemetry guide](/docs/observability/otel-stack/).
 

@@ -5,11 +5,13 @@ weight: 10
 
 Deploy an open source observability stack based on OpenTelemetry (OTel) that includes the following components:
 
-- **Logs**: Centralized log collection and storage with Grafana Loki.
-- **Traces**: Distributed tracing with Grafana Tempo.
-- **Metrics**: Time-series metrics collection with Prometheus.
-- **Collection**: Unified telemetry collection with OTel Collector.
-- **Visualization**: Comprehensive dashboards with Grafana.
+- **Logs**: Centralized log collection and storage with Grafana [Loki](https://github.com/grafana/loki).
+- **Traces**: Distributed tracing with Grafana [Tempo](https://github.com/grafana/tempo).
+- **Metrics**: Time-series metrics collection with [Prometheus](https://github.com/prometheus/prometheus).
+- **Collection**: Unified telemetry collection with [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector).
+- **Visualization**: Comprehensive dashboards with [Grafana](https://github.com/grafana/grafana).
+
+Observability tools are essential to gain insight into the health and performance of your gateway proxies. [OpenTelemetry](https://opentelemetry.io/) (OTel) is a flexible, open source framework that provides a set of APIs, libraries, and instrumentation to help capture and export observability data. However, you can follow a similar process as this guide to use the tools that you prefer.
 
 For more information about observability, see the [Overview](/docs/observability/) page.
 
@@ -41,6 +43,14 @@ Architecture data flow:
    - **Metrics** go to Prometheus for time-series metrics storage.
 5. **Visualization**: Grafana queries the storage backends as data sources to create unified dashboards.
 
+### More considerations {#more-considerations}
+
+**Push model**: This guide sets up the OTel collectors to push metrics to the storage backends (`push` model), vs. setting up the backends such as Prometheus to scrape metrics from the collector pod (`pull` model). The `push` model is used because it shows the ease and consistency of using OTel for demonstration purposes. It also supports Native Histograms out of the box, which the `pull` model does not due to [a known OTel issue with the Prometheus exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703).
+
+**Debug exporter**: The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
+
+**Prometheus exporter**: You can use the `promexporter` endpoint with Prometheus to scrape metrics from the collector pod, if you prefer the `pull` model to the `push` model. Also, if you use the `pull` model, make sure to configure Prometheus to handle Native Histograms per the [known issue](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703) previously mentioned.
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -49,7 +59,7 @@ Architecture data flow:
 
 Grafana is a suite of open source tools that help you analyze, visualize, and monitor data in your cluster. For the OTel stack, you install the following Grafana components:
 
-* **Loki**: A log aggregation system that indexes only the metadata about your logs (_labels_) and not the actual log contents. This way, Loki is more cost-efficient and performant than traditional log aggregation systems.
+* **Loki**: A log aggregation system that indexes only the label metadata about your logs and not the actual log contents. This way, Loki is more cost-efficient and performant than traditional log aggregation systems.
   {{< callout type="tip" >}}
   Loki works best when you use structured logging in your applications, such as JSON format.
   {{< /callout >}}
@@ -157,7 +167,7 @@ Steps to install:
    ```console
    NAME                   READY   STATUS    RESTARTS   AGE
    loki-0                 2/2     Running   0          3m45s
-   loki-chunks-cache-0    0/2     Pending   0          3m45s
+   loki-chunks-cache-0    2/2     Running   0          3m45s
    loki-results-cache-0   2/2     Running   0          3m45s
    tempo-0                1/1     Running   0          2m10s
    ```
@@ -170,7 +180,11 @@ By using an OTel collector to aggregate metrics, you avoid having to configure e
 
 You can deploy three separate OTel collectors that are optimized for the three different types of telemetry data: metrics, logs, and traces. This way, you can scale and optimize each collector based on your telemetry needs.
 
-1. Deploy the metrics collector to handle numerical measurements and time-series data.
+{{< callout type="warning" >}}
+The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
+{{< /callout >}}
+
+1. Deploy the metrics collector to handle numerical measurements and time-series data. Note that you can also use the `promexporter` endpoint with Prometheus to scrape metrics from the collector pod, if you prefer the `pull` model to the `push` model.
 
    ```yaml
    helm upgrade --install opentelemetry-collector-metrics opentelemetry-collector \
@@ -385,7 +399,7 @@ You can deploy three separate OTel collectors that are optimized for the three d
 
 Prometheus is a monitoring system and time-series database that collects metrics from configured targets at given intervals. It's the de facto standard for metrics collection in cloud-native environments. You can use the PromQL query language to set up flexible queries and alerts based on the metrics.
 
-1. Deploy Prometheus as a Helm chart in your cluster.
+1. Deploy Prometheus in your cluster.
 
    ```yaml
    helm upgrade --install kube-prometheus-stack kube-prometheus-stack \
@@ -485,7 +499,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
              name: opentelemetry-collector-logs
              namespace: telemetry
              port: 4317
-           logName: "otel-accesslog-service"
+           logName: "http-gateway-access-logs"
          body: >-
            "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %RESPONSE_CODE% "%REQ(:AUTHORITY)%" "%UPSTREAM_CLUSTER%"'
    EOF
@@ -572,7 +586,7 @@ To verify that your setup is working, generate sample traffic and review the log
    for i in {1..5}; do curl -v http://$INGRESS_GW_ADDRESS:8080/status/418 -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}} %}} %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    for i in {1..5}; do curl -v localhost:8080/status/418 -H "host: www.example.com:8080"; done
    ```
@@ -613,7 +627,7 @@ To verify that your setup is working, generate sample traffic and review the log
       10
    ```
 
-3. Verify that data plane metrics for the gateway proxy are being collected by using a Grafana dashboard.
+4. Verify that data plane metrics for the gateway proxy are being collected by using a Grafana dashboard.
    
    1. Create a Grafana dashboard for the data plane metrics of your gateway proxy. For example, you can download the [sample Grafana dashboard configuration for the `http` gateway](grafana.json) as an `envoy.json` file. 
 
@@ -625,7 +639,7 @@ To verify that your setup is working, generate sample traffic and review the log
       kubectl label -n telemetry cm envoy-dashboard grafana_dashboard=1
       ```
 
-   3. Open Grafana and log in to Grafana by using the username `admin` and password `prom-operator`. 
+   3. Open and log in to Grafana by using the username `admin` and password `prom-operator`. 
       
       {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
       {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -633,7 +647,7 @@ To verify that your setup is working, generate sample traffic and review the log
       open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
       ```
       {{% /tab %}}
-      {{% tab tabName="Port-forward for local testing" %}} %}} %}}
+      {{% tab tabName="Port-forward for local testing" %}}
       1. Port-forward the Grafana service to your local machine.
          ```sh
          kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000

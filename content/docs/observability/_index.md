@@ -8,8 +8,6 @@ prev: /docs/integrations
 
 Gain insight into the health and performance of your gateway environment.
 
-Observability tools are essential to gain insight into the health and performance of your gateway proxies. [OpenTelemetry](https://opentelemetry.io/) (OTel) is a flexible, open source framework that provides a set of APIs, libraries, and instrumentation to help capture and export observability data.
-
 ## Observability data types {#data-types}
 
 Observability is built on three core pillars as described in the following table. By combining these three data types, you get a complete picture of your system's health and performance.
