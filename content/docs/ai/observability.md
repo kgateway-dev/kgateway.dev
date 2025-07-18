@@ -73,6 +73,13 @@ Take a look at the default metrics that the system outputs.
 
 4. Stop port-forwarding the `ai-gateway` container.
 
+### Integrate with the OTel stack {#otel-integration}
+
+Review the Observability guides to set up an OpenTelemetry stack to collect logs, metrics, and traces.
+
+{{< cards >}}
+  {{< card link="../../observability/" title="Observability guides" >}}
+{{< /cards >}}
 
 ## Next
 
