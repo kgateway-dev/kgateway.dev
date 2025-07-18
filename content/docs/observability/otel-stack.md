@@ -59,7 +59,7 @@ Architecture data flow:
 
 Grafana is a suite of open source tools that help you analyze, visualize, and monitor data in your cluster. For the OTel stack, you install the following Grafana components:
 
-* **Loki**: A log aggregation system that indexes only the label metadata about your logs and not the actual log contents. This way, Loki is more cost-efficient and performant than traditional log aggregation systems.
+* **Loki**: A log aggregation system that indexes metadata about your logs as a set of labels, not the actual log contents. This way, Loki is more cost-efficient and performant than traditional log aggregation systems.
   {{< callout type="tip" >}}
   Loki works best when you use structured logging in your applications, such as JSON format.
   {{< /callout >}}
