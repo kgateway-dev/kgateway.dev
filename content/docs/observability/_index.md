@@ -26,4 +26,5 @@ Observability is built on three core pillars as described in the following table
   {{< card link="otel-stack" title="Set up the OpenTelemetry stack" >}}
   {{< card link="control-plane-metrics" title="Review control plane metrics" >}}
   {{< card link="gateway-metrics" title="Review gateway proxy metrics" >}}
+  {{< card link="../ai/observability/" title="AI Gateway observability" >}}
 {{< /cards >}}

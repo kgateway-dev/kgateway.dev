@@ -564,17 +564,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
 
 To verify that your setup is working, generate sample traffic and review the logs and Grafana dashboard.
    
-1. Save the [sample Grafana dashboard configuration](grafana.json) as `envoy.json`. 
-
-2. Import the Grafana dashboard. 
-   
-   ```sh
-   kubectl -n telemetry create cm envoy-dashboard \
-   --from-file=envoy.json
-   kubectl label -n telemetry cm envoy-dashboard grafana_dashboard=1
-   ```
-   
-3. Generate traffic for the httpbin app. 
+1. Generate traffic for the httpbin app. 
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -597,7 +587,7 @@ To verify that your setup is working, generate sample traffic and review the log
    ...
    ```
 
-4. Check that logs are being collected.
+2. Check that logs are being collected.
 
    ```sh
    kubectl -n telemetry logs deploy/opentelemetry-collector-logs | grep '/status/418' | wc -l
@@ -610,7 +600,7 @@ To verify that your setup is working, generate sample traffic and review the log
        5
    ```
 
-5. Check that traces are being collected.
+3. Check that traces are being collected.
 
    ```sh
    kubectl -n telemetry logs deploy/opentelemetry-collector-traces | grep 'http.status_code: Str(418)' | wc -l
@@ -623,34 +613,47 @@ To verify that your setup is working, generate sample traffic and review the log
       10
    ```
 
-6. Open Grafana and log in to Grafana by using the username `admin` and password `prom-operator`. 
+3. Verify that data plane metrics for the gateway proxy are being collected by using a Grafana dashboard.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}} %}} %}}
-   1. Port-forward the Grafana service to your local machine.
+   1. Create a Grafana dashboard for the data plane metrics of your gateway proxy. For example, you can download the [sample Grafana dashboard configuration for the `http` gateway](grafana.json) as an `envoy.json` file. 
+
+   2. Import the Grafana dashboard.
+   
       ```sh
-      kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
+      kubectl -n telemetry create cm envoy-dashboard \
+      --from-file=envoy.json
+      kubectl label -n telemetry cm envoy-dashboard grafana_dashboard=1
       ```
-   2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
-   {{% /tab %}}
-   {{< /tabs >}}
-   
-7. Go to **Dashboards** > **Envoy** to open the dashboard that you imported. Verify that you see the traffic that you generated for the httpbin app. 
-   
-   {{< reuse-image src="img/grafana-dashboard.png" >}}
+
+   3. Open Grafana and log in to Grafana by using the username `admin` and password `prom-operator`. 
+      
+      {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+      {{% tab tabName="Cloud Provider LoadBalancer" %}}
+      ```sh
+      open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
+      ```
+      {{% /tab %}}
+      {{% tab tabName="Port-forward for local testing" %}} %}} %}}
+      1. Port-forward the Grafana service to your local machine.
+         ```sh
+         kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
+         ```
+      2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
+      {{% /tab %}}
+      {{< /tabs >}}
+      
+   4. Go to **Dashboards** > **Envoy** to open the dashboard that you imported. Verify that you see the traffic that you generated for the httpbin app. 
+      
+      {{< reuse-image src="img/grafana-dashboard.png" >}}
 
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Remove the configmap for the Envoy dashboard. 
+1. Remove the configmap for the Envoy gateway proxy dashboard and delete the `envoy.json` file.
    ```sh
    kubectl delete cm envoy-dashboard -n telemetry
+   rm envoy.json
    ```
 
 2. Uninstall the Grafana Loki and Tempo components. 
