@@ -32,10 +32,18 @@ The following steps show you how to quickly view the metrics endpoint of the con
 Review the following table to understand more about each metric.
 
 Helpful terms:
-* Controller: The controller is the {{< reuse "/docs/snippets/kgateway.md" >}} control plane deployment.
-* Resource: A resource is a Kubernetes object that is managed by the controller.
+
+* Controller: A Kubernetes controller that reconciles resources as part of the {{< reuse "/docs/snippets/kgateway.md" >}} control plane deployment.
+
+* Resource: A Kubernetes object that is managed by a controller of the control plane.
+
 * Snapshot: A complete, point-in-time representation of the current state of resources that the controller builds and serves to a gateway proxy via the Envoy extensible Discovery Service (XDS) API.
-* Sync: The syncer synchronizes the status of resources between the control plane and the underlying Kubernetes resources, so that their state is accurately reflected.
+
+* Sync: The metrics refer to two kinds of syncs:
+  
+  * Status sync metrics represent the time it takes for you as a user to view the status that is reported on the resource.
+  * Snapshot sync metrics roughly represent the time it takes for a resource change to become effective in the gateway proxies.
+
 * Transform: The process of the control plane converting high-level resources or intermediate representations (IR) into lower-level representations into the structure that the XDS API expects for a snapshot.
 
 {{< reuse "docs/snippets/metrics-control-plane.md" >}}
