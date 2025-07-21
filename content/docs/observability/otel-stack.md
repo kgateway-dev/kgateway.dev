@@ -11,11 +11,21 @@ Deploy an open source observability stack based on OpenTelemetry (OTel) that inc
 - **Collection**: Unified telemetry collection with [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector).
 - **Visualization**: Comprehensive dashboards with [Grafana](https://github.com/grafana/grafana).
 
+## About
+
 Observability tools are essential to gain insight into the health and performance of your gateway proxies. [OpenTelemetry](https://opentelemetry.io/) (OTel) is a flexible, open source framework that provides a set of APIs, libraries, and instrumentation to help capture and export observability data. However, you can follow a similar process as this guide to use the tools that you prefer.
 
-For more information about observability, see the [Overview](/docs/observability/) page.
+### Observability data types {#data-types}
 
-## Architecture
+Observability is built on three core pillars as described in the following table. By combining these three data types, you get a complete picture of your system's health and performance.
+
+| Pillar | Description |
+| -- | -- |
+| Logs | Discrete events that happen at a specific time with detailed context. |
+| Metrics | Numerical measurements aggregated over time intervals. |
+| Traces | Records of requests as they flow through distributed systems. |
+
+### Architecture
 
 Review the following diagram to understand the architecture of the observability stack.
 

@@ -8,16 +8,6 @@ prev: /docs/integrations
 
 Gain insight into the health and performance of your gateway environment.
 
-## Observability data types {#data-types}
-
-Observability is built on three core pillars as described in the following table. By combining these three data types, you get a complete picture of your system's health and performance.
-
-| Pillar | Description |
-| -- | -- |
-| Logs | Discrete events that happen at a specific time with detailed context. |
-| Metrics | Numerical measurements aggregated over time intervals. |
-| Traces | Records of requests as they flow through distributed systems. |
-
 ## Guides
 
 {{< cards >}}
