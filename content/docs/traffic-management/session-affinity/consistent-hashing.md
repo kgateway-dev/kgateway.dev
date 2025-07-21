@@ -205,7 +205,7 @@ To try out session affinity with consistent hashing, you can follow these steps 
    httpbin-8d557795f-h8ks9   3/3     Running       0          26m
    ```
 
-3. Create a BackendConfigPolicy to configure the following Ringhash algorithm for the httpbin app.
+3. Create a BackendConfigPolicy to configure the following Maglev algorithm for the httpbin app.
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
@@ -219,11 +219,7 @@ To try out session affinity with consistent hashing, you can follow these steps 
          group: ""
          kind: Service
      loadBalancer:
-       ringHash:
-         minimumRingSize: 1024
-         maximumRingSize: 2048
-       useHostnameForHashing: true
-       closeConnectionsOnHostSetChange: true
+       maglev: {}
    EOF
    ```
 
