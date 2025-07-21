@@ -50,7 +50,7 @@ For more information, see the [Policy inheritance](/docs/traffic-management/rout
 
 {{< reuse "docs/snippets/policy-inheritance-native.md" >}}
 
-### kgateway policies
+### Kgateway policies
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
