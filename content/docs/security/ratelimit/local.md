@@ -1,12 +1,12 @@
 ---
 title: Local rate limiting
-weight: 10
+weight: 5
 description: Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 ---
 
 Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 
-## About local rate limiting
+## About {#about}
 
 Local rate limiting is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
 
