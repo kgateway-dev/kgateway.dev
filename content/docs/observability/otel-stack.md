@@ -652,18 +652,18 @@ To verify that your setup is working, generate sample traffic and review the log
    3. Open and log in to Grafana by using the username `admin` and password `prom-operator`. 
       
       {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-      {{% tab tabName="Cloud Provider LoadBalancer" %}}
-      ```sh
-      open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
-      ```
-      {{% /tab %}}
-      {{% tab tabName="Port-forward for local testing" %}}
-      1. Port-forward the Grafana service to your local machine.
-         ```sh
-         kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
-         ```
-      2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
-      {{% /tab %}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+1. Port-forward the Grafana service to your local machine.
+   ```sh
+   kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
+   ```
+2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
+{{% /tab %}}
       {{< /tabs >}}
       
    4. Go to **Dashboards** > **Envoy** to open the dashboard that you imported. Verify that you see the traffic that you generated for the httpbin app. 
