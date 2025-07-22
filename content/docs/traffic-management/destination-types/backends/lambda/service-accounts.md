@@ -80,14 +80,19 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
           {
             "Effect": "Allow",
             "Principal": {
+              "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          },
+          {
+            "Effect": "Allow",
+            "Principal": {
               "Federated": "arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
               "StringEquals": {
-                "${OIDC_PROVIDER}:sub": [
-                  "system:serviceaccount:{{< reuse "/docs/snippets/namespace.md" >}}:http"
-                ]
+                "${OIDC_PROVIDER}:sub": "system:serviceaccount:{{< reuse "/docs/snippets/namespace.md" >}}:http"
               }
             }
           }
