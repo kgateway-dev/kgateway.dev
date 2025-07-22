@@ -151,8 +151,6 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
    metadata:
      name: extproc
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http
@@ -339,8 +337,6 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    metadata:
      name: extproc
      namespace: kgateway-system
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http

@@ -274,8 +274,6 @@ To try out session persistence, you can follow these steps to define cookie-base
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http

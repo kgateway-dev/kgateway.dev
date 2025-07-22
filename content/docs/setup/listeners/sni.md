@@ -124,8 +124,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: sni
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       gateway: sni
    spec:
      gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      listeners:
@@ -177,8 +175,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
       metadata:
         name: sni
         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-        labels:
-          gateway: sni
       spec:
         gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
         allowedListeners:
@@ -211,8 +207,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
       metadata:
         name: sni-listenerset
         namespace: {{< reuse "docs/snippets/namespace.md" >}}
-        labels:
-          gateway: sni
       spec:
         parentRef:
           name: sni
@@ -271,8 +265,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: httpbin-https
      namespace: httpbin
-     labels:
-       example: httpbin-route
        gateway: sni
    spec:
      parentRefs:
@@ -297,8 +289,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: httpbin-https
      namespace: httpbin
-     labels:
-       example: httpbin-route
        gateway: sni
    spec:
      parentRefs:
@@ -329,9 +319,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: petstore-https
      namespace: default
-     labels:
-       example: petstore-route
-       gateway: sni
    spec:
      parentRefs:
        - name: sni
@@ -355,9 +342,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: petstore-https
      namespace: default
-     labels:
-       example: petstore-route
-       gateway: sni
    spec:
      parentRefs:
        - name: sni-listenerset
