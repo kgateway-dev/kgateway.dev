@@ -76,6 +76,7 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | Feature | Minimum Gateway API version |
 | --- | --- |
 | [ListenerSets](/docs/setup/listeners/#listenersets) | 1.3 |
+| [Session persistence](/docs/traffic-management/session-persistence/) | 1.3 |
 | [TCPRoutes](/docs/setup/listeners/tcp/) | 1.3 |
 | [BackendTLSPolicy](/docs/security/backend-tls/) | 1.2 |
 | [CORS policies](/docs/security/cors/) | 1.2 |
