@@ -17,7 +17,9 @@ With your own rate limit service in place, you get benefits such as:
 - Dynamic descriptor-based rate limits that can consider multiple request attributes.
 - Consistent user experience, regardless of which Gateway receives the request.
 
-## How It Works
+### Request flow
+
+Review the following sequence diagram to understand the request flow with global rate limiting.
 
 ```mermaid
 sequenceDiagram
@@ -28,7 +30,7 @@ sequenceDiagram
 
     Client->>Gateway: 1. Send request to protected App
     Gateway->>Gateway: 2. Receive request
-    Gateway->>RateLimiter: 3. Extract descriptors & send to Rate Limiter
+    Gateway->>RateLimiter: 3. Extract descriptors & send to Rate Limit Service
     RateLimiter->>RateLimiter: 4. Apply configured limits for descriptors
     RateLimiter->>Gateway: Return decision
     alt Request allowed
@@ -40,35 +42,68 @@ sequenceDiagram
     end
 ```
 
-
 1. Client sends a request to an App that is protected by the Gateway.
 2. Gateway receives the request.
-3. Gateway extracts descriptors and sends them to the Rate Limiter.
-4. The Rate Limiter applies configured limits for those descriptors and returns a decision to the Gateway.
+3. Gateway extracts descriptors and sends them to the Rate Limit Service.
+4. The Rate Limit Service applies configured limits for those descriptors and returns a decision to the Gateway.
 5. If allowed, the Gateway forwards the request to the App.
 6. If the rate limit is reached, the Gateway denies the request and returns a message to the Client.
 
-## Architecture
+### Architecture
 
 The global rate limiting feature consists of three components:
 
-1. **TrafficPolicy with rateLimit.global** - Configures which descriptors to extract and send to the rate limit service
-2. **GatewayExtension** - References the rate limit service implementation
-3. **Rate Limit Service** - An external service that implements the Envoy Rate Limit protocol and contains the actual rate limit values
+1. **TrafficPolicy with rateLimit.global**: Configure your rate limit policy in a kgateway TrafficPolicy. The rate limit policy includes the descriptors to extract from requests for the Gateway to send to the Rate Limit Service.
+2. **GatewayExtension**: Configure a Gateway to use the Rate Limit Service by using a kgateway GatewayExtension.
+3. **Rate Limit Service** - An external service that you set up to implement the Envoy Rate Limit protocol. The Rate Limit Service has the actual rate limit values to enforce on requests, based on the descriptors that the TrafficPolicy includes.
 
-## Deployment
+### Response headers
 
-### 1. Deploy the Rate Limit Service
+When rate limiting is enabled, kgateway adds the following headers to responses. These headers help clients understand their current rate limit status and adapt their behavior accordingly.
 
-kgateway integrates with any service that implements the Envoy Rate Limit gRPC protocol. For your convenience, we provide an example deployment using the official Envoy rate limit service in the [test/kubernetes/e2e/features/rate_limit/testdata](../test/kubernetes/e2e/features/rate_limit/testdata) directory.
+| Header | Description | Example |
+|--------|-------------|---------|
+| x-ratelimit-limit | The rate limit ceiling for the given request | `10, 10;w=60` (10 requests per 60 seconds) |
+| x-ratelimit-remaining | The number of requests left for the time window | `5` (5 requests remaining) |
+| x-ratelimit-reset | The time in seconds until the rate limit resets | `30` (rate limit resets in 30 seconds) |
+| x-envoy-ratelimited | Present when the request is rate limited | `true` |
 
-```bash
-kubectl apply -f test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Step 1: Deploy your Rate Limit Service {#byo-rate-limit-service}
+
+You can bring your own rate limit service that implements the Envoy Rate Limit gRPC protocol. 
+
+To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/rate_limit/testdata).
+
+1. Create the `kgateway-test` namespace.
+
+   ```sh
+   kubectl create namespace kgateway-test
+   ```
+
+2. Deploy the rate limit service.
+
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
+   ```
+
+## Step 2: Define the rate limits {#rate-limits}
+
+Define the actual rate limit values (requests per unit time) in your Rate Limit Service. For example, using the [Envoy Rate Limit](https://github.com/envoyproxy/ratelimit) service, you configure the rate limits in its configuration file.
+
+The kgateway example that you deployed in the previous step includes the following rate limit configuration as a Kubernetes ConfigMap.
+
+```sh
+kubectl describe configmap ratelimit-config -n kgateway-test
 ```
 
-### 2. Configure the Rate Limit Service
+Example output:
 
-The actual rate limit values (requests per unit time) must be configured in the rate limit service, not in kgateway's policies. For example, using the [Envoy Rate Limit](https://github.com/envoyproxy/ratelimit) service, you would configure limits in its configuration file:
+* The descriptor `key` values are the descriptor names that you use later in the kgateway TrafficPolicy to decide which rate limits to apply to requests.
+* The example sets various rate limits per minute.
 
 ```yaml
 # ratelimit-config.yaml
@@ -94,44 +129,86 @@ descriptors:
       requests_per_unit: 2
 ```
 
-### 3. Create a GatewayExtension
+## Step 3: Create a GatewayExtension {#gateway-extension}
 
-The GatewayExtension resource connects your kgateway installation with the rate limit service:
+Create a GatewayExtension resource that points to your Rate Limit Service. 
+
+1. Create a GatewayExtension resource that points to your Rate Limit Service.
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayExtension
+   metadata:
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     name: global-ratelimit
+   spec:
+     type: RateLimit
+     rateLimit:
+       grpcService:
+         backendRef:
+           name: ratelimit
+           namespace: {{< reuse "docs/snippets/namespace.md" >}}
+           port: 8081
+       domain: "api-gateway"
+       timeout: "100ms"
+       failOpen: false
+   EOF
+   ```
+
+   {{% reuse "docs/snippets/field-desc/review-table.md" %}} For more information, see the [API docs](../../reference/api/#ratelimitprovider).
+
+   | Field | Description | Required |
+   |-------|-------------|----------|
+   | grpcService | Configuration for connecting to the gRPC rate limit service. | Yes |
+   | domain | Domain identity for the rate limit service. | Yes |
+   | timeout | Timeout for rate limit service calls, such as `100ms`. | No |
+   | failOpen | When `true`, requests continue even if the rate limit service is unavailable. | No (defaults to `false`) |
+
+2. Create a Kubernetes ReferenceGrant to allow the GatewayExtension to access the Rate Limit Service. Otherwise, you can create the GatewayExtension and Gateway in the same namespace as the Rate Limit Service.
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ReferenceGrant
+   metadata:
+     name: global-ratelimit
+     namespace: kgateway-test
+   spec:
+     from:
+     - group: gateway.kgateway.dev
+       kind: GatewayExtension
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     to:
+     - group: v1
+       kind: Service
+   EOF
+   ```
+
+## Step 4: Create a TrafficPolicy {#traffic-policy}
+
+Create a TrafficPolicy resource that applies rate limits to your routes. 
+
+Flip through the tabs for different example rate limit policies. Note that the examples apply to the Gateway that you created before you began, but you can also apply a TrafficPolicy to an HTTPRoute or specific route.
+
+{{< tabs tabTotal="4" items="Client IP address, User ID, Combined rate limiting, Combined local and global rate limiting" >}}
+
+{{% tab tabName="Client IP address" %}}
+
+Limit requests based on the client's IP address.
 
 ```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayExtension
-metadata:
-  name: global-ratelimit
-  namespace: kgateway-system
-spec:
-  type: RateLimit
-  rateLimit:
-    grpcService:
-      backendRef:
-        name: ratelimit
-        namespace: kgateway-system
-        port: 8081
-    domain: "api-gateway"
-    timeout: "100ms"  # Optional timeout for rate limit service calls
-    failOpen: false   # Optional: when true, requests proceed if the rate limit service is unavailable
-```
-
-### 4. Create TrafficPolicies with Global Rate Limiting
-
-Apply rate limits to your routes using the TrafficPolicy resource:
-
-```yaml
+kubectl apply -f - <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
   name: ip-rate-limit
-  namespace: kgateway-system
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: test-route-1
+    kind: Gateway
+    name: http
   rateLimit:
     global:
       descriptors:
@@ -139,107 +216,27 @@ spec:
         - type: RemoteAddress
       extensionRef:
         name: global-ratelimit
+EOF
 ```
 
-## Configuration Options
+{{% /tab %}}
 
-### TrafficPolicy.spec.rateLimit.global
+{{% tab tabName="User ID" %}}
 
-| Field | Description | Required |
-|-------|-------------|----------|
-| descriptors | Define the dimensions for rate limiting | Yes |
-| extensionRef | Reference to a GatewayExtension for the rate limit service | Yes |
-
-### GatewayExtension.spec.rateLimit
-
-| Field | Description | Required |
-|-------|-------------|----------|
-| grpcService | Configuration for connecting to the gRPC rate limit service | Yes |
-| domain | Domain identity for the rate limit service | Yes |
-| timeout | Timeout for rate limit service calls (e.g., "100ms") | No |
-| failOpen | When true, requests continue if the rate limit service is unavailable | No (defaults to false) |
-
-### Rate Limit Descriptors
-
-Descriptors define the dimensions for rate limiting. Each descriptor consists of one or more entries that help categorize and count requests:
+Limit requests based on a user ID from an `X-User-ID` header.
 
 ```yaml
-descriptors:
-- entries:
-  - type: RemoteAddress
-  - type: Generic
-    generic:
-      key: "custom_key"
-      value: "custom_value"
-- entries:
-  - type: Header
-    header: "X-User-ID"
-  - type: Path
-```
-
-### Descriptor Entry Types
-
-| Type | Description | Additional Fields |
-|------|-------------|-------------------|
-| RemoteAddress | Uses the client's IP address as the descriptor value | None |
-| Path | Uses the request path as the descriptor value | None |
-| Header | Extracts the descriptor value from a request header | `header`: The name of the header to extract |
-| Generic | Uses a static key-value pair | `generic.key`: The descriptor key<br>`generic.value`: The static value |
-
-## Rate Limit Response Headers
-
-When rate limiting is enabled, kgateway adds the following headers to responses:
-
-| Header | Description | Example |
-|--------|-------------|---------|
-| x-ratelimit-limit | The rate limit ceiling for the given request | `10, 10;w=60` (10 requests per 60 seconds) |
-| x-ratelimit-remaining | The number of requests left for the time window | `5` (5 requests remaining) |
-| x-ratelimit-reset | The time in seconds until the rate limit resets | `30` (rate limit resets in 30 seconds) |
-| x-envoy-ratelimited | Present when the request is rate limited | `true` |
-
-These headers help clients understand their current rate limit status and adapt their behavior accordingly.
-
-## Examples
-
-### Rate Limiting by IP Address
-
-Limit requests based on the client's IP address:
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: TrafficPolicy
-metadata:
-  name: ip-rate-limit
-  namespace: kgateway-system
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: test-route-1
-  rateLimit:
-    global:
-      descriptors:
-      - entries:
-        - type: RemoteAddress
-      extensionRef:
-        name: global-ratelimit
-```
-
-### Rate Limiting by User ID (from header)
-
-Limit requests based on a user ID header:
-
-```yaml
+kubectl apply -f - <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
   name: user-rate-limit
-  namespace: kgateway-system
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: test-route-1
+    kind: Gateway
+    name: http
   rateLimit:
     global:
       descriptors:
@@ -248,23 +245,27 @@ spec:
           header: "X-User-ID"
       extensionRef:
         name: global-ratelimit
+EOF
 ```
 
-### Combined Rate Limiting
+{{% /tab %}}
+
+{{% tab tabName="Combined rate limiting" %}}
 
 Apply different limits based on both path and user ID:
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
   name: combined-rate-limit
-  namespace: kgateway-system
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: test-route-1
+    kind: Gateway
+    name: http
   rateLimit:
     global:
       descriptors:
@@ -274,23 +275,27 @@ spec:
           header: "user-id"
       extensionRef:
         name: global-ratelimit
+EOF
 ```
 
-## Combining Local and Global Rate Limiting
+{{% /tab %}}
 
-kgateway allows you to use both local and global rate limiting in the same TrafficPolicy:
+{{% tab tabName="Combined local and global rate limiting" %}}
+
+Combine local and global rate limiting in the same TrafficPolicy. For more information, see [Local rate limiting](../local).
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
-  name: combined-rate-limit
-  namespace: kgateway-system
+  name: local-global-rate-limit
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: test-route-1
+    kind: Gateway
+    name: http
   rateLimit:
     local:
       tokenBucket:
@@ -306,4 +311,94 @@ spec:
             value: "premium-api"
       extensionRef:
         name: global-ratelimit
+```
+
+{{% /tab %}}
+
+{{< /tabs >}}
+
+### Descriptors
+
+Descriptors define the dimensions for rate limiting. Each descriptor consists of one or more entries that help categorize and count requests.
+
+```yaml
+descriptors:
+- entries:
+  - type: RemoteAddress
+  - type: Generic
+    generic:
+      key: "custom_key"
+      value: "custom_value"
+- entries:
+  - type: Header
+    header: "X-User-ID"
+  - type: Path
+```
+
+The following table describes the different descriptor entry types. For more information, see the [API docs](../../reference/api/#ratelimitpolicy).
+
+| Type | Description | Additional Fields |
+|------|-------------|-------------------|
+| RemoteAddress | Uses the client's IP address as the descriptor value | None |
+| Path | Uses the request path as the descriptor value | None |
+| Header | Extracts the descriptor value from a request header | `header`: The name of the header to extract |
+| Generic | Uses a static key-value pair | `generic.key`: The descriptor key<br>`generic.value`: The static value |
+
+## Step 5: Test the rate limits {#test-rate-limits}
+
+Test the rate limits by sending requests to the Gateway. The following steps assume that you created the client IP address example TrafficPolicy.
+
+1. Send a test request to the httpbin sample app. The request succeeds because you did not exceed the rate limit of 1 request per minute.
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/headers -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   
+   ```txt
+   HTTP/1.1 200 OK
+   ...
+   ```
+
+2. Repeat the request. The request fails because you exceeded the rate limit of 1 request per minute.
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/headers -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   
+   ```txt
+   HTTP/1.1 200 OK
+   ...
+   ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
+kubectl delete gatewayextension global-ratelimit
+kubectl delete trafficpolicy ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit
+kubectl delete namespace kgateway-test
 ```
