@@ -101,8 +101,6 @@ Keep in mind the following considerations when working with an NLB:
       metadata:
         name: aws-cloud
         namespace: kgateway-system
-        labels:
-          gateway: aws-cloud
       spec:
         gatewayClassName: kgateway
         infrastructure:
@@ -163,8 +161,6 @@ Keep in mind the following considerations when working with an NLB:
    metadata:
      name: httpbin-elb
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: aws-cloud
@@ -207,8 +203,6 @@ Keep in mind the following considerations when working with an NLB:
    metadata:
      name: httpbin-elb
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: aws-cloud

@@ -26,8 +26,6 @@ weight: 10
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http
