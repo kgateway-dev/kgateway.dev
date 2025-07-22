@@ -54,6 +54,10 @@ For more information, see the [Policy inheritance](/docs/traffic-management/rout
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
+## Automatic route replacement
+
+If a destination that is defined in the HTTPRoute's `backendRefs` section cannot be found, such as when a parent HTTPRoute routes traffic to a child HTTPRoute that does not exits, the route is automatically replaced with a 500 HTTP direct response. However, valid routes are not replaced and continue to work. 
+
 ## Limitations
 
 The current route delegation model imposes a few restrictions on how routes can be delegated. If a rule is violated, the corresponding rule is removed from the route. 
@@ -127,5 +131,5 @@ For an example route delegation setup that uses header and query parameters, see
 
 ### Cyclic delegation
 
-Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is ignored and reported as an error.  
+Cyclic route delegations, such as where HTTPRoute A delegates to B, B delegates to C, and C delegates back to A are not allowed as no proper backend is specified that fulfills the request. If cyclic route delegation is detected, the route that is part of the cycle is automatically replaced with a 500 HTTP direct response.   
 
