@@ -35,6 +35,33 @@ spec:
         value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
+You can also apply the same TrafficPolicy to multiple HTTPRoutes by referencing them in the `targetRefs` section, as shown in the following example. 
+
+```yaml {hl_lines=[7,8,9,10,11,12,13,14,15,16]}
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: transformation
+  namespace: httpbin
+spec:
+  targetRefs: 
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: petstore
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: echo
+  transformation:
+    response:
+      set:
+      - name: x-kgateway-response
+        value: '{{ request_header("x-kgateway-request") }}' 
+```
+
+
 ### Individual route {#attach-to-route}
 
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
