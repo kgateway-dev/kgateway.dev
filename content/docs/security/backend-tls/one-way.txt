@@ -26,7 +26,7 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "docs/snippets/prereq-x-channel.md" >}}
 
 ## In-cluster service
 
@@ -60,13 +60,7 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
 
 Create the BackendTLSPolicy for the NGINX workload. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
 
-1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use BackendTLSPolicy.
-
-   ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-
-2. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
+1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
    ```shell
    kubectl apply -f- <<EOF
@@ -74,7 +68,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    EOF
    ```
 
-3. Create the BackendTLSPolicy.
+2. Create the BackendTLSPolicy.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -106,7 +100,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    | `validation.hostname` | The hostname that matches the NGINX server certificate. |
    | `validation.caCertificateRefs` | The ConfigMap that has the public CA certificate for the NGINX server. |
 
-4. Create an HTTPRoute that routes traffic to the NGINX server on the `example.com` hostname and HTTPS port 8443. Note that the parent Gateway is the sample `http` Gateway resource that you created [before you began](#before-you-begin).
+3. Create an HTTPRoute that routes traffic to the NGINX server on the `example.com` hostname and HTTPS port 8443. Note that the parent Gateway is the sample `http` Gateway resource that you created [before you began](#before-you-begin).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -182,13 +176,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
 
-1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use BackendTLSPolicy.
-
-   ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
-
-2. Create a Backend resurce that represents your external service. In this example, you use a static Backend that routes traffic to the `httpbin.org` site. Make sure to include the HTTPS port 443 so that traffic is routed to this port. 
+1. Create a Backend resource that represents your external service. In this example, you use a static Backend that routes traffic to the `httpbin.org` site. Make sure to include the HTTPS port 443 so that traffic is routed to this port. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -205,7 +193,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
    
-3. Create a BackendTLSPolicy resource that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. 
+2. Create a BackendTLSPolicy resource that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha3	
@@ -224,7 +212,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
 
-4. Create an HTTPRoute that rewrites traffic on the `httpbin-external.example` domain to the `httpbin.org` hostname and routes traffic to your Backend.  
+3. Create an HTTPRoute that rewrites traffic on the `httpbin-external.example` domain to the `httpbin.org` hostname and routes traffic to your Backend.  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -254,7 +242,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
 
-5. Send a request to the `httpbin-external.example` domain. Verify that the host is rewritten to `https://httpbin.org/anything` and that you get back a 200 HTTP response code.  
+4. Send a request to the `httpbin-external.example` domain. Verify that the host is rewritten to `https://httpbin.org/anything` and that you get back a 200 HTTP response code.  
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
