@@ -35,7 +35,7 @@ spec:
         value: '{{ request_header("x-kgateway-request") }}' 
 ```
 
-You can also apply the same TrafficPolicy to multiple HTTPRoutes by referencing them in the `targetRefs` section as shown in the following example. 
+You can also apply the same TrafficPolicy to multiple HTTPRoutes by referencing them in the `targetRefs` section, as shown in the following example. 
 
 ```yaml {hl_lines=[7,8,9,10,11,12,13,14,15,16]}
 apiVersion: gateway.kgateway.dev/v1alpha1

@@ -56,7 +56,7 @@ For more information, see the [Policy inheritance](/docs/traffic-management/rout
 
 ## Automatic route replacement
 
-If a destination that is defined in the HTTPRoute's `backendRefs` section cannot be found, such as when a parent HTTPRoute routes traffic to a child HTTPRoute that does not exits, the route is automatically replaced with a 500 HTTP direct response. However, valid routes are not replaced and continue to work. 
+If a destination that is defined in the HTTPRoute's `backendRefs` section cannot be found, such as when a parent HTTPRoute routes traffic to a child HTTPRoute that does not exist, the route is automatically replaced with a 500 HTTP direct response. However, valid routes are not replaced and continue to work.
 
 ## Limitations
 

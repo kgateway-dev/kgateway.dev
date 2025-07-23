@@ -20,7 +20,7 @@ Use the `kgwctl` CLI to quickly assess the health of your kgateway control and d
    
    Example output: 
    ```sh
-   Downloading kgwctl-darwin-arm64 from release v0.0.1-alpha2...
+   Downloading kgwctl-darwin-arm64 from release v{{< reuse "docs/versions/kgwctl.md" >}}...
    Verifying checksum...
    Checksum verified successfully
    Download successful: kgwctl-darwin-arm64
@@ -48,12 +48,12 @@ Use the `kgwctl` CLI to quickly assess the health of your kgateway control and d
     kgwctl [command]
 
    Available Commands:
-     analyze     Anaylze resources by file names or stdin
-     check       Check the health of the kgateway installation
-     completion  Generate the autocompletion script for the specified shell
-     describe    Display one or many resources
-     get         Display one or many resources
-     help        Help about any command
+     analyze     Analyze kgateway resource manifests by file names or directory to find configuration issues and impacts on other resources. 
+     check       Check the health of the kgateway control and data plane. 
+     completion  Generate the autocompletion script for the `kgwctl` CLI for the specified shell.
+     describe    Get the details of one or more kgateway resources. 
+     get         List one or more kgateway resources. 
+     help        List all supported commands for the `kgwctl` CLI. 
    ...
    ```
    
