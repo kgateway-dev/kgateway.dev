@@ -282,7 +282,7 @@ By default, the following rules apply. You can update the behavior by using the 
 
 ### Priority order
 
-Review the following Gateway and HTTPRoute policy priorities, sorted from highest to lowest. 
+Review the following Gateway and HTTPRoute policy priorities, sorted from highest to lowest.
 
 **Gateway**: 
 
@@ -298,6 +298,10 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 | 1 | [Individual HTTPRoute policy](#attach-to-route) | A TrafficPolicy that is attached to an individual route by using the `extensionRef` filter in the HTTPRoute has the highest priority. Note that if you have multiple HTTPRoute policies that are attached via the `extensionRef` option and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
 | 2 | [HTTPRoute rule policy](#attach-to-rule) | A TrafficPolicy that is attached to an HTTPRoute rule by using the `targetRefs.sectionName` option has a lower priority. This policy can still augment any `extensionRef` policies by defining different top-level policies. Note that if you have multiple HTTPRoute rule policies and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
 | 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A TrafficPolicy that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple HTTPRoute rule policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
+
+{{< callout type="info" >}} 
+If you apply a TrafficPolicy with the same top-level policy to a Gateway and an HTTPRoute, the policy on the HTTPRoute takes precedence and the one on the Gateway is ignored. For example, you might have two local rate limiting policies. One is applied to a Gateway and one is applied to the HTTPRoute. Because the same top-level policy is defined, the policy on the HTTPRoute is considered higher priority and therefore enforced. 
+{{< /callout >}}
 
 ### Policy inheritance and overrides in delegation setups {#delegation}
 
