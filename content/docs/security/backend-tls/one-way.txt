@@ -6,9 +6,9 @@ description:
 
 Originate a one-way TLS connection from the Gateway to a backend. 
 
-{{% callout type="warning" %}}
+{{< callout type="warning" >}}
 {{< reuse "docs/versions/warn-experimental.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 ## About one-way TLS
 
@@ -29,6 +29,8 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## In-cluster service
+
+Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server. 
 
 ### Deploy the sample app
 
@@ -133,13 +135,13 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 1. Send a request to the NGINX server and verify that you get back a 200 HTTP response code. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/ -H "host: example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -vi http://localhost:8080/ -H "host: example.com:8080"
    ```
@@ -178,7 +180,15 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    
 ## External service
 
-1. Create a Backend that represents the external service. 
+Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
+
+1. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use BackendTLSPolicy.
+
+   ```shell
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```
+
+2. Create a Backend resurce that represents your external service. In this example, you use a static Backend that routes traffic to the `httpbin.org` site. Make sure to include the HTTPS port 443 so that traffic is routed to this port. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -190,12 +200,12 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
      type: Static
      static:
        hosts:
-         - host: httpbin.org
-           port: 443
+       - host: httpbin.org
+         port: 443
    EOF
    ```
    
-2. Create a BackendConfigPolicy. 
+3. Create a BackendTLSPolicy resource that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha3	
@@ -214,7 +224,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    EOF
    ```
 
-3. Create an HTTPRoute that routes traffic on the `httpbin-external.example` domain to the Backend that you created. 
+4. Create an HTTPRoute that rewrites traffic on the `httpbin-external.example` domain to the `httpbin.org` hostname and routes traffic to your Backend.  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -244,9 +254,52 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    EOF
    ```
 
+5. Send a request to the `httpbin-external.example` domain. Verify that the host is rewritten to `https://httpbin.org/anything` and that you get back a 200 HTTP response code.  
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: httpbin-external.example" 
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi http://localhost:8080/anything -H "host: httpbin-external.example" 
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   ```console {hl_lines=[1,2,20]}
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   ...
+   {
+     "args": {}, 
+     "data": "", 
+     "files": {}, 
+     "form": {}, 
+     "headers": {
+       "Accept": "*/*", 
+       "Host": "httpbin.org", 
+       "User-Agent": "curl/8.7.1", 
+       "X-Amzn-Trace-Id": "Root=1-6881126a-03bfc90450805b9703e66e78", 
+       "X-Envoy-Expected-Rq-Timeout-Ms": "15000", 
+       "X-Envoy-External-Address": "10.0.15.215"
+     }, 
+     "json": null, 
+     "method": "GET", 
+     "origin": "10.0.X.XXX, 3.XXX.XXX.XXX", 
+     "url": "https://httpbin.org/anything"
+   }
+   ```
+
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
+
+### In-cluster service
 
 1. Delete the NGINX server.
 
@@ -254,7 +307,7 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
    kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
    ```
    
-2. Delete the routing resources that your created for the NGINX server.
+2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
    kubectl delete backendtlspolicy,configmap,httproute -A -l app=nginx
@@ -262,41 +315,20 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.
 
-   {{% callout type="warning" %}}
+   {{< callout type="warning" >}}
    Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
-   {{% /callout %}}
+   {{< /callout >}}
 
    ```sh
    kubectl rollout restart -n kgateway-system deployment/kgateway
    ```
    
+### External service
 
-kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httpbin-org
-  namespace: default
-spec:
-  parentRefs:
-  - name: http
-    namespace: kgateway-system
-  hostnames:
-  - "httpbin-external.example"
-  rules:
-    - matches:
-      - path:
-          type: PathPrefix
-          value: /external
-      backendRefs:
-      - name: httpbin-org
-        kind: Backend
-        group: gateway.kgateway.dev
-      filters:
-      - type: URLRewrite
-        urlRewrite:
-          hostname: httpbin.org
-          path: 
-            type: ReplacePrefixMatch
-            replacePrefixMatch: /
-EOF
+Delete the resources that you created. 
+
+```sh
+kubectl delete httproute httpbin-org
+kubectl delete backendtlspolicy httpbin-org
+kubectl delete backed httpbin-org
+```
