@@ -56,6 +56,10 @@ Kgateway custom resources do not follow the same cross-namespace restrictions as
 
 Review the kgateway resources that you use to bootstrap, configure, and customize your gateway proxy, and the policies that you can leverage to add additional traffic management, resiliency, and security capabilities to your gateway and routes. 
 
+### GatewayExtensions
+
+A GatewayExtension is a {{< reuse "/docs/snippets/kgateway.md" >}} Custom Resource that serves as a configuration bridge between {{< reuse "/docs/snippets/kgateway.md" >}} and external services that extend a Gateway's functionality. These external services provide additional capabilities like authentication (`extAuth`), rate limiting (`rateLimit`), and request processing (`extProc`). TrafficPolicies can then refer to the GatewayExtension with the external service that the policy needs to be enforced. For more information, see the [API docs](../../reference/api/#gatewayextension).
+
 ### GatewayParameters
 
 When you create a Gateway resource, a [default gateway proxy template](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml) is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the [GatewayParameters](#gatewayparameters) resource are used to configure the gateway proxy.
