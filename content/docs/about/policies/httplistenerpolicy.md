@@ -114,9 +114,9 @@ If you create multiple HTTPListenerPolicy resources that define the same type of
 
 <!--
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 You cannot attach multiple HTTPListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same HTTPListenerPolicy resource.
-{{% /callout %}}
+{{< /callout >}}
 
 In the following image, you want to attach two HTTPListenerPolicy resources to the HTTP listener. One configures local rate limiting and the other one configures a CSRF policy. Because only one HTTPListenerPolicy can be attached to a gateway listener via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 

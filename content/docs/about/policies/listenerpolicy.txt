@@ -97,9 +97,9 @@ If you create multiple ListenerPolicy resources that define the same type of top
 
 <!--
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 You cannot attach multiple ListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same ListenerPolicy resource.
-{{% /callout %}}
+{{< /callout >}}
 
 In the following image, you want to attach two ListenerPolicy resources to the HTTP listener. One adds an access logging policy and the other one defines connection buffer limits. Because only one ListenerPolicy can be attached to a gateway listener via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 
