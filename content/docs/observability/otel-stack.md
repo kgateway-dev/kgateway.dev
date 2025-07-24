@@ -59,7 +59,7 @@ Architecture data flow:
 
 **Debug exporter**: The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
 
-**Prometheus exporter**: You can use the `promexporter` endpoint with Prometheus to scrape metrics from the collector pod, if you prefer the `pull` model to the `push` model. Also, if you use the `pull` model, make sure to configure Prometheus to handle Native Histograms per the [known issue](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703) previously mentioned.
+**Prometheus exporter**: You can use `prometheusexporter`'s `promexporter` port with Prometheus to scrape metrics from the collector pod (already configured in the example below), if you prefer the `pull` model to the `push` model. Also, if you use the `pull` model, make sure to configure Prometheus to handle Native Histograms and scrape the metrics directly as for this model OTel's `prometheusexporter` is not yet supperted as per the [known issue](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703) previously mentioned.
 
 ## Before you begin
 
