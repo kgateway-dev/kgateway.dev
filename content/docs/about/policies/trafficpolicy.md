@@ -121,9 +121,9 @@ spec:
 
 ### HTTPRoute rule {#attach-to-rule}
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
-{{% /callout %}}
+{{< /callout >}}
 
 Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a TrafficPolicy to an HTTPRoute rule by using the TrafficPolicy's `targetRefs.sectionName` option. 
 

@@ -234,9 +234,9 @@ curl -sL https://run.solo.io/gloo/install | sh
 export PATH=$HOME/.gloo/bin:$PATH
 ```
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that matches your installed version.
-{{% /callout %}}
+{{< /callout >}}
 
 -->
 

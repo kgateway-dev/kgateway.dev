@@ -34,9 +34,9 @@ The ExtProc server is a gRPC interface that must be able to respond to events in
 
 To implement your own ExtProc server, make sure that you follow [Envoy's technical specification for an external processor](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor). This guide uses a sample ExtProc server that you can use to try out the ExtProc functionality.
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 ExtProc can be applied to an HTTPRoute. However, it can currently not be applied to a Gateway. 
-{{% /callout %}}
+{{< /callout >}}
 
 
 ## Before you begin
