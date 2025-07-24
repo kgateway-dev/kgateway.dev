@@ -59,7 +59,7 @@ Architecture data flow:
 
 **Debug exporter**: The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
 
-**Prometheus exporter**: You can use `prometheusexporter`'s `promexporter` port with Prometheus to scrape metrics from the collector pod (already configured in the example below), if you prefer the `pull` model to the `push` model. Also, if you use the `pull` model, make sure to configure Prometheus to handle Native Histograms and scrape the metrics directly as for this model OTel's `prometheusexporter` is not yet supperted as per the [known issue](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703) previously mentioned.
+**Prometheus exporter**: If you prefer the `pull` model to the `push` model, you can use `prometheusexporter`'s `promexporter` port with Prometheus to scrape metrics from the collector pod, such as configured in the example later. Also, if you use the `pull` model, make sure to configure Prometheus to handle Native Histograms and scrape the metrics directly as for this model OTel's `prometheusexporter` is not yet supported, per the [known issue](https://github.com/open-telemetry/opentelemetry-collector-contrib/issues/33703) previously mentioned.
 
 ## Before you begin
 
@@ -486,7 +486,7 @@ Prometheus is a monitoring system and time-series database that collects metrics
 
 ## Step 4: Configure telemetry policies {#policies}
 
-Now that you have the telemetry stack set up, you can configure the telemetry policies for your gateway environment. The HTTPListenerPolicy lets you configure how to collect, process, and route logs and traces for your Gateway or ListenerSet resources.
+Now that you have the telemetry stack set up, you can configure the telemetry policies to collect logging and tracing data for your gateway environment. The HTTPListenerPolicy lets you configure how to collect, process, and route logs and traces for your Gateway or ListenerSet resources. Note that metrics are collected automatically.
 
 1. Create an HTTPListenerPolicy to collect and store logs in Loki. The policy applies to the `http` Gateway that serves traffic to the `httpbin` app that you set up before you began.
 
@@ -680,25 +680,32 @@ open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jso
    rm envoy.json
    ```
 
-2. Uninstall the Grafana Loki and Tempo components. 
+2. Delete the HTTPListenerPolicy policies that collect logs and traces.
+
+   ```sh
+   kubectl delete httplistenerpolicy logging-policy -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete httplistenerpolicy tracing-policy -n {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+3. Uninstall the Grafana Loki and Tempo components. 
    ```sh
    helm uninstall loki -n telemetry
    helm uninstall tempo -n telemetry
    ```
 
-3. Uninstall the OpenTelemetry collectors. 
+4. Uninstall the OpenTelemetry collectors. 
    ```sh
    helm uninstall opentelemetry-collector-metrics -n telemetry
    helm uninstall opentelemetry-collector-logs -n telemetry
    helm uninstall opentelemetry-collector-traces -n telemetry
    ```
 
-4. Uninstall the Prometheus stack. 
+5. Uninstall the Prometheus stack. 
    ```sh
    helm uninstall kube-prometheus-stack -n telemetry
    ```
 
-5. Remove the `telemetry` namespace. 
+6. Remove the `telemetry` namespace. 
    ```sh
    kubectl delete namespace telemetry
    ```
