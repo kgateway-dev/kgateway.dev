@@ -98,7 +98,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
      name: debug-gateway
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: debug-gateway
