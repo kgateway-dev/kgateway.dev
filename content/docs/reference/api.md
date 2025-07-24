@@ -328,7 +328,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `endpoint` _[AbsoluteURI](#absoluteuri)_ | EndPoint specifies the URL of the OTLP Exporter for traces.<br />Example: "http://my-otel-collector.svc.cluster.local:4317"<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_endpoint |  |  |
 | `sampler` _[OTelTracesSampler](#oteltracessampler)_ | Sampler defines the sampling strategy for OpenTelemetry traces.<br />Sampling helps in reducing the volume of trace data by selectively<br />recording only a subset of traces.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  |  |
-| `timeout` _[Duration](#duration)_ | OTLPTimeout specifies timeout configurations for OTLP (OpenTelemetry Protocol) exports.<br />It allows setting general and trace-specific timeouts for sending data.<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_timeout |  |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | OTLPTimeout specifies timeout configurations for OTLP (OpenTelemetry Protocol) exports.<br />It allows setting general and trace-specific timeouts for sending data.<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_timeout |  |  |
 | `protocol` _[OTLPTracesProtocolType](#otlptracesprotocoltype)_ | OTLPProtocol specifies the protocol to be used for OTLP exports.<br />This determines how tracing data is serialized and transported (e.g., gRPC, HTTP/Protobuf).<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_protocol |  | Enum: [grpc http/protobuf http/json] <br /> |
 | `transportSecurity` _[OTLPTransportSecurityMode](#otlptransportsecuritymode)_ | TransportSecurity controls the TLS (Transport Layer Security) settings when connecting<br />to the tracing server. It determines whether certificate verification should be skipped. |  | Enum: [secure insecure] <br /> |
 
@@ -2738,7 +2738,7 @@ _Appears in:_
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the rate limiting. |  |  |
 | `domain` _string_ | Domain identifies a rate limiting configuration for the rate limit service.<br />All rate limit requests must specify a domain, which enables the configuration<br />to be per application without fear of overlap (e.g., "api", "web", "admin"). |  |  |
 | `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />When true, requests are not limited if the rate limit service is unavailable. | false |  |
-| `timeout` _[Duration](#duration)_ | Timeout for requests to the rate limit service. | 20ms |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout for requests to the rate limit service. | 20ms |  |
 
 
 #### Regex
@@ -3232,7 +3232,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `maxTokens` _integer_ | MaxTokens specifies the maximum number of tokens that the bucket can hold.<br />This value must be greater than or equal to 1.<br />It determines the burst capacity of the rate limiter. |  | Minimum: 1 <br /> |
 | `tokensPerFill` _integer_ | TokensPerFill specifies the number of tokens added to the bucket during each fill interval.<br />If not specified, it defaults to 1.<br />This controls the steady-state rate of token generation. | 1 | Minimum: 1 <br /> |
-| `fillInterval` _[Duration](#duration)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
+| `fillInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | FillInterval defines the time duration between consecutive token fills.<br />This value must be a valid duration string (e.g., "1s", "500ms").<br />It determines the frequency of token replenishment. |  |  |
 
 
 #### Tracing
