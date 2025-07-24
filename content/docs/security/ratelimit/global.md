@@ -148,7 +148,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
        grpcService:
          backendRef:
            name: ratelimit
-           namespace: {{< reuse "docs/snippets/namespace.md" >}}
+           namespace: kgateway-test
            port: 8081
        domain: "api-gateway"
        timeout: "100ms"
@@ -156,7 +156,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    EOF
    ```
 
-   {{% reuse "docs/snippets/field-desc/review-table.md" %}} For more information, see the [API docs](../../reference/api/#ratelimitprovider).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API docs](../../reference/api/#ratelimitprovider).
 
    | Field | Description | Required |
    |-------|-------------|----------|
@@ -169,7 +169,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
 
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: gateway.networking.k8s.io/v1beta1
    kind: ReferenceGrant
    metadata:
      name: global-ratelimit
@@ -180,7 +180,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
        kind: GatewayExtension
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      to:
-     - group: v1
+     - group: ""
        kind: Service
    EOF
    ```
@@ -191,7 +191,7 @@ Create a TrafficPolicy resource that applies rate limits to your routes.
 
 Flip through the tabs for different example rate limit policies. Note that the examples apply to the Gateway that you created before you began, but you can also apply a TrafficPolicy to an HTTPRoute or specific route.
 
-{{< tabs tabTotal="4" items="Client IP address, User ID, Combined rate limiting, Combined local and global rate limiting" >}}
+{{< tabs tabTotal="5" items="Client IP address, Request path, User ID, Combined rate limiting, Combined local and global rate limiting" >}}
 
 {{% tab tabName="Client IP address" %}}
 
@@ -214,6 +214,34 @@ spec:
       descriptors:
       - entries:
         - type: RemoteAddress
+      extensionRef:
+        name: global-ratelimit
+EOF
+```
+
+{{% /tab %}}
+
+{{% tab tabName="Request path" %}}
+
+Limit requests based on the request path, such as a request with `/path1` or `/path2` in the path as defined in the example Rate Limit Service actions.
+
+```yaml
+kubectl apply -f - <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: request-path
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    global:
+      descriptors:
+      - entries:
+        - type: Path
       extensionRef:
         name: global-ratelimit
 EOF
@@ -346,7 +374,7 @@ The following table describes the different descriptor entry types. For more inf
 
 ## Step 5: Test the rate limits {#test-rate-limits}
 
-Test the rate limits by sending requests to the Gateway. The following steps assume that you created the client IP address example TrafficPolicy.
+Test the rate limits by sending requests to the Gateway. The following steps assume that you created the **client IP address** example TrafficPolicy.
 
 1. Send a test request to the httpbin sample app. The request succeeds because you did not exceed the rate limit of 1 request per minute.
 
@@ -388,7 +416,7 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
    Example output: 
    
    ```txt
-   HTTP/1.1 200 OK
+   HTTP/1.1 429 Too Many Requests
    ...
    ```
 
