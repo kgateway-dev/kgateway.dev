@@ -91,6 +91,10 @@ To try out an active health check policy, you can follow these steps to create a
       ```
       httpbin_httpbin::10.XX.X.XX:8080::health_flags::/failed_active_hc
       ```
+   4. Stop port-forwarding the `http` deployment.
+      ```sh
+      lsof -ti:19000 | xargs kill -9
+      ```
 
 3. Check the Envoy logs for health check failures.
    1. Get the logs for the `http` gateway deployment.

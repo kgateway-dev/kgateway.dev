@@ -57,7 +57,6 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      name: httpbin-https-redirect
      namespace: httpbin
      labels:
-       example: httpbin-route
        gateway: https
    spec:
      parentRefs:
@@ -93,7 +92,6 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      name: httpbin-https
      namespace: httpbin
      labels:
-       example: httpbin-route
        gateway: https
    spec:
      parentRefs:

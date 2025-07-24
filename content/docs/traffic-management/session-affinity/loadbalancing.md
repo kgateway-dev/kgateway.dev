@@ -28,9 +28,9 @@ The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest
 
 Learn about other load balancing options that you can set in the load balancer policy.
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 All settings in this section can be set only in conjunction with a simple load balancing mode or consistent hash algorithm.
-{{% /callout %}}
+{{< /callout >}}
 
 ### Healthy panic threshold 
 
@@ -146,32 +146,28 @@ Define the load balancing algorithm that you want to use for your backend app in
       ```sh
       open http://localhost:19000/config_dump
       ```
-   3. Search for the `dynamic_warming_clusters` section, and verify that the policy that you set is listed in the `lb_policy` field. For example, the following shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`.
+   3. Search for the `lb_policy` field, and verify that the policy that you set is listed, along with your other load balancing settings. For example, the following output shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`, and settings for the slow start window.
       ```json
-      "dynamic_warming_clusters": [
-       {
-        "version_info": "10665027509180737706",
-        "cluster": {
-         "@type": "type.googleapis.com/envoy.config.cluster.v3.Cluster",
-         "name": "kube_httpbin_httpbin_8000",
-         "type": "EDS",
-         "eds_cluster_config": {
-          "eds_config": {
-           "ads": {},
-           "resource_api_version": "V3"
-          }
-         },
-         "connect_timeout": "5s",
-         "lb_policy": "LEAST_REQUEST",
-         "metadata": {},
-         "common_lb_config": {
-          "consistent_hashing_lb_config": {}
-         },
-         "ignore_health_on_host_removal": true,
-         "least_request_lb_config": {
-          "choice_count": 3
-         }
+      ...
+      "lb_policy": "LEAST_REQUEST",
+      "metadata": {},
+      "common_lb_config": {
+       "consistent_hashing_lb_config": {}
+      },
+      "ignore_health_on_host_removal": true,
+      "least_request_lb_config": {
+       "choice_count": 3,
+       "slow_start_config": {
+        "slow_start_window": "10s",
+        "aggression": {
+         "default_value": 1.5,
+         "runtime_key": "upstream.kube_httpbin_httpbin_9000.slowStart.aggression"
         },
+        "min_weight_percent": {
+         "value": 10
+        }
+       }
+      }
       ...
       ```
    4. Stop port-forwarding the `http` deployment.

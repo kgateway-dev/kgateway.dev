@@ -17,8 +17,8 @@
    {{% /tab %}}
    {{< /tabs >}}
 
-4. **Important**: Install the experimental channel of the Kubernetes Gateway API to use this feature.
+4. **Important**: Install the standard channel of version 1.3 of the Kubernetes Gateway API to use this feature.
 
    ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/standard-install.yaml
    ```

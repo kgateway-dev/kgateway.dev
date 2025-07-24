@@ -129,8 +129,6 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: debug-gateway

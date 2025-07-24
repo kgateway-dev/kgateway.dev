@@ -52,8 +52,6 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    metadata:
      name: httpbin-healthcheck
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: alb
@@ -80,8 +78,6 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    metadata:
      name: httpbin-alb
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: alb

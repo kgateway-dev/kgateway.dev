@@ -122,8 +122,6 @@ Now that you have an app and a gateway proxy, you can create a route to access t
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http

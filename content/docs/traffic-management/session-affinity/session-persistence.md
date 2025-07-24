@@ -5,6 +5,10 @@ weight: 30
 
 Ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
 
+{{< callout type="warning" >}} 
+{{< reuse "docs/versions/warn-1-3-only.md" >}}
+{{< /callout >}}
+
 ## About
 
 HTTPRoutes support `sessionPersistence`, also known as "strong" session affinity or sticky sessions. Session persistence ensures that traffic is always routed to the same backend instance for the duration of the session, which can improve request latency and the user experience.
@@ -27,7 +31,7 @@ For more information about session peristence, see the [Kubernetes Gateway API e
 
 ## Before you begin 
 
-{{< reuse "docs/snippets/prereq-x-channel.md" >}}
+{{< reuse "docs/snippets/prereq-1-3-channel.md" >}}
 
 ## Configure session persistence
 
@@ -270,8 +274,6 @@ To try out session persistence, you can follow these steps to define cookie-base
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: http
