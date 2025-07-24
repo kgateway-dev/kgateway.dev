@@ -21,10 +21,6 @@ The following steps get you started with a basic installation. For instructions,
 
 {{< reuse "docs/snippets/get-started.md" >}}
 
-{{% callout type="info" %}}
-Want to quickly validate the health of your kgateway control plane? Check out the [`kgwctl` CLI](/docs/reference/cli/install/) and run the `kgwctl check` command to assess your kgateway installation. 
-{{% /callout %}}
-
 Good job! You now have the {{< reuse "/docs/snippets/kgateway.md" >}} control plane running in your cluster.
 
 ## Next steps
