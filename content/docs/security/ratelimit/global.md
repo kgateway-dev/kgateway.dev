@@ -103,7 +103,7 @@ kubectl describe configmap ratelimit-config -n kgateway-test
 Example output:
 
 * The descriptor `key` values are the descriptor names that you use later in the kgateway TrafficPolicy to decide which rate limits to apply to requests.
-* The example sets different rate limits for each descriptor key. The rate limits consist of a unit of time, such as `minute`, and the number of requests per unit of time, such as `1`. If a descriptor key does not have a rate limit, the TrafficPolicy cannot does not apply a rate limit to requests.
+* The example sets different rate limits for each descriptor key. The rate limits consist of a unit of time, such as `minute`, and the number of requests per unit of time, such as `1`. If a descriptor key does not have a rate limit, the TrafficPolicy cannot not apply a rate limit to requests.
 
 ```yaml
 Data
