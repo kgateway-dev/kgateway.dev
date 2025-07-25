@@ -104,9 +104,9 @@ kubectl describe configmap ratelimit-config -n kgateway-test
 
 | Field | Description |
 |-------|-------------|
-| domain | Required. A globally unique identifier to group together a set of rate limit rules. This way, different teams can have their own set of rate limits that don't conflict with each other. |
+| domain | Required. A globally unique identifier to group together a set of rate limit rules. This way, different teams can have their own set of rate limits that don't conflict with each other. Later, you set the domain to use in the kgateway GatewayExtension. If you have different domains for different teams, each team can create their own GatewayExtension that their TrafficPolicies can reference. |
 | descriptors | A list of key-value pairs that the Rate Limit Service uses to select which rate limit to use on matching requests. Descriptors are case-sensitive. |
-| key | Required. The name for the descriptor to use when matching requests. Later, you use the descriptor key in the kgateway TrafficPolicy to decide which rate limits to apply to requests. The TrafficPolicy expects one of the following values for the descriptor key: `remote_address` for a client IP address, `path` for path matching, a name for header matching, or a custom name for generic matching. |
+| key | Required. The name for the descriptor to use when matching requests. Later, you use the descriptor key in the kgateway TrafficPolicy to decide which rate limits to apply to requests. The Rate Limit Service expects one of the following values for the descriptor key: `remote_address` for a client IP address (`RemoteAddress` in the TrafficPolicy), `path` for path matching (`Path` in the TrafficPolicy), a key name for header matching (`Header` in the TrafficPolicy), or a custom key name for matching on a generic key-value pair (`Generic` in the TrafficPolicy). |
 | value | Optional. Each descriptor can have a value for more specific matching. For example, you might have two descriptor keys that are both for an `X-User-ID` header, but one also has a value of `user1`. This way, you can apply different rate limits to the specific value, such as to further restrict or permit a particular user. Similarly, you can take this approach for remote addresses, paths, and generic key-value pairs such as for `service` plans. |
 | rate_limit | Optional. The actual rate limit rule to apply. The example sets different rate limits for each descriptor key. If a descriptor key does not have a rate limit, the TrafficPolicy cannot apply a rate limit to requests, and the requests that match the descriptor are allowed. |
 | unit | The unit of time for the rate limit, such as `second`, `minute`, `hour`, or `day`. |
@@ -187,7 +187,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    | Field | Description | Required |
    |-------|-------------|----------|
    | grpcService | Configuration for connecting to the gRPC rate limit service. | Yes |
-   | domain | Domain identity for the rate limit service. | Yes |
+   | domain | Domain identity for the rate limit service. If you have different domains for different teams, each team can create their own GatewayExtension that their TrafficPolicies can reference. | Yes |
    | timeout | Timeout for rate limit service calls, such as `100ms`. | No |
    | failOpen | When `true`, requests continue even if the rate limit service is unavailable. | No (defaults to `false`) |
 
@@ -221,10 +221,10 @@ Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`,
 
 | Type | Description | Additional Fields |
 |------|-------------|-------------------|
-| Header | Extract the descriptor value from a request header. | `header`: The name of the header to extract. |
+| Header | Extract the descriptor value from a request header. The header name must match a descriptor key in the Rate Limit Service. | `header`: The name of the header to extract. |
 | Generic | Use a static key-value pair that you define as the descriptor. | `generic.key`: The descriptor key that matches the descriptor key in the Rate Limit Service.<br>`generic.value`: The static value for more specific matching. |
-| Path | Use the request path as the descriptor value. | None |
-| RemoteAddress | Use the client's IP address as the descriptor value. | None |
+| Path | Use the request path as the descriptor value. The `Path` entry type is mapped to the `path` descriptor key in the Rate Limit Service. | None |
+| RemoteAddress | Use the client's IP address as the descriptor value. The `RemoteAddress` entry type is mapped to the `remote_address` descriptor key in the Rate Limit Service. | None |
 
 Flip through the tabs for different example rate limit policies. Note that the examples apply to the Gateway that you created before you began, but you can also apply a TrafficPolicy to an HTTPRoute or specific route.
 
