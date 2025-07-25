@@ -34,7 +34,7 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Direct response](../../traffic-management/direct-response/) | DirectResponse | 
 | [External authorization](../../security/external-auth) | GatewayExtension and {{< reuse "docs/snippets/trafficpolicy.md" >}} |
 | [External processing (ExtProc)](../../traffic-management/extproc/) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
-| [Local rate limiting](../../security/local-ratelimit/) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
+| [Rate limiting](../../security/ratelimit/) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
 | [Transformations](../../traffic-management/transformations) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
 
 ## Policy merging {#policy-merging}
