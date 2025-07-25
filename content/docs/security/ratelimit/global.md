@@ -110,7 +110,7 @@ kubectl describe configmap ratelimit-config -n kgateway-test
 | value | Optional. Each descriptor can have a value for more specific matching. For example, you might have two descriptor keys that are both for an `X-User-ID` header, but one also has a value of `user1`. This way, you can apply different rate limits to the specific value, such as to further restrict or permit a particular user. Similarly, you can take this approach for remote addresses, paths, and generic key-value pairs such as for `service` plans. |
 | rate_limit | Optional. The actual rate limit rule to apply. The example sets different rate limits for each descriptor key. If a descriptor key does not have a rate limit, the TrafficPolicy cannot not apply a rate limit to requests, and the requests that match the descriptor are allowed. |
 | unit | The unit of time for the rate limit, such as `second`, `minute`, `hour`, or `day`. |
-| requests_per_unit | The number of requests to allowper unit of time. |
+| requests_per_unit | The number of requests to allow per unit of time. |
 
 Example output:
 
