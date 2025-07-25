@@ -228,7 +228,7 @@ Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`,
 
 Flip through the tabs for different example rate limit policies. Note that the examples apply to the Gateway that you created before you began, but you can also apply a TrafficPolicy to an HTTPRoute or specific route.
 
-{{< tabs tabTotal="5" items="Client IP address, Request path, User ID, Combined global rate limits, Local and global rate limits" >}}
+{{< tabs tabTotal="5" items="Client IP address, Request path, User ID, Nested global rate limits, Local and global rate limits" >}}
 
 {{% tab tabName="Client IP address" %}}
 
@@ -315,9 +315,9 @@ EOF
 
 {{% /tab %}}
 
-{{% tab tabName="Combined globalrate limits" %}}
+{{% tab tabName="Nested global rate limits" %}}
 
-Apply different limits based on both path and user ID. The following example rate limits requests along the path defined in the Rate Limit Service actions (1 per minute for `/path1` and 2 per minute for `/path2`) and requests with a `X-User-ID` header of `user1` (1 per minute).
+Apply different limits based on both path and user ID. The following example requires nested descriptors to rate limit requests along the path and header.
 
 ```yaml
 kubectl apply -f - <<EOF
@@ -341,6 +341,22 @@ spec:
       extensionRef:
         name: global-ratelimit
 EOF
+```
+
+To rate limit based on `/path1` value for path and `user1` value for header, the matching Rate Limit Service must have nested descriptors as follows:
+
+```yaml
+descriptors:
+  # Level 1: Path
+  - key: path
+    value: "/path1"
+    descriptors:
+      # Level 2: User ID (nested under path)
+      - key: X-User-ID
+        value: "user1"
+        rate_limit:
+          unit: minute
+          requests_per_unit: 2
 ```
 
 {{% /tab %}}
