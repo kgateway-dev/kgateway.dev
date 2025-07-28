@@ -112,37 +112,37 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
 
 2. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `ollama` path to the Backend you previously created. The `URLRewrite` filter rewrites the path from `ollama` to the API path you want to use in the LLM provider, `/v1/models`.
 
-    ```yaml
-    kubectl apply -f- <<EOF
-    apiVersion: gateway.networking.k8s.io/v1
-    kind: HTTPRoute
-    metadata:
-      name: ollama
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-      labels:
-        app: ai-gateway
-    spec:
-      parentRefs:
-        - name: ai-gateway
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-      rules:
-      - matches:
-        - path:
-            type: PathPrefix
-            value: /ollama
-        filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplaceFullPath
-              replaceFullPath: /v1/models
-        backendRefs:
-        - name: ollama
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-          group: gateway.kgateway.dev
-          kind: Backend
-    EOF
-    ```
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: ollama
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: ai-gateway
+   spec:
+     parentRefs:
+       - name: ai-gateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /ollama
+       filters:
+       - type: URLRewrite
+         urlRewrite:
+           path:
+             type: ReplaceFullPath
+             replaceFullPath: /v1/models
+       backendRefs:
+       - name: ollama
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         group: gateway.kgateway.dev
+         kind: Backend
+   EOF
+   ```
 
 3. Send a request to the Ollama server that you started in the previous section. Verify that the request succeeds and that you get back a response from the chat completion API.
 

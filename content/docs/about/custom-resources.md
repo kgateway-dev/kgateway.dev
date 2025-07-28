@@ -48,13 +48,17 @@ A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) al
 
 <!--
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 Kgateway custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a TrafficPolicy resource in `namespace1` and a Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a kgateway resource from a {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
-{{% /callout %}}-->
+{{< /callout >}}-->
 
 ## Kgateway resources {#kgateway}
 
 Review the kgateway resources that you use to bootstrap, configure, and customize your gateway proxy, and the policies that you can leverage to add additional traffic management, resiliency, and security capabilities to your gateway and routes. 
+
+### GatewayExtensions
+
+A GatewayExtension is a {{< reuse "/docs/snippets/kgateway.md" >}} Custom Resource that serves as a configuration bridge between {{< reuse "/docs/snippets/kgateway.md" >}} and external services that extend a Gateway's functionality. These external services provide additional capabilities like authentication (`extAuth`), rate limiting (`rateLimit`), and request processing (`extProc`). TrafficPolicies can then refer to the GatewayExtension with the external service that the policy needs to be enforced. For more information, see the [API docs](../../reference/api/#gatewayextension).
 
 ### GatewayParameters
 

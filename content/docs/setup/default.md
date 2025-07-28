@@ -51,9 +51,9 @@ The resulting gateway proxy is managed for you and its configuration is automati
 
 You can change the default configuration of your gateway proxy by creating custom GatewayParameters resources, or updating the default GatewayParameters values in your kgateway Helm chart. If you change the values in the Helm chart, kgateway automatically applies the changes to the default GatewayParameters resources. 
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 Do not edit or change the default GatewayParameters resource directly. Always update the values in the kgateway Helm chart so that they persist between upgrades.
-{{% /callout %}} 
+{{< /callout >}} 
 
 If you do not want to use the default gateway proxy template to bootstrap your proxies, you can choose to create a self-managed gateway. With self-managed gateways, you are responsible for defining the proxy deployment template that you want to bootstrap your proxies with. For more information, see [Self-managed gateways (BYO)](/docs/setup/customize/selfmanaged/).
 

@@ -98,7 +98,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
      name: debug-gateway
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: debug-gateway
@@ -129,8 +129,6 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    metadata:
      name: httpbin
      namespace: httpbin
-     labels:
-       example: httpbin-route
    spec:
      parentRefs:
        - name: debug-gateway
@@ -236,9 +234,9 @@ curl -sL https://run.solo.io/gloo/install | sh
 export PATH=$HOME/.gloo/bin:$PATH
 ```
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 Make sure to use the version of `{{< reuse "docs/snippets/cli-name.md" >}}` that matches your installed version.
-{{% /callout %}}
+{{< /callout >}}
 
 -->
 

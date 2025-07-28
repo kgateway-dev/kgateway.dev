@@ -6,9 +6,9 @@ description:
 
 Use a BackendConfigPolicy resource to configure connection settings for a backend.  
 
-{{% callout type="warning" %}} 
+{{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 ## Policy attachment {#policy-attachment-backendconfigpolicy}
 
