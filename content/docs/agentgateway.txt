@@ -4,9 +4,9 @@ weight: 50
 description: 
 ---
 
-{{% callout type="warning" %}} 
+{{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}}
-{{% /callout %}}
+{{< /callout >}}
 
 In this guide, you learn how to set up kgateway as the control plane for your Agent Gateway so that you can proxy requests to an MCP or A2A target. 
 

@@ -62,9 +62,9 @@ Route traffic directly to an AWS EC2 instance.
 
 Create AWS credentials for the EC2 instance so that kgateway can connect to it. 
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 The following example shows how to use a user's AWS access key ID and secret key to authenticate with AWS, and an AWS role to authorize access to the EC2 instance. This approach is recommended. However, you can also assign the required permissions to your AWS user directly and only use an AWS access key ID and secret key. 
-{{% /callout %}}
+{{< /callout >}}
 
 1. Get the AWS access key ID and secret key of the user that you want to use to authenticate with AWS. For more information, see the [AWS documentation](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html). 
 
