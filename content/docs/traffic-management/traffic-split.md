@@ -1,7 +1,6 @@
 ---
 title: Traffic splitting
 weight: 130
-next: /docs/resiliency/
 ---
 
 Set up weight-based routing between multiple apps. 

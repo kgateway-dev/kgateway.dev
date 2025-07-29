@@ -91,6 +91,7 @@ The kgateway project provides the following extensions on top of the {{< reuse "
   {{< card link="/docs/integrations/" title="Integrations" tag="Setup" >}}
   {{< card link="/docs/resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}
   {{< card link="/docs/traffic-management/transformations/" title="Transformations" tag="Traffic" >}}
+  {{< card link="/docs/traffic-management/weighted-routes/" title="Weighted routes" tag="Traffic" >}}
 {{< /cards >}}
 
 ## Default gateway proxy setup
