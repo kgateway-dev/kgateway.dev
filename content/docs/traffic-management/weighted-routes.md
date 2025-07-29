@@ -305,10 +305,11 @@ Steps to weight routes:
    Request ID: dbfe6dd762fc25ae7297f2ef881ae30b
    ```
 
-3. Add a weight of `10` to the HTTPRoute with the matching rule for the `/anything` path that is served by the httpbin service.
+3. Add a weight of `10` to the HTTPRoute with the matching rule for the `/anything` path that is served by the httpbin service, and a weight of `1` to the HTTPRoute with the matching rule for the `/anything/a` path that is served by the hello-world service.
 
    ```yaml
    kubectl annotate httproute -n httpbin httpbin kgateway.dev/route-weight=10
+   kubectl annotate httproute -n httpbin hello-world-a kgateway.dev/route-weight=1
    ```
 
 4. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
@@ -367,21 +368,10 @@ Steps to weight routes:
 
 For more examples of weighted routes, review following examples from the kgateway GitHub repository.
 
-### Input of weighted routes {#input-example}
-
-Weighted route input from [this GitHub link](https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml).
-
-```yaml
-{{< github url="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml" >}}
-```
-
-### Output of resulting routes {#output-example}
-
-Weighted route output in the gateway proxy config from [this GitHub link](https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/outputs/route-sort-weighted.yaml).
-
-```yaml
-{{< github url="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/outputs/route-sort-weighted.yaml" >}}
-```
+{{< cards >}}
+  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml" title="Weighted route input" icon="external-link" >}}
+  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/outputs/route-sort-weighted.yaml" title="Weighted route output" icon="external-link" >}}
+{{< /cards >}}
 
 ## Cleanup {#cleanup}
 
