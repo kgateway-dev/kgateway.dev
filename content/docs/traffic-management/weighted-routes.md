@@ -107,7 +107,7 @@ Review route precedence in action:
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output from httpbin service (more specific rule takes precedence):
+   Example output from the hello-world service:
    
    ```txt
    HTTP/1.1 200 OK
@@ -141,7 +141,7 @@ Review route precedence in action:
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output from hello-world service:
+   Example output from the httpbin service:
    
    ```txt
    HTTP/1.1 200 OK
