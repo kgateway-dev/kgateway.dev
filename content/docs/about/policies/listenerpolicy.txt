@@ -1,6 +1,6 @@
 ---
 title: ListenerPolicy
-weight: 30
+weight: 10
 description: You can use a ListenerPolicy resource to attach policies to all gateway listeners. 
 ---
 

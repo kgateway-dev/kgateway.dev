@@ -1,6 +1,6 @@
 ---
 title: HTTPListenerPolicy
-weight: 35
+weight: 10
 description: You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway. 
 ---
 
