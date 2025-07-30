@@ -8,7 +8,7 @@ By default, you must attach policies to resources that are in the same namespace
 To do so, you can create policies in a "global" namespace. Then, the policies can attach to resources in any namespace in your cluster through label selectors.
 
 {{< callout type="warning" >}}
-Because it increases the number of policy attachments to calculate, the global policy namespace feature can impact performance at scale. It also changes the standard policy attachment behavior, which can make debugging more difficult. As such, make sure to establish clear guidelines for when and how many global policies to use this feature.
+Because it increases the number of policy attachments to calculate, the global policy namespace feature can impact performance at scale. It also changes the standard policy attachment behavior, which can make debugging more difficult. As such, make sure to establish clear guidelines for using this feature, such as how many global policies are available for teams to use.
 {{< /callout >}}
 
 ## Before you begin
@@ -165,7 +165,7 @@ By default, policies are attached to resources in the same namespace. This way, 
    EOF
    ```
 
-6. Repeat the request. This time, the request is not transformed because the policy cannot be attached since the resource is in a different namespace. Instead, you get the initial 200 response.
+6. Repeat the request. This time, the request is not transformed. The policy cannot be attached because the resource is in a different namespace. Instead, you get the initial 200 response.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -240,7 +240,7 @@ By default, policies are attached to resources in the same namespace. Upgrade yo
    open {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
-2. Add the following values to the Helm values file to enable the global policy namespace feature in {{< reuse "/docs/snippets/kgateway.md" >}}. The example uses the `{{< reuse "docs/snippets/namespace.md" >}}` namespace, but you can update the namespace to any existing namespace that you want.
+2. Add the following values to the Helm values file to enable the global policy namespace feature. The example uses the `{{< reuse "docs/snippets/namespace.md" >}}` namespace as the "global" namespace, but you can use any existing namespace that you want.
    ```yaml
    
    controller:
@@ -258,7 +258,7 @@ By default, policies are attached to resources in the same namespace. Upgrade yo
 
 Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. Then, use a `global-policy` label selector to attach the policy to resources in any namespace.
 
-1. Update the HTTPRoute for the httpbin service to add a label selector. The label selector can be any value that you want, but it must match the label selector in the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+1. Update the HTTPRoute for the httpbin service to add a label selector. The label selector can be any value that you want, but it must match the label selector that you add in the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
    ```yaml
    kubectl apply -f- <<EOF
