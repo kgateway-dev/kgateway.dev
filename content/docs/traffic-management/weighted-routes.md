@@ -215,18 +215,16 @@ By default, weighted routes are disabled. Upgrade your {{< reuse "/docs/snippets
    helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
    ```
 
-4. Restart the control plane for the updated environment variable to take effect.
-
-   ```sh
-   kubectl rollout restart deployment -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}}
-   ```
-
 ## Step 3: Add weights to routes {#weight-routes}
 
 Apply an annotation at the HTTPRoute level that sets a weight for the route, which can be any 32-bit integer, including negative numbers. HTTPRoutes without the annotation are given a weight of `0`. Routes are sorted as follows:
 
 1. In descending order by weight, from highest to lowest.
 2. By [Gateway API route precedence](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule) for routes with the same weight.
+
+{{< callout type="info" >}}
+Using route delegation? Make sure to add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
+{{< /callout >}}
 
 Steps to weight routes:
 
@@ -318,7 +316,13 @@ Steps to weight routes:
    kubectl annotate httproute -n httpbin hello-world-a kgateway.dev/route-weight=1
    ```
 
-4. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
+4. Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11789), restart the control plane for the updated annotations to take effect.
+
+   ```sh
+   kubectl rollout restart deployment -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}}
+   ```
+
+5. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
