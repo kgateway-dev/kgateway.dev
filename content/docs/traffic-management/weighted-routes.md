@@ -1,5 +1,5 @@
 ---
-title: Route weighting
+title: Weighted routing
 weight: 20
 ---
 
