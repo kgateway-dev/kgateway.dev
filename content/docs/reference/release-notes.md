@@ -32,7 +32,7 @@ Note that this change does not impact the other delegation annotations:
 
 #### Global policy attachment {#v2.1-global-policy-attachment}
 
-By default, policies can be attached to resources in the same namespace. Now, you can designate a "well-known" namespace to attach policies globally to resources across namespaces in your clusters. For more information, see the [Global policy attachment](/docs//) docs.
+By default, policies can be attached to resources in the same namespace. Now, you can designate a "well-known" namespace to attach policies globally to resources across namespaces in your clusters. For more information, see the [Global policy attachment](/docs/about/policies/global-attachment/) docs.
 
 #### Weighted routes {#v2.1-weighted-routes}
 
