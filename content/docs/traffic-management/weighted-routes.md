@@ -1,7 +1,6 @@
 ---
 title: Route weighting
-weight: 140
-next: /docs/resiliency/
+weight: 20
 ---
 
 By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their order and specificity, as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule). When a route matches a request, no further routes are evaluated for matching, which might affect the policies and final destination of the traffic. With {{< reuse "/docs/snippets/kgateway.md" >}}, you can configure weights for more fine-grained control over your routing rules.

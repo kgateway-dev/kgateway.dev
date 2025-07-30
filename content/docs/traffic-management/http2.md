@@ -1,6 +1,6 @@
 ---
 title: HTTP/2
-weight: 90
+weight: 20
 description: Configure a service to use HTTP/2. 
 ---
 
