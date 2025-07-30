@@ -232,7 +232,7 @@ By default, policies are attached to resources in the same namespace. This way, 
 
 ## Step 2: Enable global policy attachment {#enable-global-policy-attachment}
 
-By default, policies are attached to resources in the same namespace. Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} Helm installation to enable the feature.
+To enable the global policy attachment feature, upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} Helm installation.
 
 1. Get the Helm values for your current Helm installation. 
    ```sh
