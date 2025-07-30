@@ -11,6 +11,10 @@ Use a TrafficPolicy resource to attach policies to one, multiple, or all routes 
 
 You can apply TrafficPolicy policies to all routes in an HTTPRoute resource or only to specific routes. 
 
+{{< callout type="info" >}}
+{{< reuse "docs/snippets/global-policy.md" >}}
+{{< /callout >}}
+
 ### All HTTPRoute routes {#attach-to-all-routes}
 
 You can use the `spec.targetRefs` section in the TrafficPolicy resource to apply policies to all the routes that are specified in a particular HTTPRoute resource. 

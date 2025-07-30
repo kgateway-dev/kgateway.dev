@@ -6,6 +6,10 @@ description: You can use an HTTPListenerPolicy resource to attach policies to HT
 
 You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway.
 
+{{< callout type="info" >}}
+{{< reuse "docs/snippets/global-policy.md" >}}
+{{< /callout >}}
+
 ## Policy attachment {#policy-attachment-listeneroption}
 
 <!--
