@@ -204,15 +204,22 @@ By default, weighted routes are disabled. Upgrade your {{< reuse "/docs/snippets
    
 2. Add the following values to the Helm values file to enable the weighted routes feature in {{< reuse "/docs/snippets/kgateway.md" >}}.
    ```yaml
+   
    controller:
      extraEnv:
        KGW_WEIGHTED_ROUTE_PRECEDENCE: true
    ```
    
-3. Upgrade your Helm installation. Replace the `--version {{< reuse "/docs/versions/helm-version-flag.md" >}}` option to match your current version. This upgrade automatically triggers a restart of any existing gateway proxies to enable weighted route precedence.
+3. Upgrade your Helm installation. Replace the `--version {{< reuse "/docs/versions/helm-version-flag.md" >}}` option to match your current version.
    
    ```sh
    helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
+   ```
+
+4. Restart the control plane for the updated environment variable to take effect.
+
+   ```sh
+   kubectl rollout restart deployment -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}}
    ```
 
 ## Step 3: Weight routes {#weight-routes}
@@ -377,9 +384,11 @@ For more examples of weighted routes, review following examples from the kgatewa
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the extra HTTPRoute that you created for this tutorial.
+1. Delete the extra hello-world app that you created for this tutorial.
 
    ```sh
+   kubectl delete deployment -n httpbin hello-world
+   kubectl delete service -n httpbin hello-world
    kubectl delete httproute -n httpbin hello-world-a
    ```
 
