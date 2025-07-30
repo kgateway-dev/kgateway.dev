@@ -22,13 +22,17 @@ The route delegation feature for policy merging is expanded to reflect its broad
 
 To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`.
 
-To learn more about policy merging, see the [Policy merging](/docs/about/policies/#policy-merging) docs.
+To learn more about policy merging, see the [Policy merging](/docs/about/policies/merging/) docs.
 
 Note that this change does not impact the other delegation annotations:
 * `delegation.kgateway.dev/inherit-parent-matcher`
 * `delegation.kgateway.dev/label`
 
 ### 🌟 New features {#v2.1-new-features}
+
+#### Global policy attachment {#v2.1-global-policy-attachment}
+
+By default, policies can be attached to resources in the same namespace. Now, you can designate a "well-known" namespace to attach policies globally to resources across namespaces in your clusters. For more information, see the [Global policy attachment](/docs//) docs.
 
 #### Weighted routes {#v2.1-weighted-routes}
 
