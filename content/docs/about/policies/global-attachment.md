@@ -8,7 +8,7 @@ By default, you must attach policies to resources that are in the same namespace
 To do so, you can create policies in a "global" namespace. Then, the policies can attach to resources in any namespace in your cluster through label selectors.
 
 {{< callout type="warning" >}}
-Because it increases the number of policy attachments to calculate, the global policy namespace feature can impact performance at scale. It also violates the standard policy attachment behavior, which can make debugging more difficult. As such, make sure to establish clear guidelines for when and how many global policies to use this feature.
+Because it increases the number of policy attachments to calculate, the global policy namespace feature can impact performance at scale. It also changes the standard policy attachment behavior, which can make debugging more difficult. As such, make sure to establish clear guidelines for when and how many global policies to use this feature.
 {{< /callout >}}
 
 ## Before you begin
