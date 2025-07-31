@@ -15,7 +15,7 @@ The following image shows the different components that make up the {{< reuse "/
 
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
-1. The config and secret watcher components in the `{{< reuse "/docs/snippets/helm-{{< reuse "/docs/snippets/kgateway.md" >}}.md" >}}` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
+1. The config and secret watcher components in the `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "/docs/snippets/kgateway.md" >}} translation engine. 
 3. The translation engine translates Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources into Envoy configuration. All Envoy configuration is consolidated into an xDS snapshot. 
 4. The reporter receives a status report for every resource that is processed by the translator. 
