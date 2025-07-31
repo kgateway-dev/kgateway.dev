@@ -13,6 +13,8 @@ The following image illustrates how the kgateway custom resources interact with 
 {{< reuse-image src="img/kgw-crs-light.svg" >}}
 {{< reuse-image-dark srcDark="img/kgw-crs-dark.svg" >}}
 
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
 ## Kubernetes Gateway API resources {#k8s}
 
 Review the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources that you use to set up gateway proxies and configure routing for your apps. 
