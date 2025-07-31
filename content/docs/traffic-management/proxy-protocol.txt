@@ -1,6 +1,6 @@
 ---
 title: Proxy protocol
-weight: 110
+weight: 20
 next: /docs/traffic-management/transformations
 ---
 

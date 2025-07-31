@@ -28,11 +28,15 @@ Note that this change does not impact the other delegation annotations:
 * `delegation.kgateway.dev/inherit-parent-matcher`
 * `delegation.kgateway.dev/label`
 
+### 🌟 New features {#v2.1-new-features}
+
+#### Weighted routing {#v2.1-weighted-routing}
+
+Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing](/docs/traffic-management/weighted-routes/) docs.
+
 <!-- TODO release 2.1
 
 ### ⚒️ Installation changes {#v2.1-installation-changes}
-
-### 🌟 New features {#v2.1-new-features}
 
 ### 🔄 Feature changes {#v2.1-feature-changes}
 
