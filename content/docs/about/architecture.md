@@ -10,8 +10,8 @@ Learn more about the components that make up {{< reuse "/docs/snippets/kgateway.
 
 The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control and data plane. These components work together to translate gateway custom resources into Envoy configuration. The Envoy configuration controls the behavior of the gateway proxies that serve your apps.
 
-{{< reuse-image src="img/translation.svg" caption="Component architecture" >}}
-{{< reuse-image-dark srcDark="img/translation-dark.svg" caption="Component architecture" >}}
+{{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
+{{< reuse-image-dark srcDark="img/gw-control-plane-components-dark.svg" caption="Component architecture" >}}
 
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
