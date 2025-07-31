@@ -1,6 +1,6 @@
 ---
 title: Request matching
-weight: 30
+weight: 20
 ---
 
 Specify how you want to match requests that arrive at your gateway.

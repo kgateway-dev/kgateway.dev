@@ -1,10 +1,14 @@
 ---
 title: HTTPListenerPolicy
-weight: 35
-description: You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway. 
+weight: 10
+description: You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPS listeners on the gateway. 
 ---
 
-You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPs listeners on the gateway.
+You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPS listeners on the gateway.
+
+{{< callout type="info" >}}
+{{< reuse "docs/snippets/global-policy.md" >}}
+{{< /callout >}}
 
 ## Policy attachment {#policy-attachment-listeneroption}
 
