@@ -1,6 +1,6 @@
 ---
 title: Buffering
-weight: 70
+weight: 20
 next: /docs/traffic-management/header-control
 prev: /docs/traffic-management/route-delegation
 ---

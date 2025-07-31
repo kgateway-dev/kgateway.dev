@@ -1,6 +1,6 @@
 ---
 title: TCP keepalive
-weight: 100
+weight: 20
 next: /docs/traffic-management/proxy-protocol
 prev: /docs/traffic-management/health-checks
 ---

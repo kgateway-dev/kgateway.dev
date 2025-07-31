@@ -1,6 +1,6 @@
 ---
 title: Header control
-weight: 90
+weight: 20
 ---
 
 {{< cards >}}
