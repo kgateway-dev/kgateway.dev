@@ -14,6 +14,10 @@ Use a BackendConfigPolicy resource to configure connection settings for a backen
 
 You can apply BackendConfigPolicies to individual backend services, any backend that matches a specific label, or a global service in your ambient mesh.
 
+{{< callout type="info" >}}
+{{< reuse "docs/snippets/global-policy.md" >}}
+{{< /callout >}}
+
 ### Individual backend {#attach-to-backend}
 
 You can use the `spec.targetRefs` section in the BackendConfigPolicy resource to apply policies to a specific backend, such as a Kubernetes Service or a Backend resource. 

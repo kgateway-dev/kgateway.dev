@@ -1,0 +1,1 @@
+By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](/docs/about/policies/global-attachment/) guide.
