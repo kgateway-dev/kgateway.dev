@@ -189,7 +189,25 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    }
    ```
 
+## Overriding LLM Provider Settings {#override-settings}
+
+You can customize the default endpoint paths and authentication headers for LLM providers using override settings. This is useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure.
+
+### Configuration Options
+
+**Path Override**
+- `pathOverride.fullPath` - Specifies a custom API path to replace the provider's default path
+- Supported for OpenAI and Anthropic compatible APIs
+
+**Auth Header Override** 
+- `authHeaderOverride.headerName` - Custom header name (default: "Authorization")
+- `authHeaderOverride.prefix` - Custom prefix (default: "Bearer")
+- Note: Not all providers use the same authentication format (e.g., Azure OpenAI uses "api-key" header with no prefix)
+
+
 ## Next
+
+### Example Configuration
 
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
