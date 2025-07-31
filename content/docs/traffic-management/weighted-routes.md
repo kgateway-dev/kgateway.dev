@@ -1,15 +1,15 @@
 ---
-title: Route weighting
+title: Weighted routing
 weight: 20
 ---
 
-By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their order and specificity, as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule). When a route matches a request, no further routes are evaluated for matching, which might affect the policies and final destination of the traffic. With {{< reuse "/docs/snippets/kgateway.md" >}}, you can configure weights for more fine-grained control over your routing rules.
+By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their order and specificity, as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule). When a route matches a request, no further routes are evaluated for matching, which might affect the gateway's routing decision and the policies that are applied to the traffic. With {{< reuse "/docs/snippets/kgateway.md" >}}, you can configure weights for more fine-grained control over your routing rules.
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Step 1: Review default routing behavior {#default-routing}
+## Step 1: Review the default routing behavior {#default-routing}
 
 By default, the Kubernetes Gateway API sorts HTTPRoute rules as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule).
 
@@ -59,7 +59,7 @@ Review route precedence in action:
    EOF
    ```
 
-2. Update the HTTPRoute to demonstrate the default Gateway API precedence behavior by configuring two routes: `/anything` and `/anything/a`.
+2. Update the HTTPRoute to demonstrate the default Gateway API precedence behavior by configuring two routes: `/anything` that routes traffic to the httpbin app and `/anything/a` that targets the hello-world app you just deployed.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -107,7 +107,7 @@ Review route precedence in action:
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output from httpbin service (more specific rule takes precedence):
+   Example output from the hello-world service:
    
    ```txt
    HTTP/1.1 200 OK
@@ -126,7 +126,7 @@ Review route precedence in action:
    Request ID: 796644ce8bda8ae5ecc36c5f4117a590
    ```
 
-4. Send a request to the `/anything` path. This routes to the httpbin service because it only matches the less specific rule.
+4. Send a request to the `/anything` path. This example routes to the httpbin service because it only matches the less specific rule.
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -141,7 +141,7 @@ Review route precedence in action:
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output from hello-world service:
+   Example output from the httpbin service:
    
    ```txt
    HTTP/1.1 200 OK
@@ -215,22 +215,20 @@ By default, weighted routes are disabled. Upgrade your {{< reuse "/docs/snippets
    helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
    ```
 
-4. Restart the control plane for the updated environment variable to take effect.
-
-   ```sh
-   kubectl rollout restart deployment -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}}
-   ```
-
-## Step 3: Weight routes {#weight-routes}
+## Step 3: Add weights to routes {#weight-routes}
 
 Apply an annotation at the HTTPRoute level that sets a weight for the route, which can be any 32-bit integer, including negative numbers. HTTPRoutes without the annotation are given a weight of `0`. Routes are sorted as follows:
 
 1. In descending order by weight, from highest to lowest.
 2. By [Gateway API route precedence](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule) for routes with the same weight.
 
+{{< callout type="info" >}}
+Using route delegation? Make sure to add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
+{{< /callout >}}
+
 Steps to weight routes:
 
-1. Create separate HTTPRoutes for `/anything` and `/anything/a`.
+1. Create separate HTTPRoutes for the `/anything` and `/anything/a` paths.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -372,7 +370,7 @@ Steps to weight routes:
 
 ## More resources
 
-For more examples of weighted routes, review following examples from the kgateway GitHub repository.
+For more examples of weighted routes, review the following examples from the kgateway GitHub repository.
 
 {{< cards >}}
   {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml" title="Weighted route input" icon="external-link" >}}

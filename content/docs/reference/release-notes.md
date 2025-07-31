@@ -34,9 +34,9 @@ Note that this change does not impact the other delegation annotations:
 
 By default, you must attach policies to resources that are in the same namespace. Now, you can enable a feature to create a "global" namespace for policies. Then, these global policies can attach to resources in any namespace in your cluster through label selectors. For more information, see the [Global policy attachment](../../about/policies/global-attachment/) docs.
 
-#### Weighted routes {#v2.1-weighted-routes}
+#### Weighted routing {#v2.1-weighted-routing}
 
-Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Route weighting](../../traffic-management/weighted-routes/) docs.
+Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing](/docs/traffic-management/weighted-routes/) docs.
 
 <!-- TODO release 2.1
 
