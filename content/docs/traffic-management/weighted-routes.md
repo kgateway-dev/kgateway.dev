@@ -316,13 +316,7 @@ Steps to weight routes:
    kubectl annotate httproute -n httpbin hello-world-a kgateway.dev/route-weight=1
    ```
 
-4. Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11789), restart the control plane for the updated annotations to take effect.
-
-   ```sh
-   kubectl rollout restart deployment -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}}
-   ```
-
-5. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
+4. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
