@@ -107,8 +107,8 @@ You must use both shortcodes together to display an image. This way, the image i
 The following example shows the example syntax for using this shortcode:
 
 ```markdown
-{{</* reuse-image src="img/translation.svg" */>}}
-{{</* reuse-image-dark srcDark="img/translation-dark.svg" */>}}
+{{</* reuse-image src="img/translation-loop.svg" */>}}
+{{</* reuse-image-dark srcDark="img/translation-loop-dark.svg" */>}}
 ```
 
 To support different screen sizes, make sure to use images of type `.svg` only. 

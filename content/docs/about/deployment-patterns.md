@@ -14,6 +14,8 @@ The following image shows a gateway proxy that serves as a single ingress API ga
 {{% reuse-image src="img/pattern-simple-ingress.svg" width="400px" caption="Simple ingress"  %}}
 {{% reuse-image-dark srcDark="img/pattern-simple-ingress.svg" width="400px" caption="Simple ingress"  %}}
 
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
 This setup is a great way to get started with {{< reuse "/docs/snippets/kgateway.md" >}}, and is suitable for smaller environments where all workloads run in a single cluster and traffic is balanced between services. However, in larger environments or environments where you have both high traffic and low traffic services, consider adding [multiple gateway proxies to distribute traffic load more evenly](#sharded-gateway). 
 
 ## Sharded gateway {#sharded-gateway}
@@ -22,6 +24,8 @@ In larger environments or environments where you have both high traffic and low 
 
 {{% reuse-image src="img/pattern-sharded-gateway.svg" width="400px" caption="Sharded gateway" %}}
 {{% reuse-image-dark srcDark="img/pattern-sharded-gateway.svg" width="400px" caption="Sharded gateway" %}}
+
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
 All gateway proxies are managed by the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. However, one gateway proxy manages traffic for the workloads in the `foo` and `bar` namespaces. The second gateway proxy is a dedicated API gateway for the workloads in the `extra` namespace. Both gateway proxies are exposed directly on the edge. 
 
@@ -37,10 +41,14 @@ The second layer of gateway proxies can apply additional traffic management, res
 {{% reuse-image src="img/pattern-central-ingress-gloo.svg" width="600px"  %}}
 {{% reuse-image-dark srcDark="img/pattern-central-ingress-gloo.svg" width="600px"  %}}
 
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
 Depending on your existing setup, you might want to use a different type of proxy as your central ingress endpoint. For example, you might have an HAProxy or AWS NLB/ALB instance that all traffic must go through. Kgateway can be paired with these types of proxies as depicted in the following image. 
 
 {{% reuse-image src="img/pattern-central-ingress-any.svg" width="600px"  %}}
 {{% reuse-image-dark srcDark="img/pattern-central-ingress-any.svg" width="600px"  %}}
+
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
 ## API gateway for a service mesh
 
@@ -53,7 +61,9 @@ The following image shows a gateway proxy that is exposed on the edge and serves
 {{% reuse-image src="img/ambient-ingress.svg" width="600px"  %}}
 {{% reuse-image-dark srcDark="img/ambient-ingress.svg" width="600px"  %}}
 
-For more information, see the guides for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](/docs/integrations/istio/ambient/ambient-ingress/) or [waypoint proxy](/docs/integrations/istio/ambient/waypoint/) for your ambient mesh. 
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
+For more information, see the guides for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](../../integrations/istio/ambient/ambient-ingress/) or [waypoint proxy](../../integrations/istio/ambient/waypoint/) for your ambient mesh. 
 
 ### Sidecar mesh
 
@@ -62,4 +72,6 @@ You can deploy {{< reuse "/docs/snippets/kgateway.md" >}} with an Istio sidecar 
 {{< reuse-image src="img/sidecar-ingress.svg" width="800px" >}}
 {{< reuse-image-dark srcDark="img/sidecar-ingress.svg" width="800px" >}}
 
-For more information, see the guide for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](/docs/integrations/istio/sidecar/ingress/) to your sidecar mesh. 
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
+For more information, see the guide for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](../../integrations/istio/sidecar/ingress/) to your sidecar mesh. 
