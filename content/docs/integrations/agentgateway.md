@@ -41,7 +41,7 @@ Enable the agentgateway feature in kgateway.
 
 Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
-1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy knows to use MCP for the Backend that you create in the next step. For an A2A backend, you can use the `appProtocol: kgateway.dev/a2a` setting.
+1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step. For an A2A backend, you use the `appProtocol: kgateway.dev/a2a` setting.
 
    ```yaml
    kubectl apply -f- <<EOF
