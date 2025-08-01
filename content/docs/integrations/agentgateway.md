@@ -4,7 +4,7 @@ weight: 10
 description: Use kgateway with agentgateway. 
 ---
 
-Use {{< reuse "/docs/snippets/kgateway.md" >}} as to manage [agentgateway](https://agentgateway.dev/) proxies for AI gateways in a Kubernetes environment. 
+Use {{< reuse "/docs/snippets/kgateway.md" >}} to manage [agentgateway](https://agentgateway.dev/) proxies for AI gateways in a Kubernetes environment. 
 
 ## About agentgateway {#about}
 
@@ -39,9 +39,9 @@ Enable the agentgateway feature in kgateway.
 
 ## Step 2: Deploy an MCP server {#mcp-server}
 
-Deploy a Model Context Protocol (MCP) server that you want agentgateway to route traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
+Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
-1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This setting lets the Backend target the Service in the next step.
+1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy knows to use MCP for the Backend that you create in the next step. For an A2A backend, you can use the `appProtocol: kgateway.dev/a2a` setting.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -173,16 +173,11 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{< /tabs >}}
 
-2. From the terminal, run the MCP Inspector command.
+2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
    
    ```sh
    npx github:modelcontextprotocol/inspector
    ```
-
-   The MCP Inspector opens in your browser.
-
-   {{< reuse-image src="img/mcp-inspector-landing.png" >}}
-   {{< reuse-image-dark srcDark="img/mcp-inspector-landing-dark.png" >}}
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
@@ -192,14 +187,9 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{< reuse-image src="img/mcp-inspector-connected.png" >}}
    {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
 
-4. In the MCP Inspector, select the `mcp-server` server.
-
-   {{< reuse-image src="img/mcp-inspector-connected.png" >}}
-   {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
-
-5. From the menu bar, click the **Tools** tab. Then from the **Tools** pane, click **List Tools** and select the `fetch` tool. 
-6. From the **fetch** pane, in the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
-7. Verify that you get back the the fetched URL content.
+4. From the menu bar, click the **Tools** tab. Then from the **Tools** pane, click **List Tools** and select the `fetch` tool. 
+5. From the **fetch** pane, in the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
+6. Verify that you get back the the fetched URL content.
 
    {{< reuse-image src="img/mcp-inspector-fetch.png" >}}
    {{< reuse-image-dark srcDark="img/mcp-inspector-fetch-dark.png" >}}
