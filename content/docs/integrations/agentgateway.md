@@ -104,7 +104,7 @@ Deploy a Model Context Protocol (MCP) server that you want agentgateway to route
 
 Route to the MCP server with agentgateway.
 
-1. Create an Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically spins up an agentgateway proxy for you.
+1. Create a Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically spins up an agentgateway proxy for you.
 
    ```yaml
    kubectl apply -f- <<EOF
