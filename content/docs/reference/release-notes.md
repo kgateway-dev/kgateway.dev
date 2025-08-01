@@ -30,6 +30,10 @@ Note that this change does not impact the other delegation annotations:
 
 ### 🌟 New features {#v21-new-features}
 
+#### Agentgateway integration {#v21-agentgateway}
+
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../integrations/agentgateway/).
+
 #### Global policy attachment {#v21-global-policy-attachment}
 
 By default, you must attach policies to resources that are in the same namespace. Now, you can enable a feature to create a "global" namespace for policies. Then, these global policies can attach to resources in any namespace in your cluster through label selectors. For more information, see the [Global policy attachment](../../about/policies/global-attachment/) docs.
