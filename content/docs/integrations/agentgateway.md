@@ -39,7 +39,7 @@ Enable the agentgateway feature in kgateway.
 
 ## Step 2: Deploy an MCP server {#mcp-server}
 
-Deploy a Model Context Protocol (MCP) server that you want agentgateway to route traffic to. The following example sets up a simple MCP server.
+Deploy a Model Context Protocol (MCP) server that you want agentgateway to route traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
 1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This setting lets the Backend target the Service in the next step.
 
