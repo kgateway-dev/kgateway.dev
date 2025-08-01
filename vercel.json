@@ -1,9 +1,16 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "build": {
     "env": {
       "HUGO_VERSION": "0.134.2"
     }
   },
   "buildCommand": "hugo --gc --minify",
-  "installCommand": "yum install -y golang; npm i"
+  "installCommand": "yum install -y golang; npm i",
+  "redirects": [
+    {
+      "source": "/docs/mcp", 
+      "destination": "/docs/integrations/agentgateway", 
+      "statusCode": 301 }
+  ]
 }
