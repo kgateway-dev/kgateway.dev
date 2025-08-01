@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1158pt" height="402pt" viewBox="0.00 0.00 1158.15 401.73">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 397.73)">
+<polygon fill="white" stroke="none" points="-4,4 -4,-397.73 1154.15,-397.73 1154.15,4 -4,4"/>
+<!-- Namespace/httpbin -->
+<g id="node1" class="node">
+<title>Namespace/httpbin</title>
+<ellipse fill="#d08770" stroke="black" cx="218.57" cy="-252.68" rx="56.93" ry="29.42"/>
+<text text-anchor="middle" x="218.57" y="-256.88" font-family="Times,serif" font-size="14.00">Namespace</text>
+<text text-anchor="middle" x="218.57" y="-240.08" font-family="Times,serif" font-size="14.00">httpbin</text>
+</g>
+<!-- Namespace/default -->
+<g id="node2" class="node">
+<title>Namespace/default</title>
+<ellipse fill="#d08770" stroke="black" cx="797.57" cy="-252.68" rx="56.93" ry="29.42"/>
+<text text-anchor="middle" x="797.57" y="-256.88" font-family="Times,serif" font-size="14.00">Namespace</text>
+<text text-anchor="middle" x="797.57" y="-240.08" font-family="Times,serif" font-size="14.00">default</text>
+</g>
+<!-- Namespace/kgateway&#45;system -->
+<g id="node3" class="node">
+<title>Namespace/kgateway-system</title>
+<ellipse fill="#d08770" stroke="black" cx="608.57" cy="-141.05" rx="80.04" ry="29.42"/>
+<text text-anchor="middle" x="608.57" y="-145.25" font-family="Times,serif" font-size="14.00">Namespace</text>
+<text text-anchor="middle" x="608.57" y="-128.45" font-family="Times,serif" font-size="14.00">kgateway-system</text>
+</g>
+<!-- Gateway.gateway.networking.k8s.io/kgateway&#45;system/http -->
+<g id="node4" class="node">
+<title>Gateway.gateway.networking.k8s.io/kgateway-system/http</title>
+<ellipse fill="#ebcb8b" stroke="black" cx="565.57" cy="-252.68" rx="98.19" ry="29.42"/>
+<text text-anchor="middle" x="565.57" y="-256.88" font-family="Times,serif" font-size="14.00">Gateway</text>
+<text text-anchor="middle" x="565.57" y="-240.08" font-family="Times,serif" font-size="14.00">kgateway-system/http</text>
+</g>
+<!-- Namespace/kgateway&#45;system&#45;&gt;Gateway.gateway.networking.k8s.io/kgateway&#45;system/http -->
+<g id="edge1" class="edge">
+<title>Namespace/kgateway-system-&gt;Gateway.gateway.networking.k8s.io/kgateway-system/http</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M593.34,-180.89C587.85,-194.88 581.77,-210.38 576.7,-223.3"/>
+<polygon fill="black" stroke="black" points="596.44,-182.56 596.83,-171.97 589.92,-180.01 596.44,-182.56"/>
+<text text-anchor="middle" x="621.91" y="-192.66" font-family="Times,serif" font-size="14.00">Namespace</text>
+</g>
+<!-- GatewayClass.gateway.networking.k8s.io/kgateway -->
+<g id="node10" class="node">
+<title>GatewayClass.gateway.networking.k8s.io/kgateway</title>
+<ellipse fill="#e5e9f0" stroke="black" cx="565.57" cy="-364.31" rx="67.95" ry="29.42"/>
+<text text-anchor="middle" x="565.57" y="-368.51" font-family="Times,serif" font-size="14.00">GatewayClass</text>
+<text text-anchor="middle" x="565.57" y="-351.71" font-family="Times,serif" font-size="14.00">kgateway</text>
+</g>
+<!-- Gateway.gateway.networking.k8s.io/kgateway&#45;system/http&#45;&gt;GatewayClass.gateway.networking.k8s.io/kgateway -->
+<g id="edge12" class="edge">
+<title>Gateway.gateway.networking.k8s.io/kgateway-system/http-&gt;GatewayClass.gateway.networking.k8s.io/kgateway</title>
+<path fill="none" stroke="black" d="M565.57,-282.48C565.57,-294.95 565.57,-309.74 565.57,-323.25"/>
+<polygon fill="black" stroke="black" points="562.07,-323.18 565.57,-333.18 569.07,-323.18 562.07,-323.18"/>
+<text text-anchor="middle" x="605.62" y="-304.29" font-family="Times,serif" font-size="14.00">GatewayClass</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/default/static&#45;backend -->
+<g id="node5" class="node">
+<title>HTTPRoute.gateway.networking.k8s.io/default/static-backend</title>
+<ellipse fill="#a3be8c" stroke="black" cx="805.57" cy="-141.05" rx="98.72" ry="29.42"/>
+<text text-anchor="middle" x="805.57" y="-145.25" font-family="Times,serif" font-size="14.00">HTTPRoute</text>
+<text text-anchor="middle" x="805.57" y="-128.45" font-family="Times,serif" font-size="14.00">default/static-backend</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/default/static&#45;backend&#45;&gt;Namespace/default -->
+<g id="edge2" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/default/static-backend-&gt;Namespace/default</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M803.47,-170.85C802.56,-183.31 801.48,-198.11 800.5,-211.62"/>
+<polygon fill="black" stroke="black" points="797.01,-211.33 799.77,-221.56 803.99,-211.84 797.01,-211.33"/>
+<text text-anchor="middle" x="834.31" y="-192.66" font-family="Times,serif" font-size="14.00">Namespace</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/default/static&#45;backend&#45;&gt;Gateway.gateway.networking.k8s.io/kgateway&#45;system/http -->
+<g id="edge4" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/default/static-backend-&gt;Gateway.gateway.networking.k8s.io/kgateway-system/http</title>
+<path fill="none" stroke="black" d="M752.61,-166.24C715.98,-182.97 667.1,-205.3 628.49,-222.94"/>
+<polygon fill="black" stroke="black" points="627.42,-219.58 619.78,-226.92 630.33,-225.94 627.42,-219.58"/>
+<text text-anchor="middle" x="727.93" y="-192.66" font-family="Times,serif" font-size="14.00">ParentRef</text>
+</g>
+<!-- Backend.gateway.kgateway.dev/default/json&#45;backend -->
+<g id="node6" class="node">
+<title>Backend.gateway.kgateway.dev/default/json-backend</title>
+<ellipse fill="#d8dee9" stroke="black" cx="1011.57" cy="-252.68" rx="138.58" ry="29.42"/>
+<text text-anchor="middle" x="1011.57" y="-256.88" font-family="Times,serif" font-size="14.00">Backend.gateway.kgateway.dev</text>
+<text text-anchor="middle" x="1011.57" y="-240.08" font-family="Times,serif" font-size="14.00">default/json-backend</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/default/static&#45;backend&#45;&gt;Backend.gateway.kgateway.dev/default/json&#45;backend -->
+<g id="edge3" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/default/static-backend-&gt;Backend.gateway.kgateway.dev/default/json-backend</title>
+<path fill="none" stroke="black" d="M852.83,-167.2C882.09,-182.77 919.95,-202.92 951.35,-219.63"/>
+<polygon fill="black" stroke="black" points="949.49,-222.6 959.96,-224.21 952.78,-216.42 949.49,-222.6"/>
+<text text-anchor="middle" x="955.5" y="-192.66" font-family="Times,serif" font-size="14.00">BackendRef</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin -->
+<g id="node7" class="node">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin</title>
+<ellipse fill="#a3be8c" stroke="black" cx="440.57" cy="-141.05" rx="70.16" ry="29.42"/>
+<text text-anchor="middle" x="440.57" y="-145.25" font-family="Times,serif" font-size="14.00">HTTPRoute</text>
+<text text-anchor="middle" x="440.57" y="-128.45" font-family="Times,serif" font-size="14.00">httpbin/httpbin</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;&gt;Namespace/httpbin -->
+<g id="edge5" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-&gt;Namespace/httpbin</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M394.81,-163.53C378.44,-171.3 359.88,-180.19 343.05,-188.46 318.35,-200.61 291.05,-214.43 268.34,-226.04"/>
+<polygon fill="black" stroke="black" points="266.9,-222.84 259.59,-230.51 270.09,-229.07 266.9,-222.84"/>
+<text text-anchor="middle" x="375.31" y="-192.66" font-family="Times,serif" font-size="14.00">Namespace</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;&gt;Gateway.gateway.networking.k8s.io/kgateway&#45;system/http -->
+<g id="edge6" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-&gt;Gateway.gateway.networking.k8s.io/kgateway-system/http</title>
+<path fill="none" stroke="black" d="M470.2,-168.03C486.82,-182.61 507.79,-201 525.83,-216.82"/>
+<polygon fill="black" stroke="black" points="523.45,-219.39 533.28,-223.36 528.07,-214.13 523.45,-219.39"/>
+<text text-anchor="middle" x="538.55" y="-192.66" font-family="Times,serif" font-size="14.00">ParentRef</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;direct&#45;response -->
+<g id="node8" class="node">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-direct-response</title>
+<ellipse fill="#a3be8c" stroke="black" cx="218.57" cy="-141.05" rx="133.93" ry="29.42"/>
+<text text-anchor="middle" x="218.57" y="-145.25" font-family="Times,serif" font-size="14.00">HTTPRoute</text>
+<text text-anchor="middle" x="218.57" y="-128.45" font-family="Times,serif" font-size="14.00">httpbin/httpbin-direct-response</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;direct&#45;response&#45;&gt;Namespace/httpbin -->
+<g id="edge7" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-direct-response-&gt;Namespace/httpbin</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M218.57,-170.85C218.57,-183.31 218.57,-198.11 218.57,-211.62"/>
+<polygon fill="black" stroke="black" points="215.07,-211.55 218.57,-221.55 222.07,-211.55 215.07,-211.55"/>
+<text text-anchor="middle" x="250.83" y="-192.66" font-family="Times,serif" font-size="14.00">Namespace</text>
+</g>
+<!-- HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;direct&#45;response&#45;&gt;Gateway.gateway.networking.k8s.io/kgateway&#45;system/http -->
+<g id="edge8" class="edge">
+<title>HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-direct-response-&gt;Gateway.gateway.networking.k8s.io/kgateway-system/http</title>
+<path fill="none" stroke="black" d="M318.94,-160.8C348.1,-167.82 379.61,-176.95 407.57,-188.46 421,-193.99 422.46,-199.06 435.59,-205.26 452.28,-213.15 470.69,-220.49 488.27,-226.9"/>
+<polygon fill="black" stroke="black" points="487.07,-230.19 497.67,-230.26 489.43,-223.6 487.07,-230.19"/>
+<text text-anchor="middle" x="463.58" y="-192.66" font-family="Times,serif" font-size="14.00">ParentRef</text>
+</g>
+<!-- Service/httpbin/httpbin -->
+<g id="node9" class="node">
+<title>Service/httpbin/httpbin</title>
+<ellipse fill="#88c0d0" stroke="black" cx="218.57" cy="-29.42" rx="70.16" ry="29.42"/>
+<text text-anchor="middle" x="218.57" y="-33.62" font-family="Times,serif" font-size="14.00">Service</text>
+<text text-anchor="middle" x="218.57" y="-16.82" font-family="Times,serif" font-size="14.00">httpbin/httpbin</text>
+</g>
+<!-- Service/httpbin/httpbin&#45;&gt;Namespace/httpbin -->
+<g id="edge9" class="edge">
+<title>Service/httpbin/httpbin-&gt;Namespace/httpbin</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M150.44,-37.35C102.7,-46.16 42.08,-66.17 11.05,-111.63 -3.68,-133.23 -3.68,-148.87 11.05,-170.46 42.25,-216.17 103.37,-236.15 151.23,-244.89"/>
+<polygon fill="black" stroke="black" points="150.53,-248.32 160.97,-246.53 151.69,-241.42 150.53,-248.32"/>
+<text text-anchor="middle" x="43.31" y="-136.85" font-family="Times,serif" font-size="14.00">Namespace</text>
+</g>
+<!-- Service/httpbin/httpbin&#45;&gt;HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin -->
+<g id="edge10" class="edge">
+<title>Service/httpbin/httpbin-&gt;HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin</title>
+<path fill="none" stroke="black" d="M273.54,-57.56C311.27,-76.19 360.71,-100.61 395.99,-118.03"/>
+<polygon fill="black" stroke="black" points="275.1,-54.43 264.59,-53.14 272,-60.71 275.1,-54.43"/>
+<text text-anchor="middle" x="377.46" y="-81.03" font-family="Times,serif" font-size="14.00">BackendRef</text>
+</g>
+<!-- Service/httpbin/httpbin&#45;&gt;HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin&#45;direct&#45;response -->
+<g id="edge11" class="edge">
+<title>Service/httpbin/httpbin-&gt;HTTPRoute.gateway.networking.k8s.io/httpbin/httpbin-direct-response</title>
+<path fill="none" stroke="black" d="M218.57,-70.68C218.57,-84.2 218.57,-99 218.57,-111.43"/>
+<polygon fill="black" stroke="black" points="222.07,-70.73 218.57,-60.73 215.07,-70.73 222.07,-70.73"/>
+<text text-anchor="middle" x="253.17" y="-81.03" font-family="Times,serif" font-size="14.00">BackendRef</text>
+</g>
+</g>
+</svg>
