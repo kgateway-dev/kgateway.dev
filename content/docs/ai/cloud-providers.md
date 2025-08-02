@@ -198,16 +198,218 @@ You can customize the default endpoint paths and authentication headers for LLM 
 **Path Override**
 - `pathOverride.fullPath` - Specifies a custom API path to replace the provider's default path
 - Supported for OpenAI and Anthropic compatible APIs
+- **Example use case**: Azure OpenAI requires deployment-specific paths like `/openai/deployments/{deployment-name}/chat/completions`
+- **Note**: The full path should include any query parameters required by your custom endpoint
 
 **Auth Header Override** 
 - `authHeaderOverride.headerName` - Custom header name (default: "Authorization")
-- `authHeaderOverride.prefix` - Custom prefix (default: "Bearer")
-- Note: Not all providers use the same authentication format (e.g., Azure OpenAI uses "api-key" header with no prefix)
+- `authHeaderOverride.prefix` - Custom prefix (default: "Bearer ")
+- **Important**: When using no prefix, set `prefix: ""` (empty string)
 
+### Common Use Cases
+
+**Path Override Examples:**
+- **Custom API Gateways**: When routing through your own API gateway that uses different paths
+- **API Versioning**: When you need to use a specific API version not supported by default
+- **Proxy Services**: When using a proxy service that modifies the standard endpoint structure
+- **Azure OpenAI**: Requires deployment-specific paths with API version parameters
+
+**Auth Header Override Examples:**
+- **Azure OpenAI**: Uses `api-key` header without `Bearer` prefix
+- **Custom Authentication**: When your organization requires specific header formats
+- **API Proxies**: When routing through services that expect different auth formats
+
+### Practical Examples
+
+#### Example 1: Custom API Endpoint (Path Override)
+
+This example shows how to configure a custom API endpoint path for an OpenAI-compatible provider:
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: custom-openai
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  labels:
+    app: ai-gateway
+spec:
+  ai:
+    llm:
+      provider:
+        openai:
+          model: gpt-4
+          authToken:
+            kind: SecretRef
+            secretRef:
+              name: openai-secret
+          pathOverride:
+            fullPath: "/v2/custom/chat/completions"  # Custom endpoint path
+  type: AI
+```
+
+#### Example 2: Custom Authentication (Auth Header Override)
+
+This example demonstrates how to configure custom authentication headers:
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  name: custom-auth-provider
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  labels:
+    app: ai-gateway
+spec:
+  ai:
+    llm:
+      provider:
+        openai:
+          model: gpt-4
+          authToken:
+            kind: SecretRef
+            secretRef:
+              name: custom-auth-secret
+          authHeaderOverride:
+            headerName: "X-API-Key"       # Custom header name
+            prefix: "Token "              # Custom prefix
+  type: AI
+```
+
+### Complete Example: Azure OpenAI Setup
+
+This complete example shows how to set up Azure OpenAI with both path and authentication overrides:
+
+1. Create the authentication secret:
+
+   ```bash
+   kubectl apply -f - <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: azure-openai-secret
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: ai-gateway
+   type: Opaque
+   stringData:
+     api-key: your-azure-api-key-here
+   EOF
+   ```
+
+2. Create the Backend with overrides:
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: azure-openai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: ai-gateway
+   spec:
+     ai:
+       llm:
+         provider:
+           openai:
+             model: gpt-4
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: azure-openai-secret
+             authHeaderOverride:
+               headerName: "api-key"      # Azure uses "api-key" instead of "Authorization"
+               prefix: ""                 # No "Bearer" prefix for Azure
+             pathOverride:
+               fullPath: "/openai/deployments/gpt-4/chat/completions?api-version=2024-02-15-preview"
+     type: AI
+   EOF
+   ```
+
+3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend:
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: azure-openai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: ai-gateway
+   spec:
+     parentRefs:
+       - name: ai-gateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /azure-openai
+       backendRefs:
+       - name: azure-openai
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         group: gateway.kgateway.dev
+         kind: Backend
+   EOF
+   ```
+
+4. Test the configuration:
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```bash
+   curl "$INGRESS_GW_ADDRESS:8080/azure-openai" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "messages": [
+         {"role": "user", "content": "Hello from Azure OpenAI!"}
+       ],
+       "max_tokens": 100
+     }' | jq
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```bash
+   curl "localhost:8080/azure-openai" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "messages": [
+         {"role": "user", "content": "Hello from Azure OpenAI!"}
+       ],
+       "max_tokens": 100
+     }' | jq
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```json
+   {
+     "id": "chatcmpl-abc123",
+     "object": "chat.completion",
+     "created": 1699896916,
+     "model": "gpt-4",
+     "choices": [
+       {
+         "index": 0,
+         "message": {
+           "role": "assistant",
+           "content": "Hello! I'm Azure OpenAI, ready to help you with any questions or tasks you have."
+         },
+         "finish_reason": "stop"
+       }
+     ],
+     "usage": {
+       "prompt_tokens": 12,
+       "completion_tokens": 20,
+       "total_tokens": 32
+     }
+   }
+   ```
 
 ## Next
-
-### Example Configuration
 
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
