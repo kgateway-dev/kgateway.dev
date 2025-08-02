@@ -3,11 +3,11 @@ title: Overview
 weight: 10
 ---
 
-Learn more about kgateway, its architecture, and benefits. 
+Learn more about {{< reuse "/docs/snippets/kgateway.md" >}}, its architecture, and benefits.
 
-## About kgateway
+## API gateway {#api-gateway}
 
-Kgateway is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
 
 ### What is an ingress?
 
@@ -79,23 +79,23 @@ The Gateway API is an API which can be used to program an ingress or an API gate
 
 ## Extensions
 
-The kgateway project provides the following extensions on top of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} to configure advanced routing, security, and resiliency capabilities.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} provides the following extensions on top of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} to configure advanced routing, security, and resiliency capabilities.
 
 {{< cards >}}
-  {{< card link="/docs/security/access-logging/" title="Access logging" tag="Security" >}}
-  {{< card link="/docs/setup/customize/aws-elb/" title="AWS ALB and NLB" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
-  {{< card link="/docs/setup/customize/" title="Gateway customization" tag="Setup" >}}
-  {{< card link="/docs/integrations/" title="Integrations" tag="Setup" >}}
-  {{< card link="/docs/resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}
-  {{< card link="/docs/traffic-management/transformations/" title="Transformations" tag="Traffic" >}}
-  {{< card link="/docs/traffic-management/weighted-routes/" title="Weighted routing" tag="Traffic" >}}
+  {{< card link="../../security/access-logging/" title="Access logging" tag="Security" >}}
+  {{< card link="../../setup/customize/aws-elb/" title="AWS ALB and NLB" tag="Traffic" >}}
+  {{< card link="../../traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
+  {{< card link="../../traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
+  {{< card link="../../traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
+  {{< card link="../../setup/customize/" title="Gateway customization" tag="Setup" >}}
+  {{< card link="../../integrations/" title="Integrations" tag="Setup" >}}
+  {{< card link="../../resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}
+  {{< card link="../../traffic-management/transformations/" title="Transformations" tag="Traffic" >}}
+  {{< card link="../../traffic-management/weighted-routes/" title="Weighted routing" tag="Traffic" >}}
 {{< /cards >}}
 
 ## Default gateway proxy setup
 
-Kgateway automatically spins up, bootstraps, and manages gateway proxy deployments when you create a Kubernetes Gateway resource. To do that, a combination of kgateway and Kubernetes resources are used, such as GatewayClass, GatewayParameters, and a gateway proxy template that includes the Envoy configuration that each proxy is bootstrapped with. 
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} automatically spins up, bootstraps, and manages gateway proxy deployments when you create a Kubernetes Gateway resource. To do that, a combination of kgateway and Kubernetes resources are used, such as GatewayClass, GatewayParameters, and a gateway proxy template that includes the Envoy configuration that each proxy is bootstrapped with. 
 
 To learn more about the default setup and how these resources interact with each other, see the [Default gateway proxy setup](/docs/setup/default/).
