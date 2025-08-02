@@ -5,14 +5,14 @@ weight: 100
 
 Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
-## v2.1.0
+## v2.1.0 {#v210}
 
 <!-- TODO release 2.1 
 For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.1.0).-->
 
-### 🔥 Breaking changes {#v2.1-breaking-changes}
+### 🔥 Breaking changes {#v21-breaking-changes}
 
-#### Route delegation annotation for policy merging {#v2.1-delegation-policy-merging}
+#### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
 
 The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
 
@@ -28,13 +28,17 @@ Note that this change does not impact the other delegation annotations:
 * `delegation.kgateway.dev/inherit-parent-matcher`
 * `delegation.kgateway.dev/label`
 
-### 🌟 New features {#v2.1-new-features}
+### 🌟 New features {#v21-new-features}
 
-#### Global policy attachment {#v2.1-global-policy-attachment}
+#### Agentgateway integration {#v21-agentgateway}
+
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../integrations/agentgateway/).
+
+#### Global policy attachment {#v21-global-policy-attachment}
 
 By default, you must attach policies to resources that are in the same namespace. Now, you can enable a feature to create a "global" namespace for policies. Then, these global policies can attach to resources in any namespace in your cluster through label selectors. For more information, see the [Global policy attachment](../../about/policies/global-attachment/) docs.
 
-#### Weighted routing {#v2.1-weighted-routing}
+#### Weighted routing {#v21-weighted-routing}
 
 Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing](/docs/traffic-management/weighted-routes/) docs.
 
@@ -49,7 +53,7 @@ Now, you can configure weights for more fine-grained control over your routing r
 ### 🚧 Known issues {#v2.1-known-issues}
 -->
 
-## v2.0.0
+## v2.0.0 {#v200}
 
 **Kgateway version 2.0.0** is the first official release of the project following its donation to the [Cloud Native Computing Foundation (CNCF)](https://www.cncf.io/). The donation marks a new chapter for the codebase, which was originally developed as the Gloo project by Solo.io. The 2.0 release introduces foundational changes to the Gloo project that lay the groundwork for a vibrant, open-source ecosystem built around the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/).
 
