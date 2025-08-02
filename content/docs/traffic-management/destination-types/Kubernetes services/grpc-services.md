@@ -11,7 +11,7 @@ Route traffic to gRPC services using the GRPCRoute resource for protocol-aware r
 GRPCRoute provides protocol-aware routing for gRPC traffic within the Kubernetes Gateway API. Unlike HTTPRoute, which requires matching on HTTP paths and methods, GRPCRoute allows you to define routing rules using gRPC-native concepts like service and method names.
 
 Consider the difference:
-- **HTTPRoute Match**: `path: /com.example.User/Login`, `method: POST`
+- **HTTPRoute Match**: `path:/com.example.User/Login`, `method: POST`
 - **GRPCRoute Match**: `service: com.example.User`, `method: Login`
 
 The GRPCRoute approach is more readable, less error-prone, and aligns with the Gateway API's role-oriented philosophy.
