@@ -1,11 +1,12 @@
 ---
 title: Destination types
 weight: 10
+description: Configure routing to different types of service destinations.
 ---
 
-You can route to two main types of destinations.
+Configure routing to different types of service destinations.
 
 {{< cards >}}
-  {{< card link="kube-services" title="Services" tag= "Kubernetes API" >}}
-  {{< card link="backends" title="Backends" tag= "Kgateway API" >}}
+  {{< card link="backends" title="Backends" >}}
+  {{< card link="kubernetes-services" title="Kubernetes services" >}}
 {{< /cards >}}
