@@ -29,7 +29,7 @@ Set up the data plane by choosing a gateway proxy depending on your use case.
 
 {{< icon "kgateway" >}} [Set up an API gateway with an httpbin sample app](../operations/sample-app/). This guide uses the Envoy-based {{< reuse "/docs/snippets/kgateway.md" >}} proxy to set up an API gateway. Then, deploy a sample httpbin app, configure a basic HTTP listener on the API gateway, and route traffic to httpbin by using an HTTPRoute resource.
 
-{{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool](../agentgateway/get-started/). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related networking use cases. Then, the example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and inspects the tool with the MCP Inspector UI.
+{{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool server](../agentgateway/get-started/). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
 
 ## Cleanup
 

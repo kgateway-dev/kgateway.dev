@@ -4,7 +4,7 @@ weight: 460
 description: Use kgateway with agentgateway. 
 ---
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} acts as the control plane for agentgateway data plane gateway proxies.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} acts as the control plane for agentgateway proxies.
 
 {{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-2-1-only.md" >}}
