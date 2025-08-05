@@ -3,4 +3,5 @@
 # Redirect old MCP documentation to new Agent Gateway documentation
 /docs/mcp /docs/agentgateway 301
 /docs/integrations/agentgateway /docs/agentgateway 301
- 
+/docs/mcp/ /docs/agentgateway/ 301
+/docs/integrations/agentgateway/ /docs/agentgateway/ 301
