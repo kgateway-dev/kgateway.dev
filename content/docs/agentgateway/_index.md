@@ -1,6 +1,6 @@
 ---
 title: Agentgateway
-weight: 10
+weight: 460
 description: Use kgateway with agentgateway. 
 ---
 
