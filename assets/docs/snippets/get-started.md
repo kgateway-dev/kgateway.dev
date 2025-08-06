@@ -15,7 +15,9 @@
 
    {{% tab tabName="Development" %}}
    ```sh
-   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
+   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
+   kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
+   --set controller.image.pullPolicy=Always
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -30,7 +32,9 @@
 
    {{% tab tabName="Development" %}}
    ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
+   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
+   kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   --set controller.image.pullPolicy=Always
    ```
    {{% /tab %}}
    {{< /tabs >}}

@@ -12,7 +12,7 @@ Integrate kgateway with common cloud-native tools.
   {{< card link="external-dns-cert-manager" title="ExternalDNS & Cert Manager"  >}}
   {{< card link="inference-extension" title="Inference Extension to the Gateway API"  >}}
   {{< card link="istio" title="Ingress to service meshes"  >}}
-   {{< card link="kserve" title="kserve" >}}
+  {{< card link="kserve" title="KServe" >}}
   {{< card link="/docs/reference/helm/" title="Helm"  >}}
   {{< card link="/docs/quickstart/" title="Kubernetes"  >}}
 {{< /cards >}}
