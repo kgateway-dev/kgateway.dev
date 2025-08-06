@@ -9,7 +9,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 
 ## Debug the control plane {#control-plane}
 
-1. Enable port-forwarding to the control plane.
+1. Enable port-forwarding on the control plane.
 
    ```sh
    kubectl port-forward deploy/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 9097:9097
@@ -27,7 +27,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    | `/debug/pprof` | View the pprof profile of the control plane. A profile shows you the stack traces of the call sequences, such as Go routines, that led to particular events, such as memory allocation. The endpoint includes descriptions of each available profile.|
    | `/logging` | Review the current logging levels of each component in the control plane. You can also interactively set the log level by component, such as to enable `DEBUG` logs. |
    | `/snapshots/krt` | View the current krt snapshot, or the point-in-time view of the transformed Kubernetes resources and their sync status that the control plane processed. These resources are then used to generate gateway configuration that is sent to the gateway proxies for routing decisions. |
-   | `/snapshots/xds` | View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies in the data plane. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. |  
+   | `/snapshots/xds` | View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. |  
 
 ## Debug your gateway setup
 
