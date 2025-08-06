@@ -18,9 +18,9 @@ Agentgateway is an open source, highly available, highly scalable, and enterpris
 
 Enable the agentgateway feature in kgateway.
 
-1. Complete the [Get started guide](../../quickstart/) to create a Kubernetes cluster, deploy the Kubernetes Gateway API CRDs, and install kgateway. **Note**: Agentgateway is currently available in the v{{< reuse "docs/versions/patch-dev.md" >}} development release.
+1. Complete the [Get started guide](../quickstart/) to create a Kubernetes cluster, deploy the Kubernetes Gateway API CRDs, and install kgateway. **Note**: Agentgateway is currently available in the v{{< reuse "docs/versions/patch-dev.md" >}} development release.
 
-2. Upgrade your kgateway installation to enable agentgateway. For complete upgrade instructions, see the [upgrade guide](../../reference/upgrade/).
+2. Upgrade your kgateway installation to enable agentgateway. For complete upgrade instructions, see the [upgrade guide](../operations/upgrade/).
 
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
