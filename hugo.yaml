@@ -131,7 +131,3 @@ params:
       dropdown: "main"
       linkVersion: "main"
       url: "/main"
-    - version: "2.0"
-      dropdown: "2.0"
-      linkVersion: "2.0"
-      url: "/2.0"
