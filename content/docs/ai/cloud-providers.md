@@ -191,7 +191,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 
 ## Overriding LLM Provider Settings {#override-settings}
 
-You can customize the default endpoint paths and authentication headers for LLM providers using override settings. This is useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure.
+You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI uses deployment-specific paths as well as a non-standard `Authorization` header that does not include the default `Bearer ` prefix.
+
+For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
 
 ### Configuration Options
 
