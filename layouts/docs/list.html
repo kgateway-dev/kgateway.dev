@@ -1,4 +1,10 @@
 {{ define "main" }}
+  <script>
+    if (window.location.pathname === "/docs/") {
+      window.location.assign(window.location.href + "main");
+    }
+  </script>
+  
   <div class="w-full z-10">
     {{ partial "announcement.html" .}}
   </div>

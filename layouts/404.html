@@ -1,12 +1,22 @@
+{{ $docsVersions := slice }}
+{{ range site.Params.versions }}
+    {{ $docsVersions = $docsVersions | append .linkVersion }}
+{{ end }}
 <!DOCTYPE html>
 <html lang="en">
 
 <script>
-  // Redirect from 404 docs pages to the base docs page for the selected version
-  var match = window.location.href.match(/.*\/docs\/[a-zA-Z0-9\.]+\//);
-  if (match) {
-    window.location.assign(match[0]);
-  }
+    var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
+    var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
+    if (match) {
+        if (docsVersions.includes(match[1])) {
+            // match is a valid docs version, redirect to base docs page for that version
+            window.location.assign(window.location.origin + "/docs/" + match[1]);
+        } else {
+            // match is not a valid docs version, insert `main` after docs and retry
+            window.location.assign(window.location.href.replace("/docs/", "/docs/main/"));
+        }
+    }
 </script>
 
 <body
