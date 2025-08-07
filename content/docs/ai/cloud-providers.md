@@ -293,7 +293,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
        app: ai-gateway
    type: Opaque
    stringData:
-     api-key: your-azure-api-key-here
+     api-key: $AZURE_KEY
    EOF
    ```
 
