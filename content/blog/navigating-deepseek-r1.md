@@ -3,6 +3,7 @@ title: Navigating DeepSeek R1, Security Concerns, and Guardrails
 toc: false
 publishDate: 2025-01-29T00:00:00-00:00
 author: Christian Posta
+excludeSearch: true
 ---
 
 DeepSeek R1 is a new model from Chinese startup DeepSeek released on January 20th with impressive reasoning ability which rivals (or beats) the existing leading reasoning models (ie, o1 from OpenAI). It is available from a few different providers but from my perspective, the most interesting thing is that it's open source and is available in distilled form with similar performance (ie, distilled to Qwen or Llama models, which can be self-hosted).

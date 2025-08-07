@@ -2,7 +2,8 @@
 title: Configuring HTTPS routes with the Gateway API
 toc: false
 publishDate: 2025-03-14T00:00:00-00:00
-author: Eitan Suez & Brian Jimerson 
+author: Eitan Suez & Brian Jimerson
+excludeSearch: true
 ---
 
 In the [previous blog](https://kgateway.dev/blog/introduction-to-kubernetes-gateway-api/), we explored a straightforward example of configuring an ingress route for a workload running in Kubernetes. That example focused on simplicity by utilizing a single Gateway listener with the HTTP protocol. 

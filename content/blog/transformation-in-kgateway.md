@@ -2,7 +2,8 @@
 title: Transformations in kgateway 
 toc: false
 publishDate: 2025-04-17T00:00:00-00:00
-author: Eitan Suez 
+author: Eitan Suez
+excludeSearch: true
 ---
 
 Transformations are a feature in kgateway that allows for the transformation of an incoming request or outgoing response. It offers the addition, removal, or replacement of HTTP headers and the manipulation of request or response body.

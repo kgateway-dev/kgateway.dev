@@ -2,6 +2,7 @@
 title: kgateway
 toc: false
 description: ""
+excludeSearch: true
 ---
 
 
