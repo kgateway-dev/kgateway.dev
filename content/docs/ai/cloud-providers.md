@@ -297,7 +297,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
    EOF
    ```
 
-2. Create the Backend with overrides:
+2. Create a Backend resource that defines the custom overrides for your Azure OpenAI destination.
 
    ```yaml
    kubectl apply -f - <<EOF
