@@ -327,7 +327,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
    EOF
    ```
 
-3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend:
+3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
    ```yaml
    kubectl apply -f - <<EOF
