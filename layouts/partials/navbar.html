@@ -38,6 +38,14 @@
   .search-results li a:not([href*="/docs/{{$version}}/"]) {
     display: none;
   }
+
+  /* Fix top margin when first item returned is hidden */
+  .search-results .prefix:has(+ li a[href*="/docs/{{$version}}/"]) {
+    margin-top: 0;
+  }
+  .search-results .prefix:has(+ li a[href*="/docs/{{$version}}/"]) ~ .prefix:has(+ li a[href*="/docs/{{$version}}/"]) {
+    margin-top: 1.5rem;
+  }
 </style>
 
 <div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden">
