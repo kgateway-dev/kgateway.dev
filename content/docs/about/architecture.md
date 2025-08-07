@@ -22,7 +22,7 @@ The following image shows the different components that make up the {{< reuse "/
 5. The reporter writes the resource status back to the etcd data store. 
 6. The xDS snapshot is provided to the {{< reuse "/docs/snippets/kgateway.md" >}} xDS server component in the `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` pod. 
 7. Gateway proxies in the cluster pull the latest gateway proxy configuration from the {{< reuse "/docs/snippets/kgateway.md" >}} xDS server.
-8. Users send a request to the IP address or hostname that the gateway proxy is exposed on. 
+8. Clients send a request to the IP address or hostname that the gateway proxy is exposed on. 
 9. The gateway proxy uses the listener and route-specific configuration that was provided in the xDS snapshot to perform routing decisions and forward requests to destinations in the cluster.
 
 ### Config watcher 
@@ -67,66 +67,24 @@ The following image shows the different stages of a translation cycle for the di
 
 {{% tab tabName="Agentgateway proxy" %}}
 
-<!--{{< reuse-image src="img/translation-loop.svg" caption="Agentgateway translation cycle" >}}
-{{< reuse-image-dark srcDark="img/translation-loop-dark.svg" caption="Agentgateway translation cycle" >}}-->
+{{< reuse-image src="img/agw-translation-loop.svg" caption="Agentgateway translation cycle" >}}
+{{< reuse-image-dark srcDark="img/agw-translation-loop-dark.svg" caption="Agentgateway translation cycle" >}}
 
-The Agentgateway syncer in kgateway follows this specific order when translating resources:
-1. Input Collection Building
-Collects all input resources: Namespaces, Services, Secrets, GatewayClasses, Gateways, HTTPRoutes, GRPCRoutes, TCPRoutes, TLSRoutes, ReferenceGrants, ServiceEntries, InferencePools, and Backends
-2. Core Collection Processing
-GatewayClasses: Processes GatewayClass resources to determine which gateways to handle
-ReferenceGrants: Builds reference grants for cross-namespace references
-Gateways: Builds gateway collection with listeners and validates against the agentgateway class
-3. ADP (Agentgateway Data Plane) Resource Building
-The buildADPResources method processes resources in this specific order:
-3.1 Binds (Port Bindings)
-Groups gateways by port
-Creates api.Bind resources for each port/gateway combination
-Binds are the foundation for connecting listeners to ports
-3.2 Listeners
-Creates api.Listener resources from gateway listeners
-Sets protocol (HTTP, HTTPS, TCP, TLS) and TLS configuration
-Associates listeners with their corresponding binds
-3.3 Routes
-Route Parents: Builds route parent references from gateways
-Route Context: Sets up context with grants, services, namespaces, inference pools, backends, and plugins
-Route Translation: Translates different route types:
-HTTPRoutes: Converts to api.Route resources with matches, backends, and policies
-GRPCRoutes: Converts to api.Route resources for gRPC traffic
-TCPRoutes: Converts to api.TCPRoute resources
-TLSRoutes: Converts to api.TCPRoute resources for TLS termination
-3.4 Policies
-Processes attached policies for routes and listeners
-Applies policy-specific configurations through plugins
-4. Backend Collections
-Processes all Backend resources independently (not per-gateway)
-Converts Backends to agentgateway-compatible backend configurations
-Includes service discovery and endpoint information
-5. Address Collections
-Builds address configurations for services and workloads
-Handles service discovery and endpoint resolution
-6. XDS Collection Building
-The buildXDSCollection method combines everything:
-Merges all ADP resources (binds, listeners, routes, policies) per gateway
-Adds backend resources to all gateways
-Creates separate resource and address configurations
-Generates versioned XDS snapshots
-7. Status Reporting
-Builds status reports for gateways, listeners, and routes
-Tracks attached routes and policy acceptance
-8. Final XDS Snapshot
-Composes final xDS snapshot with:
-ResourceConfig: Contains binds, listeners, routes, policies, and backends
-AddressConfig: Contains service and workload addresses
-Sends snapshot to agentgateway xDS server
-Key Differences from Envoy-based Translation
-Unlike the Envoy-based translation you described, the Agentgateway translation:
-Starts with binds rather than clusters - binds are the foundation for port binding
-Processes listeners early - listeners are created directly from gateway configurations
-Handles routes with policy integration - routes are translated with attached policies applied through plugins
-Separates backends globally - backends are not per-gateway but shared across all gateways
-Uses agentgateway-specific APIs - translates to api.Bind, api.Listener, api.Route, api.TCPRoute rather than Envoy resources
-The translation order ensures that dependencies are resolved correctly: binds → listeners → routes → policies, with backends and addresses processed separately and added to the final configuration.
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
+1. When the agentgateway feature is enabled for {{< reuse "/docs/snippets/kgateway.md" >}}, the agentgateway syncer component is created as part of the control plane.
+
+2. The agentgateway syncer sets up the initial configuration, including the `agentgateway` GatewayClass name that Gateways can use to automatically create agentgateway proxies. The agentgateway syncer also builds the initial krt collections based on the Gateway API and kgateway resources in the cluster.
+
+3. The translation cycle starts by collecting all of the resources that are needed to create agentgateway proxy config. These various collections include:
+   * Core collections of the Kubernetes, Gateway API, and kgateway resources that are defined in the cluster, such as namespaces, services, gateways, routes, policies, backends, and plugins for AI, MCP, and A2A-specific backends.
+   * Agentgateway data plane resource building that consist of information translated from the core collection into the format that agentgateway expects, such as bind, port, listener, route, backend, target, and policy configuration for agentgateway. For more information, see the [agentgateway about topic](../../agentgateway/about/#resources).
+   * Address collections of the service and workloads that are included in service discovery and endpoint resolution.
+   * The translation order ensures that dependencies are resolved correctly: `binds → listeners → routes → policies`, with backends and addresses processed separately and added to the final configuration.
+
+4. The next step in the translation process is to build the xDS collection. This step merges all of the resource config of agentgateway data plane resources together with the address config to create the config for each agentgateway proxy. It also builds status reports for the resources, tracks attached routes, and determines attached policies.
+
+5. Finally, the information from the resource and xDS collections are turned into an xDS snapshot of the agentgateway proxy config. The snapshot is sent to the xDS server. The agentgateway proxies in your cluster watch the xDS server for new config. When new config is detected, the config is pulled into the agentgateway proxy via gRPC.
 
 {{% /tab %}}
 
