@@ -13,6 +13,10 @@
   {{ end -}}
 {{- end -}}
 
+{{- $pagelink := page.RelPermalink -}}
+{{ $parts := split $pagelink "/" }}
+{{ $version := index $parts 2 }}
+
 <style>
   .dropdown {
     position: relative;
@@ -24,6 +28,16 @@
   }
 
   .dropdown:hover .dropdown-content {display: block;}
+
+  /* Hide section headers for non-selected versions */
+  .search-results .prefix:has(+ li a:not([href*="{{$version}}"]) ){
+    display: none;
+  }
+
+  /* Hide articles for non-selected versions */
+  .search-results li a:not([href*="/docs/{{$version}}/"]) {
+    display: none;
+  }
 </style>
 
 <div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden">
@@ -43,9 +57,6 @@
     {{ if site.Params.versions }}
     <div class="dropdown px-2 cursor-pointer">
         <button class="btn" type="button">
-          {{- $pagelink := page.RelPermalink -}}
-          {{ $parts := split $pagelink "/" }}
-          {{ $version := index $parts 2 }}
           {{- range site.Params.versions -}}
             {{- if in $version .linkVersion -}}
                {{- printf "%s" .dropdown -}}
