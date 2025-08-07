@@ -49,11 +49,11 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
        app: ai-gateway
    type: Opaque
    stringData:
-     Authorization: $GOOGLE_KEY 
+     Authorization: $GOOGLE_KEY
    EOF
    ```
 
-3. Create a Backend resource to define the Gemini destination. 
+3. Create a Backend resource to define the Gemini destination.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -81,22 +81,22 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 
    {{< reuse "docs/snippets/review-table.md" >}}
 
-   | Setting | Description |
-   |---------|-------------|
-   | `gemini` | The Gemini AI provider. |
+   | Setting      | Description                                                                                                                                                                                                                                                                                                           |
+   | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `gemini`     | The Gemini AI provider.                                                                                                                                                                                                                                                                                               |
    | `apiVersion` | The API version of Gemini that is compatible with the model that you plan to use. In this example, you must use `v1beta` because the `gemini-1.5-flash-latest` model is not compatible with the `v1` API version. For more information, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/api-versions). |
-   | `authToken` | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step. |
-   | `model` | The model to use to generate responses. In this example, you use the `gemini-1.5-flash-latest` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models). |
+   | `authToken`  | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step.                                                                                                                                                                          |
+   | `model`      | The model to use to generate responses. In this example, you use the `gemini-1.5-flash-latest` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                                                                                                        |
 
 4. Create an HTTPRoute resource to route requests to the Gemini backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/gemini`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
    ```yaml
-   kubectl apply -f- <<EOF                                             
+   kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
-   metadata:       
+   metadata:
      name: google
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}                           
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -117,40 +117,43 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    ```
 
 5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
-   
+
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
+
+   ````sh
    curl "$INGRESS_GW_ADDRESS:8080/gemini" -H content-type:application/json  -d '{
-     "contents": [                         
-       {          
+     "contents": [
+       {
          "parts": [
-           {     
+           {
              "text": "Explain how AI works in a few words"
            }
-         ]             
+         ]
        }
-     ]          
-   }' | jq  
+     ]
+   }' | jq
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/gemini" -H content-type:application/json -d '{
-     "contents": [                         
-       {          
+     "contents": [
+       {
          "parts": [
-           {     
+           {
              "text": "Explain how AI works in a few words"
            }
-         ]             
+         ]
        }
-     ]          
-   }' | jq 
-   ```
+     ]
+   }' | jq
+   ````
+
    {{% /tab %}}
    {{< /tabs >}}
-   
-   Example output: 
+
+   Example output:
+
    ```json
    {
      "candidates": [
@@ -195,8 +198,15 @@ You can customize the default endpoint paths and authentication headers for LLM 
 
 For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
 
+1. Save your OpenAI API key as an environment variable. To retrieve your API key, log in to your [OpenAI account dashboard](https://platform.openai.com/account/api-keys) and create or copy your API key.
 
-1. Create the authentication secret:
+```bash
+export OPENAI_API_KEY=<your-api-key>
+```
+
+Replace `` with your actual OpenAI API key.
+
+2. Create the authentication secret:
 
    ```bash
    kubectl apply -f - <<EOF
@@ -213,7 +223,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    EOF
    ```
 
-2. Create a Backend resource that defines the custom overrides for your Azure OpenAI destination.
+3. Create a Backend resource that defines the custom overrides for your Azure OpenAI destination.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -234,19 +244,20 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
                kind: SecretRef
                secretRef:
                  name: azure-openai-secret
-             model: gpt-4o    
+             model: gpt-4o
      type: AI
    EOF
    ```
-Review the following table to understand this configuration.
 
-| Setting            | Description                                                                                          |
-|--------------------|----------------------------------------------------------------------------------------------------|
-| `authHeaderOverride`| Overrides the default Authorization header sent to the AI provider.                                |
-| `headerName`        | The name of the authentication header. Azure requires `"api-key"` instead of `"Authorization"`.     |
-| `prefix`            | Prefix for the auth token; left blank because Azure OpenAI does not use `"Bearer "` prefix.         |
-| `pathOverride`      | Provides a full override for the API request path to the AI backend.                                |
-| `fullPath`          | The exact API endpoint path including deployment name (`gpt-4`) and API version.                    |
+   Review the following table to understand this configuration.
+
+| Setting              | Description                                                                                     |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| `authHeaderOverride` | Overrides the default Authorization header sent to the AI provider.                             |
+| `headerName`         | The name of the authentication header. Azure requires `"api-key"` instead of `"Authorization"`. |
+| `prefix`             | Prefix for the auth token; left blank because Azure OpenAI does not use `"Bearer "` prefix.     |
+| `pathOverride`       | Provides a full override for the API request path to the AI backend.                            |
+| `fullPath`           | The exact API endpoint path including deployment name (`gpt-4`) and API version.                |
 
 3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
@@ -280,6 +291,7 @@ Review the following table to understand this configuration.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
+
    ```bash
    curl "$INGRESS_GW_ADDRESS:8080/azure-openai" \
      -H "Content-Type: application/json" \
@@ -290,8 +302,10 @@ Review the following table to understand this configuration.
        "max_tokens": 100
      }' | jq
    ```
+
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
+
    ```bash
    curl "localhost:8080/azure-openai" \
      -H "Content-Type: application/json" \
@@ -302,10 +316,12 @@ Review the following table to understand this configuration.
        "max_tokens": 100
      }' | jq
    ```
+
    {{% /tab %}}
    {{< /tabs >}}
 
    Example output:
+
    ```json
    {
      "id": "chatcmpl-abc123",
@@ -335,9 +351,9 @@ Review the following table to understand this configuration.
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-  {{< card link="/docs/ai/failover" title="Model failover" >}}
-  {{< card link="/docs/ai/functions" title="Function calling" >}}
-  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
-  {{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
+{{< card link="/docs/ai/failover" title="Model failover" >}}
+{{< card link="/docs/ai/functions" title="Function calling" >}}
+{{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
+{{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
+{{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
 {{< /cards >}}
