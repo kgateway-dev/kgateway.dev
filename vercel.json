@@ -6,11 +6,5 @@
     }
   },
   "buildCommand": "hugo --gc --minify",
-  "installCommand": "yum install -y golang; npm i",
-  "redirects": [
-    {
-      "source": "/docs/mcp", 
-      "destination": "/docs/integrations/agentgateway", 
-      "statusCode": 301 }
-  ]
+  "installCommand": "yum install -y golang; npm i"
 }

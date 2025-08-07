@@ -1,0 +1,1 @@
+{{< icon "agentgateway" >}} The docs in this section use the agentgateway proxy. The docs might not work with the Envoy-based kgateway proxy.

@@ -1,12 +1,16 @@
 ---
 title: Agentgateway
-weight: 10
+weight: 460
 description: Use kgateway with agentgateway. 
 ---
 
-Use {{< reuse "/docs/snippets/kgateway.md" >}} to manage [agentgateway](https://agentgateway.dev/) proxies for AI gateways in a Kubernetes environment. 
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} acts as the control plane for agentgateway proxies.
 
-## About agentgateway {#about}
+{{< callout type="warning" >}} 
+{{< reuse "docs/versions/warn-2-1-only.md" >}}
+{{< /callout >}}
+
+## About agentgateway {#about-agentgateway}
 
 Agentgateway is an open source, highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [agentgateway docs](https://agentgateway.dev/docs/about/).
 
@@ -14,9 +18,9 @@ Agentgateway is an open source, highly available, highly scalable, and enterpris
 
 Enable the agentgateway feature in kgateway.
 
-1. Complete the [Get started guide](../../quickstart/) to create a Kubernetes cluster, deploy the Kubernetes Gateway API CRDs, and install kgateway. **Note**: Agentgateway is currently available in the v{{< reuse "docs/versions/patch-dev.md" >}} development release.
+1. Complete the [Get started guide](../quickstart/) to create a Kubernetes cluster, deploy the Kubernetes Gateway API CRDs, and install kgateway. **Note**: Agentgateway is currently available in the v{{< reuse "docs/versions/patch-dev.md" >}} development release.
 
-2. Upgrade your kgateway installation to enable agentgateway. For complete upgrade instructions, see the [upgrade guide](../../reference/upgrade/).
+2. Upgrade your kgateway installation to enable agentgateway. For complete upgrade instructions, see the [upgrade guide](../operations/upgrade/).
 
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
