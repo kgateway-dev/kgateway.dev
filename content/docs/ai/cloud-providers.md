@@ -355,7 +355,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
    EOF
    ```
 
-4. Test the configuration:
+4. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
