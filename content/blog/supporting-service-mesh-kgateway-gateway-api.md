@@ -3,6 +3,7 @@ title: Supporting Service Mesh with kgateway and Gateway API
 toc: false
 publishDate: 2025-03-20T00:00:00-00:00
 author: Nadine Spies & Eitan Suez
+excludeSearch: true
 ---
 
 A service mesh allows you to configure and control traffic between Kubernetes services that are deployed in a cluster. Service-to-service communication is also referred to as “east-west” traffic and does not involve ingress gateways.

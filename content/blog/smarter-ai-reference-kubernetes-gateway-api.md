@@ -3,6 +3,7 @@ title: Smarter AI Inference Routing on Kubernetes with Gateway API Inference Ext
 toc: false
 publishDate: 2025-03-25T00:00:00-00:00
 author: Christian Posta
+excludeSearch: true
 ---
 
 The [kgateway](https://kgateway.dev) 2.0 release includes support for the new [Kubernetes Gateway API Inference Extension](https://gateway-api-inference-extension.sigs.k8s.io). This extension brings AI/LLM awareness to Kubernetes networking, enabling organizations to optimize load balancing and routing for AI inference workloads. This post explores why this capability is critical and how it improves efficiency when running AI workloads on Kubernetes.

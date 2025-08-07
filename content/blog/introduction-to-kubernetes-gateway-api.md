@@ -3,6 +3,7 @@ title: Introduction to the Kubernetes Gateway API
 toc: false
 publishDate: 2025-03-05T00:00:00-00:00
 author:  Eitan Suez & Alex Ly
+excludeSearch: true
 ---
 
 Kubernetes has come a long way since its early days of exposing services via the original Ingress API. As more workloads adopt Kubernetes, the types of traffic management needed—ingress from the outside world, service-to-service (east-west) communication within the cluster, and egress to external systems—have also become more sophisticated. 
