@@ -278,8 +278,6 @@ spec:
 
 ### Complete Example: Azure OpenAI Setup
 
-This complete example shows how to set up Azure OpenAI with both path and authentication overrides:
-
 1. Create the authentication secret:
 
    ```bash
