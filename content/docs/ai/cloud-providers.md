@@ -191,94 +191,10 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 
 ## Overriding LLM Provider Settings {#override-settings}
 
-You can customize the default endpoint paths and authentication headers for LLM providers using override settings. This is useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure.
+You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI uses deployment-specific paths as well as a non-standard `Authorization` header that does not include the default `Bearer ` prefix.
 
-### Configuration Options
+For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
 
-**Path Override**
-- `pathOverride.fullPath` - Specifies a custom API path to replace the provider's default path
-- Supported for OpenAI and Anthropic compatible APIs
-- **Example use case**: Azure OpenAI requires deployment-specific paths like `/openai/deployments/{deployment-name}/chat/completions`
-- **Note**: The full path should include any query parameters required by your custom endpoint
-
-**Auth Header Override** 
-- `authHeaderOverride.headerName` - Custom header name (default: "Authorization")
-- `authHeaderOverride.prefix` - Custom prefix (default: "Bearer ")
-- **Important**: When using no prefix, set `prefix: ""` (empty string)
-
-### Common Use Cases
-
-**Path Override Examples:**
-- **Custom API Gateways**: When routing through your own API gateway that uses different paths
-- **API Versioning**: When you need to use a specific API version not supported by default
-- **Proxy Services**: When using a proxy service that modifies the standard endpoint structure
-- **Azure OpenAI**: Requires deployment-specific paths with API version parameters
-
-**Auth Header Override Examples:**
-- **Azure OpenAI**: Uses `api-key` header without `Bearer` prefix
-- **Custom Authentication**: When your organization requires specific header formats
-- **API Proxies**: When routing through services that expect different auth formats
-
-### Practical Examples
-
-#### Example 1: Custom API Endpoint (Path Override)
-
-This example shows how to configure a custom API endpoint path for an OpenAI-compatible provider:
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: Backend
-metadata:
-  name: custom-openai
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  labels:
-    app: ai-gateway
-spec:
-  ai:
-    llm:
-      provider:
-        openai:
-          model: gpt-4
-          authToken:
-            kind: SecretRef
-            secretRef:
-              name: openai-secret
-          pathOverride:
-            fullPath: "/v2/custom/chat/completions"  # Custom endpoint path
-  type: AI
-```
-
-#### Example 2: Custom Authentication (Auth Header Override)
-
-This example demonstrates how to configure custom authentication headers:
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: Backend
-metadata:
-  name: custom-auth-provider
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  labels:
-    app: ai-gateway
-spec:
-  ai:
-    llm:
-      provider:
-        openai:
-          model: gpt-4
-          authToken:
-            kind: SecretRef
-            secretRef:
-              name: custom-auth-secret
-          authHeaderOverride:
-            headerName: "X-API-Key"       # Custom header name
-            prefix: "Token "              # Custom prefix
-  type: AI
-```
-
-### Complete Example: Azure OpenAI Setup
-
-This complete example shows how to set up Azure OpenAI with both path and authentication overrides:
 
 1. Create the authentication secret:
 
@@ -293,11 +209,11 @@ This complete example shows how to set up Azure OpenAI with both path and authen
        app: ai-gateway
    type: Opaque
    stringData:
-     api-key: your-azure-api-key-here
+     api-key: $AZURE_KEY
    EOF
    ```
 
-2. Create the Backend with overrides:
+2. Create a Backend resource that defines the custom overrides for your Azure OpenAI destination.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -327,7 +243,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
    EOF
    ```
 
-3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend:
+3. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -355,7 +271,7 @@ This complete example shows how to set up Azure OpenAI with both path and authen
    EOF
    ```
 
-4. Test the configuration:
+4. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
