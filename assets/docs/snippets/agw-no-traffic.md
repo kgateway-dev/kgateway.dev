@@ -1,0 +1,1 @@
+Note that agentgateway does not yet support kgateway TrafficPolicies. Any guide that relies on TrafficPolicies will not work with the agentgateway data plane. Instead, use the kgateway Envoy-based data plane.
