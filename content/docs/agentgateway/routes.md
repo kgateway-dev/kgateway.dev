@@ -9,6 +9,10 @@ The agentgateway data plane supports the Gateway API routing resources, includin
 {{< reuse "docs/snippets/agw-no-traffic.md" >}}
 {{< /callout >}}
 
+## Before you begin
+
+{{< reuse "docs/snippets/prereq-agw.md" >}}
+
 ## HTTP
 
 Use agentgateway to proxy HTTP requests to your backend services.
@@ -180,7 +184,11 @@ Use agentgateway to proxy gRPC requests to your backend services.
    {{< /tabs >}}
 
    Example output:
-   ```
+   
+   ```json
+   {
+     "text": "pong"
+   }
    ```
 
 6. Optional: {{< reuse "docs/snippets/cleanup.md" >}}
