@@ -10,6 +10,10 @@ Configure and manage HTTP connections to an upstream service.
 {{< reuse "docs/versions/warn-2-1-only.md" >}} {{< reuse "docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Supported HTTP connection settings
 
 You can use a BackendConfigPolicy to apply HTTP connection settings to a service in your cluster. These settings include general settings, such as connection timeouts or the maximum number of connections that an upstream service can receive. You can also configure settings for HTTP/2 and HTTP/1 requests. 

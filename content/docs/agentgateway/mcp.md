@@ -35,25 +35,25 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 Deploy an MCP server that you want agentgateway to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
 
-1. Create an MCP server (`mcp-server-everything`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
+1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: apps/v1
    kind: Deployment
    metadata:
-     name: mcp-server-everything
+     name: mcp-server
      labels:
-       app: mcp-server-everything
+       app: mcp-server
    spec:
      replicas: 1
      selector:
        matchLabels:
-         app: mcp-server-everything
+         app: mcp-server
      template:
        metadata:
          labels:
-           app: mcp-server-everything
+           app: mcp-server
        spec:
          containers:
            - name: mcp-server
@@ -66,12 +66,12 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    apiVersion: v1
    kind: Service
    metadata:
-     name: mcp-server-everything
+     name: mcp-server
      labels:
-       app: mcp-server-everything
+       app: mcp-server
    spec:
      selector:
-       app: mcp-server-everything
+       app: mcp-server
      ports:
        - protocol: TCP
          port: 3001
@@ -97,7 +97,7 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
          - selectors:
              serviceSelector:
                matchLabels:
-                 app: mcp-server-everything
+                 app: mcp-server
    EOF
    ```
 
@@ -119,6 +119,9 @@ Route to the MCP server with agentgateway.
      - protocol: HTTP
        port: 8080
        name: http
+       allowedRoutes:
+         namespaces:
+           from: All
    EOF
    ```
 
@@ -146,6 +149,7 @@ Route to the MCP server with agentgateway.
    spec:
      parentRefs:
      - name: agentgateway
+       namespace: default
      rules:
        - backendRefs:
          - name: mcp-backend
@@ -197,8 +201,8 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete Deployment mcp-server-everything
-kubectl delete Service mcp-server-everything
+kubectl delete Deployment mcp-server
+kubectl delete Service mcp-server
 kubectl delete Backend mcp-backend
 kubectl delete Gateway agentgateway
 kubectl delete HTTPRoute mcp
@@ -220,25 +224,25 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway to proxy traffic to. The following example sets up two MCP servers with different tools: one `npx` based MCP server that provides various utility tools and a Python-based `uvx` MCP server that provides time-related tools.
 
-1. Create an MCP server (`mcp-server-everything`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
+1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: apps/v1
    kind: Deployment
    metadata:
-     name: mcp-server-everything
+     name: mcp-server
      labels:
-       app: mcp-server-everything
+       app: mcp-server
    spec:
      replicas: 1
      selector:
        matchLabels:
-         app: mcp-server-everything
+         app: mcp-server
      template:
        metadata:
          labels:
-           app: mcp-server-everything
+           app: mcp-server
        spec:
          containers:
            - name: mcp-server
@@ -257,12 +261,12 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
    apiVersion: v1
    kind: Service
    metadata:
-     name: mcp-server-everything
+     name: mcp-server
      labels:
-       app: mcp-server-everything
+       app: mcp-server
    spec:
      selector:
-       app: mcp-server-everything
+       app: mcp-server
      ports:
        - name: mcp-server
          protocol: TCP
@@ -294,7 +298,7 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
          - selectors:
              serviceSelector:
                matchLabels:
-                 app: mcp-server-everything
+                 app: mcp-server
    EOF
    ```
 
@@ -456,7 +460,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
 
 4. From the menu bar, click the **Tools** tab. You should now see tools from both MCP servers:
-   * **From `mcp-server-everything`**: Tools like `fetch`, `echo`, `random_number`, etc.
+   * **From `mcp-server`**: Tools like `fetch`, `echo`, `random_number`, etc.
    * **From `mcp-server-filesystem`**: Tools like `read_file`, `write_file`, `list_directory`, etc.
 
 5. Test the federated tools:
@@ -468,9 +472,9 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete Deployment mcp-server-everything
+kubectl delete Deployment mcp-server
 kubectl delete Deployment mcp-server-filesystem
-kubectl delete Service mcp-server-everything
+kubectl delete Service mcp-server
 kubectl delete Service mcp-server-filesystem
 kubectl delete Backend mcp-backend
 kubectl delete Gateway agentgateway

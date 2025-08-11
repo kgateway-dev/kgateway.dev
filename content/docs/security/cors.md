@@ -36,6 +36,10 @@ You can configure the CORS policy at two levels:
 
 The CORS filter supports only exact matches, not wildcard matchers. This limitation applies to both the HTTPRoute and TrafficPolicy. For example, you cannot set the `allowOrigins` field to `https://*.example.com/` or `allowHeaders` to `X-Custom-*`.
 
+{{< callout >}}
+{{< icon name="agentgateway" >}} {{< reuse "docs/snippets/agw-no-traffic.md">}}
+{{< /callout >}}
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq-x-channel.md" >}}

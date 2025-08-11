@@ -7,6 +7,10 @@ Automatically monitor the status of backends by configuring health checks.
 
 Health checks periodically and automatically assess the readiness of the Backend to receive requests. You can configure several settings, such as health thresholds and check intervals, that {{< reuse "/docs/snippets/kgateway.md" >}} uses to determine whether a service is marked as healthy or unhealthy. For more information, see the Envoy [health checking](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/health_checking#arch-overview-health-checking) documentation.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
