@@ -117,7 +117,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="2" items="Basic installation,Custom values" >}}
+      {{< tabs tabTotal="3" items="Basic installation,Custom values file,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -129,6 +129,14 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /tab %}}
+{{% tab tabName="Agentgateway and AI extensions" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     --set gateway.aiExtension.enabled=true \
+     --set agentGateway.enabled=true \
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
 ```
 {{% /tab %}}
       {{< /tabs >}}
@@ -143,7 +151,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
       TEST SUITE: None
       ```
 
-4. Verify that the control plane is up and running. 
+1. Verify that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -289,6 +297,18 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 ## Installation settings {#installation-settings}
 
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
+
+### Agentgateway and AI extensions {#agentgateway-ai-extensions}
+
+To enable the [Agentgateway](../../agentgateway/) and [AI extensions](../../ai/), set the following values in your Helm values file.
+
+```yaml
+agentGateway:
+  enabled: true
+gateway:
+  aiExtension:
+    enabled: true
+```
 
 ### Helm reference docs {#helm-docs}
 
