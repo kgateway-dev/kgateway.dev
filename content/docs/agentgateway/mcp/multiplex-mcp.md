@@ -15,85 +15,134 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 {{< reuse "docs/snippets/prereq-agw.md" >}}
 
-## Step 1: Deploy MCP servers {#mcp-servers}
+## Step 1: Deploy MCP servers {#mcp-server-everythings}
 
-Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway to proxy traffic to. The following example sets up two MCP servers with different tools: one `npx` based MCP server that provides various utility tools and a Python-based `uvx` MCP server that provides time-related tools.
+Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway to proxy traffic to. The following example sets up two MCP servers with different tools: one `npx` based MCP server that provides various utility tools and a `fetcher` tool.
 
-1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
+1. Create an MCP server (`mcp-server-everything`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: apps/v1
    kind: Deployment
    metadata:
-     name: mcp-server
+     name: mcp-server-everything
      labels:
-       app: mcp-server
+       app: mcp-server-everything
    spec:
      replicas: 1
      selector:
        matchLabels:
-         app: mcp-server
+         app: mcp-server-everything
      template:
        metadata:
          labels:
-           app: mcp-server
+           app: mcp-server-everything
        spec:
          containers:
-           - name: mcp-server
+           - name: mcp-server-everything
              image: node:20-alpine
              command: ["npx"]
              args: ["-y", "@modelcontextprotocol/server-everything", "streamableHttp"]
              ports:
                - containerPort: 3001
-           - name: mcp-everything
-             image: node:20-alpine
-             command: ["npx"]
-             args: ["-y", "@modelcontextprotocol/server-everything", "streamableHttp", "--port", "3002"]
-             ports:
-               - containerPort: 3002
    ---
    apiVersion: v1
    kind: Service
    metadata:
-     name: mcp-server
+     name: mcp-server-everything
      labels:
-       app: mcp-server
+       app: mcp-server-everything
    spec:
      selector:
-       app: mcp-server
+       app: mcp-server-everything
      ports:
-       - name: mcp-server
+       - name: mcp-server-everything
          protocol: TCP
          port: 3001
          targetPort: 3001
-         appProtocol: kgateway.dev/mcp
-       - name: mcp-everything
-         protocol: TCP
-         port: 3002
-         targetPort: 3002
          appProtocol: kgateway.dev/mcp
      type: ClusterIP
    EOF
    ```
 
-2. Create a Backend that uses label selectors to discover and federate both MCP servers.
+2. Create a Backend that selects the MCP server that you just created.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
-     name: mcp-backend
+     name: mcp-server-everything
    spec:
      type: MCP
      mcp:
-       name: mcp-federated-server
+       name: mcp-server-everything
        targets:
-         - selectors:
-             serviceSelector:
-               matchLabels:
-                 app: mcp-server
+       - static:
+           name: mcp-server-everything
+           host: mcp-server-everything.default.svc.cluster.local
+           port: 3001
+           protocol: StreamableHTTP   
+   EOF
+   ```
+
+3. Create another MCP server workload with a fetcher tool.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: mcp-website-fetcher
+   spec:
+     selector:
+       matchLabels:
+         app: mcp-website-fetcher
+     template:
+       metadata:
+         labels:
+           app: mcp-website-fetcher
+       spec:
+         containers:
+         - name: mcp-website-fetcher
+           image: ghcr.io/peterj/mcp-website-fetcher:main
+           imagePullPolicy: Always
+   ---
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: mcp-website-fetcher
+     labels:
+       app: mcp-website-fetcher
+   spec:
+     selector:
+       app: mcp-website-fetcher
+     ports:
+     - port: 80
+       targetPort: 8000
+       appProtocol: kgateway.dev/mcp
+   EOF
+   ```
+
+4. Create a Backend that sets up the agentgateway target details for the MCP fetcher tool. 
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: mcp-website-fetcher
+   spec:
+     type: MCP
+     mcp:
+       name: mcp-website-fetcher
+       targets:
+       - static:
+           name: mcp-website-fetcher
+           host: mcp-website-fetcher.default.svc.cluster.local
+           port: 80
+           protocol: SSE   
    EOF
    ```
 
@@ -115,6 +164,9 @@ Route to the federated MCP servers with agentgateway.
      - protocol: HTTP
        port: 8080
        name: http
+       allowedRoutes:
+         namespaces:
+           from: All
    EOF
    ```
 
@@ -131,7 +183,7 @@ Route to the federated MCP servers with agentgateway.
    agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
-3. Create an HTTPRoute resource that routes to the Backend that you created in the previous step.
+3. Create an HTTPRoute resource that routes to the Backends that you created in the previous step.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -144,13 +196,70 @@ Route to the federated MCP servers with agentgateway.
      - name: agentgateway
      rules:
        - backendRefs:
-         - name: mcp-backend
+         - name: mcp-server-everything
+           group: gateway.kgateway.dev
+           kind: Backend   
+         - name: mcp-website-fetcher
            group: gateway.kgateway.dev
            kind: Backend   
    EOF
    ```
 
 ## Step 3: Verify the connection {#verify}
+
+Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your federated MCP servers through agentgateway.
+
+1. Get the agentgateway address.
+   
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -o=jsonpath="{.status.addresses[0].value}")
+   echo $INGRESS_GW_ADDRESS
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing"%}}
+   ```sh
+   kubectl port-forward deployment/agentgateway 8080:80
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
+   
+   ```sh
+   npx modelcontextprotocol/inspector
+   ```
+   
+3. From the MCP Inspector menu, connect to your agentgateway address as follows:
+   * **Transport Type**: Select `Streamable HTTP`.
+   * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
+   * Click **Connect**.
+
+   {{< reuse-image src="img/mcp-inspector-connected.png" >}}
+   {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
+
+4. From the menu bar, click the **Tools** tab. You should now see tools from both MCP servers:
+   * **From `mcp-server-everything`**: Tools like `fetch`, `echo`, `random_number`, etc.
+   * **From `mcp-server-everything-filesystem`**: Tools like `read_file`, `write_file`, `list_directory`, etc.
+
+5. Test the federated tools:
+   * **Test the `fetch` tool**: Click **List Tools** and select the `fetch` tool. In the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
+   * **Test the `list_directory` tool**: Click **List Tools** and select the `list_directory` tool. In the **path** field, enter `/tmp`, and click **Run Tool** to list the contents of the temporary directory.
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete Deployment mcp-server-everything mcp-website-fetcher
+kubectl delete Service mcp-server-everything mcp-website-fetcher
+kubectl delete Backend mcp-server-everything mcp-website-fetcher
+kubectl delete Gateway agentgateway
+kubectl delete HTTPRoute mcp
+```
+
+<!-- TODO CLI steps
 
 You can verify the connection to the MCP server through a command line tool with `curl` requests or a user interface that is provided by the MCP Inspector tool.
 
@@ -222,56 +331,4 @@ You can verify the connection to the MCP server through a command line tool with
 
 ### Browser-based MCP Inspector {#ui}
 
-Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your federated MCP servers through agentgateway.
-
-1. Get the agentgateway address.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -o=jsonpath="{.status.addresses[0].value}")
-   echo $INGRESS_GW_ADDRESS
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
-   ```sh
-   kubectl port-forward deployment/agentgateway 8080:80
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
-   
-   ```sh
-   npx github:modelcontextprotocol/inspector
-   ```
-   
-3. From the MCP Inspector menu, connect to your agentgateway address as follows:
-   * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
-   * Click **Connect**.
-
-   {{< reuse-image src="img/mcp-inspector-connected.png" >}}
-   {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
-
-4. From the menu bar, click the **Tools** tab. You should now see tools from both MCP servers:
-   * **From `mcp-server`**: Tools like `fetch`, `echo`, `random_number`, etc.
-   * **From `mcp-server-filesystem`**: Tools like `read_file`, `write_file`, `list_directory`, etc.
-
-5. Test the federated tools:
-   * **Test the `fetch` tool**: Click **List Tools** and select the `fetch` tool. In the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
-   * **Test the `list_directory` tool**: Click **List Tools** and select the `list_directory` tool. In the **path** field, enter `/tmp`, and click **Run Tool** to list the contents of the temporary directory.
-
-## Cleanup
-
-{{< reuse "docs/snippets/cleanup.md" >}}
-
-```sh
-kubectl delete Deployment mcp-server
-kubectl delete Deployment mcp-server-filesystem
-kubectl delete Service mcp-server
-kubectl delete Service mcp-server-filesystem
-kubectl delete Backend mcp-backend
-kubectl delete Gateway agentgateway
-kubectl delete HTTPRoute mcp
-```
+-->

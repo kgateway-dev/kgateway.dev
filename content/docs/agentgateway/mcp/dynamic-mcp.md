@@ -24,21 +24,21 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    apiVersion: apps/v1
    kind: Deployment
    metadata:
-     name: mcp-server
+     name: mcp-server-everything
      labels:
-       app: mcp-server
+       app: mcp-server-everything
    spec:
      replicas: 1
      selector:
        matchLabels:
-         app: mcp-server
+         app: mcp-server-everything
      template:
        metadata:
          labels:
-           app: mcp-server
+           app: mcp-server-everything
        spec:
          containers:
-           - name: mcp-server
+           - name: mcp-server-everything
              image: node:20-alpine
              command: ["npx"]
              args: ["-y", "@modelcontextprotocol/server-everything", "streamableHttp"]
@@ -48,12 +48,12 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    apiVersion: v1
    kind: Service
    metadata:
-     name: mcp-server
+     name: mcp-server-everything
      labels:
-       app: mcp-server
+       app: mcp-server-everything
    spec:
      selector:
-       app: mcp-server
+       app: mcp-server-everything
      ports:
        - protocol: TCP
          port: 3001
@@ -79,7 +79,7 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
          - selectors:
              serviceSelector:
                matchLabels:
-                 app: mcp-server
+                 app: mcp-server-everything
    EOF
    ```
 
@@ -98,12 +98,12 @@ Route to the MCP server with agentgateway.
    spec:
      gatewayClassName: agentgateway
      listeners:
-     - protocol: HTTP
-       port: 8080
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
+       - protocol: HTTP
+         port: 8080
+         name: http
+         allowedRoutes:
+           namespaces:
+             from: All
    EOF
    ```
 
@@ -128,15 +128,17 @@ Route to the MCP server with agentgateway.
    kind: HTTPRoute
    metadata:
      name: mcp
+     labels:
+       example: mcp-route
    spec:
      parentRefs:
-     - name: agentgateway
-       namespace: default
+       - name: agentgateway
+         namespace: default
      rules:
        - backendRefs:
-         - name: mcp-backend
-           group: gateway.kgateway.dev
-           kind: Backend   
+           - name: mcp-backend
+             group: gateway.kgateway.dev
+             kind: Backend
    EOF
    ```
 
@@ -155,7 +157,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:80
+   kubectl port-forward deployment/agentgateway 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -163,7 +165,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
    
    ```sh
-   npx github:modelcontextprotocol/inspector
+   npx modelcontextprotocol/inspector
    ```
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
@@ -171,20 +173,23 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
    * Click **Connect**.
 
-   {{< reuse-image src="img/mcp-inspector-connected.png" >}}
-   {{< reuse-image-dark srcDark="img/mcp-inspector-connected-dark.png" >}}
+4. From the menu bar, click the **Tools** tab, then click **List Tools**.
 
-4. From the menu bar, click the **Tools** tab. You should now see tools from the MCP server, such as `fetch`, `echo`, `random_number`, etc.
+   {{< reuse-image src="img/mcp-tools-everything.png" >}}
+   {{< reuse-image-dark srcDark="img/mcp-tools-everything-dark.png" >}}
 
-5. Test the tools: Click **List Tools** and select the `fetch` tool. In the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
+5. Test the tools: Select a tool, such as `echo`. In the **message** field, enter a message, such as `Hello, world!`, and click **Run Tool**.
+
+   {{< reuse-image src="img/mcp-tool-echo.png" >}}
+   {{< reuse-image-dark srcDark="img/mcp-tool-echo-dark.png" >}}
 
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete Deployment mcp-server
-kubectl delete Service mcp-server
+kubectl delete Deployment mcp-server-everything
+kubectl delete Service mcp-server-everything
 kubectl delete Backend mcp-backend
 kubectl delete Gateway agentgateway
 kubectl delete HTTPRoute mcp

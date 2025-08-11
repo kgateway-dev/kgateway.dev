@@ -90,6 +90,9 @@ Route to the MCP server with agentgateway.
      - protocol: HTTP
        port: 80
        name: http
+       allowedRoutes:
+         namespaces:
+           from: All
    EOF
    ```
 
@@ -140,7 +143,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:80
+   kubectl port-forward deployment/agentgateway 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -148,7 +151,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
    
    ```sh
-   npx github:modelcontextprotocol/inspector
+   npx modelcontextprotocol/inspector
    ```
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
