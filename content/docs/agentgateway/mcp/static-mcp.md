@@ -1,44 +1,15 @@
 ---
-title: Setup
-weight: 15
+title: Static MCP
+weight: 10
 ---
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} acts as the control plane for agentgateway proxies. For more information, see the [About agentgateway](../about/) docs.
+Route to a static Model Context Protocol (MCP) server. For more information, see the [About MCP](../) topic.
 
-In this guide, you enable agentgateway in kgateway and deploy an MCP server. Then, you route to the MCP server with agentgateway and view your MCP server tools in the MCP Inspector interface.
+## Before you begin
 
-{{< callout type="warning" >}} 
-{{< reuse "docs/versions/warn-2-1-only.md" >}}
-{{< /callout >}}
+{{< reuse "docs/snippets/prereq-agw.md" >}}
 
-## Step 1: Set up kgateway {#kgateway-setup}
-
-Enable the agentgateway feature in kgateway.
-
-1. Complete the [Get started guide](../quickstart/) to create a Kubernetes cluster, deploy the Kubernetes Gateway API CRDs, and install kgateway. **Note**: Agentgateway is currently available in the v{{< reuse "docs/versions/patch-dev.md" >}} development release.
-
-2. Upgrade your kgateway installation to enable agentgateway. For complete upgrade instructions, see the [upgrade guide](../operations/upgrade/).
-
-   ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     --set agentGateway.enabled=true \
-     --set agentGateway.enableAlphaAPIs=true
-   ```
-
-3. Make sure that `kgateway` is running.
-
-   ```sh
-   kubectl get pods -n kgateway-system
-   ```
-
-   Example output:
-
-   ```console
-   NAME                        READY   STATUS    RESTARTS   AGE
-   kgateway-5495d98459-46dpk   1/1     Running   0          19s
-   ```
-
-## Step 2: Deploy an MCP server {#mcp-server}
+## Step 1: Deploy an MCP server {#mcp-server}
 
 Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
@@ -101,7 +72,7 @@ Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy
    EOF
    ```
 
-## Step 3: Route with agentgateway {#agentgateway}
+## Step 2: Route with agentgateway {#agentgateway}
 
 Route to the MCP server with agentgateway.
 
@@ -154,7 +125,7 @@ Route to the MCP server with agentgateway.
    EOF
    ```
 
-## Step 4: Verify the connection {#verify}
+## Step 3: Verify the connection {#verify}
 
 Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your sample MCP server through agentgateway.
 
