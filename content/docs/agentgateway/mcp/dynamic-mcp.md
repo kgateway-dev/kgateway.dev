@@ -165,9 +165,9 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
    
    ```sh
-   npx modelcontextprotocol/inspector
+   npx modelcontextprotocol/inspector#{{% reuse "docs/versions/mcp-inspector.md" %}}
    ```
-   
+
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
    * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
