@@ -246,7 +246,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    EOF
    ```
 
-   Review the following table to understand this configuration.
+   {{< reuse "docs/snippets/review-table.md" >}}
 
    | Setting              | Description                                                                                     |
    | -------------------- | ----------------------------------------------------------------------------------------------- |
