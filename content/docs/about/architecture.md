@@ -92,19 +92,15 @@ The following image shows the different stages of a translation cycle for the di
 
 ### Reporter
 
-The reporter component receives a validation report for every {{< reuse "/docs/snippets/kgateway.md" >}} resource that was processed by the translator. Any invalid configuration is reported back to the user through the Kubernetes storage layer. Invalid resources are marked as `rejected` and an error message is captured in the resource configuration.  
-
-### xDS Server
-
-The final snapshot is passed to the xDS Server, which notifies the gateway proxy of a successful config update. 
+The reporter component receives a validation report for every {{< reuse "/docs/snippets/kgateway.md" >}} resource that was processed by the translator. Any invalid configuration is reported back to the user through the Kubernetes storage layer. Invalid resources are marked as `rejected` and an error message is captured in the resource configuration.
 
 ### xDS server
 
-The xDS server is responsible for sending the xDS snapshot to the gateway proxies in the data plane.
+The xDS server sends the xDS snapshot to the gateway proxies in the data plane.
 
 * **Envoy-based kgateway proxy**: Updates the Envoy cluster with a new configuration of Envoy EDS, CDS, RDS, and LDS resources to match the desired state.
 
-**Agentgateway proxy:** Updates the agentgateway proxy with agentgateway-specific configuration, including MCP and A2A protocol support, to match the desired state.
+* **Agentgateway proxy**: Updates the agentgateway proxy with agentgateway-specific configuration, including MCP and A2A protocol support, to match the desired state.
 
 <!--
 

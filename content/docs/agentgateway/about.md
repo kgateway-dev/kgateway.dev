@@ -15,7 +15,7 @@ Agentgateway supports many agent connectivity use cases, including the following
 
 ## Architecture
 
-For more information about how kgateway integrates with agentgateway, see the [Architecture](../about/architecture/) topic.
+For more information about how kgateway integrates with agentgateway, see the [Architecture](../../about/architecture/) topic.
 
 For more information about agentgateway resources, see the [Agentgateway docs](https://agentgateway.dev/docs/about/).
 
