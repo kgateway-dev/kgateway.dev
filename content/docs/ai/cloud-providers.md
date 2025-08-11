@@ -248,13 +248,13 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
 
    Review the following table to understand this configuration.
 
-| Setting              | Description                                                                                     |
-| -------------------- | ----------------------------------------------------------------------------------------------- |
-| `authHeaderOverride` | Overrides the default Authorization header sent to the AI provider.                             |
-| `headerName`         | The name of the authentication header. Azure requires `"api-key"` instead of `"Authorization"`. |
-| `prefix`             | Prefix for the auth token; left blank because Azure OpenAI does not use `"Bearer "` prefix.     |
-| `pathOverride`       | Provides a full override for the API request path to the AI backend.                            |
-| `fullPath`           | The exact API endpoint path including deployment name (`gpt-4`) and API version.                |
+   | Setting              | Description                                                                                     |
+   | -------------------- | ----------------------------------------------------------------------------------------------- |
+   | `authHeaderOverride` | Overrides the default Authorization header sent to the AI provider.                             |
+   | `headerName`         | The name of the authentication header. Azure requires `"api-key"` instead of `"Authorization"`. |
+   | `prefix`             | Prefix for the auth token; left blank because Azure OpenAI does not use `"Bearer "` prefix.     |
+   | `pathOverride`       | Provides a full override for the API request path to the AI backend.                            |
+   | `fullPath`           | The exact API endpoint path including deployment name (`gpt-4`) and API version.                |
 
 4. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
