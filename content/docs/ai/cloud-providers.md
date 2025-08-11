@@ -200,11 +200,8 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
 
 1. Save your OpenAI API key as an environment variable. To retrieve your API key, log in to your [OpenAI account dashboard](https://platform.openai.com/account/api-keys) and create or copy your API key.
 
-```bash
-export OPENAI_API_KEY=<your-api-key>
-```
-
-Replace `` with your actual OpenAI API key.
+   ```bash
+   export OPENAI_API_KEY=<your-api-key>
 
 2. Create the authentication secret:
 
