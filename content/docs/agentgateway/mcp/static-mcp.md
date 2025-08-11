@@ -88,7 +88,7 @@ Route to the MCP server with agentgateway.
      gatewayClassName: agentgateway
      listeners:
      - protocol: HTTP
-       port: 80
+       port: 8080
        name: http
        allowedRoutes:
          namespaces:

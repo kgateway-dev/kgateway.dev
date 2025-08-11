@@ -3,6 +3,16 @@ title: Multiplex MCP
 weight: 30
 ---
 
+<!--TODO
+
+Creating 2 HTTPRoutes on the same gateway makes the MCP inspector unable to connect.
+
+Creating 1 HTTPRoute that refers to both Backends, the MCP inspector is able to connect but only lists the fetch tools.
+
+It was still trying to connect to the fetcher when I deleted the Backend and HTTPRoute for the fetcher. I had to delete the Deploy and Service for the fetcher, and then the MCP inspector could connect again just to the verything tool.
+
+-->
+
 To federate multiple MCP servers on the same gateway, you can use a label selector in the MCP Backend.
 
 This approach makes it easier for you to add more MCP servers by adding labels. It also lets your clients access tools from multiple MCP servers through a single endpoint and MCP connection.
@@ -57,8 +67,7 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
      selector:
        app: mcp-server-everything
      ports:
-       - name: mcp-server-everything
-         protocol: TCP
+       - protocol: TCP
          port: 3001
          targetPort: 3001
          appProtocol: kgateway.dev/mcp
@@ -77,13 +86,12 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
    spec:
      type: MCP
      mcp:
-       name: mcp-server-everything
+       name: mcp-virtual-server
        targets:
-       - static:
-           name: mcp-server-everything
-           host: mcp-server-everything.default.svc.cluster.local
-           port: 3001
-           protocol: StreamableHTTP   
+         - selectors:
+             serviceSelector:
+               matchLabels:
+                 app: mcp-server-everything
    EOF
    ```
 
@@ -194,6 +202,7 @@ Route to the federated MCP servers with agentgateway.
    spec:
      parentRefs:
      - name: agentgateway
+       namespace: default
      rules:
        - backendRefs:
          - name: mcp-server-everything
@@ -204,6 +213,69 @@ Route to the federated MCP servers with agentgateway.
            kind: Backend   
    EOF
    ```
+
+4. Check that the HTTPRoute is `Accepted`, selects the Gateway, and includes backend rules for both the Backends that you created.
+
+   ```sh
+   kubectl describe httproute mcp
+   ```
+
+   Example output:
+
+   ```
+   Name:         mcp
+   Namespace:    default
+   Labels:       <none>
+   Annotations:  <none>
+   API Version:  gateway.networking.k8s.io/v1
+   Kind:         HTTPRoute
+   Metadata:
+     Creation Timestamp:  2025-08-11T16:16:16Z
+     Generation:          1
+     Resource Version:    13598
+     UID:                    78f649b9-310e-4f21-ac0f-e516f06d8f22
+   Spec:
+     Parent Refs:
+       Group:        gateway.networking.k8s.io
+       Kind:         Gateway
+       Name:         agentgateway
+       Namespace:    default
+     Rules:
+       Backend Refs:
+         Group:   gateway.kgateway.dev
+         Kind:    Backend
+         Name:    mcp-server-everything
+         Weight:  1
+         Group:   gateway.kgateway.dev
+         Kind:    Backend
+         Name:    mcp-website-fetcher
+         Weight:  1
+       Matches:
+         Path:
+           Type:   PathPrefix
+           Value:  /
+   Status:
+     Parents:
+       Conditions:
+         Last Transition Time:  2025-08-11T16:16:16Z
+         Message:               Route is accepted
+         Observed Generation:   1
+         Reason:                Accepted
+         Status:                True
+         Type:                  Accepted
+         Last Transition Time:  2025-08-11T16:17:22Z
+         Message:               Route has valid refs
+         Observed Generation:   1
+         Reason:                ResolvedRefs
+         Status:                True
+         Type:                  ResolvedRefs
+       Controller Name:         kgateway.dev/kgateway
+       Parent Ref:
+         Group:  gateway.networking.k8s.io
+         Kind:   Gateway
+         Name:   agentgateway   
+   ```
+
 
 ## Step 3: Verify the connection {#verify}
 
@@ -220,7 +292,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:80
+   kubectl port-forward deployment/agentgateway 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
