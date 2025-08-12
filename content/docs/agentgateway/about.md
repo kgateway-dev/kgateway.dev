@@ -3,7 +3,7 @@ title: About
 weight: 10
 ---
 
-[Agentgateway](https://agentgateway.dev/) is an open source, highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for agents and tools in any environment. For Kubernetes environments, agentgateway supports the Kubernetes Gateway API. {{< reuse "/docs/snippets/kgateway-capital.md" >}} acts as the control plane to translate Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} custom resources into proxy configuration for the agentgateway data plane.
+[Agentgateway](https://agentgateway.dev/) is an open source, highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for agents and tools in any environment. You can use {{< reuse "/docs/snippets/kgateway.md" >}} as the control plane to quickly spin up and manage the lifecycle of agentgateway proxies in Kubernetes environments. The control plane translates Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} custom resources into proxy configuration for the agentgateway data plane.
 
 Agentgateway supports many agent connectivity use cases, including the following:
 
@@ -35,7 +35,7 @@ Review the following table to understand how to configure agentgateway resources
 
 ## Feature enablement
 
-To use agentgateway features, you must enable the agentgateway feature in kgateway. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
+To use agentgateway features, you must enable the agentgateway feature in {{< reuse "docs/snippets/kgateway.md" >}}. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
 
 Example command:
 

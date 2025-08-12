@@ -26,9 +26,9 @@ Use agentgateway to proxy HTTP requests to your backend services.
    * [Security](../../security/)
    * [AI](../../ai/)
 
-## Static routes to external services {#static}
+## Routes to external services {#static}
 
-Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for external HTTP services. Make sure to create the Gateway with the `agentgateway` GatewayClass.
+Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for an external HTTP service. Then, use an HTTPRoute to route traffic to that service through your agentgateway. When you set up your Gateway, make sure to use the `agentgateway` GatewayClass.
 
 ## gRPC
 

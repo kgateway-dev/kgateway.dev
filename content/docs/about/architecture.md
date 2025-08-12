@@ -82,7 +82,7 @@ The following image shows the different stages of a translation cycle for the di
    * Address collections of the service and workloads that are included in service discovery and endpoint resolution.
    * The translation order ensures that dependencies are resolved correctly: `binds → listeners → routes → policies`, with backends and addresses processed separately and added to the final configuration.
 
-4. The next step in the translation process is to build the xDS collection. This step merges all of the resource config of agentgateway data plane resources together with the address config to create the config for each agentgateway proxy. It also builds status reports for the resources, tracks attached routes, and determines attached policies.
+4. The next step in the translation process is to build the xDS collection. This step merges all of the resource config of agentgateway data plane resources together with the address collections to create the config for each agentgateway proxy. It also builds status reports for the resources, tracks attached routes, and determines attached policies.
 
 5. Finally, the information from the resource and xDS collections are turned into an xDS snapshot of the agentgateway proxy config. The snapshot is sent to the xDS server. The agentgateway proxies in your cluster watch the xDS server for new config. When new config is detected, the config is pulled into the agentgateway proxy via gRPC.
 

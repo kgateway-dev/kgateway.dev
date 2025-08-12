@@ -31,7 +31,7 @@ Deploy an A2A server that you want agentgateway to proxy traffic to.
    CLUSTER_NAME=<your-cluster-name> VERSION={{< reuse "docs/versions/patch-dev.md" >}} make kind-load-test-a2a-agent
    ```
 
-4. Deploy the A2A server. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use A2A.
+4. Deploy the A2A server. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use  the A2A protocol.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -106,7 +106,7 @@ Route to the A2A server with agentgateway.
    agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
-3. Create an HTTPRoute resource that routes to the A2A server.
+3. Create an HTTPRoute resource that routes incoming traffic to the A2A server.
 
    ```yaml
    kubectl apply -f- <<EOF

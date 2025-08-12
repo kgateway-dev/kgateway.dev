@@ -6,7 +6,7 @@ weight: 20
 Route to a dynamic Model Context Protocol (MCP) server by using a label selector. For more information, see the [About MCP](../#about) topic.
 
 {{< callout type="warning" >}}
-Note that only streamable HTTP is currently supported for label selectors. If you have SSE, use a [static MCP Backend](../static-mcp/).
+Note that only streamable HTTP is currently supported for label selectors. If you need to use an SSE listener, use a [static MCP Backend](../static-mcp/).
 {{< /callout >}}
 
 ## Before you begin
@@ -63,7 +63,7 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    EOF
    ```
 
-2. Create a Backend that uses label selectors.
+2. Create a Backend for your MCP server that uses label selectors to select the MCP server. 
 
    ```yaml
    kubectl apply -f- <<EOF
