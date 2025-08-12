@@ -144,7 +144,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
    EOF
    ```
 
-3. Port forward the AI Gateway service to access it locally:
+3. For local testing: Port forward the AI Gateway service.
 
    ```sh
    kubectl port-forward svc/ai-gateway 8080:8080 -n {{< reuse "docs/snippets/namespace.md" >}}
