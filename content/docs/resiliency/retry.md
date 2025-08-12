@@ -12,6 +12,10 @@ The Kubernetes Gateway API provides a way to configure retries on your HTTPRoute
 {{< reuse "docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About
 
 A retry is the number of times a request is retried if it fails. This setting can be useful to avoid your apps from failing if they are temporarily unavailable. With retries, calls are retried a certain number of times before they are considered failed. Retries can enhance your app's availability by making sure that calls don’t fail permanently because of transient problems, such as a temporarily overloaded service or network.

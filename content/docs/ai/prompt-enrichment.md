@@ -6,6 +6,10 @@ description: Effectively manage system and user prompts to improve LLM outputs.
 
 Effectively manage system and user prompts to improve LLM outputs.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About prompt enrichment
 
 Prompts are basic building blocks for guiding LLMs to produce relevant and accurate responses. By effectively managing both system prompts, which set initial guidelines, and user prompts, which provide specific context, you can significantly enhance the quality and coherence of the model's outputs.

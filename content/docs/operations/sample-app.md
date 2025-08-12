@@ -1,5 +1,5 @@
 ---
-title: Sample app
+title: Sample HTTP app
 weight: 7
 description: Deploy httpbin as a sample app.
 ---
@@ -58,8 +58,10 @@ The following configuration file creates the httpbin app. To review the source f
 
 Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}.
 
-1. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces.  
+1. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces. For more information about which GatewayClass to use, see [About gateway proxies](../../about/proxies/).
    
+   {{< tabs items="Kgateway (Envoy), Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Kgateway (Envoy)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -78,6 +80,28 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
            from: All
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: http
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     gatewayClassName: agentgateway
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
    
