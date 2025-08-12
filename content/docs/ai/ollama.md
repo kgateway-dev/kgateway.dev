@@ -26,19 +26,12 @@ Instead of a cloud LLM provider, you might want to use a local LLM provider such
 
 Start running an Ollama server as a local LLM provider.
 
-1. Find your local IP address, such as with the `ifconfig` (Unix-based systems) or `ipconfig` (Windows) command or `ipconfig getifaddr en0` (macOS).
+1. Find your local IP address.
 
-   ```sh
-   ifconfig
-   ```
-
-   or for macOS
-
-
+   {{< tabs items="macOS, Unix-based systems, Windows" tabTotal="3" >}}
+   {{% tab tabName="macOS" %}}
    ```sh
    ipconfig getifaddr en0
-   ```
-
    Example output: Note the `inet 192.168.1.100` address.
 
    ```
