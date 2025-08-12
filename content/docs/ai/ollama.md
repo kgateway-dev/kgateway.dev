@@ -32,6 +32,20 @@ Start running an Ollama server as a local LLM provider.
    {{% tab tabName="macOS" %}}
    ```sh
    ipconfig getifaddr en0
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Unix-based systems" %}}
+   ```sh
+   ifconfig
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Windows" %}}
+   ```sh
+   ipconfig
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
    Example output: Note the `inet 192.168.1.100` address.
 
    ```
