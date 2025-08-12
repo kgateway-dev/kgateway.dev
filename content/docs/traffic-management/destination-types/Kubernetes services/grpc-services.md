@@ -28,40 +28,65 @@ Deploy a gRPC echo server for testing:
 
 ```yaml
 kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Service
-metadata:
-  name: grpc-echo
-  labels:
-    app: grpc-echo
-spec:
-  ports:
-  - port: 9000
-    name: grpc
-  selector:
-    app: grpc-echo
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grpc-echo
-  labels:
-    app: grpc-echo
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: grpc-echo
+  replicas: 1
   template:
     metadata:
       labels:
         app: grpc-echo
     spec:
       containers:
-      - name: grpc-echo
-        image: docker.io/soloio/grpc-echo-server:v0.1.0
-        ports:
-        - containerPort: 9000
+        - name: grpc-echo
+          image: ghcr.io/projectcontour/yages:v0.1.0
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: GRPC_ECHO_SERVER
+              value: "true"
+            - name: SERVICE_NAME
+              value: grpc-echo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grpc-echo-svc
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 9000
+      appProtocol: kubernetes.io/h2c
+  selector:
+    app: grpc-echo
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: grpcurl-client
+spec:
+  containers:
+    - name: grpcurl
+      image: docker.io/fullstorydev/grpcurl:v1.8.7-alpine
+      command:
+        - sleep
+        - "infinity"
 EOF
 ```
 
@@ -188,9 +213,9 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
      - "grpc.example.com"
      rules:
      - backendRefs:
-       - name: grpc-echo
+       - name: grpc-echo-svc
          namespace: default
-         port: 9000
+         port: 3000
    EOF
    ```
 
@@ -305,8 +330,8 @@ spec:
     - name: grpc-echo-v2
       port: 9000
   - backendRefs:
-    - name: grpc-echo
-      port: 9000
+    - name: grpc-echo-svc
+      port: 3000
 EOF
 ```
 
@@ -336,8 +361,8 @@ spec:
     - name: grpc-echo-v2
       port: 9000
   - backendRefs:
-    - name: grpc-echo
-      port: 9000
+    - name: grpc-echo-svc
+      port: 3000
 EOF
 ```
 
@@ -372,11 +397,11 @@ spec:
     - method:
         service: "grpc.reflection.v1alpha.ServerReflection"
     backendRefs:
-    - name: grpc-echo
-      port: 9000
+    - name: grpc-echo-svc
+      port: 3000
   - backendRefs:
-    - name: grpc-echo
-      port: 9000
+    - name: grpc-echo-svc
+      port: 3000
 EOF
 ```
 
