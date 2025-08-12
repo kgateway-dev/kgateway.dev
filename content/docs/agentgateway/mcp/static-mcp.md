@@ -3,7 +3,7 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a static Model Context Protocol (MCP) server. For more information, see the [About MCP](../) topic.
+Route to a static Model Context Protocol (MCP) server. For more information, see the [About MCP](../#about) topic.
 
 ## Before you begin
 
