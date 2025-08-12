@@ -69,6 +69,12 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the following information.
 
+{{% callout %}}
+**Dev build considerations**: If you're using a development build (like `v2.1.0-main`), you should either:
+- Use `--set controller.image.pullPolicy=Always` in your Helm commands to ensure you get the latest image
+- Or reference the exact image digest to avoid using cached images
+{{% /callout %}}
+
 1. Review the [kgateway release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
 2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
@@ -180,7 +186,8 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    ```sh
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml \
-     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} \
+     {{ if eq {{< reuse "docs/versions/helm-version-upgrade.md" >}} "v2.1.0-main" }}--set controller.image.pullPolicy=Always{{ end }}
    ```
    
 5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.
