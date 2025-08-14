@@ -25,7 +25,9 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+In this example, you create a Backend with multiple pools for the same LLM provider, as shown in the following diagram. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+
+{{< reuse-image src="img/aig-model-priority.svg" caption="Figure: Example of model priority with three OpenAI models." width="75%">}}
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
@@ -74,7 +76,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    EOF
    ```
 
-2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. AI Gateway automatically rewrites this path to the API path of a supported LLM, such as `/v1/chat/completions` in OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -94,12 +96,6 @@ In this example, you create a Backend with multiple pools for the same LLM provi
        - path:
            type: PathPrefix
            value: /model
-       filters:
-       - type: URLRewrite
-         urlRewrite:
-           path:
-             type: ReplaceFullPath
-             replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
