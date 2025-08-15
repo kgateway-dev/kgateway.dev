@@ -639,7 +639,7 @@ To verify that your setup is working, generate sample traffic and review the log
 
 4. Verify that data plane metrics for the gateway proxy are being collected by using a Grafana dashboard.
    
-   1. Create a Grafana dashboard for the data plane metrics of your gateway proxy. For example, you can download the [sample Grafana dashboard configuration for the `http` gateway](grafana.json) as an `envoy.json` file. 
+   1. Create a Grafana dashboard for the data plane metrics of your gateway proxy. For example, you can download the [sample Grafana dashboard configuration for the `http` gateway](../grafana.json) as an `envoy.json` file. 
 
    2. Import the Grafana dashboard.
    
