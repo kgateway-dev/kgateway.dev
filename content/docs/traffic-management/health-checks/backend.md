@@ -100,16 +100,6 @@ To try out an active health check policy, you can follow these steps to create a
       lsof -ti:19000 | xargs kill -9
       ```
 
-3. Check the Envoy logs for health check failures.
-   1. Get the logs for the `http` gateway deployment.
-      ```shell
-      kubectl logs -f deploy/http -n {{< reuse "/docs/snippets/namespace.md" >}} > gateway-proxy.log
-      ```
-   2. In the output `gateway-proxy.log` file, search for events such as `health_check_failure_event` as shown in the following example log lines.
-      ```json
-      {"health_checker_type":"HTTP","host":{"socket_address":{"protocol":"TCP","address":"10.XX.X.XX","port_value":8080,"resolver_name":"","ipv4_compat":false}},"cluster_name":"httpbin_httpbin","timestamp":"2024-08-20T18:13:47.577Z","health_check_failure_event":{"failure_type":"ACTIVE","first_check":false},"metadata":{"filter_metadata":{"envoy.lb":{"version":"v1","app":"httpbin","pod-template-hash":"f46cc8b9b"}},"typed_filter_metadata":{}},"locality":{"region":"","zone":"","sub_zone":""}}
-      ```
-
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
