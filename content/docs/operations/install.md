@@ -116,9 +116,6 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       ```
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
-  {{< callout type="warning" >}}
-    When using the development build {{< reuse "docs/versions/helm-version-flag.md" >}} , add --set controller.image.pullPolicy=Always to ensure you get the latest image. Alternatively, you can specify the exact image digest.
-  {{< /callout >}}
       
       {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
@@ -135,7 +132,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /tab %}}
 {{% tab tabName="Development" %}}
-When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the --set controller.image.pullPolicy=Always option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
+When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
 
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
