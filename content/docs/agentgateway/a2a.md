@@ -76,7 +76,7 @@ Deploy an A2A server that you want agentgateway to proxy traffic to.
 
 ## Step 1: Deploy an A2A server {#a2a-server}
 
-Deploy an A2A server that you want agentgateway to proxy traffic to. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use  the A2A protocol.
+Deploy an A2A server that you want agentgateway to proxy traffic to. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use the A2A protocol.
 
 ```yaml
 kubectl apply -f- <<EOF

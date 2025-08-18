@@ -3,19 +3,19 @@ title: User interface
 weight: 50
 ---
 
-Review your agentic networking resources in a user interface (UI), such as the agentgateway UI or MCP Inspector.
+Review your agentic networking resources in a user interface (UI). Choose from the [agentgateway UI](#agentgateway) or [MCP Inspector](#mcp-inspector).
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq-agw.md" >}}
-3. Follow one of the guides such as the [static MCP server](../mcp/static-mcp/) to create some agentgateway resources.
+3. Follow one of the guides such as the [static MCP server](../mcp/static-mcp/) to create an agentgateway proxy and set up routing to an MCP server. 
 
 ## Launch the agentgateway UI {#agentgateway}
 
 Agentgateway includes a read-only user interface (UI) that you can use to view your agentgateway resources.
 
 {{< callout type="warning" >}}
-Note that the agentgateway UI is read-only, because proxy updates must be made through the {{< reuse "/docs/snippets/kgateway.md" >}} control plane translation process. The playground functionality is also restricted until agentgateway supports more policies in {{< reuse "/docs/snippets/kgateway.md" >}}.
+Note that the agentgateway UI is read-only, because proxy updates must go through the {{< reuse "/docs/snippets/kgateway.md" >}} control plane translation process to generate an xDS snapshot. The playground functionality is also restricted until agentgateway supports more policies in {{< reuse "/docs/snippets/kgateway.md" >}}.
 {{< /callout >}}
 
 1. Find the agentgateway proxy that you want to view resources for. 

@@ -3,7 +3,7 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a Model Context Protocol (MCP) server through a static address to its Kubernetes Service. For more information, see the [About MCP](../) topic.
+Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP](../) topic.
 
 ## Before you begin
 
