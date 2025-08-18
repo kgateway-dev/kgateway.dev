@@ -9,6 +9,7 @@ With agentgateway, you can route to agent-to-agent (A2A) servers and expose thei
 
 {{< reuse "docs/snippets/prereq-agw.md" >}}
 
+<!-- Steps to build image locally from kgateway repo
 ## Step 1: Deploy an A2A server {#a2a-server}
 
 Deploy an A2A server that you want agentgateway to proxy traffic to.
@@ -71,6 +72,50 @@ Deploy an A2A server that you want agentgateway to proxy traffic to.
          appProtocol: kgateway.dev/a2a
    EOF
    ```
+-->
+
+## Step 1: Deploy an A2A server {#a2a-server}
+
+Deploy an A2A server that you want agentgateway to proxy traffic to. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use  the A2A protocol.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: a2a-agent
+  labels:
+    app: a2a-agent
+spec:
+  selector:
+    matchLabels:
+      app: a2a-agent
+  template:
+    metadata:
+      labels:
+        app: a2a-agent
+    spec:
+      containers:
+        - name: a2a-agent
+          image: gcr.io/solo-public/docs/test-a2a-agent:latest
+          ports:
+            - containerPort: 9090
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: a2a-agent
+spec:
+  selector:
+    app: a2a-agent
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090
+      appProtocol: kgateway.dev/a2a
+EOF
+```
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
