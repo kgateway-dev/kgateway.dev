@@ -12,89 +12,115 @@ GRPCRoute provides protocol-aware routing for gRPC traffic within the Kubernetes
 
 Consider the difference:
 - **HTTPRoute Match**: `path:/com.example.User/Login`, `method: POST`
-- **GRPCRoute Match**: `service: com.example.User`, `method: Login`
+- **GRPCRoute Match**: `service: yages.Echo`, `method: Ping`
 
 The GRPCRoute approach is more readable, less error-prone, and aligns with the Gateway API's role-oriented philosophy.
 
 ## Before you begin
 
-1. [Set up kgateway](/docs/setup/).
-2. Install `grpcurl` for testing: [Installation guide](https://github.com/fullstorydev/grpcurl).
-3. Deploy the sample gRPC service (covered in the next section).
+1. [Install kgateway](/docs/quickstart/).
+2. [Install `grpcurl` for testing](https://github.com/fullstorydev/grpcurl).
 
-## Deploy a sample gRPC service
+## Deploy a sample gRPC service {#sample-grpc}
 
-Deploy a gRPC echo server for testing:
+Deploy a sample gRPC service for testing purposes. The sample service has two APIs:
 
-```yaml
-kubectl apply -f - <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: grpc-echo
-spec:
-  selector:
-    matchLabels:
-      app: grpc-echo
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: grpc-echo
-    spec:
-      containers:
-        - name: grpc-echo
-          image: ghcr.io/projectcontour/yages:v0.1.0
-          ports:
-            - containerPort: 9000
-              protocol: TCP
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            - name: GRPC_ECHO_SERVER
-              value: "true"
-            - name: SERVICE_NAME
-              value: grpc-echo
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: grpc-echo-svc
-spec:
-  type: ClusterIP
-  ports:
-    - port: 3000
-      protocol: TCP
-      targetPort: 9000
-      appProtocol: kubernetes.io/h2c
-  selector:
-    app: grpc-echo
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: grpcurl-client
-spec:
-  containers:
-    - name: grpcurl
-      image: docker.io/fullstorydev/grpcurl:v1.8.7-alpine
-      command:
-        - sleep
-        - "infinity"
-EOF
-```
+- `yages.Echo.Ping`: Takes no input (empty message) and returns a `pong` message.
+- `yages.Echo.Reverse`: Takes input content and returns the content in reverse order, such as `hello world` becomes `dlrow olleh`.
 
-## Set up the Gateway for gRPC routes
+Steps to set up the sample gRPC service:
 
-Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute requires HTTPS listeners for TLS termination.
+1. Deploy the gRPC echo server and client.
 
-1. Create a TLS certificate for testing:
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: grpc-echo
+   spec:
+     selector:
+       matchLabels:
+         app: grpc-echo
+     replicas: 1
+     template:
+       metadata:
+         labels:
+           app: grpc-echo
+       spec:
+         containers:
+           - name: grpc-echo
+             image: ghcr.io/projectcontour/yages:v0.1.0
+             ports:
+               - containerPort: 9000
+                 protocol: TCP
+             env:
+               - name: POD_NAME
+                 valueFrom:
+                   fieldRef:
+                     fieldPath: metadata.name
+               - name: NAMESPACE
+                 valueFrom:
+                   fieldRef:
+                     fieldPath: metadata.namespace
+               - name: GRPC_ECHO_SERVER
+                 value: "true"
+               - name: SERVICE_NAME
+                 value: grpc-echo
+   ---
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: grpc-echo-svc
+   spec:
+     type: ClusterIP
+     ports:
+       - port: 3000
+         protocol: TCP
+         targetPort: 9000
+         appProtocol: kubernetes.io/h2c
+     selector:
+       app: grpc-echo
+   ---
+   apiVersion: v1
+   kind: Pod
+   metadata:
+     name: grpcurl-client
+   spec:
+     containers:
+       - name: grpcurl
+         image: docker.io/fullstorydev/grpcurl:v1.8.7-alpine
+         command:
+           - sleep
+           - "infinity"
+   EOF
+   ```
+
+2. Create a ReferenceGrant to allow GRPCRoutes to reference the gRPC echo service.
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1beta1
+   kind: ReferenceGrant
+   metadata:
+     name: allow-grpc-route-to-echo
+     namespace: default
+   spec:
+     from:
+     - group: gateway.networking.k8s.io
+       kind: GRPCRoute
+       namespace: kgateway-system
+     to:
+     - group: ""
+       kind: Service
+   EOF
+   ```
+
+## Set up the Gateway for gRPC routes {#gateway}
+
+Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute requires HTTPS listeners for TLS termination. For more information, see the [HTTPS listener guide](/docs/setup/listeners/https/).
+
+1. Create a TLS certificate for testing.
 
    ```bash
    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
@@ -103,11 +129,12 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
      -subj "/CN=grpc.example.com"
    
    kubectl create secret tls grpc-example-com-cert \
+     -n kgateway-system \
      --key grpc.example.com.key \
      --cert grpc.example.com.crt
    ```
 
-2. Create a Gateway resource with an HTTPS listener:
+2. Create a Gateway resource with an HTTPS listener.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -130,8 +157,8 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
          certificateRefs:
          - name: grpc-example-com-cert
        allowedRoutes:
-         kinds:
-         - kind: GRPCRoute
+         namespaces:
+           from: All
    EOF
    ```
 
@@ -144,7 +171,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
    | `hostname` | The hostname for SNI-based routing. Must match the hostname in your GRPCRoute. |
    | `tls.mode: Terminate` | Terminates TLS at the gateway, required for GRPCRoute. |
 
-3. Check the status of the Gateway:
+3. Check the status of the Gateway.
 
    ```bash
    kubectl get gateway grpc-gateway -n kgateway-system -o yaml
@@ -171,29 +198,9 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
        type: Programmed
    ```
 
-4. Create a ReferenceGrant to allow GRPCRoutes to reference the grpc-echo service:
+## Create a GRPCRoute {#create-grpcroute}
 
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
-   kind: ReferenceGrant
-   metadata:
-     name: allow-grpc-route-to-echo
-     namespace: default
-   spec:
-     from:
-     - group: gateway.networking.k8s.io
-       kind: GRPCRoute
-       namespace: kgateway-system
-     to:
-     - group: ""
-       kind: Service
-   EOF
-   ```
-
-## Create a GRPCRoute
-
-1. Create the GRPCRoute resource. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute).
+1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -212,6 +219,13 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
      hostnames:
      - "grpc.example.com"
      rules:
+     - matches:
+       - method:
+           service: "grpc.reflection.v1alpha.ServerReflection"
+       backendRefs:
+       - name: grpc-echo-svc
+         namespace: default
+         port: 3000
      - backendRefs:
        - name: grpc-echo-svc
          namespace: default
@@ -219,7 +233,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
    EOF
    ```
 
-2. Verify that the GRPCRoute is applied successfully:
+2. Verify that the GRPCRoute is applied successfully.
 
    ```bash
    kubectl get grpcroute grpc-echo-route -n kgateway-system -o yaml
@@ -251,11 +265,11 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
          sectionName: https
    ```
 
-## Verify the gRPC route
+## Verify the gRPC route {#verify-grpcroute}
 
 Verify that the gRPC route to the echo service is working.
 
-1. Get the external address of the gateway and save it in an environment variable:
+1. Get the external address of the gateway and save it in an environment variable.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -266,31 +280,57 @@ Verify that the gRPC route to the echo service is working.
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
-   kubectl port-forward deployment/grpc-gateway -n kgateway-system 8443:443
-   export GATEWAY_IP=localhost:8443
+   kubectl port-forward svc/grpc-gateway -n kgateway-system 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Send a gRPC request to test the route:
+2. Explore the API dynamically.
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```bash
+   grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 list
+   grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 describe yages.Echo
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```bash
+   grpcurl -insecure -authority grpc.example.com localhost:8443 list
+   grpcurl -insecure -authority grpc.example.com localhost:8443 describe yages.Echo
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Expected response:
+   ```
+   grpc.health.v1.Health
+   grpc.reflection.v1alpha.ServerReflection
+   yages.Echo
+   yages.Echo is a service:
+   service Echo {
+     rpc Ping ( .yages.Empty ) returns ( .yages.Content );
+     rpc Reverse ( .yages.Content ) returns ( .yages.Content );
+   }
+   ```
+
+3. Send a gRPC request to test the route.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
    grpcurl -insecure \
      -authority grpc.example.com \
-     -d '{"text": "hello world"}' \
      $GATEWAY_IP:443 \
-     echo.Echo/Echo
+     yages.Echo/Ping
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
    grpcurl -insecure \
      -authority grpc.example.com \
-     -d '{"text": "hello world"}' \
      localhost:8443 \
-     echo.Echo/Echo
+     yages.Echo/Ping
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -298,147 +338,23 @@ Verify that the gRPC route to the echo service is working.
    Expected response:
    ```json
    {
-     "text": "hello world",
-     "source": "grpc-echo-..."
+     "text": "pong"
    }
    ```
 
-## Advanced routing patterns
-
-### Method-based routing
-
-Route specific gRPC methods to different backend services:
-
-```yaml
-kubectl apply -f - <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: grpc-echo-route
-spec:
-  parentRefs:
-  - name: https-gateway
-    namespace: kgateway-system
-  hostnames:
-  - "grpc.example.com"
-  rules:
-  - matches:
-    - method:
-        service: "echo.Echo"
-        method: "EchoV2"
-    backendRefs:
-    - name: grpc-echo-v2
-      port: 9000
-  - backendRefs:
-    - name: grpc-echo-svc
-      port: 3000
-EOF
-```
-
-### Header-based routing
-
-Route requests based on headers for A/B testing:
-
-```yaml
-kubectl apply -f - <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: grpc-echo-route
-spec:
-  parentRefs:
-  - name: https-gateway
-    namespace: kgateway-system
-  hostnames:
-  - "grpc.example.com"
-  rules:
-  - matches:
-    - headers:
-      - type: Exact
-        name: "env"
-        value: "canary"
-    backendRefs:
-    - name: grpc-echo-v2
-      port: 9000
-  - backendRefs:
-    - name: grpc-echo-svc
-      port: 3000
-EOF
-```
-
-Test with header:
-```bash
-grpcurl -insecure \
-  -H 'env: canary' \
-  -authority grpc.example.com \
-  -d '{"text": "hello canary"}' \
-  $GATEWAY_IP:443 \
-  echo.Echo/Echo
-```
-
-### Enable gRPC Reflection
-
-Add routing for gRPC Reflection to enable dynamic API exploration:
-
-```yaml
-kubectl apply -f - <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: GRPCRoute
-metadata:
-  name: grpc-echo-route
-spec:
-  parentRefs:
-  - name: https-gateway
-    namespace: kgateway-system
-  hostnames:
-  - "grpc.example.com"
-  rules:
-  - matches:
-    - method:
-        service: "grpc.reflection.v1alpha.ServerReflection"
-    backendRefs:
-    - name: grpc-echo-svc
-      port: 3000
-  - backendRefs:
-    - name: grpc-echo-svc
-      port: 3000
-EOF
-```
-
-Explore the API dynamically:
-```bash
-# List services
-grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 list
-
-# Describe a service
-grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 describe echo.Echo
-```
-
-## Troubleshooting
-
-Check the GRPCRoute status for issues:
-
-```bash
-kubectl get grpcroute grpc-echo-route -o yaml
-```
-
-Common issues:
-- **Listener Protocol Mismatch**: GRPCRoute requires HTTPS listeners
-- **Hostname Conflict**: Hostnames must be unique per listener across HTTPRoute and GRPCRoute
-- **Backend Not Found**: Verify the Service exists and ports are correct
-- **Cross-namespace Access**: Use ReferenceGrant for cross-namespace routing
-
 ## Next steps
 
+Explore the traffic management, resiliency, and security policies that you can apply to make your gRPC services more robust and secure.
+
 {{< cards >}}
-  {{< card link="/docs/traffic-management/traffic-policies/" title="Traffic policies" >}}
-  {{< card link="/docs/observability/" title="Observability" >}}
-  {{< card link="/docs/ai/" title="AI Gateway for gRPC" >}}
+  {{< card link="/docs/traffic-management/" title="Traffic management" >}}
+  {{< card link="/docs/resiliency/" title="Resiliency" >}}
+  {{< card link="/docs/security/" title="Security" >}}
 {{< /cards >}}
 
 ## Cleanup
 
-Remove the resources that you created in this guide:
+{{< reuse "docs/snippets/cleanup.md" >}}
 
 ```bash
 kubectl delete -A gateways,grpcroutes,pod,svc,secrets -l app=grpc-echo
