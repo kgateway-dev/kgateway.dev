@@ -100,7 +100,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
    2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
       ```sh
-      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} 
       ```
 
 3. Install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart.
@@ -117,7 +117,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="3" items="Basic installation,Custom values file,Agentgateway and AI extensions" >}}
+      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -129,6 +129,15 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /tab %}}
+{{% tab tabName="Development" %}}
+When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
+
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/patch-dev.md" >}} \
+--set controller.image.pullPolicy=Always
 ```
 {{% /tab %}}
 {{% tab tabName="Agentgateway and AI extensions" %}}
@@ -235,6 +244,9 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    ```
 
 6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. 
+ {{< callout type="warning" >}}
+   When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image.
+   {{< /callout >}}
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -252,6 +264,9 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        chart: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
        helm:
          skipCrds: false
+         parameters:
+         - name: controller.image.pullPolicy
+           value: "Always"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:
@@ -309,6 +324,10 @@ gateway:
   aiExtension:
     enabled: true
 ```
+
+### Development builds
+
+When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
 ### Helm reference docs {#helm-docs}
 

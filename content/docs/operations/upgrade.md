@@ -170,17 +170,16 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
 
-   3. Make any changes that you want by editing your `values.yaml` Helm values file or preparing the `--set` flags.
+   3. Make any changes that you want by editing your `values.yaml` Helm values file or preparing the `--set` flags. For development v{{< reuse "docs/versions/patch-dev.md" >}} builds, include the `controller.image.pullPolicy=Always` setting or refer to the exact image digest to avoid using cached images.
 
 4. Upgrade the kgateway Helm installation.
-   {{< callout type="warning" >}}
-   Make sure to include your Helm values when you upgrade either as a configuration file or with <code>--set</code> flags. Otherwise, any previous custom values that you set might be overwritten.
-   {{< /callout >}}
+   * Make sure to include your Helm values when you upgrade either as a configuration file or with `--set` flags. Otherwise, any previous custom values that you set might be overwritten.
+   * When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
    
    ```sh
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml \
-     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} 
    ```
    
 5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.
