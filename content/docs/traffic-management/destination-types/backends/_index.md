@@ -1,7 +1,6 @@
 ---
 title: Backends
 weight: 20
-prev: /docs/traffic-management/destination-types/kube-services
 ---
 
 Use a Backend resource to define a backing destination that you want kgateway to route to. A Backend destination is external to the cluster and, as such, cannot be represented as a Kubernetes Service. For more information, see the [Backend API docs](/docs/reference/api/#backend). 
