@@ -7,6 +7,10 @@ next: /docs/traffic-management/match
 
 Use the DirectResponse API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About direct responses
 
 When you configure a DirectResponse, the gateway proxy intercepts requests to specific routes and directly sends back a predefined response. Common use cases include: 

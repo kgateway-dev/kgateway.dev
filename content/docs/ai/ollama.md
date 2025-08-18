@@ -26,12 +26,26 @@ Instead of a cloud LLM provider, you might want to use a local LLM provider such
 
 Start running an Ollama server as a local LLM provider.
 
-1. Find your local IP address, such as with the `ifconfig` (Unix-based systems) or `ipconfig` (Windows) command.
+1. Find your local IP address.
 
+   {{< tabs items="macOS, Unix-based systems, Windows" tabTotal="3" >}}
+   {{% tab tabName="macOS" %}}
+   ```sh
+   ipconfig getifaddr en0
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Unix-based systems" %}}
    ```sh
    ifconfig
    ```
-
+   {{% /tab %}}
+   {{% tab tabName="Windows" %}}
+   ```sh
+   ipconfig
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
    Example output: Note the `inet 192.168.1.100` address.
 
    ```
@@ -144,7 +158,13 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
    EOF
    ```
 
-3. Send a request to the Ollama server that you started in the previous section. Verify that the request succeeds and that you get back a response from the chat completion API.
+3. For local testing: Port forward the AI Gateway service.
+
+   ```sh
+   kubectl port-forward svc/ai-gateway 8080:8080 -n {{< reuse "docs/snippets/namespace.md" >}}
+   ``` 
+
+4. Send a request to the Ollama server that you started in the previous section. Verify that the request succeeds and that you get back a response from the chat completion API.
 
     ```bash
     curl -v "localhost:8080/ollama" \

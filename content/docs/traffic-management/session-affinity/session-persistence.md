@@ -6,7 +6,7 @@ weight: 30
 Ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
 
 {{< callout type="warning" >}} 
-{{< reuse "docs/versions/warn-1-3-only.md" >}}
+{{< reuse "docs/versions/warn-1-3-only-experimental.md" >}}
 {{< /callout >}}
 
 ## About
@@ -31,7 +31,7 @@ For more information about session peristence, see the [Kubernetes Gateway API e
 
 ## Before you begin 
 
-{{< reuse "docs/snippets/prereq-1-3-channel.md" >}}
+{{< reuse "docs/snippets/prereq-1-3-channel-experimental.md" >}}
 
 ## Configure session persistence
 

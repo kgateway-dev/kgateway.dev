@@ -120,7 +120,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
     When using the development build {{< reuse "docs/versions/helm-version-flag.md" >}} , add --set controller.image.pullPolicy=Always to ensure you get the latest image. Alternatively, you can specify the exact image digest.
   {{< /callout >}}
       
-      {{< tabs tabTotal="3" items="Basic installation,Custom values,Development" >}}
+      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -134,7 +134,6 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
 {{% /tab %}}
-
 {{% tab tabName="Development" %}}
 When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the --set controller.image.pullPolicy=Always option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
 
@@ -142,6 +141,14 @@ When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, ad
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
 --set controller.image.pullPolicy=Always
+```
+{{% /tab %}}
+{{% tab tabName="Agentgateway and AI extensions" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     --set gateway.aiExtension.enabled=true \
+     --set agentGateway.enabled=true \
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
 ```
 {{% /tab %}}
       {{< /tabs >}}
@@ -156,7 +163,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
       TEST SUITE: None
       ```
 
-4. Verify that the control plane is up and running. 
+1. Verify that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -309,10 +316,21 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
 
-{{< callout type="warning" >}}
-**For development builds only:**  
-When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
-{{< /callout >}}
+### Agentgateway and AI extensions {#agentgateway-ai-extensions}
+
+To enable the [Agentgateway](../../agentgateway/) and [AI extensions](../../ai/), set the following values in your Helm values file.
+
+```yaml
+agentGateway:
+  enabled: true
+gateway:
+  aiExtension:
+    enabled: true
+```
+
+### Development builds
+
+When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
 ### Helm reference docs {#helm-docs}
 
