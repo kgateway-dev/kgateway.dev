@@ -3,7 +3,7 @@ title: Dynamic MCP
 weight: 20
 ---
 
-Route to a dynamic Model Context Protocol (MCP) server by using a label selector. For more information, see the [About MCP](../#about) topic.
+Route to a Model Context Protocol (MCP) server dynamically by using a label selector. This way, unlike a static backend, you can update the backing MCP server without having to update the Backend resource. For more information, see the [About MCP](../#about) topic.
 
 {{< callout type="warning" >}}
 Note that only streamable HTTP is currently supported for label selectors. If you need to use an SSE listener, use a [static MCP Backend](../static-mcp/).
@@ -17,7 +17,7 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 Deploy an MCP server that you want agentgateway to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
 
-1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step.
+1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, the agentgateway proxy uses the MCP protocol for the service.
 
    ```yaml
    kubectl apply -f- <<EOF

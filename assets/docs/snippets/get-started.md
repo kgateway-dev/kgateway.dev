@@ -30,14 +30,14 @@
    {{< /tabs >}}
 3. Install kgateway by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
 
-   {{< tabs items="Latest, Development, Agentgateway" tabTotal="3">}}
-   {{% tab tabName="Latest" %}}
+   {{< tabs items="Kgateway latest, Kgateway development, Agentgateway" tabTotal="3">}}
+   {{% tab tabName="Kgateway latest" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
    ```
    {{% /tab %}}
 
-   {{% tab tabName="Development" %}}
+   {{% tab tabName="Kgateway development" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
    ```

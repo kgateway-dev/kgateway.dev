@@ -3,7 +3,7 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a static Model Context Protocol (MCP) server. For more information, see the [About MCP](../#about) topic.
+Route to a Model Context Protocol (MCP) server through a static address to its Kubernetes Service. For more information, see the [About MCP](../) topic.
 
 ## Before you begin
 
@@ -13,7 +13,7 @@ Route to a static Model Context Protocol (MCP) server. For more information, see
 
 Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
-1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, kgateway configures the agentgateway proxy to use MCP for the Backend that you create in the next step. 
+1. Create the MCP server workload. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, the agentgateway proxy uses the MCP protocol for the service.
 
    ```yaml
    kubectl apply -f- <<EOF

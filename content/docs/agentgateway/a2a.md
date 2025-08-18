@@ -143,7 +143,7 @@ Route to the A2A server with agentgateway.
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Send a request to the A2A server.
+2. As a user, send a request to the A2A server. As an assistant, the agent echoes back the message that you sent.
 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
