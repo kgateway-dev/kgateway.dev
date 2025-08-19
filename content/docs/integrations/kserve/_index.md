@@ -7,7 +7,7 @@ description:
 Integrate kgateway with Kserve .
 
 {{< cards >}}
-  {{< card link="Serverless Installation" title="Serverless Installation" >}}
-  {{< card link="KServe Ingress with kgateway" title="KServe Ingress with kgateway" >}}
+  {{< card link="serverless-installation" title="Serverless Installation" >}}
+  {{< card link="kserve-Ingress-with-kgateway" title="Kserve Ingress with kgateway" >}}
 {{< /cards >}}
 
