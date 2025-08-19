@@ -1,7 +1,8 @@
 ---
 title: gRPC services
-weight: 10
+weight: 20
 description: Route traffic to gRPC services using GRPCRoute.
+next: /docs/traffic-management/destination-types/backends
 ---
 
 Route traffic to gRPC services using the GRPCRoute resource for protocol-aware routing.
@@ -18,7 +19,7 @@ The GRPCRoute approach is more readable, less error-prone, and aligns with the G
 
 ## Before you begin
 
-1. [Install kgateway](/docs/quickstart/).
+1. [Install {{< reuse "/docs/snippets/kgateway.md" >}}](/docs/quickstart/).
 2. [Install `grpcurl` for testing](https://github.com/fullstorydev/grpcurl).
 
 ## Deploy a sample gRPC service {#sample-grpc}
@@ -109,7 +110,7 @@ Steps to set up the sample gRPC service:
      from:
      - group: gateway.networking.k8s.io
        kind: GRPCRoute
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      to:
      - group: ""
        kind: Service
@@ -118,7 +119,7 @@ Steps to set up the sample gRPC service:
 
 ## Set up the Gateway for gRPC routes {#gateway}
 
-Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute requires HTTPS listeners for TLS termination. For more information, see the [HTTPS listener guide](/docs/setup/listeners/https/).
+Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute requires HTTPS listeners for TLS termination. For more information, see the [HTTPS listener guide](../../../../setup/listeners/https/).
 
 1. Create a TLS certificate for testing.
 
@@ -129,7 +130,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
      -subj "/CN=grpc.example.com"
    
    kubectl create secret tls grpc-example-com-cert \
-     -n kgateway-system \
+     -n {{< reuse "docs/snippets/namespace.md" >}} \
      --key grpc.example.com.key \
      --cert grpc.example.com.crt
    ```
@@ -142,11 +143,11 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
    kind: Gateway
    metadata:
      name: grpc-gateway
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
        app: grpc-echo
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTPS
        port: 443
@@ -166,7 +167,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 
    | Setting | Description |
    |---------|-------------|
-   | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up kgateway, a default GatewayClass is set up for you. |
+   | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up {{< reuse "/docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
    | `spec.listeners` | Configure the listeners for this Gateway. GRPCRoute requires HTTPS listeners with TLS termination. |
    | `hostname` | The hostname for SNI-based routing. Must match the hostname in your GRPCRoute. |
    | `tls.mode: Terminate` | Terminates TLS at the gateway, required for GRPCRoute. |
@@ -174,7 +175,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 3. Check the status of the Gateway.
 
    ```bash
-   kubectl get gateway grpc-gateway -n kgateway-system -o yaml
+   kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
    Example output:
@@ -208,13 +209,13 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
    kind: GRPCRoute
    metadata:
      name: grpc-echo-route
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      labels:
        app: grpc-echo
    spec:
      parentRefs:
      - name: grpc-gateway
-       namespace: kgateway-system
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
        sectionName: https
      hostnames:
      - "grpc.example.com"
@@ -236,7 +237,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 2. Verify that the GRPCRoute is applied successfully.
 
    ```bash
-   kubectl get grpcroute grpc-echo-route -n kgateway-system -o yaml
+   kubectl get grpcroute grpc-echo-route -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
    Example output:
@@ -261,7 +262,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
          group: gateway.networking.k8s.io
          kind: Gateway
          name: grpc-gateway
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          sectionName: https
    ```
 
@@ -274,13 +275,13 @@ Verify that the gRPC route to the echo service is working.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
-   export GATEWAY_IP=$(kubectl get gateway grpc-gateway -n kgateway-system -o jsonpath='{.status.addresses[0].value}')
+   export GATEWAY_IP=$(kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.status.addresses[0].value}')
    echo $GATEWAY_IP
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
-   kubectl port-forward svc/grpc-gateway -n kgateway-system 8443:443
+   kubectl port-forward svc/grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -347,9 +348,9 @@ Verify that the gRPC route to the echo service is working.
 Explore the traffic management, resiliency, and security policies that you can apply to make your gRPC services more robust and secure.
 
 {{< cards >}}
-  {{< card link="/docs/traffic-management/" title="Traffic management" >}}
-  {{< card link="/docs/resiliency/" title="Resiliency" >}}
-  {{< card link="/docs/security/" title="Security" >}}
+  {{< card link="../../../../traffic-management/" title="Traffic management" >}}
+  {{< card link="../../../../resiliency/" title="Resiliency" >}}
+  {{< card link="../../../../security/" title="Security" >}}
 {{< /cards >}}
 
 ## Cleanup
