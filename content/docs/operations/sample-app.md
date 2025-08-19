@@ -20,7 +20,7 @@ flowchart LR
 
 ## Before you begin
 
-Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
+Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../../quickstart/) or [Installation](../install/) guides.
 
 ## Deploy a sample app {#deploy-app}
 
@@ -285,9 +285,9 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 
 Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
 
-- Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
-- Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 
-- Secure your routes with external authentication and rate limiting policies by using the [Security](/docs/security) guides.
+- Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
+- Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
+- Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides.
 
 ## Cleanup
 
