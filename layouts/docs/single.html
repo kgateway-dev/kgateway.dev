@@ -1,4 +1,35 @@
 {{ define "main" }}
+  <style>
+    /* Hide unselected docs version dropdown */
+    .sidebar-container > div > ul > li:not(li:has(.sidebar-active-item)) {
+      display: none;
+    }
+
+    /* Hide top-level docs version dropdowns */
+    .sidebar-container > div > ul > li > a {
+      display: none;
+    }
+
+    /* Adjust padding and hide left border for top-level docs dropdown */
+    sidebar-container > div > ul > li > div {
+      padding-top: 0;
+    }
+
+    .sidebar-container > div > ul > li > div > ul {
+      padding-left: 0;
+      margin-left: 0;
+    }
+
+    .sidebar-container > div > ul > li > div > ul::before {
+      display: none;
+    }
+
+    /* Hide top-layer docs link from breadcrumbs */
+    main > div:first-child > *:nth-child(-n + 2) {
+      display: none;
+    }
+  </style>
+
   <div class="w-full z-10">
     {{ partial "announcement.html" .}}
   </div>

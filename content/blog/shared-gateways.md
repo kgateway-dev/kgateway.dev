@@ -3,6 +3,7 @@ title: Shared Gateways in kgateway
 toc: false
 publishDate: 2025-03-28T00:00:00-00:00
 author: Alex Ly
+excludeSearch: true
 ---
 
 In [part 1](https://kgateway.dev/blog/introduction-to-kubernetes-gateway-api/) of this blog series, we explored persona-based management as a new concept of the Kubernetes Gateway API compared to the monolithic or single-owner approach of the legacy Ingress API. By defining clear roles for infrastructure providers, cluster operators, and application developers, Gateway API enables teams to work independently while still adhering to organizational policies.

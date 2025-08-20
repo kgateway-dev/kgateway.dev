@@ -1,0 +1,54 @@
+<!-- Get the current buildcondition from the config and lowercase it -->
+{{- $url := .Page.RelPermalink -}}
+{{- /* remove leading/trailing slashes */ -}}
+{{- $trimmed := trim $url "/" -}}
+{{- /* split by slash */ -}}
+{{- $parts := split $trimmed "/" -}}
+{{- $version := "" -}}
+
+{{- if and (ge (len $parts) 2) (eq (index $parts 0) "docs") -}}
+    {{- $version = index $parts 1 -}}
+{{- end -}}
+
+{{ $condition := $version }}
+
+{{- if ne $condition "" -}}
+    <!-- Get the parameters from the shortcode invocation and lowercase them.
+    TODO: to enable multiple conditions, we could accept comma-separated lists and split them -->
+    {{- $include := .Get "include-if" | default "" -}}
+    {{- $include_if := split $include "," -}}
+    {{- $exclude := .Get "exclude-if" | default "" -}}
+    {{- $exclude_if := split $exclude "," -}}
+
+    {{ range .Site.Params.versions }} 
+
+     {{- if in $condition .linkVersion -}}
+       {{- $versionToml := .version -}}
+     
+        {{- if and (in $include_if $versionToml ) (in $exclude_if $versionToml) -}}
+            <!-- condition appears in both parameters -->
+            {{- errorf "Build condition %q appears in both include-if and exclude-if parameters of conditional-txt shortcode on page %s" $condition .Position -}}
+        {{- end -}}
+
+        {{- if isset $.Params "include-if" -}}
+            <!-- WARNING substring matches are matches as well! That means, if include-if="foobar", and buildcondition is "foo", you have a match!-->
+            {{- if in $include_if $versionToml -}}
+    <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
+{{- $.Inner -}}
+        {{- else -}}
+        {{- end -}}
+    {{- else -}}
+
+        {{- if isset $.Params "exclude-if" -}}
+            <!-- WARNING substring matches are matches as well! That means, if exclude-if="foobar", and buildcondition is "foo", you have a match!-->
+            {{- if in $exclude_if $versionToml -}}
+    <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
+{{- .Inner -}}
+            {{- end -}}
+        {{- end -}}
+
+    {{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{- end -}}

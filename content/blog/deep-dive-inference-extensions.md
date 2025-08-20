@@ -3,6 +3,7 @@ title: Deep Dive into the Gateway API Inference Extension
 toc: false
 publishDate: 2025-04-01T00:00:00-00:00
 author: Christian Posta
+excludeSearch: true
 ---
 
 Running AI inference workloads on Kubernetes has some unique characteristics and challenges, and the Gateway API Inference Extension project aims to solve some of those challenges. I recently wrote about these new capabilities [introduced in kgateway v2.0.0](https://kgateway.dev/blog/smarter-ai-reference-kubernetes-gateway-api/). In this blog we’ll take a deep dive into how it all works.

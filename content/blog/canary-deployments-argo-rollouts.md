@@ -3,6 +3,7 @@ title: Canary Deployments with kgateway and Argo Rollouts
 toc: false
 publishDate: 2025-04-01T00:00:00-00:00
 author: Brian Jimerson
+excludeSearch: true
 ---
 
 # Introduction

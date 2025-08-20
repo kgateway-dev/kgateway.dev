@@ -1,0 +1,11 @@
+{{ $path := page.RelPermalink }}
+{{- $segments := split $path "/" -}}
+{{- $filtered := after 3 $segments -}}
+{{- $newPath := printf "/%s" (delimit $filtered "/") -}}
+{{ $baseurl := site.BaseURL }}
+
+{{ range site.Params.versions }}
+  <li>
+    <a class="dropdow-item" href="{{ $baseurl }}docs/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+  </li>
+{{ end }}

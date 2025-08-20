@@ -3,6 +3,7 @@ title: How prioritized model load-balancing helps keep your AI-powered workloads
 toc: false
 publishDate: 2025-05-02T00:00:00-00:00
 author: Art Berger
+excludeSearch: true
 ---
 
 When deploying workloads that rely on large language models (LLMs) in production, an important, yet often overlooked, challenge is LLM reliability. Models can go offline for all sorts of reasons: infrastructure hiccups, resource constraints, or version rollouts gone awry.

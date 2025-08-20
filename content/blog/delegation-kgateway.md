@@ -3,6 +3,7 @@ title: Delegation in kgateway - scaling routing with multi-tenant ownership
 toc: false
 publishDate: 2025-05-09T00:00:00-00:00
 author: Alex Ly
+excludeSearch: true
 ---
 
 As environments scale, traffic routing through Kubernetes gateways naturally becomes increasingly complex. Microservices architecture adoption tends to amplify this challenge as what used to be a single route for a monolith becomes hundreds or even thousands of path-based matchers across services, often bundled under a shared hostname. 

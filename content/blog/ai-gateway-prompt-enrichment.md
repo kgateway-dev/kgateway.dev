@@ -3,6 +3,7 @@ title: Get Better Results from your LLM with AI Gateway Prompt Enrichment
 toc: false
 publishDate: 2025-05-02T00:00:00-00:00
 author: Art Berger
+excludeSearch: true
 ---
 
 Prompting is more than just typing something into a chat and hoping the AI understands you. If you're working with large language models (LLMs) through an API gateway—or managing a system that does—it pays to be deliberate about how prompts are structured and enriched.

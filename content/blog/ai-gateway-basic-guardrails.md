@@ -3,6 +3,7 @@ title: Dive into Basic Prompt Guardrails with kgateway
 toc: false
 publishDate: 2025-05-01T00:00:00-00:00
 author: Alex Ly
+excludeSearch: true
 ---
 
 Earlier this year, Solo.io's Field CTO, Christian Posta, posted this article [Navigating DeepSeek R1, Security Concerns, and Guardrails](https://kgateway.dev/blog/navigating-deepseek-r1/) which provided the following diagram that depicts how an AI Gateway can play a part in a "defense in depth" strategy.
