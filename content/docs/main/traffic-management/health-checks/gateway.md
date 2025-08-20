@@ -7,6 +7,10 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} includes an HTTP health checking plug-in that you can enable for a gateway proxy listener. This plug-in responds to health check requests directly with either a `200 OK` or `503 Service Unavailable` message, depending on the current draining state of Envoy.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

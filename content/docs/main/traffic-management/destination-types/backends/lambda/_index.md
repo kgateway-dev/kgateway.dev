@@ -5,6 +5,10 @@ weight: 30
 
 Use kgateway to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About
 
 Serverless functions, such as Lambda functions, provide an alternative to traditional applications or services. The functions run on servers that you do not have to manage yourself, and you pay for only for the compute time you use.

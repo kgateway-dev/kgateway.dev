@@ -5,6 +5,10 @@ weight: 30
 
 Prioritize the failover of requests across different models from an LLM provider.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About failover {#about}
 
 Failover is a way to keep services running smoothly by automatically switching to a backup system when the main one fails or becomes unavailable.

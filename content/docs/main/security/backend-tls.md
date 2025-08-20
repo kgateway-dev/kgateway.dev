@@ -10,6 +10,10 @@ Originate a one-way TLS connection from the Gateway to a backend.
 {{< reuse "docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About one-way TLS
 
 When you configure a TLS listener on your Gateway, the Gateway typically terminates incoming TLS traffic and forwards the unencrypted traffic to the backend service. However, you might have a service that only accepts TLS connections, or you want to forward traffic a secured Backend service that is external to the cluster.

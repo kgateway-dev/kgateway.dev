@@ -23,7 +23,7 @@ The guide includes steps to install {{< reuse "/docs/snippets/kgateway.md" >}} i
 ## Before you begin
 
 {{< callout type="warning" >}}
-{{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Get started](/docs/quickstart/) guide, first [uninstall your installation](/docs/operations/uninstall/).
+{{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Get started](../../quickstart/) guide, first [uninstall your installation](../uninstall/).
 {{< /callout >}}
 
 {{< tabs tabTotal="2" items="Helm,Argo CD" >}}
@@ -88,7 +88,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](/docs/reference/versions/#experimental-features).{{< /callout >}}
+   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
 
 2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
 
@@ -100,7 +100,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
    2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
       ```sh
-      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}}
+      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} 
       ```
 
 3. Install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart.
@@ -117,7 +117,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="2" items="Basic installation,Custom values" >}}
+      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -129,6 +129,23 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /tab %}}
+{{% tab tabName="Development" %}}
+When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
+
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/patch-dev.md" >}} \
+--set controller.image.pullPolicy=Always
+```
+{{% /tab %}}
+{{% tab tabName="Agentgateway and AI extensions" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     --set gateway.aiExtension.enabled=true \
+     --set agentGateway.enabled=true \
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
 ```
 {{% /tab %}}
       {{< /tabs >}}
@@ -143,7 +160,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
       TEST SUITE: None
       ```
 
-4. Verify that the control plane is up and running. 
+1. Verify that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -179,7 +196,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](/docs/reference/versions/#experimental-features).{{< /callout >}}
+   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
    
 2. Port-forward the Argo CD server on port 9999.
    
@@ -227,6 +244,9 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    ```
 
 6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. 
+ {{< callout type="warning" >}}
+   When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image.
+   {{< /callout >}}
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -244,6 +264,9 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
        chart: {{< reuse "/docs/snippets/helm-kgateway.md" >}}
        helm:
          skipCrds: false
+         parameters:
+         - name: controller.image.pullPolicy
+           value: "Always"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:
@@ -290,6 +313,22 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
 
+### Agentgateway and AI extensions {#agentgateway-ai-extensions}
+
+To enable the [Agentgateway](../../agentgateway/) and [AI extensions](../../ai/), set the following values in your Helm values file.
+
+```yaml
+agentGateway:
+  enabled: true
+gateway:
+  aiExtension:
+    enabled: true
+```
+
+### Development builds
+
+When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
+
 ### Helm reference docs {#helm-docs}
 
 For more information, see the Helm reference docs.
@@ -332,11 +371,11 @@ discoveryNamespaceSelectors:
 ## Next steps
 
 Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
-- Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](/docs/about/overview). 
-- [Deploy an API gateway and sample app](/docs/operations/sample-app/) to test out routing to an app.
-- Add routing capabilities to your httpbin route by using the [Traffic management](/docs/traffic-management) guides. 
-- Explore ways to make your routes more resilient by using the [Resiliency](/docs/resiliency) guides. 
-- Secure your routes with external authentication and rate limiting policies by using the [Security](/docs/security) guides. 
+- Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](../../about/overview). 
+- [Deploy an API gateway and sample app](../sample-app/) to test out routing to an app.
+- Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
+- Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
+- Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides. 
 
 ## Cleanup
 
@@ -344,8 +383,8 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
 
 {{< tabs tabTotal="2" items="Helm,Argo CD" >}}
   
-  {{% tab tabName="Helm" %}}Follow the [Uninstall guide](/docs/operations/uninstall).{{% /tab %}}
+  {{% tab tabName="Helm" %}}Follow the [Uninstall guide](../uninstall).{{% /tab %}}
   
-  {{% tab tabName="Argo CD" %}}Follow the [Uninstall with Argo CD guide](/docs/operations/uninstall#argocd).{{% /tab %}}
+  {{% tab tabName="Argo CD" %}}Follow the [Uninstall with Argo CD guide](../uninstall#argocd).{{% /tab %}}
 
 {{< /tabs >}}

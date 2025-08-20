@@ -7,6 +7,10 @@ Automatically monitor the status of backends by configuring health checks.
 
 Health checks periodically and automatically assess the readiness of the Backend to receive requests. You can configure several settings, such as health thresholds and check intervals, that {{< reuse "/docs/snippets/kgateway.md" >}} uses to determine whether a service is marked as healthy or unhealthy. For more information, see the Envoy [health checking](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/health_checking#arch-overview-health-checking) documentation.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -94,16 +98,6 @@ To try out an active health check policy, you can follow these steps to create a
    4. Stop port-forwarding the `http` deployment.
       ```sh
       lsof -ti:19000 | xargs kill -9
-      ```
-
-3. Check the Envoy logs for health check failures.
-   1. Get the logs for the `http` gateway deployment.
-      ```shell
-      kubectl logs -f deploy/http -n {{< reuse "/docs/snippets/namespace.md" >}} > gateway-proxy.log
-      ```
-   2. In the output `gateway-proxy.log` file, search for events such as `health_check_failure_event` as shown in the following example log lines.
-      ```json
-      {"health_checker_type":"HTTP","host":{"socket_address":{"protocol":"TCP","address":"10.XX.X.XX","port_value":8080,"resolver_name":"","ipv4_compat":false}},"cluster_name":"httpbin_httpbin","timestamp":"2024-08-20T18:13:47.577Z","health_check_failure_event":{"failure_type":"ACTIVE","first_check":false},"metadata":{"filter_metadata":{"envoy.lb":{"version":"v1","app":"httpbin","pod-template-hash":"f46cc8b9b"}},"typed_filter_metadata":{}},"locality":{"region":"","zone":"","sub_zone":""}}
       ```
 
 ## Cleanup

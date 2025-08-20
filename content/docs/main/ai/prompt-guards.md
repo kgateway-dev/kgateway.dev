@@ -6,6 +6,10 @@ description: Secure access to the LLM and the data that is returned with Web App
 
 Secure access to the LLM and the data that is returned with Web Application Filter and Data Loss Prevention policies. 
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About prompt guards {#about}
 
 Prompt guards are mechanisms that ensure that prompt-based interactions with a language model are secure, appropriate, and aligned with the intended use. These mechanisms help to filter, block, monitor, and control LLM inputs and outputs to filter offensive content, prevent misuse, and ensure ethical and responsible AI usage.

@@ -14,17 +14,37 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/), you must also enable agentgateway.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
    {{< /callout >}}
 
+   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Kgateway" %}}
    ```shell
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
         --set gateway.aiExtension.enabled=true \
         --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+
+   {{< reuse "docs/snippets/agw-no-traffic.md" >}} For AI gateway use cases, this limitation means the following:
+   * ✅ AI routing with agentgateway to all supported cloud LLM providers, including those that are compatible with the OpenAI API.
+   * ✅ Function calling.
+   * ❌ Model failover.
+   * ❌ Prompt guards and enrichment, which use TrafficPolicies.
+   * ❌ AI observability metrics, which rely on Envoy dynamic metadata.
+
+   ```shell
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+        --set gateway.aiExtension.enabled=true \
+        --set agentGateway.enabled=true \
+        --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Verify that your Helm installation is updated.
 
@@ -33,12 +53,27 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    ```
 
    Example output:
-   
+
+   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Kgateway" %}}   
    ```yaml
+   
    gateway:
      aiExtension:
        enabled: true
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   
+   agentgateway:
+     enabled: true
+   gateway:
+     aiExtension:
+       enabled: true
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 ## Create an AI Gateway {#gateway}
 
@@ -101,8 +136,10 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Create a Gateway that uses the default GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step.
-   
+2. Create a Gateway that uses the default GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
+
+   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -128,6 +165,35 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
            from: All
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
+   metadata:
+     name: ai-gateway
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: ai-gateway
+   spec:
+     gatewayClassName: agentgateway
+     infrastructure:
+       parametersRef:
+         name: ai-gateway
+         group: gateway.kgateway.dev
+         kind: GatewayParameters
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 3. Verify that the AI Gateway is created. 
 

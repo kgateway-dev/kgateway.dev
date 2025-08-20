@@ -1,10 +1,10 @@
 ---
-title: Kubernetes services
+title: HTTP services
 weight: 10
-next: /docs/traffic-management/destination-types/backends
+prev: /docs/traffic-management/destination-types/
 ---
 
-Route traffic to a Kubernetes service.
+Route traffic to an HTTP or HTTPS Kubernetes service.
 
 You can route to a Kubernetes service by simply referencing that service in the `backendRefs` section of your HTTPRoute resource as shown in the following example.
 

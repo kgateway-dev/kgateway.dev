@@ -6,6 +6,10 @@ description: Configure a service to use HTTP/2.
 
 You might have services in your Kubernetes cluster that use HTTP/2 for communication. Typically these are gRPC services, but it could apply to any service that uses HTTP/2 in its transport layer. To enable HTTP/2 communication, you simply set the app protocol on the service to HTTP/2. This setting instructs {{< reuse "docs/snippets/kgateway.md" >}} to use HTTP/2 for communication with the destination.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
