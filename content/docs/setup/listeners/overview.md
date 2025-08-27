@@ -83,7 +83,7 @@ To use ListenerSets, you must have the following environment:
 
 2. Follow the [Get Started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
-3. If you already have a {{< reuse "docs/snippets/kgateway.md" >}} installation, restart the `{{< reuse "docs/snippets/kgateway.md" >}}` pod to pick up the new CRDs.
+3. If you already have a {{< reuse "docs/snippets/kgateway.md" >}} installation, restart the `{{< reuse "docs/snippets/pod-name.md" >}}` deployment to pick up the new CRDs.
 
    ```sh
    kubectl rollout restart deployment/{{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
