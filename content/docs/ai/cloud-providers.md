@@ -200,7 +200,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 
 You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI supports authentication via an `Authorization` or `api-key` header. 
 
-By default, {{< reuse "docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use a API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
+By default, {{< reuse "docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use an API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
 
 For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
 
