@@ -61,7 +61,7 @@ Our goal was to provide complete observability support for AI Gateway:
 
 ### Design Approach
 
-The project was divided into two main parts:
+The project was divided into two main parts. For more details, see: [EP-11777](https://github.com/kgateway-dev/kgateway/blob/main/design/11177.md):
 
 **Control Plane**: Provides configuration interface through GatewayParameters API, where users can specify tracing backends, sampling rates, and other parameters.
 
