@@ -27,7 +27,7 @@ Instead of rushing to submit my application, I first went to actually experience
 
 I didn't just report the problem, but proactively proposed a solution. I brought up this issue in the community Slack:
 
-![First community interaction](/assets/blog/zzk-slack-first-context.png)
+{{< reuse-image src="blog/zzk-slack-first-context.png" width="750px" caption="First community interaction">}}
 
 Eventually, I successfully submitted a PR: [Allow overriding default LLM provider endpoints](https://github.com/kgateway-dev/kgateway/pull/11282), which solved this configuration issue.
 
