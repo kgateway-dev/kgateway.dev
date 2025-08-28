@@ -91,7 +91,7 @@ After discussions with my mentor, Nina, I learned that the system already had a 
 
 ### Community Collaboration
 
-Throughout the development process, support from the KGateway community was crucial. Whether for technical discussions or code review feedback, community members were always very helpful. This gave me a deep appreciation for the collaborative spirit of open source projects.
+Throughout the development process, support from the kgateway community was crucial. Whether for technical discussions or code review feedback, community members were always very helpful. This gave me a deep appreciation for the collaborative spirit of open source projects.
 
 ## Project Results and Value
 
