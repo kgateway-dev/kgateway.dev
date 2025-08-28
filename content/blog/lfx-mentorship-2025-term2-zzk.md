@@ -100,7 +100,7 @@ Throughout the development process, support from the kgateway community was cruc
 Through this project, we added complete distributed tracing support to kgateway's AI Gateway:
 
 - **Unified configuration interface**: Users can easily configure distributed tracing through GatewayParameters
-- **Multi-vendor support**: Support for mainstream LLM service providers like OpenAI, Anthropic, Gemini
+- **Multi-vendor support**: Support for mainstream LLM service providers like OpenAI, Anthropic, and Gemini
 - **Standardized tracing**: Follows OpenTelemetry GenAI semantic conventions
 - **Flexible deployment**: Supports sending to any OTLP-compatible backend storage
 
