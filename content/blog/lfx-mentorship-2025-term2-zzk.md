@@ -143,8 +143,8 @@ spec:
       env:
         - name: LOG_LEVEL
           value: DEBUG
-      service:
-        type: NodePort
+    service:
+      type: NodePort
 EOF
 ```
 
@@ -205,6 +205,13 @@ config:
 EOF
 ```
 
+Configure Grafana for more intuitive trace observation
+
+Install Grafana using [deploy-grafana-using-helm-charts](https://grafana.com/docs/grafana/latest/setup-grafana/installation/helm/#deploy-grafana-using-helm-charts).
+
+Configure Tempo as a data source, and fill in the URL field with: `http://tempo.telemetry:3100`
+{{< reuse-image src="blog/config-data-source-tempo.png" width="750px" caption="Configure Tempo as data source">}}
+
 #### 4. Create Tracing Policy
 ```yaml
 kubectl apply -f- <<EOF
@@ -253,7 +260,7 @@ curl -v "localhost:8080/ollama" \
 ```
 
 #### 6. Verify Distributed Tracing
-Check if traces are being collected properly:
+Check if traces are being collected properly via command line:
 
 ```bash
 kubectl -n telemetry logs deploy/opentelemetry-collector-traces | grep 'llama'
@@ -265,6 +272,9 @@ Name           : gen_ai.request generate_content llama3.2
     -> gen_ai.request.model: Str(llama3.2)
     -> gen_ai.response.model: Str(llama3.2)
 ```
+
+Observe traces more intuitively through Grafana:
+{{< reuse-image src="blog/assets/blog/tempo-traces-result.png" width="750px" caption="Tempo traces visualization in Grafana">}}
 
 This indicates that the distributed tracing feature is working properly, and your AI Gateway requests are being completely traced and recorded!
 
