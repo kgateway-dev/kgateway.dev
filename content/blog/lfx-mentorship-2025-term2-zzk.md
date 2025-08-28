@@ -55,7 +55,7 @@ Distributed tracing can help us:
 Our goal was to provide complete observability support for AI Gateway:
 
 1. **Configuration flexibility**: Users can configure OpenTelemetry tracer and Span Exporter
-2. **Standardized tracing**: Follow OpenTelemetry's GenAI semantic conventions
+2. **Standardized tracing**: Follow [OpenTelemetry's GenAI semantic conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/gen-ai-spans/)
 3. **Multi-vendor support**: Support multiple LLM service providers like OpenAI, Anthropic, and Gemini
 4. **Ease of use**: Provide simple configuration methods and clear documentation
 
