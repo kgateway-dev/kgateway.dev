@@ -81,7 +81,7 @@ Early in the project, I made an important mistake: skipping unit tests and going
 - Test environment configuration was complex and hard to maintain
 
 **Better Solution**:
-After discussions with mentor Nina, I learned that the system already had a simpler method: send traces to OTel Collector and have the Collector output structured logs. This way, we could directly retrieve all traces data from container logs using `kubectl logs`, greatly simplifying the testing process.
+After discussions with my mentor, Nina, I learned that the system already had a simpler method: send traces to OTel Collector and have the Collector output structured logs. This way, we could directly retrieve all traces data from container logs using `kubectl logs`, greatly simplifying the testing process.
 
 ### Key Takeaways
 
