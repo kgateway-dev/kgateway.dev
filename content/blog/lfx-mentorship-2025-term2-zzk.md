@@ -296,6 +296,6 @@ Through LFX Mentorship, I not only completed a meaningful technical project, but
 
 From applying for LFX Mentorship to completing the AI Gateway distributed tracing project, this experience gave me a deep understanding of the power and value of open source communities. Technology itself is important, but what's more important is learning how to collaborate with the community, how to solve real problems, and how to create value for a broader user base.
 
-If you're also interested in open source contribution, why not start today: find a project you're interested in and submit your first issue or PR. Every small contribution is a step toward bigger goals.
+If you're also interested in open source contribution, why not start today? Find a project you're interested in and submit your first issue or PR. Every small contribution is a step toward bigger goals.
 
 Finally, special thanks to my mentors [@Nina](https://github.com/npolshakova) and [@Andy](https://github.com/andy-fong) for taking their valuable time to guide and help me complete this project!
