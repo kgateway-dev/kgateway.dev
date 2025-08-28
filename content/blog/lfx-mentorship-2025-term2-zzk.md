@@ -5,7 +5,7 @@ publishDate: 2025-08-28T00:00:00-00:00
 author: Zhengke Zhou
 ---
 
-In today's rapidly evolving AI application landscape, effectively monitoring and debugging AI Gateways has become a critical challenge. This article shares my complete experience through the LFX Mentorship program, where I added OpenTelemetry distributed tracing support to KGateway's AI Gateway functionality.
+In today's rapidly evolving AI application landscape, effectively monitoring and debugging AI Gateways has become a critical challenge. This article shares my complete experience through the LFX Mentorship program, where I added OpenTelemetry distributed tracing support to kgateway's AI Gateway functionality.
 
 From application strategies for LFX Mentorship to challenges and insights during project implementation, I hope this provides valuable reference for students who want to participate in open source projects.
 
