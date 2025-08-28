@@ -112,7 +112,7 @@ Want to experience this distributed tracing feature yourself? Follow these steps
 Follow the [Get started](https://kgateway.dev/docs/quickstart/) guide. For the installation, choose the development version, v{{< reuse "docs/versions/patch-dev.md" >}}.
 
 #### 2. Enable AI Extension
-Refer to https://kgateway.dev/docs/ai/setup/, but note the following configurations:
+As you follow the [Set up AI Gateway](https://kgateway.dev/docs/ai/setup/), note the following configurations:
 
 Upgrade kgateway and enable AI Gateway extension:
 ```bash
