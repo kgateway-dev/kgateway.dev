@@ -1,5 +1,5 @@
 ---
-title: "From LFX Mentorship to AI Gateway Distributed Tracing: My Open Source Contribution Journey"
+title: "Adding Distributed Tracing to AI Gateway: My LFX Mentorship Journey"
 toc: false
 publishDate: 2025-08-28T00:00:00-00:00
 author: Zhengke Zhou
