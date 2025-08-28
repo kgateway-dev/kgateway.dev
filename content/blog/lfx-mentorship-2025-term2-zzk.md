@@ -42,7 +42,7 @@ By contributing code before applying, I achieved several goals:
 
 ### The Problem to Solve
 
-AI Gateway is implemented using Envoy's extproc functionality, where all requests to LLM service providers are intercepted and processed by the extension program. When system issues occur, we can only sift through massive amounts of logs for troubleshooting, which is both time-consuming and inefficient.
+AI Gateway is implemented using Envoy's extproc functionality, where all requests to LLM service providers are intercepted and processed by the extension program. Currently, AI Gateway has introduced Metrics in the observability domain (Logs, Metrics, Traces). However, when issues occur, Metrics can only tell us 'What' happened, but not 'Where' the issue occurred, we can only sift through massive amounts of logs for troubleshooting, which is both time-consuming and inefficient.
 
 Distributed tracing can help us:
 - **Visualize request flow**: Clearly see the complete path of requests through the system
