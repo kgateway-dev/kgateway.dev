@@ -274,7 +274,7 @@ Name           : gen_ai.request generate_content llama3.2
 ```
 
 Observe traces more intuitively through Grafana:
-{{< reuse-image src="blog/assets/blog/tempo-traces-result.png" width="750px" caption="Tempo traces visualization in Grafana">}}
+{{< reuse-image src="blog/tempo-traces-result.png" width="750px" caption="Tempo traces visualization in Grafana">}}
 
 This indicates that the distributed tracing feature is working properly, and your AI Gateway requests are being completely traced and recorded!
 
