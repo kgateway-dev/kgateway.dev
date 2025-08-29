@@ -35,6 +35,7 @@ A Helm chart for the kgateway project
 | nodeSelector | object | {} | Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'. |
 | podAnnotations | object | {"prometheus.io/scrape":"true"} | Add annotations to the kgateway pods. |
 | podSecurityContext | object | {} | Set the pod-level security context. For example, 'fsGroup: 2000' sets the filesystem group to 2000. |
+| policyMerge | object | {} | Policy merging settings. Currently, TrafficPolicy's extAuth, extProc, and transformation policies support deep merging. E.g., to enable deep merging of extProc policy in TrafficPolicy: policyMerge:   trafficPolicy:     extProc: DeepMerge |
 | resources | object | {} | Configure resource requests and limits for the container, such as 'limits.cpu: 100m' or 'requests.memory: 128Mi'. |
 | securityContext | object | {} | Set the container-level security context, such as 'runAsNonRoot: true'. |
 | serviceAccount | object | {"annotations":{},"create":true,"name":""} | Configure the service account for the deployment. |
