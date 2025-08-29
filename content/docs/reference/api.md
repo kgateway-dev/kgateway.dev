@@ -60,7 +60,7 @@ _Appears in:_
 | `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
 | `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
 | `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
-| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported. | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
+| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported.<br />Note: This field is not applicable when using agentgateway | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
 
 
 #### AIPromptEnrichment
@@ -442,6 +442,23 @@ _Appears in:_
 | `headerName` _string_ |  |  |  |
 
 
+#### AuthorizationPolicyAction
+
+_Underlying type:_ _string_
+
+AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
+
+
+
+_Appears in:_
+- [RBAC](#rbac)
+
+| Field | Description |
+| --- | --- |
+| `Allow` | AuthorizationPolicyActionAllow defines the action to take when the RBACPolicies matches.<br /> |
+| `Deny` | AuthorizationPolicyActionDeny denies the action to take when the RBACPolicies matches.<br /> |
+
+
 #### AwsAuth
 
 
@@ -600,6 +617,7 @@ _Appears in:_
 | `tls` _[TLS](#tls)_ | TLS contains the options necessary to configure a backend to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig) for more details. |  |  |
 | `loadBalancer` _[LoadBalancer](#loadbalancer)_ | LoadBalancer contains the options necessary to configure the load balancer. |  |  |
 | `healthCheck` _[HealthCheck](#healthcheck)_ | HealthCheck contains the options necessary to configure the health check. |  |  |
+| `outlierDetection` _[OutlierDetection](#outlierdetection)_ | OutlierDetection contains the options necessary to configure passive health checking. |  |  |
 
 
 #### BackendSpec
@@ -897,7 +915,7 @@ _Appears in:_
 
 #### Cookie
 
-
+_Underlying type:_ _[struct{Name string "json:\"name\""; Path *string "json:\"path,omitempty\""; TTL *k8s.io/apimachinery/pkg/apis/meta/v1.Duration "json:\"ttl,omitempty\""; Secure *bool "json:\"secure,omitempty\""; HttpOnly *bool "json:\"httpOnly,omitempty\""; SameSite *string "json:\"sameSite,omitempty\""}](#struct{name-string-"json:\"name\"";-path-*string-"json:\"path,omitempty\"";-ttl-*k8sioapimachinerypkgapismetav1duration-"json:\"ttl,omitempty\"";-secure-*bool-"json:\"secure,omitempty\"";-httponly-*bool-"json:\"httponly,omitempty\"";-samesite-*string-"json:\"samesite,omitempty\""})_
 
 
 
@@ -906,12 +924,6 @@ _Appears in:_
 _Appears in:_
 - [HashPolicy](#hashpolicy)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `name` _string_ | Name of the cookie. |  | MinLength: 1 <br /> |
-| `path` _string_ | Path is the name of the path for the cookie. |  |  |
-| `ttl` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | TTL specifies the time to live of the cookie.<br />If specified, a cookie with the TTL will be generated if the cookie is not present.<br />If the TTL is present and zero, the generated cookie will be a session cookie. |  |  |
-| `attributes` _object (keys:string, values:string)_ | Attributes are additional attributes for the cookie. |  | MaxProperties: 10 <br />MinProperties: 1 <br /> |
 
 
 #### CorsPolicy
@@ -1230,7 +1242,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | ExtensionRef references the ExternalExtension that should be used for authentication. |  |  |
+| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references the GatewayExtension that should be used for authentication. |  |  |
 | `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
 | `contextExtensions` _object (keys:string, values:string)_ | Additional context for the authorization service. |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable all external authorization filters.<br />Can be used to disable external authorization policies applied at a higher level in the config hierarchy. |  |  |
@@ -1284,7 +1296,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  |  |
+| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references the GatewayExtension that should be used for external processing. |  |  |
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable all external processing filters.<br />Can be used to disable external processing policies applied at a higher level in the config hierarchy. |  |  |
 
@@ -1633,6 +1645,8 @@ _Appears in:_
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
+| `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
+| `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
 
 
 #### HashPolicy
@@ -1644,7 +1658,8 @@ _Appears in:_
 
 
 _Appears in:_
-- [TrafficPolicySpec](#trafficpolicyspec)
+- [LoadBalancerMaglevConfig](#loadbalancermaglevconfig)
+- [LoadBalancerRingHashConfig](#loadbalancerringhashconfig)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1656,7 +1671,7 @@ _Appears in:_
 
 #### Header
 
-
+_Underlying type:_ _[struct{Name string "json:\"name\""}](#struct{name-string-"json:\"name\""})_
 
 
 
@@ -1665,9 +1680,6 @@ _Appears in:_
 _Appears in:_
 - [HashPolicy](#hashpolicy)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `name` _string_ | Name is the name of the header to use as a component of the hash key. |  | MinLength: 1 <br /> |
 
 
 #### HeaderFilter
@@ -1685,6 +1697,23 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  |  |
+
+
+#### HeaderModifiers
+
+
+
+HeaderModifiers can be used to define the policy to modify request and response headers.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `request` _[HTTPHeaderFilter](#httpheaderfilter)_ | Request modifies request headers. |  |  |
+| `response` _[HTTPHeaderFilter](#httpheaderfilter)_ | Response modifies response headers. |  |  |
 
 
 #### HeaderName
@@ -2033,6 +2062,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
+| `hashPolicies` _[HashPolicy](#hashpolicy) array_ | HashPolicies specifies the hash policies for hashing load balancers (RingHash, Maglev). |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### LoadBalancerRandomConfig
@@ -2064,6 +2094,7 @@ _Appears in:_
 | `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. |  |  |
 | `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. |  |  |
 | `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
+| `hashPolicies` _[HashPolicy](#hashpolicy) array_ | HashPolicies specifies the hash policies for hashing load balancers (RingHash, Maglev). |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### LoadBalancerRoundRobinConfig
@@ -2228,7 +2259,7 @@ _Appears in:_
 
 _Underlying type:_ _string_
 
-
+MCPProtocol defines the protocol to use for the MCP target
 
 
 
@@ -2237,9 +2268,8 @@ _Appears in:_
 
 | Field | Description |
 | --- | --- |
-| `Undefined` |  |
-| `SSE` |  |
-| `StreamableHTTP` |  |
+| `StreamableHTTP` | MCPProtocolStreamableHTTP specifies Streamable HTTP must be used as the protocol<br /> |
+| `SSE` | MCPProtocolSSE specifies Server-Sent Events (SSE) must be used as the protocol<br /> |
 
 
 #### McpSelector
@@ -2274,8 +2304,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `name` _string_ | Name is the name of this MCP target. |  | MinLength: 1 <br /> |
 | `host` _string_ | Host is the hostname or IP address of the MCP target. |  | MinLength: 1 <br /> |
+| `path` _string_ | Path is the URL path of the MCP target endpoint.<br />Defaults to "/sse" for SSE protocol or "/mcp" for StreamableHTTP protocol if not specified. |  |  |
 | `port` _integer_ | Port is the port number of the MCP target. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
-| `protocol` _[MCPProtocol](#mcpprotocol)_ | Protocol is the protocol to use for the connection to the MCP target. |  | Enum: [Undefined SSE StreamableHTTP] <br /> |
+| `protocol` _[MCPProtocol](#mcpprotocol)_ | Protocol is the protocol to use for the connection to the MCP target. |  | Enum: [StreamableHTTP SSE] <br /> |
 
 
 #### McpTargetSelector
@@ -2437,6 +2468,26 @@ _Appears in:_
 | `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
 
 
+#### NamespacedObjectReference
+
+
+
+Select the object by Name and Namespace.
+You can target only one object at a time.
+
+
+
+_Appears in:_
+- [ExtAuthPolicy](#extauthpolicy)
+- [ExtProcPolicy](#extprocpolicy)
+- [RateLimitPolicy](#ratelimitpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+| `namespace` _[Namespace](#namespace)_ | The namespace of the target resource.<br />If not set, defaults to the namespace of the parent object. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` <br /> |
+
+
 #### OTLPTracesProtocolType
 
 _Underlying type:_ _string_
@@ -2531,9 +2582,29 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `grpcService` _[CommonGrpcService](#commongrpcservice)_ | Send traces to the gRPC service |  |  |
-| `serviceName` _string_ | The name for the service. This will be populated in the ResourceSpan Resource attributes |  |  |
+| `serviceName` _string_ | The name for the service. This will be populated in the ResourceSpan Resource attributes<br />Defaults to the envoy cluster name. Ie: `<gateway-name>.<gateway-namespace>` |  |  |
 | `resourceDetectors` _[ResourceDetector](#resourcedetector) array_ | An ordered list of resource detectors. Currently supported values are `EnvironmentResourceDetector` |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
 | `sampler` _[Sampler](#sampler)_ | Specifies the sampler to be used by the OpenTelemetry tracer. This field can be left empty. In this case, the default Envoy sampling decision is used.<br />Currently supported values are `AlwaysOn` |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
+
+
+#### OutlierDetection
+
+
+
+OutlierDetection contains the options to configure passive health checks.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier#outlier-detection) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `consecutive5xx` _integer_ | The number of consecutive server-side error responses (for HTTP traffic,<br />5xx responses; for TCP traffic, connection failures; etc.) before an<br />ejection occurs. Defaults to 5. If this is zero, consecutive 5xx passive<br />health checks will be disabled. In the future, other types of passive<br />health checking might be added, but none will be enabled by default. | 5 |  |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The time interval between ejection analysis sweeps. This can result in<br />both new ejections as well as hosts being returned to service. Defaults<br />to 10s. | 10s |  |
+| `baseEjectionTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The base time that a host is ejected for. The real time is equal to the<br />base time multiplied by the number of times the host has been ejected.<br />Defaults to 30s. | 30s |  |
+| `maxEjectionPercent` _integer_ | The maximum % of an upstream cluster that can be ejected due to outlier<br />detection. Defaults to 10%. | 10 | Maximum: 100 <br />Minimum: 0 <br /> |
 
 
 #### Parameters
@@ -2724,6 +2795,7 @@ _Appears in:_
 PromptguardResponse configures the response that the prompt guard applies to responses returned by the LLM provider.
 Both webhook and regex can be set, they will be executed in the following order: webhook → regex, where each step
 can reject the request and stop further processing.
+Note: This is not yet supported for agentgateway.
 
 
 
@@ -2750,6 +2822,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `replicas` _integer_ | The number of desired pods. Defaults to 1. |  |  |
+| `omitReplicas` _boolean_ | If true, replicas will not be set in the deployment (allowing HPA to control scaling) |  |  |
 
 
 #### Publisher
@@ -2766,6 +2839,39 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `GOOGLE` |  |
+
+
+#### RBAC
+
+
+
+RBAC defines the configuration for role-based access control.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `policy` _[RBACPolicy](#rbacpolicy)_ | Policy specifies the RBAC rule to evaluate.<br />A policy matches only **all** the conditions evaluates to true. |  |  |
+| `action` _[AuthorizationPolicyAction](#authorizationpolicyaction)_ | Action defines whether the rule allows or denies the request if matched.<br />If unspecified, the default is "Allow". | Allow | Enum: [Allow Deny] <br /> |
+
+
+#### RBACPolicy
+
+
+
+RBACPolicy defines a single RBAC rule.
+
+
+
+_Appears in:_
+- [RBAC](#rbac)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `matchExpressions` _string array_ | MatchExpressions defines a set of conditions that must be satisfied for the rule to match.<br />These expression should be in the form of a Common Expression Language (CEL) expression.<br />See: https://www.envoyproxy.io/docs/envoy/latest/xds/type/matcher/v3/cel.proto |  | MinItems: 1 <br /> |
 
 
 #### RateLimit
@@ -2857,7 +2963,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `descriptors` _[RateLimitDescriptor](#ratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting.<br />These values are passed to the rate limit service which applies configured limits based on them.<br />Each descriptor represents a single rate limit rule with one or more entries. |  | MinItems: 1 <br /> |
-| `extensionRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
+| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references a GatewayExtension that provides the global rate limit service. |  |  |
 
 
 #### RateLimitProvider
@@ -3123,6 +3229,7 @@ _Appears in:_
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  |  |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  |  |
 | `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
+| `externalTrafficPolicy` _string_ | ExternalTrafficPolicy defines the external traffic policy for the service.<br />Valid values are Cluster and Local. Default value is Cluster. |  |  |
 
 
 #### ServiceAccount
@@ -3204,7 +3311,7 @@ _Appears in:_
 
 #### SourceIP
 
-
+_Underlying type:_ _[struct{}](#struct{})_
 
 
 
@@ -3494,6 +3601,7 @@ _Appears in:_
 
 
 TrafficPolicySpec defines the desired state of a traffic policy.
+Note: Backend attachment is only supported for agentgateway.
 
 
 
@@ -3511,11 +3619,12 @@ _Appears in:_
 | `rateLimit` _[RateLimit](#ratelimit)_ | RateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
-| `hashPolicies` _[HashPolicy](#hashpolicy) array_ | HashPolicies specifies the hash policies for hashing load balancers (RingHash, Maglev).<br />Should be used in conjunction with Load Balancer on the BackendConfigPolicy.<br />Note: can only be used when targeting routes. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | HeaderModifiers defines the policy to modify request and response headers. |  |  |
 | `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honoured for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
+| `rbac` _[RBAC](#rbac)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions. |  |  |
 
 
 #### Transform
@@ -3612,6 +3721,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br /> |  |  |
-| `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook. |  |  |
+| `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook.<br />Note: This is not yet supported for agentgateway. |  |  |
 
 
