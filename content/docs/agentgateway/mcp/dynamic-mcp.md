@@ -76,8 +76,9 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
      mcp:
        name: mcp-virtual-server
        targets:
-         - selectors:
-             serviceSelector:
+         - name: mcp-server-everything
+           selector:
+             service:
                matchLabels:
                  app: mcp-server-everything
    EOF
