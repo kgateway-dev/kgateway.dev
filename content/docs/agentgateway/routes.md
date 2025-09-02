@@ -221,7 +221,7 @@ metadata:
   labels:
     app: tcp-echo
 spec:
-  gatewayClassName: agentgateway
+  gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
   listeners:
   - protocol: TCP
     port: 8000
@@ -254,7 +254,7 @@ EOF
      labels:
        app: tcp-echo
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      allowedListeners:
        namespaces:
          from: All
@@ -330,7 +330,7 @@ Example TLS listener configuration:
      name: tls-passthrough
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - name: tls
        protocol: TLS
@@ -365,7 +365,7 @@ Example TLS listener configuration:
      name: tls-passthrough
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      allowedListeners:
        namespaces:
          from: All

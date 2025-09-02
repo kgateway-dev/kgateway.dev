@@ -130,7 +130,7 @@ Route to the A2A server with agentgateway.
    metadata:
      name: agentgateway
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080

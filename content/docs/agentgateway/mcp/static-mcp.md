@@ -85,7 +85,7 @@ Route to the MCP server with agentgateway.
    metadata:
      name: agentgateway
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
