@@ -17,7 +17,9 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 Deploy an MCP server that you want agentgateway to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
 
-1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, the agentgateway proxy uses the MCP protocol for the service.
+1. Create an MCP server (`mcp-server`) that provides various utility tools.Notice the following details about the Service:
+   * Required `appProtocol: kgateway.dev/mcp` setting. This way, the agentgateway proxy uses the MCP protocol for the service.
+   * Optional `kgateway.dev/mcp-path` annotation. The default values are `/sse` for the SSE protocol or `/mcp` for the Streamable HTTP protocol. If you need to change the path of the MCP target endpoint, set this annotation on the Service.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -63,7 +65,7 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    EOF
    ```
 
-2. Create a Backend for your MCP server that uses label selectors to select the MCP server. 
+2. Create a Backend for your MCP server that uses label selectors to select the MCP server.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -83,6 +85,10 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
                  app: mcp-server-everything
    EOF
    ```
+
+   {{< callout type="info" >}}
+   Plan to attach policies to your selector-based Backend later? You can still target the policy to a particular backing Service. To do so, set the `targetRef` to backing Service, not the service selector. Include the `sectionName` of the port that you want the policy to apply to. For an example, check out the [BackendTLSPolicy guide](../../../security/backend-tls/).
+   {{< /callout >}}
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
