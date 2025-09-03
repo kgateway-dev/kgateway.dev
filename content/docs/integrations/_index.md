@@ -14,5 +14,6 @@ Integrate kgateway with common cloud-native tools.
   {{< card link="inference-extension" title="Inference Extension to the Gateway API"  >}}
   {{< card link="istio" title="Ingress to service meshes"  >}}
   {{< card link="../reference/helm/" title="Helm"  >}}
+  {{< card link="kserve" title="kserve" >}}
   {{< card link="../quickstart/" title="Kubernetes"  >}}
 {{< /cards >}}

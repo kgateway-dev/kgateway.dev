@@ -116,6 +116,9 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       ```
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
+  {{< callout type="warning" >}}
+    When using the development build {{< reuse "docs/versions/helm-version-flag.md" >}} , add --set controller.image.pullPolicy=Always to ensure you get the latest image. Alternatively, you can specify the exact image digest.
+  {{< /callout >}}
       
       {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}

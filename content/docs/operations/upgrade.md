@@ -181,6 +181,9 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
      -f values.yaml \
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} 
    ```
+   {{< callout type="Note" >}}
+   For development builds, you may include --set controller.image.pullPolicy=Always to avoid using cached images.
+   {{< /callout >}}
    
 5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.
    
