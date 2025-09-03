@@ -3,6 +3,7 @@ title: Exploring the Gateway API's HTTPRoute
 toc: false
 publishDate: 2025-03-28T00:00:00-00:00
 author: Nadine Spies
+excludeSearch: true
 ---
 
 An [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/) resource is the main resource in the Kubernetes Gateway API to define HTTP routing rules for one or more services in your cluster. Its configuration is simple and easy to comprehend.

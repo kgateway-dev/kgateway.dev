@@ -2,7 +2,8 @@
 title: Policy attachments with kgateway and Gateway API
 toc: false
 publishDate: 2025-03-21T00:00:00-00:00
-author: Nadine Spies 
+author: Nadine Spies
+excludeSearch: true
 ---
 
 One of the major shortcomings of the venerable Kubernetes Ingress API was in the area of extensibility. The API specification did not address how implementers should specify features that were outside the scope of the ingress scenarios covered by the Ingress API.

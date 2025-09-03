@@ -1,0 +1,57 @@
+{{ $docsVersions := slice }}
+{{ range site.Params.versions }}
+    {{ $docsVersions = $docsVersions | append .linkVersion }}
+{{ end }}
+<!DOCTYPE html>
+<html lang="en">
+
+<script>
+    var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
+    var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
+    if (match) {
+        if (docsVersions.includes(match[1])) {
+            // match is a valid docs version, redirect to base docs page for that version
+            window.location.assign(window.location.origin + "/docs/" + match[1]);
+        } else {
+            // match is not a valid docs version, insert `main` after docs and retry
+            window.location.assign(window.location.href.replace("/docs/", "/docs/main/"));
+        }
+    }
+</script>
+
+<body
+    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; height:100vh; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center'>
+    <div>
+        <style>
+            body {
+                color: #000;
+                background: #fff;
+                margin: 0;
+            }
+
+            .next-error-h1 {
+                border-right: 1px solid rgba(0, 0, 0, 0.3);
+            }
+
+            @media (prefers-color-scheme: dark) {
+                body {
+                    color: #fff;
+                    background: #000;
+                }
+
+                .next-error-h1 {
+                    border-right: 1px solid rgba(255, 255, 255, 0.3);
+                }
+            }
+        </style>
+        <h1 class="next-error-h1"
+            style='display: inline-block; margin: 0 20px 0 0; padding-right: 23px; font-size: 24px; font-weight: 500; vertical-align: top; line-height: 49px; font-feature-settings: "rlig" 1,"calt" 1,"ss01" 1,"ss06" 1 !important;'>
+            404</h1>
+        <div style="display: inline-block; text-align: left">
+            <h2 style="font-size: 14px; font-weight: 400; line-height: 49px; margin: 0">This page could not be found.
+            </h2>
+        </div>
+    </div>
+</body>
+
+</html>
