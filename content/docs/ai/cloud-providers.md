@@ -222,7 +222,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
        app: ai-gateway
    type: Opaque
    stringData:
-     api-key: $AZURE_KEY
+     Authorization: $AZURE_KEY
    EOF
    ```
 
@@ -250,9 +250,6 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
                secretRef:
                  name: azure-openai-secret
              model: gpt-4o
-         authHeaderOverride: 
-           headerName: api-key
-           prefix: ""
      type: AI
    EOF
    ```
@@ -303,7 +300,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    ```bash
    curl "$INGRESS_GW_ADDRESS:8080/azure-openai" \
      -H "Content-Type: application/json" \
-     -H "api-key: $API_KEY" \
+     -H "Authorization: $API_KEY" \
      -d '{
        "messages": [
          {"role": "user", "content": "Hello from Azure OpenAI!"}
@@ -318,7 +315,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    ```bash
    curl "localhost:8080/azure-openai" \
      -H "Content-Type: application/json" \
-     -H "api-key: $API_KEY" \
+     -H "Authorization: $API_KEY" \
      -d '{
        "messages": [
          {"role": "user", "content": "Hello from Azure OpenAI!"}
