@@ -32,7 +32,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
    3. Then, you can repeat the steps in this guide to upgrade to the latest patch of the next minor version.
 
 2. Check that your underlying infrastructure platform, such as Kubernetes, and other dependencies run supported versions for the kgateway version that you want to upgrade to.
-   1. Review the [supported versions](/docs/reference/versions/) for dependencies such as Kubernetes, Istio, Helm, and more.
+   1. Review the [supported versions](../../reference/versions/) for dependencies such as Kubernetes, Istio, Helm, and more.
    2. Compare the supported version against the versions that you currently use. 
    3. If necessary, upgrade your dependencies, such as consulting your cluster infrastructure provider to upgrade the version of Kubernetes that your cluster runs.
 
@@ -71,14 +71,14 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
 
 1. Review the [kgateway release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
-2. Check the [supported version compatibility matrix](/docs/reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
+2. Check the [supported version compatibility matrix](../../reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
 
    {{< tabs tabTotal="3" items="Kubernetes Gateway API, Kubernetes, Istio" >}}
 {{% tab tabName="Kubernetes Gateway API" %}}
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
 
    * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes).
-   * Check if you need to install the [experimental channel for the features that you want to use](/docs/reference/versions/#experimental-features).
+   * Check if you need to install the [experimental channel for the features that you want to use](../../reference/versions/#experimental-features).
 
 2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.
    
@@ -173,9 +173,8 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    3. Make any changes that you want by editing your `values.yaml` Helm values file or preparing the `--set` flags. For development v{{< reuse "docs/versions/patch-dev.md" >}} builds, include the `controller.image.pullPolicy=Always` setting or refer to the exact image digest to avoid using cached images.
 
 4. Upgrade the kgateway Helm installation.
-   {{< callout type="warning" >}}
-   Make sure to include your Helm values when you upgrade either as a configuration file or with <code>--set</code> flags. Otherwise, any previous custom values that you set might be overwritten.
-   {{< /callout >}}
+   * Make sure to include your Helm values when you upgrade either as a configuration file or with `--set` flags. Otherwise, any previous custom values that you set might be overwritten.
+   * When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
    
    ```sh
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \

@@ -112,7 +112,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 * {{< reuse "docs/versions/warn-2-1-only.md" >}} 
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
-1. Create an SNI Gateway. The Gateway defines two hosts on the same HTTPS listener. Each host is configured with the host-specific TLS certificate that you set up earlier. 
+1. Create an SNI Gateway. The Gateway defines two hosts on the same HTTPS listener. Each host is configured with the host-specific TLS certificate that you set up earlier. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
 
    {{< tabs items="Gateway listeners,ListenerSet (experimental)" tabTotal="2" >}}
    {{% tab tabName="Gateway listeners" %}}
@@ -158,7 +158,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 
    |Setting|Description|
    |--|--|
-   |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you.|
+   |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}|
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure two HTTPS listeners. One listener is for the httpbin app and the other is for the petstore app. Each listener refers to a secret that holds the TLS certificate and key for the hostname that the listener is configured for. |
    |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the Gateway and the unencrypted request is forwarded to the service in the cluster. |
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
@@ -194,7 +194,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
       
       |Setting|Description|
       |--|--|
-      |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
+      |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}|
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
       | `spec.listeners` | {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on HTTP port 80, which differs from the HTTPS port 443 in the ListenerSet that you create later. |
    

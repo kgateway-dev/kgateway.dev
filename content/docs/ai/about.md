@@ -51,6 +51,6 @@ AI Gateway supports chat streaming, which allows the LLM to stream out tokens as
 
 ## Supported LLM providers {#supported-llm-providers}
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](/docs/ai/cloud-providers/) guide.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](../cloud-providers/) guide.
 
 {{< reuse "docs/snippets/llm-providers.md" >}}

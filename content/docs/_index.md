@@ -13,10 +13,11 @@ Welcome to the documentation for the kgateway open source project!
   {{< card link="resiliency" title="Resiliency" >}}
   {{< card link="security" title="Security" >}}
   {{< card link="ai" title="AI Gateway" >}}
-  {{< card link="mcp" title="MCP Gateway" >}}
+  {{< card link="agentgateway" title="Agentgateway" >}}
   {{< card link="integrations" title="Integrations" >}}
   {{< card link="observability" title="Observability" >}}
   {{< card link="operations" title="Operations" >}}
+  {{< card link="GRPCRoute" title="GRPCRoute" >}}
   {{< card link="reference" title="Reference" >}}
   {{< card link="faqs" title="FAQs" >}}
 {{< /cards >}}

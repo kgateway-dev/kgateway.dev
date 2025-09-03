@@ -1,7 +1,7 @@
 ---
 title: Policies
 weight: 30
-prev: /docs/about/custom-resources
+prev: /docs/about/proxies
 next: /docs/about/policies/trafficpolicy
 ---
 

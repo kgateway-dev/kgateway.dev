@@ -8,6 +8,10 @@ Set a maximum time for the gateway to handle a request.
 
 The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries](/docs/resiliency/retry/) to ensure that your apps are available even if they are temporarily unavailable.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About
 
 A timeout is the amount of time ([duration](https://protobuf.dev/reference/protobuf/google.protobuf/#duration)) that the gateway waits for replies from a backend service before the service is considered unavailable. This setting can be useful to avoid your apps from hanging or fail if no response is returned in a specific timeframe. With timeouts, calls either succeed or fail within a predicatble timeframe.
