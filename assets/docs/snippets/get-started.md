@@ -13,33 +13,24 @@
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Deploy the kgateway CRDs by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
-
-   {{< tabs items="Latest, Development" tabTotal="2">}}
-   {{% tab tabName="Latest" %}}
-   ```sh
-   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
-   ```
-   {{% /tab %}}
-
-   {{% tab tabName="Development" %}}
+2. Deploy the kgateway CRDs by using Helm.
+   {{% version include-if="2.1.x" %}}
    ```sh
    helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
    kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --set controller.image.pullPolicy=Always
    ```
-   {{% /tab %}}
-   {{< /tabs >}}
-3. Install kgateway by using Helm. The following command uses the latest stable release, v{{< reuse "docs/versions/n-patch.md" >}}. For active development, update the version to v{{< reuse "docs/versions/patch-dev.md" >}}.
-
-   {{< tabs items="Kgateway latest, Kgateway development, Agentgateway" tabTotal="3">}}
-   {{% tab tabName="Kgateway latest" %}}
+   {{% /version %}}
+   {{% version include-if="2.0.x" %}}
    ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
+   helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
-   {{% /tab %}}
+   {{% /version %}}
 
-   {{% tab tabName="Kgateway development" %}}
+3. Install kgateway by using Helm.
+   {{< version include-if="2.1.x" >}}
+   {{< tabs items="Kgateway, Agentgateway" tabTotal="3">}}
+   {{% tab tabName="Kgateway" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
    kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
@@ -54,6 +45,12 @@
    ```
    {{% /tab %}}
    {{< /tabs >}}
+   {{< /version >}}
+   {{% version include-if="2.0.x" %}}
+   ```sh
+   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
+   ```
+   {{% /version %}}
 
 4. Make sure that `kgateway` is running.
 

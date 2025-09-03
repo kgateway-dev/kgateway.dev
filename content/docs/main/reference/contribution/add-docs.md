@@ -149,6 +149,26 @@ This is a sample callout of type info.
 {{</* /callout */>}}
 ```
 
+### version
+
+Use the version shortcode to conditionally display content based on the documentation version being viewed.
+
+Example:
+```markdown
+{{< version include-if="2.1.x" >}}
+Content to show only for the specified 2.1.x version.
+{{< /version >}}
+{{< version include-if="2.0.x" >}}
+Content to show only for the specified 2.0.x version.
+{{< /version >}}
+```
+
+Supported parameters:
+- `include-if`: Shows content only when the current version matches the specified version
+- `exclude-if`: Shows content only when the current version does not match the specified version
+
+Available versions: Check the `hugo.yaml` file's `versions` section in the [kgateway.dev repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/hugo.yaml#L129) for the current versions.
+
 
 ## Create a PR in GitHub {#pr}
 
