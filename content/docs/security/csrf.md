@@ -65,7 +65,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
    | `percentageEnabled` | The percentage of requests for which the CSRF policy is enabled. A value of `100` means that all requests are enforced by the CSRF rules. |
    | `additionalOrigins` | Additional origins that the CSRF policy allows, besides the destination origin. Possible values include `exact`, `prefix`, `suffix`, `contains`, `safeRegex`, and an `ignoreCase` boolean. At least one of `exact`, `prefix`, `suffix`, `contains`, or `safeRegex` must be set. The example allows requests from the `allowThisOne.example.com` exact origin. |
    
-2. Send a request to the httpbin app on the `csrf.example` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
+2. Send a request to the httpbin app on the `www.example.com` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
