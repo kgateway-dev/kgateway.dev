@@ -3,6 +3,7 @@ title: "Adding Distributed Tracing to AI Gateway: My LFX Mentorship Journey"
 toc: false
 publishDate: 2025-08-28T00:00:00-00:00
 author: Zhengke Zhou
+excludeSearch: true
 ---
 
 In today's rapidly evolving AI application landscape, effectively monitoring and debugging AI Gateways has become a critical challenge. This article shares my complete experience through the LFX Mentorship program, where I added OpenTelemetry distributed tracing support to kgateway's AI Gateway functionality.
