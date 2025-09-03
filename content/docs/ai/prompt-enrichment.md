@@ -6,10 +6,6 @@ description: Effectively manage system and user prompts to improve LLM outputs.
 
 Effectively manage system and user prompts to improve LLM outputs.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About prompt enrichment
 
 Prompts are basic building blocks for guiding LLMs to produce relevant and accurate responses. By effectively managing both system prompts, which set initial guidelines, and user prompts, which provide specific context, you can significantly enhance the quality and coherence of the model's outputs.
@@ -22,8 +18,8 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
-2. [Authenticate to the LLM](/docs/ai/auth/).
+1. [Set up AI Gateway](../setup/).
+2. [Authenticate to the LLM](../auth/).
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
 ## Refactor LLM prompts
@@ -317,4 +313,4 @@ kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l ap
 
 ## Next
 
-Explore how to set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
+Explore how to set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.

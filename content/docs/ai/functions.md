@@ -68,9 +68,9 @@ Each AI provider has a different way of handling function calling. For example, 
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 
-2. [Authenticate to the LLM](/docs/ai/auth/).
+2. [Authenticate to the LLM](../auth/).
 
 3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 
@@ -329,6 +329,6 @@ Keep in mind that for a real use case, you must develop your own app that is cap
 
 Explore other AI Gateway features.
 
-* [Fail over traffic](/docs/ai/failover/) across models from the same LLM provider.
-* Set up [prompt guards](/docs/ai/prompt-guards/) to block unwanted requests and mask sensitive data.
-* [Enrich your prompts](/docs/ai/prompt-enrichment/) with system prompts to improve LLM outputs.
+* [Fail over traffic](../failover/) across models from the same LLM provider.
+* Set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.
+* [Enrich your prompts](../prompt-enrichment/) with system prompts to improve LLM outputs.

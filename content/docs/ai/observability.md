@@ -11,9 +11,9 @@ Observability helps you understand how your system is performing, identify issue
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 
-2. [Authenticate to the LLM](/docs/ai/auth/).
+2. [Authenticate to the LLM](../auth/).
 
 3. Get the external address of the gateway and save it in an environment variable.
    
@@ -90,8 +90,8 @@ Review the Observability guides to set up an OpenTelemetry stack to collect logs
 If you haven't already, set up other features and start collecting metrics on your AI Gateway usage.
 
 {{< cards >}}
-  {{< card link="/docs/ai/failover" title="Model failover" >}}
-  {{< card link="/docs/ai/functions" title="Function calling" >}}
-  {{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
+  {{< card link="../failover" title="Model failover" >}}
+  {{< card link="../functions" title="Function calling" >}}
+  {{< card link="../prompt-enrichment" title="Prompt enrichment" >}}
+  {{< card link="../prompt-guards" title="Prompt guards" >}}
 {{< /cards >}}
