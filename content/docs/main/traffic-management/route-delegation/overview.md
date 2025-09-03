@@ -54,10 +54,6 @@ For more information, see the [Policy inheritance](/docs/traffic-management/rout
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-{{< callout >}}
-{{< icon name="agentgateway" >}} {{< reuse "docs/snippets/agw-no-traffic.md">}}
-{{< /callout >}}
-
 ## Automatic route replacement
 
 If a destination that is defined in the HTTPRoute's `backendRefs` section cannot be found, such as when a parent HTTPRoute routes traffic to a child HTTPRoute that does not exist, the route is automatically replaced with a 500 HTTP direct response. However, valid routes are not replaced and continue to work.

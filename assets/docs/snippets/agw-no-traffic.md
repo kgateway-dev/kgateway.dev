@@ -1,1 +1,0 @@
-Agentgateway supports the routing rules and policies that are native to the Kubernetes Gateway API, such as basic matching, rewrites, retries, and timeouts. Note that agentgateway does not yet support kgateway TrafficPolicies. Any guide that relies on TrafficPolicies will not work with the agentgateway data plane. Instead, use the kgateway Envoy-based data plane.

@@ -45,3 +45,11 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
      --set agentGateway.enabled=true \
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
 ```
+
+## More considerations
+
+Review the following considerations for using agentgateway.
+
+- Attaching TrafficPolicies to particular routes via the `ExtensionRef` filter is not supported. Instead, use the [HTTPRoute rule attachment option](../about/policies/trafficpolicy/#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+- HTTPListenerPolicy and BackendConfigPolicy resources that configure Envoy-specific filters, such as health checks and access logging, cannot be applied to agentgateway proxies. You can use these policies with Envoy-based kgateway proxies only. 
+- External processing (extProc) as part of the TrafficPolicy is not supported.

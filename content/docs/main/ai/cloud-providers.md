@@ -8,7 +8,7 @@ Set up cloud LLM providers with AI Gateway.
 
 ## Before you begin
 
-1. [Set up AI Gateway](/docs/ai/setup/).
+1. [Set up AI Gateway](../setup/).
 2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
 3. Choose a [supported LLM provider](#supported-llm-providers).
 
@@ -26,7 +26,7 @@ The following sections in this guide provide examples that are tailored to the s
 
 OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 
-To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
+To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
 ## Gemini {#google}
 
@@ -36,7 +36,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
    export GOOGLE_KEY=<your-api-key>
    ```
 
-2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](/docs/ai/auth/).
+2. Create a secret to authenticate to Google. For other ways to authenticate, see the [Auth guide](../auth/).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -198,7 +198,9 @@ To set up OpenAI, continue with the [Authenticate to the LLM](/docs/ai/auth/) gu
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
 
-You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI uses deployment-specific paths as well as a non-standard `Authorization` header that does not include the default `Bearer ` prefix.
+You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI supports authentication via an `Authorization` or `api-key` header. 
+
+By default, {{< reuse "docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use an API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
 
 For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
 
@@ -238,6 +240,8 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    spec:
      ai:
        llm:
+         hostOverride: apic.ocp.provider.com
+         pathOverride: /my-openai-service/gpt35/chat/completions
          provider:
            openai:
              model: gpt-4
@@ -246,6 +250,9 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
                secretRef:
                  name: azure-openai-secret
              model: gpt-4o
+         authHeaderOverride: 
+           headerName: api-key
+           prefix: ""
      type: AI
    EOF
    ```
@@ -254,11 +261,11 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
 
    | Setting              | Description                                                                                     |
    | -------------------- | ----------------------------------------------------------------------------------------------- |
-   | `authHeaderOverride` | Overrides the default Authorization header sent to the AI provider.                             |
-   | `headerName`         | The name of the authentication header. Azure requires `"api-key"` instead of `"Authorization"`. |
-   | `prefix`             | Prefix for the auth token; left blank because Azure OpenAI does not use `"Bearer "` prefix.     |
-   | `pathOverride`       | Provides a full override for the API request path to the AI backend.                            |
-   | `fullPath`           | The exact API endpoint path including deployment name (`gpt-4`) and API version.                |
+   | `authHeaderOverride` | Overrides the default `Authorization` header that is sent to the AI provider.                             |
+   | `headerName`         | The name of the header to use for authentication. Azure requires API keys to be sent in an `"api-key"` header. |
+   | `prefix`             | The prefix for the auth token that is provided in the authentication header, such as `Bearer`. By default, the prefix is an empty string. In this example, the `prefix` is an empty string, because Azure OpenAI does not require a prefix for API keys that are provided in an `api-key` header.     |
+   | `hostOverride` | Set a custom host for your LLM provider. This host is used for all providers that are defined in the Backend. | 
+   | `pathOverride`       | Provide a full path override for all API requests to the AI backend.                            |
 
 4. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
@@ -296,6 +303,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    ```bash
    curl "$INGRESS_GW_ADDRESS:8080/azure-openai" \
      -H "Content-Type: application/json" \
+     -H "api-key: $API_KEY" \
      -d '{
        "messages": [
          {"role": "user", "content": "Hello from Azure OpenAI!"}
@@ -310,6 +318,7 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    ```bash
    curl "localhost:8080/azure-openai" \
      -H "Content-Type: application/json" \
+     -H "api-key: $API_KEY" \
      -d '{
        "messages": [
          {"role": "user", "content": "Hello from Azure OpenAI!"}
@@ -352,9 +361,9 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
 Now that you can send requests to an LLM provider, explore the other AI Gateway features.
 
 {{< cards >}}
-{{< card link="/docs/ai/failover" title="Model failover" >}}
-{{< card link="/docs/ai/functions" title="Function calling" >}}
-{{< card link="/docs/ai/prompt-enrichment" title="Prompt enrichment" >}}
-{{< card link="/docs/ai/prompt-guards" title="Prompt guards" >}}
-{{< card link="/docs/ai/observability" title="AI Gateway metrics" >}}
+{{< card link="../failover" title="Model failover" >}}
+{{< card link="../functions" title="Function calling" >}}
+{{< card link="../prompt-enrichment" title="Prompt enrichment" >}}
+{{< card link="../prompt-guards" title="Prompt guards" >}}
+{{< card link="../observability" title="AI Gateway metrics" >}}
 {{< /cards >}}

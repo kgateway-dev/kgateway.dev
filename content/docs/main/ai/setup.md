@@ -30,13 +30,6 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    {{% /tab %}}
    {{% tab tabName="Agentgateway" %}}
 
-   {{< reuse "docs/snippets/agw-no-traffic.md" >}} For AI gateway use cases, this limitation means the following:
-   * ✅ AI routing with agentgateway to all supported cloud LLM providers, including those that are compatible with the OpenAI API.
-   * ✅ Function calling.
-   * ❌ Model failover.
-   * ❌ Prompt guards and enrichment, which use TrafficPolicies.
-   * ❌ AI observability metrics, which rely on Envoy dynamic metadata.
-
    ```shell
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
         --set gateway.aiExtension.enabled=true \
@@ -198,7 +191,8 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 3. Verify that the AI Gateway is created. 
 
    * Gateway: Note that it might take a few minutes for an address to be assigned.
-   * Deployment: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
+   * Pod for `kgateway` proxy: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
+   * Pod for `agentgateway` proxy: The pod has one container: `agent-gateway`.
 
    ```sh
    kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A
@@ -221,6 +215,6 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 
 ## Next
 
-* For OpenAI: Continue with the [Authenticate to the LLM](/docs/ai/auth/) guide.
-* For other cloud LLM providers such as Gemini: [Review the Cloud LLM providers guide](/docs/ai/cloud-providers/) for provider-specific setup examples.
-* For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](/docs/ai/ollama/).
+* For OpenAI: Continue with the [Authenticate to the LLM](../auth/) guide.
+* For other cloud LLM providers such as Gemini: [Review the Cloud LLM providers guide](../cloud-providers/) for provider-specific setup examples.
+* For local LLM providers such as Ollama: [Set up Ollama as a local LLM provider](../ollama/).
