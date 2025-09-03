@@ -10,10 +10,6 @@ Originate a one-way TLS connection from the Gateway to a backend.
 {{< reuse "docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About one-way TLS
 
 When you configure a TLS listener on your Gateway, the Gateway typically terminates incoming TLS traffic and forwards the unencrypted traffic to the backend service. However, you might have a service that only accepts TLS connections, or you want to forward traffic a secured Backend service that is external to the cluster.
@@ -44,7 +40,7 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
 1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/nginx.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
    ```
 
 2. Verify that the NGINX server is running.
@@ -68,7 +64,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
 
    ```shell
    kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/inputs/configmap.yaml" >}}
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/configmap.yaml" >}}
    EOF
    ```
 
@@ -87,6 +83,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
      - group: ""
        kind: Service
        name: nginx
+       sectionName: "8443"
      validation:
        hostname: "example.com"
        caCertificateRefs:
@@ -100,7 +97,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
 
    | Setting | Description |
    |---------|-------------|
-   | `targetRefs` | The service that you want the Gateway to originate a TLS connection to, such as the NGINX server. |
+   | `targetRefs` | The service that you want the Gateway to originate a TLS connection to, such as the NGINX server. <br><br>{{< icon name="agentgateway" >}}**Agentgateway proxies**: Even if you use a Backend for selector-based destinations, you still need to target the backing Service and the `sectionName` of the port that you want the policy to apply to.  |
    | `validation.hostname` | The hostname that matches the NGINX server certificate. |
    | `validation.caCertificateRefs` | The ConfigMap that has the public CA certificate for the NGINX server. |
 
