@@ -5,10 +5,6 @@ weight: 20
 
 The agentgateway data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.
 
-{{< callout type="warning" >}}
-{{< reuse "docs/snippets/agw-no-traffic.md" >}}
-{{< /callout >}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq-agw.md" >}}
@@ -19,7 +15,7 @@ Use agentgateway to proxy HTTP requests to your backend services.
 
 1. Follow the [Sample HTTP app](../../operations/sample-app/) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `agentgateway` GatewayClass, and an HTTPRoute.
 
-2. Check out the following guides for more advanced routing use cases. {{< reuse "docs/snippets/agw-no-traffic.md" >}}
+2. Check out the following guides for more advanced routing use cases.
 
    * [Traffic management](../../traffic-management/)
    * [Resiliency](../../resiliency/)

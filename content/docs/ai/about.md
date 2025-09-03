@@ -51,20 +51,6 @@ AI Gateway supports chat streaming, which allows the LLM to stream out tokens as
 
 ## Supported LLM providers {#supported-llm-providers}
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](/docs/ai/cloud-providers/) guide.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](../cloud-providers/) guide.
 
 {{< reuse "docs/snippets/llm-providers.md" >}}
-
-## Agentgateway support for AI Gateway {#agentgateway-support}
-
-[Agentgateway](../../agentgateway) is a data plane that is built specific for agentic use cases, such as AI backends, Model Context Protocol (MCP) servers, and agent-to-agent (A2A) communication.
-
-{{< reuse "docs/snippets/agw-no-traffic.md" >}} 
-
-For AI gateway use cases, this limitation means the following:
-
-* ✅ AI routing with agentgateway to all supported cloud LLM providers, including those that are compatible with the OpenAI API.
-* ✅ Function calling.
-* ❌ Model failover.
-* ❌ Prompt guards and enrichment, which use TrafficPolicies.
-* ❌ AI observability metrics, which rely on Envoy dynamic metadata.

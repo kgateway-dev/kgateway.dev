@@ -45,6 +45,10 @@ Use a TrafficPolicy resource to define your CSRF rules.
      name: csrf
      namespace: httpbin
    spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
      csrf:
        percentageEnabled: 100
        additionalOrigins:
@@ -57,48 +61,21 @@ Use a TrafficPolicy resource to define your CSRF rules.
 
    | Field | Description |
    |-------|-------------|
+   | `targetRefs` | The policy targets the `httpbin` HTTPRoute resource that you created before you began. |
    | `percentageEnabled` | The percentage of requests for which the CSRF policy is enabled. A value of `100` means that all requests are enforced by the CSRF rules. |
    | `additionalOrigins` | Additional origins that the CSRF policy allows, besides the destination origin. Possible values include `exact`, `prefix`, `suffix`, `contains`, `safeRegex`, and an `ignoreCase` boolean. At least one of `exact`, `prefix`, `suffix`, `contains`, or `safeRegex` must be set. The example allows requests from the `allowThisOne.example.com` exact origin. |
-
-2. Create an HTTPRoute resource for the httpbin app that applies the TrafficPolicy resource that you just created. 
    
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: httpbin-csrf
-     namespace: httpbin
-   spec:
-     parentRefs:
-     - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     hostnames:
-       - csrf.example
-     rules:
-       - filters:
-           - type: ExtensionRef
-             extensionRef:
-               group: gateway.kgateway.dev
-               kind: TrafficPolicy
-               name: csrf
-         backendRefs:
-           - name: httpbin
-             port: 8000
-   EOF
-   ```
-   
-3. Send a request to the httpbin app on the `csrf.example` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
+2. Send a request to the httpbin app on the `csrf.example` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080"
+   curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi -X POST localhost:8080/post -H "host: csrf.example"
+   curl -vi -X POST localhost:8080/post -H "host: www.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -111,17 +88,17 @@ Use a TrafficPolicy resource to define your CSRF rules.
    Invalid origin
    ```
 
-4. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
+3. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: csrf.example:8080" -H "origin: allowThisOne.example.com"
+   curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080" -H "origin: allowThisOne.example.com"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi -X POST localhost:8080/post -H "host: csrf.example" -H "origin: allowThisOne.example.com"
+   curl -vi -X POST localhost:8080/post -H "host: www.example.com" -H "origin: allowThisOne.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}   
