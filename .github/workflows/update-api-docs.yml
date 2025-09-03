@@ -121,6 +121,17 @@ jobs:
             echo "=== Debug: After creating index file ==="
             echo "Content directory structure:"
             ls -la content/docs/reference/helm/
+      
+      - name: Copy OSA
+        run: | 
+          echo "Looking for OSA reference:"
+          ls -la "$GITHUB_WORKSPACE/kgateway/hack/utils/oss_compliance" || echo "OSA directory not found!"
+          
+          echo "Copy OSA provided"
+          cp $GITHUB_WORKSPACE/kgateway/hack/utils/oss_compliance/osa_provided.md $GITHUB_WORKSPACE/kgateway.dev/content/docs/snippets/osa_provided.md
+          
+          echo "Copy OSA included"
+          cp $GITHUB_WORKSPACE/kgateway/hack/utils/oss_compliance/osa_included.md $GITHUB_WORKSPACE/kgateway.dev/content/docs/snippets/osa_included.md
 
       - name: Generate Control Plane Metrics Documentation
         run: |
