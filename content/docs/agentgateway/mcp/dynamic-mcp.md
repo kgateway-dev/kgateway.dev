@@ -18,8 +18,8 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 Deploy an MCP server that you want agentgateway to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
 
 1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice the following details about the Service:
-   * Required `appProtocol: kgateway.dev/mcp` setting. This way, the agentgateway proxy uses the MCP protocol for the service.
-   * Optional `kgateway.dev/mcp-path` annotation. The default values are `/sse` for the SSE protocol or `/mcp` for the Streamable HTTP protocol. If you need to change the path of the MCP target endpoint, set this annotation on the Service.
+   * `appProtocol: kgateway.dev/mcp` (required): Configure your service to use the MCP protocol. This way, the agentgateway proxy uses the MCP protocol when connecting to the service.
+   * `kgateway.dev/mcp-path` annotation (optional): The default values are `/sse` for the SSE protocol or `/mcp` for the Streamable HTTP protocol. If you need to change the path of the MCP target endpoint, set this annotation on the Service.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -87,7 +87,7 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
    ```
 
    {{< callout type="info" >}}
-   Plan to attach policies to your selector-based Backend later? You can still attach the policy to a particular backing Service. To do so, set the `targetRef` setting to the backing Service, not the service selector. Include the `sectionName` of the port that you want the policy to apply to. For an example, check out the [BackendTLSPolicy guide](../../../security/backend-tls/).
+   Plan to attach policies to your selector-based Backend later? You can still attach the policy to a particular backing Service. To do so, set the `targetRef` setting in the policy to the backing Service, not to the Backend's service selector. Include the `sectionName` of the port that you want the policy to apply to. For an example, check out the [BackendTLSPolicy guide](../../../security/backend-tls/).
    {{< /callout >}}
 
 ## Step 2: Route with agentgateway {#agentgateway}
