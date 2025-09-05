@@ -24,47 +24,65 @@
   {{- end }}
 {{- end }}
 
-{{/* Recursive renderer for nested headings, with original CSS */}}
-{{- define "render-headings" -}}
-  {{- $headings := .headings }}
-  {{- $parentLevel := .parentLevel }}
+{{/* ---------- recursive renderer (consumes list so no duplicates) ---------- */}}
+{{- define "render-list" -}}
   <ul>
-    {{- range $i, $h := $headings }}
-      {{- $next := index $headings (add $i 1) | default dict }}
-      <li class="hx-my-2 hx-scroll-my-6 hx-scroll-py-6">
-        {{- $padding := mul (sub $h.level $parentLevel) 4 -}}
-        {{- $class := cond (eq $h.level $parentLevel) "hx:font-medium" (printf "hx:ltr:pl-%d hx:rtl:pr-%d" $padding $padding) -}}
-        <a
-          href="#{{ $h.id }}"
-          class="{{ $class }} hx-font-semibold hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words"
-        >
-          {{ $h.text }}
-        </a>
-
-        {{- if and $next.id (gt $next.level $h.level) }}
-          {{- $subs := slice }}
-          {{- range $j := seq (add $i 1) (sub (len $headings) 1) }}
-            {{- $nh := index $headings $j }}
-            {{- if eq $nh.level $h.level }}{{ break }}{{ end }}
-            {{- $subs = $subs | append $nh }}
-          {{- end }}
-          {{- if gt (len $subs) 0 }}
-            {{ template "render-headings" (dict "headings" $subs "parentLevel" $h.level) }}
-          {{- end }}
-        {{- end }}
-      </li>
-    {{- end }}
+    {{- template "render-items" . -}}
   </ul>
 {{- end }}
 
+{{- define "render-items" -}}
+  {{- $headings := .headings -}}
+  {{- $parentLevel := .parentLevel -}}
+  {{- $n := len $headings -}}
+  {{- if gt $n 0 -}}
+    {{- $h := index $headings 0 -}}
+    <li class="hx-my-2 hx-scroll-my-6 hx-scroll-py-6">
+      {{- $padding := mul (sub $h.level $parentLevel) 4 -}}
+      {{- $class := cond (eq $h.level $parentLevel) "hx:font-medium" (printf "hx:ltr:pl-%d hx:rtl:pr-%d" $padding $padding) -}}
+      <a
+        href="#{{ $h.id }}"
+        class="{{ $class }} hx-font-semibold hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words">
+        {{ $h.text }}
+      </a>
+
+      {{- /* collect immediate children */ -}}
+      {{- $subs := slice -}}
+      {{- if gt $n 1 -}}
+        {{- range $j := seq 1 (sub $n 1) -}}
+          {{- $nh := index $headings $j -}}
+          {{- if le $nh.level $h.level -}}
+            {{- break -}}
+          {{- end -}}
+          {{- $subs = $subs | append $nh -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if gt (len $subs) 0 -}}
+        {{- template "render-list" (dict "headings" $subs "parentLevel" $h.level) -}}
+      {{- end -}}
+    </li>
+
+    {{- /* render the rest */ -}}
+    {{- $consumed := add 1 (len $subs) -}}
+    {{- if lt $consumed $n -}}
+      {{- $rest := slice -}}
+      {{- range $k := seq $consumed (sub $n 1) -}}
+        {{- $rest = $rest | append (index $headings $k) -}}
+      {{- end -}}
+      {{- template "render-items" (dict "headings" $rest "parentLevel" $parentLevel) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end }}
+
+{{/* ---------- TOC container ---------- */}}
 {{- if and $toc (ge (len $headings) $minNumHeadings) }}
 <nav class="hextra-toc hx-order-last hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-px-4" aria-label="table of contents">
   <div class="hextra-scrollbar hx-sticky hx-top-16 hx-overflow-y-auto hx-pr-4 hx-pt-6 hx-text-sm [hyphens:auto] hx-max-h-[calc(100vh-var(--navbar-height)-env(safe-area-inset-bottom))] ltr:hx--mr-4 rtl:hx--ml-4">
     <p class="hx-mb-4 hx-font-semibold hx-tracking-tight">{{ $onThisPage }}</p>
 
-    {{ template "render-headings" (dict "headings" $headings "parentLevel" $startLevel) }}
+    {{ template "render-list" (dict "headings" $headings "parentLevel" $startLevel) }}
 
-    {{- $borderClass := "hx:mt-8 hx:border-t hx:bg-white hx:pt-8 hx:shadow-[0_-12px_16px_white] hx:dark:bg-dark hx:dark:shadow-[0_-12px_16px_#111]" -}}
     <div class="hx-mt-8 hx-border-t hx-bg-white hx-pt-8 hx-shadow-[0_-12px_16px_white] dark:hx-bg-dark dark:hx-shadow-[0_-12px_16px_#111] hx-sticky hx-bottom-0 hx-flex hx-flex-col hx-items-start hx-gap-2 hx-pb-8 dark:hx-border-neutral-800 contrast-more:hx-border-t contrast-more:hx-border-neutral-400 contrast-more:hx-shadow-none contrast-more:dark:hx-border-neutral-400">
 
       {{- if and site.Params.toc.displayTags .Params.tags -}}
@@ -86,10 +104,11 @@
             {{- $sourceDir = strings.TrimPrefix "/content" $sourceDir -}}
             {{- $path := replace .Path "\\" "/" -}}
             {{- $editURL = urls.JoinPath $editURL $sourceDir $path -}}
-          {{- end }}
+          {{- end -}}
         {{- end }}
-        <a class="hx:text-xs hx:font-medium hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-100 hx:contrast-more:text-gray-800 hx:contrast-more:dark:text-gray-50" href="{{ $editURL }}" target="_blank" rel="noreferrer">{{ $editThisPage }}</a>
+        <a class="hx:text-xs hx-font-medium hx:text-gray-500 hx:hover:text-gray-900 hx:dark:text-gray-400 hx:dark:hover:text-gray-100 hx:contrast-more:text-gray-800 hx:contrast-more:dark:text-gray-50" href="{{ $editURL }}" target="_blank" rel="noreferrer">{{ $editThisPage }}</a>
       {{- end }}
+
       <button aria-hidden="true" id="backToTop" onClick="scrollUp();" class="hx-transition-all hx-duration-75 hx-text-xs hx-font-medium hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-100 contrast-more:hx-text-gray-800 contrast-more:dark:hx-text-gray-50">
         <span>{{ $backToTop }}</span>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="hx-inline ltr:hx-ml-1 rtl:hx-mr-1 hx-h-3.5 hx-w-3.5 hx-border hx-rounded-full hx-border-gray-500 hover:hx-border-gray-900 dark:hx-border-gray-400 dark:hover:hx-border-gray-100 contrast-more:hx-border-gray-800 contrast-more:dark:hx-border-gray-50">
