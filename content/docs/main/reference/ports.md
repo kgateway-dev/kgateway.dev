@@ -34,13 +34,16 @@ A standard installation of kgateway includes the following components:
 
 The components are instantiated by using pods and services. The following table lists the deployed pods and ports in use by each pod.
 
+### Control plane ports
+
 | Pod | Port | Usage |
 |-----|------|-------|
 | kgateway | 9976 | REST xDS | 
 | kgateway | 9977 | xDS Server |
-| gateway proxy | 8080 | HTTP |
-| gateway proxy | 8443 | HTTPS |
-| gateway proxy | 19000 | Envoy admin |
+
+### Gateway proxy ports
+
+{{< reuse "docs/snippets/reserved-ports.md" >}}
 
 <!--
 ## mTLS considerations
