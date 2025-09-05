@@ -102,6 +102,8 @@ The xDS server sends the xDS snapshot to the gateway proxies in the data plane.
 
 * **Agentgateway proxy**: Updates the agentgateway proxy with agentgateway-specific configuration, including MCP and A2A protocol support, to match the desired state.
 
+
+
 <!--
 
 ## Discovery architecture
