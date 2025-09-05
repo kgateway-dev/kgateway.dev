@@ -6,9 +6,13 @@ Fine-tune connection speeds for read and write operations by setting a connectio
 
 ## About read and write buffer limits
 
-By default, {{< reuse "/docs/snippets/kgateway.md" >}} is set up with 1MiB of request read and write buffer for each gateway. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "/docs/snippets/kgateway.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 500 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service. Alternatively, when using {{< reuse "/docs/snippets/kgateway.md" >}} as an edge proxy, configuring the buffer limit can be important when dealing with untrusted downstreams. By setting the limit to a small number, such as 32KiB, you can better guard against potential attacks or misconfigured downstreams that could excessively use the proxy's resources.
+By default, {{< reuse "/docs/snippets/kgateway.md" >}} is set up with 1MiB of request read and write buffer for each gateway. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "/docs/snippets/kgateway.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 413 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service. Alternatively, when using {{< reuse "/docs/snippets/kgateway.md" >}} as an edge proxy, configuring the buffer limit can be important when dealing with untrusted downstreams. By setting the limit to a small number, such as 32KiB, you can better guard against potential attacks or misconfigured downstreams that could excessively use the proxy's resources.
 
-The connection buffer limit can be configured at both the Gateway level and the {{< reuse "/docs/snippets/trafficpolicy.md" >}} level, providing flexibility in how you manage buffer limits in your applications.
+The connection buffer limit can be configured on the Gateway level{{% version include-if="2.1.x" %}} or on an individual route{{% /version %}}. 
+
+## Considerations when using httpbin
+
+When you use the httpbin sample app, keep in mind that httpbin limits the maximum body size to 1 mebibyte (1Mi). If you send a request to httpbin with a body size that is larger than that, httpbin automatically rejects the request with a 400 HTTP response code. 
 
 ## Before you begin
 
@@ -140,9 +144,9 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
    }
    ```
    
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 {{< reuse "docs/snippets/buffering-route.md" >}}
-{{% /version %}}
+{{< /version >}}
 
 ## Cleanup
 
