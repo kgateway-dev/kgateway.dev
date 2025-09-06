@@ -25,3 +25,20 @@ render:
     - name: TypeMeta
       package: k8s.io/apimachinery/pkg/apis/meta/v1
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
+    
+    # Gateway API types
+    - name: BackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef
+    - name: BackendObjectReference
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendObjectReference
+    - name: ParentReference
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference
+    - name: GRPCBackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCBackendRef
+    - name: HTTPBackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPBackendRef
