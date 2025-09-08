@@ -145,17 +145,22 @@ jobs:
               os.environ['LINK_VERSION'] = link_version
               
               # Use the original working shell commands with environment variables
-              subprocess.run(['bash', '-c', '''
-                envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config-$LINK_VERSION.yaml
-                go run github.com/elastic/crd-ref-docs@v0.1.0 --source-path=$KGATEWAY_DIR/api/v1alpha1/ --renderer=markdown --output-path ./ --config=crd-ref-docs-config-$LINK_VERSION.yaml
-                rm -f crd-ref-docs-config-$LINK_VERSION.yaml
-                mkdir -p content/docs/$VERSION_PATH/reference/
-                echo \"---\ntitle: API reference\nweight: 10\n---\n\" > content/docs/$VERSION_PATH/reference/api.md
-                cat ./out.md >> content/docs/$VERSION_PATH/reference/api.md
+              shell_script = f'''
+                envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config-{link_version}.yaml
+                go run github.com/elastic/crd-ref-docs@v0.1.0 --source-path=kgateway-{link_version}/api/v1alpha1/ --renderer=markdown --output-path ./ --config=crd-ref-docs-config-{link_version}.yaml
+                rm -f crd-ref-docs-config-{link_version}.yaml
+                mkdir -p content/docs/{url_path}/reference/
+                echo "---" > content/docs/{url_path}/reference/api.md
+                echo "title: API reference" >> content/docs/{url_path}/reference/api.md
+                echo "weight: 10" >> content/docs/{url_path}/reference/api.md
+                echo "---" >> content/docs/{url_path}/reference/api.md
+                echo "" >> content/docs/{url_path}/reference/api.md
+                cat ./out.md >> content/docs/{url_path}/reference/api.md
                 rm -f ./out.md
-                sed -i \"s/Required: {}/Required/g; s/Optional: {}/Optional/g\" content/docs/$VERSION_PATH/reference/api.md
-                sed -i \"/^# API Reference$/,/^$/d\" content/docs/$VERSION_PATH/reference/api.md
-              '''], check=True)
+                sed -i "s/Required: {{}}/Required/g; s/Optional: {{}}/Optional/g" content/docs/{url_path}/reference/api.md
+                sed -i "/^# API Reference$/,/^$/d" content/docs/{url_path}/reference/api.md
+              '''
+              subprocess.run(['bash', '-c', shell_script], check=True)
               
               print(f'Generated API docs for version {version} in content/docs/{url_path}/reference/api.md')
           "
@@ -186,15 +191,16 @@ jobs:
               os.environ['LINK_VERSION'] = link_version
               
               # Use the original working shell commands with environment variables
-              subprocess.run(['bash', '-c', '''
-                mkdir -p content/docs/$VERSION_PATH/reference/helm/
-                for chart in \"kgateway:helm\" \"kgateway-crds:crds\"; do
-                  IFS=: read -r dir file <<< \"$chart\"
-                  go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 --chart-search-root $KGATEWAY_DIR/install/helm/$dir --dry-run > content/docs/$VERSION_PATH/reference/helm/$file.md
-                  sed -i \"/!\[Version:/,/^$/d\" content/docs/$VERSION_PATH/reference/helm/$file.md
-                  sed -i \"s/| \`\([^\`]*\)\` |/| \1 |/g\" content/docs/$VERSION_PATH/reference/helm/$file.md
+              shell_script = f'''
+                mkdir -p content/docs/{url_path}/reference/helm/
+                for chart in "kgateway:helm" "kgateway-crds:crds"; do
+                  IFS=: read -r dir file <<< "$chart"
+                  go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 --chart-search-root kgateway-{link_version}/install/helm/$dir --dry-run > content/docs/{url_path}/reference/helm/$file.md
+                  sed -i "/!\[Version:/,/^$/d" content/docs/{url_path}/reference/helm/$file.md
+                  sed -i "s/| \`\([^\`]*\)\` |/| \1 |/g" content/docs/{url_path}/reference/helm/$file.md
                 done
-              '''], check=True)
+              '''
+              subprocess.run(['bash', '-c', shell_script], check=True)
               
               print(f'Generated Helm docs for version {version} in content/docs/{url_path}/reference/helm/')
           "
@@ -225,11 +231,12 @@ jobs:
               os.environ['LINK_VERSION'] = link_version
               
               # Use the original working shell commands with environment variables
-              subprocess.run(['bash', '-c', '''
-                cd $KGATEWAY_DIR
-                mkdir -p ../kgateway.dev/assets/docs/snippets/$LINK_VERSION
-                go run ./pkg/metrics/cmd/findmetrics/main.go --markdown . > ../kgateway.dev/assets/docs/snippets/$LINK_VERSION/metrics-control-plane.md
-              '''], check=True)
+              shell_script = f'''
+                cd kgateway-{link_version}
+                mkdir -p ../kgateway.dev/assets/docs/snippets/{link_version}
+                go run ./pkg/metrics/cmd/findmetrics/main.go --markdown . > ../kgateway.dev/assets/docs/snippets/{link_version}/metrics-control-plane.md
+              '''
+              subprocess.run(['bash', '-c', shell_script], check=True)
               
               print(f'Generated metrics documentation for version {version} in assets/docs/snippets/{link_version}/metrics-control-plane.md')
           "
