@@ -139,28 +139,35 @@ jobs:
               
               print(f'Generating API docs for version: {version}')
               
-              # Set environment variables for this version
-              os.environ['KGATEWAY_DIR'] = f'kgateway-{link_version}'
-              os.environ['VERSION_PATH'] = url_path
-              os.environ['LINK_VERSION'] = link_version
+              # Generate API docs using individual subprocess calls
+              subprocess.run(['envsubst'], input=open('scripts/crd-ref-docs-config.yaml').read(), text=True, stdout=open(f'crd-ref-docs-config-{link_version}.yaml', 'w'))
               
-              # Use the original working shell commands with environment variables
-              shell_script = f'''
-                envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config-{link_version}.yaml
-                go run github.com/elastic/crd-ref-docs@v0.1.0 --source-path=kgateway-{link_version}/api/v1alpha1/ --renderer=markdown --output-path ./ --config=crd-ref-docs-config-{link_version}.yaml
-                rm -f crd-ref-docs-config-{link_version}.yaml
-                mkdir -p content/docs/{url_path}/reference/
-                echo "---" > content/docs/{url_path}/reference/api.md
-                echo "title: API reference" >> content/docs/{url_path}/reference/api.md
-                echo "weight: 10" >> content/docs/{url_path}/reference/api.md
-                echo "---" >> content/docs/{url_path}/reference/api.md
-                echo "" >> content/docs/{url_path}/reference/api.md
-                cat ./out.md >> content/docs/{url_path}/reference/api.md
-                rm -f ./out.md
-                sed -i "s/Required: {{}}/Required/g; s/Optional: {{}}/Optional/g" content/docs/{url_path}/reference/api.md
-                sed -i "/^# API Reference$/,/^$/d" content/docs/{url_path}/reference/api.md
-              '''
-              subprocess.run(['bash', '-c', shell_script], check=True)
+              subprocess.run([
+                  'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
+                  f'--source-path=kgateway-{link_version}/api/v1alpha1/',
+                  '--renderer=markdown',
+                  '--output-path=./',
+                  f'--config=crd-ref-docs-config-{link_version}.yaml'
+              ], check=True)
+              
+              os.remove(f'crd-ref-docs-config-{link_version}.yaml')
+              
+              os.makedirs(f'content/docs/{url_path}/reference/', exist_ok=True)
+              
+              # Create API reference file with frontmatter
+              with open(f'content/docs/{url_path}/reference/api.md', 'w') as f:
+                  f.write('---\n')
+                  f.write('title: API reference\n')
+                  f.write('weight: 10\n')
+                  f.write('---\n\n')
+                  f.write(open('./out.md').read())
+              
+              os.remove('./out.md')
+              
+              # Format the generated docs
+              subprocess.run(['sed', '-i', 's/Required: {}/Required/g', f'content/docs/{url_path}/reference/api.md'], check=True)
+              subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', f'content/docs/{url_path}/reference/api.md'], check=True)
+              subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', f'content/docs/{url_path}/reference/api.md'], check=True)
               
               print(f'Generated API docs for version {version} in content/docs/{url_path}/reference/api.md')
           "
@@ -185,22 +192,27 @@ jobs:
               
               print(f'Generating Helm docs for version: {version}')
               
-              # Set environment variables for this version
-              os.environ['KGATEWAY_DIR'] = f'kgateway-{link_version}'
-              os.environ['VERSION_PATH'] = url_path
-              os.environ['LINK_VERSION'] = link_version
+              os.makedirs(f'content/docs/{url_path}/reference/helm/', exist_ok=True)
               
-              # Use the original working shell commands with environment variables
-              shell_script = f'''
-                mkdir -p content/docs/{url_path}/reference/helm/
-                for chart in "kgateway:helm" "kgateway-crds:crds"; do
-                  IFS=: read -r dir file <<< "$chart"
-                  go run github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2 --chart-search-root kgateway-{link_version}/install/helm/$dir --dry-run > content/docs/{url_path}/reference/helm/$file.md
-                  sed -i "/!\[Version:/,/^$/d" content/docs/{url_path}/reference/helm/$file.md
-                  sed -i "s/| \`\([^\`]*\)\` |/| \1 |/g" content/docs/{url_path}/reference/helm/$file.md
-                done
-              '''
-              subprocess.run(['bash', '-c', shell_script], check=True)
+              # Generate Helm docs for each chart
+              charts = ['kgateway:helm', 'kgateway-crds:crds']
+              for chart in charts:
+                  dir_name, file_name = chart.split(':')
+                  
+                  result = subprocess.run([
+                      'go', 'run', 'github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2',
+                      f'--chart-search-root=kgateway-{link_version}/install/helm/{dir_name}',
+                      '--dry-run'
+                  ], capture_output=True, text=True, check=True)
+                  
+                  with open(f'content/docs/{url_path}/reference/helm/{file_name}.md', 'w') as f:
+                      f.write(result.stdout)
+                  
+                  # Remove badge line and following empty line
+                  subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', f'content/docs/{url_path}/reference/helm/{file_name}.md'], check=True)
+                  
+                  # Remove backticks from the Default column in the table
+                  subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', f'content/docs/{url_path}/reference/helm/{file_name}.md'], check=True)
               
               print(f'Generated Helm docs for version {version} in content/docs/{url_path}/reference/helm/')
           "
@@ -225,18 +237,16 @@ jobs:
               
               print(f'Generating metrics docs for version: {version}')
               
-              # Set environment variables for this version
-              os.environ['KGATEWAY_DIR'] = f'kgateway-{link_version}'
-              os.environ['VERSION_PATH'] = url_path
-              os.environ['LINK_VERSION'] = link_version
+              os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
               
-              # Use the original working shell commands with environment variables
-              shell_script = f'''
-                cd kgateway-{link_version}
-                mkdir -p ../kgateway.dev/assets/docs/snippets/{link_version}
-                go run ./pkg/metrics/cmd/findmetrics/main.go --markdown . > ../kgateway.dev/assets/docs/snippets/{link_version}/metrics-control-plane.md
-              '''
-              subprocess.run(['bash', '-c', shell_script], check=True)
+              # Run the metrics finder tool
+              result = subprocess.run([
+                  'go', 'run', f'./kgateway-{link_version}/pkg/metrics/cmd/findmetrics/main.go', 
+                  '--markdown', f'./kgateway-{link_version}'
+              ], capture_output=True, text=True, check=True)
+              
+              with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+                  f.write(result.stdout)
               
               print(f'Generated metrics documentation for version {version} in assets/docs/snippets/{link_version}/metrics-control-plane.md')
           "
