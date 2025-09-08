@@ -178,84 +178,50 @@ jobs:
               print(f'Generating API docs for {version} using {kgateway_dir}')
               
               # Substitute KUBE_VERSION in the config template and write to a temp file
-              subprocess.run(['envsubst'], input=open('scripts/crd-ref-docs-config.yaml').read(), text=True, stdout=open(f'crd-ref-docs-config-{link_version}.yaml', 'w'))
+              envsubst < scripts/crd-ref-docs-config.yaml > crd-ref-docs-config-${link_version}.yaml
               
               # Generate API reference
-              subprocess.run([
-                  'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
-                  f'--source-path={kgateway_dir}/api/v1alpha1/',
-                  '--renderer=markdown',
-                  '--output-path=./',
-                  f'--config=crd-ref-docs-config-{link_version}.yaml'
-              ], check=True)
+              go run github.com/elastic/crd-ref-docs@v0.1.0 \
+                --source-path=\"${kgateway_dir}/api/v1alpha1/\" \
+                --renderer=markdown \
+                --output-path ./ \
+                --config=crd-ref-docs-config-${link_version}.yaml
               
               # Create versioned directory
-              os.makedirs(f'content/docs/{url_path}/reference/', exist_ok=True)
+              mkdir -p content/docs/${url_path}/reference/
               
               # Create index file with frontmatter
-              frontmatter = '''---
-title: API reference
-weight: 10
----
-
-'''
-              with open('./out.md', 'r') as f:
-                  content = f.read()
+              (echo '---
+              title: API reference
+              weight: 10
+              ---
               
-              with open(f'content/docs/{url_path}/reference/api.md', 'w') as f:
-                  f.write(frontmatter + content)
+              '; cat \"./out.md\" ) > content/docs/${url_path}/reference/api.md
               
               # Remove temporary files
-              os.remove('./out.md')
-              os.remove(f'crd-ref-docs-config-{link_version}.yaml')
+              rm -f \"./out.md\"
+              rm -f crd-ref-docs-config-${link_version}.yaml
               
-              # Format generated docs using Python instead of sed
-              with open(f'content/docs/{url_path}/reference/api.md', 'r') as f:
-                  content = f.read()
+              # Format generated docs
+              sed -i 's/Required: \\{\\}/Required/g; s/Optional: \\{\\}/Optional/g' content/docs/${url_path}/reference/api.md
+              # Fix formatting issues in the markdown
+              sed -i '
+              /```yaml<br \/>/ {
+                s/```yaml<br \/>//
+                s/<br \/>$//
+                /^$/d
+                s/stats:<br \/>/stats:<br \/>/
+                s/  customLabels:<br \/>/\&nbsp;\&nbsp;customLabels:<br \/>/
+                s/    - name:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;- name:/g
+                s/      metadataNamespace:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataNamespace:/g
+                s/      metadataKey:/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;metadataKey:/g
+                s/```//
+                /^\s*$/d
+              }' content/docs/${url_path}/reference/api.md
+              sed -i '/```yaml/,/```/{ /^```/! { s/\t/  /g; /^\s*$/d } }' content/docs/${url_path}/reference/api.md
+              sed -i '/^# API Reference$/,/^$/d' content/docs/${url_path}/reference/api.md
               
-              # Apply formatting fixes
-              content = content.replace('Required: {}', 'Required')
-              content = content.replace('Optional: {}', 'Optional')
-              
-              # Fix YAML formatting issues
-              lines = content.split('\n')
-              fixed_lines = []
-              in_yaml_block = False
-              
-              for line in lines:
-                  if '```yaml<br />' in line:
-                      in_yaml_block = True
-                      continue
-                  elif in_yaml_block and line.strip() == '```':
-                      in_yaml_block = False
-                      continue
-                  elif in_yaml_block:
-                      # Fix indentation and formatting
-                      line = line.replace('<br />', '')
-                      line = line.replace('\t', '  ')
-                      if line.strip() == '':
-                          continue
-                      fixed_lines.append(line)
-                  else:
-                      fixed_lines.append(line)
-              
-              # Remove API Reference header
-              final_lines = []
-              skip_header = False
-              for line in fixed_lines:
-                  if line.strip() == '# API Reference':
-                      skip_header = True
-                      continue
-                  elif skip_header and line.strip() == '':
-                      skip_header = False
-                      continue
-                  elif not skip_header:
-                      final_lines.append(line)
-              
-              with open(f'content/docs/{url_path}/reference/api.md', 'w') as f:
-                  f.write('\n'.join(final_lines))
-              
-              print(f'Generated API docs for version {version} in content/docs/{url_path}/reference/api.md')
+              print(f'Generated API docs for version {version} in content/docs/${url_path}/reference/api.md')
           "
 
       - name: Generate Helm Chart Reference for each version
@@ -307,46 +273,32 @@ weight: 10
               subprocess.run(['ls', '-la', f'{kgateway_dir}/install/helm/kgateway'], check=False)
               
               # Create directory for Helm docs
-              os.makedirs(f'content/docs/{url_path}/reference/helm/', exist_ok=True)
+              mkdir -p content/docs/${url_path}/reference/helm/
               
               # Generate Helm Docs with helm-docs
-              for chart in ['kgateway:helm', 'kgateway-crds:crds']:
-                dir_name, file_name = chart.split(':')
-                print(f'Generating Helm docs for {dir_name} -> {file_name}')
+              for chart in 'kgateway:helm' 'kgateway-crds:crds'; do
+                dir, file = chart.split(':')
+                print(f'Generating Helm docs for {dir} -> {file}')
                 
                 # Generate helm docs
                 result = subprocess.run([
                   'go', 'run', 'github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2',
-                  '--chart-search-root', f'{kgateway_dir}/install/helm/{dir_name}',
+                  '--chart-search-root', f'{kgateway_dir}/install/helm/{dir}',
                   '--dry-run'
                 ], capture_output=True, text=True, check=True)
                 
                 # Write to versioned file
-                with open(f'content/docs/{url_path}/reference/helm/{file_name}.md', 'w') as f:
+                with open(f'content/docs/${url_path}/reference/helm/{file}.md', 'w') as f:
                   f.write(result.stdout)
                 
-                # Remove badge line and following empty line using Python
-                with open(f'content/docs/{url_path}/reference/helm/{file_name}.md', 'r') as f:
-                  lines = f.readlines()
+                # Remove badge line and following empty line 
+                subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', f'content/docs/${url_path}/reference/helm/{file}.md'], check=False)
                 
-                filtered_lines = []
-                skip_next = False
-                for line in lines:
-                    if '![Version:' in line:
-                        skip_next = True
-                        continue
-                    elif skip_next and line.strip() == '':
-                        skip_next = False
-                        continue
-                    elif not skip_next:
-                        # Remove backticks from the Default column in the table
-                        line = line.replace('| `', '| ').replace('` |', ' |')
-                        filtered_lines.append(line)
-                
-                with open(f'content/docs/{url_path}/reference/helm/{file_name}.md', 'w') as f:
-                  f.writelines(filtered_lines)
+                # Remove backticks from the Default column in the table
+                subprocess.run(['sed', '-i', 's/| `\([^`]*\)` |/| \1 |/g', f'content/docs/${url_path}/reference/helm/{file}.md'], check=False)
+              done
               
-              print(f'Generated Helm docs for version {version} in content/docs/{url_path}/reference/helm/')
+              print(f'Generated Helm docs for version {version} in content/docs/${url_path}/reference/helm/')
           "
 
       - name: Generate Control Plane Metrics Documentation for each version
