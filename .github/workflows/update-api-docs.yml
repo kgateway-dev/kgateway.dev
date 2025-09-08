@@ -74,7 +74,7 @@ jobs:
         run: |
           cd kgateway.dev
           
-          # Process each version
+          # Process each version sequentially
           python3 -c "
           import json
           import sys
@@ -109,21 +109,35 @@ jobs:
                       print(f'Error fetching tags for version {version}: {e}')
                       continue
               
+              # Clean up any existing kgateway directory
+              if os.path.exists('kgateway'):
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
               # Checkout kgateway repository with specific tag
-              kgateway_dir = f'kgateway-{link_version}'
+              kgateway_dir = 'kgateway'
               if tag == 'main':
                   subprocess.run(['git', 'clone', '--branch', 'main', '--depth', '1', 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
               else:
                   subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
               
+              # Debug: List contents of checked out directory
+              print(f'Contents of {kgateway_dir}:')
+              subprocess.run(['ls', '-la', kgateway_dir], check=False)
+              if os.path.exists(f'{kgateway_dir}/api'):
+                  print(f'Contents of {kgateway_dir}/api:')
+                  subprocess.run(['ls', '-la', f'{kgateway_dir}/api'], check=False)
+              
               print(f'Generated docs for version {version} using tag {tag}')
+              
+              # Clean up after processing this version
+              subprocess.run(['rm', '-rf', 'kgateway'], check=True)
           "
 
       - name: Generate API Reference for each version
         run: |
           cd kgateway.dev
           
-          # Process each version
+          # Process each version sequentially
           python3 -c "
           import json
           import subprocess
@@ -139,12 +153,46 @@ jobs:
               
               print(f'Generating API docs for version: {version}')
               
+              # Determine tag to checkout based on linkVersion
+              if link_version == 'main':
+                  tag = 'main'
+              else:
+                  try:
+                      result = subprocess.run(['git', 'ls-remote', '--tags', '--sort=-version:refname', 'https://github.com/kgateway-dev/kgateway.git', f'{version}*'], 
+                                            capture_output=True, text=True, check=True)
+                      if result.stdout.strip():
+                          latest_tag = result.stdout.split('\n')[0].split('/')[-1]
+                          tag = latest_tag
+                      else:
+                          print(f'No tags found for version {version}, skipping')
+                          continue
+                  except subprocess.CalledProcessError as e:
+                      print(f'Error fetching tags for version {version}: {e}')
+                      continue
+              
+              # Clean up any existing kgateway directory
+              if os.path.exists('kgateway'):
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
+              # Checkout kgateway repository with specific tag
+              if tag == 'main':
+                  subprocess.run(['git', 'clone', '--branch', 'main', '--depth', '1', 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              else:
+                  subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              
               # Generate API docs using individual subprocess calls
               subprocess.run(['envsubst'], input=open('scripts/crd-ref-docs-config.yaml').read(), text=True, stdout=open(f'crd-ref-docs-config-{link_version}.yaml', 'w'))
               
+              # Check if the API directory exists before running crd-ref-docs
+              api_path = 'kgateway/api/v1alpha1/'
+              if not os.path.exists(api_path):
+                  print(f'Warning: API directory {api_path} does not exist, skipping API docs generation for version {version}')
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+                  continue
+              
               subprocess.run([
                   'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
-                  f'--source-path=kgateway-{link_version}/api/v1alpha1/',
+                  f'--source-path={api_path}',
                   '--renderer=markdown',
                   '--output-path=./',
                   f'--config=crd-ref-docs-config-{link_version}.yaml'
@@ -169,6 +217,9 @@ jobs:
               subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', f'content/docs/{url_path}/reference/api.md'], check=True)
               subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', f'content/docs/{url_path}/reference/api.md'], check=True)
               
+              # Clean up after processing this version
+              subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
               print(f'Generated API docs for version {version} in content/docs/{url_path}/reference/api.md')
           "
 
@@ -176,7 +227,7 @@ jobs:
         run: |
           cd kgateway.dev
           
-          # Process each version
+          # Process each version sequentially
           python3 -c "
           import json
           import subprocess
@@ -192,16 +243,49 @@ jobs:
               
               print(f'Generating Helm docs for version: {version}')
               
+              # Determine tag to checkout based on linkVersion
+              if link_version == 'main':
+                  tag = 'main'
+              else:
+                  try:
+                      result = subprocess.run(['git', 'ls-remote', '--tags', '--sort=-version:refname', 'https://github.com/kgateway-dev/kgateway.git', f'{version}*'], 
+                                            capture_output=True, text=True, check=True)
+                      if result.stdout.strip():
+                          latest_tag = result.stdout.split('\n')[0].split('/')[-1]
+                          tag = latest_tag
+                      else:
+                          print(f'No tags found for version {version}, skipping')
+                          continue
+                  except subprocess.CalledProcessError as e:
+                      print(f'Error fetching tags for version {version}: {e}')
+                      continue
+              
+              # Clean up any existing kgateway directory
+              if os.path.exists('kgateway'):
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
+              # Checkout kgateway repository with specific tag
+              if tag == 'main':
+                  subprocess.run(['git', 'clone', '--branch', 'main', '--depth', '1', 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              else:
+                  subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              
               os.makedirs(f'content/docs/{url_path}/reference/helm/', exist_ok=True)
               
               # Generate Helm docs for each chart
               charts = ['kgateway:helm', 'kgateway-crds:crds']
               for chart in charts:
                   dir_name, file_name = chart.split(':')
+                  helm_path = f'kgateway/install/helm/{dir_name}'
+                  
+                  # Check if Helm directory exists
+                  if not os.path.exists(helm_path):
+                      print(f'Warning: Helm directory {helm_path} does not exist, skipping {file_name} for version {version}')
+                      continue
                   
                   result = subprocess.run([
                       'go', 'run', 'github.com/norwoodj/helm-docs/cmd/helm-docs@v1.14.2',
-                      f'--chart-search-root=kgateway-{link_version}/install/helm/{dir_name}',
+                      f'--chart-search-root={helm_path}',
                       '--dry-run'
                   ], capture_output=True, text=True, check=True)
                   
@@ -214,6 +298,9 @@ jobs:
                   # Remove backticks from the Default column in the table
                   subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', f'content/docs/{url_path}/reference/helm/{file_name}.md'], check=True)
               
+              # Clean up after processing this version
+              subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
               print(f'Generated Helm docs for version {version} in content/docs/{url_path}/reference/helm/')
           "
 
@@ -221,7 +308,7 @@ jobs:
         run: |
           cd kgateway.dev
           
-          # Process each version
+          # Process each version sequentially
           python3 -c "
           import json
           import subprocess
@@ -237,16 +324,53 @@ jobs:
               
               print(f'Generating metrics docs for version: {version}')
               
+              # Determine tag to checkout based on linkVersion
+              if link_version == 'main':
+                  tag = 'main'
+              else:
+                  try:
+                      result = subprocess.run(['git', 'ls-remote', '--tags', '--sort=-version:refname', 'https://github.com/kgateway-dev/kgateway.git', f'{version}*'], 
+                                            capture_output=True, text=True, check=True)
+                      if result.stdout.strip():
+                          latest_tag = result.stdout.split('\n')[0].split('/')[-1]
+                          tag = latest_tag
+                      else:
+                          print(f'No tags found for version {version}, skipping')
+                          continue
+                  except subprocess.CalledProcessError as e:
+                      print(f'Error fetching tags for version {version}: {e}')
+                      continue
+              
+              # Clean up any existing kgateway directory
+              if os.path.exists('kgateway'):
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+              
+              # Checkout kgateway repository with specific tag
+              if tag == 'main':
+                  subprocess.run(['git', 'clone', '--branch', 'main', '--depth', '1', 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              else:
+                  subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, 'https://github.com/kgateway-dev/kgateway.git', 'kgateway'], check=True)
+              
               os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
+              
+              # Check if metrics tool exists
+              metrics_tool_path = 'kgateway/pkg/metrics/cmd/findmetrics/main.go'
+              if not os.path.exists(metrics_tool_path):
+                  print(f'Warning: Metrics tool {metrics_tool_path} does not exist, skipping metrics docs for version {version}')
+                  subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+                  continue
               
               # Run the metrics finder tool
               result = subprocess.run([
-                  'go', 'run', f'./kgateway-{link_version}/pkg/metrics/cmd/findmetrics/main.go', 
-                  '--markdown', f'./kgateway-{link_version}'
+                  'go', 'run', metrics_tool_path, 
+                  '--markdown', './kgateway'
               ], capture_output=True, text=True, check=True)
               
               with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
                   f.write(result.stdout)
+              
+              # Clean up after processing this version
+              subprocess.run(['rm', '-rf', 'kgateway'], check=True)
               
               print(f'Generated metrics documentation for version {version} in assets/docs/snippets/{link_version}/metrics-control-plane.md')
           "
@@ -254,7 +378,7 @@ jobs:
       - name: Clean up temporary directories
         run: |
           cd kgateway.dev
-          rm -rf kgateway-*
+          rm -rf kgateway
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
