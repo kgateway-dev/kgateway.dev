@@ -10,6 +10,6 @@
 
    ```yaml
    
-   agentgateway:
+   agentGateway:
      enabled: true
    ```
