@@ -3,7 +3,6 @@ title: API reference
 weight: 10
 ---
 
-
 ## Packages
 - [gateway.kgateway.dev/v1alpha1](#gatewaykgatewaydevv1alpha1)
 
@@ -83,21 +82,29 @@ The following example prepends a system prompt of `Answer all questions in Frenc
 and appends `Describe the painting as if you were a famous art critic from the 17th century.`
 to each request that is sent to the `openai` HTTPRoute.
 ```yaml
-  name: openai-opt
-  namespace: kgateway-system
+
+
+	name: openai-opt
+	namespace: kgateway-system
+
+
 spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: openai
-  ai:
-      promptEnrichment:
-        prepend:
-        - role: SYSTEM
-          content: "Answer all questions in French."
-        append:
-        - role: USER
-          content: "Describe the painting as if you were a famous art critic from the 17th century."
+
+
+	targetRefs:
+	- group: gateway.networking.k8s.io
+	  kind: HTTPRoute
+	  name: openai
+	ai:
+	    promptEnrichment:
+	      prepend:
+	      - role: SYSTEM
+	        content: "Answer all questions in French."
+	      append:
+	      - role: USER
+	        content: "Describe the painting as if you were a famous art critic from the 17th century."
+
+
 ```
 
 
@@ -124,19 +131,23 @@ This example rejects any request prompts that contain
 the string "credit card", and masks any credit card numbers in the response.
 ```yaml
 promptGuard:
-  request:
-    customResponse:
-      message: "Rejected due to inappropriate content"
-    regex:
-      action: REJECT
-      matches:
-      - pattern: "credit card"
-        name: "CC"
-  response:
-    regex:
-      builtins:
-      - CREDIT_CARD
-      action: MASK
+
+
+	request:
+	  customResponse:
+	    message: "Rejected due to inappropriate content"
+	  regex:
+	    action: REJECT
+	    matches:
+	    - pattern: "credit card"
+	      name: "CC"
+	response:
+	  regex:
+	    builtins:
+	    - CREDIT_CARD
+	    action: MASK
+
+
 ```
 
 
@@ -239,7 +250,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  |  |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -311,7 +322,7 @@ _Appears in:_
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The extension's container environment variables. |  |  |
 | `ports` _[ContainerPort](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#containerport-v1-core) array_ | The extension's container ports. |  |  |
-| `stats` _[AiExtensionStats](#aiextensionstats)_ | Additional stats config for AI Extension.<br />This config can be useful for adding custom labels to the request metrics.<br /><br />Example:<br />stats:<br />&nbsp;&nbsp;customLabels:<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "subject"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:sub"<br />&nbsp;&nbsp;&nbsp;&nbsp;- name: "issuer"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataNamespace: "envoy.filters.http.jwt_authn"<br />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;metadataKey: "principal:iss"<br /> |  |  |
+| `stats` _[AiExtensionStats](#aiextensionstats)_ | Additional stats config for AI Extension.<br />This config can be useful for adding custom labels to the request metrics.<br /><br />Example:<br />```yaml<br />stats:<br />  customLabels:<br />    - name: "subject"<br />      metadataNamespace: "envoy.filters.http.jwt_authn"<br />      metadataKey: "principal:sub"<br />    - name: "issuer"<br />      metadataNamespace: "envoy.filters.http.jwt_authn"<br />      metadataKey: "principal:iss"<br />``` |  |  |
 | `tracing` _[AiExtensionTrace](#aiextensiontrace)_ | Additional OTel tracing config for AI Extension. |  |  |
 
 
@@ -842,7 +853,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  |  |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -869,7 +880,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  |  |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -1185,7 +1196,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
-| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />		componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
+| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 
 
 #### EnvoyContainer
@@ -1279,7 +1290,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](#backendref)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 
 
@@ -1334,6 +1345,8 @@ Example: Setting a default system field for Anthropic, which does not support sy
 defaults:
   - field: "system"
     value: "answer all questions in French"
+
+
 ```
 
 
@@ -1345,6 +1358,8 @@ defaults:
   - field: "max_tokens"
     value: "100"
     override: true
+
+
 ```
 
 
@@ -1353,6 +1368,8 @@ Example: Overriding a custom list field:
 defaults:
   - field: "custom_list"
     value: "[a,b,c]"
+
+
 ```
 
 
@@ -2437,25 +2454,29 @@ Note: Only two levels of nesting are permitted. Any nested entries after the sec
 
 ```yaml
 multi:
-  priorities:
-  - pool:
-    - azureOpenai:
-        deploymentName: gpt-4o-mini
-        apiVersion: 2024-02-15-preview
-        endpoint: ai-gateway.openai.azure.com
-        authToken:
-          secretRef:
-            name: azure-secret
-            namespace: kgateway-system
-  - pool:
-    - azureOpenai:
-        deploymentName: gpt-4o-mini-2
-        apiVersion: 2024-02-15-preview
-        endpoint: ai-gateway-2.openai.azure.com
-        authToken:
-          secretRef:
-            name: azure-secret-2
-            namespace: kgateway-system
+
+
+	priorities:
+	- pool:
+	  - azureOpenai:
+	      deploymentName: gpt-4o-mini
+	      apiVersion: 2024-02-15-preview
+	      endpoint: ai-gateway.openai.azure.com
+	      authToken:
+	        secretRef:
+	          name: azure-secret
+	          namespace: kgateway-system
+	- pool:
+	  - azureOpenai:
+	      deploymentName: gpt-4o-mini-2
+	      apiVersion: 2024-02-15-preview
+	      endpoint: ai-gateway-2.openai.azure.com
+	      authToken:
+	        secretRef:
+	          name: azure-secret-2
+	          namespace: kgateway-system
+
+
 ```
 
 
@@ -2686,7 +2707,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `ancestorRef` _[ParentReference](#parentreference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
+| `ancestorRef` _[ParentReference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
 | `controllerName` _string_ | ControllerName is a domain/path string that indicates the name of the<br />controller that wrote this status. This corresponds with the<br />controllerName field on GatewayClass.<br /><br />Example: "example.net/gateway-controller".<br /><br />The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are<br />valid Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).<br /><br />Controllers MUST populate this field when writing status. Controllers should ensure that<br />entries to status populated with their ControllerName are cleaned up when they are no<br />longer necessary. |  |  |
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
@@ -3449,6 +3470,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
 | `tlsFiles` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
+| `wellKnownCACertificates` _[WellKnownCACertificatesType](#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
 | `insecureSkipVerify` _boolean_ | InsecureSkipVerify originates TLS but skips verification of the backend's certificate.<br />WARNING: This is an insecure option that should only be used if the risks are understood. |  |  |
 | `sni` _string_ | The SNI domains that should be considered for TLS connection |  | MinLength: 1 <br /> |
 | `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
@@ -3720,7 +3742,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br /> |  |  |
+| `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />```yaml<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br />``` |  |  |
 | `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook.<br />Note: This is not yet supported for agentgateway. |  |  |
 
 
