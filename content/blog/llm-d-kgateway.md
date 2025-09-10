@@ -3,6 +3,7 @@ title: llm-d - Distributed Inference Serving on Kubernetes
 toc: false
 publishDate: 2025-05-20T10:00:00-00:00
 author: Christian Posta
+excludeSearch: true
 ---
 
 Today, Red Hat, Google, and IBM announced [an exciting new open-source project called llm-d](https://llm-d.ai/blog/llm-d-announce); a distributed inference platform built around [vLLM](https://github.com/vllm-project/vllm). Personally, I'm very excited about this project as we know working with users and the community how difficult it is to build a cost-effective and performant inference platform. Organizations trying to run inference themselves have likely run into the main motivation for the llm-d project ([quoted from the press release](https://llm-d.ai/blog/llm-d-press-release)):

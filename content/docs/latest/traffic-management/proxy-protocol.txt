@@ -1,0 +1,64 @@
+---
+title: Proxy protocol
+weight: 20
+next: /docs/traffic-management/transformations
+---
+
+Preserve connection information such as the client IP address and port for traffic that goes through your gateway listener.
+
+## About proxy protocol
+
+Proxy Protocol is used to ensure that backend services receive the full network information, even when traffic is proxied through other components, such as an AWS Network Load Balancer or the gateway proxy itself. The gateway proxy and backend services can then use this information to apply accurate rate limiting policies, make routing decisions, and properly log and audit traffic. Without proxy protocol, the backend service can only see the IP address of the last proxy that handled the request, which can impact security measures and access control. 
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Enable proxy protocol for a listener
+
+1. Create a ListenerPolicy resource to enable proxy protocol for the listeners on your gateway proxy. The following example enables proxy protocol on all listeners that are configured on the gateway. To enable proxy protocol for a particular listener, include the `spec.targetRefs.sectionName` field as described in [Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)](/docs/about/policies/listeneroption/#option-2-attach-the-policy-to-a-particular-listener-on-the-gateway-targetrefssectionname/).   
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: proxy-protocol
+     namespace: kgateway-system
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     options:
+       proxyProtocol:
+         allowRequestsWithoutProxyProtocol: false    
+   EOF
+   ```
+
+2. Verify that your configuration is applied by reviewing the Envoy configuration. 
+   1. Port forward the `gloo-gateway-http` deployment on port 19000. 
+      ```sh
+      kubectl port-forward deploy/http -n kgateway-system 19000 & 
+      ```
+   2. Open the `config_dump` endpoint. 
+      ```sh
+      open http://localhost:19000/config_dump
+      ```
+   3. Find the listener filters and verify that proxy protocol is enabled for all of the gateway listeners. You see a listener filter that looks similar to the following. 
+      ```yaml
+      "listener_filters": [
+        {
+         "name": "envoy.filters.listener.proxy_protocol",
+         "typed_config": {
+          "@type": "type.googleapis.com/envoy.extensions.filters.listener.proxy_protocol.v3.ProxyProtocol"
+         }
+        },
+      ```
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete listeneroption proxy-protocol -n kgateway-system
+```

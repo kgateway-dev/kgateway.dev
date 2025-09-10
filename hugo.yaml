@@ -56,10 +56,10 @@ menu:
       weight: 2
     - name: Get Started
       weight: 3
-      url: /docs/quickstart/
+      url: /docs/main/quickstart/
     - name: Why kgateway
       weight: 4
-      url: /docs/about/overview/
+      url: /docs/main/about/overview/
     - name: Search
       weight: 5
       params:
@@ -125,3 +125,13 @@ params:
     urls:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
+  
+  versions:
+    - version: "2.1.x"
+      dropdown: "2.1 (main)"
+      linkVersion: "main"
+      url: "/main"
+    - version: "2.0.x"
+      dropdown: "2.0 (latest)"
+      linkVersion: "latest"
+      url: "/latest"
