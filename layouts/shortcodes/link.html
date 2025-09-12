@@ -1,2 +1,5 @@
 {{ $path := .Get "path" }}
-{{ .Page.FirstSection.RelPermalink }}{{ $path }}
+{{ $rel := .Page.RelPermalink }}
+{{ $match := findRE `^/[^/]+/[^/]+` $rel }}
+{{ $prefix := index $match 0 }}
+{{ $prefix }}{{ $path }}
