@@ -37,19 +37,36 @@ Review the following table to understand how to configure agentgateway resources
 
 To use agentgateway features, you must enable the agentgateway feature in {{< reuse "docs/snippets/kgateway.md" >}}. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
 
-Example command:
+1. Upgrade or install {{< reuse "/docs/snippets/kgateway.md" >}} with the agentgateway and AI Gateway feature enabled. 
 
-```shell
-helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-     --set gateway.aiExtension.enabled=true \
+   ```shell
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      --set agentGateway.enabled=true \
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
-```
+   ```
+
+2. Verify that your Helm installation was updated.
+   ```shell
+   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   ```
+   
+   Example output: 
+   ```
+   
+   agentGateway:
+     enabled: true
+   ```
+
+3. Review the guides in the following sections to create an agentgateway proxy that fits your use case:
+   * [LLM consumption]({{< link path="/agentgateway/llm/" >}})
+   * [Inference routing]({{< link path="/agentgateway/inference/" >}})
+   * [MCP connectivity]({{< link path="/agentgateway/mcp/" >}})
+   * [Agent connectivity]({{< link path="/agentgateway/agent/" >}})
 
 ## More considerations
 
 Review the following considerations for using agentgateway.
 
-- Attaching TrafficPolicies to particular routes via the `ExtensionRef` filter is not supported. Instead, use the [HTTPRoute rule attachment option](../about/policies/trafficpolicy/#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+- Attaching a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a particular route via the `ExtensionRef` filter is not supported. Instead, use the [HTTPRoute rule attachment option]({{< link path="/about/policies/trafficpolicy/#attach-to-rule" >}}) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 - HTTPListenerPolicy and BackendConfigPolicy resources that configure Envoy-specific filters, such as health checks and access logging, cannot be applied to agentgateway proxies. You can use these policies with Envoy-based kgateway proxies only. 
-- External processing (extProc) as part of the TrafficPolicy is not supported.
+- External processing (extProc) as part of the {{< reuse "docs/snippets/trafficpolicy.md" >}} is not supported.
