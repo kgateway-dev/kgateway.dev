@@ -70,7 +70,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
    | `authToken`  | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step.                                                                                                                                                                          |
    | `model`      | The model to use to generate responses. In this example, you use the `gemini-1.5-flash-latest` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                                                                                                        |
 
-4. Create an HTTPRoute resource to route requests to the Gemini backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/gemini`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+4. Create an HTTPRoute resource to route requests to the Gemini backend. Note that {{< reuse "/docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/gemini`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
    ```yaml
    kubectl apply -f- <<EOF
