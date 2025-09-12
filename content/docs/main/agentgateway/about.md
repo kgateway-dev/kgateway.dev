@@ -41,7 +41,6 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
 
    ```shell
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-     --set gateway.aiExtension.enabled=true \
      --set agentGateway.enabled=true \
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
    ```
@@ -54,9 +53,6 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
    Example output: 
    ```
    
-   gateway: 
-     aiExtension: 
-       enabled: true
    agentGateway:
      enabled: true
    ```
