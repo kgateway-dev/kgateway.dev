@@ -1,4 +1,4 @@
-1. Create a Gateway that uses the agentgateway GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step. 
+1. Create a Gateway that uses the agentgateway GatewayClass. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
