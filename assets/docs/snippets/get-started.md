@@ -40,8 +40,8 @@
    {{% tab tabName="Agentgateway" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     --set agentGateway.enabled=true \
-     --set agentGateway.enableAlphaAPIs=true
+     --set agentGateway.enabled=true  \
+     --set controller.image.pullPolicy=Always
    ```
    {{% /tab %}}
    {{< /tabs >}}

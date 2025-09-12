@@ -37,14 +37,35 @@ Review the following table to understand how to configure agentgateway resources
 
 To use agentgateway features, you must enable the agentgateway feature in {{< reuse "docs/snippets/kgateway.md" >}}. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
 
-Example command:
+1. Upgrade or install {{< reuse "/docs/snippets/kgateway.md" >}} with the agentgateway and AI Gateway feature enabled. 
 
-```shell
-helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+   ```shell
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      --set gateway.aiExtension.enabled=true \
      --set agentGateway.enabled=true \
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
-```
+   ```
+
+2. Verify that your Helm installation was updated.
+   ```shell
+   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   ```
+   
+   Example output: 
+   ```
+   
+   gateway: 
+     aiExtension: 
+       enabled: true
+   agentGateway:
+     enabled: true
+   ```
+
+3. Review the guides in the following sections to create an agentgateway proxy that fits your use case:
+   * [LLM consumption]({{< link path="/agentgateway/llm/" >}})
+   * [Inference routing]({{< link path="/agentgateway/inference/" >}})
+   * [MCP connectivity]({{< link path="/agentgateway/mcp/" >}})
+   * [Agent connectivity]({{< link path="/agentgateway/agent/" >}})
 
 ## More considerations
 

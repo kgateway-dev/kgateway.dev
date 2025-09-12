@@ -1,5 +1,5 @@
 ---
-title: Agent-to-agent (A2A)
+title: Connect to an agent
 weight: 40
 ---
 
