@@ -18,14 +18,14 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Reject unwanted requests
 
-Use the TrafficPolicy resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
+Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
 
-1. Update the TrafficPolicy resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
+1. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The AI gateway blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: openai-prompt-guard
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -184,12 +184,12 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
 
 In the next step, you instruct the AI Gateway to mask credit card numbers that are returned by the LLM.
 
-1. Add the following credit card response matcher to the TrafficPolicy resource. This time, use the built-in credit card regex match instead of a custom one.
+1. Add the following credit card response matcher to the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. This time, use the built-in credit card regex match instead of a custom one.
    
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: openai-prompt-guard
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -274,7 +274,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l app=agentgateway
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -l app=agentgateway
 ```
 
 ## Next

@@ -124,14 +124,14 @@ In the following example, you explore how to refactor system and user prompts to
 
 ## Append or prepend prompts
 
-Use a TrafficPolicy resource to enrich prompts by appending or prepending system and user prompts to each request. This way, you can centrally manage common prompts that you want to add to each request.
+Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts by appending or prepending system and user prompts to each request. This way, you can centrally manage common prompts that you want to add to each request.
 
-1. Create a TrafficPolicy resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: openai-opt
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -150,7 +150,7 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
    EOF
    ```
 
-2. Send a request without a system prompt. Although the system prompt instructions are missing in the request, the unstructured text in the user prompt is still transformed into structured CSV format. This is because the system prompt is automatically prepended from the TrafficPolicy resource before it is sent to the LLM provider.
+2. Send a request without a system prompt. Although the system prompt instructions are missing in the request, the unstructured text in the user prompt is still transformed into structured CSV format. This is because the system prompt is automatically prepended from the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource before it is sent to the LLM provider.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
@@ -194,7 +194,7 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
 
 ## Overwrite settings on the route level
 
-To overwrite a setting that you added to a TrafficPolicy resource, you simply include that setting in your request.
+To overwrite a setting that you added to a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource, you simply include that setting in your request.
 
 1. Send a request to the AI API and include a custom system prompt that instructs the API to transform unstructured text into JSON format.
 
@@ -258,7 +258,7 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
    }
    ```
 
-2. Send another request. This time, you do not include a system prompt. Because the default setting in the TrafficPolicy resource is applied, the unstructured text is returned in CSV format.
+2. Send another request. This time, you do not include a system prompt. Because the default setting in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource is applied, the unstructured text is returned in CSV format.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
@@ -306,7 +306,7 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l app=agentgateway
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -l app=agentgateway
 ```
 
 ## Next
