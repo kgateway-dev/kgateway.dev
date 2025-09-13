@@ -6,7 +6,6 @@
    
    Example output: 
    ```
-   
    agentGateway:
      enabled: true
    ```
