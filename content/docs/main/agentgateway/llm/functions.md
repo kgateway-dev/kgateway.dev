@@ -69,8 +69,7 @@ Each AI provider has a different way of handling function calling. For example, 
 
 ## Before you begin
 
-1. [Set up an agentgateway proxy]({{< link path="/agentgateway/llm/setup/" >}}). 
-2. [Set up access to the OpenAI LLM provider]({{< link path="/agentgateway/llm/providers/openai/" >}}).
+{{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 ## Example of function calling {#function-call}
 

@@ -17,8 +17,7 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 ## Before you begin
 
-1. [Set up an agentgateway proxy]({{< link path="/agentgateway/llm/setup/" >}}). 
-2. [Set up access to the OpenAI LLM provider]({{< link path="/agentgateway/llm/providers/openai/" >}}).
+{{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 ## Refactor LLM prompts
 

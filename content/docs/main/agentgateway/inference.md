@@ -4,7 +4,7 @@ weight: 30
 description:
 ---
 
-Use agentgateway proxies in {{< reuse "/docs/snippets/kgateway.md" >}} with the Kubernetes Gateway API Inference Extension project. This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
+Use {{< reuse "docs/snippets/agentgateway.md" >}} proxies in {{< reuse "/docs/snippets/kgateway.md" >}} with the Kubernetes Gateway API Inference Extension project. This project extends the Gateway API so that you can route to AI inference workloads such as local Large Language Models (LLMs) that run in your Kubernetes environment.
 
 For more information, see the following resources.
 

@@ -13,8 +13,7 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 ## Before you begin
 
-1. [Set up an agentgateway proxy]({{< link path="/agentgateway/llm/setup/" >}}). 
-2. [Set up access to the OpenAI LLM provider]({{< link path="/agentgateway/llm/providers/openai/" >}}).
+{{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 ## Reject unwanted requests
 

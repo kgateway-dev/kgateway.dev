@@ -1,4 +1,4 @@
-1. Create a Gateway that uses the agentgateway GatewayClass. 
+1. Create a Gateway that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -9,7 +9,7 @@
      labels:
        app: agentgateway
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -33,7 +33,7 @@
    Example output: 
    ```
    NAME           CLASS          ADDRESS                                                                  PROGRAMMED   AGE
-   agentgateway   agentgateway   a1cff4bd974a34d8b882b2fa01d357f0-119963959.us-east-2.elb.amazonaws.com   True         6m9s
+   agentgateway   {{< reuse "docs/snippets/agw-gatewayclass.md" >}}   a1cff4bd974a34d8b882b2fa01d357f0-119963959.us-east-2.elb.amazonaws.com   True         6m9s
    NAME           READY   UP-TO-DATE   AVAILABLE   AGE
    agentgateway   1/1     1            1           6m11s
    ```
