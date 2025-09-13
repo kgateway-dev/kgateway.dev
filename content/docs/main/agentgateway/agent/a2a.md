@@ -7,7 +7,7 @@ With {{< reuse "docs/snippets/agentgateway.md" >}}, you can route to agent-to-ag
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-agw.md" >}}
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 <!-- Steps to build image locally from kgateway repo
 ## Step 1: Deploy an A2A server {#a2a-server}
