@@ -1,5 +1,0 @@
----
-title: Amazon Bedrock
-weight: 50
-description:
----
