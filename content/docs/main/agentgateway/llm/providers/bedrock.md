@@ -12,7 +12,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
 
 ## Set up access to Amazon Bedrock {#setup}
 
-1. Log in to the [AWS console](console.aws.amazon.com) and store your access credentials as environment variables.
+1. Log in to the [AWS console](https://console.aws.amazon.com) and store your access credentials as environment variables.
 
    ```bash
    export AWS_ACCESS_KEY_ID="<aws-access-key-id>"
@@ -68,7 +68,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
    | `region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
 
-4. Create an HTTPRoute resource to route requests to the Bedrock upstream. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Upstream resource.
+4. Create an HTTPRoute resource to route requests through your agentgateway Gateway to the Bedrock Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
    ```yaml
    kubectl apply -f- <<EOF                                             
    apiVersion: gateway.networking.k8s.io/v1
@@ -78,7 +78,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: ai-gateway
+       - name: agentgateway
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
