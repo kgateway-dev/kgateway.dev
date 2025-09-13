@@ -98,10 +98,10 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/bedrock" -H content-type:application/json -d '{
-       "messages": [
+      "model": "",
+      "messages": [
          {
            "role": "user",
-           "model": "",
            "content": [
              {
                "text": "You are a cloud native solutions architect, skilled in explaining complex technical concepts such as API Gateway, microservices, LLM operations, kubernetes, and advanced networking patterns. Write me a 20-word pitch on why I should use an AI gateway in my Kubernetes cluster."
