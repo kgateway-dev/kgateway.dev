@@ -3,7 +3,7 @@ title: Routes
 weight: 90
 ---
 
-The agentgateway data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.
+The {{< reuse "docs/snippets/agentgateway.md" >}} data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.
 
 ## Before you begin
 
@@ -11,9 +11,9 @@ The agentgateway data plane supports the Gateway API routing resources, includin
 
 ## HTTP
 
-Use agentgateway to proxy HTTP requests to your backend services.
+Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy HTTP requests to your backend services.
 
-1. Follow the [Sample HTTP app](../../operations/sample-app/) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `agentgateway` GatewayClass, and an HTTPRoute.
+1. Follow the [Sample HTTP app](../../operations/sample-app/) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass, and an HTTPRoute.
 
 2. Check out the following guides for more advanced routing use cases.
 
@@ -24,11 +24,11 @@ Use agentgateway to proxy HTTP requests to your backend services.
 
 ## Routes to external services {#static}
 
-Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for an external HTTP service. Then, use an HTTPRoute to route traffic to that service through your agentgateway. When you set up your Gateway, make sure to use the `agentgateway` GatewayClass.
+Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for an external HTTP service. Then, use an HTTPRoute to route traffic to that service through your agentgateway proxy. When you set up your Gateway, make sure to use the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
 
 ## gRPC
 
-Use agentgateway to proxy gRPC requests to your backend services.
+Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your backend services.
 
 1. Deploy a gRPC sample echo app and a sample gRPC curl client.
 
@@ -96,7 +96,7 @@ Use agentgateway to proxy gRPC requests to your backend services.
    EOF
    ```
 
-2. Create a Gateway that uses the `agentgateway` GatewayClass and an HTTP listener that can be used for gRPC.
+2. Create a Gateway that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass and an HTTP listener that can be used for gRPC.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -105,7 +105,7 @@ Use agentgateway to proxy gRPC requests to your backend services.
    metadata:
      name: agentgateway
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
        - protocol: HTTP
          port: 8080
@@ -201,7 +201,7 @@ Use agentgateway to proxy gRPC requests to your backend services.
 
 Follow the [TCP listener guide](../../setup/listeners/tcp/) to create a TCP listener and a TCPRoute. 
 
-Make sure to create the Gateway with the `agentgateway` GatewayClass.
+Make sure to create the Gateway with the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
 
 Example TCP listener configuration:
 
@@ -310,7 +310,7 @@ EOF
 
 ## TLS
 
-Follow the [TLS listener guide](../../setup/listeners/tls/) to create a TLS listener and a TLSRoute. Make sure to create the Gateway with the `agentgateway` GatewayClass.
+Follow the [TLS listener guide](../../setup/listeners/tls/) to create a TLS listener and a TLSRoute. Make sure to create the Gateway with the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
 
 Example TLS listener configuration:
 

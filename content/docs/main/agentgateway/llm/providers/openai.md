@@ -4,11 +4,11 @@ weight: 10
 description:
 ---
 
-Configure OpenAI as an LLM provider in agentgateway.
+Configure OpenAI as an LLM provider in {{< reuse "docs/snippets/agentgateway.md" >}}.
 
 ## Before you begin
 
-Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}). 
+Set up an [agentgateway proxy](../../setup/). 
 
 ## Set up access to OpenAI
 
