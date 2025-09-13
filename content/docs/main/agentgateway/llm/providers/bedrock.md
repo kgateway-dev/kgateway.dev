@@ -114,6 +114,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/bedrock" -H content-type:application/json  -d '{
+       "model": "",
        "messages": [
          {
            "role": "user",
