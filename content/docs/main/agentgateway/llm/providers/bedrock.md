@@ -98,8 +98,8 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}).
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/bedrock" -H content-type:application/json -d '{
-      "model": "",
-      "messages": [
+       "model": "",
+       "messages": [
          {
            "role": "user",
            "content": [
