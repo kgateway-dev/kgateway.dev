@@ -33,14 +33,14 @@ graph TD
 
 The InferencePool groups together InferenceModels of LLM workloads into a routable backend resource that the Gateway API can route inference requests to. An InferenceModel represents not just a single LLM model, but a specific configuration including information such as as the version and criticality. The InferencePool uses this information to ensure fair consumption of compute resources across competing LLM workloads and share routing decisions to the Gateway API.
 
-### Kgateway with Inference Extension {#kgateway}
+### {{< reuse "/docs/snippets/kgateway-capital.md" >}} with Inference Extension {#integration}
 
-Kgateway integrates with the Inference Extension as a supported Gateway API provider. This way, a kgateway-created Gateway can route requests to InferencePools, as shown in the following diagram.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} integrates with the Inference Extension as a supported Gateway API provider. This way, a Gateway can route requests to InferencePools, as shown in the following diagram.
 
 ```mermaid
 graph TD
-    Client -->|inference request| kgateway
-    kgateway -->|route to| InferencePool
+    Client -->|inference request| {{< reuse "/docs/snippets/kgateway.md" >}}
+    {{< reuse "/docs/snippets/kgateway.md" >}} -->|route to| InferencePool
     InferencePool --> InferenceModel_v1["InferenceModel v1"]
     InferencePool --> InferenceModel_v2["InferenceModel v2"]
     InferencePool --> InferenceModel_v3["InferenceModel v3"]
@@ -51,7 +51,7 @@ graph TD
             InferenceModel_v2
             InferenceModel_v3
         end
-        kgateway
+        {{< reuse "/docs/snippets/kgateway.md" >}}
     end
 ```
 

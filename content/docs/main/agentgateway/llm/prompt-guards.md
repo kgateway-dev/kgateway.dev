@@ -23,7 +23,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
 
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: openai-prompt-guard

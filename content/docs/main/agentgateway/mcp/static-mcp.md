@@ -3,11 +3,11 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP](../) topic.
+Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP]({{< link path="/agentgateway/mcp/about" >}}) topic.
 
 ## Before you begin
 
-Set up an [{{< reuse "docs/snippets/agentgateway.md" >}} proxy]({{< link path="/agentgateway/setup/" >}}). 
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 ## Step 1: Deploy an MCP server {#mcp-server}
 
