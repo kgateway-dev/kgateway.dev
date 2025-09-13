@@ -37,23 +37,7 @@ The InferencePool groups together InferenceModels of LLM workloads into a routab
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} integrates with the Inference Extension as a supported Gateway API provider. This way, a Gateway can route requests to InferencePools, as shown in the following diagram.
 
-```mermaid
-graph TD
-    Client -->|inference request| {{< reuse "/docs/snippets/kgateway.md" >}}
-    {{< reuse "/docs/snippets/kgateway.md" >}} -->|route to| InferencePool
-    InferencePool --> InferenceModel_v1["InferenceModel v1"]
-    InferencePool --> InferenceModel_v2["InferenceModel v2"]
-    InferencePool --> InferenceModel_v3["InferenceModel v3"]
-    subgraph  
-        subgraph InferencePool
-            direction TB
-            InferenceModel_v1
-            InferenceModel_v2
-            InferenceModel_v3
-        end
-        {{< reuse "/docs/snippets/kgateway.md" >}}
-    end
-```
+{{< reuse "docs/snippets/inference-diagram.md" >}}
 
 The Client sends an inference request to get a response from a local LLM workload. The Gateway receives the request and routes to the InferencePool as a backend. Then, the InferencePool selects a specific InferenceModel to route the request to, based on criteria such as the least-loaded model or highest criticality. The Gateway can then return the response to the Client.
 
