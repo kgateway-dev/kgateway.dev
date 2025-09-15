@@ -58,15 +58,15 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
    ```
 
 3. Review the guides in the following sections to create an agentgateway proxy that fits your use case:
-   * [LLM consumption]({{< link path="/agentgateway/llm/" >}})
-   * [Inference routing]({{< link path="/agentgateway/inference/" >}})
-   * [MCP connectivity]({{< link path="/agentgateway/mcp/" >}})
-   * [Agent connectivity]({{< link path="/agentgateway/agent/" >}})
+   * [LLM consumption]({{< link-hextra path="/agentgateway/llm/" >}})
+   * [Inference routing]({{< link-hextra path="/agentgateway/inference/" >}})
+   * [MCP connectivity]({{< link-hextra path="/agentgateway/mcp/" >}})
+   * [Agent connectivity]({{< link-hextra path="/agentgateway/agent/" >}})
 
 ## More considerations
 
 Review the following considerations for using agentgateway.
 
-- Attaching a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a particular route via the `ExtensionRef` filter is not supported. Instead, use the [HTTPRoute rule attachment option]({{< link path="/about/policies/trafficpolicy/#attach-to-rule" >}}) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+- Attaching a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a particular route via the `ExtensionRef` filter is not supported. Instead, use the [HTTPRoute rule attachment option]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-rule" >}}) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 - HTTPListenerPolicy and BackendConfigPolicy resources that configure Envoy-specific filters, such as health checks and access logging, cannot be applied to agentgateway proxies. You can use these policies with Envoy-based kgateway proxies only. 
 - External processing (extProc) as part of the {{< reuse "docs/snippets/trafficpolicy.md" >}} is not supported.
