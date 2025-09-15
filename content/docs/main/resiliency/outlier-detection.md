@@ -18,7 +18,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
 
 1. Scale the httpbin app to 2 replicas. 
    ```sh
-   kubectl scale deploy/httpbin --replicas=2
+   kubectl scale deploy/httpbin -n httpbin --replicas=2
    ```
 
 2. Verify that you see two replicas of the httpbin app. 
@@ -235,7 +235,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
 
 1. Scale down the httpbin app to 1 replica. 
    ```sh
-   kubectl scale deploy/httpbin --replicas=1
+   kubectl scale deploy/httpbin -n httpbin --replicas=1
    ```
 
 2. Remove the BackendConfigPolicy. 
