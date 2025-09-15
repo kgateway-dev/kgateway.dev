@@ -8,7 +8,8 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
 
 ## Before you begin
 
-Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}). 
+1. Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}). 
+2. Make sure that your [Amazon credentials](https://docs.aws.amazon.com/sdkref/latest/guide/creds-config-files.html) have access to the Bedrock models that you want to use.
 
 ## Set up access to Amazon Bedrock {#setup}
 
