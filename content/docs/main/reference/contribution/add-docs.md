@@ -79,6 +79,14 @@ As mentioned earlier, the documentation in the kgateway project is built by usin
 
 Review common shortcodes that you find throughout the documentation: 
 
+### link-hextra
+
+Use the link-hextra shortcode to link to a topic within the documentation in a way that is compatible with the versioning strategy.
+
+```
+[AI Backend API docs]({{< link-hextra path="/reference/api/#aibackend" />}})
+```
+
 ### reuse
 You can use the reuse shortcode to reuse content in multiple places while maintaining a single source of truth. A common use case for this shortcode is a reference to the latest version, product names, or short paragraphs. The source of the reused content is stored as a markdown file in the `assets/docs` directory. 
 
