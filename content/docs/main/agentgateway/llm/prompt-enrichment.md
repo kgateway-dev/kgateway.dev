@@ -17,8 +17,7 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 ## Before you begin
 
-1. [Set up an agentgateway proxy]({{< link path="/agentgateway/llm/setup/" >}}). 
-2. [Set up access to the OpenAI LLM provider]({{< link path="/agentgateway/llm/providers/openai/" >}}).
+{{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 ## Refactor LLM prompts
 
@@ -130,7 +129,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: openai-opt
@@ -311,4 +310,4 @@ kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs
 
 ## Next
 
-Explore how to set up [prompt guards](../prompt-guards/) to block unwanted requests and mask sensitive data.
+Explore how to [call functions](../functions/) to extend the capabilities of the LLM with your own external APIs, apps, and data.

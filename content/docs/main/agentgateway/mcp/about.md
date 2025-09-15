@@ -12,7 +12,7 @@ Learn more about MCP and common challenges when adopting MCP in enterprise envir
 
 An MCP server exposes external data sources and tools so that LLM applications can access them. Typically, you want to deploy these servers remotely and have authorization mechanisms in place so that LLM applications can safely access the data.
 
-With agentgateway, you can connect to one or multiple MCP servers in any environment. The agentgateway proxies requests to the MCP tool that is exposed on the server. <!-- You can also use the agentgateway to federate tools from multiple MCP servers. For more information, see the [MCP multiplexing](/docs/mcp/connect/multiplex/) guide. -->
+With {{< reuse "docs/snippets/agentgateway.md" >}}, you can connect to one or multiple MCP servers in any environment. {{< reuse "docs/snippets/agentgateway-capital.md" >}} proxies requests to the MCP tool that is exposed on the server. <!-- You can also use the agentgateway to federate tools from multiple MCP servers. For more information, see the [MCP multiplexing](/docs/mcp/connect/multiplex/) guide. -->
 
 ## MCP vs. A2A
 
@@ -29,4 +29,4 @@ Such long-lived interactivity creates new vectors for risk and complexity, inclu
 * **Observability**: How to gain visibility into what agents are doing, when, and why? 
 * **Scalability and performance**: How to ensure low latency while securely handling retries, timeouts, and failures? 
 
-Agentgateway is designed to tackle these challenges at its core with built-in security, governance, and observability for all MCP and A2A communication between agents, tools, and LLMs. 
+{{< reuse "docs/snippets/agentgateway-capital.md" >}} is designed to tackle these challenges at its core with built-in security, governance, and observability for all MCP and A2A communication between agents, tools, and LLMs. 

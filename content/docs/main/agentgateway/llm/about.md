@@ -4,7 +4,7 @@ weight: 10
 description:
 ---
 
-Agentgateway provides seamless integration with various Large Language Model (LLM) providers. This way, you can consume AI services through a unified interface while still maintain flexibility in the providers that you use.
+{{< reuse "docs/snippets/agentgateway-capital.md" >}} provides seamless integration with various Large Language Model (LLM) providers. This way, you can consume AI services through a unified interface while still maintain flexibility in the providers that you use.
 
 ## What is an LLM?
 

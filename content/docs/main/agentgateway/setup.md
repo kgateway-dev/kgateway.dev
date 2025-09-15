@@ -4,7 +4,7 @@ weight: 15
 description:
 ---
 
-Set up an agentgateway proxy. 
+Set up an {{< reuse "docs/snippets/agentgateway.md" >}} proxy. 
 
 ## Before you begin
 
@@ -16,8 +16,8 @@ Set up an agentgateway proxy.
 
 ## Next
 
-Explore how you can use your agentgateway by checking out guides for the most common use cases: 
-* [LLM consumption]({{< link path="/agentgateway/llm" >}}) 
-* [Inference routing]({{< link path="/agentgateway/inference" >}}) 
-* [MCP connectivity]({{< link path="/agentgateway/mcp" >}}) 
-* [Agent connectivity]({{< link path="/agentgateway/agent" >}}) 
+Explore how you can use {{< reuse "docs/snippets/agentgateway.md" >}} by checking out guides for the most common use cases: 
+* [LLM consumption]({{< link-hextra path="/agentgateway/llm" >}}) 
+* [Inference routing]({{< link-hextra path="/agentgateway/inference" >}}) 
+* [MCP connectivity]({{< link-hextra path="/agentgateway/mcp" >}}) 
+* [Agent connectivity]({{< link-hextra path="/agentgateway/agent" >}}) 

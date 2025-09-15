@@ -10,7 +10,7 @@ Follow the instructions in this guide to learn how to use these different method
 
 ## Before you begin
 
-Set up an [agentgateway proxy]({{< link path="/agentgateway/setup/" >}}). 
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 ## Manage API keys
 
@@ -53,7 +53,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    EOF
    ``` 
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -222,7 +222,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -369,7 +369,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    EOF
    ``` 
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference](/docs/reference/api/#aibackend).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|

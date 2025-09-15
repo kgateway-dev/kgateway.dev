@@ -3,11 +3,11 @@ title: Connect to an agent
 weight: 40
 ---
 
-With agentgateway, you can route to agent-to-agent (A2A) servers and expose their tools securely.
+With {{< reuse "docs/snippets/agentgateway.md" >}}, you can route to agent-to-agent (A2A) servers and expose their tools securely.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-agw.md" >}}
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 <!-- Steps to build image locally from kgateway repo
 ## Step 1: Deploy an A2A server {#a2a-server}
@@ -76,7 +76,7 @@ Deploy an A2A server that you want agentgateway to proxy traffic to.
 
 ## Step 1: Deploy an A2A server {#a2a-server}
 
-Deploy an A2A server that you want agentgateway to proxy traffic to. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, kgateway configures the agentgateway proxy to use the A2A protocol.
+Deploy an A2A server that you want {{< reuse "docs/snippets/agentgateway.md" >}} to proxy traffic to. Notice that the Service uses the `appProtocol: kgateway.dev/a2a` setting. This way, {{< reuse "docs/snippets/kgateway.md" >}} configures the {{< reuse "docs/snippets/agentgateway.md" >}} proxy to use the A2A protocol.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -119,9 +119,9 @@ EOF
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
-Route to the A2A server with agentgateway.
+Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
 
-1. Create a Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically creates an agentgateway proxy for you.
+1. Create a Gateway resource that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. Kgateway automatically creates an {{< reuse "docs/snippets/agentgateway.md" >}} proxy for you.
 
    ```yaml
    kubectl apply -f- <<EOF

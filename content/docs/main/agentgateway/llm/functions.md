@@ -50,7 +50,7 @@ sequenceDiagram
 
 ### Behavior with other AI features {#about-behavior}
 
-Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs]({{< link path="reference/api/#aitrafficpolicy" >}}).
+Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs]({{< link-hextra path="reference/api/#aitrafficpolicy" >}}).
 
 * Streaming responses: You can stream responses that call functions.
 * Semantic caching: Function calls are not cached.
@@ -69,8 +69,7 @@ Each AI provider has a different way of handling function calling. For example, 
 
 ## Before you begin
 
-1. [Set up an agentgateway proxy]({{< link path="/agentgateway/llm/setup/" >}}). 
-2. [Set up access to the OpenAI LLM provider]({{< link path="/agentgateway/llm/providers/openai/" >}}).
+{{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 ## Example of function calling {#function-call}
 

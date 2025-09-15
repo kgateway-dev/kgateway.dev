@@ -3,7 +3,7 @@ title: Dynamic MCP
 weight: 20
 ---
 
-Route to a Model Context Protocol (MCP) server dynamically by using a label selector. This way, unlike a static backend, you can update the backing MCP server without having to update the Backend resource. For more information, see the [About MCP](../#about) topic.
+Route to a Model Context Protocol (MCP) server dynamically by using a label selector. This way, unlike a static backend, you can update the backing MCP server without having to update the Backend resource. For more information, see the [About MCP]({{< link-hextra path="/agentgateway/mcp/about" >}}) topic.
 
 {{< callout type="warning" >}}
 Note that only streamable HTTP is currently supported for label selectors. If you need to use an SSE listener, use a [static MCP Backend](../static-mcp/).
@@ -11,11 +11,11 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-agw.md" >}}
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 ## Step 1: Deploy an MCP server {#mcp-server}
 
-Deploy an MCP server that you want agentgateway to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
+Deploy an MCP server that you want {{< reuse "docs/snippets/agentgateway.md" >}} to proxy traffic to. The following example sets up an MCP server that provides various utility tools.
 
 1. Create an MCP server (`mcp-server`) that provides various utility tools. Notice the following details about the Service:
    * `appProtocol: kgateway.dev/mcp` (required): Configure your service to use the MCP protocol. This way, the agentgateway proxy uses the MCP protocol when connecting to the service.
@@ -92,9 +92,9 @@ Deploy an MCP server that you want agentgateway to proxy traffic to. The followi
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
-Route to the MCP server with agentgateway.
+Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
 
-1. Create a Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically creates an agentgateway proxy for you.
+1. Create a Gateway resource that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. Kgateway automatically creates an {{< reuse "docs/snippets/agentgateway.md" >}} proxy for you.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -151,7 +151,7 @@ Route to the MCP server with agentgateway.
 
 ## Step 3: Verify the connection {#verify}
 
-Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your MCP server through agentgateway.
+Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your MCP server through {{< reuse "docs/snippets/agentgateway.md" >}}.
 
 1. Get the agentgateway address.
    
