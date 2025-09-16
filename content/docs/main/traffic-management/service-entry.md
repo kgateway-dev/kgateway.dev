@@ -61,7 +61,7 @@ Before diving into the specifics of each `ServiceEntry` type, it's important to 
 The `Gateway` resource, `http-gw-for-test`, listens for HTTP traffic on port `8080`. The `HTTPRoute`, `route-to-upstream`, then matches incoming requests for the hostname `se.example.com` and directs them to a backend specified as an Istio `ServiceEntry`. This separation of concerns means the ingress logic remains constant, while the `ServiceEntry` itself dictates the backend's discovery and resolution strategy.
 
 ```yaml
-kubectl create namespace gw-test
+kubectl create namespace gwtest
 kubectl apply -f - <<EOF
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
