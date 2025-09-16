@@ -61,6 +61,7 @@ Before diving into the specifics of each `ServiceEntry` type, it's important to 
 The `Gateway` resource, `http-gw-for-test`, listens for HTTP traffic on port `8080`. The `HTTPRoute`, `route-to-upstream`, then matches incoming requests for the hostname `se.example.com` and directs them to a backend specified as an Istio `ServiceEntry`. This separation of concerns means the ingress logic remains constant, while the `ServiceEntry` itself dictates the backend's discovery and resolution strategy.
 
 ```yaml
+kubectl apply -f - <<EOF
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
@@ -92,6 +93,7 @@ spec:
       port: 80
       kind: ServiceEntry
       group: networking.istio.io
+EOF
 ```
 
 ## Full Code Examples & Use Cases
@@ -105,6 +107,7 @@ This configuration is the most straightforward, designed for external services w
 The `ServiceEntry` explicitly lists the IP addresses of the external service in the `endpoints` array. With `resolution: STATIC`, Istio directly distributes traffic among these predefined addresses.
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
@@ -126,6 +129,7 @@ spec:
     locality: r1/z1/sz1
   - address: 3.3.3.3
     locality: r3/z3/sz3
+EOF
 ```
 #### Verification Process 
 The goal is to simulate a request from inside the mesh and confirm that the Istio sidecar proxy correctly routes it to one of the static endpoints you defined in the ServiceEntry YAML.
@@ -160,6 +164,7 @@ For external services hosted in dynamic cloud environments or those whose IP add
 The key here is `resolution: DNS`. The `ServiceEntry` relies on DNS lookups for the specified `hosts` (`se.example.com` in this case) to determine the service's current IP addresses. The `endpoints` field is intentionally omitted, as discovery is handled automatically.
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
@@ -174,6 +179,7 @@ spec:
     protocol: TCP
   resolution: DNS
   location: MESH_INTERNAL
+EOF
 ```
 #### Verification Process
 DNS Resolution
@@ -205,6 +211,7 @@ This advanced method provides a flexible way to route to specific in-mesh worklo
 The `ServiceEntry` leverages a `workloadSelector` to identify its endpoints. Istio will automatically discover and include any workloads within the mesh that possess the label `app: reviews` as part of this service.
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
@@ -222,6 +229,7 @@ spec:
   workloadSelector:
     labels:
       app: reviews
+EOF
 ```
 #### Verification Process:
 **Get Target Pod IPs and Verify Routinig**
@@ -247,6 +255,7 @@ This approach involves two key resources:
   * **`ServiceEntry`**: Utilizes a `workloadSelector` that matches the labels defined in the `WorkloadEntry`. This instructs Istio to automatically discover and use these `WorkloadEntry` instances as its endpoints, effectively bridging your Kubernetes-native mesh with external infrastructure.
 
 ```yaml
+kubectl apply -f - <<EOF
 apiVersion: networking.istio.io/v1
 kind: ServiceEntry
 metadata:
@@ -290,6 +299,7 @@ spec:
   locality: r2/z2/sz2
   ports:
     http: 8080
+EOF
 ```
 #### Verification Process: 
 **Verify Envoy Endpoints & Test Traffic Flow**
