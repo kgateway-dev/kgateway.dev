@@ -8,7 +8,7 @@ Configure OpenAI as an LLM provider in {{< reuse "docs/snippets/agentgateway.md"
 
 ## Before you begin
 
-Set up an [agentgateway proxy]({{< link path="/agentgateway/setup" >}}). 
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 ## Set up access to OpenAI
 
@@ -62,7 +62,7 @@ Set up an [agentgateway proxy]({{< link path="/agentgateway/setup" >}}).
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link path="/reference/api/#aibackend" >}}).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|

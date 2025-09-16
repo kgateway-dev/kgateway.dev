@@ -3,7 +3,7 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP]({{< link path="/agentgateway/mcp/about" >}}) topic.
+Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP]({{< link-hextra path="/agentgateway/mcp/about" >}}) topic.
 
 ## Before you begin
 

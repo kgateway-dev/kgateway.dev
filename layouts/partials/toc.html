@@ -24,9 +24,14 @@
   {{- end }}
 {{- end }}
 
+{{- if false -}}
+{{- range $headings -}}
+{{- end -}}
+{{- end -}}
+
 {{/* ---------- recursive renderer (consumes list so no duplicates) ---------- */}}
 {{- define "render-list" -}}
-  <ul>
+  <ul class="hx-ml-4 hx-mt-1">
     {{- template "render-items" . -}}
   </ul>
 {{- end }}
@@ -38,15 +43,13 @@
   {{- if gt $n 0 -}}
     {{- $h := index $headings 0 -}}
     <li class="hx-my-2 hx-scroll-my-6 hx-scroll-py-6">
-      {{- $padding := mul (sub $h.level $parentLevel) 4 -}}
-      {{- $class := cond (eq $h.level $parentLevel) "hx:font-medium" (printf "hx:ltr:pl-%d hx:rtl:pr-%d" $padding $padding) -}}
       <a
         href="#{{ $h.id }}"
-        class="{{ $class }} hx-font-semibold hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words">
+        class="hx-font-semibold hx-inline-block hx-text-gray-500 hover:hx-text-gray-900 dark:hx-text-gray-400 dark:hover:hx-text-gray-300 contrast-more:hx-text-gray-900 contrast-more:hx-underline contrast-more:dark:hx-text-gray-50 hx-w-full hx-break-words">
         {{ $h.text }}
       </a>
 
-      {{- /* collect immediate children */ -}}
+      {{- /* collect immediate children that come after this heading */ -}}
       {{- $subs := slice -}}
       {{- if gt $n 1 -}}
         {{- range $j := seq 1 (sub $n 1) -}}
@@ -63,7 +66,7 @@
       {{- end -}}
     </li>
 
-    {{- /* render the rest */ -}}
+    {{- /* render the rest of headings at this level */ -}}
     {{- $consumed := add 1 (len $subs) -}}
     {{- if lt $consumed $n -}}
       {{- $rest := slice -}}

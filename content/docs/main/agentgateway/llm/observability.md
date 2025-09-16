@@ -8,7 +8,7 @@ Review LLM-specific metrics and logs.
 
 ## Before you begin
 
-Complete an LLM guide, such as an [LLM provider-specific guide]({{< link path="/agentgateway/llm/providers/" >}}). This guide sends a request to the LLM and receives a response. You can use this request and response example to verify metrics and logs.  
+Complete an LLM guide, such as an [LLM provider-specific guide]({{< link-hextra path="/agentgateway/llm/providers/" >}}). This guide sends a request to the LLM and receives a response. You can use this request and response example to verify metrics and logs.  
 
 ## View LLM metrics
 
