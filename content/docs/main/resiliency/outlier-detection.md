@@ -77,7 +77,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
    size_bytes=0 duration_ms=0.03 user_agent="curl/8.7.1" client_ip=10.X.X.XX
    ```
 
-5. Create a BackendConfigPolicy with your outlier detection policy. The following example ejects an unhealthy upstream host for one hour if the host returns one 5XX HTTP response code. Note that the maximum number of ejected hosts is set to 80%. Because of that, only one replica of httpbin can be ejected at any given time as both replicas would equal 100%. 
+5. Create a BackendConfigPolicy with your outlier detection policy. The following example ejects an unhealthy upstream host for one hour if the host returns one 5XX HTTP response code. Note that the maximum number of ejected hosts is set to 80%. Because of that, only one replica of httpbin can be ejected at any given time. If two replicas were ejected, that would exceed the 80% maximum threshold (because the two replicas equal 100%).
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
