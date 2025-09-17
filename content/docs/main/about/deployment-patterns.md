@@ -84,9 +84,11 @@ For more information, see the guide for using {{< reuse "/docs/snippets/kgateway
 
 ## AI and Agentic Gateway
 
-Traditional API gateways, reverse proxies, and AI gateways, such as Envoy, were built and optimized for RESTful microservices architectures where the gateway receives short-lived HTTP requests from a client, decides on a backend, and forwards the request to that backend. Agentic AI workloads on the other hand are stateful and bidirectional, and require a gateway to properly handle session and message awareness. These communication patterns are very resource intensive and can quicky overwhelm traditional gateways leading to performance impacts or even failure. 
+Traditional API gateways, reverse proxies, and AI gateways like Envoy were designed for REST-style microservices. In those systems, a gateway takes short-lived HTTP requests from a client, picks a backend, and forwards the request there. Agentic AI workloads are different. They keep long-lived state and exchange bidirectional messages. Such workloads also typically are resource intensive. As such, traditional gateways can experience performance impacts or even failure. Instead, AI workloads need a gateway that handles sessions and message context at scale.
 
 [Agentgateway](https://agentgateway.dev/docs/about/introduction/) is an open source, highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for AI agents, MCP tool servers, and LLM providers. You can use {{< reuse "docs/snippets/kgateway.md" >}} as the control plane to quickly spin up and manage the lifecycle of agentgateway proxies in Kubernetes environments. In addition, you get {{< reuse "docs/snippets/kgateway.md" >}}'s enterprise-grade security, observability, resiliency, reliability, and multi-tenancy features. 
 
 {{< reuse-image src="img/kgateway-agw.svg" >}}
 {{< reuse-image-dark srcDark="img/kgateway-agw.svg" >}}
+
+For more information, see [About {{< reuse "docs/snippets/agentgateway.md" >}}]({{< link-hextra path="/agentgateway/about/" >}}).
