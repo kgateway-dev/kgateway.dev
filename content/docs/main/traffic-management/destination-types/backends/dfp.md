@@ -4,4 +4,4 @@ weight: 40
 description:
 ---
 
-{{< reuse "docs/pages/traffic-management/dfp.md" >}}
+Review the [Dynamic Forward Proxy (DFP)]({{< link-hextra path="/traffic-management/dfp" >}}) guide in the traffic management section. 
