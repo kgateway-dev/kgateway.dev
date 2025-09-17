@@ -8,7 +8,7 @@ The type of gateway proxy that you want to use depends on your use case, which i
 
 Backend applications are commonly accessed by clients through application programming interfaces (APIs). Hence, an "API gateway" is a common use case for a gateway proxy. For more information, see the [API gateway overview topic](../overview/#api-gateway). If the client is outside your cluster, you need an ingress gateway to handle this "north-south" traffic. If the client is within the cluster or service mesh, you need an "east-west" gateway. To control traffic that leaves your environment, you need an egress gateway.
 
-Increasingly, gateway proxies are designed to meet the challenges that are specific to artificial intelligence (AI) networking. In these scenarios, your backend applciations might be cloud provider large language models (LLMs), your own LLMs and inferences, model context protocol (MCP) servers, agent-to-agent (A2A) servers, and similar AI use cases.
+Increasingly, gateway proxies are designed to meet the challenges that are specific to artificial intelligence (AI) networking. In these scenarios, your backend applications might be cloud provider large language models (LLMs), your own LLMs and inferences, model context protocol (MCP) servers, agent-to-agent (A2A) servers, and similar AI use cases.
 
 The best gateway proxies offer you ways to configure advanced routing, load balancing, security enforcement, protocol translation, and more. They also generate metrics and logs that you can use to monitor and troubleshoot your traffic.
 
