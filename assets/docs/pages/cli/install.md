@@ -4,6 +4,8 @@ weight: 10
 description:
 ---
 
+<!--TODO: CLI implement reuse when ready -->
+
 Use the `kgwctl` CLI to quickly assess the health of your kgateway control and data plane components. 
 
 1. Save the version of the kgwctl CLI that you want to install as an environment variable. 
