@@ -16,17 +16,17 @@ This list of ports reflects the default values that are included in an unmodifie
 
 ## Installation
 
-The kgateway installation process uses a Helm chart to create the necessary custom resource definitions (CRDs), deployments, services, pods, etc. The services and pods listen on specific ports to enable communication between the components that make up kgateway.
+The {{< reuse "docs/snippets/kgateway.md" >}} installation process uses a Helm chart to create the necessary custom resource definitions (CRDs), deployments, services, pods, etc. The services and pods listen on specific ports to enable communication between the components that make up {{< reuse "docs/snippets/kgateway.md" >}}.
 
 ## Components
 
-A standard installation of kgateway includes the following components:
+A standard installation of {{< reuse "docs/snippets/kgateway.md" >}} includes the following components:
 
-* **Kgateway control plane**
+* **{{< reuse "docs/snippets/kgateway-capital.md" >}} control plane**
   * Creates an Envoy configuration from multiple custom resources.
   * Serves Envoy configurations using xDS.
   * Validates Proxy configurations for the gateway proxy.
-* **Kgateway data plane (gateway proxy)**
+* **{{< reuse "docs/snippets/kgateway-capital.md" >}} data plane (gateway proxy)**
   * Receives and loads configuration from kgateway xDS.
   * Proxies incoming traffic.
 
@@ -38,8 +38,8 @@ The components are instantiated by using pods and services. The following table 
 
 | Pod | Port | Usage |
 |-----|------|-------|
-| kgateway | 9976 | REST xDS | 
-| kgateway | 9977 | xDS Server |
+| {{< reuse "docs/snippets/kgateway.md" >}} | 9976 | REST xDS | 
+| {{< reuse "docs/snippets/kgateway.md" >}} | 9977 | xDS Server |
 
 ### Gateway proxy ports
 
