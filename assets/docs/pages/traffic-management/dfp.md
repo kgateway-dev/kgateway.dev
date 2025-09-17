@@ -1,10 +1,16 @@
 Dynamically resolve upstream hosts at request time.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## About Dynamic Forward Proxy
 
 Dynamic Forward Proxy (DFP) is a filter in Envoy that allows a gateway proxy to act as a generic HTTP(S) forward proxy without the need to preconfigure all possible upstream hosts. Instead, the DFP dynamically resolves the upstream host at request time by using DNS. 
 
-DFPs are especially useful in highly dynamic environments where services come up and down frequently making it hard for a service registry to list all available endpoints at a given time. With DFP, you do not need to have pre-defined destinations giving you more flexibility to resolve endpoints as the request comes in. Another common use case for DFPs is to control and monitor all egress traffic. For example, you can apply policies, such as rate limiting, authentication, authorization, and access logging, and easily access metrics for the egress traffic that is routed through the forward proxy. 
+DFPs are especially useful in highly dynamic environments where services come up and down frequently. Such churn makes it hard for a service registry to list all available endpoints at a given time. With DFP, you do not need to have pre-defined destinations. This approach gives you more flexibility to resolve endpoints as the request comes in. 
+	
+Another common use case for DFPs is to control and monitor all egress traffic. For example, you can apply policies, such as rate limiting, authentication, authorization, and access logging. You can also easily access metrics for the egress traffic that is routed through the forward proxy. 
 
 DFPs are configured in a Backend resource and an HTTPRoute that routes traffic to the DFP Backend. If a request reaches the gateway proxy, the proxy extracts the host header value from the request and uses DNS to resolve the host to an IP address. Then, the request is forwarded to the resolved IP address.
 
@@ -12,12 +18,9 @@ DFPs are configured in a Backend resource and an HTTPRoute that routes traffic t
 
 DFPs offer great flexibility for defining routing patterns for your upstream hosts. However, consider the following downsides when using a DFP:
 
-* You cannot configure failover or client-side load balancing policies for DFP-configured routes as no pre-defined upstream hosts exist that determine the desired upstream service. 
+* You cannot configure failover or client-side load balancing policies for DFP-configured routes because no pre-defined upstream hosts exist that determine the desired upstream service.
 * DNS resolution is done at runtime, which can have performance implications. If Envoy detects a new domain name, Envoy pauses the request and synchronously resolves this domain to get the IP address of the endpoint. Then, Envoy caches the IP address locally. 
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
 
 ## Before you begin
 
@@ -46,7 +49,7 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
    kind: HTTPRoute
    metadata:
      namespace: httpbin
-     name: httproute-dfp
+     name: dfp-httproute
    spec:
      parentRefs:
        - name: http
@@ -104,7 +107,7 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
 
 2. Remove the HTTPRoute. 
    ```sh
-   kubectl delete httproute httpbin-dfp -n httpbin
+   kubectl delete httproute dfp-httproute -n httpbin
    ```
 
 
