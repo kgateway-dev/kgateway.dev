@@ -1,7 +1,7 @@
 ---
 title: Service Entry
 weight: 20 # (Assuming a logical weight after External Auth, adjust as needed)
-description: Extend K-Gateway's service mesh to external services using Istio Service Entries for unified traffic management.
+description: Register and route external services through kgateway using Istio ServiceEntries.
 ---
 
 Extend K-Gateway's service mesh to external services using Istio Service Entries for unified traffic management.
