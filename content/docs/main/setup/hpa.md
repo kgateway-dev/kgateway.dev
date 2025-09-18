@@ -148,7 +148,7 @@ To enable HPA plug-in integration, you must create a Gateway with a custom Gatew
 
 ```sh
 kubectl delete gateway hpa -n httpbin
-kubectl delete gatewayparameters.gateway.kgateway.dev custom-gw-params -n httpbin
+kubectl delete gatewayparameters custom-gw-params -n httpbin
 kubectl delete hpa hpa -n httpbin
 kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 ```
