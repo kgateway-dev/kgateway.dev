@@ -54,7 +54,7 @@ sequenceDiagram
 
 -----
 
-## The Common Components: K-Gateway and HTTPRoute
+## Targeting ServiceEntry Backends with HTTPRoute
 
 Before diving into the specifics of each `ServiceEntry` type, it's important to note the consistent ingress and routing components used across all examples. The `Gateway` and `HTTPRoute` resources define how incoming traffic reaches the mesh's edge and is initially processed.
 
