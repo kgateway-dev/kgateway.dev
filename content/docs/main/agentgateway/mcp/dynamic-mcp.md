@@ -76,7 +76,6 @@ Deploy an MCP server that you want {{< reuse "docs/snippets/agentgateway.md" >}}
    spec:
      type: MCP
      mcp:
-       name: mcp-virtual-server
        targets:
          - name: mcp-server-everything
            selector:
@@ -169,15 +168,15 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{< /tabs >}}
 
-2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
-   
+2. From the terminal, install the MCP Inspector tool. Then, run the tool to open it in your browser.
    ```sh
    npx modelcontextprotocol/inspector#{{% reuse "docs/versions/mcp-inspector.md" %}}
+   mcp-inspector 
    ```
 
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
+   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>:8080/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
    * Click **Connect**.
 
 4. From the menu bar, click the **Tools** tab, then click **List Tools**.
