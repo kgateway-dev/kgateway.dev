@@ -8,7 +8,7 @@ Extend K-Gateway's service mesh to external services using Istio Service Entries
 
 # Service Entry with K-Gateway
 
-An **Istio Service Entry** is a Kubernetes custom resource that allows you to integrate and manage external services within your Istio service mesh. For K-Gateway, this is a critical capability as it extends the mesh's robust features – such as traffic management, security, and observability – to services residing outside your Kubernetes cluster. Whether it's a legacy application, a third-party API, or a remote database, Service Entries enable you to treat these external dependencies as first-class citizens of your mesh.
+An **Istio ServiceEntry** is a Kubernetes custom resource that allows you to integrate and manage external services within your Istio service mesh. kgateway supports ServiceEntries for services residing outside your Kubernetes cluster. Whether it’s a legacy application, a third-party API, or a remote database, ServiceEntries allow you to treat these external dependencies as first-class citizens of your mesh, in addition to applying kgateway policies.
 
 The `ServiceEntry` resource offers flexible mechanisms to define how these external services are discovered and addressed, tailored to different operational needs:
 
