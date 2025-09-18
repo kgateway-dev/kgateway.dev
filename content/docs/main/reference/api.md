@@ -301,6 +301,7 @@ _Appears in:_
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
 | `customConfigMapName` _string_ | Name of the custom configmap to use instead of the default generated one.<br />When set, the agent gateway will use this configmap instead of creating the default one.<br />The configmap must contain a 'config.yaml' key with the agent gateway configuration. |  |  |
+| `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
 
 #### AiExtension
@@ -741,8 +742,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
-| `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body. |  |  |
+| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected.<br />This field is only supported for kgateway (Envoy) data plane and is ignored by agentgateway.<br />For agentgateway, use json(request.body) or json(response.body) directly in CEL expressions. | AsString | Enum: [AsString AsJson] <br /> |
+| `value` _[Template](#template)_ | Value is the template to apply to generate the output value for the body.<br />Inja templates are supported for Envoy-based data planes only.<br />CEL expressions are supported for agentgateway data plane only.<br />The system will auto-detect the appropriate template format based on the data plane. |  |  |
 
 
 #### Buffer
@@ -760,24 +761,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `maxRequestSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | MaxRequestSize sets the maximum size in bytes of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413.<br />Example format: "1Mi", "512Ki", "1Gi" |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the buffer filter.<br />Can be used to disable buffer policies applied at a higher level in the config hierarchy. |  |  |
-
-
-#### BufferSettings
-
-
-
-BufferSettings configures how the request body should be buffered.
-
-
-
-_Appears in:_
-- [ExtAuthPolicy](#extauthpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br /> |
-| `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the authorization service even if they exceed maxRequestBytes.<br />When unset, the default behavior is false. |  |  |
-| `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />When unset, the default behavior is false. |  |  |
 
 
 #### BuiltIn
@@ -1217,6 +1200,7 @@ _Appears in:_
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
+| `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
 
 #### EnvoyHealthCheck
@@ -1234,6 +1218,25 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `path` _string_ | Path defines the exact path that will be matched for health check requests. |  | MaxLength: 2048 <br />Pattern: `^/[-a-zA-Z0-9@:%.+~#?&/=_]+$` <br /> |
+
+
+#### ExtAuthBufferSettings
+
+
+
+ExtAuthBufferSettings configures how the request body should be buffered.
+
+
+
+_Appears in:_
+- [ExtAuthPolicy](#extauthpolicy)
+- [ExtAuthProvider](#extauthprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br /> |
+| `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the authorization service even if they exceed maxRequestBytes.<br />The default behavior is false. | false |  |
+| `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />The default behavior is false. | false |  |
 
 
 #### ExtAuthPolicy
@@ -1254,7 +1257,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references the GatewayExtension that should be used for authentication. |  |  |
-| `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
+| `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
 | `contextExtensions` _object (keys:string, values:string)_ | Additional context for the authorization service. |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable all external authorization filters.<br />Can be used to disable external authorization policies applied at a higher level in the config hierarchy. |  |  |
 
@@ -1273,6 +1276,11 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the authentication. |  |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext auth service is unavailable.<br />Defaults to false, meaning requests will be denied if the ext auth service is unavailable. | false |  |
+| `clearRouteCache` _boolean_ | ClearRouteCache determines if the route cache should be cleared to allow the<br />external authorization service to correctly affect routing decisions. | false |  |
+| `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning: buffering has implications for streaming and therefore performance. |  |  |
+| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />authorization server returns an error or cannot be reached. Must be in the range of 100-511 inclusive.<br />The default matches the deny response code of 403 Forbidden. | 403 | Maximum: 511 <br />Minimum: 100 <br /> |
+| `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extauth filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 
 
 #### ExtGrpcService
@@ -1292,6 +1300,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
+| `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 
 
 #### ExtProcPolicy
@@ -1326,6 +1335,31 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the processing. |  |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext proc service is unavailable.<br />Defaults to true, meaning requests are allowed upstream even if the ext proc service is unavailable. | true |  |
+| `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams. |  |  |
+| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server. |  |  |
+| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />The default value 0, which effectively disables the override_message_timeout API. |  |  |
+| `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
+| `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
+| `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
+
+
+#### ExtProcRouteCacheAction
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description |
+| --- | --- |
+| `FromResponse` | RouteCacheActionFromResponse is the default behavior, which clears the route cache only<br />when the clear_route_cache field is set in an external processor response.<br /> |
+| `Clear` | RouteCacheActionClear always clears the route cache irrespective of the<br />clear_route_cache field in the external processor response.<br /> |
+| `Retain` | RouteCacheActionRetain never clears the route cache irrespective of the<br />clear_route_cache field in the external processor response.<br /> |
 
 
 #### FieldDefault
@@ -1363,11 +1397,14 @@ defaults:
 ```
 
 
-Example: Overriding a custom list field:
+Example: Setting custom lists fields:
 ```yaml
 defaults:
-  - field: "custom_list"
-    value: "[a,b,c]"
+  - field: "custom_integer_list"
+    value: "[1,2,3]"
+  - field: "custom_string_list"
+    value: '["one","two","three"]'
+    override: true
 
 
 ```
@@ -1761,7 +1798,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
-| `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
+| `value` _[Template](#template)_ | Value is the template to apply to generate the output value for the header.<br />Inja templates are supported for Envoy-based data planes only.<br />CEL expressions are supported for agentgateway data plane only.<br />The system will auto-detect the appropriate template format based on the data plane. |  |  |
 
 
 #### HeaderValue
@@ -1920,20 +1957,6 @@ _Appears in:_
 | `tag` _string_ | The image tag. |  |  |
 | `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
 | `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
-
-
-#### InjaTemplate
-
-_Underlying type:_ _string_
-
-
-
-
-
-_Appears in:_
-- [BodyTransformation](#bodytransformation)
-- [HeaderTransformation](#headertransformation)
-
 
 
 #### IstioContainer
@@ -2398,6 +2421,42 @@ _Appears in:_
 | `Host` | Host kind of metadata.<br /> |
 
 
+#### MetadataNamespaces
+
+
+
+MetadataNamespaces configures which metadata namespaces to use.
+See [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-msg-extensions-filters-http-ext-proc-v3-metadataoptions-metadatanamespaces)
+for specifics.
+
+
+
+_Appears in:_
+- [MetadataOptions](#metadataoptions)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `typed` _string array_ |  |  | MinItems: 1 <br /> |
+| `untyped` _string array_ |  |  | MinItems: 1 <br /> |
+
+
+#### MetadataOptions
+
+
+
+MetadataOptions allows configuring metadata namespaces to forward or receive from the external
+processing server.
+
+
+
+_Appears in:_
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `forwarding` _[MetadataNamespaces](#metadatanamespaces)_ | Forwarding defines the typed or untyped dynamic metadata namespaces to forward to the external processing server. |  |  |
+
+
 #### MetadataPathSegment
 
 _Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
@@ -2692,6 +2751,7 @@ _Appears in:_
 | `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 | `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 | `topologySpreadConstraints` _[TopologySpreadConstraint](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#topologyspreadconstraint-v1-core) array_ | If specified, the pod's topology spread constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#topologyspreadconstraint-v1-core<br />for details. |  |  |
+| `extraVolumes` _[Volume](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volume-v1-core) array_ | Additional volumes to add to the pod. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volume-v1-core<br />for details. |  |  |
 
 
 #### PolicyAncestorStatus
@@ -2777,6 +2837,7 @@ ProcessingMode defines how the filter should interact with the request/response 
 
 _Appears in:_
 - [ExtProcPolicy](#extprocpolicy)
+- [ExtProcProvider](#extprocprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -3002,8 +3063,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the rate limiting. |  |  |
 | `domain` _string_ | Domain identifies a rate limiting configuration for the rate limit service.<br />All rate limit requests must specify a domain, which enables the configuration<br />to be per application without fear of overlap (e.g., "api", "web", "admin"). |  |  |
-| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />When true, requests are not limited if the rate limit service is unavailable. | true |  |
-| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout for requests to the rate limit service. | 100ms |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />Defaults to true, meaning requests are allowed upstream and not limited if the rate limit service is unavailable. | true |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout provides an optional timeout value for requests to the rate limit service.<br />For rate limiting, prefer using this timeout rather than setting the generic `timeout` on the `GrpcService`.<br />See [envoy issue](https://github.com/envoyproxy/envoy/issues/20070) for more info. | 100ms |  |
+| `xRateLimitHeaders` _[XRateLimitHeadersStandard](#xratelimitheadersstandard)_ | XRateLimitHeaders configures the standard version to use for X-RateLimit headers emitted.<br />See [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ratelimit/v3/rate_limit.proto#envoy-v3-api-field-extensions-filters-http-ratelimit-v3-ratelimit-enable-x-ratelimit-headers) for more info.<br />Disabled by default. | Off | Enum: [Off DraftVersion03] <br /> |
 
 
 #### Regex
@@ -3519,6 +3581,20 @@ _Appears in:_
 | `1.3` |  |
 
 
+#### Template
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [BodyTransformation](#bodytransformation)
+- [HeaderTransformation](#headertransformation)
+
+
+
 #### Timeouts
 
 
@@ -3646,7 +3722,7 @@ _Appears in:_
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
-| `rbac` _[RBAC](#rbac)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions. |  |  |
+| `rbac` _[RBAC](#rbac)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />With an Envoy-based Gateway, RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. In Envoy, this means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. In contrast, an<br />Agentgateway-based Gateway supports cumulative RBAC policies across different attachment points, such that<br />an RBAC policy attached to a route augments policies applied to the gateway or listener without overriding them. |  |  |
 
 
 #### Transform
@@ -3743,6 +3819,23 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />```yaml<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br />``` |  |  |
-| `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook.<br />Note: This is not yet supported for agentgateway. |  |  |
+| `forwardHeaderMatches` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
+
+
+#### XRateLimitHeadersStandard
+
+_Underlying type:_ _string_
+
+XRateLimitHeadersStandard controls how XRateLimit headers will emitted.
+
+
+
+_Appears in:_
+- [RateLimitProvider](#ratelimitprovider)
+
+| Field | Description |
+| --- | --- |
+| `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
+| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
