@@ -23,33 +23,39 @@ Consistent hashing is less reliable than a "strong" or "sticky" session affinity
 
 ## Configure session affinity with consistent hashing
 
-First, define the Ringhash or Maglev hashing algorithm that you want to use for your backend app in a `BackendConfigPolicy`. Then, define the request property to hash in a {{< reuse "docs/snippets/trafficpolicy.md" >}} that you apply to the backend app's HTTPRoute.
+Choose between the following supported consistent hashing algorithms: 
+* [Ringhash](#ringhash)
+* [Maglev](#maglev)
 
-### Define Ringhash or Maglev hashing
+### Set up Ringhash hashing
 
-In the `loadBalancer` section of a BackendConfigPolicy resource, specify settings for either the Ringhash or Maglev hashing algorithm. 
+Ringhash allows you to tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup. To learn more about Ringhash, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html). 
 
-* **Ringhash**: You can tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup.
-* **Maglev**: You use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning.
 
-{{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
-{{% tab tabName="Ringhash" %}}
+
+{{< tabs tabTotal="2" items="Headers,Cookies" >}}
+{{% tab tabName="Headers" %}}
 ```yaml
 kind: BackendConfigPolicy
 apiVersion: gateway.kgateway.dev/v1alpha1
 metadata:
-  name: example-ringhash-policy
-  namespace: default
+  name: httpbin-ringhash-policy
 spec:
   targetRefs:
-    - name: example-app
+    - name: httpbin-ringhash
       group: ""
       kind: Service
   loadBalancer:
     ringHash:
       minimumRingSize: 1024
       maximumRingSize: 2048
-    useHostnameForHashing: true
+      hashPolicies:
+      - header:
+          name: "x-user-id"
+        terminal: true
+      - header:
+          name: "x-session-id"
+        terminal: false
     closeConnectionsOnHostSetChange: true
 ```
 
@@ -61,9 +67,54 @@ spec:
 | `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
 | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
 | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
+| `header.name` | The expected header name to create the hash with. |
+| `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
 
 {{% /tab %}}
-{{% tab tabName="Maglev" %}}
+{{% tab tabName="Cookies" %}}
+
+```yaml
+kind: BackendConfigPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+metadata:
+  name: httpbin-ringhash-policy
+spec:
+  targetRefs:
+    - name: httpbin-ringhash
+      group: ""
+      kind: Service
+  loadBalancer:
+    ringHash:
+      minimumRingSize: 1024
+      maximumRingSize: 2048
+      hashPolicies:
+      - cookie:
+        name: "session-id"
+        path: "/api"
+        ttl: 30m
+        attributes:
+          httpOnly: "true"
+          secure: "true"
+          sameSite: "Strict"
+      terminal: true
+```
+
+{{< reuse "/docs/snippets/review-table.md" >}}
+
+| Setting | Description | 
+| -- | -- | 
+| `minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
+| `maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+| `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
+| `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
+| `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
+| `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
+| `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attirbutes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+| `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
+
+
+{{% /tab %}}
+{{% tab tabName="Maglev with headers" %}}
 Note that no further settings for Maglev are required because it uses a fixed table size.
 
 ```yaml
@@ -82,6 +133,15 @@ spec:
 ```
 {{% /tab %}}
 {{< /tabs >}}
+
+
+Use a BackendConfigPolicy to enable Ringhash hashing and set the request properties that you want to use for hashing. 
+
+
+* **Maglev**: You use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning.
+
+First, define the Ringhash or Maglev hashing algorithm that you want to use for your backend app in a `BackendConfigPolicy`. Then, define the request property to hash in a {{< reuse "docs/snippets/trafficpolicy.md" >}} that you apply to the backend app's HTTPRoute.
+
 
 ### Define request properties
 
