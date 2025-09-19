@@ -9,14 +9,14 @@ You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to {{< reuse "doc
 To allow integration with HPA plug-ins, you must set the `omitReplicas` option to `true` in the GatewayParameters resource. This way, your HPA plug-in can scale the proxy based on your autoscaling strategy. 
 
 {{< callout context="info" >}}
-To enable HPA plug-in integration, you must create a Gateway with a custom GatewayParameters resource. You cannot enable this feature by using the {{< reuse "docs/snippets/kgateway.md" >}} Helm chart.
+To enable the HPA plug-in integration, you must create a Gateway with a custom GatewayParameters resource. You cannot enable this feature by using the {{< reuse "docs/snippets/kgateway.md" >}} Helm chart.
 {{< /callout >}}
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up our own HPA plug-in
+## Set up your own HPA plug-in
 
 1. Create a GatewayParameters resource and enable the HPA plug-in integration by setting `omitReplicas: true`. 
    ```yaml
@@ -89,7 +89,7 @@ To enable HPA plug-in integration, you must create a Gateway with a custom Gatew
 
 5. Review the metrics for the HPA Gateway. 
    ```sh
-   kubectl top pod -n httpbin  | grep hpa
+   kubectl top pod -n httpbin | grep hpa
    ```
    
    Example output: 
