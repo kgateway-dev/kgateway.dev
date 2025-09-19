@@ -48,7 +48,7 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
    Example output: 
    ```
    
-   agentGateway:
+   agentgateway:
      enabled: true
    ```
 
