@@ -204,10 +204,9 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
 
    | Setting | Description | 
    | -- | -- | 
-   | `maglev` | Note that no further settings for Maglev are required because it uses a fixed table size. | 
-   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
    | `header.name` | The expected header name to create the hash with. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
+   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
    | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
 
    {{% /tab %}}
@@ -243,7 +242,6 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
 
    | Setting | Description | 
    | -- | -- | 
-   | `maglev` | Note that no further settings for Maglev are required because it uses a fixed table size. | 
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
@@ -275,7 +273,6 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
 
    | Setting | Description | 
    | -- | -- | 
-   | `maglev` | Note that no further settings for Maglev are required because it uses a fixed table size. | 
    | `sourceIP` | Hash based on the source IP address of the request. No further configuration is required. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
