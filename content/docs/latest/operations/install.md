@@ -314,7 +314,7 @@ When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add
 For more information, see the Helm reference docs.
 
 {{< cards >}}
-  {{< card link="/docs/reference/helm/helm/" title="Helm reference docs" >}}
+  {{< card link="/../../reference/helm/" title="Helm reference docs" >}}
 {{< /cards >}}
 
 ### Namespace discovery {#namespace-discovery}
