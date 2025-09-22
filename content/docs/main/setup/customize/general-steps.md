@@ -4,12 +4,12 @@ weight: 10
 next: /docs/setup/customize/aws-elb
 ---
 
-The configuration that is used to spin up a gateway proxy is stored in several custom resources, including GatewayParameters, and a gateway proxy template. By default, kgateway creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration](/docs/setup/default/). You have the following options to change the default configuration for your gateway proxies: 
+The configuration that is used to spin up a gateway proxy is stored in several custom resources, including GatewayParameters, and a gateway proxy template. By default, {{< reuse "docs/snippets/kgateway.md" >}} creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration](/docs/setup/default/). You have the following options to change the default configuration for your gateway proxies: 
 
 | Option | Description | 
 | -- | -- | 
 | Create your own GatewayParameters resource (recommended) | To adjust the settings on the gateway proxy, you can create your own GatewayParameters resource. This approach allows you to spin up gateway proxies with different configurations. Keep in mind that you must maintain the GatewayParameters resources that you created manually. The values in these resources are not automatically updated during upgrades.  | 
-| Change default GatewayParameters | You can change the values for the default GatewayParameters resource by updating the values in the kgateway Helm chart. Do not update the values in these resources directly as the values do not persist between upgrades. The values that you set in your Helm chart are automatically applied to the default GatewayParameters resource, and rolled out to the gateway proxies.  |
+| Change default GatewayParameters | You can change some of the values for the default GatewayParameters resource by updating the values in the kgateway Helm chart. Do not update the values in the GatewayParameters resource directly as the values do not persist between upgrades. The values that you set in your Helm chart are automatically applied to the default GatewayParameters resource, and rolled out to the gateway proxies.  |
 | Create self-managed gateways with custom proxy templates | If you want to change the [default gateway proxy template](/docs/setup/default/#gateway-proxy-template) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)](/docs/setup/customize/selfmanaged). | 
 
 ## Customize the gateway proxy 
