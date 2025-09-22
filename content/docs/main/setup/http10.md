@@ -8,9 +8,13 @@ Configure your gateway proxy to accept older HTTP protocols.
 
 ## About HTTP/1.0 and HTTP/0.9
 
-By default, Envoy-based gateway proxy return a 426 Upgrade Required HTTP response code for HTTP/1.0 and HTTP/0.9 requests. HTTP/0.9 was a simple, rudimentary protocol that was introduced in 1991 and supported only the `GET` HTTP method. Other methods, such as `POST`, `PUT`, and `DELETE` were later introduced in HTTP/1.0. 
+By default, Envoy-based gateway proxies return a 426 Upgrade Required HTTP response code for HTTP/1.0 and HTTP/0.9 requests. HTTP/0.9 was a simple, rudimentary protocol that was introduced in 1991 and supported only the `GET` HTTP method. Other methods, such as `POST`, `PUT`, and `DELETE` were later introduced in HTTP/1.0.
 
 Both protocol versions are rarely used nowadays. However, some applications might still require support for these versions for backwards compatibililty. To allow the gateway proxy to accept these types of requests, you can create an HTTPListenerPolicy and attach it to your Gateway. 
+
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
 
 
 ## Before you begin
@@ -19,7 +23,7 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 
 ## Set up HTTP 1.0 support
 
-1. Create an HTTPListenerPolicy with the `acceptHttp10` field. 
+1. Create an HTTPListenerPolicy with the `acceptHttp10` field. In the `targetRefs`, attach the policy to the Gateway that you want to support the HTTP/1.0 protocol.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
