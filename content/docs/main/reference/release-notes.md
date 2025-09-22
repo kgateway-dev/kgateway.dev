@@ -12,6 +12,86 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v21-breaking-changes}
 
+#### AI Backend API changes {#v21-ai-backend-api-changes}
+
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]() and [AI guides](../../agentgateway/llm/) docs.
+
+Update your old configuration to the new API style as follows.
+
+**Simpler LLM provider nesting**
+
+LLM providers are now nested directly under the `llm` spec field, removing the previous `llm.provider` field.
+
+{{< tabs items="New llm,Old llm.provider" >}}
+{{% tab %}}
+```yaml
+llm:
+  openai:
+```
+{{% /tab %}}
+{{% tab %}}
+```yaml
+llm:
+  provider:
+    openai:
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+
+**Priority groups instead of multipool**
+
+The `priorityGroups` field replaces the `multipool` field with simpler nesting for providers.
+
+{{< tabs items="New priorityGroups,Old multipool" >}}
+{{% tab %}}
+```yaml
+priorityGroups:
+- providers:
+  - openai:
+```
+{{% /tab %}}
+{{% tab %}}
+```yaml
+multipool:
+  priorities:
+    - pool:
+        - provider:
+            openai:
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+**Overrides are simplified**
+
+Some LLM settings are renamed to remove redundant `Override` prefixes.
+
+{{< tabs items="New priorityGroups,Old multipool" >}}
+{{% tab %}}
+```yaml
+host: foo
+port: 8080
+path: 
+  full: "/foo"
+authHeader:
+  prefix: foo
+  headerName: bar
+```
+{{% /tab %}}
+{{% tab %}}
+```yaml
+hostOverride:
+  host: foo
+  port: 8080
+pathOverride:
+  full: /foo
+authHeaderOverride:
+  prefix: foo
+  headerName: bar
+```
+{{% /tab %}}
+{{< /tabs >}}
+
 #### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
 
 The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
