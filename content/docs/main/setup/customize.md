@@ -1,6 +1,6 @@
 ---
-title: Customize gateway proxies
-weight: 10
+title: Customize the proxy
+weight: 20
 next: /docs/setup/customize/aws-elb
 ---
 
@@ -21,6 +21,7 @@ The example in this guide uses the GatewayParameters resource to change settings
    * The Envoy log level is set to `debug` (default value: `info`).
    * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`). 
    * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`). 
+   * The `externalTrafficPolicy` is set to `Local` to preserve the original client IP address.  
    * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
    
@@ -44,6 +45,7 @@ The example in this guide uses the GatewayParameters resource to change settings
          type: NodePort
          extraLabels: 
            gateway: custom
+         externalTrafficPolicy: Local
        podTemplate: 
          extraLabels:
            gateway: custom
