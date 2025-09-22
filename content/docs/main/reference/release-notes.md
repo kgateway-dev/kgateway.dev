@@ -14,7 +14,7 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]() and [AI guides](../../agentgateway/llm/) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
 
 Update your old configuration to the new API style as follows.
 
