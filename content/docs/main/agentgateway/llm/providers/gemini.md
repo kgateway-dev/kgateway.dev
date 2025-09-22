@@ -49,14 +49,13 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    spec:
      ai:
        llm:
-         provider:
-           gemini:
-             apiVersion: v1beta
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: google-secret
-             model: gemini-1.5-flash-latest
+         gemini:
+           apiVersion: v1beta
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: google-secret
+           model: gemini-1.5-flash-latest
      type: AI
    EOF
    ```
