@@ -15,7 +15,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 Add headers to incoming requests before they are forwarded to an upstream service. If the request already has the header set, the value of the header in the `RequestHeaderModifier` filter is appended to the value of the header in the request. 
 
-1. Set up a route with a `RequestHeaderModifier` that adds a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as gateway-level policy. 
+1. Set up a header modifier that adds a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -51,7 +51,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    |`spec.rules.filters.requestHeaderModifier.add`|The name and value of the request header that you want to add. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    {{< callout >}}
    {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    {{< /callout >}}
@@ -76,7 +76,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with the `RequestHeaderModifier` filter that adds a `my-header: hello` request header. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that adds a `my-header: hello` header to a request. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -136,7 +136,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    ...
    ```
 
-3. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is appended with the value from the `RequestHeaderModifier` filter. 
+1. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is appended with the value from the `RequestHeaderModifier` filter. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
 {{% tab tabName="Cloud Provider LoadBalancer" %}}
 ```sh
@@ -173,14 +173,14 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
    ...
    ```
 
-4. Optional: Remove the resources that you created. 
+1. Optional: Remove the resources that you created. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -192,7 +192,7 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
 
 Setting headers is similar to adding headers. If the request does not include the header, it is added by the `RequestHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `RequestHeaderModifier` filter. 
 
-1. Set up a route with a `RequestHeaderModifier` that sets a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as gateway-level policy. 
+1. Set up a header modifier that sets a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -228,7 +228,7 @@ Setting headers is similar to adding headers. If the request does not include th
    |`spec.rules.filters.requestHeaderModifier.set`|The name and value of the request header that you want to set. |
    |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    {{< callout >}}
    {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    {{< /callout >}}
@@ -253,7 +253,7 @@ Setting headers is similar to adding headers. If the request does not include th
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with the `RequestHeaderModifier` filter that sets a `my-header: hello` request header. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `my-header` header value to `hello` on a request. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -313,7 +313,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    ...
    ```
 
-3. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is overwritten with the value from the `RequestHeaderModifier` filter. 
+1. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is overwritten with the value from the `RequestHeaderModifier` filter. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
 {{% tab tabName="Cloud Provider LoadBalancer" %}}
 ```sh
@@ -349,14 +349,14 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
    ...
    ```
 
-4. Optional: Remove the resources that you created. 
+1. Optional: Remove the resources that you created. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -409,7 +409,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    }
    ```
 
-2. Set up a route with a `RequestHeaderModifier` that removes the `User-Agent` header when requests are sent to the `headers.example` domain. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as gateway-level policy. 
+2. Set up a header modifier that removes the `User-Agent` header when requests are sent to the `headers.example` domain. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -444,7 +444,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    |`spec.rules.filters.requestHeaderModifier.remove`|The name of the request header that you want to remove. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    {{< callout >}}
    {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    {{< /callout >}}   
@@ -469,7 +469,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with the `RequestHeaderModifier` filter that removes the `User-Agent` header. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that removes the `User-Agent` header from a request. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -528,14 +528,14 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    }
    ```
 
-4. Optional: Clean up the resources that you created.  
+1. Optional: Clean up the resources that you created.  
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -553,7 +553,7 @@ You can return dynamic information about the request in the request header. For 
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}} 
 
-1. Set up a route with a `RequestHeaderModifier` that sets the `X-Client-Ip` header with the value of the downstream remote address. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as gateway-level policy. 
+1. Set up a header modifier that sets the `X-Client-Ip` header with the value of the downstream remote address. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -589,7 +589,7 @@ You can return dynamic information about the request in the request header. For 
    |`spec.rules.filters.requestHeaderModifier.set`|The request header that you want to set. In this example, the `x-client-ip` header is set to the downstream remote address without the port. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}  
+   {{% tab tabName="GlooTrafficPolicy" %}}  
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -611,7 +611,7 @@ You can return dynamic information about the request in the request header. For 
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with the `RequestHeaderModifier` filter that sets the `x-client-ip` header to the downstream remote address without the port. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `x-client-ip` header to the downstream remote address without the port for a request. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -681,7 +681,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="TrafficPolicy" %}}
+   {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}

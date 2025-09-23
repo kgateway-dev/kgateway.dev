@@ -130,7 +130,7 @@ For more information, see [Customize the gateway]({{< link-hextra path="/setup/c
 
 #### Header modifier filter for TrafficPolicy {#header-modifier}
 
-Now, you can apply header request and response modifiers in a TrafficPolicy. This way, you get more flexible policy attachment options such as gateway-level policy. For more information, see the [Header modifier filter for TrafficPolicy](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
+Now, you can apply header request and response modifiers in a TrafficPolicy. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header modifier filter for TrafficPolicy](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
 
 <!-- TODO release 2.1
 
