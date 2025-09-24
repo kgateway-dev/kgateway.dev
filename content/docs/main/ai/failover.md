@@ -25,7 +25,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [Priority Groups API reference docs](/docs/reference/api/#prioritygroups).
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
@@ -45,32 +45,26 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    spec:
      type: AI
      ai:
-       multipool:
-         priorities:
-         - pool:
-           - provider:
-               openai:
-                 model: "gpt-4o"
-                 authToken:
-                   kind: SecretRef
-                   secretRef:
-                     name: openai-secret
-         - pool:
-           - provider:
-               openai:
-                 model: "gpt-4.0-turbo"
-                 authToken:
-                   kind: SecretRef
-                   secretRef:
-                     name: openai-secret
-         - pool:
-           - provider:
-               openai:
-                 model: "gpt-3.5-turbo"
-                 authToken:
-                   kind: SecretRef
-                   secretRef:
-                     name: openai-secret
+       priorityGroups:
+       - providers:
+         - openai:
+             model: "gpt-4o"
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: openai-secret
+         - openai:
+             model: "gpt-4.0-turbo"
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: openai-secret
+         - openai:
+             model: "gpt-3.5-turbo"
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: openai-secret
    EOF
    ```
 

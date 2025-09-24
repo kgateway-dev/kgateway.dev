@@ -7,7 +7,7 @@ A Helm chart for the kgateway project
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object |  | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. |
-| agentGateway | object |  | Enable the integration with Agent Gateway, which lets you use kgateway to help manage agent connectivity across MCP servers, A2A agents, and REST APIs. |
+| agentgateway | object |  | Enable the integration with Agent Gateway, which lets you use kgateway to help manage agent connectivity across MCP servers, A2A agents, and REST APIs. |
 | controller | object |  | Configure the kgateway control plane deployment. |
 | controller.extraEnv | object |  | Add extra environment variables to the controller container. |
 | controller.image | object |  | Configure the controller container image. |
@@ -20,6 +20,7 @@ A Helm chart for the kgateway project
 | controller.service | object |  | Configure the controller service. |
 | controller.service.ports | object |  | Set the service ports for gRPC and health endpoints. |
 | controller.service.type | string |  | Set the service type for the controller. |
+| controller.strategy | object |  | Change the rollout strategy from the Kubernetes default of a RollingUpdate with 25% maxUnavailable, 25% maxSurge. E.g., to recreate pods, minimizing resources for the rollout but causing downtime: strategy:   type: Recreate E.g., to roll out as a RollingUpdate but with non-default parameters: strategy:   type: RollingUpdate   rollingUpdate:     maxSurge: 100% |
 | deploymentAnnotations | object |  | Add annotations to the kgateway deployment. |
 | discoveryNamespaceSelectors | list |  | List of namespace selectors (OR'ed): each entry can use 'matchLabels' or 'matchExpressions' (AND'ed within each entry if used together). Kgateway includes the selected namespaces in config discovery. For more information, see the docs https://kgateway.dev/docs/operations/install/#namespace-discovery. |
 | fullnameOverride | string |  | Override the full name of resources created by the Helm chart, which is 'kgateway'. If you set 'fullnameOverride: "foo", the full name of the resources that the Helm release creates become 'foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace. |

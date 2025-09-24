@@ -103,15 +103,13 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
      type: AI
      ai:
        llm:
-         hostOverride:
-           host: $OLLAMA_HOST # replace with your IP address
-           port: 11434
-         provider:
-           openai:
-             model: "llama3.2" # replace with your model
-             authToken:
-               kind: Inline
-               inline: "$TOKEN"
+         host: $OLLAMA_HOST # replace with your IP address
+         port: 11434
+         openai:
+           model: "llama3.2" # replace with your model
+           authToken:
+             kind: Inline
+             inline: "$TOKEN"
    EOF
    ```
    
