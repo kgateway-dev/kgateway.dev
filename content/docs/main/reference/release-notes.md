@@ -128,9 +128,9 @@ Gateway proxies are created with a default proxy template that is stored in the 
 
 For more information, see [Customize the gateway]({{< link-hextra path="/setup/customize/general-steps/" >}}). To find all the values that you can change, see the [PodTemplate reference]({{< link-hextra path="/reference/api/#pod" >}}) in the GatewayParameters API.
 
-#### Header modifier filter for TrafficPolicy {#header-modifier}
+#### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
 
-Now, you can apply header request and response modifiers in a TrafficPolicy. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header modifier filter for TrafficPolicy](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
+Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
 
 <!-- TODO release 2.1
 

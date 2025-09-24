@@ -15,7 +15,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
-1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
+1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy.
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -76,7 +76,7 @@ Add headers to incoming requests before they are sent back to the client. If the
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that adds a `my-response: hello` header to a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that adds a `my-response: hello` header to a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. 
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -144,7 +144,7 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -153,7 +153,7 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
 
 Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
 
-1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
+1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -214,7 +214,7 @@ Setting headers is similar to adding headers. If the response does not include t
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `my-response` header to a `custom` value on a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `my-response` header to a `custom` value on a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. 
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -278,7 +278,7 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -321,7 +321,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    server: envoy
    ```
    
-2. Set up a header modifier that removes the `content-length` header from the response. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
+2. Set up a header modifier that removes the `content-length` header from the response. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -381,7 +381,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that removes the `content-length` header from a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that removes the `content-length` header from a response. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. 
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -446,7 +446,7 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -461,7 +461,7 @@ You can return dynamic information about the response in the response header. Fo
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}} 
 
-1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more flexible attachment options such as a gateway-level policy. 
+1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -519,7 +519,7 @@ You can return dynamic information about the response in the response header. Fo
       EOF
       ```
    
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `x-response-code` header to the HTTP response code. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](../../about/policies/trafficpolicy/).
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets the `x-response-code` header to the HTTP response code. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway.
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -579,7 +579,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    {{% tab tabName="GlooTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
-   kubectl delete trafficpolicy httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    {{% /tab %}}
    {{< /tabs >}}
