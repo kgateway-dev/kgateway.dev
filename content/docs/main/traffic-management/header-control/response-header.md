@@ -52,9 +52,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
    {{% tab tabName="GlooTrafficPolicy" %}}
-   {{< callout >}}
-   {{< reuse "docs/snippets/proxy-kgateway.md" >}}
-   {{< /callout >}}   
+   **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -190,9 +188,7 @@ Setting headers is similar to adding headers. If the response does not include t
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
    {{% tab tabName="GlooTrafficPolicy" %}}
-   {{< callout >}}
-   {{< reuse "docs/snippets/proxy-kgateway.md" >}}
-   {{< /callout >}}   
+   **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -357,9 +353,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
    {{% tab tabName="GlooTrafficPolicy" %}}
-   {{< callout >}}
-   {{< reuse "docs/snippets/proxy-kgateway.md" >}}
-   {{< /callout >}}   
+   **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
