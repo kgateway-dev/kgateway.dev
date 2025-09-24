@@ -15,5 +15,6 @@ You can configure different types of timeouts by using a Kubernetes Gateway API-
 | Type of timeout| Description | Configured via | Attach to | 
 | -- | -- | -- | --- | 
 | [Request timeout]({{< link-hextra path="/resiliency/timeouts/request/" >}}) | Request timeouts configure the time Envoy allows for the entire request stream to be received from the client. | <ul><li>HTTPRoute </li><li>{{< reuse "docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute </li><li>HTTPRoute rule </li></ul> | 
+| [Idle timeout]({{< link-hextra path="/resiliency/timeouts/idle/" >}})  | An idle timeout is the time when Envoy terminates the connection to a downstream or upstream service if there no active streams.| HTTPListenerPolicy | Gateway | 
 | [Idle stream timeout]({{< link-hextra path="/resiliency/timeouts/idle-stream/" >}})  | An idle stream timeout is the time Envoy allows a stream to exist without activity before it is terminated. | {{< reuse "docs/snippets/trafficpolicy.md" >}} | <ul><li>HTTPRoute</li><li>HTTPRoute rule</li></ul> | 
 | [Per-try timeout]({{< link-hextra path="/resiliency/retry/per-try-timeout" >}}) | Set a shorter timeout for retries than the overall request timeout.  | <ul><li>HTTPRoute</li><li>{{< reuse "docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute </li><li>HTTPRoute rule</li><li>Gateway listener</li></ul> | 

@@ -1,6 +1,6 @@
 ---
 title: Idle stream timeouts
-weight: 20
+weight: 25
 description:
 ---
 
