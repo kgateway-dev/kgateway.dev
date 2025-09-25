@@ -60,49 +60,7 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
 
 Create a TLS policy for the NGINX workload. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead.
 
-{{< tabs tabTotal="2" items="BackendTLSPolicy,BackendConfigPolicy" >}}
-{{% tab tabName="BackendTLSPolicy" %}}
-
-1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
-
-   ```shell
-   kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/configmap.yaml" >}}
-   EOF
-   ```
-
-2. Create the TLS policy. 
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3
-   kind: BackendTLSPolicy
-   metadata:
-     name: nginx-tls-policy
-     labels:
-       app: nginx
-   spec:
-     targetRefs:
-     - group: ""
-       kind: Service
-       name: nginx
-       sectionName: "8443"
-     validation:
-       hostname: "example.com"
-       caCertificateRefs:
-       - group: ""
-         kind: ConfigMap
-         name: ca
-   EOF
-   ```
-
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
-
-   | Setting | Description |
-   |---------|-------------|
-   | `targetRefs` | The service that you want the Gateway to originate a TLS connection to, such as the NGINX server. <br><br>**Agentgateway proxies**: Even if you use a Backend for selector-based destinations, you still need to target the backing Service and the `sectionName` of the port that you want the policy to apply to.  |
-   | `validation.hostname` | The hostname that matches the NGINX server certificate. |
-   | `validation.caCertificateRefs` | The ConfigMap that has the public CA certificate for the NGINX server. |
-{{% /tab %}}
+{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
 {{% tab tabName="BackendConfigPolicy" %}}
 
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
@@ -173,6 +131,49 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    | `tls.secretRef` | The Kubernetes Secret that has the public CA certificate for the NGINX server. |
 
 {{% /tab %}}
+
+{{% tab tabName="BackendTLSPolicy" %}}
+
+1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
+
+   ```shell
+   kubectl apply -f- <<EOF
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/configmap.yaml" >}}
+   EOF
+   ```
+
+2. Create the TLS policy. 
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1alpha3
+   kind: BackendTLSPolicy
+   metadata:
+     name: nginx-tls-policy
+     labels:
+       app: nginx
+   spec:
+     targetRefs:
+     - group: ""
+       kind: Service
+       name: nginx
+     validation:
+       hostname: "example.com"
+       caCertificateRefs:
+       - group: ""
+         kind: ConfigMap
+         name: ca
+   EOF
+   ```
+
+   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+
+   | Setting | Description |
+   |---------|-------------|
+   | `targetRefs` | The service that you want the Gateway to originate a TLS connection to, such as the NGINX server. <br><br>**Agentgateway proxies**: Even if you use a Backend for selector-based destinations, you still need to target the backing Service and the `sectionName` of the port that you want the policy to apply to.  |
+   | `validation.hostname` | The hostname that matches the NGINX server certificate. |
+   | `validation.caCertificateRefs` | The ConfigMap that has the public CA certificate for the NGINX server. |
+{{% /tab %}}
+
 {{< /tabs >}}
 
 ### Create an HTTPRoute {#create-http-route}
@@ -272,26 +273,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    
 2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead.
    
-   {{< tabs tabTotal="2" items="BackendTLSPolicy,BackendConfigPolicy" >}}
-   {{% tab tabName="BackendTLSPolicy" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3	
-   kind: BackendTLSPolicy
-   metadata:
-     name: httpbin-org
-     namespace: default
-   spec:
-     targetRefs:
-       - name: httpbin-org
-         kind: Backend
-         group: gateway.kgateway.dev
-     validation:
-       hostname: httpbin.org
-       wellKnownCACertificates: System
-   EOF
-   ```
-   {{% /tab %}}
+   {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
    {{% tab tabName="BackendConfigPolicy" %}}
    
    {{< reuse "docs/snippets/proxy-kgateway.md" >}}
@@ -309,6 +291,25 @@ Set up a Backend resource that represents your external service. Then, use a Bac
          group: gateway.kgateway.dev
      tls:
        sni: httpbin.org
+       wellKnownCACertificates: System
+   EOF
+   ```
+   {{% /tab %}}
+   {{% tab tabName="BackendTLSPolicy" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1alpha3	
+   kind: BackendTLSPolicy
+   metadata:
+     name: httpbin-org
+     namespace: default
+   spec:
+     targetRefs:
+       - name: httpbin-org
+         kind: Backend
+         group: gateway.kgateway.dev
+     validation:
+       hostname: httpbin.org
        wellKnownCACertificates: System
    EOF
    ```
