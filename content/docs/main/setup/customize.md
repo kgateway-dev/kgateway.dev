@@ -25,9 +25,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
    
-   {{< callout type="info" >}}
-   For other settings, see the [{{< reuse "docs/snippets/gatewayparameters.md" >}} API docs]({{< link-hextra path="/reference/api/#gatewayparametersspec" >}}) or check out the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
-   {{< /callout >}}
+   For other settings, see the [API docs]({{< link-hextra path="/reference/api/#gatewayparametersspec" >}}) or check out the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
    
    ```yaml
    kubectl apply -f- <<EOF
