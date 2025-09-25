@@ -187,7 +187,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
    | `timeouts` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
    {{% /tab %}}
    {{% tab tabName="HTTPRoute (GlooTrafficPolicy)" %}}
-   1. Create an HTTPRoute that route requests along the `retry.example` domain to the reviews app. Note that you add a name `timeout` to your HTTPRoute rule so that you can later attach the retry policy to that rule.
+   1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. Note that you add a name `timeout` to your HTTPRoute rule so that you can later attach the retry policy to that rule.
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: gateway.networking.k8s.io/v1
@@ -253,7 +253,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
    
    {{% /tab %}}
    {{% tab tabName="Gateway listener" %}}
-   1. Create an HTTPRoute that route requests along the `retry.example` domain to the reviews app. 
+   1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. 
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: gateway.networking.k8s.io/v1

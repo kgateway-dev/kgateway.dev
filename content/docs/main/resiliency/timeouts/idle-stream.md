@@ -12,13 +12,18 @@ By default, Envoy closes all idle request and response streams after 5 minutes i
 
 You can change the default idle stream timeout setting with a {{< reuse "docs/snippets/trafficpolicy.md" >}}.  While idle streams are a concept in the HTTP/2 and HTTP/3 protocols, Envoy also maps an HTTP/1 request to a stream. Because of that, you can apply idle stream timeouts to HTTP/1 traffic too. 
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## Set up idle stream timeouts
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your idle stream timeout settings. If you have an HTTPRoute with multiple HTTPRoute rules, you can use the `targetRefs.sectionName` to apply the timeout to a specific HTTPRoute rule. In this example, you apply the policy to the `timeout` rule that points to the `/headers` path in your HTTPRoute resource.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your idle stream timeout settings. If you have an HTTPRoute with multiple HTTPRoute rules, you can use the `targetRefs.sectionName` to apply the timeout to a specific HTTPRoute rule. In this example, you apply the policy to the httpbin HTTPRoute.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -49,7 +54,7 @@ You can change the default idle stream timeout setting with a {{< reuse "docs/sn
       curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
       ```
 
-   3. Open the config dump and find the route configuration for the `kube_default_reviews_9080` Envoy cluster on the `listener~8080~retry_example` virtual host. Verify that the timeout policy is set as you configured it.
+   3. Open the config dump and find the route configuration for the `kube_httpbin_httpbin_8000` Envoy cluster on the `listener~8080~www_example_com` virtual host. Verify that the timeout policy is set as you configured it.
       
       Example `jq` command:
       ```sh

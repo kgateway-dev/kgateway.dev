@@ -65,7 +65,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 1. Create a ConfigMap with your agentgateway tracing configuration. The following example collects additional information about the request to the LLM and adds this information to the trace. The trace is then sent to the collector that you set up earlier. To learn more about the fields that you can configure, see the [agentgateway docs](https://agentgateway.dev/docs/reference/cel/#context-reference).
 
    {{< callout type="info" >}}
-   To view other tracing configurations, see [Other tracing configurations](#other-tracing-configurations)
+   For more tracing providers, see [Other tracing configurations](#other-tracing-configurations).
    {{< /callout>}}
    ```yaml
    kubectl apply -f- <<EOF
@@ -92,11 +92,11 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    EOF
    ```
 
-2. Create a GatewayParameters resource that references the ConfigMap that you created. 
+2. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that references the ConfigMap that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: GatewayParameters
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: tracing
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -107,7 +107,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    EOF
    ```
 
-3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the GatewayParameters resource that you created so that your proxy starts with the custom tracing configuration.
+3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -122,8 +122,8 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
      infrastructure:
        parametersRef:
          name: tracing
-         group: gateway.kgateway.dev
-         kind: GatewayParameters  
+         group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}  
+         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}  
      listeners:
      - protocol: HTTP
        port: 8080
@@ -162,13 +162,13 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    
 ## Set up access to Gemini
 
-Configure access to the Gemini provider and send a sample request. You later use this request to verify your tracing configuration. 
+Configure access to an LLM provider such as Gemini and send a sample request. You later use this request to verify your tracing configuration.
 
 {{% reuse "docs/snippets/gemini-setup.md" %}}
 
 ## Verify tracing 
 
-1. Get the logs of the agentgateway proxy. In your CLI 
+1. Get the logs of the agentgateway proxy. In the CLI output, find the `trace.id`.
    ```sh
    kubectl logs deploy/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
@@ -184,7 +184,7 @@ Configure access to the Gemini provider and send a sample request. You later use
    llm.response.model=gemini-1.5-flash-latest llm.response.tokens=313 duration=3165ms
    ```
 
-2. Get the logs of the collector and search for the tracing ID. Verify that you see the additional LLM that you configured initially.
+2. Get the logs of the collector and search for the trace ID. Verify that you see the additional LLM that you configured initially.
    ```sh
    kubectl logs deploy/opentelemetry-collector-traces -n telemetry
    ```
@@ -230,8 +230,7 @@ Configure access to the Gemini provider and send a sample request. You later use
 
 ## Other tracing configurations
 
-Review common tracing providers configurations that you can use with agentgateway. s
-
+Review common tracing providers configurations that you can use with agentgateway.
 
 {{< tabs tabTotal="4" items="Jaeger,Langfuse,Phoenix (Arize),OpenLLMetry" >}}
 {{% tab tabName="Jaeger" %}}
@@ -344,7 +343,7 @@ data:
 
 ```sh
 kubectl delete gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete gatewayparameters tracing -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}}   tracing -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
 helm uninstall opentelemetry-collector-traces -n telemetry
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}

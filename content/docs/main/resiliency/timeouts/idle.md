@@ -8,9 +8,14 @@ Customize the default idle timeout of 1 hour (3600s).
 
 ## About idle timeouts
 
-By default, Envoy terminates the connection to a downstream or upstream service after one hour if there are no active streams. You can customize this idle timeout with an HTTPListenerPolicy. The policy updates the `common_http_protocol_options` setting in Envoy. 
+By default, Envoy terminates the connection to a downstream or upstream service after one hour if there are no active streams. You can customize this idle timeout with an HTTPListenerPolicy. The policy updates the [`common_http_protocol_options` setting in Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/upstreams/http/v3/http_protocol_options.proto).
 
 Note that the idle timeout configures the timeout for the entire connection from a downstream service to the gateway proxy, and to the upstream service. If you want to set a timeout for a single stream, configure the [idle stream timeout]({{< link-hextra path="/resiliency/timeouts/idle-stream/" >}}) instead. 
+
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 
 ## Before you begin
 
