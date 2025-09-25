@@ -15,9 +15,9 @@ You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resil
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
 
-## About
+## About request retries
 
-A retry is the number of times a request is retried if it fails. This setting can be useful to avoid your apps from failing if they are temporarily unavailable. With retries, calls are retried a certain number of times before they are considered failed. Retries can enhance your app's availability by making sure that calls don’t fail permanently because of transient problems, such as a temporarily overloaded service or network.
+A request retry is the number of times a request is retried if it fails. This setting can be useful to avoid your apps from failing if they are temporarily unavailable. With retries, calls are retried a certain number of times before they are considered failed. Retries can enhance your app's availability by making sure that calls don’t fail permanently because of transient problems, such as a temporarily overloaded service or network.
 
 ## Before you begin
 
@@ -132,9 +132,9 @@ To use retries, you need to install the experimental channel. You can also set u
    EOF
    ```
 
-## Step 2: Set up retries {#setup-retries}
+## Step 2: Set up request retries {#setup-retries}
 
-Set up retries to the reviews app on the HTTPRoute resource.
+Set up retries to the reviews app.
 
 1. Create an HTTPRoute resource to specify your retry rules. You can apply the retry policy on an HTTPRoute, HTTPRoute rule, or Gateway listener. 
    {{< tabs tabTotal="3" items="HTTPRoute (Kubernetes GW API),HTTPRoute and rule (TrafficPolicy),Gateway listener" >}}

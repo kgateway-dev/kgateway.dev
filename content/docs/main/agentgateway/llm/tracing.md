@@ -164,7 +164,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 
 Configure access to an LLM provider such as Gemini and send a sample request. You later use this request to verify your tracing configuration.
 
-{{% reuse "docs/snippets/gemini-setup.md" %}}
+{{< reuse "docs/snippets/gemini-setup.md" >}}
 
 ## Verify tracing 
 

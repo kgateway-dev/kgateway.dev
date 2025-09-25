@@ -14,7 +14,7 @@ By default, Envoy has a default overall request timeout of 15 seconds. A request
 
 <!--
 When per-try timeouts are enabled, Envoy returns the `x-envoy-upstream-rq-per-try-timeout-ms` header in the response.  -->
-Note that if you configured a global timeout, the per-try timeout must be less than the global timeout.
+Note that if you configured a global request timeout, the per-try timeout must be less than the global request timeout.
 
 Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try timeouts on a Gateway listener level, use a {{< reuse "docs/snippets/trafficpolicy.md" >}} instead. 
 

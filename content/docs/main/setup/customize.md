@@ -29,7 +29,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: custom-gw-params

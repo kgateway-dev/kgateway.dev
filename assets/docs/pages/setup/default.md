@@ -24,7 +24,7 @@ If you do not want to use the default gateway proxy template to bootstrap your p
 
 ## {{< reuse "docs/snippets/gatewayparameters.md" >}}
 
-{{< reuse "docs/gatewayparameters.md" >}}
+{{< reuse "docs/snippets/gatewayparameters-about.md" >}}
 
 ## Reserved ports
 
