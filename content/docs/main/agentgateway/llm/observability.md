@@ -1,6 +1,6 @@
 ---
-title: Observe traffic
-weight: 90
+title: View metrics and logs
+weight: 80
 description:
 ---
 

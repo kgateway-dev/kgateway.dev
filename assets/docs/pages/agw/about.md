@@ -67,3 +67,4 @@ Review the following considerations for using agentgateway.
 - External processing (extProc) as part of the {{< reuse "docs/snippets/trafficpolicy.md" >}} is not supported.
 - Configuring your agentgateway proxy as a Dynamic Forward Proxy (DFP) is currently not supported.
 - [Header modifier filters](../../traffic-management/header-control/) in {{< reuse "docs/snippets/trafficpolicy.md" >}} are not supported for agentgateway proxies. You can still use header modifier filters in the Gateway API-native HTTPRoutes.
+- Retries and timeouts cannot be configured on an agentgateway proxy.
