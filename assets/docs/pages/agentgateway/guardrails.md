@@ -68,7 +68,7 @@ sequenceDiagram
 
 1. The client sends a request to the LLM.
 2. {{< reuse "docs/snippets/agentgateway-capital.md" >}} receives the request and passes it to the webhook server for a pre-request guardrail check.
-3. If the request is allowed, {{< reuse "docs/snippets/agentgateway.md" >}} forwards the request to the LLM. The LLM generates a response that the webhook server can modify before {{< reuse "docs/snippets/agentgateway.md" >}}returns the response to the client.
+3. If the request is allowed, {{< reuse "docs/snippets/agentgateway.md" >}} forwards the request to the LLM. The LLM generates a response that the webhook server can modify before {{< reuse "docs/snippets/agentgateway.md" >}} returns the response to the client.
 4. If the request is rejected by the Guardrail Webhook, {{< reuse "docs/snippets/agentgateway.md" >}} forwards the rejection to the client.
 
 ### Considerations for using guardrails {#about-considerations}
