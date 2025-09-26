@@ -29,7 +29,7 @@
 
 3. Install kgateway by using Helm.
    {{< version include-if="2.1.x" >}}
-   {{< tabs items="Kgateway, Agentgateway" tabTotal="3">}}
+   {{< tabs items="Kgateway, Agentgateway" tabTotal="2">}}
    {{% tab tabName="Kgateway" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
@@ -40,8 +40,8 @@
    {{% tab tabName="Agentgateway" %}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     --set agentGateway.enabled=true \
-     --set agentGateway.enableAlphaAPIs=true
+     --set agentgateway.enabled=true  \
+     --set controller.image.pullPolicy=Always
    ```
    {{% /tab %}}
    {{< /tabs >}}

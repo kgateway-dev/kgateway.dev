@@ -3,18 +3,18 @@ title: Static MCP
 weight: 10
 ---
 
-Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP](../) topic.
+Route to a Model Context Protocol (MCP) server through a static address. For more information, see the [About MCP]({{< link-hextra path="/agentgateway/mcp/about" >}}) topic.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-agw.md" >}}
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 ## Step 1: Deploy an MCP server {#mcp-server}
 
-Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
+Deploy a Model Context Protocol (MCP) server that you want {{< reuse "docs/snippets/agentgateway.md" >}} to proxy traffic to. The following example sets up a simple MCP server with one tool, `fetch`, that retrieves the content of a website URL that you pass in.
 
 1. Create the MCP server workload. Notice the following details about the Service:
-   * `appProtocol: kgateway.dev/mcp` (required): Configure your service to use the MCP protocol. This way, the agentgateway proxy uses the MCP protocol when connecting to the service.
+   * `appProtocol: kgateway.dev/mcp` (required): Configure your service to use the MCP protocol. This way, the {{< reuse "docs/snippets/agentgateway.md" >}} proxy uses the MCP protocol when connecting to the service.
    * `kgateway.dev/mcp-path` annotation (optional): The default values are `/sse` for the SSE protocol or `/mcp` for the Streamable HTTP protocol. If you need to change the path of the MCP target endpoint, set this annotation on the Service.
 
    ```yaml
@@ -53,7 +53,7 @@ Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy
    EOF
    ```
 
-2. Create a Backend that sets up the agentgateway target details for the MCP server. 
+2. Create a Backend that sets up the {{< reuse "docs/snippets/agentgateway.md" >}} target details for the MCP server. 
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -64,7 +64,6 @@ Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy
    spec:
      type: MCP
      mcp:
-       name: mcp-server
        targets:
        - name: mcp-target
          static:
@@ -76,9 +75,9 @@ Deploy a Model Context Protocol (MCP) server that you want agentgateway to proxy
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
-Route to the MCP server with agentgateway.
+Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
 
-1. Create a Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically spins up an agentgateway proxy for you.
+1. Create a Gateway resource that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. Kgateway automatically spins up an {{< reuse "docs/snippets/agentgateway.md" >}} proxy for you.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -150,15 +149,14 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{< /tabs >}}
 
-2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser.
-   
+2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser. If the MCP inspector tool does not open automatically, run `mcp-inspector`. 
    ```sh
    npx modelcontextprotocol/inspector#{{% reuse "docs/versions/mcp-inspector.md" %}}
    ```
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
+   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>:8080/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
    * Click **Connect**.
 
    {{< reuse-image src="img/mcp-inspector-connected.png" >}}

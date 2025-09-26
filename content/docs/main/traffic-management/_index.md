@@ -7,6 +7,7 @@ weight: 400
 {{< cards >}}
   {{< card link="destination-types" title="Destination types" >}}
   {{< card link="direct-response" title="Direct response" >}}
+  {{< card link="dfp" title="Dynamic Forward Proxy (DFP)" >}}
   {{< card link="extproc" title="External processing (ExtProc)" >}}
   {{< card link="match" title="Request matching" >}}
   {{< card link="redirect" title="Redirects" >}}

@@ -67,14 +67,13 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    spec:
      ai:
        llm:
-         provider:
-           gemini:
-             apiVersion: v1beta
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: google-secret
-             model: gemini-1.5-flash-latest
+         gemini:
+           apiVersion: v1beta
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: google-secret
+           model: gemini-1.5-flash-latest
      type: AI
    EOF
    ```
@@ -240,17 +239,17 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
    spec:
      ai:
        llm:
-         hostOverride: apic.ocp.provider.com
-         pathOverride: /my-openai-service/gpt35/chat/completions
-         provider:
-           openai:
-             model: gpt-4
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: azure-openai-secret
-             model: gpt-4o
-         authHeaderOverride: 
+         host: apic.ocp.provider.com
+         path:
+           full: "/my-openai-service/gpt35/chat/completions"
+         openai:
+           model: gpt-4
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: azure-openai-secret
+           model: gpt-4o
+         authHeader: 
            headerName: api-key
            prefix: ""
      type: AI
@@ -261,11 +260,11 @@ For more information, see the overrides in the [LLM provider API docs](/docs/ref
 
    | Setting              | Description                                                                                     |
    | -------------------- | ----------------------------------------------------------------------------------------------- |
-   | `authHeaderOverride` | Overrides the default `Authorization` header that is sent to the AI provider.                             |
+   | `authHeader` | Overrides the default `Authorization` header that is sent to the AI provider.                             |
    | `headerName`         | The name of the header to use for authentication. Azure requires API keys to be sent in an `"api-key"` header. |
    | `prefix`             | The prefix for the auth token that is provided in the authentication header, such as `Bearer`. By default, the prefix is an empty string. In this example, the `prefix` is an empty string, because Azure OpenAI does not require a prefix for API keys that are provided in an `api-key` header.     |
-   | `hostOverride` | Set a custom host for your LLM provider. This host is used for all providers that are defined in the Backend. | 
-   | `pathOverride`       | Provide a full path override for all API requests to the AI backend.                            |
+   | `host` | Set a custom host for your LLM provider. This host is used for all providers that are defined in the Backend. | 
+   | `path`       | Provide a full path override for all API requests to the AI backend.                            |
 
 4. Create an HTTPRoute resource to route requests to the Azure OpenAI backend. Note that kgateway automatically rewrites the endpoint that you set up (such as `/azure-openai`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 

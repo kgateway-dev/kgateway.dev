@@ -14,30 +14,17 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/), you must also enable agentgateway.
+1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/), see the [agentgateway docs]({{< link-hextra path="/agentgateway" >}}).
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
    {{< /callout >}}
 
-   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Kgateway" %}}
    ```shell
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
         --set gateway.aiExtension.enabled=true \
         --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
    ```
-   {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
-
-   ```shell
-   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-        --set gateway.aiExtension.enabled=true \
-        --set agentGateway.enabled=true \
-        --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
 2. Verify that your Helm installation is updated.
 
@@ -46,28 +33,12 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    ```
 
    Example output:
-
-   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Kgateway" %}}   
    ```yaml
-   
    gateway:
      aiExtension:
        enabled: true
    ```
-   {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
-   ```yaml
-   
-   agentgateway:
-     enabled: true
-   gateway:
-     aiExtension:
-       enabled: true
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
+  
 ## Create an AI Gateway {#gateway}
 
 1. Create a GatewayParameters resource which enables an AI extension for the Gateway.
@@ -131,8 +102,6 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 
 2. Create a Gateway that uses the default GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
 
-   {{< tabs items="Kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -158,41 +127,11 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
            from: All
    EOF
    ```
-   {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   kind: Gateway
-   apiVersion: gateway.networking.k8s.io/v1
-   metadata:
-     name: ai-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: ai-gateway
-   spec:
-     gatewayClassName: agentgateway
-     infrastructure:
-       parametersRef:
-         name: ai-gateway
-         group: gateway.kgateway.dev
-         kind: GatewayParameters
-     listeners:
-     - protocol: HTTP
-       port: 8080
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
 3. Verify that the AI Gateway is created. 
 
    * Gateway: Note that it might take a few minutes for an address to be assigned.
    * Pod for `kgateway` proxy: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
-   * Pod for `agentgateway` proxy: The pod has one container: `agent-gateway`.
 
    ```sh
    kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A

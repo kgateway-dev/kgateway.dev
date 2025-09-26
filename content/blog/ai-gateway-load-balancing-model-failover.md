@@ -49,6 +49,44 @@ In kgateway, a Backend represents a service that you want to route traffic to. I
 - gpt-4.0-turbo model
 - gpt-3.5-turbo model
 
+{{< tabs items="2.1 and later,2.0" >}}
+{{% tab %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: Backend
+metadata:
+  labels:
+    app: model-priority
+  name: model-priority
+  namespace: kgateway-system
+spec:
+  type: AI
+  ai:
+    priorityGroups:
+    - providers:
+      - openai:
+          model: "gpt-4o"
+        authToken:
+          kind: SecretRef
+          secretRef:
+            name: openai-secret
+      - openai:
+          model: "gpt-4.0-turbo"
+        authToken:
+          kind: SecretRef
+          secretRef:
+            name: openai-secret
+      - openai:
+          model: "gpt-3.5-turbo"
+        authToken:
+          kind: SecretRef
+          secretRef:
+            name: openai-secret
+EOF
+```
+{{% /tab %}}
+{{% tab %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -89,6 +127,8 @@ spec:
                 name: openai-secret
 EOF
 ```
+{{% /tab %}}
+{{< /tabs >}}
 
 ## Step 2: Create an HTTPRoute to the Backend
 
