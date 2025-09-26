@@ -1,0 +1,142 @@
+{{ $url := .Get "url" }}
+{{ $spec := resources.GetRemote $url | transform.Unmarshal }}
+
+{{/* Add Swagger UI CSS to head */}}
+{{ $swaggerCSS := resources.GetRemote "https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css" }}
+{{ $swaggerCSS = $swaggerCSS | resources.Minify }}
+{{ $swaggerCSS = $swaggerCSS | resources.Fingerprint }}
+<link rel="stylesheet" href="{{ $swaggerCSS.RelPermalink }}" integrity="{{ $swaggerCSS.Data.Integrity }}">
+
+{{/* Add Swagger UI JS to head */}}
+{{ $swaggerBundle := resources.GetRemote "https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js" }}
+{{ $swaggerBundle = $swaggerBundle | resources.Minify }}
+{{ $swaggerBundle = $swaggerBundle | resources.Fingerprint }}
+<script src="{{ $swaggerBundle.RelPermalink }}" integrity="{{ $swaggerBundle.Data.Integrity }}"></script>
+
+{{ $swaggerPreset := resources.GetRemote "https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js" }}
+{{ $swaggerPreset = $swaggerPreset | resources.Minify }}
+{{ $swaggerPreset = $swaggerPreset | resources.Fingerprint }}
+<script src="{{ $swaggerPreset.RelPermalink }}" integrity="{{ $swaggerPreset.Data.Integrity }}"></script>
+
+<div class="openapi-container">
+  <div id="swagger-ui"></div>
+</div>
+
+<style>
+  .openapi-container {
+    width: 100%;
+    margin: 2rem 0;
+  }
+  .swagger-ui {
+    width: 100% !important;
+    background: #ffffff !important;
+    color: #333333 !important;
+  }
+  .swagger-ui .opblock {
+    background: #ffffff !important;
+    border: 1px solid #e0e0e0 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    margin: 0 0 15px !important;
+  }
+  .swagger-ui .opblock .opblock-summary {
+    background: #f8f8f8 !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    padding: 8px 20px !important;
+  }
+  .swagger-ui .opblock .opblock-summary-method {
+    background: #4990e2 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    padding: 6px 10px !important;
+    border-radius: 3px !important;
+  }
+  .swagger-ui .info {
+    background: #ffffff !important;
+    color: #333333 !important;
+  }
+  .swagger-ui .info .title {
+    color: #333333 !important;
+  }
+  .swagger-ui .info .description {
+    color: #333333 !important;
+  }
+  .swagger-ui .model {
+    color: #333333 !important;
+  }
+  .swagger-ui .model-toggle {
+    color: #333333 !important;
+  }
+  .swagger-ui .model-title {
+    color: #333333 !important;
+  }
+  .swagger-ui .model-description {
+    color: #333333 !important;
+  }
+  .swagger-ui .parameter__name {
+    color: #333333 !important;
+  }
+  .swagger-ui .parameter__type {
+    color: #333333 !important;
+  }
+  .swagger-ui .parameter__description {
+    color: #333333 !important;
+  }
+  .swagger-ui .response-col_status {
+    color: #333333 !important;
+  }
+  .swagger-ui .response-col_description {
+    color: #333333 !important;
+  }
+  .swagger-ui .response-col_links {
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description {
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description__inner {
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description__inner p {
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description__inner code {
+    background: #f8f8f8 !important;
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description__inner pre {
+    background: #f8f8f8 !important;
+    color: #333333 !important;
+  }
+  .swagger-ui .response__description__inner pre code {
+    background: transparent !important;
+    color: #333333 !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const ui = SwaggerUIBundle({
+      url: "{{ $url }}",
+      dom_id: '#swagger-ui',
+      deepLinking: true,
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIStandalonePreset
+      ],
+      plugins: [
+        SwaggerUIBundle.plugins.DownloadUrl
+      ],
+      layout: "StandaloneLayout",
+      supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+      operationsSorter: 'alpha',
+      tagsSorter: 'alpha',
+      docExpansion: 'list',
+      defaultModelsExpandDepth: 3,
+      defaultModelExpandDepth: 3,
+      displayRequestDuration: true,
+      showExtensions: true,
+      showCommonExtensions: true
+    });
+  });
+</script>

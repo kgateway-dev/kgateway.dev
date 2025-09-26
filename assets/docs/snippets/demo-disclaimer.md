@@ -1,0 +1,1 @@
+The following example uses a sample app for demonstration purposes only. You can use the app to try out the feature and to help design your own app. The app is not intended for production use and might not have updated dependencies or security patches.
