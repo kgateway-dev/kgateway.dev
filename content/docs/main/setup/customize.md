@@ -63,7 +63,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
      name: custom
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: custom-gw-params

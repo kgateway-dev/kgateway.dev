@@ -4,6 +4,10 @@ weight: 5
 description: Unleash developer productivity and accelerate AI innovation with AI Gateway.  
 ---
 
+{{< callout warning >}}
+AI Gateway for Envoy-based gateway proxies is deprecated and is planning to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](../../agentgateway/) instead.
+{{< /callout >}}
+
 Unleash developer productivity and accelerate AI innovation with AI Gateway.
 
 ## About LLMs {#about-llms}

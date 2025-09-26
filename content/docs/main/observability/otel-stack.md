@@ -636,39 +636,11 @@ To verify that your setup is working, generate sample traffic and review the log
 
       10
    ```
-
-4. Verify that data plane metrics for the gateway proxy are being collected by using a Grafana dashboard.
    
-   1. Create a Grafana dashboard for the data plane metrics of your gateway proxy. For example, you can download the [sample Grafana dashboard configuration for the `http` gateway](../grafana.json) as an `envoy.json` file. 
+## Step 6: Explore Grafana dashboards
 
-   2. Import the Grafana dashboard.
-   
-      ```sh
-      kubectl -n telemetry create cm envoy-dashboard \
-      --from-file=envoy.json
-      kubectl label -n telemetry cm envoy-dashboard grafana_dashboard=1
-      ```
+{{< reuse "docs/snippets/grafana-dashboards.md" >}}
 
-   3. Open and log in to Grafana by using the username `admin` and password `prom-operator`. 
-      
-      {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-```sh
-open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
-```
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-1. Port-forward the Grafana service to your local machine.
-   ```sh
-   kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000
-   ```
-2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
-{{% /tab %}}
-      {{< /tabs >}}
-      
-   4. Go to **Dashboards** > **Envoy** to open the dashboard that you imported. Verify that you see the traffic that you generated for the httpbin app. 
-      
-      {{< reuse-image src="img/grafana-dashboard.png" >}}
 
 ## Cleanup
 
@@ -678,6 +650,8 @@ open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jso
    ```sh
    kubectl delete cm envoy-dashboard -n telemetry
    rm envoy.json
+   kubectl delete cm {{< reuse "docs/snippets/kgateway.md" >}}-dashboard -n telemetry
+   rm {{< reuse "docs/snippets/kgateway.md" >}}.json
    ```
 
 2. Delete the HTTPListenerPolicy policies that collect logs and traces.

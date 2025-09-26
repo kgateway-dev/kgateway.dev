@@ -4,6 +4,8 @@ weight: 15
 description: Set up cloud LLM providers with AI Gateway.
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Set up cloud LLM providers with AI Gateway.
 
 ## Before you begin
