@@ -139,10 +139,10 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 3. Deploy the Amazon EKS Pod Identity Webhook.
    ```sh
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-18/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
    ```
 
 4. Verify that the webhook deployment completes.
@@ -174,7 +174,7 @@ Be sure that you [deployed the Amazon EKS Pod Identity Webhook](#webhook) to you
    EOF
    ```
 
-2. Update the `http` Gateway resource to add a reference to the `http-lambda` GatewayParameters.
+2. Create the following `http` Gateway resource, which includes a reference to the `http-lambda` GatewayParameters.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
