@@ -18,7 +18,7 @@ For an overview of supported CEL expressions, see the [agentgateway docs](https:
 
 ## Set up access to Gemini
 
-Configure access to an LLM provider such as Gemini. You can use any other LLM provider, or set up an MCP server, or agent to try out CEL-based RBAC.
+Configure access to an LLM provider such as Gemini. You can use any other LLM provider, an MCP server, or an agent to try out CEL-based RBAC.
 
 {{< reuse "docs/snippets/gemini-setup.md" >}} 
 

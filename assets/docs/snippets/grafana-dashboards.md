@@ -65,13 +65,6 @@ open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jso
    {{< reuse-image src="img/kgateway-dashboard.png" >}}
    {{< reuse-image-dark srcDark="img/kgateway-dashboard.png" >}}
    
-   
-   
-
-All of the "... Latency" panels do show the p70, but they also graph the p90 and p99. And I would say: "The duration, under which X%..." rather than "in which". For XDS Snapshot Sync Latency I'd say: "The durations under which 70%, 90%, and 99% of xDS snapshot syncs finished, within the last 5 minutes."
-And, for Status Syncs by Resource, I'd say "The total number of status syncs completed by resource type."
-
-
    | Metric | Description |
    | -- | -- |
    | Number of translations running per translator | The number of active Kubernetes Gateway API translations. |
@@ -83,9 +76,9 @@ And, for Status Syncs by Resource, I'd say "The total number of status syncs com
    | Total operations | The total number of reconciliations for each controller plus the total number of translations for each translator, and the total number of status syncs for each status syncer. |   
    | XDS resources by gateway | The total number of resources in the XDS snapshot for each gateway, such as clusters, endpoints, listeners, and routes. |
    | Routing domains per gateway port | The total number of routing domains for each gateway and port. |
-   | Reconciliation latency | The duration, under which 70%, 90%, and 99% of reconciliations finished within the last 5 minutes.|
-   | Status Syncer Latency |  The duration, under which 70%, 90%, and 99% of status syncs finished within the last 5 minutes.|
-   | Translation Latency | The duration, under which 70%, 90%, and 99% of translations finished within the last 5 minutes. |
-   | XDS Snapshot Sync Latency | The duration, under which 70%, 90%, and 99% of xDS snapshots finished within the last 5 minutes. |
-   | Resource Status Sync Latency | The duration, under which 70%, 90%, and 99% of resource status syncs finished within the last 5 minutes. |
+   | Reconciliation latency | In the last 5 minutes, the amount of time that it took 70%, 90%, and 99% of reconciliation processes to finish. |
+   | Status Syncer Latency |  In the last 5 minutes, the amount of time that it took 70%, 90%, and 99% of status syncs to finish. | 
+   | Translation Latency | In the last 5 minutes, the amount of time that it took 70%, 90%, and 99% of translations to finish. |
+   | XDS Snapshot Sync Latency | In the last 5 minutes, the amount of time that it took 70%, 90%, and 99% of xDS snapshots to finish. |
+   | Resource Status Sync Latency | In the last 5 minutes, the amount of time that it took 70%, 90%, and 99% of resource status syncs to finish. |
    | Status Syncs by Resource | The total number of status syncs completed by resource type. |
