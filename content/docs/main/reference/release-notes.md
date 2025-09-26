@@ -108,6 +108,10 @@ Note that this change does not impact the other delegation annotations:
 * `delegation.kgateway.dev/inherit-parent-matcher`
 * `delegation.kgateway.dev/label`
 
+#### Deprecated support for AI Gateway with Envoy
+
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/agentgateway/" >}}) instead.
+
 ### 🌟 New features {#v21-new-features}
 
 #### Agentgateway integration {#v21-agentgateway}

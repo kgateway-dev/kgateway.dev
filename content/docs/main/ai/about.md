@@ -4,6 +4,8 @@ weight: 5
 description: Unleash developer productivity and accelerate AI innovation with AI Gateway.  
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Unleash developer productivity and accelerate AI innovation with AI Gateway.
 
 ## About LLMs {#about-llms}

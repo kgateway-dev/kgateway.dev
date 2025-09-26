@@ -4,6 +4,8 @@ weight: 20
 description: Let AI Gateway send requests to an LLM provider. 
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Let AI Gateway send requests to an LLM provider.
 
 To configure authentication, you provide the authentication details in the Backend resource that is backed by the LLM provider endpoint.

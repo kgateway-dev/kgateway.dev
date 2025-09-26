@@ -3,6 +3,8 @@ title: Model failover
 weight: 30
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Prioritize the failover of requests across different models from an LLM provider.
 
 {{< callout >}}

@@ -4,6 +4,8 @@ weight: 10
 description: Use a custom GatewayParameters resource to set up AI Gateway. 
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Configure your Helm chart installation to use AI Gateway. Then, use a custom GatewayParameters resource to set up AI Gateway.
 
 ## Before you begin

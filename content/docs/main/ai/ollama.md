@@ -4,6 +4,8 @@ weight: 15
 description: Set up Ollama as a local LLM provider with AI Gateway.
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Instead of a cloud LLM provider, you might want to use a local LLM provider such as [Ollama](https://ollama.com/) for local development. 
 
 ## Before you begin
