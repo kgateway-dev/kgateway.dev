@@ -30,7 +30,9 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 ## In-cluster service
 
-Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server. 
+Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server.
+
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
 
 ### Deploy the sample app
 
@@ -62,8 +64,6 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 
 {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
 {{% tab tabName="BackendConfigPolicy" %}}
-
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
 
 1. Create a Kubernetes Secret that has the public CA certificate for the NGINX server.
 
@@ -271,7 +271,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
    
-2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead.
+2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies. For agentgateway proxies, use the BackendTLSPolicy.
    
    {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
    {{% tab tabName="BackendConfigPolicy" %}}
@@ -393,7 +393,20 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 ### In-cluster service
 
-{{< tabs tabTotal="2" items="BackendTLSPolicy,BackendConfigPolicy" >}}
+{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
+{{% tab tabName="BackendConfigPolicy" %}}
+1. Delete the NGINX server.
+
+   ```yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   ```
+   
+2. Delete the routing resources that you created for the NGINX server.
+   
+   ```sh
+   kubectl delete backendconfigpolicy,secret,httproute -A -l app=nginx
+   ```
+{{% /tab %}}
 {{% tab tabName="BackendTLSPolicy" %}}
 1. Delete the NGINX server.
 
@@ -415,19 +428,6 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    kubectl rollout restart -n kgateway-system deployment/kgateway
    ```
 {{% /tab %}}
-{{% tab tabName="BackendConfigPolicy" %}}
-1. Delete the NGINX server.
-
-   ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
-   ```
-   
-2. Delete the routing resources that you created for the NGINX server.
-   
-   ```sh
-   kubectl delete backendconfigpolicy,secret,httproute -A -l app=nginx
-   ```
-{{% /tab %}}
 {{< /tabs >}}
 
 
@@ -435,18 +435,18 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 Delete the resources that you created. 
 
-{{< tabs tabTotal="2" items="BackendTLSPolicy,BackendConfigPolicy" >}}
-{{% tab tabName="BackendTLSPolicy" %}}
-```sh
-kubectl delete httproute httpbin-org
-kubectl delete backendtlspolicy httpbin-org
-kubectl delete backend httpbin-org
-```
-{{% /tab %}}
+{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
 {{% tab tabName="BackendConfigPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-org
 kubectl delete backendconfigpolicy httpbin-org
+kubectl delete backend httpbin-org
+```
+{{% /tab %}}
+{{% tab tabName="BackendTLSPolicy" %}}
+```sh
+kubectl delete httproute httpbin-org
+kubectl delete backendtlspolicy httpbin-org
 kubectl delete backend httpbin-org
 ```
 {{% /tab %}}
