@@ -5,7 +5,7 @@ weight: 20
 
 Use {{< reuse "/docs/snippets/kgateway.md" >}} to route traffic requests directly to an [Amazon Web Services (AWS) Lambda](https://aws.amazon.com/lambda/resources/) function.
 
-Note that this guide uses a Kubernetes secret that contains your AWS access key and secret key to invoke Lambda functions. To use AWS IAM roles to control access instead, see [Access AWS Lambda with a service account](/docs/traffic-management/destination-types/backends/lambda/service-accounts/) instead.
+Note that this guide uses a Kubernetes secret that contains your AWS access key and secret key to invoke Lambda functions. To use AWS IAM roles to control access instead, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}).
 
 ## Before you begin
 
