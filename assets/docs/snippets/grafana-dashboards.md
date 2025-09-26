@@ -1,4 +1,4 @@
-You can use the pre-built Grafana dashboards to observe the control and data plane status. 
+You can use the pre-built Grafana dashboards to observe the control and data plane statuses. 
 
 1. Create Grafana dashboards for the control and data plane metrics. For example, you can download the following sample Grafana dashboard configurations: 
      
@@ -64,21 +64,28 @@ open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jso
       
    {{< reuse-image src="img/kgateway-dashboard.png" >}}
    {{< reuse-image-dark srcDark="img/kgateway-dashboard.png" >}}
+   
+   
+   
+
+All of the "... Latency" panels do show the p70, but they also graph the p90 and p99. And I would say: "The duration, under which X%..." rather than "in which". For XDS Snapshot Sync Latency I'd say: "The durations under which 70%, 90%, and 99% of xDS snapshot syncs finished, within the last 5 minutes."
+And, for Status Syncs by Resource, I'd say "The total number of status syncs completed by resource type."
+
 
    | Metric | Description |
    | -- | -- |
    | Number of translations running per translator | The number of active Kubernetes Gateway API translations. |
    | Number of reconciliations running per controller | The number of active reconciliations for each controller. |
    | Number of resources | The number of Kubernetes Gateway API and kgateway resources in your cluster. |
-   | Translations rate by results | The total number of translations and their status. |
-   | Reconciliation rate by results | The total number of reconciliations and their status. |
-   | Status syncs rate by results | The total number of status syncs and their status. |
-   | Total operations | The total number of reconciliations for each controller. |
+   | Translations rate by results | The rate of translations in seconds and their statuses. |
+   | Reconciliation rate by results | The rate of reconciliations in seconds and their statuses. |
+   | Status syncs rate by results | The rate of status syncs in seconds and their statuses. |
+   | Total operations | The total number of reconciliations for each controller plus the total number of translations for each translator, and the total number of status syncs for each status syncer. |   
    | XDS resources by gateway | The total number of resources in the XDS snapshot for each gateway, such as clusters, endpoints, listeners, and routes. |
    | Routing domains per gateway port | The total number of routing domains for each gateway and port. |
-   | Reconciliation latency | The duration, in which 70% of reconciliations finished within the last 5 minutes.|
-   | Status Syncer Latency |  The duration, in which 70% of status syncs finished within the last 5 minutes.|
-   | Translation Latency | The duration, in which 70% of translations finished within the last 5 minutes. |
-   | XDS Snapshot Sync Latency | The duration, in which 70% of xDS snapshots finished within the last 5 minutes. |
-   | Resource Status Sync Latency | The duration, in which 70% of resource status syncs finished within the last 5 minutes. |
-   | Status Syncs by Resource | The number of status syncs completed by resource. |
+   | Reconciliation latency | The duration, under which 70%, 90%, and 99% of reconciliations finished within the last 5 minutes.|
+   | Status Syncer Latency |  The duration, under which 70%, 90%, and 99% of status syncs finished within the last 5 minutes.|
+   | Translation Latency | The duration, under which 70%, 90%, and 99% of translations finished within the last 5 minutes. |
+   | XDS Snapshot Sync Latency | The duration, under which 70%, 90%, and 99% of xDS snapshots finished within the last 5 minutes. |
+   | Resource Status Sync Latency | The duration, under which 70%, 90%, and 99% of resource status syncs finished within the last 5 minutes. |
+   | Status Syncs by Resource | The total number of status syncs completed by resource type. |

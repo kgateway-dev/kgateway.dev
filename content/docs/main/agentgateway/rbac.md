@@ -18,13 +18,13 @@ For an overview of supported CEL expressions, see the [agentgateway docs](https:
 
 ## Set up access to Gemini
 
-Configure access to an LLM provider such as Gemini. You can use any other LLM provider or set up an MCP server or agent to try out CEL-based RBAC.
+Configure access to an LLM provider such as Gemini. You can use any other LLM provider, or set up an MCP server, or agent to try out CEL-based RBAC.
 
 {{< reuse "docs/snippets/gemini-setup.md" >}} 
 
 ## Set up RBAC permissions
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your CEL rules. The following example allows requests with 
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your CEL rules. The following example allows requests with the `x-llm: gemini` header.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -46,7 +46,7 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
    EOF
    ```
    
-2. Send a request to the LLM provider API again without the `llm` header. Verify that the request is denied with a 403 HTTP response code. 
+2. Send a request to the LLM provider API without the `llm` header. Verify that the request is denied with a 403 HTTP response code. 
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
