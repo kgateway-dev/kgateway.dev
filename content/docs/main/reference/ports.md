@@ -38,8 +38,8 @@ The components are instantiated by using pods and services. The following table 
 
 | Pod | Port | Usage |
 |-----|------|-------|
-| {{< reuse "docs/snippets/kgateway.md" >}} | 9976 | REST xDS | 
-| {{< reuse "docs/snippets/kgateway.md" >}} | 9977 | xDS Server |
+| {{< reuse "docs/snippets/pod-name.md" >}} | 9976 | REST xDS | 
+| {{< reuse "docs/snippets/pod-name.md" >}} | 9977 | xDS Server |
 
 ### Gateway proxy ports
 

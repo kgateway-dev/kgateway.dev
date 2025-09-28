@@ -1,1 +1,1 @@
-{{< icon "kgateway" >}} The docs in this section use the Envoy-based kgateway proxy. The docs do not work with the agentgateway proxy.
+{{< icon "kgateway" >}} The steps in this section use the Envoy-based kgateway proxy. The steps do not work with the agentgateway proxy.

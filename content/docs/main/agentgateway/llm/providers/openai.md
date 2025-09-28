@@ -52,13 +52,12 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      type: AI
      ai:
        llm:
-         provider:
-           openai:
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: openai-secret
-             model: "gpt-3.5-turbo"
+         openai:
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: openai-secret
+           model: "gpt-3.5-turbo"
    EOF
    ```
 
@@ -67,7 +66,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    | Setting     | Description |
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 

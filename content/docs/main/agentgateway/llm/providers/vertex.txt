@@ -53,14 +53,13 @@ Configure Google Gemini as an LLM provider in agentgateway.
    spec:
      ai:
        llm:
-         provider:
-           gemini:
-             apiVersion: v1beta
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: google-secret
-             model: google/gemini-2.5-flash-lite-preview-06-17
+         gemini:
+           apiVersion: v1beta
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: google-secret
+           model: google/gemini-2.5-flash-lite-preview-06-17
      type: AI
    EOF
    ```

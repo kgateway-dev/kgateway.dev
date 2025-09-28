@@ -1,6 +1,6 @@
 ---
 title: Routes
-weight: 90
+weight: 70
 ---
 
 The {{< reuse "docs/snippets/agentgateway.md" >}} data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.

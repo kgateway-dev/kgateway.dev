@@ -318,7 +318,7 @@ You can update several installation settings in your Helm values file. For examp
 To enable the [Agentgateway](../../agentgateway/) and [AI extensions](../../ai/), set the following values in your Helm values file.
 
 ```yaml
-agentGateway:
+agentgateway:
   enabled: true
 gateway:
   aiExtension:

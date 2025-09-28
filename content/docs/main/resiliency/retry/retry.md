@@ -1,12 +1,11 @@
 ---
-title: Retries
+title: Request retries
 weight: 10
 description: Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 ---
 
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
-
-The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts](/docs/resiliency/timeouts/) to ensure that your apps are available even if they are temporarily unavailable.
+You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/">}}) to ensure that your apps are available even if they are temporarily unavailable.
 
 {{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-experimental.md" >}}
@@ -16,11 +15,9 @@ The Kubernetes Gateway API provides a way to configure retries on your HTTPRoute
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
 
-## About
+## About request retries
 
-A retry is the number of times a request is retried if it fails. This setting can be useful to avoid your apps from failing if they are temporarily unavailable. With retries, calls are retried a certain number of times before they are considered failed. Retries can enhance your app's availability by making sure that calls don’t fail permanently because of transient problems, such as a temporarily overloaded service or network.
-
-For more information, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/geps/gep-1731/).
+A request retry is the number of times a request is retried if it fails. This setting can be useful to avoid your apps from failing if they are temporarily unavailable. With retries, calls are retried a certain number of times before they are considered failed. Retries can enhance your app's availability by making sure that calls don’t fail permanently because of transient problems, such as a temporarily overloaded service or network.
 
 ## Before you begin
 
@@ -135,12 +132,13 @@ To use retries, you need to install the experimental channel. You can also set u
    EOF
    ```
 
-## Step 2: Set up retries {#setup-retries}
+## Step 2: Set up request retries {#setup-retries}
 
-Set up retries to the reviews app on the HTTPRoute resource.
+Set up retries to the reviews app.
 
-1. Create an HTTPRoute resource to specify your retry rules.
-
+1. Create an HTTPRoute resource to specify your retry rules. You can apply the retry policy on an HTTPRoute, HTTPRoute rule, or Gateway listener. 
+   {{< tabs tabTotal="3" items="HTTPRoute (Kubernetes GW API),HTTPRoute and rule (TrafficPolicy),Gateway listener" >}}
+   {{% tab tabName="HTTPRoute (Kubernetes GW API)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -187,6 +185,134 @@ Set up retries to the reviews app on the HTTPRoute resource.
    | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
    | `timeouts` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
+   {{% /tab %}}
+   {{% tab tabName="HTTPRoute (GlooTrafficPolicy)" %}}
+   1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. Note that you add a name `timeout` to your HTTPRoute rule so that you can later attach the retry policy to that rule.
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: retry
+        namespace: default
+      spec:
+        hostnames:
+        - retry.example
+        parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: http
+          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        rules:
+        - matches: 
+          - path:
+              type: PathPrefix
+              value: /
+          backendRefs:
+          - group: ""
+            kind: Service
+            name: reviews
+            port: 9080 
+          name: timeout
+      EOF
+      ```
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `timeout` HTTPRoute rule. 
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+      kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+      metadata:
+        name: retry
+        namespace: default
+      spec:
+        targetRefs:
+        - kind: HTTPRoute
+          group: gateway.networking.k8s.io
+          name: retry
+          sectionName: timeout
+        retry:
+          attempts: 3
+          backoffBaseInterval: 1s
+          retryOn: 
+          - 5xx
+          - unavailable
+        timeouts:
+          request: 20s
+      EOF
+      ```
+      
+      {{< reuse "docs/snippets/review-table.md" >}}
+
+      | Field | Description |
+      |-------|-------------|
+      | `targetRefs.sectionName` | Select the HTTPRoute rule that you want to apply the policy to. |
+      | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
+      | `retry.backoffBaseInterval` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
+      | `retry.retryOn` | The condition that must be met for the gateway proxy to retry the request. In this example, the request is retried if a 5xx HTTP response code is returned or if the upstream service is unavailable. |
+      | `timeouts.request` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
+   
+   {{% /tab %}}
+   {{% tab tabName="Gateway listener" %}}
+   1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. 
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: gateway.networking.k8s.io/v1
+      kind: HTTPRoute
+      metadata:
+        name: retry
+        namespace: default
+      spec:
+        hostnames:
+        - retry.example
+        parentRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: http
+          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        rules:
+        - matches: 
+          - path:
+              type: PathPrefix
+              value: /
+          backendRefs:
+          - group: ""
+            kind: Service
+            name: reviews
+            port: 9080 
+      EOF
+      ```
+   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `http` Gateway listener. You set up this Gateway in the [before you begin](#before-you-begin) section.  
+      ```yaml
+      kubectl apply -f- <<EOF
+      apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+      kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+      metadata:
+        name: retry
+        namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      spec:
+        targetRefs:
+        - kind: Gateway
+          group: gateway.networking.k8s.io
+          name: http
+          sectionName: http
+        retry:
+          attempts: 3
+          backoffBaseInterval: 1s
+          retryOn: 
+          - 5xx
+          - unavailable
+      EOF
+      ```
+      
+      | Field | Description |
+      |-------|-------------|
+      | `targetRefs.sectionName` | Select the Gateway listener that you want to apply the policy to. |
+      | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
+      | `retry.backoffBaseInterval` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
+      | `retry.retryOn` | The condition that must be met for the gateway proxy to retry the request. In this example, the request is retried if a 5xx HTTP response code is returned or if the upstream service is unavailable. |
+      | `timeouts.request` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Verify that the gateway proxy is configured to retry the request.
 
@@ -271,7 +397,7 @@ Set up retries to the reviews app on the HTTPRoute resource.
 4. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field is `-`, which means that the request was not retried.
@@ -366,4 +492,10 @@ Simulate a failure for the reviews app so that you can verify that the request i
 
    ```sh
    kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+   
+4. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+   ```sh
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} retry 
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} retry -n {{< reuse "docs/snippets/namespace.md" >}}
    ```

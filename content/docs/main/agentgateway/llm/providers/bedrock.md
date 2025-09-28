@@ -48,14 +48,13 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
      type: AI
      ai:
        llm:
-         provider:
-           bedrock:
-             model: "amazon.titan-text-lite-v1"
-             region: us-east-1
-             auth:
-               type: Secret
-               secretRef:
-                 name: bedrock-secret
+         bedrock:
+           model: "amazon.titan-text-lite-v1"
+           region: us-east-1
+           auth:
+             type: Secret
+             secretRef:
+               name: bedrock-secret
    EOF
    ```
 
@@ -64,7 +63,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    | Setting     | Description |
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses Amazon Bedrock (`spec.ai.llm.provider.bedrock`). |
+   | `ai`        | Define the AI backend configuration. The example uses Amazon Bedrock (`spec.ai.llm.bedrock`). |
    | `model`     | The model to use to generate responses. In this example, you use the `amazon.titan-text-lite-v1` model. For more models, see the [AWS Bedrock docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html). |
    | `region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|

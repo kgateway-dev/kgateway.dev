@@ -25,11 +25,9 @@ weight: 10
 
 
 
+AIBackend specifies the AI backend configuration
 
 
-_Validation:_
-- MaxProperties: 1
-- MinProperties: 1
 
 _Appears in:_
 - [BackendSpec](#backendspec)
@@ -37,7 +35,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `llm` _[LLMProvider](#llmprovider)_ | The LLM configures the AI gateway to use a single LLM provider backend. |  |  |
-| `multipool` _[MultiPoolConfig](#multipoolconfig)_ | The MultiPool configures the backends for multiple hosts or models from the same provider in one Backend resource. |  |  |
+| `priorityGroups` _[PriorityGroup](#prioritygroup) array_ | PriorityGroups specifies a list of groups in priority order where each group defines<br />a set of LLM providers. The priority determines the priority of the backend endpoints chosen.<br /><br />Example configuration with two priority groups:<br />```yaml<br />priorityGroups:<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret<br />	          namespace: kgateway-system<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini-2<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway-2.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret-2<br />	          namespace: kgateway-system<br />``` |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 
 
 #### AIPolicy
@@ -281,11 +279,11 @@ _Appears in:_
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
 
 
-#### AgentGateway
+#### Agentgateway
 
 
 
-AgentGateway configures the AgentGateway integration. If AgentGateway is enabled, Envoy
+Agentgateway configures the agentgateway dataplane integration to be enabled if the `agentgateway` GatewayClass is used.
 
 
 
@@ -301,6 +299,7 @@ _Appears in:_
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
 | `customConfigMapName` _string_ | Name of the custom configmap to use instead of the default generated one.<br />When set, the agent gateway will use this configmap instead of creating the default one.<br />The configmap must contain a 'config.yaml' key with the agent gateway configuration. |  |  |
+| `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
 
 #### AiExtension
@@ -383,7 +382,7 @@ AnthropicConfig settings for the [Anthropic](https://docs.anthropic.com/en/relea
 
 
 _Appears in:_
-- [SupportedLLMProvider](#supportedllmprovider)
+- [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -434,11 +433,11 @@ _Appears in:_
 | `kubernetes.io/ws` | AppProtocolKubernetesWs is the kubernetes.io/ws app protocol.<br /> |
 
 
-#### AuthHeaderOverride
+#### AuthHeader
 
 
 
-AuthHeaderOverride allows customization of the default Authorization header sent to the LLM Provider.
+AuthHeader allows customization of the default Authorization header sent to the LLM Provider.
 The default header is `Authorization: Bearer <token>`. HeaderName can change the Authorization
 header name and Prefix can change the Bearer prefix
 
@@ -449,8 +448,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `prefix` _string_ |  |  |  |
-| `headerName` _string_ |  |  |  |
+| `prefix` _string_ | Prefix specifies the prefix to use in the Authorization header. |  | MinLength: 1 <br /> |
+| `headerName` _string_ | HeaderName specifies the name of the header to use for authorization. |  | MinLength: 1 <br /> |
 
 
 #### AuthorizationPolicyAction
@@ -552,7 +551,7 @@ AzureOpenAIConfig settings for the [Azure OpenAI](https://learn.microsoft.com/en
 
 
 _Appears in:_
-- [SupportedLLMProvider](#supportedllmprovider)
+- [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -645,7 +644,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used. |  | Enum: [AI AWS Static DynamicForwardProxy MCP] <br /> |
-| `ai` _[AIBackend](#aibackend)_ | AI is the AI backend configuration. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
+| `ai` _[AIBackend](#aibackend)_ | AI is the AI backend configuration. |  |  |
 | `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration.<br />The Aws backend type is only supported with envoy-based gateways, it is not supported in agentgateway. |  |  |
 | `static` _[StaticBackend](#staticbackend)_ | Static is the static backend configuration. |  |  |
 | `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | DynamicForwardProxy is the dynamic forward proxy backend configuration.<br />The DynamicForwardProxy backend type is only supported with envoy-based gateways, it is not supported in agentgateway. |  |  |
@@ -699,7 +698,7 @@ _Appears in:_
 
 
 _Appears in:_
-- [SupportedLLMProvider](#supportedllmprovider)
+- [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -741,8 +740,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
-| `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body. |  |  |
+| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected.<br />This field is only supported for kgateway (Envoy) data plane and is ignored by agentgateway.<br />For agentgateway, use json(request.body) or json(response.body) directly in CEL expressions. | AsString | Enum: [AsString AsJson] <br /> |
+| `value` _[Template](#template)_ | Value is the template to apply to generate the output value for the body.<br />Inja templates are supported for Envoy-based data planes only.<br />CEL expressions are supported for agentgateway data plane only.<br />The system will auto-detect the appropriate template format based on the data plane. |  |  |
 
 
 #### Buffer
@@ -760,24 +759,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `maxRequestSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | MaxRequestSize sets the maximum size in bytes of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413.<br />Example format: "1Mi", "512Ki", "1Gi" |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the buffer filter.<br />Can be used to disable buffer policies applied at a higher level in the config hierarchy. |  |  |
-
-
-#### BufferSettings
-
-
-
-BufferSettings configures how the request body should be buffered.
-
-
-
-_Appears in:_
-- [ExtAuthPolicy](#extauthpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the authorization service. |  | Minimum: 1 <br /> |
-| `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the authorization service even if they exceed maxRequestBytes.<br />When unset, the default behavior is false. |  |  |
-| `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />When unset, the default behavior is false. |  |  |
 
 
 #### BuiltIn
@@ -1217,6 +1198,7 @@ _Appears in:_
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
+| `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
 
 #### EnvoyHealthCheck
@@ -1236,12 +1218,31 @@ _Appears in:_
 | `path` _string_ | Path defines the exact path that will be matched for health check requests. |  | MaxLength: 2048 <br />Pattern: `^/[-a-zA-Z0-9@:%.+~#?&/=_]+$` <br /> |
 
 
+#### ExtAuthBufferSettings
+
+
+
+ExtAuthBufferSettings configures how the request body should be buffered.
+
+
+
+_Appears in:_
+- [ExtAuthPolicy](#extauthpolicy)
+- [ExtAuthProvider](#extauthprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxRequestBytes` _integer_ | MaxRequestBytes sets the maximum size of a message body to buffer.<br />Requests exceeding this size will receive HTTP 413 and not be sent to the auth service. |  | Minimum: 1 <br /> |
+| `allowPartialMessage` _boolean_ | AllowPartialMessage determines if partial messages should be allowed.<br />When true, requests will be sent to the auth service even if they exceed maxRequestBytes.<br />The default behavior is false. | false |  |
+| `packAsBytes` _boolean_ | PackAsBytes determines if the body should be sent as raw bytes.<br />When true, the body is sent as raw bytes in the raw_body field.<br />When false, the body is sent as UTF-8 string in the body field.<br />The default behavior is false. | false |  |
+
+
 #### ExtAuthPolicy
 
 
 
-ExtAuthPolicy configures external authentication for a route.
-This policy will determine the ext auth server to use and how to  talk to it.
+ExtAuthPolicy configures external authentication/authorization for a route.
+This policy will determine the ext auth server to use and how to talk to it.
 Note that most of these fields are passed along as is to Envoy.
 For more details on particular fields please see the Envoy ExtAuth documentation.
 https://raw.githubusercontent.com/envoyproxy/envoy/f910f4abea24904aff04ec33a00147184ea7cffa/api/envoy/extensions/filters/http/ext_authz/v3/ext_authz.proto
@@ -1253,10 +1254,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references the GatewayExtension that should be used for authentication. |  |  |
-| `withRequestBody` _[BufferSettings](#buffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the authorization service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
-| `contextExtensions` _object (keys:string, values:string)_ | Additional context for the authorization service. |  |  |
-| `disable` _[PolicyDisable](#policydisable)_ | Disable all external authorization filters.<br />Can be used to disable external authorization policies applied at a higher level in the config hierarchy. |  |  |
+| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references the GatewayExtension that should be used for auth. |  |  |
+| `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the auth service.<br />Warning buffering has implications for streaming and therefore performance. |  |  |
+| `contextExtensions` _object (keys:string, values:string)_ | Additional context for the auth service. |  |  |
+| `disable` _[PolicyDisable](#policydisable)_ | Disable all external auth filters.<br />Can be used to disable external auth policies applied at a higher level in the config hierarchy. |  |  |
 
 
 #### ExtAuthProvider
@@ -1272,7 +1273,12 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the authentication. |  |  |
+| `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the auth. |  |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext auth service is unavailable.<br />Defaults to false, meaning requests will be denied if the ext auth service is unavailable. | false |  |
+| `clearRouteCache` _boolean_ | ClearRouteCache determines if the route cache should be cleared to allow the<br />external authentication service to correctly affect routing decisions. | false |  |
+| `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the auth service.<br />Warning: buffering has implications for streaming and therefore performance. |  |  |
+| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />auth server returns an error or cannot be reached. Must be in the range of 100-511 inclusive.<br />The default matches the deny response code of 403 Forbidden. | 403 | Maximum: 511 <br />Minimum: 100 <br /> |
+| `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extauthz filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 
 
 #### ExtGrpcService
@@ -1292,6 +1298,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
+| `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 
 
 #### ExtProcPolicy
@@ -1326,6 +1333,31 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the processing. |  |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext proc service is unavailable.<br />Defaults to true, meaning requests are allowed upstream even if the ext proc service is unavailable. | true |  |
+| `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams. |  |  |
+| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server. |  |  |
+| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />The default value 0, which effectively disables the override_message_timeout API. |  |  |
+| `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
+| `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
+| `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
+
+
+#### ExtProcRouteCacheAction
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description |
+| --- | --- |
+| `FromResponse` | RouteCacheActionFromResponse is the default behavior, which clears the route cache only<br />when the clear_route_cache field is set in an external processor response.<br /> |
+| `Clear` | RouteCacheActionClear always clears the route cache irrespective of the<br />clear_route_cache field in the external processor response.<br /> |
+| `Retain` | RouteCacheActionRetain never clears the route cache irrespective of the<br />clear_route_cache field in the external processor response.<br /> |
 
 
 #### FieldDefault
@@ -1363,11 +1395,14 @@ defaults:
 ```
 
 
-Example: Overriding a custom list field:
+Example: Setting custom lists fields:
 ```yaml
 defaults:
-  - field: "custom_list"
-    value: "[a,b,c]"
+  - field: "custom_integer_list"
+    value: "[1,2,3]"
+  - field: "custom_string_list"
+    value: '["one","two","three"]'
+    override: true
 
 
 ```
@@ -1568,7 +1603,7 @@ GeminiConfig settings for the [Gemini](https://ai.google.dev/gemini-api/docs) LL
 
 
 _Appears in:_
-- [SupportedLLMProvider](#supportedllmprovider)
+- [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1761,7 +1796,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
-| `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the header. |  |  |
+| `value` _[Template](#template)_ | Value is the template to apply to generate the output value for the header.<br />Inja templates are supported for Envoy-based data planes only.<br />CEL expressions are supported for agentgateway data plane only.<br />The system will auto-detect the appropriate template format based on the data plane. |  |  |
 
 
 #### HeaderValue
@@ -1850,7 +1885,6 @@ Host defines a static backend host.
 
 
 _Appears in:_
-- [LLMProvider](#llmprovider)
 - [StaticBackend](#staticbackend)
 - [Webhook](#webhook)
 
@@ -1907,7 +1941,7 @@ for details.
 
 
 _Appears in:_
-- [AgentGateway](#agentgateway)
+- [Agentgateway](#agentgateway)
 - [AiExtension](#aiextension)
 - [EnvoyContainer](#envoycontainer)
 - [IstioContainer](#istiocontainer)
@@ -1920,20 +1954,6 @@ _Appears in:_
 | `tag` _string_ | The image tag. |  |  |
 | `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
 | `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
-
-
-#### InjaTemplate
-
-_Underlying type:_ _string_
-
-
-
-
-
-_Appears in:_
-- [BodyTransformation](#bodytransformation)
-- [HeaderTransformation](#headertransformation)
-
 
 
 #### IstioContainer
@@ -1992,7 +2012,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `deployment` _[ProxyDeployment](#proxydeployment)_ | Use a Kubernetes deployment as the proxy workload type. Currently, this is the only<br />supported workload type. |  |  |
-| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If AgentGateway is enabled, the EnvoyContainer values will be ignored. |  |  |
+| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If agentgateway is enabled, the EnvoyContainer values will be ignored. |  |  |
 | `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
 | `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
 | `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  |  |
@@ -2000,7 +2020,7 @@ _Appears in:_
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
 | `aiExtension` _[AiExtension](#aiextension)_ | Configuration for the AI extension. |  |  |
-| `agentGateway` _[AgentGateway](#agentgateway)_ | Configure the AgentGateway integration. If AgentGateway is disabled, the EnvoyContainer values will be used by<br />default to configure the data plane proxy. |  |  |
+| `agentgateway` _[Agentgateway](#agentgateway)_ | Configure the agentgateway integration. If agentgateway is disabled, the EnvoyContainer values will be used by<br />default to configure the data plane proxy. |  |  |
 | `floatingUserId` _boolean_ | Used to unset the `runAsUser` values in security contexts. |  |  |
 
 
@@ -2015,14 +2035,20 @@ TODO: Move auth options off of SupportedLLMProvider to BackendConfigPolicy: http
 
 _Appears in:_
 - [AIBackend](#aibackend)
-- [Priority](#priority)
+- [PriorityGroup](#prioritygroup)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `provider` _[SupportedLLMProvider](#supportedllmprovider)_ | The LLM provider type to configure. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
-| `hostOverride` _[Host](#host)_ | Send requests to a custom host and port, such as to proxy the request,<br />or to use a different backend that is API-compliant with the Backend version. |  |  |
-| `pathOverride` _[PathOverride](#pathoverride)_ | TODO: Consolidate all Override options into ProviderOverride.<br />Overrides the default API path for the LLM provider.<br />Allows routing requests to a custom API endpoint path. |  | MinProperties: 1 <br /> |
-| `authHeaderOverride` _[AuthHeaderOverride](#authheaderoverride)_ | Customizes the Authorization header sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
+| `openai` _[OpenAIConfig](#openaiconfig)_ | OpenAI provider |  |  |
+| `azureopenai` _[AzureOpenAIConfig](#azureopenaiconfig)_ | Azure OpenAI provider |  |  |
+| `anthropic` _[AnthropicConfig](#anthropicconfig)_ | Anthropic provider |  |  |
+| `gemini` _[GeminiConfig](#geminiconfig)_ | Gemini provider |  |  |
+| `vertexai` _[VertexAIConfig](#vertexaiconfig)_ | Vertex AI provider |  |  |
+| `bedrock` _[BedrockConfig](#bedrockconfig)_ | Bedrock provider |  |  |
+| `host` _string_ | Host specifies the hostname to send the requests to.<br />If not specified, the default hostname for the provider is used. |  | MinLength: 1 <br /> |
+| `port` _[PortNumber](#portnumber)_ | Port specifies the port to send the requests to. |  |  |
+| `path` _[PathOverride](#pathoverride)_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
+| `authHeader` _[AuthHeader](#authheader)_ | AuthHeader specifies how the Authorization header is set in the request sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
 
 #### LoadBalancer
@@ -2398,6 +2424,42 @@ _Appears in:_
 | `Host` | Host kind of metadata.<br /> |
 
 
+#### MetadataNamespaces
+
+
+
+MetadataNamespaces configures which metadata namespaces to use.
+See [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-msg-extensions-filters-http-ext-proc-v3-metadataoptions-metadatanamespaces)
+for specifics.
+
+
+
+_Appears in:_
+- [MetadataOptions](#metadataoptions)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `typed` _string array_ |  |  | MinItems: 1 <br /> |
+| `untyped` _string array_ |  |  | MinItems: 1 <br /> |
+
+
+#### MetadataOptions
+
+
+
+MetadataOptions allows configuring metadata namespaces to forward or receive from the external
+processing server.
+
+
+
+_Appears in:_
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `forwarding` _[MetadataNamespaces](#metadatanamespaces)_ | Forwarding defines the typed or untyped dynamic metadata namespaces to forward to the external processing server. |  |  |
+
+
 #### MetadataPathSegment
 
 _Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
@@ -2436,57 +2498,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `openAIModeration` _[OpenAIConfig](#openaiconfig)_ | Pass prompt data through an external moderation model endpoint,<br />which compares the request prompt input to predefined content rules.<br />Configure an OpenAI moderation endpoint. |  |  |
-
-
-#### MultiPoolConfig
-
-
-
-MultiPoolConfig configures the backends for multiple hosts or models from the same provider in one Backend resource.
-This method can be useful for creating one logical endpoint that is backed
-by multiple hosts or models.
-
-
-In the `priorities` section, the order of `pool` entries defines the priority of the backend endpoints.
-The `pool` entries can either define a list of backends or a single backend.
-Note: Only two levels of nesting are permitted. Any nested entries after the second level are ignored.
-
-
-```yaml
-multi:
-
-
-	priorities:
-	- pool:
-	  - azureOpenai:
-	      deploymentName: gpt-4o-mini
-	      apiVersion: 2024-02-15-preview
-	      endpoint: ai-gateway.openai.azure.com
-	      authToken:
-	        secretRef:
-	          name: azure-secret
-	          namespace: kgateway-system
-	- pool:
-	  - azureOpenai:
-	      deploymentName: gpt-4o-mini-2
-	      apiVersion: 2024-02-15-preview
-	      endpoint: ai-gateway-2.openai.azure.com
-	      authToken:
-	        secretRef:
-	          name: azure-secret-2
-	          namespace: kgateway-system
-
-
-```
-
-
-
-_Appears in:_
-- [AIBackend](#aibackend)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `priorities` _[Priority](#priority) array_ | The priority list of backend pools. Each entry represents a set of LLM provider backends.<br />The order defines the priority of the backend endpoints. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
 
 
 #### NamespacedObjectReference
@@ -2560,8 +2571,8 @@ OpenAIConfig settings for the [OpenAI](https://platform.openai.com/docs/api-refe
 
 
 _Appears in:_
+- [LLMProvider](#llmprovider)
 - [Moderation](#moderation)
-- [SupportedLLMProvider](#supportedllmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -2628,43 +2639,20 @@ _Appears in:_
 | `maxEjectionPercent` _integer_ | The maximum % of an upstream cluster that can be ejected due to outlier<br />detection. Defaults to 10%. | 10 | Maximum: 100 <br />Minimum: 0 <br /> |
 
 
-#### Parameters
-
-
-
-
-
-
-
-_Appears in:_
-- [TLS](#tls)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `tlsMinVersion` _[TLSVersion](#tlsversion)_ | Minimum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
-| `tlsMaxVersion` _[TLSVersion](#tlsversion)_ | Maximum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
-| `cipherSuites` _string array_ |  |  |  |
-| `ecdhCurves` _string array_ |  |  |  |
-
-
 #### PathOverride
 
 
 
-PathOverride configures the AI gateway to use a custom path for LLM provider chat-completion API requests.
-It allows overriding the default API path with a custom one.
-This is useful when you need to route requests to a different API endpoint while maintaining
-compatibility with the original provider's API structure.
+PathOverride allows overriding the default URL path used for LLM provider API requests.
 
-_Validation:_
-- MinProperties: 1
+
 
 _Appears in:_
 - [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `fullPath` _string_ | FullPath specifies the custom API path to use for the LLM provider requests.<br />This path will replace the default API path for the provider. |  |  |
+| `full` _string_ |  |  | MinLength: 1 <br /> |
 
 
 #### Pod
@@ -2692,6 +2680,7 @@ _Appears in:_
 | `readinessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)_ | If specified, the pod's readiness probe. Periodic probe of container service readiness.<br />Container will be removed from service endpoints if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 | `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 | `topologySpreadConstraints` _[TopologySpreadConstraint](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#topologyspreadconstraint-v1-core) array_ | If specified, the pod's topology spread constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#topologyspreadconstraint-v1-core<br />for details. |  |  |
+| `extraVolumes` _[Volume](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volume-v1-core) array_ | Additional volumes to add to the pod. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volume-v1-core<br />for details. |  |  |
 
 
 #### PolicyAncestorStatus
@@ -2751,20 +2740,27 @@ _Appears in:_
 | `nodePort` _integer_ | The NodePort to be used for the service. If not specified, a random port<br />will be assigned by the Kubernetes API server. |  |  |
 
 
-#### Priority
+#### PriorityGroup
 
 
 
-Priority configures the priority of the backend endpoints.
+MultiPoolConfig configures the backends for multiple hosts or models from the same provider in one Backend resource.
+This method can be useful for creating one logical endpoint that is backed
+by multiple hosts or models.
+
+
+In the `priorities` section, the order of `pool` entries defines the priority of the backend endpoints.
+The `pool` entries can either define a list of backends or a single backend.
+Note: Only two levels of nesting are permitted. Any nested entries after the second level are ignored.
 
 
 
 _Appears in:_
-- [MultiPoolConfig](#multipoolconfig)
+- [AIBackend](#aibackend)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `pool` _[LLMProvider](#llmprovider) array_ | A list of LLM provider backends within a single endpoint pool entry. |  | MaxItems: 20 <br />MinItems: 1 <br /> |
+| `providers` _[LLMProvider](#llmprovider) array_ | A list of LLM provider backends within a single endpoint pool entry. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 
 
 #### ProcessingMode
@@ -2777,6 +2773,7 @@ ProcessingMode defines how the filter should interact with the request/response 
 
 _Appears in:_
 - [ExtProcPolicy](#extprocpolicy)
+- [ExtProcProvider](#extprocprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -2844,6 +2841,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `replicas` _integer_ | The number of desired pods. Defaults to 1. |  |  |
 | `omitReplicas` _boolean_ | If true, replicas will not be set in the deployment (allowing HPA to control scaling) |  |  |
+| `strategy` _[DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#deploymentstrategy-v1-apps)_ | The deployment strategy to use to replace existing pods with new<br />ones. The Kubernetes default is a RollingUpdate with 25% maxUnavailable,<br />25% maxSurge.<br /><br />E.g., to recreate pods, minimizing resources for the rollout but causing downtime:<br />strategy:<br />  type: Recreate<br />E.g., to roll out as a RollingUpdate but with non-default parameters:<br />strategy:<br />  type: RollingUpdate<br />  rollingUpdate:<br />    maxSurge: 100% |  |  |
 
 
 #### Publisher
@@ -3002,8 +3000,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `grpcService` _[ExtGrpcService](#extgrpcservice)_ | GrpcService is the GRPC service that will handle the rate limiting. |  |  |
 | `domain` _string_ | Domain identifies a rate limiting configuration for the rate limit service.<br />All rate limit requests must specify a domain, which enables the configuration<br />to be per application without fear of overlap (e.g., "api", "web", "admin"). |  |  |
-| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />When true, requests are not limited if the rate limit service is unavailable. | true |  |
-| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout for requests to the rate limit service. | 100ms |  |
+| `failOpen` _boolean_ | FailOpen determines if requests are limited when the rate limit service is unavailable.<br />Defaults to true, meaning requests are allowed upstream and not limited if the rate limit service is unavailable. | true |  |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout provides an optional timeout value for requests to the rate limit service.<br />For rate limiting, prefer using this timeout rather than setting the generic `timeout` on the `GrpcService`.<br />See [envoy issue](https://github.com/envoyproxy/envoy/issues/20070) for more info. | 100ms |  |
+| `xRateLimitHeaders` _[XRateLimitHeadersStandard](#xratelimitheadersstandard)_ | XRateLimitHeaders configures the standard version to use for X-RateLimit headers emitted.<br />See [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ratelimit/v3/rate_limit.proto#envoy-v3-api-field-extensions-filters-http-ratelimit-v3-ratelimit-enable-x-ratelimit-headers) for more info.<br />Disabled by default. | Off | Enum: [Off DraftVersion03] <br /> |
 
 
 #### Regex
@@ -3414,29 +3413,6 @@ _Appears in:_
 | `ignoreCase` _boolean_ | If true, indicates the exact/prefix/suffix/contains matching should be<br />case insensitive. This has no effect on the regex match.<br />For example, the matcher data will match both input string Data and data if this<br />option is set to true. | false |  |
 
 
-#### SupportedLLMProvider
-
-
-
-SupportedLLMProvider configures the AI gateway to use a single LLM provider backend.
-
-_Validation:_
-- MaxProperties: 1
-- MinProperties: 1
-
-_Appears in:_
-- [LLMProvider](#llmprovider)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `openai` _[OpenAIConfig](#openaiconfig)_ |  |  |  |
-| `azureopenai` _[AzureOpenAIConfig](#azureopenaiconfig)_ |  |  |  |
-| `anthropic` _[AnthropicConfig](#anthropicconfig)_ |  |  |  |
-| `gemini` _[GeminiConfig](#geminiconfig)_ |  |  |  |
-| `vertexai` _[VertexAIConfig](#vertexaiconfig)_ |  |  |  |
-| `bedrock` _[BedrockConfig](#bedrockconfig)_ |  |  |  |
-
-
 #### TCPKeepalive
 
 
@@ -3469,12 +3445,12 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
-| `tlsFiles` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
+| `files` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
 | `wellKnownCACertificates` _[WellKnownCACertificatesType](#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
 | `insecureSkipVerify` _boolean_ | InsecureSkipVerify originates TLS but skips verification of the backend's certificate.<br />WARNING: This is an insecure option that should only be used if the risks are understood. |  |  |
 | `sni` _string_ | The SNI domains that should be considered for TLS connection |  | MinLength: 1 <br /> |
-| `verifySubjectAltName` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
-| `parameters` _[Parameters](#parameters)_ | General TLS parameters. See the [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto#extensions-transport-sockets-tls-v3-tlsparameters)<br />for more information on the meaning of these values. |  |  |
+| `verifySubjectAltNames` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
+| `parameters` _[TLSParameters](#tlsparameters)_ | General TLS parameters. See the [envoy docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/common.proto#extensions-transport-sockets-tls-v3-tlsparameters)<br />for more information on the meaning of these values. |  |  |
 | `alpnProtocols` _string array_ | Set Application Level Protocol Negotiation<br />If empty, defaults to ["h2", "http/1.1"]. |  |  |
 | `allowRenegotiation` _boolean_ | Allow Tls renegotiation, the default value is false.<br />TLS renegotiation is considered insecure and shouldn't be used unless absolutely necessary. |  |  |
 | `simpleTLS` _boolean_ | If the TLS config has the tls cert and key provided, kgateway uses it to perform mTLS by default.<br />Set simpleTLS to true to disable mTLS in favor of server-only TLS (one-way TLS), even if kgateway has the client cert.<br />If unset, defaults to false. |  |  |
@@ -3498,6 +3474,25 @@ _Appears in:_
 | `rootCA` _string_ |  |  | MinLength: 1 <br /> |
 
 
+#### TLSParameters
+
+
+
+
+
+
+
+_Appears in:_
+- [TLS](#tls)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `minVersion` _[TLSVersion](#tlsversion)_ | Minimum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `maxVersion` _[TLSVersion](#tlsversion)_ | Maximum TLS version. |  | Enum: [AUTO 1.0 1.1 1.2 1.3] <br /> |
+| `cipherSuites` _string array_ |  |  |  |
+| `ecdhCurves` _string array_ |  |  |  |
+
+
 #### TLSVersion
 
 _Underlying type:_ _string_
@@ -3508,7 +3503,7 @@ _Validation:_
 - Enum: [AUTO 1.0 1.1 1.2 1.3]
 
 _Appears in:_
-- [Parameters](#parameters)
+- [TLSParameters](#tlsparameters)
 
 | Field | Description |
 | --- | --- |
@@ -3517,6 +3512,20 @@ _Appears in:_
 | `1.1` |  |
 | `1.2` |  |
 | `1.3` |  |
+
+
+#### Template
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [BodyTransformation](#bodytransformation)
+- [HeaderTransformation](#headertransformation)
+
 
 
 #### Timeouts
@@ -3646,7 +3655,7 @@ _Appears in:_
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
-| `rbac` _[RBAC](#rbac)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions. |  |  |
+| `rbac` _[RBAC](#rbac)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />With an Envoy-based Gateway, RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. In Envoy, this means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. In contrast, an<br />Agentgateway-based Gateway supports cumulative RBAC policies across different attachment points, such that<br />an RBAC policy attached to a route augments policies applied to the gateway or listener without overriding them. |  |  |
 
 
 #### Transform
@@ -3715,7 +3724,7 @@ To find the values for the project ID, project location, and publisher, you can 
 
 
 _Appears in:_
-- [SupportedLLMProvider](#supportedllmprovider)
+- [LLMProvider](#llmprovider)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -3743,6 +3752,23 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />```yaml<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br />``` |  |  |
-| `forwardHeaders` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaders define headers to forward with the request to the webhook.<br />Note: This is not yet supported for agentgateway. |  |  |
+| `forwardHeaderMatches` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
+
+
+#### XRateLimitHeadersStandard
+
+_Underlying type:_ _string_
+
+XRateLimitHeadersStandard controls how XRateLimit headers will emitted.
+
+
+
+_Appears in:_
+- [RateLimitProvider](#ratelimitprovider)
+
+| Field | Description |
+| --- | --- |
+| `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
+| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
