@@ -125,41 +125,33 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 
    ```bash
    openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-     -keyout grpc.example.com.key \
-     -out grpc.example.com.crt \
-     -subj "/CN=grpc.example.com"
+     -keyout example.com.key \
+     -out example.com.crt \
+     -subj "/CN=example.com"
    
-   kubectl create secret tls grpc-example-com-cert \
+   kubectl create secret tls example-com-cert \
      -n {{< reuse "docs/snippets/namespace.md" >}} \
-     --key grpc.example.com.key \
-     --cert grpc.example.com.crt
+     --key example.com.key \
+     --cert example.com.crt
    ```
 
 2. Create a Gateway resource with an HTTPS listener.
 
    ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
+   kubectl apply -f- <<EOF
    kind: Gateway
+   apiVersion: gateway.networking.k8s.io/v1
    metadata:
-     name: grpc-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: grpc-echo
+     name: gw
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: kgateway
      listeners:
-     - protocol: HTTPS
-       port: 443
-       name: https
-       hostname: "grpc.example.com"
-       tls:
-         mode: Terminate
-         certificateRefs:
-         - name: grpc-example-com-cert
-       allowedRoutes:
-         namespaces:
-           from: All
+       - protocol: HTTP
+         port: 8080
+         name: http
+         allowedRoutes:
+           namespaces:
+             from: All
    EOF
    ```
 
@@ -175,7 +167,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 3. Check the status of the Gateway.
 
    ```bash
-   kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   kubectl get gateway gw -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
    Example output:
@@ -204,40 +196,32 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute).
 
    ```yaml
-   kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: GRPCRoute
    metadata:
-     name: grpc-echo-route
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: grpc-echo
+     name: grpc-route
    spec:
      parentRefs:
-     - name: grpc-gateway
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
-       sectionName: https
+       - name: gw
      hostnames:
-     - "grpc.example.com"
+       - "example.com"
      rules:
-     - matches:
-       - method:
-           service: "grpc.reflection.v1alpha.ServerReflection"
-       backendRefs:
-       - name: grpc-echo-svc
-         namespace: default
-         port: 3000
-     - backendRefs:
-       - name: grpc-echo-svc
-         namespace: default
-         port: 3000
+       - matches:
+           - method:
+               method: ServerReflectionInfo
+               service: grpc.reflection.v1alpha.ServerReflection
+           - method:
+               method: Ping
+         backendRefs:
+           - name: grpc-echo-svc
+             port: 3000
    EOF
    ```
 
 2. Verify that the GRPCRoute is applied successfully.
 
    ```bash
-   kubectl get grpcroute grpc-echo-route -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   kubectl get grpcroute grpc-route -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
    Example output:
@@ -275,13 +259,13 @@ Verify that the gRPC route to the echo service is working.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
-   export GATEWAY_IP=$(kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.status.addresses[0].value}')
+   export GATEWAY_IP=$(kubectl get gateway gw -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.status.addresses[0].value}')
    echo $GATEWAY_IP
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
-   kubectl port-forward svc/grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
+   kubectl port-forward svc/gw -n {{< reuse "docs/snippets/namespace.md" >}} 8000:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -291,14 +275,14 @@ Verify that the gRPC route to the echo service is working.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
-   grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 list
-   grpcurl -insecure -authority grpc.example.com $GATEWAY_IP:443 describe yages.Echo
+   grpcurl -plainitext -authority example.com $GATEWAY_IP:8080 list
+   grpcurl -plainitext -authority example.com $GATEWAY_IP:8080 describe yages.Echo
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
-   grpcurl -insecure -authority grpc.example.com localhost:8443 list
-   grpcurl -insecure -authority grpc.example.com localhost:8443 describe yages.Echo
+   grpcurl -plaintext -authority example.com localhost:8000 list
+   grpcurl -plaintext -authority example.com localhost:8000 describe yages.Echo
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -320,18 +304,18 @@ Verify that the gRPC route to the echo service is working.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
-   grpcurl -insecure \
-     -authority grpc.example.com \
-     $GATEWAY_IP:443 \
+   grpcurl \
+     -authority example.com \
+     $GATEWAY_IP:8080 \
      yages.Echo/Ping
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```bash
-   grpcurl -insecure \
-     -authority grpc.example.com \
-     localhost:8443 \
-     yages.Echo/Ping
+   grpcurl \
+     -plaintext \
+     -authority example.com \
+     -d '{}' localhost:8000 yages.Echo/Ping
    ```
    {{% /tab %}}
    {{< /tabs >}}
