@@ -14,7 +14,7 @@ For an overview of supported CEL expressions, see the [agentgateway docs](https:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 ## Set up access to Gemini
 
