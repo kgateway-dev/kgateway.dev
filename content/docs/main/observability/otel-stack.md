@@ -650,8 +650,8 @@ To verify that your setup is working, generate sample traffic and review the log
    ```sh
    kubectl delete cm envoy-dashboard -n telemetry
    rm envoy.json
-   kubectl delete cm {{< reuse "docs/snippets/kgateway.md" >}}-dashboard -n telemetry
-   rm {{< reuse "docs/snippets/kgateway.md" >}}.json
+   kubectl delete cm {{< reuse "docs/snippets/pod-name.md" >}}-dashboard -n telemetry
+   rm {{< reuse "docs/snippets/pod-name.md" >}}.json
    ```
 
 2. Delete the HTTPListenerPolicy policies that collect logs and traces.
