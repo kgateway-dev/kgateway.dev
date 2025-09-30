@@ -189,7 +189,7 @@ Leader election is now enabled by default to ensure that you can run kgateway in
 You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
 
 ```sh
-helm upgrade -i --namespace kgateway-system --version {{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
+helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
 ```
 
 
