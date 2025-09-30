@@ -47,7 +47,7 @@ Resulting merged policy: The parent's `x-season` header is not included in the m
 | `x-season` | `winter` | Child |
 | `x-holiday` | `christmas` | Child |
 
-**Deep merging** means that values from both parent and child policies can be combined. Currently, only [Transformation rules of a {{< reuse "docs/snippets/trafficpolicy.md" >}}](../../traffic-management/transformations) can be deep merged. Consider the following deep merge scenario:
+**Deep merging** means that values from both parent and child policies can be combined. Currently, you can use deep merging for extAuth, extProc, and transformation policies that you define in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. Consider the following transformation deep merge scenario:
 
 * Parent policy adds an `x-season=summer` header.
 * Child policy adds `x-season=winter` and `x-holiday=christmas` headers.
@@ -61,6 +61,16 @@ Resulting merged policy's headers: The child and grandchild values merge with th
 | `x-season` | `summer,winter,spring` | Parent, Child, Grandchild |
 | `x-holiday` | `christmas,easter` | Child, Grandchild |
 | `x-discount` | `10%` | Grandchild |
+
+### Policy priority during merging
+
+If you have multiple policies that you want to merge, you can add the `kgateway.dev/policy-weight` annotation on the {{< reuse "docs/snippets/trafficpolicy.md" >}} or GatewayExtension to determine the order in which the policies are merged. 
+
+By default, all policies have a weight of 0. Policies with higher priority take precedence. The following rules apply when policies with different weights are merged: 
+
+* Policies with earlier creation timestamps are considered higher in priority and are preferred during a deep merge.
+* For extAuth and extProc policies, the policy weight that you specify on the GatewayExtension determines the ordering of the extAuth and extProc filters. 
+* For transformation, the policy weight that you specify on the {{< reuse "docs/snippets/trafficpolicy.md" >}} determines the order of your request and response transformation rules.
 
 ## Merging examples {#merging-examples}
 
