@@ -68,3 +68,4 @@ Review the following considerations for using agentgateway.
 - Configuring your agentgateway proxy as a Dynamic Forward Proxy (DFP) is currently not supported.
 - [Header modifier filters](../../traffic-management/header-control/) in {{< reuse "docs/snippets/trafficpolicy.md" >}} are not supported for agentgateway proxies. You can still use header modifier filters in the Gateway API-native HTTPRoutes.
 - Retries and timeouts cannot be configured on an agentgateway proxy.
+- In transformation policies, pseudo headers and response-based transformations are not supported. Also note that the `parseAs` field is not supported, but you can use the `json()` function directly in CEL expressions instead.<!--TODO agentgateway pseudo headers-->

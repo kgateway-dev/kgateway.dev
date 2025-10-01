@@ -6,6 +6,14 @@ description:
 
 Extract the values of common pseudo headers to generate a redirect URL.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not yet support pseudo headers in CEL expressions.
+{{< /callout >}}
+<!--TODO agentgateway pseudo headers
+the CEL expression would be something like:
+"https://" + request.headers["host"] + request.path"
+-->
+
 ## About pseudo headers 
 
 Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
@@ -52,7 +60,7 @@ Common pseudo headers include:
    EOF
    ```
 
-2. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
+2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

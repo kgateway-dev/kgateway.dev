@@ -6,6 +6,10 @@ description: Update the response status based on headers being present in a resp
 
 Update the response status based on headers being present in a response.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not yet support pseudo headers in CEL expressions.
+{{< /callout >}}
+<!--TODO agentgateway pseudo headers-->
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -35,7 +39,7 @@ Update the response status based on headers being present in a response.
    EOF
    ```
 
-3. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
+2. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -79,7 +83,7 @@ Update the response status based on headers being present in a response.
    }
    ```
 
-4. Send another request to the httpbin app. This time, you include the `foo:bar2` query parameter. Verify that you get back a 403 HTTP response code. 
+3. Send another request to the httpbin app. This time, you include the `foo:bar2` query parameter. Verify that you get back a 403 HTTP response code. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

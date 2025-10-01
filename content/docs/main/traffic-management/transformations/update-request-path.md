@@ -6,6 +6,16 @@ description: Change the request path and HTTP method when a request header is pr
 
 Change the request path and HTTP method when a request header is present. To update the path and HTTP method the `:path` and `:method` pseudo headers are used. 
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not yet support pseudo headers in CEL expressions.
+{{< /callout >}}
+<!--TODO agentgateway pseudo headers
+the CEL expression would be something like:
+request.header["foo"] == "bar" ?
+  "POST" :
+  request.method
+-->
+
 ## About pseudo headers 
 
 Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
