@@ -4,7 +4,11 @@ weight: 40
 description: 
 ---
 
-Connect your agentgateway proxy to the remote [GitHub MCP server](https://github.com/github/github-mcp-server). This server allows you to interact with GitHub repositories. To connect to it, you must use the HTTPS protocol and provide a GitHub acces token for authentication. 
+Configure your agentgateway proxy to connect to an MCP server by using the HTTPS protocol. 
+
+## About this guide 
+
+In this guide, you configure your agentgateway proxy to connect to the remote [GitHub MCP server](https://github.com/github/github-mcp-server) by using the HTTPS protocol. The server allows you to interact with GitHub repositories, issues, pull requests, and more. All connections to the server must be secured via HTTPS and a GitHub access token must be provided for authentication. 
 
 ## Before you begin
 
@@ -37,7 +41,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
    
-3. Create a BackendTLSPolicy to configure your agentgateway to connect to your Backend by using HTTPS. To validate the MCP server's TLS certificate, you use the well known system CA certificates. 
+3. Create a BackendTLSPolicy to configure your agentgateway to connect to your Backend by using HTTPS. To validate the MCP server's TLS certificate, you use the well-known system CA certificates. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha3	
@@ -56,7 +60,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
 
-4. Create an HTTPRoute that routes traffic to the GitHub MCP server along the `/mcp-github` path. To properly connect to the MCP server, you must allow traffic from `http://localhost:8080` which is the domain and port your agentgateway proxy is exposed on later. If you expose the proxy under a different domain, make sure to add this domain to the allowed origins. Because the MCP server also requires a GitHub access token to connect, you set the `Authorization` header to the token that you created earlier. 
+4. Create an HTTPRoute that routes traffic to the GitHub MCP server along the `/mcp-github` path. To properly connect to the MCP server, you must allow traffic from `http://localhost:8080`, which is the domain and port you expose your agentgateway proxy on later. If you expose the proxy under a different domain, make sure to add this domain to the allowed origins. Because the MCP server also requires a GitHub access token to connect, you set the `Authorization` header to the token that you created earlier. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -113,7 +117,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{< /tabs >}}
 
-2. From the terminal, run the MCP Inspector command. Then, the MCP Inspector opens in your browser. If the MCP inspector tool does not open automatically, run `mcp-inspector`. 
+2. From your terminal, run the MCP Inspector command to open the MCP Inspector in your browser. If the MCP inspector tool does not open automatically, run `mcp-inspector`.
    ```sh
    npx modelcontextprotocol/inspector#{{% reuse "docs/versions/mcp-inspector.md" %}}
    ```

@@ -173,7 +173,7 @@ You can now set the following retries and timeouts for your Envoy-based gateway 
 
 #### Passive health checks with outlier detection {#outlier-detection}
 
-Configure passive health checks and remove unhealthy hosts from the load balancing pool with an outlier detection policy. An outlier detection policy sets up several conditions, such as retries and ejection percentages, that kgateway uses to determine if a service is unhealthy. In case an unhealthy service is detected, the outlier detection policy defines how the service is removed from the pool of healthy destinations to send traffic to. For more information, see [Outlier detection]({{< link-hextra path="/resiliency/outlier-detection/" >}}).
+Configure passive health checks and remove unhealthy hosts from the load balancing pool with an outlier detection policy. An outlier detection policy sets up several conditions, such as retries and ejection percentages, that kgateway uses to determine if a service is unhealthy. When an unhealthy service is detected, the outlier detection policy defines how the service is removed from the pool of healthy destinations to send traffic to. For more information, see [Outlier detection]({{< link-hextra path="/resiliency/outlier-detection/" >}}).
 
 #### New kgateway operations dashboard {#kgateway-dashboard}
 
