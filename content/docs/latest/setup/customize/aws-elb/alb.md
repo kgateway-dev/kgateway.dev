@@ -13,7 +13,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 1. Create or use an existing AWS account. 
 2. Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do not need to set up a Gateway as you create a custom Gateway as part of this guide.
-3. Follow the [Sample app guide](/docs/operations/sample-app/#deploy-app) to deploy the httpbin sample app.
+3. Follow the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) to deploy the httpbin sample app.
    
 ## Step 1: Deploy gateway proxy resources
  

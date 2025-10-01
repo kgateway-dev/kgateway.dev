@@ -1,6 +1,6 @@
 1. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
-2. Deploy a [sample httpbin app](/docs/operations/sample-app/).
+2. Deploy a [sample httpbin app]({{< link-hextra path="/install/sample-app/" >}}).
 
 3. {{% reuse "docs/snippets/prereq-listenerset.md" %}}
 

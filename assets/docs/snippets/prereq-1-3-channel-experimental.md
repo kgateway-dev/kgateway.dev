@@ -1,6 +1,6 @@
 1. Follow the [Get started guide](/docs/quickstart/) to install kgateway.
 
-2. Follow the [Sample app guide](/docs/operations/sample-app/) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
+2. Follow the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
 
 3. Get the external address of the gateway and save it in an environment variable.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
