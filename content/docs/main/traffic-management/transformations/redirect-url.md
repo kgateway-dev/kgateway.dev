@@ -4,15 +4,11 @@ weight: 70
 description:
 ---
 
-Extract the values of common pseudo headers to generate a redirect URL.
+Extract the values of common headers to generate a redirect URL.
 
 {{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not yet support pseudo headers in CEL expressions.
+Both Envoy-based kgateway and agentgateway support redirect URL transformations.
 {{< /callout >}}
-<!--TODO agentgateway pseudo headers
-the CEL expression would be something like:
-"https://" + request.headers["host"] + request.path"
--->
 
 ## About pseudo headers 
 
@@ -35,11 +31,13 @@ Common pseudo headers include:
 ## Set up redirect URLs
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules:
-   * Build a redirect URL with the values of the `:authority` and `:path` pseudo headers. These headers are extracted from the request with the `request_header` function that is provided in {{< reuse "docs/snippets/kgateway.md" >}}.
-   * The `:authority` pseudo header contains the hostname that the request is sent to.
-   * The `:path` pseudo header is set to the request path.
-   * The redirect URL is added to the `x-forwarded-uri` response header.
+   * Build a redirect URL with the values of the host and path headers. 
+   * The host header contains the hostname that the request is sent to.
+   * The path is extracted from the request.
+   * The redirect URL is added to the `x-forwarded-uri` header.
    
+   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -59,6 +57,29 @@ Common pseudo headers include:
            value: 'https://{{ request_header(":authority") }}{{ request_header(":path") }}'
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       request:  
+         add:
+         - name: x-forwarded-uri
+           value: '"https://" + request.headers["host"] + request.path'
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
    

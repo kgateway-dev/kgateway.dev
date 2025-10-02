@@ -13,8 +13,10 @@ In this guide, you use the following methods to transform a JSON body:
 * Use the `replace_with_random` Inja function to replace specific patterns in the JSON body.
 
 {{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not support variable response body modifications. You can do static response body transformations. Also note that the `parseAs` field is not supported for {{< reuse "docs/snippets/agentgateway.md" >}}. Instead, use the `json()` function directly in CEL expressions.
+{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}}
 {{< /callout >}}
+
+<!--TODO agentgateway response transformations-->
 
 ## Before you begin
 

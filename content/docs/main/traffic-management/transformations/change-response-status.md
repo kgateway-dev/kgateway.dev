@@ -6,10 +6,7 @@ description: Update the response status based on headers being present in a resp
 
 Update the response status based on headers being present in a response.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}} does not yet support pseudo headers in CEL expressions.
-{{< /callout >}}
-<!--TODO agentgateway pseudo headers-->
+
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -19,6 +16,8 @@ Update the response status based on headers being present in a response.
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
 
+   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -38,6 +37,29 @@ Update the response status based on headers being present in a response.
            value: '{% if header("foo") == "bar" %}401{% else %}403{% endif %}'
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       response:
+         set:
+         - name: ":status"
+           value: 'response.headers["foo"] == "bar" ? "401" : "403"'
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
    
