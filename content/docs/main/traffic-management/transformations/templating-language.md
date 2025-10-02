@@ -6,7 +6,7 @@ weight: 10
 The data plane proxy of your Gateway determines the templating language that you use to express transformations.
 
 * {{< icon "agentgateway" >}} [Common Expression Language (CEL) for {{< reuse "docs/snippets/agentgateway.md" >}}](#cel)
-* {{< icon "kgateway" >}} [Inja for Kgateway Envoy](#inja)
+* {{< icon "kgateway" >}} [Inja for Envoy-based kgateway proxies](#inja)
 
 ## CEL for Agentgateway {#cel}
 
@@ -31,7 +31,7 @@ agentgateway:
   enabled: true
 ```
 
-## Inja for Kgateway Envoy {#inja}
+## Inja for Envoy-based kgateway proxies {#inja}
 
 {{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates are powered by v3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0), which is inspired by the popular Jinja templating language in Python. The template lets you transform headers and body information of a request or response based on the header and body properties themselves. 
 
