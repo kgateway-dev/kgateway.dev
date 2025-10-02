@@ -48,7 +48,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    kind: BackendTLSPolicy
    metadata:
      name: github-mcp-backend-tls
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
        - name: github-mcp-backend

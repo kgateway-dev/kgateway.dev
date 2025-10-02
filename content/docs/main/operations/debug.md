@@ -162,7 +162,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    kubectl get pods -l app.kubernetes.io/name=debug-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
    
-4. Create an HTTPRoute that routes traffic to your app through the debug gateway. The following example assumes that you set up the [sample `httpbin` app](../../operations/sample-app/).
+4. Create an HTTPRoute that routes traffic to your app through the debug gateway. The following example assumes that you set up the [sample `httpbin` app]({{< link-hextra path="/install/sample-app/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF

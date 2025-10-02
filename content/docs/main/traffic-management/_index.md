@@ -1,6 +1,5 @@
 ---
-linkTitle: "Traffic management"
-title: Control traffic and route requests
+title: Traffic management
 weight: 400
 ---
 
