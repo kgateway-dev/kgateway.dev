@@ -36,7 +36,7 @@ Resulting merged policy: The parent's `x-season` header is not included in the m
 | `x-season` | `winter` | Child |
 | `x-holiday` | `christmas` | Child |
 
-<!--TODO deep merge>
+<!--TODO deep merge
 The annotation takes four values:
 
 - `ShallowMergePreferChild` (default): Child policies take precedence over parent policies and the policies are shallow merged.

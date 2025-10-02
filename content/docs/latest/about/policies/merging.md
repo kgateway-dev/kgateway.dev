@@ -3,6 +3,6 @@ title: Policy merging
 weight: 20
 ---
 
-{{< reuse "docs/about/policies/merging.md" >}}
+{{< reuse "docs/pages/about/policy-merging.md" >}}
 
 # {#about}
