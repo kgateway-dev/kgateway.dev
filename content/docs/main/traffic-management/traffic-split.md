@@ -82,7 +82,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you created when you set up the [Sample app](/docs/operations/sample-app/). |
+   |`spec.parentRefs.name`|The name and namespace of the gateway resource that serves the route. In this example, you use the gateway that you created when you set up the [Sample app]({{< link-hextra path="/install/sample-app#deploy-app/" >}}). |
    |`spec.hostnames`| The hostname for which you want to apply traffic splitting.|
    |`spec.rules.matches.path`|The path prefix to match on. In this example, `/` is used. |
    |`spec.rules.backendRefs`| A list of services you want to forward traffic to. Use the `weight` option to define the amount of traffic that you want to forward to each service. |

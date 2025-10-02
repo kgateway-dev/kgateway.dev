@@ -5,3 +5,5 @@
 /docs/integrations/agentgateway /docs/agentgateway 301
 /docs/mcp/ /docs/agentgateway/ 301
 /docs/integrations/agentgateway/ /docs/agentgateway/ 301
+/docs/operations/install /docs/install/ 301
+/docs/operations/sample-app/ /docs/install/sample-app/ 301

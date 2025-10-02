@@ -1,6 +1,6 @@
 ---
 title: Sample HTTP app
-weight: 7
+weight: 40
 description: Deploy httpbin as a sample app.
 ---
 
@@ -20,7 +20,7 @@ flowchart LR
 
 ## Before you begin
 
-Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../../quickstart/) or [Installation](../install/) guides.
+Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../../quickstart/) or [Installation](../) guides.
 
 ## Deploy a sample app {#deploy-app}
 

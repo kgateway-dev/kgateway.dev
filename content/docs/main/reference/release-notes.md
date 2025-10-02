@@ -108,7 +108,7 @@ Note that this change does not impact the other delegation annotations:
 * `delegation.kgateway.dev/inherit-parent-matcher`
 * `delegation.kgateway.dev/label`
 
-#### Deprecated support for AI Gateway with Envoy
+#### Deprecated support for AI Gateway and Inference Extension with Envoy
 
 AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/agentgateway/" >}}) instead.
 
@@ -124,7 +124,11 @@ By default, you must attach policies to resources that are in the same namespace
 
 #### Weighted routing {#v21-weighted-routing}
 
-Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing](/docs/traffic-management/weighted-routes/) docs.
+Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing]({{< link-hextra path="/traffic-management/weighted-routes/" >}}) docs.
+
+#### Deep merging for extauth and extproc policies {#deep-merge}
+
+You can now apply deep merging for extAuth and extProc policies. In addition, you can use the `kgateway.dev/policy-weight` annotation to determine the priority in which multiple extAuth and extProc policies are merged. For more information, see [Policy priority during merging]({{< link-hextra path="/about/policies/merging/#policy-priority-during-merging" >}}). 
 
 #### Additional proxy pod template customization {#podtemplate}
 
@@ -135,6 +139,61 @@ For more information, see [Customize the gateway]({{< link-hextra path="/setup/c
 #### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
 
 Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
+
+
+#### Horizontal Pod Autoscaling {#hpa}
+
+You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale gateway proxy pods up and down based on certain thresholds, like memory and CPU consumption. For more information, see [Horizontal Pod Autoscaling (HPA)]({{< link-hextra path="/setup/hpa/" >}}).
+
+#### HTTP1.0/0.9 support {#http10}
+
+Configure your gateway proxy to accept the HTTP/1.0 and HTTP/0.9 protocols so that you can support legacy applications. For more information, see [HTTP/1.0 and HTTP/0.9]({{< link-hextra path="/setup/http10/" >}}).
+
+#### Dynamic Forward Proxy {#dfp}
+
+Configure the gateway proxy to use a Dynamic Forward Proxy (DFP) filter to allow the proxy to act as a generic HTTP(S) forward proxy without the need to preconfigure all possible upstream hosts. Instead, the DFP dynamically resolves the upstream host at request time by using DNS.
+
+For more information, see [Dynamic Forward Proxy (DFP)]({{< link-hextra path="/traffic-management/dfp/" >}}).
+
+#### Session affinity {#session-affinity}
+
+You can configure different types of session affinity for your Envoy-based gateway proxies:
+* [Change the loadbalancing algorithm]({{< link-hextra path="/traffic-management/session-affinity/loadbalancing/" >}}): By default, incoming requests are forwarded to the instance with the least requests. You can change this behavior and instead use a round robin or random algorithm to forward the request to a backend service.
+* [Consistent hashing]({{< link-hextra path="/traffic-management/session-affinity/consistent-hashing/" >}}): Set up soft session affinity between a client and a backend service by using consistent hashing algorithms. 
+* [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}): Set up “strong” session affinity or sticky sessions to ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
+
+#### Enhanced retries and timeout capabilities {#retries-timeouts}
+
+You can now set the following retries and timeouts for your Envoy-based gateway proxies:
+* [Request retries]({{< link-hextra path="/resiliency/retry/retry/" >}})
+* [Request timeouts]({{< link-hextra path="/resiliency/timeouts/request/" >}})
+* [Per-try timeouts]({{< link-hextra path="/resiliency/retry/per-try-timeout/" >}})
+* [Idle timeouts]({{< link-hextra path="/resiliency/timeouts/idle/" >}})
+* [Idle stream timeouts]({{< link-hextra path="/resiliency/timeouts/idle-stream/" >}})
+
+#### Passive health checks with outlier detection {#outlier-detection}
+
+Configure passive health checks and remove unhealthy hosts from the load balancing pool with an outlier detection policy. An outlier detection policy sets up several conditions, such as retries and ejection percentages, that kgateway uses to determine if a service is unhealthy. When an unhealthy service is detected, the outlier detection policy defines how the service is removed from the pool of healthy destinations to send traffic to. For more information, see [Outlier detection]({{< link-hextra path="/resiliency/outlier-detection/" >}}).
+
+#### New kgateway operations dashboard {#kgateway-dashboard}
+
+When you install the [OTel stack]({{< link-hextra path="/observability/otel-stack/" >}}), you can now leverage the new kgateway operations dashboard for Grafana. This dashboard shows important metrics at a glance, such as the translation and reconciliation time, total number of operations, the number of resources in your cluster, and latency.
+      
+{{< reuse-image src="img/kgateway-dashboard.png" >}}
+{{< reuse-image-dark srcDark="img/kgateway-dashboard.png" >}}
+
+#### Leader election enabled {#kgateway-dashboard}
+
+Leader election is now enabled by default to ensure that you can run kgateway in a multi-control plane replica setup for high availability. 
+
+You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
+
+```sh
+helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
+```
+
+
+
 
 <!-- TODO release 2.1
 

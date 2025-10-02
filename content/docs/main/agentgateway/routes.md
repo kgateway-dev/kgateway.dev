@@ -13,7 +13,7 @@ The {{< reuse "docs/snippets/agentgateway.md" >}} data plane supports the Gatewa
 
 Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy HTTP requests to your backend services.
 
-1. Follow the [Sample HTTP app](../../operations/sample-app/) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass, and an HTTPRoute.
+1. Follow the [Sample HTTP app]({{< link-hextra path="/install/sample-app/" >}}) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass, and an HTTPRoute.
 
 2. Check out the following guides for more advanced routing use cases.
 
