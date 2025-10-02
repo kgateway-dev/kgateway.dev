@@ -82,16 +82,16 @@ You can bring your own rate limit service that implements the Envoy Rate Limit g
 
 To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/rate_limit/testdata).
 
-1. Create the `kgateway-test` namespace.
+1. Create the `kgateway-test-extensions` namespace.
 
    ```sh
-   kubectl create namespace kgateway-test
+   kubectl create namespace kgateway-test-extensions
    ```
 
 2. Deploy the rate limit service.
 
    ```bash
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
    ```
 
 ## Step 2: Define the rate limits {#rate-limits}
@@ -101,7 +101,7 @@ Define the actual rate limit values (requests per unit time) in your Rate Limit 
 The kgateway example that you deployed in the previous step includes the following rate limit configuration as a Kubernetes ConfigMap.
 
 ```sh
-kubectl describe configmap ratelimit-config -n kgateway-test
+kubectl describe configmap ratelimit-config -n kgateway-test-extensions
 ```
 
 {{< reuse "docs/snippets/review-table.md" >}}
@@ -178,7 +178,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
        grpcService:
          backendRef:
            name: ratelimit
-           namespace: kgateway-test
+           namespace: kgateway-test-extensions
            port: 8081
        domain: "api-gateway"
        timeout: "100ms"
@@ -203,7 +203,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    kind: ReferenceGrant
    metadata:
      name: global-ratelimit
-     namespace: kgateway-test
+     namespace: kgateway-test-extensions
    spec:
      from:
      - group: gateway.kgateway.dev
@@ -461,5 +461,5 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
 kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
 kubectl delete gatewayextension global-ratelimit
 kubectl delete trafficpolicy ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit
-kubectl delete namespace kgateway-test
+kubectl delete namespace kgateway-test-extensions
 ```
