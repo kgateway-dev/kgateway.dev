@@ -55,7 +55,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
    1. **Optional**: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
-      {{< callout type="info" >}}For common values that you might want to update, see [Installation settings](#installation-settings).{{< /callout >}}
+      {{< callout type="info" >}}For other values that you might want to update, see [Advanced settings](../advanced).{{< /callout >}}
 
       ```sh
       helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}}
