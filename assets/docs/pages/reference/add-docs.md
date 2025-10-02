@@ -78,8 +78,8 @@ Review common shortcodes that you find throughout the documentation:
 
 Use the link-hextra shortcode to link to a topic within the documentation in a way that is compatible with the versioning strategy.
 
-```
-[AI Backend API docs](\{\{\< link-hextra path="/reference/api/#aibackend" \>\}\})
+```markdown
+[AI Backend API docs]({{</* link-hextra path="/reference/api/#aibackend" */>}})
 ```
 
 ### reuse
