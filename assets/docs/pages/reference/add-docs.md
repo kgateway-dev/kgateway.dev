@@ -79,7 +79,7 @@ Review common shortcodes that you find throughout the documentation:
 Use the link-hextra shortcode to link to a topic within the documentation in a way that is compatible with the versioning strategy.
 
 ```
-[AI Backend API docs]({{< link-hextra path="/reference/api/#aibackend" >}})
+[AI Backend API docs](\{\{\< link-hextra path="/reference/api/#aibackend" \>\}\})
 ```
 
 ### reuse
@@ -172,6 +172,21 @@ Supported parameters:
 
 Available versions: Check the `hugo.yaml` file's `versions` section in the [kgateway.dev repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/hugo.yaml#L129) for the current versions.
 
+## Redirects {#redirects}
+
+If you want to redirect a page to a new location, you can add a redirect rule to the [`static/_redirects` file in the `kgateway.dev` repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/static/_redirects).
+
+The format is as follows. For more information, see the [Cloudflare documentation](https://developers.cloudflare.com/pages/configuration/redirects/).
+
+```
+</old-path> </new-path> <status-code>
+```
+
+Example:
+
+```yaml
+/docs/mcp /docs/main/agentgateway 301
+```
 
 ## Create a PR in GitHub {#pr}
 
