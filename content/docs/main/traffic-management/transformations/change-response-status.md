@@ -55,7 +55,7 @@ Update the response status based on headers being present in a response.
        response:
          set:
          - name: ":status"
-           value: 'response.headers["foo"] == "bar" ? "401" : "403"'
+           value: 'request.uri.contains("foo=bar") ? 401 : 403'
    EOF
    ```
    {{% /tab %}}
@@ -105,18 +105,18 @@ Update the response status based on headers being present in a response.
    }
    ```
 
-3. Send another request to the httpbin app. This time, you include the `foo:bar2` query parameter. Verify that you get back a 403 HTTP response code. 
+3. Send another request to the httpbin app. This time, you include the `foo:baz` query parameter. Verify that you get back a 403 HTTP response code. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=bar2 \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=baz \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi "localhost:8080/response-headers?foo=bar2" \
+   curl -vi "localhost:8080/response-headers?foo=baz" \
    -H "host: www.example.com" 
    ```
    {{% /tab %}}
