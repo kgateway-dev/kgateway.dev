@@ -74,10 +74,10 @@ Common pseudo headers include:
 ## Set up redirect URLs
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules:
-   * Build a redirect URL with the values of the host and path headers. 
-   * The host header contains the hostname that the request is sent to.
-   * The path is extracted from the request.
-   * The redirect URL is added to the `x-forwarded-uri` header.
+   * Build a redirect URL with the values of the `:authority` and `:path` pseudo headers. These headers are extracted from the request with the `request_header` function that is provided in {{< reuse "docs/snippets/kgateway.md" >}}.
+   * The `:authority` pseudo header contains the hostname that the request is sent to.
+   * The `:path` pseudo header is set to the request path.
+   * The redirect URL is added to the `x-forwarded-uri` response header.
 
    ```yaml
    kubectl apply -f- <<EOF
