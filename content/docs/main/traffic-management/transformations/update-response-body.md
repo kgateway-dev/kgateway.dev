@@ -16,7 +16,7 @@ In this guide, you use the following methods to transform a JSON body:
 {{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}}
 {{< /callout >}}
 
-<!--TODO agentgateway response transformations-->
+<!--TODO agentgateway transformations-->
 
 ## Before you begin
 

@@ -6,36 +6,7 @@ description:
 
 Extract the values of common headers to generate a redirect URL.
 
-{{< callout >}}
-Both Envoy-based kgateway and agentgateway support redirect URL transformations.
-{{< /callout >}}
-
-## About pseudo headers 
-
-Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
-
-* Must always start with a colon (`:`).
-* Must appear before regular headers in the HTTP/2 frame.
-* Contain details about the request or response.
-
-Common pseudo headers include:
-* `:method`: The HTTP method that is used, such as GET or POST.
-* `:scheme`: The protocol that is used, such as http or https.
-* `:authority`: The hostname and port number that the request is sent to.
-* `:path`: The path of the request.
-
-## Before you begin
-
-{{< reuse "docs/snippets/prereq.md" >}}
-
-## Set up redirect URLs
-
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules:
-   * Build a redirect URL with the values of the host and path headers. 
-   * The host header contains the hostname that the request is sent to.
-   * The path is extracted from the request.
-   * The redirect URL is added to the `x-forwarded-uri` header.
-   
+<!--TODO agentgateway transformation
    {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
    {{% tab tabName="Envoy-based kgateway" %}}
    ```yaml
@@ -80,6 +51,53 @@ Common pseudo headers include:
    ```
    {{% /tab %}}
    {{< /tabs >}}
+-->
+
+## About pseudo headers 
+
+Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
+
+* Must always start with a colon (`:`).
+* Must appear before regular headers in the HTTP/2 frame.
+* Contain details about the request or response.
+
+Common pseudo headers include:
+* `:method`: The HTTP method that is used, such as GET or POST.
+* `:scheme`: The protocol that is used, such as http or https.
+* `:authority`: The hostname and port number that the request is sent to.
+* `:path`: The path of the request.
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Set up redirect URLs
+
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules:
+   * Build a redirect URL with the values of the host and path headers. 
+   * The host header contains the hostname that the request is sent to.
+   * The path is extracted from the request.
+   * The redirect URL is added to the `x-forwarded-uri` header.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       request:  
+         add:
+         - name: x-forwarded-uri
+           value: 'https://{{ request_header(":authority") }}{{ request_header(":path") }}'
+   EOF
+   ```
 
 2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
    
