@@ -3,6 +3,36 @@ title: Templating language
 weight: 10
 ---
 
+The data plane proxy of your Gateway determines the templating language that you use to express transformations.
+
+* {{< icon "agentgateway" >}} [Common Expression Language (CEL) for {{< reuse "docs/snippets/agentgateway.md" >}}](#cel)
+* {{< icon "kgateway" >}} [Inja for Envoy-based kgateway proxies](#inja)
+
+## CEL for Agentgateway {#cel}
+
+{{< reuse "docs/snippets/agentgateway-capital.md" >}} transformation templates are written in Common Expression Language (CEL). CEL is a fast, portable, and safely executable language that goes beyond declarative configurations. CEL lets you develop more complex expressions in a readable, developer-friendly syntax.
+
+To learn more about how to use CEL, refer to the following resources:
+
+* [cel.dev tutorial](https://cel.dev/tutorials/cel-get-started-tutorial)
+* [Agentgateway reference docs](https://agentgateway.dev/docs/reference/cel/)
+
+### Log CEL variables in agentgateway {#cel-log}
+
+You can log the full context of the CEL variables by [upgrading your Helm installation settings]({{< link-hextra path="/operations/upgrade/">}}), such as the following example:
+
+```yaml
+agentgateway:
+  config:
+    logging:
+      fields:
+        add:
+          cel: variables()
+  enabled: true
+```
+
+## Inja for Envoy-based kgateway proxies {#inja}
+
 {{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates are powered by v3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0), which is inspired by the popular Jinja templating language in Python. The template lets you transform headers and body information of a request or response based on the header and body properties themselves. 
 
 The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
@@ -43,7 +73,7 @@ spec:
 
 When writing your templates, you can take advantage of all the core Inja features, such as loops, conditional logic, and functions. In addition, you can use [custom Inja functions](#custom-inja-functions) to transform request and response metadata more easily.
 
-## Custom Inja functions
+### Custom Inja functions
 
 When specifying your transformation template, you can leverage custom functions that can help to transform headers and bodies more easily. 
 
@@ -64,7 +94,7 @@ When specifying your transformation template, you can leverage custom functions 
 
 You might use default Inja functions, such as `if else` or `if exists`. For an example, see [Change response status](/docs/traffic-management/transformations/change-response-status/). 
 
-## Template attributes
+### Template attributes
 
 Learn more about the template attributes that you can use to transform headers and bodies of requests and responses.
 

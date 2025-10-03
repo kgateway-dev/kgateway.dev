@@ -90,7 +90,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
      name: http
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: agentgateway
+     gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
