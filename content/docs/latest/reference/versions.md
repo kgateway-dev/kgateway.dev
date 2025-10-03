@@ -74,4 +74,4 @@ New features are not developed on or backported to stable branches, such as `v2.
 
 ## Experimental features in Gateway API {#experimental-features}
 
-{{< reuse "docs/versions/gateway-api-x.md" >}}
+{{< reuse "docs/snippets/k8sgwapi-exp.md" >}}
