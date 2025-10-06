@@ -22,13 +22,6 @@ graph TD
     InferencePool --> InferenceModel_v1["InferenceModel v1"]
     InferencePool --> InferenceModel_v2["InferenceModel v2"]
     InferencePool --> InferenceModel_v3["InferenceModel v3"]
-    
-    subgraph InferencePool
-        direction TB
-        InferenceModel_v1
-        InferenceModel_v2
-        InferenceModel_v3
-    end
 ```
 
 The InferencePool groups together InferenceModels of LLM workloads into a routable backend resource that the Gateway API can route inference requests to. An InferenceModel represents not just a single LLM model, but a specific configuration including information such as as the version and criticality. The InferencePool uses this information to ensure fair consumption of compute resources across competing LLM workloads and share routing decisions to the Gateway API.
