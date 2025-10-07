@@ -8,7 +8,7 @@ excludeSearch: true
 
 kgateway v2.1 is packed with exciting new features and improvements. Here are a few select updates the kgateway team would like to highlight!
 
-## 🔥Breaking changes
+## 🔥 Breaking changes
 
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
