@@ -1,7 +1,7 @@
 ---
 title: kgateway v2.1 release blog
 toc: false
-publishDate: 2025-05-20T10:00:00-00:00
+publishDate: 2025-10-10T10:00:00-00:00
 author: Nadine Spies, Aryan Parashar, Nina Polshakova
 excludeSearch: true
 ---
