@@ -62,7 +62,6 @@ spec:
   commonHttpProtocolOptions:
     maxHeadersCount: 15
     maxRequestsPerConnection: 100
-    headersWithUnderscoresAction: DropHeader
 ```
 
 ### Global service {#istio-global}
@@ -88,7 +87,6 @@ spec:
   commonHttpProtocolOptions:
     maxHeadersCount: 15
     maxRequestsPerConnection: 100
-    headersWithUnderscoresAction: DropHeader
 ```
 
 

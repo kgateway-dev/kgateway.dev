@@ -62,7 +62,6 @@ spec:
     maxHeadersCount: 15
     maxStreamDuration: 30s
     maxRequestsPerConnection: 100 
-    headersWithUnderscoresAction: RejectRequest
 ```
 
 | Setting | Description | 
@@ -71,7 +70,7 @@ spec:
 | `maxHeadersCount` | The maximum number of headers that can be sent in a connection. If not specified, the number defaults to 100. Requests that exceed this limit receive a 431 response for HTTP/1 and cause a stream reset for HTTP/2. | 
 | `maxStreamDuration` | The total duration to keep alive an HTTP request/response stream. If the time limit is reached, the stream is reset independent of any other timeouts. If not specified, this value is not set. | 
 | `maxRequestsPerConnection` | The maximum number of requests that can be sent per connection. | 
-| `headersWithUnderscoresAction` | The action to take when a client request with a header name is received that includes underscore characters. Supported values include `Allow`, `RejectRequest`, and `DropHeader`. If `RejectRequest` is specified, the request is rejected with a 400 HTTP response code and the `httpN.requests_rejected_with_underscores_in_headers` header is incremented for each rejected request. When `DropHeader` is specified, the header is dropped and not included in any filter chain. In addition, the `“httpN.dropped_headers_with_underscores` header is incremnented for every header that is dropped. If not specified, the value defaults to `ALLOW`. | 
+ 
 
 #### Additional HTTP 1.0 protocol options {#http1}
 
@@ -127,7 +126,6 @@ spec:
        maxHeadersCount: 15
        maxStreamDuration: 30s
        maxRequestsPerConnection: 100 
-       headersWithUnderscoresAction: RejectRequest
      http1ProtocolOptions:
        enableTrailers: true
        overrideStreamErrorOnInvalidHttpMessage: true
