@@ -112,6 +112,10 @@ Note that this change does not impact the other delegation annotations:
 
 AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/agentgateway/" >}}) instead.
 
+#### Fail open policy for ExtProc providers
+
+The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
+
 ### 🌟 New features {#v21-new-features}
 
 #### Agentgateway integration {#v21-agentgateway}
