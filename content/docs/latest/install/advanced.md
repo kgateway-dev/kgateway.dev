@@ -4,41 +4,6 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
-You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
+{{< reuse "docs/pages/install/advanced.md" >}}
 
-For more information, see the [Helm reference docs]({{< link-hextra path="/reference/helm/" >}}).
-
-### Development builds
-
-When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
-
-### Namespace discovery {#namespace-discovery}
-
-You can limit the namespaces that {{< reuse "/docs/snippets/kgateway.md" >}} watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit {{< reuse "/docs/snippets/kgateway.md" >}} to only watch a specific namespace for gateway configuration.
-
-Namespace selectors are a list of matched expressions or labels.
-
-* `matchExpressions`: Use this field for more complex selectors where you want to specify an operator such as `In` or `NotIn`.
-* `matchLabels`: Use this field for simple selectors where you want to specify a label key-value pair.
-
-Each entry in the list is disjunctive (OR semantics). This means that a namespace is selected if it matches any selector.
-
-You can also use matched expressions and labels together in the same entry, which is conjunctive (AND semantics).
-
-The following example selects namespaces for discovery that meet either of the following conditions:
-
-* The namespace has the label `environment=prod` and the label `version=v2`, or
-* The namespace has the label `version=v3`
-
-```yaml
-discoveryNamespaceSelectors:
-- matchExpressions:
-  - key: environment
-    operator: In
-    values:
-    - prod
-  matchLabels:
-    version: v2
-- matchLabels:
-    version: v3
-```
+# {#development-builds}
