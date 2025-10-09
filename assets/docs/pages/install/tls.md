@@ -15,7 +15,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    helm repo add jetstack https://charts.jetstack.io --force-update
    ```
 
-2. Install cert-manager in your cluster.
+2. Install cert-manager in your cluster. **Note**: cert-manager versions 1.18 and later have stricter validation rules. Certificate durations must be at least 1 hour, and renewal windows must be at least 5 minutes.
    ```sh
    helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
    --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set installCRDs=true
@@ -46,16 +46,16 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
        kind: Issuer
      isCA: true
      commonName: kgateway-xds-ca
-     duration: 10m
-     renewBefore: 2m
+     duration: 1h
+     renewBefore: 5m
      privateKey:
        algorithm: RSA
        size: 2048
    EOF
    ```
 
-4. Use the CA to sign a TLS certificate for the xDS gRPC server. The certificate must be named `kgateway-xds-cert`. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. 
-   
+4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `kgateway-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
+
    {{< callout type="note" >}}**Note**: The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.{{< /callout >}}
    
    ```yaml
@@ -75,7 +75,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
      name: kgateway-xds-cert
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     secretName: kgateway-xds-tls
+     secretName: kgateway-xds-cert
      issuerRef:
        name: kgateway-xds-ca-issuer
        kind: Issuer
@@ -85,8 +85,8 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
      - {{< reuse "/docs/snippets/helm-kgateway.md" >}}.{{< reuse "docs/snippets/namespace.md" >}}
      - {{< reuse "/docs/snippets/helm-kgateway.md" >}}.{{< reuse "docs/snippets/namespace.md" >}}.svc
      - {{< reuse "/docs/snippets/helm-kgateway.md" >}}.{{< reuse "docs/snippets/namespace.md" >}}.svc.cluster.local
-     duration: 5m
-     renewBefore: 2m
+     duration: 1h
+     renewBefore: 5m
      privateKey:
        algorithm: RSA
        size: 2048
@@ -136,19 +136,31 @@ Upgrade {{< reuse "docs/snippets/kgateway.md" >}} with TLS enabled for the contr
 
 Now that the control plane is up and running, verify the TLS connection.
 
-1. Port-forward the control plane deployment.
+1. Port-forward the control plane service on port 9977.
 
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9092
+   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9977
    ```
 
-2. Send a request to the control plane. Because you do not have a valid JWT, you get back an `authentication failed` error.
+2. Send a request to the control plane in plaintext without TLS authentication. You get back an `authentication failed` error.
+
+   ```sh
+   grpcurl -plaintext localhost:9977 list
+   ```
+
+   Example output:
 
    ```
-   grpcurl -cacert ca.crt -servername {{< reuse "/docs/snippets/helm-kgateway.md" >}}.{{< reuse "docs/snippets/namespace.md" >}}.svc.cluster.local localhost:9977 list
+   Failed to list services: rpc error: code = Unknown desc = authentication failed: [Authenticator KubeJWTAuthenticator: target JWT extraction error: no HTTP authorization header exists]
    ```
 
-3. Send a request to the metrics endpoint to check for `xds_auth` metrics.
+3. Port-forward the control plane deployment on port 9092.
+
+   ```sh
+   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} deploy/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9092
+   ```
+
+4. Send a request to the metrics endpoint to check for `xds_auth` metrics.
 
    ```sh
    curl localhost:9092/metrics | grep xds_auth
@@ -157,10 +169,13 @@ Now that the control plane is up and running, verify the TLS connection.
    Example output:
 
    ```
+   # HELP kgateway_xds_auth_rq_failure_total Total number of failed xDS auth requests
+   # TYPE kgateway_xds_auth_rq_failure_total counter
+   kgateway_xds_auth_rq_failure_total 2
    # HELP kgateway_xds_auth_rq_success_total Total number of successful xDS auth requests
    # TYPE kgateway_xds_auth_rq_success_total counter
-   kgateway_xds_auth_rq_success_total 5
+   kgateway_xds_auth_rq_success_total 1
    # HELP kgateway_xds_auth_rq_total Total number of xDS auth requests
    # TYPE kgateway_xds_auth_rq_total counter
-   kgateway_xds_auth_rq_total 5
+   kgateway_xds_auth_rq_total 3
    ```
