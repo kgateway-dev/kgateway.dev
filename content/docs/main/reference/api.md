@@ -707,7 +707,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the following credential providers are tried in order, stopping when one<br />of them returns an access key ID and a secret access key (the session token is optional):<br />1. Environment variables: when the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN are set.<br />2. AssumeRoleWithWebIdentity API call: when the environment variables AWS_WEB_IDENTITY_TOKEN_FILE and AWS_ROLE_ARN are set.<br />3. EKS Pod Identity: when the environment variable AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE is set.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
-| `model` _string_ | The model field is the supported model id published by AWS. See <https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html> |  | MinLength: 1 <br /> |
+| `model` _string_ | Optional: Override the model ID.<br />If unset, the model is taken from the request.<br />See <https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html> |  | MinLength: 1 <br /> |
 | `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 | `guardrail` _[AWSGuardrailConfig](#awsguardrailconfig)_ | Guardrail configures the Guardrail policy to use for the backend. See <https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html><br />If not specified, the AWS Guardrail policy will not be used. |  |  |
 
@@ -1896,7 +1896,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
-| `port` _[PortNumber](#portnumber)_ | Port is the port to use for the backend. |  |  |
+| `port` _integer_ | Port is the port to use for the backend. |  |  |
 
 
 #### Http1ProtocolOptions
@@ -2052,7 +2052,7 @@ _Appears in:_
 | `vertexai` _[VertexAIConfig](#vertexaiconfig)_ | Vertex AI provider |  |  |
 | `bedrock` _[BedrockConfig](#bedrockconfig)_ | Bedrock provider |  |  |
 | `host` _string_ | Host specifies the hostname to send the requests to.<br />If not specified, the default hostname for the provider is used. |  | MinLength: 1 <br /> |
-| `port` _[PortNumber](#portnumber)_ | Port specifies the port to send the requests to. |  |  |
+| `port` _integer_ | Port specifies the port to send the requests to. |  |  |
 | `path` _[PathOverride](#pathoverride)_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
 | `authHeader` _[AuthHeader](#authheader)_ | AuthHeader specifies how the Authorization header is set in the request sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
@@ -2527,7 +2527,7 @@ _Appears in:_
 | `vertexai` _[VertexAIConfig](#vertexaiconfig)_ | Vertex AI provider |  |  |
 | `bedrock` _[BedrockConfig](#bedrockconfig)_ | Bedrock provider |  |  |
 | `host` _string_ | Host specifies the hostname to send the requests to.<br />If not specified, the default hostname for the provider is used. |  | MinLength: 1 <br /> |
-| `port` _[PortNumber](#portnumber)_ | Port specifies the port to send the requests to. |  |  |
+| `port` _integer_ | Port specifies the port to send the requests to. |  |  |
 | `path` _[PathOverride](#pathoverride)_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
 | `authHeader` _[AuthHeader](#authheader)_ | AuthHeader specifies how the Authorization header is set in the request sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
 
@@ -2874,8 +2874,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `replicas` _integer_ | The number of desired pods. Defaults to 1. |  | Minimum: 1 <br /> |
-| `omitReplicas` _boolean_ | If true, replicas will not be set in the deployment (allowing HPA to control scaling) |  |  |
+| `replicas` _integer_ | The number of desired pods.<br />If omitted, behavior will be managed by the K8s control plane, and will default to 1.<br />If you are using an HPA, make sure to not explicitly define this.<br />K8s reference: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#replicas |  | Minimum: 0 <br /> |
 | `strategy` _[DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#deploymentstrategy-v1-apps)_ | The deployment strategy to use to replace existing pods with new<br />ones. The Kubernetes default is a RollingUpdate with 25% maxUnavailable,<br />25% maxSurge.<br /><br />E.g., to recreate pods, minimizing resources for the rollout but causing downtime:<br />strategy:<br />  type: Recreate<br />E.g., to roll out as a RollingUpdate but with non-default parameters:<br />strategy:<br />  type: RollingUpdate<br />  rollingUpdate:<br />    maxSurge: 100% |  |  |
 
 
