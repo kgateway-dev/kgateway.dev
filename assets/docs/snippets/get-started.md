@@ -27,7 +27,7 @@
    ```
    {{% /version %}}
 
-3. Install kgateway by using Helm.
+3. Install kgateway by using Helm. Choose the [data plane gateway proxy]({{< link-hextra path="/about/proxies#supported" >}}) that you want to use, such as kgateway for API ingress or agentgateway for AI use cases.
    {{< version include-if="2.1.x" >}}
    {{< tabs items="Kgateway, Agentgateway" tabTotal="2">}}
    {{% tab tabName="Kgateway" %}}
