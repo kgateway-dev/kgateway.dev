@@ -12,7 +12,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies
 You can apply {{< reuse "docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
 {{< callout type="info" >}}
-{{< reuse "docs/snippets/global-policy.md" >}}
+By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
 {{< /callout >}}
 
 ### All HTTPRoute routes {#attach-to-all-routes}
