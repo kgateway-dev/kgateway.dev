@@ -158,7 +158,7 @@ Use the version shortcode to conditionally display content based on the document
 
 Example:
 ```markdown
-{{< version include-if="2.1.x" >}}
+{{< version include-if="2.2.x,2.1.x" >}}
 Content to show only for the specified 2.1.x version.
 {{< /version >}}
 {{< version include-if="2.0.x" >}}
@@ -213,7 +213,7 @@ The documentation maintainers of the kgateway project will review your pull requ
 The kgateway project automatically generates the following documentation from the code.
 
 * [API reference]({{< link-hextra path="/reference/api/" >}})
-* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{% version include-if="2.1.x" %}}
+* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{% version include-if="2.2.x,2.1.x" %}}
 * [Control plane metrics](../../../observability/control-plane-metrics/){{% /version %}}
 
 To learn more about how to generate these docs, see the [GitHub Workflows README](https://github.com/kgateway-dev/kgateway.dev/tree/main/.github/workflows/README.md).
