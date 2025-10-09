@@ -1,1 +1,1 @@
-2.0.4
+{{< version include-if="2.0.x" >}}2.0.4{{< /version >}}{{< version include-if="2.1.x" >}}2.1.0-main{{< /version >}}
