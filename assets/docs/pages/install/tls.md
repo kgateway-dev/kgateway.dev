@@ -56,7 +56,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
 
 4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `kgateway-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
 
-   {{< callout type="note" >}}**Note**: The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.{{< /callout >}}
+   {{< callout type="info" >}}The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.{{< /callout >}}
    
    ```yaml
    kubectl apply -f - <<EOF
