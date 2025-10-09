@@ -4,6 +4,8 @@ weight: 10
 description: Use a custom GatewayParameters resource to set up AI Gateway. 
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Configure your Helm chart installation to use AI Gateway. Then, use a custom GatewayParameters resource to set up AI Gateway.
 
 ## Before you begin
@@ -14,7 +16,7 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/), see the [agentgateway docs]({{< link-hextra path="/agentgateway" >}}).
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
@@ -33,14 +35,12 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    ```
 
    Example output:
-
    ```yaml
-   
    gateway:
      aiExtension:
        enabled: true
    ```
-
+  
 ## Create an AI Gateway {#gateway}
 
 1. Create a GatewayParameters resource which enables an AI extension for the Gateway.
@@ -133,7 +133,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 3. Verify that the AI Gateway is created. 
 
    * Gateway: Note that it might take a few minutes for an address to be assigned.
-   * Pod: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
+   * Pod for `kgateway` proxy: The pod has two containers: `kgateway-proxy` and `kgateway-ai-extension`. 
 
    ```sh
    kubectl get gateway,pods -l app.kubernetes.io/name=ai-gateway -A

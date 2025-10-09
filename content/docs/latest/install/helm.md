@@ -55,7 +55,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
    1. **Optional**: Pull and inspect the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI.
    
-      {{< callout type="info" >}}For common values that you might want to update, see [Installation settings](#installation-settings).{{< /callout >}}
+      {{< callout type="info" >}}For other values that you might want to update, see [Advanced settings](../advanced).{{< /callout >}}
 
       ```sh
       helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}}
@@ -65,7 +65,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development" >}}
+      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -86,6 +86,14 @@ When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, ad
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
 --set controller.image.pullPolicy=Always
+```
+{{% /tab %}}
+{{% tab tabName="Agentgateway and AI extensions" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     --set gateway.aiExtension.enabled=true \
+     --set agentGateway.enabled=true \
+     --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
 ```
 {{% /tab %}}
       {{< /tabs >}}
