@@ -63,7 +63,7 @@ Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} installation to enable t
 3. Upgrade your Helm installation. This upgrade automatically triggers a restart of any existing gateway proxies to inject `istio-proxy` and `sds` containers.
    
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
+   helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/n-patch.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
    {{< callout type="warning" >}}
@@ -238,6 +238,10 @@ Create or update a Gateway that includes the Istio proxy.
    x-envoy-upstream-service-time: 29
    x-envoy-decorator-operation: productpage.bookinfo.svc.cluster.local:9080/*
    ```
+
+{{< callout type="info">}}
+To exclude a service from using Istio mTLS or to configure your own TLS settings, you can create a static Backend resource for the service and add the `kgateway.dev/disable-istio-auto-mtls` annotation to the Backend. Then, you can apply custom TLS settings by using a BackendTLSPolicy or BackendConfigPolicy.   
+{{< /callout >}}
 
 ## Cleanup
 
