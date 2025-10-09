@@ -69,6 +69,10 @@ discoveryNamespaceSelectors:
     version: v3
 ```
 
+{{% version include-if="2.2.x,2.1.x" %}}
+
 ## TLS encryption {#tls-encryption}
 
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.
+
+{{% /version %}}
