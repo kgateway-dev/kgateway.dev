@@ -2,10 +2,10 @@ Review the following information about supported release versions for kgateway.
 
 ## Supported versions
 
-| Kgateway | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
-|----------|------------|----------------|-------|------|----------|
-| 2.1.x | 1.31 - 1.34 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
-| 2.0.x | 1.27 - 1.31 | 1.2.x | Proxy 1.33, API v3 | >= 3.12 | 1.18 - 1.23 |
+| Kgateway | Release date | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
+|----------|--------------|------------|----------------|-------|------|----------|
+| 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
+| 2.0.x | 01 Apr 2025 | 1.27 - 1.31 | 1.2.x | Proxy 1.33, API v3 | >= 3.12 | 1.18 - 1.23 |
 
 <!--See tested min/max versions in https://github.com/kgateway-dev/kgateway/tree/main/.github/workflows/.env/nightly-tests-->
 
