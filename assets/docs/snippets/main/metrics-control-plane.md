@@ -14,6 +14,9 @@ kgateway_status_syncer_status_syncs_total|counter|name, namespace, syncer, resul
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
 kgateway_translator_translations_running|gauge|name, namespace, translator|Current number of translations running
 kgateway_translator_translations_total|counter|name, namespace, translator, result|Total number of translations
+kgateway_xds_auth_rq_failure_total|counter||Total number of failed xDS auth requests
+kgateway_xds_auth_rq_success_total|counter||Total number of successful xDS auth requests
+kgateway_xds_auth_rq_total|counter||Total number of xDS auth requests
 kgateway_xds_snapshot_resources|gauge|gateway, namespace, resource|Current number of resources in XDS snapshot
 kgateway_xds_snapshot_sync_duration_seconds|histogram|gateway, namespace|Duration of time for a gateway resource update to be synced in an XDS snapshot
 kgateway_xds_snapshot_syncs_total|counter|gateway, namespace|Total number of XDS snapshot syncs
