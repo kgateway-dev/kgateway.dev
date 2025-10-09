@@ -8,7 +8,7 @@
    {{% /tab %}}
    {{% tab tabName="Experimental" %}}
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply {{< version include-if="2.1.x" >}}--server-side {{< /version >}}-f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```  
    {{% /tab %}}
    {{< /tabs >}}
