@@ -107,7 +107,7 @@ Check out the full details of the kgateway v1.2 release in our [release notes](h
 
 ## Availability
 We’re excited to announce that kgateway v2.1 is now available! Download the latest release on [GitHub](https://github.com/kgateway-dev/kgateway/releases).
-To get started with kgateway, check out our getting started guide(TODO: link).
+To get started with kgateway, check out our [getting started guide](https://kgateway.dev/docs/main/quickstart/).
 ## Get Involved
 
 The simplest way to get involved with kgateway is by joining our slack and community meetings. Thank you for your continued feedback and support!
