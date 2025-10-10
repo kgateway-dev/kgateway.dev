@@ -103,7 +103,7 @@ helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/
 ```
 
 ## Release notes
-Check out the full details of the kgateway v1.2 release in our release notes.
+Check out the full details of the kgateway v1.2 release in our [release notes](https://kgateway.dev/docs/main/reference/release-notes/).
 
 ## Availability
 kgateway v2.1  is available for download on GitHub.
