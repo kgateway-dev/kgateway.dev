@@ -265,7 +265,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: httpbin-https
      namespace: httpbin
-       gateway: sni
    spec:
      parentRefs:
        - name: sni
@@ -289,7 +288,6 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    metadata:
      name: httpbin-https
      namespace: httpbin
-       gateway: sni
    spec:
      parentRefs:
        - name: sni-listenerset
