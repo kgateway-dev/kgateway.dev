@@ -103,7 +103,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. 
  {{< callout type="warning" >}}
-   When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image.
+   When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image.
    {{< /callout >}}
    
    ```yaml
