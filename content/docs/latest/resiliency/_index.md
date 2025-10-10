@@ -8,6 +8,7 @@ Simulate failures, disruptions, and adverse conditions to test that your gateway
 {{< cards >}}
   {{< card link="connection" title="HTTP conection settings" >}}
   {{< card link="mirroring" title="Mirroring" >}}
+  {{< card link="outlier-detection" title="Outlier detection" >}}
   {{< card link="retry" title="Retries" >}}
   {{< card link="tcp-keepalive" title="TCP keepalive" >}}
   {{< card link="timeouts" title="Timeouts" >}}

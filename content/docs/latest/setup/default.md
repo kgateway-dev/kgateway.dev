@@ -1,5 +1,5 @@
 ---
-title: Default gateway proxy setup
+title: Default proxy setup
 weight: 10
 next: /docs/setup/customize
 ---

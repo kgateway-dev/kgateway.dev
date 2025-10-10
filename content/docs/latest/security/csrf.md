@@ -33,14 +33,14 @@ To learn more about CSRF, you can try out the [CSRF sandbox](https://www.envoypr
 
 ## Set up CSRF 
 
-Use a TrafficPolicy resource to define your CSRF rules. 
+Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSRF rules. 
 
-1. Create a TrafficPolicy resource to define your CSRF rules. The following example allows request from only the `allowThisOne.example.com` origin.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSRF rules. The following example allows request from only the `allowThisOne.example.com` origin.
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: csrf
      namespace: httpbin
@@ -88,7 +88,7 @@ Use a TrafficPolicy resource to define your CSRF rules.
    Invalid origin
    ```
 
-3. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
+3. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -173,6 +173,5 @@ Use a TrafficPolicy resource to define your CSRF rules.
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete TrafficPolicy csrf -n httpbin
-kubectl delete httproute httpbin-csrf -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} csrf -n httpbin
 ```

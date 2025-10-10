@@ -1,0 +1,99 @@
+---
+title: Additional TLS settings
+weight: 100
+description: 
+---
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Configure backend connections
+
+1. Create a BackendConfigPolicy that applies connection configuration to the httpbin app. 
+   ```yaml 
+   kubectl apply -f- <<EOF
+   kind: BackendConfigPolicy
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   metadata:
+     name: httpbin-connection
+     namespace: httpbin   
+   spec:
+     targetRefs:
+       - name: httpbin
+         group: ""
+         kind: Service
+     sslConfig: 
+       secretRef:
+         name: httpbin-tls
+       sni: "test.example.com"
+       sslParameters:
+         tlsMinVersion: "1.2"
+         tlsMaxVersion: "1.3"
+         cipherSuites:
+           - "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"
+           - "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+         ecdhCurves:
+           - "X25519"
+           - "P-256"
+   EOF
+   ```   
+
+2. Port-forward the gateway proxy on port 19000. 
+   ```sh
+   kubectl port-forward deployment/http -n kgateway-system 19000
+   ```
+   
+3. Get the configuration of your gateway proxy as a config dump. 
+   ```sh
+   curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
+   ```
+   
+4. Open the config dump and find the `kube_httpbin_httpbin_8000` cluster. Verify that you see all the connection settings that you enabled in your BackendConfigPolicy. 
+   
+   Example output
+   ```console
+   ...
+   "connect_timeout": "5s",
+      "per_connection_buffer_limit_bytes": 1024,
+      "metadata": {},
+      "upstream_connection_options": {
+      },
+      "typed_extension_protocol_options": {
+       "envoy.extensions.upstreams.http.v3.HttpProtocolOptions": {
+        "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+        "common_http_protocol_options": {
+         "idle_timeout": "10s",
+         "max_headers_count": 15,
+         "max_stream_duration": "30s",
+         "headers_with_underscores_action": "REJECT_REQUEST",
+         "max_requests_per_connection": 100
+        },
+        "explicit_http_config": {
+         "http_protocol_options": {
+          "header_key_format": {
+           "stateful_formatter": {
+            "name": "envoy.http.stateful_header_formatters.preserve_case",
+            "typed_config": {
+             "@type": "type.googleapis.com/envoy.extensions.http.header_formatters.preserve_case.v3.PreserveCaseFormatterConfig"
+            }
+           }
+          },
+          "enable_trailers": true,
+          "override_stream_error_on_invalid_http_message": true
+         }
+        }
+       }
+      }
+   ...
+   ```
+    
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete backendconfigpolicy httpbin-connection -n httpbin
+```
+   
+

@@ -12,6 +12,7 @@ Check out the following guides for examples on how to use the supported Backends
 {{< cards >}}
   {{< card link="static" title="Static IP address or hostname" >}}
   {{< card link="lambda" title="AWS Lambda" >}}
+  {{< card link="../../dfp" title="Dynamic Forward Proxy (DFP)" >}}
 {{< /cards >}}
 
 ## Routing

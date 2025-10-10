@@ -8,7 +8,7 @@ Learn more about the components that make up {{< reuse "/docs/snippets/kgateway.
 
 ## Component architecture
 
-The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control and data plane. These components work together to translate gateway custom resources into gateway proxy configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps.
+The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control and data plane. These components work together to translate gateway custom resources into gateway proxy configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps.  {{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the Envoy-based kgateway proxy and the agentgateway proxy.
 
 {{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
 {{< reuse-image-dark srcDark="img/gw-control-plane-components-dark.svg" caption="Component architecture" >}}
@@ -42,7 +42,11 @@ The endpoint discovery component is part of the {{< reuse "/docs/snippets/kgatew
 
 The {{< reuse "/docs/snippets/kgateway.md" >}} translator receives snapshots of all the Kubernetes Gateway API, Kubernetes API, and {{< reuse "/docs/snippets/kgateway.md" >}} resources that you create or update. The translator starts a new translation loop for each update to translate these resources into valid gateway proxy configuration. The gateway proxy configuration is stored in an xDS snapshot.  
 
-The following image shows the different stages of a translation cycle.
+The following image shows the different stages of a translation cycle for the different gateway proxies.
+
+{{< tabs items="Envoy-based kgateway proxy, Agentgateway proxy" tabTotal="2" >}}
+
+{{% tab tabName="Envoy-based kgateway proxy" %}}
 
 {{< reuse-image src="img/translation-loop.svg" caption="Kgateway translation cycle" >}}
 {{< reuse-image-dark srcDark="img/translation-loop-dark.svg" caption="Kgateway translation cycle" >}}
@@ -57,7 +61,34 @@ The following image shows the different stages of a translation cycle.
 
 4. Filter plug-ins are queried for their filter configurations, generating the list of HTTP and TCP Filters that are added to the [Envoy listeners](https://www.envoyproxy.io/docs/envoy/latest/configuration/listeners/listeners).
 
-5. Finally, an xDS snapshot is composed of the all the valid endpoints (EDS), clusters (CDS), route configs (RDS), and listeners (LDS). The snapshot is sent to the {{< reuse "/docs/snippets/kgateway.md" >}} xDS server. Gateway proxies in your cluster watch the xDS server for new config. When new config is detected, the config is pulled into the gateway proxy.
+5. Finally, an xDS snapshot is composed of the all the valid endpoints (EDS), clusters (CDS), route configs (RDS), and listeners (LDS). The snapshot is sent to the {{< reuse "/docs/snippets/kgateway.md" >}} xDS server. Gateway proxies in your cluster watch the xDS server for new config. When new config is detected, the config is pulled into the gateway proxy. 
+
+{{% /tab %}}
+
+{{% tab tabName="Agentgateway proxy" %}}
+
+{{< reuse-image src="img/agw-translation-loop.svg" caption="Agentgateway translation cycle" >}}
+{{< reuse-image-dark srcDark="img/agw-translation-loop-dark.svg" caption="Agentgateway translation cycle" >}}
+
+<!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
+
+1. When the agentgateway feature is enabled for {{< reuse "/docs/snippets/kgateway.md" >}}, the agentgateway syncer component is created as part of the control plane.
+
+2. The agentgateway syncer sets up the initial configuration, including the `agentgateway` GatewayClass name that Gateways can use to automatically create agentgateway proxies. The agentgateway syncer also builds the initial krt collections based on the Gateway API and kgateway resources in the cluster.
+
+3. The translation cycle starts by collecting all of the resources that are needed to create agentgateway proxy config. These various collections include:
+   * Core collections of the Kubernetes, Gateway API, and kgateway resources that are defined in the cluster, such as namespaces, services, gateways, routes, policies, backends, and plugins for AI, MCP, and A2A-specific backends.
+   * Agentgateway data plane resource building that consist of information translated from the core collection into the format that agentgateway expects, such as bind, port, listener, route, backend, target, and policy configuration for agentgateway. For more information, see the [agentgateway about topic](../../agentgateway/about/#resources).
+   * Address collections of the service and workloads that are included in service discovery and endpoint resolution.
+   * The translation order ensures that dependencies are resolved correctly: `binds → listeners → routes → policies`, with backends and addresses processed separately and added to the final configuration.
+
+4. The next step in the translation process is to build the xDS collection. This step merges all of the resource config of agentgateway data plane resources together with the address collections to create the config for each agentgateway proxy. It also builds status reports for the resources, tracks attached routes, and determines attached policies.
+
+5. Finally, the information from the resource and xDS collections are turned into an xDS snapshot of the agentgateway proxy config. The snapshot is sent to the xDS server. The agentgateway proxies in your cluster watch the xDS server for new config. When new config is detected, the config is pulled into the agentgateway proxy via gRPC.
+
+{{% /tab %}}
+
+{{< /tabs >}}
 
 ### Reporter
 
@@ -65,7 +96,13 @@ The reporter component receives a validation report for every {{< reuse "/docs/s
 
 ### xDS server
 
-The xDS server sends the xDS snapshot to the gateway proxies in the data plane. It updates the Envoy cluster with a new configuration of Envoy EDS, CDS, RDS, and LDS resources to match the desired state.
+The xDS server sends the xDS snapshot to the gateway proxies in the data plane.
+
+* **Envoy-based kgateway proxy**: Updates the Envoy cluster with a new configuration of Envoy EDS, CDS, RDS, and LDS resources to match the desired state.
+
+* **Agentgateway proxy**: Updates the agentgateway proxy with agentgateway-specific configuration, including MCP and A2A protocol support, to match the desired state.
+
+
 
 <!--
 

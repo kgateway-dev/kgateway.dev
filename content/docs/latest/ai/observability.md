@@ -3,6 +3,8 @@ title: AI observability
 weight: 90
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Observability helps you understand how your system is performing, identify issues, and troubleshoot problems. AI Gateway provides a rich set of observability features that help you monitor and analyze the performance of your AI Gateway and the LLM providers that it interacts with. 
 
 {{< callout >}}

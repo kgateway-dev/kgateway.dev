@@ -6,6 +6,10 @@ description: Create a 3-level route delegation hierarchy with a parent, child, a
 
 Create a 3-level route delegation hierarchy with a parent, child, and grandchild HTTPRoute resource.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Configuration overview
 
 In this guide you walk through a route delegation example that demonstrates route delegation from a parent HTTPRoute resource to a child HTTPRoute resource, and from a child HTTPRoute resource to a grandchild HTTPRoute resource. The following image illustrates the route delegation hierarchy:

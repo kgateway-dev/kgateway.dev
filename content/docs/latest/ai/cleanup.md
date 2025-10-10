@@ -4,6 +4,8 @@ weight: 100
 description: Remove the AI Gateway resources that you created as part of the guides. 
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Remove the AI Gateway resources that you created as part of the guides.
 
 1. Remove the Backend resource for the LLM provider.

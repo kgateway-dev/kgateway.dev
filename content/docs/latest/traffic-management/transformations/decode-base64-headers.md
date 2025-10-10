@@ -29,6 +29,8 @@ Combine multiple Inja functions to accomplish the following tasks:
    
 2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
 
+   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -48,6 +50,29 @@ Combine multiple Inja functions to accomplish the following tasks:
            value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       response:
+         add:
+         - name: x-base64-decoded
+           value: 'string(base64_decode(request.headers["x-base64-encoded"])).substring(11)'
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 3. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    

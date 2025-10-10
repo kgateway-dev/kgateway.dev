@@ -30,11 +30,11 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [External authorization](../../security/external-auth) | GatewayExtension and {{< reuse "docs/snippets/trafficpolicy.md" >}} |
 | [External processing (ExtProc)](../../traffic-management/extproc/) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
 | [Health checks for the Gateway](../../traffic-management/health-checks/gateway)| HTTPListenerPolicy | 
-| [Health checks for the Backends](../../traffic-management/health-checks/backend)| BackendConfigPolicy |{{%  version include-if="2.1.x" %}} 
+| [Health checks for the Backends](../../traffic-management/health-checks/backend)| BackendConfigPolicy |{{%  version include-if="2.2.x,2.1.x" %}} 
 | [HTTP connection settings](../../resiliency/connection)| BackendConfigPolicy | 
 | [Outlier detection](../../resiliency/outlier-detection)| BackendConfigPolicy | {{% /version %}}
 | [Rate limiting](../../security/ratelimit/) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
 | [Session affinity - Simple load balancing](../../traffic-management/session-affinity/loadbalancing/) | BackendConfigPolicy  | 
-| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version include-if="2.1.x" %}} 
+| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version include-if="2.2.x,2.1.x" %}} 
 | [TCP keepalive](../../resiliency/tcp-keepalive/) | BackendConfigPolicy | {{% /version %}}
 | [Transformations](../../traffic-management/transformations) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 

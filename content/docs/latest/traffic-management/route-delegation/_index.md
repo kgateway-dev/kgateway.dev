@@ -5,6 +5,10 @@ weight: 20
 
 Manage routing rules more effectively by using multiple connected HTTPRoute resources.
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 {{< cards >}}
   {{< card link="overview" title="Route delegation overview" >}}
   {{< card link="basic" title="Basic example" >}}

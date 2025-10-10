@@ -6,6 +6,10 @@ description: Use header and query matchers in a route delegation setup.
 
 Use header and query matchers in a route delegation setup. 
 
+{{< callout >}}
+{{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
+
 ## Configuration overview
 
 In this guide you walk through a route delegation example where headers and query parameters are added as matchers to the parent and child HTTPRoute resources. A routing hierarchy can be created only if the child defines the same header and query matchers that the parent HTTPResource defines. You can optionally define additional header or query matchers on the child HTTPRoute resource.

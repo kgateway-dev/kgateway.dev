@@ -4,6 +4,8 @@ weight: 20
 description: Let AI Gateway send requests to an LLM provider. 
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Let AI Gateway send requests to an LLM provider.
 
 To configure authentication, you provide the authentication details in the Backend resource that is backed by the LLM provider endpoint.
@@ -43,12 +45,11 @@ Provide the token directly in the configuration for the Backend. This option is 
      type: AI
      ai:
        llm:
-         provider:
-           openai:
-             authToken:
-               kind: Inline
-               inline: "$TOKEN"
-             model: "gpt-3.5-turbo"
+         openai:
+           authToken:
+             kind: Inline
+             inline: "$TOKEN"
+           model: "gpt-3.5-turbo"
    EOF
    ``` 
 
@@ -57,7 +58,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    | Setting     | Description |
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example uses an inline token. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
@@ -211,13 +212,12 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
      type: AI
      ai:
        llm:
-         provider:
-           openai:
-             authToken:
-               kind: SecretRef
-               secretRef:
-                 name: openai-secret
-             model: "gpt-3.5-turbo"
+         openai:
+           authToken:
+             kind: SecretRef
+             secretRef:
+               name: openai-secret
+           model: "gpt-3.5-turbo"
    EOF
    ```
 
@@ -226,7 +226,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    | Setting     | Description |
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
@@ -360,11 +360,10 @@ Pass through an existing token directly from the client or a successful OpenID C
      type: AI
      ai:
        llm:
-         provider:
-           openai:
-             authToken:
-               kind: Passthrough
-             model: "gpt-3.5-turbo"
+         openai:
+           authToken:
+             kind: Passthrough
+           model: "gpt-3.5-turbo"
    EOF
    ``` 
 
@@ -373,7 +372,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    | Setting     | Description |
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.provider.openai`). |
+   | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example uses passthrough authentication. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 

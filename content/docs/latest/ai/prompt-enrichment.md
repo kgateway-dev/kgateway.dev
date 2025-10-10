@@ -4,6 +4,8 @@ weight: 40
 description: Effectively manage system and user prompts to improve LLM outputs.
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 Effectively manage system and user prompts to improve LLM outputs.
 
 ## About prompt enrichment

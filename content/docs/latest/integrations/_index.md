@@ -7,6 +7,7 @@ description: Integrate kgateway with common cloud-native tools.
 Integrate kgateway with common cloud-native tools.
 
 {{< cards >}}
+  {{< card link="../agentgateway/" title="Agentgateway" >}}
   {{< card link="argo" title="Argo Rollouts" >}}
   {{< card link="aws-elb" title="AWS ELBs" >}}
   {{< card link="external-dns-cert-manager" title="ExternalDNS & Cert Manager"  >}}

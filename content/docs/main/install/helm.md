@@ -8,11 +8,6 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
 
 ## Before you begin
 
-{{< callout type="warning" >}}
-{{< reuse "docs/snippets/one-install.md" >}} If you already tried out {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Get started](../../quickstart/) guide, first [uninstall your installation](../../operations/uninstall/).
-{{< /callout >}}
-
-
 1. Create or use an existing Kubernetes cluster. 
 2. Install the following command-line tools.
    * [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use.

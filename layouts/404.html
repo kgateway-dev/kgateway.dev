@@ -13,8 +13,8 @@
             // match is a valid docs version, redirect to base docs page for that version
             window.location.assign(window.location.origin + "/docs/" + match[1]);
         } else {
-            // match is not a valid docs version, insert `main` after docs and retry
-            window.location.assign(window.location.href.replace("/docs/", "/docs/main/"));
+            // match is not a valid docs version, insert `latest` after docs and retry
+            window.location.assign(window.location.href.replace("/docs/", "/docs/latest/"));
         }
     }
 </script>
