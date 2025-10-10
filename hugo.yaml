@@ -56,10 +56,10 @@ menu:
       weight: 2
     - name: Get Started
       weight: 3
-      url: /docs/main/quickstart/
+      url: /docs/latest/quickstart/
     - name: Why kgateway
       weight: 4
-      url: /docs/main/about/overview/
+      url: /docs/latest/about/overview/
     - name: Search
       weight: 5
       params:
