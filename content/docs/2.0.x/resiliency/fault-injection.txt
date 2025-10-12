@@ -1,0 +1,193 @@
+---
+title: Fault injection
+weight: 10
+description: Test the resilience of your apps by injecting delays and connection failures into a percentage of your requests.
+---
+Test the resilience of your apps by injecting delays and connection failures into a percentage of your requests.
+
+## About fault injections
+
+You can set two following fault injection types in kgateway. 
+
+* **Delays**: Delays simulate timing failures, such as network latency or overloaded backends.
+* **Aborts**: Aborts simulate crash failures, such as HTTP error codes or TCP connection failures. 
+
+Delays and aborts are independent of one another. When both values are set, your requests are either delayed only, delayed and aborted, or aborted only.
+
+{{< callout emoji="💡" >}}
+Faults can be configured for a route by using a TrafficPolicy resource. Gateway-level faults are not supported.
+{{< /callout >}}
+
+For more information, see the [Fault API](/docs/reference/api/fault/).
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Aborts {#aborts}
+   
+Use a TrafficPolicy resource to abort all incoming requests to a specific route. 
+
+1. Create a TrafficPolicy custom resource to specify your fault injection rules. In the following example, 50% of all requests are rejected with a 503 HTTP response code.  
+   ```yaml
+   kubectl apply -n httpbin -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: TrafficPolicy
+   metadata:
+     name: faults
+     namespace: httpbin
+   spec:
+     options:
+       faults:
+         abort:
+           percentage: 50
+           httpStatus: 503
+   EOF
+   ```
+
+2. Create an HTTPRoute resource for the httpbin app that references the TrafficPolicy resource that you created. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-faults
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: kgateway-system
+     hostnames:
+       - faults.example
+     rules:
+       - filters:
+           - type: ExtensionRef
+             extensionRef:
+               group: gateway.solo.io
+               kind: TrafficPolicy
+               name: faults
+         backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+3. Send a few requests to the httpbin app on the `faults.example` domain. Verify that some requests succeed with a 200 HTTP response code and other requests are rejected with a 503 HTTP response code.  
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: faults.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab  %}}
+   ```sh
+   curl -i localhost:8080/status/200 -H "host: faults.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output for a successful response: 
+   ```
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   date: Tue, 23 Apr 2024 17:12:13 GMT
+   x-envoy-upstream-service-time: 0
+   server: envoy
+   transfer-encoding: chunked
+   ```
+   
+   Example output for a denied request: 
+   ```
+   HTTP/1.1 503 Service Unavailable
+   content-length: 18
+   content-type: text/plain
+   date: Tue, 23 Apr 2024 17:12:08 GMT
+   server: envoy
+   ```
+
+4. Optional: Remove the resources that you created. 
+   ```sh
+   kubectl delete httproute httpbin-faults -n httpbin
+   kubectl delete TrafficPolicy faults -n httpbin
+   ```
+
+## Delays {#delays}
+
+Use a TrafficPolicy resource to deny incoming requests to a specific route. 
+
+1. Create a TrafficPolicy custom resource to specify your fault injection rules. In the following example, 50% of all requests are delayed by 5 seconds.  
+   ```yaml
+   kubectl apply -n httpbin -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: TrafficPolicy
+   metadata:
+     name: faults
+     namespace: httpbin
+   spec:
+     options:
+       faults:
+         delay:
+           percentage: 50
+           fixedDelay: '5s'
+   EOF
+   ```
+
+2. Create an HTTPRoute resource for the httpbin app that references the TrafficPolicy resource that you created. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-faults
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: kgateway-system
+     hostnames:
+       - faults.example
+     rules:
+       - filters:
+           - type: ExtensionRef
+             extensionRef:
+               group: gateway.solo.io
+               kind: TrafficPolicy
+               name: faults
+         backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+3. Send a few requests to the httpbin app on the `faults.example` domain. Verify that some requests succeed immediately and other requests are delayed by 5 seconds.   
+   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
+   {{% tab %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: faults.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab %}}
+   ```sh
+   curl -i localhost:8080/status/200 -H "host: faults.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   ```
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   date: Tue, 23 Apr 2024 17:18:51 GMT
+   x-envoy-upstream-service-time: 0
+   server: envoy
+   transfer-encoding: chunked
+   ```
+
+4. Optional: Remove the resources that you created. 
+   ```sh
+   kubectl delete httproute httpbin-faults -n httpbin
+   kubectl delete TrafficPolicy faults -n httpbin
+   ```
+

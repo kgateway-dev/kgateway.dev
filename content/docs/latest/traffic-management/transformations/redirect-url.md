@@ -4,7 +4,54 @@ weight: 70
 description:
 ---
 
-Extract the values of common pseudo headers to generate a redirect URL.
+Extract the values of common headers to generate a redirect URL.
+
+<!--TODO agentgateway transformation
+   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Envoy-based kgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       request:  
+         add:
+         - name: x-forwarded-uri
+           value: 'https://{{ request_header(":authority") }}{{ request_header(":path") }}'
+   EOF
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       request:  
+         add:
+         - name: x-forwarded-uri
+           value: '"https://" + request.headers["host"] + request.path'
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+-->
 
 ## About pseudo headers 
 
@@ -31,7 +78,7 @@ Common pseudo headers include:
    * The `:authority` pseudo header contains the hostname that the request is sent to.
    * The `:path` pseudo header is set to the request path.
    * The redirect URL is added to the `x-forwarded-uri` response header.
-   
+
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -52,7 +99,7 @@ Common pseudo headers include:
    EOF
    ```
 
-2. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
+2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
