@@ -146,10 +146,27 @@ waypoint:
 
 The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}) instead. 
 
-The 
+#### Disable per route policies
 
-extAuth.enablement removed; use extAuth.disable (also for extProc, cors, buffer) (#11893)
-Removed insecureSkipVerify from Backend/AI (moved to BackendConfigPolicy) (#11819)
+The configuration for disabling policies on a route changed. Previously, you used the `enablement` field, such as in `extAuth.enablement` to enable or disable a policy on a route. Now, you use the `disable` field instead as shown in the following example: 
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: disable-all-extauth-for-route-2-1
+  namespace: infra
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: route-2
+    sectionName: rule1
+  extAuth:
+    disable: {} 
+``` 
+
+Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies. 
 
 
 ### 🌟 New features {#v21-new-features}
