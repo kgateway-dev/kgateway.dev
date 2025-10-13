@@ -191,7 +191,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ```
    {{% /tab %}}
    {{% tab tabName="BackendTLSPolicy" %}}
-   Note that in Kubernetes Gateway API versions less than 1.4, the `apiVersion` field is `gateway.networking.k8s.io/v1alpha3`.
+   Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1

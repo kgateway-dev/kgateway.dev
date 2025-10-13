@@ -142,7 +142,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    EOF
    ```
 
-2. Create the TLS policy. Note that in Kubernetes Gateway API versions less than 1.4, the `apiVersion` field is `gateway.networking.k8s.io/v1alpha3`. 
+2. Create the TLS policy. Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later. 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -296,7 +296,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
    {{% /tab %}}
    {{% tab tabName="BackendTLSPolicy" %}}
-   Note that in Kubernetes Gateway API versions less than 1.4, the `apiVersion` field is `gateway.networking.k8s.io/v1alpha3`.
+   Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
