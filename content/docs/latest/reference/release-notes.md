@@ -12,6 +12,23 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v21-breaking-changes}
 
+#### Kubernetes Gateway API version v1.4.0
+
+Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
+
+{{< tabs items="Standard,Experimental" tabTotal= "2" >}}
+{{% tab tabName="Standard" %}}
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+```
+{{% /tab %}}
+{{% tab tabName="Experimental" %}}
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+```
+{{% /tab %}}
+{{< /tabs >}}
+
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
 The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
@@ -115,6 +132,51 @@ AI Gateway and Inference Extension support for Envoy-based gateway proxies is de
 #### Fail open policy for ExtProc providers
 
 The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
+
+#### Helm changes for agentgateway
+
+The Helm value to enable the agentgateway integration changed from `agentGateway` to `agentgateway`. To enable agentgateway, use the following values in your Helm chart: 
+
+```yaml
+agentgateway: 
+  enabled: true
+```
+
+#### Helm changes for waypoints
+
+The kgateway waypoint integration is disabled by default. To enable the integration, use the following values in your Helm chart: 
+
+```yaml
+waypoint:
+  enabled: true
+```
+
+#### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
+
+The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}) instead. 
+
+#### Disable per route policies
+
+The configuration for disabling policies on a route changed. Previously, you used the `enablement` field, such as in `extAuth.enablement` to enable or disable a policy on a route. Now, you use the `disable` field instead as shown in the following example: 
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: disable-all-extauth-for-route-2-1
+  namespace: infra
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: route-2
+    sectionName: rule1
+  extAuth:
+    disable: {} 
+``` 
+
+Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies. 
+
 
 ### 🌟 New features {#v21-new-features}
 
