@@ -14,11 +14,20 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 #### Kubernetes Gateway API version v1.4.0
 
-Kgateway was updated to support the Kubernetes Gateway API version v1.4.0. This change as updated the BackendTLSPolicy API version from `v1alpha3` to `v1`. Make sure to upgrade the Kubernetes Gateway API version first before you update kgateway. 
+Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
 
+{{< tabs items="Standard,Experimental" tabTotal= "2" >}}
+{{% tab tabName="Standard" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
+{{% /tab %}}
+{{% tab tabName="Experimental" %}}
+
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+
+{{% /tab %}}
+{{< /tabs >}}
 
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
@@ -139,7 +148,7 @@ The kgateway waypoint integration is disabled by default. To enable the integrat
 
 ```yaml
 waypoint:
-  enabled: false
+  enabled: true
 ```
 
 #### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
