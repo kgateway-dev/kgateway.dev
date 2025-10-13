@@ -12,6 +12,14 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v21-breaking-changes}
 
+#### Kubernetes Gateway API version v1.4.0
+
+Kgateway was updated to support the Kubernetes Gateway API version v1.4.0. This change as updated the BackendTLSPolicy API version from `v1alpha3` to `v1`. Make sure to upgrade the Kubernetes Gateway API version first before you update kgateway. 
+
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+```
+
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
 The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
@@ -115,6 +123,34 @@ AI Gateway and Inference Extension support for Envoy-based gateway proxies is de
 #### Fail open policy for ExtProc providers
 
 The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
+
+#### Helm changes for agentgateway
+
+The Helm value to enable the agentgateway integration changed from `agentGateway` to `agentgateway`. To enable agentgateway, use the following values in your Helm chart: 
+
+```yaml
+agentgateway: 
+  enabled: true
+```
+
+#### Helm changes for waypoints
+
+The kgateway waypoint integration is disabled by default. To enable the integration, use the following values in your Helm chart: 
+
+```yaml
+waypoint:
+  enabled: false
+```
+
+#### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
+
+The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}) instead. 
+
+The 
+
+extAuth.enablement removed; use extAuth.disable (also for extProc, cors, buffer) (#11893)
+Removed insecureSkipVerify from Backend/AI (moved to BackendConfigPolicy) (#11819)
+
 
 ### 🌟 New features {#v21-new-features}
 
