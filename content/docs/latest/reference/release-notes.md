@@ -23,9 +23,9 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 ```
 {{% /tab %}}
 {{% tab tabName="Experimental" %}}
-
+```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
-
+```
 {{% /tab %}}
 {{< /tabs >}}
 
