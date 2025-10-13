@@ -58,6 +58,7 @@ _Appears in:_
 | `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
 | `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
 | `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported.<br />Note: This field is not applicable when using agentgateway | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
+| `modelAliases` _object (keys:string, values:string)_ | ModelAliases maps friendly model names to actual provider model names.<br />Example: \{"fast": "gpt-3.5-turbo", "smart": "gpt-4-turbo"\}<br />Note: This field is only applicable when using the agentgateway data plane. |  |  |
 
 
 #### AIPromptEnrichment
