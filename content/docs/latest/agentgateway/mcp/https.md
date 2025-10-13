@@ -60,10 +60,10 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
    
-3. Create a BackendTLSPolicy to configure your agentgateway to connect to your Backend by using HTTPS. To validate the MCP server's TLS certificate, you use the well-known system CA certificates. 
+3. Create a BackendTLSPolicy to configure your agentgateway to connect to your Backend by using HTTPS. To validate the MCP server's TLS certificate, you use the well-known system CA certificates. Note that in Kubernetes Gateway API versions less than 1.4, the `apiVersion` field is `gateway.networking.k8s.io/v1alpha3`.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3	
+   apiVersion: gateway.networking.k8s.io/v1
    kind: BackendTLSPolicy
    metadata:
      name: github-mcp-backend-tls
@@ -81,7 +81,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3	
+   apiVersion: gateway.networking.k8s.io/v1
    kind: BackendTLSPolicy
    metadata:
      name: github-mcp-backend-tls
