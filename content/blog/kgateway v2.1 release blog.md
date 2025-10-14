@@ -78,7 +78,7 @@ Now, you can apply header request and response modifiers in a TrafficPolicy. Thi
 
 ### Horizontal Pod Autoscaling {#hpa}
 
-You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale gateway proxy pods up and down based on certain thresholds, like memory and CPU consumption. See [Horizontal Pod Autoscaling (HPA)](/docs/latest/setup/hpa/) for more information.
+You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale kgateway control and data plane pods up and down based on certain thresholds, like memory and CPU consumption. See [Horizontal Pod Autoscaling (HPA)](/docs/latest/setup/hpa/) for more information.
 
 ### HTTP1.0/0.9 support {#http10}
 
