@@ -46,6 +46,13 @@ EOF
 
 You are now ready to try out agentgateway. Check out the [agentgateway guides](/docs/latest/agentgateway/) to learn how to route traffic to an LLM provider, MCP tool server, or agent. 
 
+### K8s GW API 1.3.0 and Inference Extenstion 1.0
+
+Kgateway is now fully conformant with the Kubernetes Gateway API version 1.3.0 and Inference Extension version 1.0. To learn more, check out the conformance test reports: 
+
+* [Kubernetes Gateway API](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.3.0/kgateway)
+* [Inference Extension](https://github.com/kubernetes-sigs/gateway-api-inference-extension/tree/main/conformance/reports/v1.0.0/gateway/kgateway)
+
 ### Global policy attachment {#v21-global-policy-attachment}
 
 By default, you must attach policies to resources that are in the same namespace. Now, you can enable a feature to create a "global" namespace for policies. Then, these global policies can attach to resources in any namespace in your cluster through label selectors. For more information, see the [Global policy attachment](/docs/latest/about/policies/global-attachment/) docs.
