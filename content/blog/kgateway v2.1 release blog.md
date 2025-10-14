@@ -8,92 +8,11 @@ excludeSearch: true
 
 We’re excited to announce the release kgateway v2.1, a release packed with exciting new features and improvements. Here are a few select updates the kgateway team would like to highlight!
 
-## 🔥 Breaking changes from the previous release
-
-### Kubernetes Gateway API version v1.4.0
-
-Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
-
-{{< tabs items="Standard,Experimental"  >}}
-{{% tab  %}}
-```sh
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
-```
-{{% /tab %}}
-{{% tab %}}
-```sh
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
-```
-{{% /tab %}}
-{{< /tabs >}}
-
-### AI Backend API changes {#v21-ai-backend-api-changes}
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](/docs/latest/reference/api/#aibackend) and [AI guides](/docs/latest/agentgateway/llm/) docs.
-
-
-### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
-The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
-* The annotation is renamed from `delegation.kgateway.dev/inherited-policy-priority` to the simpler `kgateway.dev/inherited-policy-priority`.
-* Now, the following values are accepted: `ShallowMergePreferParent` and `ShallowMergePreferChild`
-* The default behavior of parent route policies taking precedence over child routes policies is reversed. Now, child routes take precedence, which aligns better with the precedence defaults across other resources in the kgateway and Gateway APIs.
-
-To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`. For more information, check out the [Policy merging](/docs/latest/about/policies/merging/) docs.
-
-
-### Fail open policy for ExtProc providers
-
-The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
-
-### Helm changes for agentgateway
-
-The Helm value to enable the agentgateway integration changed from `agentGateway` to `agentgateway`. To enable agentgateway, use the following values in your Helm chart: 
-
-```yaml
-agentgateway: 
-  enabled: true
-```
-
-### Helm changes for waypoints
-
-The kgateway waypoint integration is disabled by default. To enable the integration, use the following values in your Helm chart: 
-
-```yaml
-waypoint:
-  enabled: true
-```
-
-### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
-
-The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy](/docs/latest/reference/api/#backendconfigpolicy) instead. 
-
-### Disable per route policies
-
-The configuration for disabling policies on a route changed. Previously, you used the `enablement` field, such as in `extAuth.enablement` to enable or disable a policy on a route. Now, you use the `disable` field instead as shown in the following example: 
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: TrafficPolicy
-metadata:
-  name: disable-all-extauth-for-route-2-1
-  namespace: infra
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: route-2
-    sectionName: rule1
-  extAuth:
-    disable: {} 
-``` 
-
-Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies.
-
-
 ## 🌟 What's new in kgateway 2.1?
 
 ### Agentgateway integration {#v21-agentgateway}
 
-This release marks a major milestone — it’s the first version of integrating the open source project [agentgateway](https://agentgateway.dev/)! As part of this evolution, we’re beginning the deprecation of the Envoy-based AI Gateway and Envoy-based Inference Extension, since all related functionality is now implemented natively through agentgateway. You can still continue to use Envoy-based Gateways for API Gateway use cases. 
+This release marks a major milestone — it’s the first version of integrating the open source project [agentgateway](https://agentgateway.dev/)! Agentgateway is a highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for LLMs, MCP tools, AI agents, and inference workloads. As part of this evolution, we’re beginning the deprecation of the Envoy-based AI Gateway and Envoy-based Inference Extension, since all related functionality is now implemented natively through agentgateway. You can still continue to use Envoy-based Gateways for API Gateway use cases. 
 
 For this release, agentgateway support is released as a beta. If you’re trying out the `agentgateway` `GatewayClass`, we recommend following the beta release feed to stay up to date with improvements, bug fixes, and breaking changes as the implementation is refined.
 
@@ -199,6 +118,86 @@ You can disable leader election by setting the `controller.disableLeaderElection
 ```sh
 helm upgrade -i --namespace kgateway-system --version v2.1.0 kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
 ```
+
+## 🔥 Breaking changes from the previous release
+
+### Kubernetes Gateway API version v1.4.0
+
+Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
+
+{{< tabs items="Standard,Experimental"  >}}
+{{% tab  %}}
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+```
+{{% /tab %}}
+{{% tab %}}
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+### AI Backend API changes {#v21-ai-backend-api-changes}
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](/docs/latest/reference/api/#aibackend) and [AI guides](/docs/latest/agentgateway/llm/) docs.
+
+
+### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
+The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
+* The annotation is renamed from `delegation.kgateway.dev/inherited-policy-priority` to the simpler `kgateway.dev/inherited-policy-priority`.
+* Now, the following values are accepted: `ShallowMergePreferParent` and `ShallowMergePreferChild`
+* The default behavior of parent route policies taking precedence over child routes policies is reversed. Now, child routes take precedence, which aligns better with the precedence defaults across other resources in the kgateway and Gateway APIs.
+
+To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`. For more information, check out the [Policy merging](/docs/latest/about/policies/merging/) docs.
+
+
+### Fail open policy for ExtProc providers
+
+The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
+
+### Helm changes for agentgateway
+
+The Helm value to enable the agentgateway integration changed from `agentGateway` to `agentgateway`. To enable agentgateway, use the following values in your Helm chart: 
+
+```yaml
+agentgateway: 
+  enabled: true
+```
+
+### Helm changes for waypoints
+
+The kgateway waypoint integration is disabled by default. To enable the integration, use the following values in your Helm chart: 
+
+```yaml
+waypoint:
+  enabled: true
+```
+
+### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
+
+The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy](/docs/latest/reference/api/#backendconfigpolicy) instead. 
+
+### Disable per route policies
+
+The configuration for disabling policies on a route changed. Previously, you used the `enablement` field, such as in `extAuth.enablement` to enable or disable a policy on a route. Now, you use the `disable` field instead as shown in the following example: 
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: TrafficPolicy
+metadata:
+  name: disable-all-extauth-for-route-2-1
+  namespace: infra
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: route-2
+    sectionName: rule1
+  extAuth:
+    disable: {} 
+``` 
+
+Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies.
 
 ##  🗑️ Deprecated or removed features
 
