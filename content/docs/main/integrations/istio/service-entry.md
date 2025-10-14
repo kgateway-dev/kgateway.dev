@@ -73,31 +73,24 @@ spec:
       port: 80
       kind: ServiceEntry
       group: networking.istio.io
+    filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            add:
+              - name: App
+                value: ServiceEntry
+            set:
+              - name: User-Agent
+                value: custom
+            remove:
+              - X-Remove
 EOF
 ```
-
-3. A TrafficPolicy allows you to modify the behavior of traffic on a specific route, adding advanced rules like timeouts, retries, and request transformations.
-
-```yaml
-kubectl apply -f - <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TrafficPolicy
-metadata:
-  name: add-custom-header-policy
-  namespace: gwtest
-spec:
-  targetRef:
-    kind: HTTPRoute
-    name: route-to-upstream
-  http:
-    request:
-      setHeaders:
-        - name: x-kgateway-processed
-          value: "true"
-        - name: x-original-host
-          value: "{hostname}" # Example of using a variable from the request
-EOF
-```
+3. It is also using a Header Manipulation rule that we apply to our `http-gw-for-test` apps to:
+* Add the App: httpbin2 header to all requests.
+* Set the User-Agent header to custom. If the User-Agent header is not present, it is added to the request.
+* Remove the X-Remove header from the request.
+For more information about Header Control, you can read [L7 policies integration](https://kgateway.dev/docs/main/integrations/istio/ambient/waypoint/#waypoint-policies) to our Gateway.
 
 ## Full Code Examples & Use Cases
 
@@ -313,12 +306,13 @@ metadata:
   name: github-https
 spec:
   hosts:
-  - github.com
+  - httpbin.org
+  location: MESH_EXTERNAL
   ports:
   - number: 443
     name: https
     protocol: HTTPS
-  location: MESH_EXTERNAL
+  resolution: DNS
 EOF
 ```
 ---
