@@ -26,7 +26,8 @@ AI Gateway and Inference Extension support for Envoy-based gateway proxies is de
 
 #### Agentgateway integration {#v21-agentgateway}
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../agentgateway/).
+This release marks a major milestone — it’s our first version integrating [agentgateway](https://agentgateway.dev/)! As part of this evolution, we’re beginning the deprecation of the Envoy-based AI Gateway and Envoy-based Inference Extension, since all related functionality is now implemented natively through agentgateway.
+For this release, agentgateway support is designated as beta. This reflects our strong commitment to this direction while allowing our contributors to continue iterating quickly. If you’re trying out the `agentgateway` `GatewayClass`, we recommend following our beta release feed to stay up to date with improvements, bug fixes, and breaking changes as we refine the implementation.
 
 #### Global policy attachment {#v21-global-policy-attachment}
 
