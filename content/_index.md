@@ -9,7 +9,7 @@ excludeSearch: true
 <section class="bg-primary-bg text-white pt-[7.875rem] pb-40 bg-[url(/hero-background.svg)] bg-center bg-no-repeat bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
   <div class="py-8 lg:py-16 flex items-center px-6">
     <div class="text-center mx-auto inline-block">
-      <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most mature and widely deployed Envoy-based gateway is now a CNCF project</h1>
+      <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most widely deployed gateway in Kubernetes for microservices and AI agents</h1>
       <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">kgateway is:</h2>
     </div>
   </div>
@@ -26,18 +26,18 @@ excludeSearch: true
       <a href="/docs/ai/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-ai.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An AI Gateway that Supports and Secures LLM Usage</h3>
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An AI Gateway that Supports and Secures LLM Consumption</h3>
         </div>
-        <p class="text-primary-text text-center px-4 md:min-h-24">Protect applications, models, and data from inappropriate access.</p>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Protect models, tools, agents, and data from inappropriate access.</p>
       </a>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
       <a href="/docs/integrations/inference-extension/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-ingress.svg" />
-          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An LLM Gateway utilizing the Inference Extension project</h3>
+          <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An Inference Gateway for your own Generative Models</h3>
         </div>
-        <p class="text-primary-text text-center px-4 md:min-h-24">Intelligently route to AI inference workloads and LLMs in your Kubernetes environment.</p>
+        <p class="text-primary-text text-center px-4 md:min-h-24">Intelligently route to AI inference workloads in Kubernetes environments.</p>
       </a>
       <a href="/docs/integrations/agentgateway/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">

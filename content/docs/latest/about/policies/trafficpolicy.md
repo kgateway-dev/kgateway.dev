@@ -12,7 +12,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies
 You can apply {{< reuse "docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
 {{< callout type="info" >}}
-{{< reuse "docs/snippets/global-policy.md" >}}
+By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
 {{< /callout >}}
 
 ### All HTTPRoute routes {#attach-to-all-routes}
@@ -71,7 +71,7 @@ spec:
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
 {{< callout type="warning" >}}
-Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later. Also, the `ExtensionRef` filter is not supported for agentgateway proxies.
 {{< /callout >}}
 
 The following example shows a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRef` field is not set. Because of that, the {{< reuse "docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 

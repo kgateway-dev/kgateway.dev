@@ -116,7 +116,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
 
 You can enable ExtProc for a particular route in an HTTPRoute resource. 
 
-1. Create a GatewayExtension resource to enable external processing in your environment. This resource points to the ExtProc service that you created earlier. 
+1. Create a GatewayExtension resource to enable external processing in your environment. This resource points to the ExtProc service that you created earlier. You can optinally add more settings, such as a default message timeout and processing mode, or change the default fail open policy to false so that requests are not forwarded to the upstream service if the ExtProc service is unvailabe. For more information, see the [API reference]({{< link-hextra path="/reference/api/#extprocprovider" >}}). 
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

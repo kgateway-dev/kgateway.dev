@@ -1,7 +1,13 @@
 # Cloudflare Pages redirects
 
 # Redirect old MCP documentation to new Agent Gateway documentation
-/docs/mcp /docs/agentgateway 301
-/docs/integrations/agentgateway /docs/agentgateway 301
-/docs/mcp/ /docs/agentgateway/ 301
-/docs/integrations/agentgateway/ /docs/agentgateway/ 301
+/docs/mcp /docs/main/agentgateway 301
+/docs/integrations/agentgateway /docs/main/agentgateway 301
+/docs/mcp/ /docs/main/agentgateway/ 301
+/docs/integrations/agentgateway/ /docs/main/agentgateway/ 301
+/docs/operations/install /docs/main/install/ 301
+/docs/operations/sample-app/ /docs/main/install/sample-app/ 301
+/docs/main/operations/install /docs/main/install/ 301
+/docs/main/operations/sample-app/ /docs/main/install/sample-app/ 301
+/docs/latest/operations/install /docs/latest/install/ 301
+/docs/latest/operations/sample-app/ /docs/latest/install/sample-app/ 301

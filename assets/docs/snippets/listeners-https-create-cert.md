@@ -9,13 +9,39 @@
    openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=any domain/CN=*' -keyout example_certs/root.key -out example_certs/root.crt
    ```
 
-3. Use the root certificate to sign the gateway certificate.
+3. Create an OpenSSL configuration that matches the HTTPS hostname you plan to use. Replace every `example.com` reference with the base domain that your listener serves.
    ```sh
-   openssl req -out example_certs/gateway.csr -newkey rsa:2048 -nodes -keyout example_certs/gateway.key -subj "/CN=*/O=any domain"
-   openssl x509 -req -sha256 -days 365 -CA example_certs/root.crt -CAkey example_certs/root.key -set_serial 0 -in example_certs/gateway.csr -out example_certs/gateway.crt
+   cat <<'EOF' > example_certs/gateway.cnf
+   [ req ]
+   default_bits = 2048
+   prompt = no
+   default_md = sha256
+   distinguished_name = dn
+   req_extensions = req_ext
+
+   [ dn ]
+   CN = *.example.com
+   O = any domain
+
+   [ req_ext ]
+   subjectAltName = @alt_names
+
+   [ alt_names ]
+   DNS.1 = *.example.com
+   DNS.2 = example.com
+   EOF
    ```
 
-4. Create a Kubernetes secret to store your server TLS certificate. You create the secret in the same cluster and namespace that the gateway is deployed to.
+4. Use the configuration and root certificate to create and sign the gateway certificate.
+   ```sh
+   openssl req -new -nodes -keyout example_certs/gateway.key -out example_certs/gateway.csr -config example_certs/gateway.cnf
+   openssl x509 -req -sha256 -days 365 \
+     -CA example_certs/root.crt -CAkey example_certs/root.key -set_serial 0 \
+     -in example_certs/gateway.csr -out example_certs/gateway.crt \
+     -extfile example_certs/gateway.cnf -extensions req_ext
+   ```
+
+5. Create a Kubernetes secret to store your server TLS certificate. You create the secret in the same cluster and namespace that the gateway is deployed to.
    ```sh
    kubectl create secret tls -n {{< reuse "docs/snippets/namespace.md" >}} https \
      --key example_certs/gateway.key \

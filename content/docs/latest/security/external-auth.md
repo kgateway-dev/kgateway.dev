@@ -288,7 +288,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
        kind: HTTPRoute
        name: httpbin
      extAuth:
-       enablement: DisableAll
+       disable: {}
    EOF
    ```
 

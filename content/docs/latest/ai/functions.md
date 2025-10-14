@@ -3,6 +3,8 @@ title: Function calling
 weight: 35
 ---
 
+{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+
 ## About function calling {#about}
 
 Large Language Models (LLMs) are limited by static training data. This limitation can make seemingly simple questions difficult to answer. For example, consider the following question:
