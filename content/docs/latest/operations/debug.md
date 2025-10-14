@@ -12,10 +12,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 1. Enable port-forwarding on the control plane.
 
    ```sh
-   kubectl port-forward deploy/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 9097:9097
+   kubectl port-forward deploy/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 9095
    ```
 
-2. In your browser, open the admin server debugging interface: [http://localhost:9097/](http://localhost:9097/).
+2. In your browser, open the admin server debugging interface: [http://localhost:9095/](http://localhost:9095/).
 
    {{< reuse-image src="img/admin-server-debug-ui.png" caption="Figure: Admin server debugging interface.">}}
    {{< reuse-image-dark srcDark="img/admin-server-debug-ui.png" caption="Figure: Admin server debugging interface.">}}

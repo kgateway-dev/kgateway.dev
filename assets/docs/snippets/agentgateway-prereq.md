@@ -6,6 +6,6 @@
    
    Example output: 
    ```
-   agentGateway:
+   agentgateway:
      enabled: true
    ```

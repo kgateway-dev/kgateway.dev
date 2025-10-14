@@ -29,12 +29,12 @@ CORS policies are typically implemented to limit access to server resources for 
 
 You can configure the CORS policy at two levels:
 
-* HTTPRoute: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any TrafficPolicy CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
-* TrafficPolicy: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the TrafficPolicy. You can attach a TrafficPolicy to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+* **HTTPRoute**: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any {{< reuse "docs/snippets/trafficpolicy.md" >}} CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
+* **{{< reuse "docs/snippets/trafficpolicy.md" >}}**: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. You can attach a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [{{< reuse "docs/snippets/trafficpolicy.md" >}} concept docs](../../about/policies/trafficpolicy/).
 
 ### Known limitations {#limitations}
 
-The CORS filter supports only exact matches, not wildcard matchers. This limitation applies to both the HTTPRoute and TrafficPolicy. For example, you cannot set the `allowOrigins` field to `https://*.example.com/` or `allowHeaders` to `X-Custom-*`.
+The CORS filter supports only exact matches, not wildcard matchers. This limitation applies to both the HTTPRoute and {{< reuse "docs/snippets/trafficpolicy.md" >}}. For example, you cannot set the `allowOrigins` field to `https://*.example.com/` or `allowHeaders` to `X-Custom-*`.
 
 ## Before you begin
 
@@ -42,7 +42,7 @@ The CORS filter supports only exact matches, not wildcard matchers. This limitat
 
 ## Set up CORS policies
 
-Create a CORS policy for the httpbin app in an HTTPRoute or TrafficPolicy.
+Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 {{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab tabName="CORS in HTTPRoute" %}}
@@ -84,13 +84,13 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="CORS in TrafficPolicy" %}}
-1. Create a TrafficPolicy resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
+{{% tab tabName="CORS in GlooTrafficPolicy" %}}
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: httpbin-cors
      namespace: httpbin
@@ -114,7 +114,7 @@ EOF
    EOF
    ```
 
-2. Attach the TrafficPolicy to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the TrafficPolicy attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [TrafficPolicy concept docs](/docs/about/policies/trafficpolicy/).
+2. Attach the {{< reuse "docs/snippets/trafficpolicy.md" >}} to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the {{< reuse "docs/snippets/trafficpolicy.md" >}} attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [{{< reuse "docs/snippets/trafficpolicy.md" >}} concept docs](/docs/about/policies/trafficpolicy/).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -133,8 +133,8 @@ EOF
        - filters:
            - type: ExtensionRef
              extensionRef:
-               group: gateway.kgateway.dev
-               kind: TrafficPolicy
+               group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+               kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
                name: httpbin-cors
          backendRefs:
            - name: httpbin
@@ -147,7 +147,7 @@ EOF
 
 ## Test CORS policies
 
-Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you can test the policies.
+Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can test the policies.
 
 1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
@@ -196,7 +196,7 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
    ...
    ```
    {{% /tab %}}
-   {{% tab tabName="CORS in TrafficPolicy" %}}
+   {{% tab tabName="CORS in GlooTrafficPolicy" %}}
    ```console {hl_lines=[7,8,9]}
    HTTP/1.1 200 OK
    x-correlation-id: aaaaaaaa
@@ -267,10 +267,10 @@ Now that you have CORS policies applied via an HTTPRoute or TrafficPolicy, you c
 kubectl delete httproute httpbin-cors -n httpbin
 ```
 {{% /tab %}}
-{{% tab tabName="CORS in TrafficPolicy" %}}
+{{% tab tabName="CORS in GlooTrafficPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
-kubectl delete trafficpolicy httpbin-cors -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cors -n httpbin
 ```
 {{% /tab %}}
 {{< /tabs >}}
