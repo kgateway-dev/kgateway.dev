@@ -1,13 +1,10 @@
 ```mermaid
-graph TD
+graph LR
     Client -->|inference request| kgateway
-    kgateway -->|route to| InferencePool
-    InferencePool --> InferenceModel_v1["InferenceModel v1"]
-    InferencePool --> InferenceModel_v2["InferenceModel v2"]
-    InferencePool --> InferenceModel_v3["InferenceModel v3"]
+    kgateway -->|routes to| InferencePool
     subgraph  
         subgraph InferencePool
-            direction TB
+            direction LR
             InferenceModel_v1
             InferenceModel_v2
             InferenceModel_v3

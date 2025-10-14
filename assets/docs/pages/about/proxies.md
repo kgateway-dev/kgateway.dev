@@ -22,7 +22,7 @@ For more information, see the other docs in this [About](../) section.
 
 ## Supported gateway proxies {#supported}
 
-Kgateway supports the following gateway proxies. You can use both gateway proxies in the same Kubernetes cluster, depending on your use case.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following gateway proxies. You can use both gateway proxies in the same Kubernetes cluster, depending on your use case.
 
 | Gateway proxy | Primary use cases | Description | Doc sections |
 | --- | --- | --- | --- |

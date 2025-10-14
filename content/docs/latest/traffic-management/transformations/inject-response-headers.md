@@ -19,6 +19,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    * `x-response-raw`: Adds a static string values of `hello` with all escape characters intact.
    * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
    
+   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
+   {{% tab tabName="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -46,6 +48,37 @@ Use an Inja template to extract a value from a request header and add it as a he
            value: '{{ replace_with_random(request_header("baz"), "pattern-to-replace") }}'
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Agentgateway" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:     
+       response:
+         set:
+         - name: x-gateway-response
+           value: 'request.headers["x-gateway-request"]'
+         - name: x-podname
+           value: 'request.headers["x-pod-name"]'
+         - name: x-season
+           value: '"summer"'
+         - name: x-response-raw
+           value: '"hello"'
+         - name: x-replace
+           value: 'request.headers["baz"].replace("pattern-to-replace", string(random()))'
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 2. Send a request to the httpbin app and include the `x-gateway-request` and `baz` request headers. Verify that you get back a 200 HTTP response code and that the following response headers are included:
    * `x-podname` that is set to the name of the gateway proxy pod.

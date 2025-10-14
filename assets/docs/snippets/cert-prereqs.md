@@ -1,6 +1,6 @@
-1. Set up kgateway by following the [Quick start](/docs/quickstart/) or [Installation](/docs/operations/install/) guides.
+1. Set up kgateway by following the [Quick start]({{< link-hextra path="/quickstart/" >}}) or [Installation]({{< link-hextra path="/install/" >}}) guides.
 
-2. [Deploy the httpbin sample app](/docs/operations/sample-app/).
+2. [Deploy the httpbin sample app]({{< link-hextra path="/install/sample-app/" >}}).
 
 3. Make sure that you have the OpenSSL version of `openssl`, not LibreSSL. The `openssl` version must be at least 1.1.
    1. Check the `openssl` version that is installed. If you see LibreSSL in the output, continue to the next step.

@@ -68,11 +68,11 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    EOF
    ```
 
-2. Create the BackendTLSPolicy.
+2. Create the BackendTLSPolicy. Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
 
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3
+   apiVersion: gateway.networking.k8s.io/v1
    kind: BackendTLSPolicy
    metadata:
      name: nginx-tls-policy
@@ -193,10 +193,10 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
    
-2. Create a BackendTLSPolicy resource that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. 
+2. Create a BackendTLSPolicy resource that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha3	
+   apiVersion: gateway.networking.k8s.io/v1
    kind: BackendTLSPolicy
    metadata:
      name: httpbin-org
