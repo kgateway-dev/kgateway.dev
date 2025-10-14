@@ -46,7 +46,7 @@ EOF
 
 You are now ready to try out agentgateway. Check out the [agentgateway guides](/docs/latest/agentgateway/) to learn how to route traffic to an LLM provider, MCP tool server, or agent. 
 
-### K8s GW API 1.3.0 and Inference Extenstion 1.0
+### K8s GW API 1.3.0 and Inference Extension 1.0
 
 Kgateway is now fully conformant with the Kubernetes Gateway API version 1.3.0 and Inference Extension version 1.0. To learn more, check out the conformance test reports: 
 
