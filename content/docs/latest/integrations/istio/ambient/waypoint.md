@@ -3,7 +3,12 @@ title: Waypoint proxy
 weight: 20
 ---
 
+{{< callout type="warning" >}}
+The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](../../agentgateway/) instead.
+{{< /callout >}}
+
 Enforce Layer 7 policies for the apps in your ambient mesh by using {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy.
+
 
 ## About ambient mesh
 
@@ -270,8 +275,31 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
 ## Create a waypoint proxy
 
 Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deploy {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy in your cluster. 
+
+1. Enable the waypoint integration in your kgateway Helm chart. 
+   ```sh
+   helm get values {{< reuse "/docs/snippets/kgateway.md" >}} -n {{< reuse "/docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/docs/snippets/kgateway.md" >}}.yaml
+   
+   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
+   kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
+   --set controller.image.pullPolicy=Always \
+   --set waypoint.enabled=true \
+   --values {{< reuse "/docs/snippets/kgateway.md" >}}.yaml
+   ```
+
+2. Verify that you see the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass in your cluster. 
+   ```sh
+   kubectl get gatewayclasses -A
+   ```
+   
+   Example output: 
+   ```
+   NAME                CONTROLLER              ACCEPTED   AGE
+   kgateway            kgateway.dev/kgateway   True       2d19h
+   kgateway-waypoint   kgateway.dev/kgateway   True       1s
+   ```
   
-1. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
+3. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -288,7 +316,7 @@ Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deplo
    EOF
    ```
 
-2. Wait for the waypoint proxy to deploy successfully.
+4. Wait for the waypoint proxy to deploy successfully.
    ```sh
    kubectl -n httpbin rollout status deploy {{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
@@ -298,13 +326,13 @@ Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deplo
    deployment "{{< reuse "/docs/snippets/waypoint-class.md" >}}" successfully rolled out
    ```
 
-3. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
+5. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
    ```sh
    kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
    kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
 
-4. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
+6. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
    ```sh
     kubectl -n httpbin exec deploy/client -- curl -s http://httpbin2:8000/get
     kubectl -n httpbin exec deploy/client -- curl -s http://httpbin3:8000/get
