@@ -54,7 +54,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
 
       ```sh
       helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}}
-      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-v{{< reuse "docs/versions/n-patch.md" >}}.tgz
+      tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-{{< reuse "docs/versions/helm-version-flag.md" >}}.tgz
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
       
