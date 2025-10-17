@@ -15,7 +15,7 @@ Next, you set up an HTTPRoute resource to route requests through the Gateway to 
 
 Set up an HTTP listener on your Gateway. 
 
-If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](/docs/setup/listeners/overview/#listenersets).
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)]({{< link-hextra path="/setup/listeners/overview/#listenersets" >}}).
 * {{< reuse "docs/versions/warn-2-1-only.md" >}} 
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
