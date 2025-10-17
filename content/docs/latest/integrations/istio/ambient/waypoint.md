@@ -6,9 +6,6 @@ weight: 20
 {{< callout type="warning" >}}
 The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](../../agentgateway/) instead.
 {{< /callout >}}
-{{< callout type="warning" >}}
-The waypoint integration for Envoy-based gateway proxies is alpha. If you are interested in trying out waypoints with kgateway, reach out to the kgateway maintainers on [Slack](https://kgateway.dev/slack/).
-{{< /callout >}}
 
 Enforce Layer 7 policies for the apps in your ambient mesh by using {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy.
 
