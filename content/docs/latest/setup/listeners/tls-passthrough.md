@@ -131,7 +131,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 
 To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
-If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)](/docs/setup/listeners/overview/#listenersets).
+If you plan to set up your listener as part of a ListenerSet, keep the following considerations in mind. For more information, see [ListenerSets (experimental)]({{< link-hextra path="/setup/listeners/overview/#listenersets" >}}).
 * {{< reuse "docs/versions/warn-2-1-only.md" >}} 
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
