@@ -1,8 +1,21 @@
-node_modules/
-public/
-resources/
-!content/resources/
-!layouts/resources
+# Build / generated files
 .hugo_build.lock
 hugo_stats.json
+
+# Node dependencies
+node_modules/
+
+# Editor settings
 .vscode/
+.cursor/
+
+# Public build artifacts
+public/
+
+# Hugo resource files
+resources/
+!content/resources/
+!layouts/resources/
+
+# macOS system files
+.DS_Store
