@@ -64,6 +64,11 @@ menu:
       weight: 5
       params:
         type: search
+    - name: GitHub
+      weight: 10
+      url: "https://github.com/kgateway-dev/kgateway.dev"
+      params:
+        icon: github
 
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
