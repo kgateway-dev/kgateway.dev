@@ -27,6 +27,7 @@ To establish a dedicated, policy-enforced egress path, we must combine three cor
 * Define the Gateway resource, leveraging the kgateway GatewayClass to instantiate a dedicated proxy that is explicitly listening for outbound traffic to the Ollama host with an HTTPRoute.
 
 ```yaml
+kubectl apply -f - <<EOF
 # ollama-serviceentry.yaml
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
@@ -85,6 +86,7 @@ spec:
   - backendRefs:
     - name: ollama-external-host
       port: 11434
+EOF
 ```
 ## Managing CEL based RBAC and integrating exAuth with Kyverno into our Request FLow
 <!-- For exmple - Kyverno for applying with demo video
@@ -128,7 +130,6 @@ spec:
     protocol: TCP
   selector:
     app: ext-authz
-EOF
 ---
 # kGateway External Auth Policy
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -149,6 +150,7 @@ spec:
     failOpen: false
     requestAttributes:
       allowedHeaders: ["x-ollama-apikey"]
+EOF
 ```
 # Kyverno Configuration Policy/ Configuration Governance
 
@@ -184,6 +186,7 @@ To test the security policies applied by kGateway, we use a simple Pod named cur
 
 ```YAML
 # Kubernetes Manifest: client-pod.yaml
+kubectl apply -f - <<EOF
 apiVersion: v1
 kind: Pod
 metadata:
@@ -198,6 +201,7 @@ spec:
     image: curlimages/curl
     command: ["sleep", "3600"]
     imagePullPolicy: IfNotPresent
+EOF
 ```
 We will use the client pod to execute tests against the ollama-external-host via the kGateway path. All tests below assume successful completion of the Host Firewall Fix.
 # Demo
