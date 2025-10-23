@@ -8,7 +8,7 @@ Fine-tune connection speeds for read and write operations by setting a connectio
 
 By default, {{< reuse "/docs/snippets/kgateway.md" >}} is set up with 1MiB of request read and write buffer for each gateway. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "/docs/snippets/kgateway.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 413 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service. Alternatively, when using {{< reuse "/docs/snippets/kgateway.md" >}} as an edge proxy, configuring the buffer limit can be important when dealing with untrusted downstreams. By setting the limit to a small number, such as 32KiB, you can better guard against potential attacks or misconfigured downstreams that could excessively use the proxy's resources.
 
-The connection buffer limit can be configured on the Gateway level{{% version include-if="2.2.x,2.1.x" %}} or on an individual route{{% /version %}}. 
+The connection buffer limit can be configured on the Gateway level{{< version include-if="2.2.x,2.1.x" >}} or on an individual route{{< /version >}}. 
 
 ## Considerations when using httpbin
 
@@ -154,8 +154,8 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 1. Delete the {{< reuse "/docs/snippets/trafficpolicy.md" >}} resources.
    ```sh
-   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin {{% version include-if="2.2.x,2.1.x" %}}
-   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin {{% /version %}}
+   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin {{< version include-if="2.2.x,2.1.x" >}}
+   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin {{< /version >}}
    ```
 
 2. Remove the buffer limit annotation from the http Gateway resource.

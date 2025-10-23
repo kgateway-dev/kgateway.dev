@@ -2,7 +2,7 @@ You can update several installation settings in your Helm values file. For examp
 
 For more information, see the [Helm reference docs]({{< link-hextra path="/reference/helm/" >}}).
 
-{{% version include-if="2.2.x,2.1.x" %}}
+{{< version include-if="2.2.x,2.1.x" >}}
 
 ## Agentgateway and AI extensions {#agentgateway-ai-extensions}
 
@@ -16,13 +16,13 @@ gateway:
     enabled: true
 ```
 
-{{% /version %}}
+{{< /version >}}
 
 ## Development builds
 
 When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
-{{% version include-if="2.2.x,2.1.x" %}}
+{{< version include-if="2.2.x,2.1.x" >}}
 
 ## Leader election
 
@@ -36,7 +36,7 @@ controller:
   disableLeaderElection: true
 ```
 
-{{% /version %}}
+{{< /version >}}
 
 ## Namespace discovery {#namespace-discovery}
 
@@ -69,10 +69,10 @@ discoveryNamespaceSelectors:
     version: v3
 ```
 
-{{% version include-if="2.2.x,2.1.x" %}}
+{{< version include-if="2.2.x,2.1.x" >}}
 
 ## TLS encryption {#tls-encryption}
 
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.
 
-{{% /version %}}
+{{< /version >}}

@@ -34,7 +34,7 @@
             <!-- WARNING substring matches are matches as well! That means, if include-if="foobar", and buildcondition is "foo", you have a match!-->
             {{- if in $include_if $versionToml -}}
     <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
-{{- $.Inner -}}
+{{- $.Inner | markdownify  -}}
         {{- else -}}
         {{- end -}}
     {{- else -}}
@@ -43,7 +43,7 @@
             <!-- WARNING substring matches are matches as well! That means, if exclude-if="foobar", and buildcondition is "foo", you have a match!-->
             {{- if in $exclude_if $versionToml -}}
     <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
-{{- .Inner -}}
+{{- .Inner | markdownify -}}
             {{- end -}}
         {{- end -}}
 

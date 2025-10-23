@@ -14,18 +14,18 @@
    {{< /tabs >}}
 
 2. Deploy the kgateway CRDs by using Helm.
-   {{% version include-if="2.2.x" %}}
+   {{< version include-if="2.2.x" >}}
    ```sh
    helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
    kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --set controller.image.pullPolicy=Always
    ```
-   {{% /version %}}
-   {{% version include-if="2.0.x,2.1.x" %}}
+   {{< /version >}}
+   {{< version include-if="2.0.x,2.1.x" >}}
    ```sh
    helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds
    ```
-   {{% /version %}}
+   {{< /version >}}
 
 3. Install kgateway by using Helm. Choose the [data plane gateway proxy]({{< link-hextra path="/about/proxies#supported" >}}) that you want to use, such as kgateway for API ingress or agentgateway for AI use cases.
    {{< version include-if="2.2.x" >}}
@@ -46,11 +46,11 @@
    {{% /tab %}}
    {{< /tabs >}}
    {{< /version >}}
-   {{% version include-if="2.0.x,2.1.x" %}}
+   {{< version include-if="2.0.x,2.1.x" >}}
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway
    ```
-   {{% /version %}}
+   {{< /version >}}
 
 4. Make sure that `kgateway` is running.
 
