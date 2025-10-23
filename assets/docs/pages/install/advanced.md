@@ -6,14 +6,11 @@ For more information, see the [Helm reference docs]({{< link-hextra path="/refer
 
 ## Agentgateway and AI extensions {#agentgateway-ai-extensions}
 
-To enable the [Agentgateway](../../agentgateway/) and [AI extensions](../../ai/), set the following values in your Helm values file.
+To enable the [agentgateway]({{< link-hextra path="/agentgateway/" >}}) integration, set the following values in your Helm values file.
 
 ```yaml
 agentgateway:
   enabled: true
-gateway:
-  aiExtension:
-    enabled: true
 ```
 
 {{< /version >}}
