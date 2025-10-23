@@ -213,7 +213,7 @@ The documentation maintainers of the kgateway project will review your pull requ
 The kgateway project automatically generates the following documentation from the code.
 
 * [API reference]({{< link-hextra path="/reference/api/" >}})
-* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{% version include-if="2.2.x,2.1.x" %}}
-* [Control plane metrics](../../../observability/control-plane-metrics/){{% /version %}}
+* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{< version include-if="2.2.x,2.1.x" >}}
+* [Control plane metrics](../../../observability/control-plane-metrics/){{< /version >}}
 
 To learn more about how to generate these docs, see the [GitHub Workflows README](https://github.com/kgateway-dev/kgateway.dev/tree/main/.github/workflows/README.md).

@@ -1,5 +1,5 @@
-{{ $path := .Get "path" }}
-{{ $rel := .Page.RelPermalink }}
-{{ $match := findRE `^/[^/]+/[^/]+` $rel }}
-{{ $prefix := index $match 0 }}
-{{ $prefix }}{{ $path }}
+{{- $path := .Get "path" -}}
+{{- $rel := .Page.RelPermalink -}}
+{{- $match := findRE `^/[^/]+/[^/]+` $rel -}}
+{{- $prefix := index $match 0 -}}
+{{- $prefix }}{{ $path -}}
