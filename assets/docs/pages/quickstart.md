@@ -24,7 +24,7 @@ Set up the data plane by choosing a gateway proxy depending on your use case.
 
 {{< version include-if="2.2.x,2.1.x" >}}
 
-{{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool server](../agentgateway/). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
+{{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool server]({{< link-hextra path="/agentgateway/setup/" >}}). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
 
 {{< /version >}}
 
