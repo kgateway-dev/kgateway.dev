@@ -9,6 +9,7 @@ For more information, see the [Helm reference docs]({{< link-hextra path="/refer
 To enable the [agentgateway]({{< link-hextra path="/agentgateway/" >}}) integration, set the following values in your Helm values file.
 
 ```yaml
+
 agentgateway:
   enabled: true
 ```
