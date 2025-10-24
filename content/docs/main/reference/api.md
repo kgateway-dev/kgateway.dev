@@ -57,7 +57,6 @@ _Appears in:_
 | `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
 | `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
 | `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
-| `routeType` _[RouteType](#routetype)_ | The type of route to the LLM provider API. Currently, `CHAT` and `CHAT_STREAMING` are supported.<br />Note: This field is not applicable when using agentgateway | CHAT | Enum: [CHAT CHAT_STREAMING] <br /> |
 | `modelAliases` _object (keys:string, values:string)_ | ModelAliases maps friendly model names to actual provider model names.<br />Example: \{"fast": "gpt-3.5-turbo", "smart": "gpt-4-turbo"\}<br />Note: This field is only applicable when using the agentgateway data plane. |  |  |
 
 
@@ -66,7 +65,6 @@ _Appears in:_
 
 
 AIPromptEnrichment defines the config to enrich requests sent to the LLM provider by appending and prepending system prompts.
-This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API type.
 
 
 Prompt enrichment allows you to add additional context to the prompt before sending it to the model.
@@ -249,7 +247,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -813,15 +811,20 @@ enable shadow-only mode where policies will be evaluated and tracked, but not en
 add additional source origins that will be allowed in addition to the destination origin.
 
 
+Dataplane Support:
+- Envoy: Supports PercentageEnabled, PercentageShadowed, and AdditionalOrigins
+- Agentgateway: Only supports AdditionalOrigins (PercentageEnabled and PercentageShadowed are ignored)
+
+
 
 _Appears in:_
 - [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `percentageEnabled` _integer_ | Specifies the percentage of requests for which the CSRF filter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `percentageShadowed` _integer_ | Specifies that CSRF policies will be evaluated and tracked, but not enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
+| `percentageEnabled` _integer_ | Specifies the percentage of requests for which the CSRF filter is enabled.<br />Envoy: Supported<br />Agentgateway: Not supported (ignored) |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `percentageShadowed` _integer_ | Specifies that CSRF policies will be evaluated and tracked, but not enforced.<br />Envoy: Supported<br />Agentgateway: Not supported (ignored) |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin.<br />Envoy: Supported<br />Agentgateway: Supported |  | MaxItems: 16 <br /> |
 
 
 #### CommonAccessLogGrpcService
@@ -839,7 +842,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -866,7 +869,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -1301,9 +1304,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
+| `retry` _[GRPCRetryPolicy](#grpcretrypolicy)_ | Retry specifies the retry policy for gRPC streams associated with the service. |  |  |
 
 
 #### ExtProcPolicy
@@ -1469,6 +1473,40 @@ _Appears in:_
 | `responseFlagFilter` _[ResponseFlagFilter](#responseflagfilter)_ |  |  |  |
 | `grpcStatusFilter` _[GrpcStatusFilter](#grpcstatusfilter)_ |  |  |  |
 | `celFilter` _[CELFilter](#celfilter)_ |  |  |  |
+
+
+#### GRPCRetryBackoff
+
+
+
+
+
+
+
+_Appears in:_
+- [GRPCRetryPolicy](#grpcretrypolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BaseInterval specifies the base interval used with a fully jittered exponential back-off between retries. |  |  |
+| `maxInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxInterval specifies the maximum interval between retry attempts.<br />Defaults to 10 times the BaseInterval if not set. |  |  |
+
+
+#### GRPCRetryPolicy
+
+
+
+
+
+
+
+_Appears in:_
+- [ExtGrpcService](#extgrpcservice)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `attempts` _integer_ | Attempts specifies the number of retry attempts for a request.<br />Defaults to 1 attempt if not set.<br />A value of 0 effectively disables retries. | 1 | Minimum: 0 <br /> |
+| `backoff` _[GRPCRetryBackoff](#grpcretrybackoff)_ | Backoff specifies the retry backoff strategy.<br />If not set, a default backoff with a base interval of 1000ms is used. The default max interval is 10 times the base interval. |  |  |
 
 
 #### GatewayExtension
@@ -2056,6 +2094,7 @@ _Appears in:_
 | `port` _integer_ | Port specifies the port to send the requests to. |  |  |
 | `path` _[PathOverride](#pathoverride)_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
 | `authHeader` _[AuthHeader](#authheader)_ | AuthHeader specifies how the Authorization header is set in the request sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
+| `routes` _object (keys:string, values:[RouteType](#routetype))_ | Routes defines how to identify the type of traffic to handle.<br />The keys are URL path suffixes matched using ends-with comparison (e.g., "/v1/chat/completions").<br />The special "*" wildcard matches any path.<br />If not specified, all traffic defaults to "completions" type. |  |  |
 
 
 #### LoadBalancer
@@ -2531,6 +2570,7 @@ _Appears in:_
 | `port` _integer_ | Port specifies the port to send the requests to. |  |  |
 | `path` _[PathOverride](#pathoverride)_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
 | `authHeader` _[AuthHeader](#authheader)_ | AuthHeader specifies how the Authorization header is set in the request sent to the LLM provider.<br />Allows changing the header name and/or the prefix (e.g., "Bearer").<br />Note: Not all LLM providers use the Authorization header and prefix.<br />For example, OpenAI uses header: "Authorization" and prefix: "Bearer" But Azure OpenAI uses header: "api-key"<br />and no Bearer. |  |  |
+| `routes` _object (keys:string, values:[RouteType](#routetype))_ | Routes defines how to identify the type of traffic to handle.<br />The keys are URL path suffixes matched using ends-with comparison (e.g., "/v1/chat/completions").<br />The special "*" wildcard matches any path.<br />If not specified, all traffic defaults to "completions" type. |  |  |
 
 
 #### NamespacedObjectReference
@@ -2703,8 +2743,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Pod object metadata. |  |  |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata. |  |  |
+| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Pod object metadata.<br />If the same label is present on `Gateway.spec.infrastructure.labels`, the `Gateway` takes precedence. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
 | `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
 | `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
@@ -2732,7 +2772,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `ancestorRef` _[ParentReference](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
+| `ancestorRef` _[ParentReference](https://gateway-api.sigs.k8s.io/reference/spec/#parentreference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
 | `controllerName` _string_ | ControllerName is a domain/path string that indicates the name of the<br />controller that wrote this status. This corresponds with the<br />controllerName field on GatewayClass.<br /><br />Example: "example.net/gateway-controller".<br /><br />The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are<br />valid Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).<br /><br />Controllers MUST populate this field when writing status. Controllers should ensure that<br />entries to status populated with their ControllerName are cleaned up when they are no<br />longer necessary. |  |  |
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
@@ -3169,17 +3209,22 @@ _Appears in:_
 
 _Underlying type:_ _string_
 
-RouteType is the type of route to the LLM provider API.
+RouteType specifies how the AI gateway should process incoming requests
+based on the URL path and the API format expected.
 
-
+_Validation:_
+- Enum: [completions messages models passthrough]
 
 _Appears in:_
-- [AIPolicy](#aipolicy)
+- [LLMProvider](#llmprovider)
+- [NamedLLMProvider](#namedllmprovider)
 
 | Field | Description |
 | --- | --- |
-| `CHAT` | The LLM generates the full response before responding to a client.<br /> |
-| `CHAT_STREAMING` | Stream responses to a client, which allows the LLM to stream out tokens as they are generated.<br /> |
+| `completions` | RouteTypeCompletions processes OpenAI /v1/chat/completions format requests<br /> |
+| `messages` | RouteTypeMessages processes Anthropic /v1/messages format requests<br /> |
+| `models` | RouteTypeModels handles /v1/models endpoint (returns available models)<br /> |
+| `passthrough` | RouteTypePassthrough sends requests to upstream as-is without LLM processing<br /> |
 
 
 #### Sampler
@@ -3281,8 +3326,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `type` _[ServiceType](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#servicetype-v1-core)_ | The Kubernetes Service type. |  | Enum: [ClusterIP NodePort LoadBalancer ExternalName] <br /> |
 | `clusterIP` _string_ | The manually specified IP address of the service, if a randomly assigned<br />IP is not desired. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#choosing-your-own-ip-address<br />and<br />https://kubernetes.io/docs/concepts/services-networking/service/#headless-services<br />on the implications of setting `clusterIP`. |  |  |
-| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata. |  |  |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata. |  |  |
+| `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the Service object metadata.<br />If the same label is present on `Gateway.spec.infrastructure.labels`, the `Gateway` takes precedence. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
 | `externalTrafficPolicy` _string_ | ExternalTrafficPolicy defines the external traffic policy for the service.<br />Valid values are Cluster and Local. Default value is Cluster. |  |  |
 
@@ -3301,7 +3346,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  |  |
-| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata. |  |  |
+| `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 
 
 #### SingleAuthToken
