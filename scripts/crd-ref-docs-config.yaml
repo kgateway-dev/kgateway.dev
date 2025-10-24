@@ -29,16 +29,16 @@ render:
     # Gateway API types
     - name: BackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendref
     - name: BackendObjectReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendObjectReference
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference
     - name: ParentReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
     - name: GRPCBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCBackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#grpcbackendref
     - name: HTTPBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPBackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#httpbackendref
