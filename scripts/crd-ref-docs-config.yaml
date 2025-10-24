@@ -9,7 +9,7 @@ render:
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
     - name: Duration
       package: k8s.io/apimachinery/pkg/apis/meta/v1
-      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#Duration
     - name: Time
       package: k8s.io/apimachinery/pkg/apis/meta/v1
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
@@ -24,7 +24,7 @@ render:
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
     - name: TypeMeta
       package: k8s.io/apimachinery/pkg/apis/meta/v1
-      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#TypeMeta
     
     # Gateway API types
     - name: BackendRef

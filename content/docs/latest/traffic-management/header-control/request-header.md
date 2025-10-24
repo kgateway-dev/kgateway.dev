@@ -15,7 +15,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 Add headers to incoming requests before they are forwarded to an upstream service. If the request already has the header set, the value of the header in the `RequestHeaderModifier` filter is appended to the value of the header in the request. 
 
-1. Set up a header modifier that adds a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy.
+1. Set up a header modifier that adds a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy.
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -191,7 +191,7 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
 
 Setting headers is similar to adding headers. If the request does not include the header, it is added by the `RequestHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `RequestHeaderModifier` filter. 
 
-1. Set up a header modifier that sets a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+1. Set up a header modifier that sets a `my-header: hello` request header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -406,7 +406,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    }
    ```
 
-2. Set up a header modifier that removes the `User-Agent` header when requests are sent to the `headers.example` domain. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+2. Set up a header modifier that removes the `User-Agent` header when requests are sent to the `headers.example` domain. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -548,7 +548,7 @@ You can return dynamic information about the request in the request header. For 
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}} 
 
-1. Set up a header modifier that sets the `X-Client-Ip` header with the value of the downstream remote address. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+1. Set up a header modifier that sets the `X-Client-Ip` header with the value of the downstream remote address. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
