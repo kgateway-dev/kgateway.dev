@@ -15,7 +15,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
-1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy.
+1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy.
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -151,7 +151,7 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
 
 Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
 
-1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -317,7 +317,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    server: envoy
    ```
    
-2. Set up a header modifier that removes the `content-length` header from the response. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+2. Set up a header modifier that removes the `content-length` header from the response. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
@@ -455,7 +455,7 @@ You can return dynamic information about the response in the response header. Fo
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}} 
 
-1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../about/policies/trafficpolicy/) such as a gateway-level policy. 
+1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
    {{% tab tabName="HTTPRoute" %}}
    ```yaml
