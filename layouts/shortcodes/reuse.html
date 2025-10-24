@@ -17,6 +17,6 @@
 {{- end }}
 
 {{- /* Render resource content. */}}
-{{- $r.Content | .Page.RenderString }}
+{{- $r.Content | .Page.RenderString | chomp }}
 
 {{- /* Chomp trailing newlines. */ -}}
