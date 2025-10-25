@@ -71,7 +71,7 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
    ```
 
 4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/anything \
@@ -145,7 +145,9 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
    ```
    
 {{< version include-if="2.2.x,2.1.x" >}}
+
 {{< reuse "docs/snippets/buffering-route.md" >}}
+
 {{< /version >}}
 
 ## Cleanup
@@ -154,7 +156,8 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 1. Delete the {{< reuse "/docs/snippets/trafficpolicy.md" >}} resources.
    ```sh
-   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin {{< version include-if="2.2.x,2.1.x" >}}
+   kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin 
+   {{< version include-if="2.2.x,2.1.x" >}}
    kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin {{< /version >}}
    ```
 
@@ -177,3 +180,6 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
            from: All
    EOF
    ```
+
+
+   

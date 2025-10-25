@@ -20,35 +20,40 @@
     {{- $exclude := .Get "exclude-if" | default "" -}}
     {{- $exclude_if := split $exclude "," -}}
 
-    {{ range .Site.Params.versions }} 
+{{- $shouldRender := false -}}
+{{- $currentVersionToml := "" -}}
 
-     {{- if in $condition .linkVersion -}}
-       {{- $versionToml := .version -}}
-     
-        {{- if and (in $include_if $versionToml ) (in $exclude_if $versionToml) -}}
-            <!-- condition appears in both parameters -->
-            {{- errorf "Build condition %q appears in both include-if and exclude-if parameters of conditional-txt shortcode on page %s" $condition .Position -}}
+{{- /* First pass: determine if content should be rendered */ -}}
+{{ range .Site.Params.versions }} 
+ {{- if in $condition .linkVersion -}}
+   {{- $versionToml := .version -}}
+   {{- $currentVersionToml = $versionToml -}}
+ 
+    {{- if and (in $include_if $versionToml ) (in $exclude_if $versionToml) -}}
+        <!-- condition appears in both parameters -->
+        {{- errorf "Build condition %q appears in both include-if and exclude-if parameters of conditional-txt shortcode on page %s" $condition .Position -}}
+    {{- end -}}
+
+    {{- if isset $.Params "include-if" -}}
+        <!-- WARNING substring matches are matches as well! That means, if include-if="foobar", and buildcondition is "foo", you have a match!-->
+        {{- if in $include_if $versionToml -}}
+          {{- $shouldRender = true -}}
         {{- end -}}
-
-        {{- if isset $.Params "include-if" -}}
-            <!-- WARNING substring matches are matches as well! That means, if include-if="foobar", and buildcondition is "foo", you have a match!-->
-            {{- if in $include_if $versionToml -}}
-    <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
-{{- $.Inner | markdownify  -}}
-        {{- else -}}
+    {{- else if isset $.Params "exclude-if" -}}
+        <!-- WARNING substring matches are matches as well! That means, if exclude-if="foobar", and buildcondition is "foo", you have a match!-->
+        {{- if not (in $exclude_if $versionToml) -}}
+          {{- $shouldRender = true -}}
         {{- end -}}
     {{- else -}}
-
-        {{- if isset $.Params "exclude-if" -}}
-            <!-- WARNING substring matches are matches as well! That means, if exclude-if="foobar", and buildcondition is "foo", you have a match!-->
-            {{- if in $exclude_if $versionToml -}}
-    <!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
-{{- .Inner | markdownify -}}
-            {{- end -}}
-        {{- end -}}
-
+        {{- $shouldRender = true -}}
     {{- end -}}
+ {{- end -}}
 {{- end -}}
+
+{{- /* Second pass: render content only once if conditions are met */ -}}
+{{- if $shouldRender -}}
+<!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
+{{- $.Inner | $.Page.RenderString -}}
 {{- end -}}
 
 {{- end -}}
