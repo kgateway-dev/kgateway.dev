@@ -1,6 +1,6 @@
 Configure agentgateway with {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
-{{< reuse "docs/snippets/gatewayparameters.md" >}} provide a way for you to pass configuration for special use cases, such as passing in raw upstream configuration from a YAML or JSON file.
+{{< reuse "docs/snippets/gatewayparameters.md" >}} provide a way for you to pass configuration for special use cases, such as passing in raw upstream configuration from a YAML file.
 
 ## Before you begin
 
@@ -21,7 +21,7 @@ However, you might want to manage the configuration of agentgateway via a raw co
 
 Use a ConfigMap to pass upstream configuration settings directly to the agentgateway proxy. 
 
-1. Create a ConfigMap with your agentgateway configuration. This configuration defines the binds, listeners, routes, backends, and policies that you want agentgateway to use. The following example sets up a simple direct response listener on port 3000 that returns a `200 OK` response with the body `"hello!"` for requests to the `/direct` path.
+1. Create a ConfigMap with your agentgateway configuration. This configuration defines the binds, listeners, routes, backends, and policies that you want agentgateway to use. The key must be named `config.yaml`.The following example sets up a simple direct response listener on port 3000 that returns a `200 OK` response with the body `"hello!"` for requests to the `/direct` path.
 
    ```yaml
    kubectl apply -f- <<EOF
