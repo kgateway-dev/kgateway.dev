@@ -160,7 +160,7 @@ The following image illustrates the route delegation hierarchy:
    EOF
    ```
       
-5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path with the `header1=val1` request header and the `query1=val1` query parameter. Verify that you get back a 404 HTTP response code. Although you included the header and query parameters that are defined on the parent HTTPRoute resource, the headers and query parameters that the child HTTPRoute resource matches on are missing in your request.
+4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path with the `header1=val1` request header and the `query1=val1` query parameter. Verify that you get back a 404 HTTP response code. Although you included the header and query parameters that are defined on the parent HTTPRoute resource, the headers and query parameters that the child HTTPRoute resource matches on are missing in your request.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -184,7 +184,7 @@ The following image illustrates the route delegation hierarchy:
    transfer-encoding: chunked
    ```
    
-6. Send another request to the `delegation.example` domain along the `/anything/team1/foo` path. This time, you include all of the header and query parameters that the parent and child HTTPRoute resources defined. Verify that you get back a 200 HTTP response code. 
+5. Send another request to the `delegation.example` domain along the `/anything/team1/foo` path. This time, you include all of the header and query parameters that the parent and child HTTPRoute resources defined. Verify that you get back a 200 HTTP response code. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -212,7 +212,7 @@ The following image illustrates the route delegation hierarchy:
    transfer-encoding: chunked
    ```
 
-7. Send another request to the `delegation.example` domain along the `/anything/team2/bar` path that is configured on the `child-team2` HTTPRoute resource and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that you get back a 404 HTTP response code. Because the `child-team2` HTTPRoute resource does not specify the same header and query matchers as the parent HTTPRoute resource, the routing configuration is considered invalid. 
+6. Send another request to the `delegation.example` domain along the `/anything/team2/bar` path that is configured on the `child-team2` HTTPRoute resource and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that you get back a 500 HTTP response code. Because the `child-team2` HTTPRoute resource does not specify the same header and query matchers as the parent HTTPRoute resource, the routing configuration is considered invalid. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -230,10 +230,13 @@ The following image illustrates the route delegation hierarchy:
 
    Example output: 
    ```
-   HTTP/1.1 404 Not Found
+   HTTP/1.1 500 Internal Server Error
+   content-length: 73
+   content-type: text/plain
    date: Mon, 06 May 2024 16:01:48 GMT
    server: envoy
-   transfer-encoding: chunked
+
+   invalid route configuration detected and replaced with a direct response.%
    ```
    
 ## Inherit parent attributes
