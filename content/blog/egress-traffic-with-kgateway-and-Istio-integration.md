@@ -17,6 +17,21 @@ Kgateway has been built on same Envoy engine that Istio’s waypoint implementat
 <!-- Differences between Layer 4 and Layer 7 policies to cover how do they effect our workloads under Ingress and Egress Traffic.
 -->
 # How important is kgateway's integration
+Before integrating kagteway with Istio Ambient, ensure we have: 
+1. Set-up `kind` cluster.
+2. Setup Kuberntes Gateway API:
+   ```
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+   ```
+4. Follow the [Get started guide](https://kgateway.dev/docs/latest/quickstart/) to install kgateway.
+5. Follow the [Sample app guide](https://kgateway.dev/docs/latest/install/sample-app/) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
+6. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
+7. Deploy the Ollama Container at port number 11434, binding to 0.0.0.0 so the Kubernetes virtual machine can access it via the host's bridge network.
+   ```
+    docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
+   ```
+
+
 While Istio ambient provides Authorization, Authentication and Egress still, there are several scenarios where kgateway can offer a more powerful alternative:
 
 ## Securely Egress Traffic with kGateway + Istio Integration
@@ -51,6 +66,7 @@ spec:
   - address: 127.0.0.1 # IP that the egress proxy attempts to connect to
     ports:
       http-ollama: 11434
+---
 
 # egress-kgateway.yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -68,6 +84,7 @@ spec:
     allowedRoutes:
       namespaces:
         from: All
+---
 
 # ollama-egress-route.yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -102,11 +119,16 @@ kind: Deployment
 metadata:
   namespace: istio-system
   name: ext-authz-server
-  labels: {app: ext-authz}
+  labels:
+    app: ext-authz
 spec:
-  selector: {matchLabels: {app: ext-authz}}
+  selector:
+    matchLabels:
+      app: ext-authz
   template:
-    metadata: {labels: {app: ext-authz}}
+    metadata:
+      labels:
+        app: ext-authz
     spec:
       containers:
       - name: ext-authz
@@ -121,7 +143,8 @@ kind: Service
 metadata:
   namespace: istio-system
   name: ext-authz-server-svc
-  labels: {app: ext-authz}
+  labels:
+    app: ext-authz
 spec:
   ports:
   - name: grpc-authz
