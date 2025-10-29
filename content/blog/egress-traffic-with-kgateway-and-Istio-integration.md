@@ -28,7 +28,11 @@ Before integrating kagteway with Istio Ambient, ensure we have:
 6. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
 7. Deploy the Ollama Container at port number 11434, binding to 0.0.0.0 so the Kubernetes virtual machine can access it via the host's bridge network.
    ```
-    docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
+   docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
+   ```
+8. Get the Container IP of ollama which will be inserted at all the **`address filds` which is 127.17.0.2 in our case.
+   ```
+   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ollama-server
    ```
 
 
@@ -55,7 +59,8 @@ spec:
   hosts:
   - "host.docker.internal"
   addresses:
-  - 127.0.0.1/32
+   # Container_IP address of your ollama conatiner
+  - 127.17.0.2/32
   ports:
   - number: 11434
     name: http-ollama
@@ -63,7 +68,8 @@ spec:
   location: MESH_EXTERNAL
   resolution: STATIC
   endpoints:
-  - address: 127.0.0.1 # IP that the egress proxy attempts to connect to
+   # IP that the egress proxy attempts to connect to
+  - address: 127.17.0.2
     ports:
       http-ollama: 11434
 ---
@@ -208,10 +214,9 @@ EOF
 To test the security policies applied by kGateway, we use a simple Pod named curl-test-client. Its primary role is to serve as the mesh-enabled client that originates the outbound traffic, allowing us to test Layer 4 security (mTLS) and Layer 7 policies (CEL RBAC/ExtAuth). It is labeled for Ambient Mesh enrollment.
 
 ```YAML
-# Kubernetes Manifest: client-pod.yaml
 kubectl apply -f - <<EOF
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: curl-test-client
   namespace: default
@@ -219,13 +224,33 @@ metadata:
     app: curl-client
     istio.io/dataplane-mode: ambient
 spec:
-  containers:
-  - name: client
-    image: curlimages/curl
-    command: ["sleep", "3600"]
-    imagePullPolicy: IfNotPresent
+  replicas: 1
+  selector:
+    matchLabels:
+      app: curl-client
+  template:
+    metadata:
+      labels:
+        app: curl-client
+        istio.io/dataplane-mode: ambient
+    spec:
+      containers:
+      - name: client
+        image: curlimages/curl
+        # Keep the container running indefinitely for testing
+        command: ["sleep", "3600"] 
+        imagePullPolicy: IfNotPresent
 EOF
 ```
-We will use the client pod to execute tests against the ollama-external-host via the kGateway path. All tests below assume successful completion of the Host Firewall Fix.
+
+### Testinig Client
+We will use the client app to execute tests against the ollama-external-host via the kGateway path.
+```
+kubectl exec -it deploy/client -- curl http://host.docker.internal:11434
+```
+Expected Output: 
+```
+Ollama is running%
+```
 # Demo
 
