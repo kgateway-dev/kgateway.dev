@@ -104,7 +104,9 @@ jobs:
                                         capture_output=True, text=True, check=True)
                   if result.stdout.strip():
                       # Filter tags that match our version pattern
-                      pattern = f'v{version.replace(\".x\", r\"\\\\.\\\\d+\")}'  # 2.1.x becomes v2\.1\.\d+
+                      # Create regex pattern: 2.1.x becomes v2\.1\.\d+
+                      version_pattern = version.replace('.x', r'\.\d+')
+                      pattern = f'v{version_pattern}'
                       matching_tags = []
                       for line in result.stdout.strip().split('\n'):
                           if 'refs/tags/' in line:
