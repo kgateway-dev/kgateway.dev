@@ -2065,7 +2065,6 @@ _Appears in:_
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
 | `aiExtension` _[AiExtension](#aiextension)_ | Deprecated: `aiExtension` is deprecated in v2.1 and will be removed in v2.2.<br />Prefer to use `agentgateway` instead.<br /><br />Configuration for the AI extension. |  |  |
 | `agentgateway` _[Agentgateway](#agentgateway)_ | Configure the agentgateway integration. If agentgateway is disabled, the<br />EnvoyContainer values will be used by default to configure the data<br />plane proxy. |  |  |
-| `floatingUserId` _boolean_ | Deprecated: Prefer to use omitDefaultSecurityContext instead. Will be<br />removed in the next release.<br /><br />Used to unset the `runAsUser` values in security contexts. |  |  |
 | `omitDefaultSecurityContext` _boolean_ | OmitDefaultSecurityContext is used to control whether or not<br />`securityContext` fields should be rendered for the various generated<br />Deployments/Containers that are dynamically provisioned by the deployer.<br /><br />When set to true, no `securityContexts` will be provided and will left<br />to the user/platform to be provided.<br /><br />This should be enabled on platforms such as Red Hat OpenShift where the<br />`securityContext` will be dynamically added to enforce the appropriate<br />level of security. |  |  |
 
 

@@ -42,4 +42,3 @@ A Helm chart for the kgateway project
 | serviceAccount.create | bool | true | Specify whether a service account should be created. |
 | serviceAccount.name | string | "" | Set the name of the service account to use. If not set and create is true, a name is generated using the fullname template. |
 | tolerations | list | [] | Set tolerations for pod scheduling, such as 'key: "nvidia.com/gpu"'. |
-

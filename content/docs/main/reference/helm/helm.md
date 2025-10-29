@@ -48,5 +48,5 @@ A Helm chart for the kgateway project
 | tolerations | list |  | Set tolerations for pod scheduling, such as 'key: "nvidia.com/gpu"'. |
 | validation | object |  | Configure validation behavior for route and policy safety checks in the control plane.    This setting determines how invalid configuration is handled to prevent security bypasses    and to maintain multi-tenant isolation. |
 | validation.level | string |  | Validation level. Accepted values: "standard" or "strict" (case-insensitive).    Standard replaces invalid routes with a direct 500 response and continues applying valid configuration.    Strict adds xDS preflight validation and blocks snapshots that would NACK in Envoy.    Default is "standard". |
-| waypoint | object |  | Enable the waypoint integration. This enables kgateway to translate istio waypoints and use kgateway as a waypoint in an Istio Ambient service mesh setup.. |
+| waypoint | object |  | Enable the waypoint integration. This enables kgateway to translate istio waypoints and use kgateway as a waypoint in an Istio Ambient service mesh setup. |
 
