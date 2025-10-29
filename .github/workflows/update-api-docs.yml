@@ -4,15 +4,10 @@ on:
   workflow_dispatch:  # Allow manual triggers for now
     inputs:
       version:
-        description: 'Version to generate docs for (e.g., "2.2.x", "2.1.x", "2.0.x", or "all")'
+        description: 'Version to generate docs for (e.g., "2.2.x", "2.1.x", "2.0.x") or "all" for all versions'
         required: true
         default: 'all'
-        type: choice
-        options:
-          - 'all'
-          - '2.2.x'
-          - '2.1.x'
-          - '2.0.x'
+        type: string
   # Later we can add:
   # push:
   #   paths:
