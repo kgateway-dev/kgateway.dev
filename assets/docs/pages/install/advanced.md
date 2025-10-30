@@ -1,5 +1,19 @@
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
 
+* **Show all values**: 
+      
+  ```sh
+  helm show values oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+  ```
+
+* **Get a file with all values**: You can get a `{{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` file for the upgrade version by pulling and inspecting the Helm chart locally.
+      
+  ```sh
+  helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+  tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-{{< reuse "docs/versions/helm-version-upgrade.md" >}}.tgz
+  open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+  ```
+
 For more information, see the [Helm reference docs]({{< link-hextra path="/reference/helm/" >}}).
 
 {{< version include-if="2.2.x,2.1.x" >}}
