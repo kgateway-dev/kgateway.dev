@@ -10,9 +10,9 @@ Configure agentgateway with {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
 In upstream agentgateway, you can manage [configuration](https://agentgateway.dev/docs/configuration/overview/) via a YAML or JSON file. The configuration features of agentgateway are captured in the [schema of the agentgateway codebase](https://github.com/agentgateway/agentgateway/tree/main/schema). 
 
-Unlike in the upstream agentgateway project, these features are not exposed via a raw configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. Instead, the features are exposed in a Kubernetes Gateway API-native way as explained in the guides throughout this doc set. 
+Unlike in the upstream agentgateway project, you do not configure these features in a raw configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. Instead, you configure them in a Kubernetes Gateway API-native way as explained in the guides throughout this doc set. 
 
-However, you might want to manage the configuration of agentgateway via a raw configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. This can be useful in the following use cases:
+However, you still might want to pass in your upstream configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. This can be useful in the following use cases:
 
 - Migrating from upstream to {{< reuse "/docs/snippets/agw-kgw.md" >}}. 
 - Using a feature that is not yet exposed via the Kubernetes Gateway or {{< reuse "/docs/snippets/agw-kgw.md" >}} APIs.
@@ -21,7 +21,7 @@ However, you might want to manage the configuration of agentgateway via a raw co
 
 Use a ConfigMap to pass upstream configuration settings directly to the agentgateway proxy. 
 
-1. Create a ConfigMap with your agentgateway configuration. This configuration defines the binds, listeners, routes, backends, and policies that you want agentgateway to use. The key must be named `config.yaml`.The following example sets up a simple direct response listener on port 3000 that returns a `200 OK` response with the body `"hello!"` for requests to the `/direct` path.
+1. Create a ConfigMap with your agentgateway configuration. This configuration defines the binds, listeners, routes, backends, and policies that you want agentgateway to use. The key must be named `config.yaml`. The following example sets up a simple direct response listener on port 3000 that returns a `200 OK` response with the body `"hello!"` for requests to the `/direct` path.
 
    ```yaml
    kubectl apply -f- <<EOF
