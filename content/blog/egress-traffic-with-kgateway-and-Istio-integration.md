@@ -61,12 +61,12 @@ spec:
   addresses:
    # Container_IP address of your ollama conatiner
   - 127.17.0.2/32
+  location: MESH_EXTERNAL
   ports:
   - number: 11434
     name: http-ollama
     protocol: HTTP
-  location: MESH_EXTERNAL
-  resolution: STATIC
+  resolution: DNS
   endpoints:
    # IP that the egress proxy attempts to connect to
   - address: 127.17.0.2
@@ -79,17 +79,16 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: egress-kgateway
-  namespace: istio-system 
+  namespace: default
 spec:
-  gatewayClassName: kgateway 
+  gatewayClassName: kgateway
   listeners:
-  - name: egress-ollama-http
-    port: 11434 
-    protocol: HTTP
-    hostname: "host.docker.internal" 
-    allowedRoutes:
-      namespaces:
-        from: All
+    - protocol: HTTP
+      port: 8080
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 ---
 
 # ollama-egress-route.yaml
@@ -101,14 +100,15 @@ metadata:
 spec:
   parentRefs:
   - name: egress-kgateway
-    namespace: istio-system
-    sectionName: egress-ollama-http
+    sectionName: http
   hostnames:
   - "host.docker.internal"
   rules:
   - backendRefs:
     - name: ollama-external-host
       port: 11434
+      kind: ServiceEntry
+      group: "networking.istio.io"
 EOF
 ```
 ## Managing CEL based RBAC and integrating exAuth with Kyverno into our Request FLow
@@ -116,51 +116,10 @@ EOF
 -->
 While CEL RBAC (from the next section) is powerful for checking native Istio identities and headers, scenarios like API key validation, integration with corporate IdPs (Identity Providers), or checking complex external policies require delegating the decision outside the mesh proxy. This is where kGateway’s External Authorization (ExtAuth) feature, coupled with Kyverno, shines.
 
-kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy.
-```YAML
-# External Auth Service and Deployment (in istio-system)
+kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
+```
+# Kyverno Envoy Plugin ExtAuth Configuration
 kubectl apply -f - <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  namespace: istio-system
-  name: ext-authz-server
-  labels:
-    app: ext-authz
-spec:
-  selector:
-    matchLabels:
-      app: ext-authz
-  template:
-    metadata:
-      labels:
-        app: ext-authz
-    spec:
-      containers:
-      - name: ext-authz
-        # Using a mock GRPC AuthZ server for simplicity
-        image: gcr.io/istio-testing/ext-authz-grpc:latest 
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 9000
----
-apiVersion: v1
-kind: Service
-metadata:
-  namespace: istio-system
-  name: ext-authz-server-svc
-  labels:
-    app: ext-authz
-spec:
-  ports:
-  - name: grpc-authz
-    port: 9000
-    targetPort: 9000
-    protocol: TCP
-  selector:
-    app: ext-authz
----
-# kGateway External Auth Policy
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
@@ -173,14 +132,44 @@ spec:
     name: ollama-egress-route 
   extAuth:
     extensionRef:
-      name: ext-authz-server-svc.istio-system.svc.cluster.local 
-      port: 9000 
-      protocol: GRPC
-    failOpen: false
-    requestAttributes:
-      allowedHeaders: ["x-ollama-apikey"]
+      name: kyverno-authz-server
+---
+# GatewayExtension defines the Kyverno server endpoint
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: kyverno-authz-server
+  namespace: default
+spec:
+  type: ExtAuth
+  extAuth:
+    grpcService:
+      backendRef:
+        name: kyverno-authz-server
+        port: 9081
+---
+# Kyverno AuthorizationPolicy (Envoy CRD) defines the L7 logic
+apiVersion: envoy.kyverno.io/v1alpha1
+kind: AuthorizationPolicy
+metadata:
+  name: demo-policy.example.com
+spec:
+  failurePolicy: Fail
+  variables:
+  - name: force_authorized
+    expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
+  - name: allowed
+    expression: variables.force_authorized in ["enabled", "true"]
+  # The core authorization rule
+  authorizations:
+  - expression: >
+      variables.allowed
+        ? envoy.Allowed().Response()
+        : envoy.Denied(403).Response()
 EOF
 ```
+This step involves configuring a TrafficPolicy to delegate authorization and a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
+
 # Kyverno Configuration Policy/ Configuration Governance
 
 This ClusterPolicy ensures that any time a ServiceEntry is created for an external host, the developer must include the security label `security.corp/egress-approved: "true"`. This fulfills the requirement of using Kyverno for security governance on the configuration plane.
@@ -244,12 +233,18 @@ EOF
 ```
 
 ### Testinig Client
-We will use the client app to execute tests against the ollama-external-host via the kGateway path.
+We will use the client app to execute tests against the host.docker.internal via the kGateway path.
+
+1. Authorized Test (With Required Header)
+This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
 ```
-kubectl exec -it deploy/client -- curl http://host.docker.internal:11434
+kubectl exec -it deploy/curl-test-client -n default -- curl [http://egress-kgateway.istio-system:8080/](http://egress-kgateway.istio-system:8080/) -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
-Expected Output: 
+
+Expected Output:
 ```
+< HTTP/1.1 200 OK
+...
 Ollama is running%
 ```
 # Demo
