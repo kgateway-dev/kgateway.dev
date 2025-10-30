@@ -30,7 +30,7 @@ Before integrating kagteway with Istio Ambient, ensure we have:
    ```
    docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
    ```
-8. Get the Container IP of ollama which will be inserted at all the **`address filds` which is 127.17.0.2 in our case.
+8. Get the Container IP of ollama which will be inserted at all the **`address filds` which is 172.17.0.2 in our case.
    ```
    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ollama-server
    ```
@@ -60,7 +60,7 @@ spec:
   - "host.docker.internal"
   addresses:
    # Container_IP address of your ollama conatiner
-  - 127.17.0.2/32
+  - 172.17.0.2/32
   location: MESH_EXTERNAL
   ports:
   - number: 11434
@@ -69,7 +69,7 @@ spec:
   resolution: DNS
   endpoints:
    # IP that the egress proxy attempts to connect to
-  - address: 127.17.0.2
+  - address: 172.17.0.2
     ports:
       http-ollama: 11434
 ---
@@ -244,7 +244,7 @@ EOF
 ### Testinig Client
 We will use the client app to execute tests against the host.docker.internal via the kGateway path.
 
-1. Authorized Test (With Required Header)
+Authorized Test (With Required Header)
 This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
 ```
 kubectl exec -it deploy/curl-test-client -n default -- curl [http://egress-kgateway.istio-system:8080/](http://egress-kgateway.istio-system:8080/) -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
