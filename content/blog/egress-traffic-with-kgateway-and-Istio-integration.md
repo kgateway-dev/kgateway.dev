@@ -118,7 +118,7 @@ While CEL RBAC (from the next section) is powerful for checking native Istio ide
 
 kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
 ```
-# Kyverno Envoy Plugin ExtAuth Configuration
+# Kyverno Envoy Plugin ExtAuth and kGateway Traffic Management
 kubectl apply -f - <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
@@ -130,6 +130,14 @@ spec:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: ollama-egress-route 
+  retry:
+    attempts: 2
+    perTryTimeout: 2ms
+    statusCodes:
+    - 517
+  timeouts:
+    request: 1ms
+  # External Authorization delegation
   extAuth:
     extensionRef:
       name: kyverno-authz-server
@@ -155,6 +163,7 @@ metadata:
   name: demo-policy.example.com
 spec:
   failurePolicy: Fail
+  # Define a variable based on the custom header presence
   variables:
   - name: force_authorized
     expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
@@ -168,7 +177,7 @@ spec:
         : envoy.Denied(403).Response()
 EOF
 ```
-This step involves configuring a TrafficPolicy to delegate authorization and a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
+This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
 
 # Kyverno Configuration Policy/ Configuration Governance
 
