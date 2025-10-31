@@ -66,7 +66,7 @@ menu:
         type: search
     - name: GitHub
       weight: 10
-      url: "https://github.com/kgateway-dev/kgateway.dev"
+      url: "https://github.com/kgateway-dev/kgateway"
       params:
         icon: github
 
