@@ -20,7 +20,7 @@ You can change the default configuration of your gateway proxy by creating custo
 Do not edit or change the default {{< reuse "docs/snippets/gatewayparameters.md" >}} resource directly. Always update the values in the {{< reuse "docs/snippets/kgateway.md" >}} Helm chart so that they persist between upgrades.
 {{< /callout >}} 
 
-If you do not want to use the default gateway proxy template to bootstrap your proxies, you can choose to create a self-managed gateway. With self-managed gateways, you are responsible for defining the proxy deployment template that you want to bootstrap your proxies with. For more information, see [Self-managed gateways (BYO)](/docs/setup/customize/selfmanaged/).
+If you do not want to use the default gateway proxy template to bootstrap your proxies, you can choose to create a self-managed gateway. With self-managed gateways, you are responsible for defining the proxy deployment template that you want to bootstrap your proxies with. For more information, see [Self-managed gateways (BYO)](https://kgateway.dev/docs/latest/setup/selfmanaged/).
 
 ## {{< reuse "docs/snippets/gatewayparameters.md" >}}
 
