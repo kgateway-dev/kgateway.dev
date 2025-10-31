@@ -1,10 +1,10 @@
 ---
 title: Header 
 weight: 10
-description: Specify a set of headers which incoming requests must match in entirety.
+description: Specify a set of headers which incoming requests must match in entirety, such as with regular expressions (regex).
 ---
 
-Specify a set of headers which incoming requests must match in entirety.
+Specify a set of headers which incoming requests must match in entirety, such as with regular expressions (regex).
 
 For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/api-types/httproute/#matches).
 
@@ -13,6 +13,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 {{< reuse "docs/snippets/prereq.md" >}}
 
 ## Set up exact header matching
+
+Match headers by an exact string, such as `version`.
 
 1. Create an HTTPRoute resource. 
    ```yaml
@@ -102,7 +104,9 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    
 ## Set up regex header matching
 
-1. Create an HTTPRoute resource to match multiple headers based on a regular expression. Only if all headers are present in the request, the request is accepted and processed by the gateway proxy. The following rules apply: 
+Match headers with regular expressions (regex).
+
+1. Create an HTTPRoute resource to match multiple headers with regex. Only if all headers are present in the request, the request is accepted and processed by the gateway proxy. The following rules apply: 
    * ` (dogs|cats)`: The value of the `pet` request header must either be `dogs` or `cats`.
    * `\\d[.]\\d.*`: The value of the `version` header must meet the following conditions: 
      * `\\d` matches a single digit.
