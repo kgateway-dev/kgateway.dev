@@ -34,6 +34,12 @@ Before integrating kagteway with Istio Ambient, ensure we have:
    ```
    docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ollama-server
    ```
+9. Deploy the Kyverno Authz Server is a GRPC server capable of processing Envoy External Authorization requests.
+```
+helm install kyverno-authz-server --namespace default --create-namespace --wait \
+  --version 0.1.0 --repo https://kyverno.github.io/kyverno-envoy-plugin \
+  kyverno-authz-server
+```
 
 
 While Istio ambient provides Authorization, Authentication and Egress still, there are several scenarios where kgateway can offer a more powerful alternative:
@@ -66,7 +72,7 @@ spec:
   - number: 11434
     name: http-ollama
     protocol: HTTP
-  resolution: DNS
+  resolution: STATIC
   endpoints:
    # IP that the egress proxy attempts to connect to
   - address: 172.17.0.2
@@ -118,8 +124,8 @@ While CEL RBAC (from the next section) is powerful for checking native Istio ide
 
 kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
 ```
-# Kyverno Envoy Plugin ExtAuth and kGateway Traffic Management
 kubectl apply -f - <<EOF
+# TrafficPolicy: ExtAuth + Corrected kGateway Resilience
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
@@ -129,14 +135,14 @@ spec:
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
-    name: ollama-egress-route 
+    name: ollama-egress-route
   retry:
     attempts: 2
-    perTryTimeout: 2ms
+    perTryTimeout: 500ms 
     statusCodes:
     - 517
   timeouts:
-    request: 1ms
+    request: 5s
   # External Authorization delegation
   extAuth:
     extensionRef:
@@ -156,20 +162,19 @@ spec:
         name: kyverno-authz-server
         port: 9081
 ---
-# Kyverno AuthorizationPolicy (Envoy CRD) defines the L7 logic
+# Kyverno AuthorizationPolicy (Envoy CRD)
 apiVersion: envoy.kyverno.io/v1alpha1
 kind: AuthorizationPolicy
 metadata:
   name: demo-policy.example.com
+  namespace: default 
 spec:
   failurePolicy: Fail
-  # Define a variable based on the custom header presence
   variables:
   - name: force_authorized
     expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
   - name: allowed
     expression: variables.force_authorized in ["enabled", "true"]
-  # The core authorization rule
   authorizations:
   - expression: >
       variables.allowed
@@ -247,7 +252,7 @@ We will use the client app to execute tests against the host.docker.internal via
 Authorized Test (With Required Header)
 This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
 ```
-kubectl exec -it deploy/curl-test-client -n default -- curl [http://egress-kgateway.istio-system:8080/](http://egress-kgateway.istio-system:8080/) -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
+kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
 
 Expected Output:
