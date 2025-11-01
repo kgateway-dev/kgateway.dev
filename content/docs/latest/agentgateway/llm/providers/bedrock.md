@@ -21,11 +21,11 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    export AWS_SESSION_TOKEN="<aws-session-token>"
    ```
 
-2. Create a secret with your Bedrock API credentials. Note that the secret keys must be named `accessKey`, `secretKey`, and `sessionToken`.
+2. Create a secret with your Bedrock API key.
 
    ```yaml
    kubectl create secret generic bedrock-secret \
-     -n {{< reuse "docs/snippets/namespace.md" >}} \
+     -n kgateway-system \
      --from-literal=accessKey="$AWS_ACCESS_KEY_ID" \
      --from-literal=secretKey="$AWS_SECRET_ACCESS_KEY" \
      --from-literal=sessionToken="$AWS_SESSION_TOKEN" \
@@ -43,7 +43,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
      labels:
        app: agentgateway
      name: bedrock
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: kgateway-system
    spec:
      type: AI
      ai:
@@ -64,7 +64,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    |-------------|-------------|
    | `type`      | Set to `AI` to configure this Backend for an AI provider. |
    | `ai`        | Define the AI backend configuration. The example uses Amazon Bedrock (`spec.ai.llm.bedrock`). |
-   | `model`     | The model to use to generate responses. In this example, you use the `us.anthropic.claude-sonnet-4-20250514-v1:0` model with the `us.` prefix for cross-region inference profiles that work with on-demand throughput. For more models, see the [AWS Bedrock docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html). |
+   | `model`     | The model to use to generate responses. In this example, you use the `amazon.titan-text-lite-v1` model. For more models, see the [AWS Bedrock docs](https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html). |
    | `region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
 
@@ -75,11 +75,11 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    kind: HTTPRoute
    metadata:       
      name: bedrock
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: kgateway-system
    spec:
      parentRefs:
        - name: agentgateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -87,7 +87,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
            value: /bedrock
        backendRefs:
        - name: bedrock
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF
