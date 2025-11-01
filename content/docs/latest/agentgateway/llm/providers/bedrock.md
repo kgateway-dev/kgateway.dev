@@ -25,10 +25,10 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
 
    ```yaml
    kubectl create secret generic bedrock-secret \
-     -n {{< reuse "docs/snippets/namespace.md" >}} \
-     --from-literal=aws_access_key_id="$AWS_ACCESS_KEY_ID" \
-     --from-literal=aws_secret_access_key="$AWS_SECRET_ACCESS_KEY" \
-     --from-literal=aws_session_token="$AWS_SESSION_TOKEN" \
+     -n kgateway-system \
+     --from-literal=accessKey="$AWS_ACCESS_KEY_ID" \
+     --from-literal=secretKey="$AWS_SECRET_ACCESS_KEY" \
+     --from-literal=sessionToken="$AWS_SESSION_TOKEN" \
      --type=Opaque \
      --dry-run=client -o yaml | kubectl apply -f -
    ```
@@ -43,13 +43,13 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
      labels:
        app: agentgateway
      name: bedrock
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: kgateway-system
    spec:
      type: AI
      ai:
        llm:
          bedrock:
-           model: "amazon.titan-text-lite-v1"
+           model: "us.anthropic.claude-sonnet-4-20250514-v1:0"
            region: us-east-1
            auth:
              type: Secret
@@ -75,11 +75,11 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    kind: HTTPRoute
    metadata:       
      name: bedrock
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: kgateway-system
    spec:
      parentRefs:
        - name: agentgateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: kgateway-system
      rules:
      - matches:
        - path:
@@ -87,7 +87,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
            value: /bedrock
        backendRefs:
        - name: bedrock
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: kgateway-system
          group: gateway.kgateway.dev
          kind: Backend
    EOF
