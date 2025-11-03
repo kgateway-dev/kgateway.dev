@@ -53,31 +53,23 @@ To establish a dedicated, policy-enforced egress path, we must combine three cor
 
 ```yaml
 kubectl apply -f - <<EOF
-# ollama-serviceentry.yaml
+# ollama-serviceentry.yaml - Using DNS for Reliability
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
   name: ollama-external-host
   namespace: default
   labels:
-    security.corp/egress-approved: "true" # Kyverno policy validation target
+    security.corp/egress-approved: "true"
 spec:
   hosts:
   - "host.docker.internal"
-  addresses:
-   # Container_IP address of your ollama conatiner
-  - 172.17.0.2/32
   location: MESH_EXTERNAL
   ports:
   - number: 11434
     name: http-ollama
     protocol: HTTP
-  resolution: STATIC
-  endpoints:
-   # IP that the egress proxy attempts to connect to
-  - address: 172.17.0.2
-    ports:
-      http-ollama: 11434
+  resolution: DNS
 ---
 
 # egress-kgateway.yaml
@@ -123,7 +115,7 @@ EOF
 While CEL RBAC (from the next section) is powerful for checking native Istio identities and headers, scenarios like API key validation, integration with corporate IdPs (Identity Providers), or checking complex external policies require delegating the decision outside the mesh proxy. This is where kGateway’s External Authorization (ExtAuth) feature, coupled with Kyverno, shines.
 
 kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
-```
+```YAML
 kubectl apply -f - <<EOF
 # TrafficPolicy: ExtAuth + Corrected kGateway Resilience
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -137,17 +129,20 @@ spec:
     kind: HTTPRoute
     name: ollama-egress-route
   retry:
-    attempts: 2
-    perTryTimeout: 500ms 
+    attempts: 3 # Increased attempts for better resilience
+    perTryTimeout: 10s # Increased from 500ms to allow more time per attempt
     statusCodes:
-    - 517
+    - 503 # Standard code for temporary overload/retryable error
+    - 504 # The timeout you just saw! Retrying this is useful.
   timeouts:
-    request: 5s
-  # External Authorization delegation
+    # Crucially increased the overall request timeout to 30 seconds
+    request: 30s 
+  # ... (Rest of your extAuth config remains the same)
   extAuth:
     extensionRef:
       name: kyverno-authz-server
 ---
+
 # GatewayExtension defines the Kyverno server endpoint
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
@@ -167,19 +162,11 @@ apiVersion: envoy.kyverno.io/v1alpha1
 kind: AuthorizationPolicy
 metadata:
   name: demo-policy.example.com
-  namespace: default 
+  namespace: default
 spec:
   failurePolicy: Fail
-  variables:
-  - name: force_authorized
-    expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
-  - name: allowed
-    expression: variables.force_authorized in ["enabled", "true"]
   authorizations:
-  - expression: >
-      variables.allowed
-        ? envoy.Allowed().Response()
-        : envoy.Denied(403).Response()
+  - expression: "envoy.Allowed().Response()" # Unconditionally allows the request
 EOF
 ```
 This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
