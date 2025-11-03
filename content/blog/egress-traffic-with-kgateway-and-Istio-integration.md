@@ -129,15 +129,13 @@ spec:
     kind: HTTPRoute
     name: ollama-egress-route
   retry:
-    attempts: 3 # Increased attempts for better resilience
-    perTryTimeout: 10s # Increased from 500ms to allow more time per attempt
+    attempts: 3
+    perTryTimeout: 10s
     statusCodes:
-    - 503 # Standard code for temporary overload/retryable error
-    - 504 # The timeout you just saw! Retrying this is useful.
+    - 503
+    - 504
   timeouts:
-    # Crucially increased the overall request timeout to 30 seconds
-    request: 30s 
-  # ... (Rest of your extAuth config remains the same)
+   request: 30s
   extAuth:
     extensionRef:
       name: kyverno-authz-server
@@ -227,7 +225,6 @@ spec:
       containers:
       - name: client
         image: curlimages/curl
-        # Keep the container running indefinitely for testing
         command: ["sleep", "3600"] 
         imagePullPolicy: IfNotPresent
 EOF
