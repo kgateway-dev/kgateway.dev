@@ -230,20 +230,49 @@ spec:
 EOF
 ```
 
-### Testinig Client
+# Testinig Client
 We will use the client app to execute tests against the host.docker.internal via the kGateway path.
 
 Authorized Test (With Required Header)
 This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
-```
+```sh
 kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
 
 Expected Output:
-```
+```sh
 < HTTP/1.1 200 OK
 ...
 Ollama is running%
+```
+
+### Testing Resiliency: Proving the Retry Policy Works
+
+While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kGateway's Envoy proxy actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
+```sh
+# Pause the container that is running the external Ollama service
+docker pause ollama-server
+echo "Ollama container is paused. Proceeding to send request..."
+kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
+```
+Send a request. kgateway will try three times (as configured by attempts: 3 in the TrafficPolicy) before ultimately failing and returning a 5xx error to the client.
+
+Then we retrieve the logs from the kGateway Envoy proxy pod. We look for the final access log entry, which must contain the URX and UF flags to prove the retries occurred.
+
+```sh
+# Get the pod name for the egress-kgateway
+KGW_POD=$(kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=egress-kgateway -o jsonpath='{.items[0].metadata.name}')
+
+# View the last request log entry
+kubectl logs $KGW_POD -n default | grep 'POST /api/generate' | tail -n 1
+```
+With inspecting the logs (again similar to the docs example) you should see something like:
+```
+{
+  "response_flags": "URX,UF",
+  "upstream_transport_failure_reason": "delayed connect error: Connection refused",
+  "attempt_count": 2
+}
 ```
 # Demo
 
