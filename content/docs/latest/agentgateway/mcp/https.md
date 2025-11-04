@@ -41,25 +41,6 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
    
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
-   metadata:
-     name: web-mcp-backend
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     type: MCP
-     mcp:
-       targets:
-       - name: mcp-target
-         static:
-           host: www.mcp.run
-           port: 443
-           path: /api/mcp/sse?sid=Fe26.2**3f65a0f4948e0a5cdefe39463778382c71d5355e47381786e9faca0a946937c1*HTf-pQXlsY3596VdrbUt3A*NsUmLUTIAeqcFCXNxxKAhNgaPkHobsKSe06X-QnLll8*1759510756907*00e6a1151933abe52d02142c1a4e3dfcc3e7dc57ba83b5b8e5ee978364994f44*jDQg0mN9ahClPQaS64Za-EGwd5dQbvo98q5JrW2sr5A
-   EOF
-   ```
-   
 3. Create a BackendTLSPolicy to configure your agentgateway to connect to your Backend by using HTTPS. To validate the MCP server's TLS certificate, you use the well-known system CA certificates. Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f- <<EOF
@@ -71,24 +52,6 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    spec:
      targetRefs:
        - name: github-mcp-backend
-         kind: Backend
-         group: gateway.kgateway.dev
-     validation:
-       hostname: api.githubcopilot.com
-       wellKnownCACertificates: System
-   EOF
-   ```
-   
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: BackendTLSPolicy
-   metadata:
-     name: github-mcp-backend-tls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     targetRefs:
-       - name: web-mcp-backend
          kind: Backend
          group: gateway.kgateway.dev
      validation:
