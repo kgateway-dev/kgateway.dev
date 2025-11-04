@@ -155,7 +155,7 @@ spec:
         name: kyverno-authz-server
         port: 9081
 ---
-# Kyverno AuthorizationPolicy (Envoy CRD)
+# Kyverno AuthorizationPolicy: RESTORING SECURITY (Conditional Access)
 apiVersion: envoy.kyverno.io/v1alpha1
 kind: AuthorizationPolicy
 metadata:
@@ -163,8 +163,17 @@ metadata:
   namespace: default
 spec:
   failurePolicy: Fail
+  variables:
+  # Check for the lowercase header key (best practice for Envoy)
+  - name: force_authorized
+    expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
+  - name: allowed
+    expression: variables.force_authorized in ["enabled", "true"]
   authorizations:
-  - expression: "envoy.Allowed().Response()" # Unconditionally allows the request
+  - expression: >
+      variables.allowed
+        ? envoy.Allowed().Response()
+        : envoy.Denied(403).Response() # DENY if the header is missing or incorrect
 EOF
 ```
 This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
