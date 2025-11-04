@@ -6,10 +6,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 
 ## Set up access to Azure OpenAI
 
-1. [Create an API key to access the Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/create-resource). You'll need:
-   - An Azure OpenAI endpoint (e.g., `my-endpoint.openai.azure.com`)
-   - A deployment name for your model
-   - An API key
+1. Create an API key to access the [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/api-management/api-management-authenticate-authorize-azure-openai).
 
 2. Save the API key in an environment variable.
    
@@ -56,7 +53,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#azureopenaiconfig" >}}).
 
    | Setting           | Description |
    |-------------------|-------------|

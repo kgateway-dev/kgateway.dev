@@ -52,7 +52,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -62,7 +62,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    | `model`     | Optional: Override the model name, such as `claude-3-opus-20240229`. If unset, the model name is taken from the request. |
    | `apiVersion` | Optional: A version header to pass to the Anthropic API. For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF
