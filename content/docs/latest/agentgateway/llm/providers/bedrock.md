@@ -25,9 +25,9 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
 
    ```yaml
    kubectl create secret generic bedrock-secret \
-     -n kgateway-system \
      --type=Opaque \
      --dry-run=client -o yaml | kubectl apply -f -
+     --n kgateway-system \
    ```
 
 3. Create a Backend resource to configure an LLM provider that references the AI API key secret.
