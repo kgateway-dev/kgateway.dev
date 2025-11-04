@@ -26,9 +26,6 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    ```yaml
    kubectl create secret generic bedrock-secret \
      -n kgateway-system \
-     --from-literal=accessKey="$AWS_ACCESS_KEY_ID" \
-     --from-literal=secretKey="$AWS_SECRET_ACCESS_KEY" \
-     --from-literal=sessionToken="$AWS_SESSION_TOKEN" \
      --type=Opaque \
      --dry-run=client -o yaml | kubectl apply -f -
    ```
