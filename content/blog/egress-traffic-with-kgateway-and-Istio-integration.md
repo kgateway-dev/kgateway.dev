@@ -187,7 +187,7 @@ spec:
   - expression: >
       variables.allowed
         ? envoy.Allowed().Response()
-        : envoy.Denied(403).Response() # DENY if the header is missing or incorrect
+        : envoy.Denied(403).Response()
 EOF
 ```
 This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
