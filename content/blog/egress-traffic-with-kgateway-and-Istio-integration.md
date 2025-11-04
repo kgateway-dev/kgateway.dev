@@ -299,3 +299,7 @@ With inspecting the logs (again similar to the docs example) you should see some
 ```
 # Demo
 
+[Demo](https://youtu.be/5PegECeu0v0)
+
+
+{{< youtube 5PegECeu0v0 >}}
