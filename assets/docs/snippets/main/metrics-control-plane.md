@@ -1,5 +1,6 @@
 Name|Type|Labels|Help
 --|--|--|--
+kgateway_agentgateway_xds_rejects_total|counter||Total number of xDS responses rejected by agentgateway proxy
 kgateway_controller_reconcile_duration_seconds|histogram|controller, name, namespace|Reconcile duration for controller
 kgateway_controller_reconciliations_running|gauge|controller, name, namespace|Number of reconciliations currently running
 kgateway_controller_reconciliations_total|counter|controller, name, namespace, result|Total number of controller reconciliations
