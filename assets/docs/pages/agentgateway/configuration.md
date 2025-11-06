@@ -79,7 +79,7 @@ Use a ConfigMap to pass upstream configuration settings directly to the agentgat
      infrastructure:
        parametersRef:
          name: agentgateway-config
-         group: gloo.solo.io
+         group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}} 
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}       
      listeners:
        - name: http
