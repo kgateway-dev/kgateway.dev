@@ -16,23 +16,6 @@ This separation lets platform teams choose when L7 processing is necessary, redu
 kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, Kgateway is the first project that can be used as a pluggable waypoint for Istio. 
 Kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
 
-## Istio Authorization Policy for zero trust difference of L4 vs. L7 auth policies
-Istio's Authorization Policy is a crucial component for implementing a Zero Trust security model within a Kubernetes environment. A Zero Trust architecture operates to ensure that service-to-service communication is explicitly authenticated (Who are you?) and authorized (Are you allowed to do that?).
-
-Istio Authorization Policies allow you to define fine-grained access control rules based on identity, namespace, path, method, and other criteria. The policies are enforced by the data plane proxies (Envoy or Ztunnel in Ambient Mesh) at the edges of your workloads.
-
-The key difference Istio authorization adopts is, in where the policy is enforced, which determines whether it applies at Layer 4 (Transport) or Layer 7 (Application). We will try to make difference between these Layer 4 and Layer 7 telemtry by overviewing how Ambient Mesh integrates their Authorization Policy models.
-
-### Layer 4 (L4) Authorization Policies
-L4 authorization policies govern access based on network identity and connection details. They are typically enforced at the lowest and most efficient layer of the data plane to ensure Secured transport, network isolation, and basic service-to-service access control with the lowest performance overhead.
-
-***Ztunnel (Ambient Mesh):*** In the modern Ambient Mesh architecture, the Rust-based Ztunnel (part of the Secure Overlay Layer) handles L4 policy enforcement in contrast to **Service Mesh** where it was handled by sidecar proxy.
-
-### Layer 7 (L7) Authorization Policies
-L7 authorization policies provide granular control over the content and context of the application traffic, primarily for HTTP and gRPC protocols which ensures Fine-grained API security, conditional access based on application context, and delegated external authorization (ExtAuth), to promote superior secure flexibility but incurs higher computation overhead due to L7 parsing.
-
-***Waypoint Proxy (Ambient Mesh):*** In Ambient Mesh, L7 policies are enforced by the Waypoint Proxy (or an Egress Gateway like kGateway). These proxies operate at the Application Layer, requiring traffic to be terminated, inspected, and then forwarded while  **Service Mesh** use to handle it by sidecar proxy.
-
 # How important is kgateway's integration
 Before integrating kagteway with Istio Ambient, ensure we have: 
 1. Set-up `kind` cluster.
