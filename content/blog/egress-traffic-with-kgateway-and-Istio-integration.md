@@ -5,9 +5,12 @@ author: Aryan Parashar
 excludeSearch: 
 ---
 
-Ambeint Mesh is a sidecar-less data plane that can help us manage our  workloads in a tranparent, Secure and Better Resource usage manner. If someone is struggling with an invasive, high computation overhead and cost operation of service mesh then Ambient Mesh can be a lot better choice for their applciation workloads. Istio Ambient Mesh helps to provide Lower Computation Overhead and Cost operations by splitting its data plane into two layers: the secure overlay layer and Layer 7 waypoint proxy layer. 
+Istio Ambient Mesh is a sidecar-less data plane model designed to reduce operational overhead and improve resource efficiency for service-to-service communication. Instead of using per-pod sidecar proxies, Ambient splits its data plane into two layers:
 
-This seperation of layers can help users to choose between the implementation and seperation of Layer 1(L4) and Layer 7(L7) behavior of their workloads. Amibient's Secure Overlay Layer handles Layer 4 behaviors including establishing mTLS and telemetry collections with a flexibility to choose what they want for their infrastructure without introducing unnecessary risk.
+* **Secure Overlay Layer (L4)** — Handled by the lightweight *ztunnel*, providing mTLS, identity, and network telemetry.
+* **Waypoint Proxy Layer (L7)** — Handles application-layer policies such as routing, authentication, RBAC, and external authorization.
+
+This separation lets platform teams choose when L7 processing is necessary, reducing cost and computational overhead for workloads that only require transport security.
 
 ## kgateway's integration with Ambient Mesh
 kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, Kgateway is the first project that can be used as a pluggable waypoint for Istio. 
