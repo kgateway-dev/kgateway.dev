@@ -268,7 +268,7 @@ kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgatew
 ```
 Send a request. kgateway will try three times (as configured by attempts: 3 in the TrafficPolicy) before ultimately failing and returning a 5xx error to the client.
 
-Then we retrieve the logs from the kGateway Envoy proxy pod. We look for the final access log entry, which must contain the URX and UF flags to prove the retries occurred.
+Now let's look at the logs from the kgateway egress gateway pod. We look for the final access log entry, which must contain the URX and UF flags to prove the retries occurred.
 
 ```sh
 # Get the pod name for the egress-kgateway
