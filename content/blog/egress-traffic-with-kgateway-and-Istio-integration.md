@@ -277,7 +277,7 @@ KGW_POD=$(kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=
 # View the last request log entry
 kubectl logs $KGW_POD -n default | grep 'POST /api/generate' | tail -n 1
 ```
-With inspecting the logs (again similar to the docs example) you should see something like:
+You should see an output similar to the following:
 ```
 {
   "response_flags": "URX,UF",
