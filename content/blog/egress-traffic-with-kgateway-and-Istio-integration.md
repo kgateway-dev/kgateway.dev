@@ -242,7 +242,7 @@ EOF
 ```
 
 ### Verify authorization policies for the Ollama service
-We will use the client app to execute tests against the host.docker.internal via the kGateway path.
+We will use the client app that we previously deployed to execute tests against the `host.docker.internal` domain through the kgateway egress gateway.
 
 Authorized Test (With Required Header)
 This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
