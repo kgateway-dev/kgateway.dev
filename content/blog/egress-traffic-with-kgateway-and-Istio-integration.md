@@ -16,7 +16,7 @@ This separation lets platform teams choose when L7 processing is necessary, redu
 kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, Kgateway is the first project that can be used as a pluggable waypoint for Istio. 
 Kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
 
-# How important is kgateway's integration
+## Prepare your kgateway environment
 Before integrating kagteway with Istio Ambient, ensure we have: 
 1. Set-up `kind` cluster.
 2. Setup Kuberntes Gateway API:
