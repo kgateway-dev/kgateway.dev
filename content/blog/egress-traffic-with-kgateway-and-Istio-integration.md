@@ -259,7 +259,7 @@ Ollama is running%
 
 ### Verify retry policies on the Kyverno server
 
-While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kGateway's Envoy proxy actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
+While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kgateway egress gateway actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
 ```sh
 # Pause the container that is running the external Ollama service
 docker pause ollama-server
