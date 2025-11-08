@@ -5,7 +5,7 @@ author: Aryan Parashar
 excludeSearch: 
 ---
 
-Istio Ambient Mesh is a sidecar-less data plane model designed to reduce operational overhead and improve resource efficiency for service-to-service communication. Instead of using per-pod sidecar proxies, Ambient splits its data plane into two layers:
+[Istio Ambient Mesh](https://ambientmesh.io/docs/about/overview/) is a sidecar-less data plane model designed to reduce operational overhead and improve resource efficiency for service-to-service communication. Instead of using per-pod sidecar proxies, Ambient splits its data plane into two layers:
 
 * **Secure Overlay Layer (L4)** — Handled by the lightweight *ztunnel*, providing mTLS, identity, and network telemetry.
 * **Waypoint Proxy Layer (L7)** — Handles application-layer policies such as routing, authentication, RBAC, and external authorization.
@@ -18,42 +18,39 @@ Kgateway has been built on same Envoy engine that Istio’s waypoint implementat
 
 ## Prepare your kgateway environment
 Before integrating kagteway with Istio Ambient, ensure we have: 
-1. Set-up `kind` cluster.
-2. Setup Kuberntes Gateway API:
-   ```
-   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
-   ```
-4. Follow the [Get started guide](https://kgateway.dev/docs/latest/quickstart/) to install kgateway.
-5. Follow the [Sample app guide](https://kgateway.dev/docs/latest/install/sample-app/) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
-6. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
-7. Deploy the Ollama Container at port number 11434, binding to 0.0.0.0 so the Kubernetes virtual machine can access it via the host's bridge network.
+1. Follow the [Get started guide](https://kgateway.dev/docs/latest/quickstart/) to install kgateway in a kind cluster
+2. Follow the [Sample app guide](https://kgateway.dev/docs/latest/install/sample-app/) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
+3. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
+4. Deploy the Ollama Container at port number 11434, binding to 0.0.0.0 so the Kubernetes virtual machine can access it via the host's bridge network.
    ```
    docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
    ```
-8. Get the Container IP of ollama which will be inserted at all the **`address filds` which is 172.17.0.2 in our case.
+5. Get the Container IP of ollama container which will be inserted at all the **`address filds` which is 172.17.0.2 in our case.
    ```
-   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ollama-server
+   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTIANER_NAME>
    ```
-9. Deploy the Kyverno Authz Server is a GRPC server capable of processing Envoy External Authorization requests.
-```
-helm install kyverno-authz-server --namespace default --create-namespace --wait \
-  --version 0.1.0 --repo https://kyverno.github.io/kyverno-envoy-plugin \
-  kyverno-authz-server
-```
-
+   Here it will get container's IP as an output:
+   ```
+   172.17.0.2
+   ```
+7. Deploy the Kyverno Authz Server as a GRPC server capable of processing Envoy External Authorization requests.
+   ```
+   helm install kyverno-authz-server --namespace default --create-namespace --wait \
+   --version 0.1.0 --repo https://kyverno.github.io/kyverno-envoy-plugin \
+   kyverno-authz-server
+   ```
 
 While Istio ambient provides Authorization, Authentication and Egress still, there are several scenarios where kgateway can offer a more powerful alternative:
 
 ## Securely Egress Traffic with kGateway + Istio Integration
 
-To establish a dedicated, policy-enforced egress path, we must combine three core resources: the **Istio ServiceEntry** (to register the external host), the **kGateway Egress Gateway** (to serve as the L7 egress waypoint), and the **HTTPRoute** (to apply the routing and security logic).
+To establish a dedicated, policy-enforced egress path, we must combine three core resources: the **Istio ServiceEntry** (to register the external host), the **kGateway Egress Gateway**, and the **HTTPRoute** (to apply the routing and security logic).
 
 * Our target is an external Ollama container running on the host machine (host.docker.internal) on the default port 11434 and `ServiceEntries` injects the external Ollama endpoint into the Istio service registry for which we'll use static resolution for our local Docker Desktop bridge.
 * Define the Gateway resource, leveraging the kgateway GatewayClass to instantiate a dedicated proxy that is explicitly listening for outbound traffic to the Ollama host with an HTTPRoute.
 
 ```yaml
 kubectl apply -f - <<EOF
-# ollama-serviceentry.yaml - Using DNS for Reliability
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
@@ -72,7 +69,6 @@ spec:
   resolution: DNS
 ---
 
-# egress-kgateway.yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
@@ -89,7 +85,6 @@ spec:
           from: All
 ---
 
-# ollama-egress-route.yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -110,15 +105,13 @@ spec:
 EOF
 ```
 ## Managing CEL based RBAC and integrating exAuth with Kyverno into our Request FLow
-<!-- For exmple - Kyverno for applying with demo video
--->
+
 While CEL RBAC (from the next section) is powerful for checking native Istio identities and headers, scenarios like API key validation, integration with corporate IdPs (Identity Providers), or checking complex external policies require delegating the decision outside the mesh proxy. This is where kGateway’s External Authorization (ExtAuth) feature, coupled with Kyverno, shines.
 
 kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
 ```YAML
 kubectl apply -f - <<EOF
-# TrafficPolicy: ExtAuth + Corrected kGateway Resilience
-apiVersion: gateway.kgateway.dev/v1alpha1
+apiVersion: gateway.kgateway.dev/v1alpha1   # TrafficPolicy for ExtAuth + Corrected kGateway Resilience
 kind: TrafficPolicy
 metadata:
   name: ollama-external-auth-policy
@@ -141,8 +134,7 @@ spec:
       name: kyverno-authz-server
 ---
 
-# GatewayExtension defines the Kyverno server endpoint
-apiVersion: gateway.kgateway.dev/v1alpha1
+apiVersion: gateway.kgateway.dev/v1alpha1   # GatewayExtension defines the Kyverno server endpoint
 kind: GatewayExtension
 metadata:
   name: kyverno-authz-server
@@ -155,8 +147,8 @@ spec:
         name: kyverno-authz-server
         port: 9081
 ---
-# Kyverno AuthorizationPolicy: RESTORING SECURITY (Conditional Access)
-apiVersion: envoy.kyverno.io/v1alpha1
+
+apiVersion: envoy.kyverno.io/v1alpha1   # Kyverno AuthorizationPolicy: RESTORING SECURITY (Conditional Access)
 kind: AuthorizationPolicy
 metadata:
   name: demo-policy.example.com
@@ -164,7 +156,6 @@ metadata:
 spec:
   failurePolicy: Fail
   variables:
-  # Check for the lowercase header key (best practice for Envoy)
   - name: force_authorized
     expression: object.attributes.request.http.?headers["x-force-authorized"].orValue("")
   - name: allowed
@@ -261,8 +252,7 @@ Ollama is running%
 
 While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kgateway egress gateway actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
 ```sh
-# Pause the container that is running the external Ollama service
-docker pause ollama-server
+docker pause ollama-server   # Pause the container that is running the external Ollama service
 echo "Ollama container is paused. Proceeding to send request..."
 kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
@@ -271,11 +261,9 @@ Send a request. kgateway will try three times (as configured by attempts: 3 in t
 Now let's look at the logs from the kgateway egress gateway pod. We look for the final access log entry, which must contain the URX and UF flags to prove the retries occurred.
 
 ```sh
-# Get the pod name for the egress-kgateway
-KGW_POD=$(kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=egress-kgateway -o jsonpath='{.items[0].metadata.name}')
+KGW_POD=$(kubectl get pods -n default -l gateway.networking.k8s.io/gateway-name=egress-kgateway -o jsonpath='{.items[0].metadata.name}')   # Get the pod name for the egress-kgateway
 
-# View the last request log entry
-kubectl logs $KGW_POD -n default | grep 'POST /api/generate' | tail -n 1
+kubectl logs $KGW_POD -n default | grep 'POST /api/generate' | tail -n 1   # View the last request log entry
 ```
 You should see an output similar to the following:
 ```
