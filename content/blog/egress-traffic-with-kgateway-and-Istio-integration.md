@@ -241,7 +241,7 @@ spec:
 EOF
 ```
 
-# Testinig Client
+### Verify authorization policies for the Ollama service
 We will use the client app to execute tests against the host.docker.internal via the kGateway path.
 
 Authorized Test (With Required Header)
