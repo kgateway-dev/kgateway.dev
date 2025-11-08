@@ -51,6 +51,22 @@ To establish a dedicated, policy-enforced egress path, we must combine three cor
 
 ```yaml
 kubectl apply -f - <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: egress-kgateway
+  namespace: default
+spec:
+  gatewayClassName: kgateway
+  listeners:
+    - protocol: HTTP
+      port: 8080
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+
 apiVersion: networking.istio.io/v1beta1
 kind: ServiceEntry
 metadata:
@@ -67,22 +83,6 @@ spec:
     name: http-ollama
     protocol: HTTP
   resolution: DNS
----
-
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: egress-kgateway
-  namespace: default
-spec:
-  gatewayClassName: kgateway
-  listeners:
-    - protocol: HTTP
-      port: 8080
-      name: http
-      allowedRoutes:
-        namespaces:
-          from: All
 ---
 
 apiVersion: gateway.networking.k8s.io/v1
