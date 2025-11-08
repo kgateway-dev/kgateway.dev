@@ -208,6 +208,8 @@ EOF
 ```
 # See it in Action/ Testing
 
+### Deploy the test client
+
 To test the security policies applied by kGateway, we use a simple Pod named curl-test-client. Its primary role is to serve as the mesh-enabled client that originates the outbound traffic, allowing us to test Layer 4 security (mTLS) and Layer 7 policies (CEL RBAC/ExtAuth). It is labeled for Ambient Mesh enrollment.
 
 ```YAML
