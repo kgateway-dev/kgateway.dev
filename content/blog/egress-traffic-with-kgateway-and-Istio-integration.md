@@ -267,9 +267,13 @@ Access denied by Kyverno policy
 ### Verify retry policies on the Kyverno server
 
 While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kgateway egress gateway actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
-```sh
-docker pause ollama-server   # Pause the container that is running the external Ollama service
+To test out an error, lets stop our Docker Ollama-server:
+```
+docker pause ollama-server
 echo "Ollama container is paused. Proceeding to send request..."
+```
+Now Let's try sending our request to ollama-server which is stopped thus unreachable:
+```
 kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
 Send a request. kgateway will try three times (as configured by attempts: 3 in the TrafficPolicy) before ultimately failing and returning a 503 Service Unavailable or a 504 Gateway Timeout error to the client like:
