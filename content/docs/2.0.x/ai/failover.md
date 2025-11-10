@@ -25,7 +25,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider. Failover priority is determined by the order in which the pools are listed in the Backend. The pool that is listed first is assigned the highest priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    
@@ -74,7 +74,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    EOF
    ```
 
-2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -108,7 +108,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    EOF
    ```
 
-3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend will automatically use the model from the first pool in the priority order.
+3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
