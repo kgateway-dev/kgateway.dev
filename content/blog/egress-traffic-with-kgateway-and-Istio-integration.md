@@ -282,6 +282,10 @@ You should see an output similar to the following:
   "attempt_count": 2
 }
 ```
+# Conclusion
+While Istio Ambient Mesh simplifies service-to-service security by removing sidecars and introducing a layered data plane model, this guide extended its capabilities to demonstrate how kGateway strengthens that foundation with fine-grained policy control, external authorization, and governance enforcement. This paves the way for platform teams to confidently manage both north-south and east-west traffic using a single control model — all while keeping the lightweight operational benefits that Ambient Mesh was designed for.
+Through this Blog we addressed one of the most overlooked challenges in service mesh deployments on **How can we extend mesh-level security beyond internal workloads while ensuring Outbound traffic follows the same policy rigor, auditability, and compliance as in-cluster communication.**
+
 # Demo
 
 [Demo](https://youtu.be/5PegECeu0v0)
