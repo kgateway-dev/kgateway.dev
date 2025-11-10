@@ -173,7 +173,7 @@ spec:
   - expression: >
       variables.allowed
         ? envoy.Allowed().Response()
-        : envoy.Denied(403).Response()
+        : envoy.Denied(403).WithBody("Access denied by Kyverno policy").Response()
 EOF
 ```
 This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
@@ -257,6 +257,13 @@ Expected Output:
 Ollama is running%
 ```
 
+If we would not include the true or enabled label with our test command then we will receive an error with 403 Forbidden as:
+```
+< HTTP/1.1 403 Forbidden
+< content-type: text/plain
+Access denied by Kyverno policy
+```
+
 ### Verify retry policies on the Kyverno server
 
 While the TrafficPolicy defines the retry logic (attempts: 3, on 503 or 504), we must prove that the kgateway egress gateway actually executes the retries when an upstream service fails. We will simulate an upstream connection failure by temporarily pausing the external Ollama container.
@@ -265,7 +272,12 @@ docker pause ollama-server   # Pause the container that is running the external 
 echo "Ollama container is paused. Proceeding to send request..."
 kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
-Send a request. kgateway will try three times (as configured by attempts: 3 in the TrafficPolicy) before ultimately failing and returning a 5xx error to the client.
+Send a request. kgateway will try three times (as configured by attempts: 3 in the TrafficPolicy) before ultimately failing and returning a 503 Service Unavailable or a 504 Gateway Timeout error to the client like:
+```
+< HTTP/1.1 504 Gateway Timeout
+< content-type: text/plain
+upstream request timeout
+```
 
 Now let's look at the logs from the kgateway egress gateway pod. We look for the final access log entry, which must contain the URX and UF flags to prove the retries occurred.
 
