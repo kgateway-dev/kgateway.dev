@@ -1,25 +1,17 @@
----
-title: Model failover
-weight: 30
----
-
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
-
 Prioritize the failover of requests across different models from an LLM provider.
 
 ## About failover {#about}
 
 Failover is a way to keep services running smoothly by automatically switching to a backup system when the main one fails or becomes unavailable.
 
-For AI gateways, you can set up failover for the models of the LLM providers that you want to prioritize. If the main model from one provider goes down, slows, or has any issue, the system quickly switches to a backup model from that same provider. This keeps the service running without interruptions.
+For {{< reuse "docs/snippets/agentgateway.md" >}}, you can set up failover for the models of the LLM providers that you want to prioritize. If the main model from one provider goes down, slows, or has any issue, the system quickly switches to a backup model from that same provider. This keeps the service running without interruptions.
 
 This approach increases the resiliency of your network environment by ensuring that apps that call LLMs can keep working without problems, even if one model has issues.
 
 ## Before you begin
 
-1. [Set up AI Gateway](../setup/).
-2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+1. Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
+2. Set up [API access to each LLM provider]({{< link-hextra path="/agentgateway/llm/api-keys/" >}}) that you want to use. The example in this guide uses OpenAI.
 
 ## Fail over to other models {#model-failover}
 
@@ -41,8 +33,6 @@ You can configure failover across multiple models and providers by using priorit
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
-     labels:
-       app: model-failover
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
@@ -90,8 +80,6 @@ You can configure failover across multiple models and providers by using priorit
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
-     labels:
-       app: model-failover
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
@@ -134,7 +122,7 @@ You can configure failover across multiple models and providers by using priorit
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/completions` for OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -143,11 +131,9 @@ You can configure failover across multiple models and providers by using priorit
    metadata:
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: model-failover
    spec:
      parentRefs:
-       - name: ai-gateway
+       - name: agentgateway
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -168,7 +154,7 @@ You can configure failover across multiple models and providers by using priorit
    EOF
    ```
 
-3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
+3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first priority group (highest priority).
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -261,9 +247,10 @@ You can configure failover across multiple models and providers by using priorit
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-   ```shell
-   kubectl delete backend,httproute -n {{< reuse "docs/snippets/namespace.md" >}} -l app=model-failover
-   ```
+```shell
+kubectl delete backend model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
+```
 
 ## Next
 

@@ -155,4 +155,3 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    ```
 
 {{< reuse "docs/snippets/agentgateway/llm-next.md" >}}
-
