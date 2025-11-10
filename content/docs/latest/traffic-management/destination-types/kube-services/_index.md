@@ -14,5 +14,5 @@ Check out the following guides for examples on how to route to different types o
 
 {{< cards >}}
   {{< card link="grpc-services" title="gRPC services" >}}
-  {{< card link="kube-services" title="HTTP services" >}}
+  {{< card link="http-services" title="HTTP services" >}}
 {{< /cards >}}
