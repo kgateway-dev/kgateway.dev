@@ -7,3 +7,4 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 ## Set up access to Gemini
 {{< reuse "docs/snippets/gemini-setup.md" >}}
 
+
