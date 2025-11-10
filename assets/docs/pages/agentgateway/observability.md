@@ -28,7 +28,7 @@ To view the logs:
 kubectl logs <agentgateway-pod> -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
-## Monitoring config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} via NACKs {#config-sync}
+## Monitoring config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} {#config-sync}
 
 ### About xDS NACKs {#nacks}
 
