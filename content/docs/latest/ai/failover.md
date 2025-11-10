@@ -7,10 +7,6 @@ weight: 30
 
 Prioritize the failover of requests across different models from an LLM provider.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About failover {#about}
 
 Failover is a way to keep services running smoothly by automatically switching to a backup system when the main one fails or becomes unavailable.
@@ -49,24 +45,27 @@ In this example, you create a Backend with multiple pools for the same LLM provi
      ai:
        priorityGroups:
        - providers:
-         - openai:
+         - name: openai-gpt-4o
+           openai:
              model: "gpt-4o"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
-         - openai:
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+         - name: openai-gpt-4.0-turbo
+           openai:
              model: "gpt-4.0-turbo"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
-         - openai:
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+         - name: openai-gpt-3.5-turbo
+           openai:
              model: "gpt-3.5-turbo"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
    EOF
    ```
 
