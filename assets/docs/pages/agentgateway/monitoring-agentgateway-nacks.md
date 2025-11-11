@@ -84,7 +84,7 @@ Use the following commands to view NACK events for your agentgateway deployment.
      Warning  AgentGatewayNackError    36s                kgateway.dev/agentgateway     policy/traffic/default/example-agw-policy-for-body:transformation:default/example-route-for-body: error: parse: ERROR: <input>:1:20: invalid argument has(request.headers['x-priority-level']) ? 'level_' + request.headers['x-priority-level'] : 'level_unknown'
    ```
 
-3. View events for the associated Deployment in the  same name and namespace as the Gateway.
+3. View events for the associated Deployment in the same name and namespace as the Gateway.
 
    ```sh
    kubectl describe deployment <gateway-name> -n <namespace>
