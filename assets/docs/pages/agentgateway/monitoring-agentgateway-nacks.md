@@ -1,36 +1,4 @@
-Monitor your {{< reuse "docs/snippets/agentgateway.md" >}} proxies with metrics, logs, and events.
-
-## Overview {#overview}
-* **Proxy metrics and logs** - Exposed by {{< reuse "docs/snippets/agentgateway.md" >}} proxy pods on port `15020`. These metrics track request/response data, traffic patterns, and proxy health.
-* **Control plane metrics and events** - Exposed by the {{< reuse "/docs/snippets/kgateway.md" >}} control plane on port `9092`. These metrics can be used to track configuration synchronization health, including NACKs (negative acknowledgements) when proxies reject configuration updates.
-
-## Proxy metrics and logs {#proxy}
-
-### View proxy metrics {#proxy-metrics}
-
-You can access the {{< reuse "docs/snippets/agentgateway.md" >}} metrics endpoint to view proxy-specific metrics, such as request counts, latency, and connection statistics.
-
-1. Port-forward the agentgateway proxy on port 15020.
-   ```sh
-   kubectl port-forward deployment/<gateway-name> -n <namespace> 15020
-   ```
-
-2. Open the {{< reuse "docs/snippets/agentgateway.md" >}} [metrics endpoint](http://localhost:15020/metrics).
-
-3. Review the available metrics. For LLM-specific metrics, see [View LLM metrics and logs]({{< link-hextra path="/agentgateway/llm/observability/" >}}).
-
-### View logs {#proxy-logs}
-
-{{< reuse "docs/snippets/agentgateway-capital.md" >}} automatically logs information to stdout. When you run {{< reuse "docs/snippets/agentgateway.md" >}} on your local machine, you can view a log entry for each request to {{< reuse "docs/snippets/agentgateway.md" >}} in your CLI output. 
-
-To view the logs: 
-```sh
-kubectl logs <agentgateway-pod> -n {{< reuse "docs/snippets/namespace.md" >}}
-```
-
-## Monitoring config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} {#config-sync}
-
-### About xDS NACKs {#nacks}
+### About NACKs {#nacks}
 
 A NACK (negative acknowledgement) occurs when an {{< reuse "docs/snippets/agentgateway.md" >}} proxy rejects a configuration update from the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. NACKs typically indicate configuration issues that prevent the proxy from applying the desired routing, policy, or backend settings. Typically the {{< reuse "/docs/snippets/kgateway.md" >}} control plane reports errors during translation, but some errors can only be caught at configuration time.
 

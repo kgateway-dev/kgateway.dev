@@ -14,6 +14,5 @@ Gain insight into the health and performance of your gateway environment.
   {{< card link="otel-stack" title="Set up the OpenTelemetry stack" >}}
   {{< card link="control-plane-metrics" title="Review control plane metrics" >}}
   {{< card link="gateway-metrics" title="Review gateway proxy metrics" >}}
-  {{< card link="../agentgateway/observability/" title="agentgateway observability" >}}
   {{< card link="../ai/observability/" title="AI Gateway observability" >}}
 {{< /cards >}}
