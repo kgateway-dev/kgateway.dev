@@ -1,4 +1,4 @@
-### About NACKs {#nacks}
+## About NACKs {#nacks}
 
 A NACK (negative acknowledgement) occurs when an {{< reuse "docs/snippets/agentgateway.md" >}} proxy rejects a configuration update from the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. NACKs typically indicate configuration issues that prevent the proxy from applying the desired routing, policy, or backend settings. Typically the {{< reuse "/docs/snippets/kgateway.md" >}} control plane reports errors during translation, but some errors can only be caught at configuration time.
 
@@ -16,11 +16,11 @@ When a NACK occurs, {{< reuse "/docs/snippets/kgateway.md" >}} provides two obse
 * **Prometheus metric**: A counter metric tracks the total number of NACKs across all {{< reuse "docs/snippets/agentgateway.md" >}} proxies which kgateway manages
 * **Kubernetes Events**: {{< reuse "/docs/snippets/kgateway.md" >}} creates Warning events on both the `Gateway` and its corresponding `Deployment` with details about the error
 
-### Monitor NACKs with control plane metrics {#nack-metrics}
+## Monitor NACKs with control plane metrics {#nack-metrics}
 
 You can access the {{< reuse "/docs/snippets/kgateway.md" >}} control plane metrics endpoint to view NACK metrics that track configuration rejections from {{< reuse "docs/snippets/agentgateway.md" >}} proxies.
 
-#### View the NACK metric {#view-nack-metric}
+### View the NACK metric {#view-nack-metric}
 
 1. Port-forward the control plane deployment on port 9092.
    ```sh
@@ -47,11 +47,11 @@ You can use this metric to configure alerts to notify you when NACKs occur so yo
 
  For guidance on setting up the observability stack which will allow for easily configurable alerting, see the [OpenTelemetry stack guide](../../observability/otel-stack/).
 
-### Monitor NACKs with kubernetes events {#nack-events}
+## Monitor NACKs with kubernetes events {#nack-events}
 
 When a NACK occurs for an {{< reuse "docs/snippets/agentgateway.md" >}} proxy, {{< reuse "/docs/snippets/kgateway.md" >}} also creates Kubernetes Warning events on both the `Gateway` and its corresponding `Deployment`.
 
-#### View NACK events {#view-nack-events}
+### View NACK events {#view-nack-events}
 
 Use the following commands to view NACK events for your agentgateway deployment.
 
