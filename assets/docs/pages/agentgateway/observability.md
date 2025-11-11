@@ -79,7 +79,7 @@ You can use this metric to configure alerts to notify you when NACKs occur so yo
 
  For guidance on setting up the observability stack which will allow for easily configurable alerting, see the [OpenTelemetry stack guide](../../observability/otel-stack/).
 
-### Check NACK events {#nack-events}
+### Monitor NACKs with kubernetes events {#nack-events}
 
 When a NACK occurs for an {{< reuse "docs/snippets/agentgateway.md" >}} proxy, {{< reuse "/docs/snippets/kgateway.md" >}} also creates Kubernetes Warning events on both the `Gateway` and its corresponding `Deployment`.
 
