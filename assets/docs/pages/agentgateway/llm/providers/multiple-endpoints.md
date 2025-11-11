@@ -5,7 +5,7 @@ Configure access to multiple OpenAI API endpoints such as for chat completions, 
 To set up multiple LLM endpoints, use the `ai.llm.routes` field. This field maps the API paths to supported route types. The keys are URL suffix matches, like `/v1/models`. The values are the route types, like `completions` or `passthrough`.
 
 - `completions`: Transforms to the LLM provider format and processes the request with the LLM provider. This route type supports full LLM features such as tokenization, rate limiting, transformations, and other policies like prompt guards.
-- `passthrough`: Forwards the request to the LLM provider as-is. This route type does not support LLM features like route processing and policies. You might use this route type for non-chat endpoints such as health checks, `GET` requests like listing models, or custom endpoints that you want to pass through to.
+- `passthrough`: Forwards the request to the LLM provider as-is. This route type does not support LLM features like route processing and policies. You might use this route type for non-chat endpoints such as health checks, `GET` requests like listing models, or custom endpoints that you want to pass traffic through to.
 
 Paths are matched in order, and the first match determines how the request is handled. The wildcard character `*` can be used to match anything. If no route is set, the route defaults to the completions endpoint.
 
@@ -54,7 +54,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
    | `v1/models` | Routes to the models endpoint with passthrough processing. This endpoint is used to get basic information about the models that are available. For more information, see the [OpenAI API docs for the endpoint](https://platform.openai.com/docs/api-reference/models/list).|
    | `*` | Matches any path that doesn't match the specific endpoints otherwise set. Typically, you set this value to `passthrough` to pass through to the provider API without LLM-specific processing.|
 
-2. Create an HTTPRoute resource that routes traffic to the Backend. Note that because you set up the `routes` map on the Backend, you do not need to create any URLRewrite filters to point your route matcher to the correct LLM provider endpoint.
+2. Create an HTTPRoute resource that routes traffic to the OpenAI Backend along the `/openai` path matcher. Note that because you set up the `routes` map on the Backend, you do not need to create any URLRewrite filters to point your route matcher to the correct LLM provider endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF
