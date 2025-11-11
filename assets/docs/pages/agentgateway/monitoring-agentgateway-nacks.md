@@ -2,19 +2,19 @@
 
 A NACK (negative acknowledgement) occurs when an {{< reuse "docs/snippets/agentgateway.md" >}} proxy rejects a configuration update from the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. NACKs typically indicate configuration issues that prevent the proxy from applying the desired routing, policy, or backend settings. Typically the {{< reuse "/docs/snippets/kgateway.md" >}} control plane reports errors during translation, but some errors can only be caught at configuration time.
 
-{{< reuse "/docs/snippets/kgateway.md" >}} provides a combination of metrics and events to monitor the health of config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} proxies. The control plane exposes these metrics and events.
+The {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes a combination of metrics and events to monitor the health of config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} proxies.
 
 For more general information about {{< reuse "/docs/snippets/kgateway.md" >}} control plane metrics, see [Control plane metrics](../../observability/control-plane-metrics/).
 
 Common causes of NACKs include:
 
-* CEL expressions in policies that pass the control plane validator but the data plane rejects (the control plane uses a Go-based CEL validator, while agentgateway uses a Rust-based validator, which can have different validation behavior)
-* Invalid TLS certificates
+* CEL expressions in policies that the control plane validator allows, but the data plane rejects. The control plane uses a Go-based CEL validator, while agentgateway uses a Rust-based validator, which can have different validation behavior.
+* Invalid TLS certificates.
 
 When a NACK occurs, {{< reuse "/docs/snippets/kgateway.md" >}} provides two observability signals:
 
-* **Prometheus metric**: A counter metric tracks the total number of NACKs across all {{< reuse "docs/snippets/agentgateway.md" >}} proxies which kgateway manages
-* **Kubernetes Events**: {{< reuse "/docs/snippets/kgateway.md" >}} creates Warning events on both the `Gateway` and its corresponding `Deployment` with details about the error
+* **Prometheus metric**: A counter metric tracks the total number of NACKs across all {{< reuse "docs/snippets/agentgateway.md" >}} proxies that {{< reuse "/docs/snippets/kgateway.md" >}} manages.
+* **Kubernetes events**: {{< reuse "/docs/snippets/kgateway.md" >}} creates Warning events on both the `Gateway` and its corresponding `Deployment` with details about the error.
 
 ## Monitor NACKs with control plane metrics {#nack-metrics}
 
@@ -45,9 +45,9 @@ You can access the {{< reuse "/docs/snippets/kgateway.md" >}} control plane metr
 
 You can use this metric to configure alerts to notify you when NACKs occur so you can quickly investigate and resolve configuration issues.
 
- For guidance on setting up the observability stack which will allow for easily configurable alerting, see the [OpenTelemetry stack guide](../../observability/otel-stack/).
+For guidance on setting up the observability stack, which allows for configurable alerting, see the [OpenTelemetry stack guide](../../observability/otel-stack/).
 
-## Monitor NACKs with kubernetes events {#nack-events}
+## Monitor NACKs with Kubernetes events {#nack-events}
 
 When a NACK occurs for an {{< reuse "docs/snippets/agentgateway.md" >}} proxy, {{< reuse "/docs/snippets/kgateway.md" >}} also creates Kubernetes Warning events on both the `Gateway` and its corresponding `Deployment`.
 
@@ -55,7 +55,7 @@ When a NACK occurs for an {{< reuse "docs/snippets/agentgateway.md" >}} proxy, {
 
 Use the following commands to view NACK events for your agentgateway deployment.
 
-1. List NACK events in the namespace where your Gateway is deployed.
+1. List NACK events in the namespace where your Gateway is deployed.  If you have multiple Gateways across different namespaces, you can search across all namespaces with `--all-namespaces` instead of `-n <namespace>`.
 
    ```sh
    kubectl get events -n <namespace> --field-selector=reason=AgentGatewayNackError
@@ -69,15 +69,13 @@ Use the following commands to view NACK events for your agentgateway deployment.
    83s         Warning   AgentGatewayNackError   deployment/agentgateway   policy/traffic/default/example-agw-policy-for-body:transformation:default/example-route-for-body: error: parse: ERROR: <input>:1:20: invalid argument has(request.headers['x-priority-level']) ? 'level_' + request.headers['x-priority-level'] : 'level_unknown'
    ```
 
-   To search across all namespaces if you have multiple `Gateways` across different namespaces , use `--all-namespaces` instead of `-n <namespace>`.
-
-2. View events for a specific `Gateway`.
+2. View events for a specific Gateway.
 
    ```sh
    kubectl describe gateway <gateway-name> -n <namespace>
    ```
 
-   Look for events in the output:
+   Look for events in the output similar to the following.
 
    ```console
    Events:
@@ -86,7 +84,7 @@ Use the following commands to view NACK events for your agentgateway deployment.
      Warning  AgentGatewayNackError    36s                kgateway.dev/agentgateway     policy/traffic/default/example-agw-policy-for-body:transformation:default/example-route-for-body: error: parse: ERROR: <input>:1:20: invalid argument has(request.headers['x-priority-level']) ? 'level_' + request.headers['x-priority-level'] : 'level_unknown'
    ```
 
-3. View events for the associated `Deployment` (same name and namespace as the Gateway).
+3. View events for the associated Deployment in the  same name and namespace as the Gateway.
 
    ```sh
    kubectl describe deployment <gateway-name> -n <namespace>
