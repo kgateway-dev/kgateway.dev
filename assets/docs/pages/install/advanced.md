@@ -34,6 +34,26 @@ agentgateway:
 
 When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
+{{< version include-if="2.2.x" >}}
+
+### Experimental Gateway API features {#experimental-gateway-api-features}
+
+To use experimental Gateway API features, you must enable the experimental feature gate, `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`. This setting defaults to `false` and must be explicitly enabled to use experimental features such as the following:
+
+- ListenerSets
+- CORS policies
+- Retries
+- Session persistence
+
+To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
+```
+{{< /version >}}
+
 {{< version include-if="2.2.x,2.1.x" >}}
 
 ## Leader election
