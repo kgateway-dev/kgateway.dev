@@ -139,3 +139,4 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    }
    ```
 
+{{< reuse "docs/snippets/agentgateway/llm-next.md" >}}
