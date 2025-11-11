@@ -83,14 +83,13 @@ To use ListenerSets, you must have the following environment:
 
 2. Follow the [Get Started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
-
 3. To use experimental Gateway API features in kgateway, you must enable the `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES` environment variable in your kgateway controller deployment. This setting defaults to `false` and must be explicitly enabled. For example, if you installed kgateway via Helm, add the following to your Helm values and upgrade your installation.
    
    ```yaml
    controller:
      extraEnv:
        KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
-   ```{{< /version >}}
+   ```
 
 4. If you already have a {{< reuse "docs/snippets/kgateway.md" >}} installation, restart the `{{< reuse "docs/snippets/pod-name.md" >}}` deployment to pick up the new CRDs and environment variable changes.
 
