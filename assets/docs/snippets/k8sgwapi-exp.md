@@ -12,7 +12,7 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 
 {{< version include-if="2.2.x" >}}
 {{< callout type="warning" >}}
-**Experimental feature gate**: To use experimental Gateway API features, you must enable the `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES` environment variable in your kgateway controller deployment. This setting defaults to `false` and must be explicitly enabled. For example, you might upgrade your installation with the following Helm value:
+**Experimental feature gate**: To use experimental Gateway API features in kgateway version 2.2 or later, you must enable the `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES` environment variable in your kgateway controller deployment. This setting defaults to `false` and must be explicitly enabled. For example, you might upgrade your installation with the following Helm value:
 
 ```yaml
 controller:
