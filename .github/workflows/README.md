@@ -1,57 +1,61 @@
-# GitHub Workflows
+# GitHub Actions Workflows
 
-This directory contains the GitHub Actions workflows for the kgateway.dev website.
+This directory contains GitHub Actions workflows for automated deployment of the documentation site.
 
-## update-api-docs.yml
+## Workflows
 
-This workflow is used to update the API and Helm reference docs for the kgateway.dev website, based on code in the kgateway repo.
+### Preview Deployment (`preview.yml`)
 
-### API reference
+- **Trigger**: Pull requests to `main` branch
+- **Purpose**: Creates a preview deployment for each PR
+- **Deployment**: Firebase Hosting preview channel (unique URL per PR)
+- **Features**:
+  - Automatically comments on PRs with preview URL
+  - Only runs when relevant files change (content, assets, configs)
+  - Uses PR number as channel ID: `pr-{PR_NUMBER}`
 
-[Published page](https://kgateway.dev/docs/reference/api/)
+### Production Deployment (`deploy.yml`)
 
-Source files: 
-* [Go code in the API directory](https://github.com/kgateway-dev/kgateway/tree/main/api/v1alpha1)
+- **Trigger**: Pushes to `main` branch
+- **Purpose**: Deploys the site to production
+- **Deployment**: Firebase Hosting production site
+- **Features**:
+  - Only runs when relevant files change
+  - Deploys to the live site
 
-The workflow uses the [crd-ref-docs](https://github.com/elastic/crd-ref-docs) tool to generate Markdown documentation from the API types.
+## Setup Instructions
 
-Process to generate markdown content from source files:
+### 1. Firebase Service Account
 
-1. Update the comments in the .go files in the kgateway/api directory
-2. Run `make generated-code`
-3. Open a PR and merge your changes into the code repo
-4. In the kgateway.dev docs repo, manually trigger the Update API Documentation GitHub Action
-5. The Action updates the [markdown source file](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/api.md)
-6. The Action opens a PR with the updated content
-7. Review and merge the PR
-8. Upon merge, the docs should be automatically built and published
+You need to create a Firebase service account and add it as a GitHub secret:
 
-### Helm reference
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Go to **Project Settings** → **Service Accounts**
+4. Click **Generate New Private Key**
+5. Download the JSON file
+6. In your GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**
+7. Add a new secret named `FIREBASE_SERVICE_ACCOUNT` with the entire contents of the JSON file
 
-[Published page](https://kgateway.dev/docs/reference/helm/)
+### 2. Firebase Project ID
 
-Source files:
-* [Helm files in the code repo](https://github.com/kgateway-dev/kgateway/tree/main/install/helm)
+1. In Firebase Console, go to **Project Settings** → **General**
+2. Copy the **Project ID**
+3. In GitHub repository, add a new secret named `FIREBASE_PROJECT_ID` with the project ID value
 
-The workflow uses the [helm docs](https://github.com/norwoodj/helm-docs/) tool to generate Markdown documentation from the API types.
+### 3. Verify Setup
 
-Process to generate markdown content from source files:
+After adding the secrets:
+- Create a test PR to trigger the preview workflow
+- Merge to main to trigger the production workflow
 
-1. Update the comments in the `values.yaml` files in the `kgateway/install/helm` directory for each field: 
-   * [kgateway values](https://github.com/kgateway-dev/kgateway/blob/main/install/helm/kgateway/values.yaml)
-   * [CRD values (currently none)](https://github.com/kgateway-dev/kgateway/blob/main/install/helm/kgateway-crds/values.yaml)
-2. Run `make generated-code`
-3. Open a PR and merge your changes into the code repo
-4. In the kgateway.dev docs repo, manually trigger the Update API Documentation GitHub Action
-5. The Action updates the markdown source file conrefs for both Helm charts:
-   * [kgateway values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/helm/helm.md)
-   * [CRD values](https://github.com/kgateway-dev/kgateway.dev/blob/main/content/docs/reference/helm/crds.md)
-6. The Action opens a PR with the updated content
-7. Review and merge the PR
-8. Upon merge, the docs should be automatically built and published
+## Workflow Details
 
-## card-check.yml
+Both workflows:
+- Use Hugo Extended v0.135.0
+- Use Node.js 18
+- Install npm dependencies
+- Build the site with `hugo --gc --minify`
+- Deploy to Firebase Hosting
 
-This workflow is used to check the `_index.md` docs files to make sure that the cards include the right links to subpages in that directory.
-
-For more information on how this works, see the [card-check.py](../../scripts/card-check.py) script.
+The preview workflow automatically comments on PRs with a link to the preview deployment.
