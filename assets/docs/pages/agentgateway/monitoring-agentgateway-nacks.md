@@ -1,8 +1,10 @@
 ## About NACKs {#nacks}
 
-A NACK (negative acknowledgement) occurs when an {{< reuse "docs/snippets/agentgateway.md" >}} proxy rejects a configuration update from the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. NACKs typically indicate configuration issues that prevent the proxy from applying the desired routing, policy, or backend settings. Typically the {{< reuse "/docs/snippets/kgateway.md" >}} control plane reports errors during translation, but some errors can only be caught at configuration time.
+A NACK (negative acknowledgement) occurs when an {{< reuse "docs/snippets/agentgateway.md" >}} proxy rejects a configuration update from the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. NACKs typically indicate configuration issues that prevent the proxy from applying the desired routing, policy, or backend settings.
 
-The {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes a combination of metrics and events to monitor the health of config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} proxies.
+Typically, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane reports errors during translation, in which the control plane immediately rejects invalid configuration in custom resources and records errors in custom resource statuses. However, some errors can only be caught at configuration time, in which the control plane cannot determine the configuration failure until a proxy in the data plane rejects the configuration.
+
+To track these NACKs at configuration time, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes a combination of metrics and events that monitor the health of config synchronization between the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and {{< reuse "docs/snippets/agentgateway.md" >}} proxies.
 
 For more general information about {{< reuse "/docs/snippets/kgateway.md" >}} control plane metrics, see [Control plane metrics](../../observability/control-plane-metrics/).
 
