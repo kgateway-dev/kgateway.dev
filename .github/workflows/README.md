@@ -53,7 +53,7 @@ After adding the secrets:
 
 Both workflows:
 - Use Hugo Extended v0.135.0
-- Use Node.js 18
+- Use Node.js 20 (required for Firebase CLI v14+)
 - Install npm dependencies
 - Build the site with `hugo --gc --minify`
 - Deploy to Firebase Hosting
