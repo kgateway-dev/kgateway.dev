@@ -49,8 +49,8 @@ jobs:
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+          firebaseServiceAccount: ${{ secrets.GC_FIREBASE_GHA_SA_JSON_KEY }}
+          projectId: ${{ secrets.GC_FIREBASE_GHA_PROJECT_ID }}
           channelId: live
-          target: 'production'
+          target: production
 

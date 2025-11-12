@@ -35,13 +35,13 @@ You need to create a Firebase service account and add it as a GitHub secret:
 4. Click **Generate New Private Key**
 5. Download the JSON file
 6. In your GitHub repository, go to **Settings** → **Secrets and variables** → **Actions**
-7. Add a new secret named `FIREBASE_SERVICE_ACCOUNT` with the entire contents of the JSON file
+7. Add a new secret named `GC_FIREBASE_GHA_SA_JSON_KEY` with the entire contents of the JSON file
 
 ### 2. Firebase Project ID
 
 1. In Firebase Console, go to **Project Settings** → **General**
 2. Copy the **Project ID**
-3. In GitHub repository, add a new secret named `FIREBASE_PROJECT_ID` with the project ID value
+3. In GitHub repository, add a new secret named `GC_FIREBASE_GHA_PROJECT_ID` with the project ID value
 
 ### 3. Verify Setup
 

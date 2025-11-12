@@ -50,9 +50,9 @@ jobs:
       - name: Deploy to Firebase Preview
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.GC_FIREBASE_GHA_SA_JSON_KEY }}
+          projectId: ${{ secrets.GC_FIREBASE_GHA_PROJECT_ID }}
           channelId: 'pr-${{ github.event.pull_request.number }}'
-          target: 'preview'
+          target: preview
 
