@@ -54,5 +54,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.GC_FIREBASE_GHA_SA_JSON_KEY }}
           projectId: ${{ secrets.GC_FIREBASE_GHA_PROJECT_ID }}
           channelId: 'pr-${{ github.event.pull_request.number }}'
-          target: preview
 
