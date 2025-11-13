@@ -13,9 +13,7 @@
         // Skip redirect for section names (envoy, agentgateway)
         if (matchedPath === "envoy" || matchedPath === "agentgateway") {
             // Let the section-specific redirects handle these
-            return;
-        }
-        if (docsVersions.includes(matchedPath)) {
+        } else if (docsVersions.includes(matchedPath)) {
             // match is a valid docs version, redirect to base docs page for that version
             window.location.assign(window.location.origin + "/docs/" + matchedPath);
         } else {
