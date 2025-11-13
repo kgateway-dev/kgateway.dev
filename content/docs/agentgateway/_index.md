@@ -1,6 +1,13 @@
 ---
 title: "Agentgateway Docs (AI gateway)"
+weight: 1
+description:
 ---
+
+{{< cards >}}
+{{< /cards >}}
+
+# Agentgateway Docs (AI gateway)
 
 Select the version for the agentgateway docs.
 

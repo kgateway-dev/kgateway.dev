@@ -1,6 +1,12 @@
 ---
 title: "Kgateway Docs (Envoy-based API gateway)"
+weight: 1
+description:
 ---
+{{< cards >}}
+{{< /cards >}}
+
+# Kgateway Docs (Envoy-based API gateway)
 
 Select the version for the kgateway docs.
 
