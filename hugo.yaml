@@ -173,7 +173,3 @@ params:
           dropdown: "2.1 (latest)"
           linkVersion: "latest"
           url: "/latest"
-        - version: "2.0.x"
-          dropdown: "2.0"
-          linkVersion: "2.0.x"
-          url: "/2.0.x"
