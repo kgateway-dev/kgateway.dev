@@ -1,5 +1,5 @@
 ---
-title: "Agentgateway Docs (AI gateway)"
+title: "Agentgateway (AI)"
 weight: 1
 description:
 ---

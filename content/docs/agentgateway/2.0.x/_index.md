@@ -1,5 +1,5 @@
 ---
-title: Agentgateway
+title: Agentgateway 2.0.x
 weight: 10
 ---
 

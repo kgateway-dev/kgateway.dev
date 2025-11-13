@@ -1,5 +1,5 @@
 ---
-title: Agentgateway
+title: Agentgateway 2.2.x
 weight: 460
 description: Use kgateway with agentgateway. 
 ---

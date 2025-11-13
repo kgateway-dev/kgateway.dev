@@ -1,5 +1,5 @@
 ---
-linkTitle: "Documentation"
+linkTitle: "Kgateway 2.0.x"
 title: Welcome
 ---
 
