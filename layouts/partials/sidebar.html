@@ -1,0 +1,182 @@
+{{- $context := .context -}}
+{{- $disableSidebar := .disableSidebar | default false -}}
+
+{{- /* Check if this is a docs landing page - don't show sidebar */ -}}
+{{- $isDocsIndex := and (eq $context.Section "docs") (eq $context.RelPermalink "/docs/") -}}
+{{- $isEnvoyIndex := and (eq $context.Section "docs") (eq $context.RelPermalink "/docs/envoy/") -}}
+{{- $isAgentgatewayIndex := and (eq $context.Section "docs") (eq $context.RelPermalink "/docs/agentgateway/") -}}
+{{- $isLandingPage := or $isDocsIndex $isEnvoyIndex $isAgentgatewayIndex -}}
+
+{{- if or $disableSidebar $isLandingPage -}}
+  <aside class="hx-hidden"></aside>
+{{- else -}}
+  {{- /* Extract current version and section from page path */ -}}
+  {{- $path := $context.RelPermalink -}}
+  {{- $segments := split $path "/" -}}
+  {{- $currentVersion := "" -}}
+  {{- $section := "" -}}
+  {{- $isVersionedDocs := false -}}
+  
+  {{- /* Check if we're in a versioned docs section */ -}}
+  {{- if and (ge (len $segments) 4) (eq (index $segments 1) "docs") -}}
+    {{- $section = index $segments 2 -}}
+    {{- $versionCandidate := index $segments 3 -}}
+    {{- if or (eq $versionCandidate "2.0.x") (eq $versionCandidate "latest") (eq $versionCandidate "main") -}}
+      {{- $currentVersion = $versionCandidate -}}
+      {{- $isVersionedDocs = true -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if $isVersionedDocs -}}
+    {{- /* Get the docs section page for the current version */ -}}
+    {{- $versionPrefix := printf "/docs/%s/%s/" $section $currentVersion -}}
+    {{- $docsSectionPath := printf "/docs/%s/%s/" $section $currentVersion -}}
+    {{- $docsSection := $context.Site.GetPage $docsSectionPath -}}
+    
+    {{- if $docsSection -}}
+      {{- /* Render sidebar starting from the versioned docs section */ -}}
+      <aside class="sidebar-container hx-order-first hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-flex hx-flex-col">
+        <div class="hextra-scrollbar hx-overflow-y-auto hx-overflow-x-hidden hx-p-4 hx-grow md:hx-h-[calc(100vh-var(--navbar-height)-var(--menu-height))]">
+          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+            {{- template "render-sidebar-tree" (dict "page" $docsSection "current" $context "versionPrefix" $versionPrefix "depth" 0) -}}
+          </nav>
+        </div>
+        {{- if (.Site.Params.theme.displayToggle | default true) -}}
+        <div class="hx-sticky hx-bottom-0 hx-bg-white dark:hx-bg-dark hx-mx-4 hx-py-4 hx-shadow-[0_-12px_16px_#fff] hx-flex hx-items-center hx-gap-2 dark:hx-border-neutral-800 dark:hx-shadow-[0_-12px_16px_#111] contrast-more:hx-border-neutral-400 contrast-more:hx-shadow-none contrast-more:dark:hx-shadow-none hx-border-t" data-toggle-animation="show">
+          <div class="hx-flex hx-grow hx-flex-col">
+            <button
+              title="Change theme"
+              data-theme="light"
+              class="theme-toggle hx-group hx-h-7 hx-rounded-md hx-px-2 hx-text-left hx-text-xs hx-font-medium hx-text-gray-600 hx-transition-colors dark:hx-text-gray-400 hover:hx-bg-gray-100 hover:hx-text-gray-900 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50"
+              type="button"
+              aria-label="Change theme"
+            >
+              <div class="hx-flex hx-items-center hx-gap-2 hx-capitalize">
+                <svg height="12" class="group-data-[theme=light]:hx-hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <span class="group-data-[theme=light]:hx-hidden">Light</span>
+                <svg height="12" class="group-data-[theme=dark]:hx-hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <span class="group-data-[theme=dark]:hx-hidden">Dark</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        {{- end -}}
+      </aside>
+    {{- else -}}
+      {{- /* Fallback: empty sidebar if section not found */ -}}
+      <aside class="sidebar-container hx-order-first hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden"></aside>
+    {{- end -}}
+  {{- else -}}
+    {{- /* For non-versioned pages, try to use theme's sidebar or render empty */ -}}
+    {{- if templates.Exists "partials/hextra/sidebar.html" -}}
+      {{- partial "hextra/sidebar.html" (dict "context" $context) -}}
+    {{- else -}}
+      <aside class="sidebar-container hx-order-first hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-flex hx-flex-col">
+        <div class="hextra-scrollbar hx-overflow-y-auto hx-overflow-x-hidden hx-p-4 hx-grow md:hx-h-[calc(100vh-var(--navbar-height)-var(--menu-height))]">
+          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+            {{- template "render-sidebar-tree" (dict "page" $context "current" $context "versionPrefix" "" "depth" 0) -}}
+          </nav>
+        </div>
+        {{- if (.Site.Params.theme.displayToggle | default true) -}}
+        <div class="hx-sticky hx-bottom-0 hx-bg-white dark:hx-bg-dark hx-mx-4 hx-py-4 hx-shadow-[0_-12px_16px_#fff] hx-flex hx-items-center hx-gap-2 dark:hx-border-neutral-800 dark:hx-shadow-[0_-12px_16px_#111] contrast-more:hx-border-neutral-400 contrast-more:hx-shadow-none contrast-more:dark:hx-shadow-none hx-border-t" data-toggle-animation="show">
+          <div class="hx-flex hx-grow hx-flex-col">
+            <button
+              title="Change theme"
+              data-theme="light"
+              class="theme-toggle hx-group hx-h-7 hx-rounded-md hx-px-2 hx-text-left hx-text-xs hx-font-medium hx-text-gray-600 hx-transition-colors dark:hx-text-gray-400 hover:hx-bg-gray-100 hover:hx-text-gray-900 dark:hover:hx-bg-primary-100/5 dark:hover:hx-text-gray-50"
+              type="button"
+              aria-label="Change theme"
+            >
+              <div class="hx-flex hx-items-center hx-gap-2 hx-capitalize">
+                <svg height="12" class="group-data-[theme=light]:hx-hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <span class="group-data-[theme=light]:hx-hidden">Light</span>
+                <svg height="12" class="group-data-[theme=dark]:hx-hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <span class="group-data-[theme=dark]:hx-hidden">Dark</span>
+              </div>
+            </button>
+          </div>
+        </div>
+        {{- end -}}
+      </aside>
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Recursive template to render sidebar tree */ -}}
+{{- define "render-sidebar-tree" -}}
+  {{- $page := .page -}}
+  {{- $current := .current -}}
+  {{- $versionPrefix := .versionPrefix -}}
+  {{- $depth := .depth | default 0 -}}
+  {{- $maxDepth := 4 -}}
+  
+  {{- if gt $depth $maxDepth -}}
+    {{- return -}}
+  {{- end -}}
+  
+  {{- /* Get children pages that match the version prefix (if specified) */ -}}
+  {{- /* Hugo's .Pages is already sorted by weight, so we maintain that order */ -}}
+  {{- $children := slice -}}
+  {{- range $page.Pages -}}
+    {{- $include := true -}}
+    {{- if ne $versionPrefix "" -}}
+      {{- $include = hasPrefix .RelPermalink $versionPrefix -}}
+    {{- end -}}
+    {{- if $include -}}
+      {{- $children = $children | append . -}}
+    {{- end -}}
+  {{- end -}}
+  
+  {{- /* Hugo's .Pages is already sorted by weight, maintain that order */ -}}
+  {{- $sortedChildren := $children -}}
+  
+  {{- if gt (len $sortedChildren) 0 -}}
+    <ul class="{{ if eq $depth 0 }}hx-mt-2{{ else }}hx-ml-4 hx-mt-1{{ end }} hx-space-y-1">
+      {{- range $sortedChildren -}}
+        {{- $childIsActive := eq .RelPermalink $current.RelPermalink -}}
+        {{- $childIsAncestor := $current.IsDescendant . -}}
+        {{- $childIsExpanded := or $childIsActive $childIsAncestor -}}
+        
+        {{- /* Get grandchildren that match version prefix */ -}}
+        {{- $grandchildren := slice -}}
+        {{- range .Pages -}}
+          {{- $include := true -}}
+          {{- if ne $versionPrefix "" -}}
+            {{- $include = hasPrefix .RelPermalink $versionPrefix -}}
+          {{- end -}}
+          {{- if $include -}}
+            {{- $grandchildren = $grandchildren | append . -}}
+          {{- end -}}
+        {{- end -}}
+        
+        <li class="hx-relative">
+          <a
+            href="{{ .RelPermalink }}"
+            class="hx-flex hx-items-center hx-gap-2 hx-rounded-md hx-px-3 hx-py-2 hx-text-sm hx-transition-colors {{ if $childIsActive }}hx-bg-primary-100 hx-font-semibold hx-text-primary-800 dark:hx-bg-gray-900 dark:hx-text-white sidebar-active-item{{ else }}hx-text-gray-700 hover:hx-bg-gray-100 hover:hx-text-gray-900 dark:hx-text-gray-300 dark:hover:hx-bg-gray-900 dark:hover:hx-text-white{{ end }}"
+            {{ if $childIsActive }}aria-current="page"{{ end }}
+          >
+            <span class="hx-flex-1">{{ .Title | default .File.LogicalName }}</span>
+            {{- if gt (len $grandchildren) 0 -}}
+              <svg class="hx-h-4 hx-w-4 hx-shrink-0 hx-ml-auto hx-transition-transform {{ if $childIsExpanded }}hx-rotate-90{{ end }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            {{- end -}}
+          </a>
+          
+          {{- if and (gt (len $grandchildren) 0) $childIsExpanded -}}
+            {{- template "render-sidebar-tree" (dict "page" . "current" $current "versionPrefix" $versionPrefix "depth" (add $depth 1)) -}}
+          {{- end -}}
+        </li>
+      {{- end -}}
+    </ul>
+  {{- end -}}
+{{- end -}}
+

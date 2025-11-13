@@ -16,7 +16,7 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/), see the [agentgateway docs]({{< link-hextra path="/agentgateway" >}}).
+1. [Upgrade](/docs/envoy/main/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: To use AI Gateway with [agentgateway](../../agentgateway/main/), see the [agentgateway docs]({{< link-hextra path="/agentgateway" >}}).
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.

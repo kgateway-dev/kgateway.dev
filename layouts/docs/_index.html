@@ -1,0 +1,43 @@
+{{ define "main" }}
+  <style>
+    /* Hide sidebar on docs landing page */
+    .sidebar-container,
+    aside.sidebar-container,
+    aside.hx-order-first,
+    .hx-order-first {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Full width for landing page - override theme's flex layout */
+    .hx-mx-auto.hx-flex {
+      max-width: 100% !important;
+      justify-content: center !important;
+    }
+    
+    /* Hide TOC on landing page */
+    .toc-container {
+      display: none !important;
+    }
+  </style>
+  
+  <div class="w-full z-10">
+    {{ partial "announcement.html" .}}
+  </div>
+  
+  <!-- Explicitly structure without sidebar wrapper -->
+  <div class="hx-mx-auto hx-flex hx-justify-center hx-px-6 md:hx-px-12 hx-py-12">
+    <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center">
+      <main class="hx-w-full hx-min-w-0 hx-max-w-6xl">
+        <div class="hx-text-center hx-mb-12">
+          <h1 class="hx-text-4xl hx-font-bold hx-mb-4">{{ .Title | default "Documentation" }}</h1>
+        </div>
+        
+        <div class="content">
+          {{ .Content }}
+        </div>
+      </main>
+    </article>
+  </div>
+{{ end }}
+

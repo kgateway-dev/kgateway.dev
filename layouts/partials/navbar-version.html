@@ -1,11 +1,27 @@
-{{ $path := page.RelPermalink }}
+{{- $path := page.RelPermalink -}}
 {{- $segments := split $path "/" -}}
-{{- $filtered := after 3 $segments -}}
-{{- $newPath := printf "/%s" (delimit $filtered "/") -}}
-{{ $baseurl := site.BaseURL }}
+{{- $section := index $segments 1 -}}  {{- /* "docs" */ -}}
+{{- $subSection := index $segments 2 -}}  {{- /* "envoy" or "agentgateway" */ -}}
+{{- $currentVersion := "" -}}
+{{- /* Extract current version from path */ -}}
+{{- if and (ge (len $segments) 4) (eq $section "docs") -}}
+  {{- $currentVersion = index $segments 3 -}}
+{{- end -}}
 
-{{ range site.Params.versions }}
+{{- /* Get versions for current section */ -}}
+{{- $versions := site.Params.versions -}}
+{{- if and $subSection (isset site.Params.sections $subSection) -}}
+  {{- $versions = (index site.Params.sections $subSection).versions -}}
+{{- end -}}
+
+{{- /* Build path without version but with section */ -}}
+{{- /* Skip first 4 segments: "", "docs", "envoy", "latest" - take everything after version */ -}}
+{{- $filtered := after 4 $segments -}}
+{{- $newPath := printf "/%s" (delimit $filtered "/") -}}
+{{- $baseurl := site.BaseURL -}}
+
+{{- range $versions -}}
   <li>
-    <a class="dropdow-item" href="{{ $baseurl }}docs/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+    <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
   </li>
-{{ end }}
+{{- end -}}

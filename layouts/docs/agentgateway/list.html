@@ -1,0 +1,160 @@
+{{ define "main" }}
+  {{- /* Check if this is the /docs/agentgateway/ index page */ -}}
+  {{- $isAgentgatewayIndex := or (eq .RelPermalink "/docs/agentgateway/") (eq .RelPermalink "/docs/agentgateway") -}}
+  
+  {{- if $isAgentgatewayIndex -}}
+    {{- /* Custom layout for agentgateway landing page */ -}}
+    <style>
+      /* Hide sidebar on agentgateway landing page */
+      .sidebar-container,
+      aside.sidebar-container,
+      aside.hx-order-first,
+      .hx-order-first {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Full width for landing page */
+      .hx-mx-auto.hx-flex {
+        max-width: 100% !important;
+        justify-content: center !important;
+      }
+      
+      /* Hide TOC on landing page */
+      .toc-container {
+        display: none !important;
+      }
+      
+      /* Force visibility for headings and content - target the actual rendered structure */
+      main .content h1,
+      main .content h2,
+      main .content h3,
+      main .content h4,
+      main .content h5,
+      main .content h6,
+      main .content p {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: rgb(17, 24, 39) !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1rem !important;
+      }
+      main .content h1 {
+        font-size: 2.25rem !important;
+        margin-top: 0 !important;
+      }
+      main .content p {
+        font-size: 1.125rem !important;
+        font-weight: 400 !important;
+        color: rgb(55, 65, 81) !important;
+      }
+      .dark main .content h1,
+      .dark main .content h2,
+      .dark main .content h3,
+      .dark main .content h4,
+      .dark main .content h5,
+      .dark main .content h6 {
+        color: rgb(243, 244, 246) !important;
+      }
+      .dark main .content p {
+        color: rgb(209, 213, 219) !important;
+      }
+    </style>
+    
+    <div class="w-full z-10">
+      {{ partial "announcement.html" .}}
+    </div>
+    
+    <div class="hx-mx-auto hx-flex hx-justify-center hx-px-6 md:hx-px-12 hx-py-12">
+      <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center">
+        <main class="hx-w-full hx-min-w-0 hx-max-w-6xl">
+          <div class="hx-text-center hx-mb-12">
+            <h1 class="hx-text-4xl hx-font-bold hx-mb-4 hx-text-gray-900 dark:hx-text-gray-100">{{ if .Title }}{{ .Title }}{{ else }}AgentGateway Documentation{{ end }}</h1>
+          </div>
+          
+          <div class="content hx-prose hx-prose-lg hx-max-w-none">
+            <div class="hx-text-center hx-mb-8">
+              <style>
+                /* Force visibility for all content elements */
+                .content,
+                .content * {
+                  opacity: 1 !important;
+                }
+                .content p,
+                .content h1,
+                .content h2,
+                .content h3,
+                .content h4,
+                .content h5,
+                .content h6 {
+                  color: rgb(55, 65, 81) !important;
+                  margin-bottom: 1.5rem !important;
+                  display: block !important;
+                  visibility: visible !important;
+                  opacity: 1 !important;
+                  height: auto !important;
+                  width: auto !important;
+                  font-size: inherit !important;
+                  line-height: inherit !important;
+                }
+                .content h1 {
+                  font-size: 2.25rem !important;
+                  font-weight: 700 !important;
+                  margin-top: 0 !important;
+                  color: rgb(17, 24, 39) !important;
+                }
+                .content p {
+                  font-size: 1.125rem !important;
+                  color: rgb(55, 65, 81) !important;
+                }
+                .dark .content p,
+                .dark .content h1,
+                .dark .content h2,
+                .dark .content h3,
+                .dark .content h4,
+                .dark .content h5,
+                .dark .content h6 {
+                  color: rgb(209, 213, 219) !important;
+                }
+                .dark .content h1 {
+                  color: rgb(243, 244, 246) !important;
+                }
+              </style>
+              {{ .Content }}
+            </div>
+          </div>
+        </main>
+      </article>
+    </div>
+  {{- else -}}
+    <style>
+      /* Hide top-layer docs link from breadcrumbs */
+      main > div:first-child > *:nth-child(-n + 2) {
+        display: none;
+      }
+    </style>
+    
+    <div class="w-full z-10">
+      {{ partial "announcement.html" .}}
+    </div>
+    <div class='hx-mx-auto hx-flex {{ partial "utils/page-width" . }}'>
+      {{ partial "sidebar.html" (dict "context" .) }}
+      {{ partial "toc.html" . }}
+      <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center hx-pb-8 hx-pr-[calc(env(safe-area-inset-right)-1.5rem)]">
+        <main class="hx-w-full hx-min-w-0 hx-max-w-6xl hx-px-6 hx-pt-4 md:hx-px-12">
+          {{ partial "breadcrumb.html" . }}
+          <div class="content">
+            {{ if .Title }}<h1>{{ .Title }}</h1>{{ end }}
+            {{ .Content }}
+          </div>
+          {{ partial "components/last-updated.html" . }}
+          {{ partial "components/pager.html" . }}
+          {{ partial "components/comments.html" . }}
+        </main>
+      </article>
+    </div>
+  {{- end -}}
+{{ end }}
+
