@@ -74,18 +74,6 @@
     <a href="/docs/{{ $subSection }}/{{ $currentVersion }}/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
       {{ $productName }}
     </a>
-    {{- if $versionDisplay -}}
-      <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
-      {{- if $isVersionIndex -}}
-        <span class="hx-text-gray-900 dark:hx-text-gray-100">
-          {{ $versionDisplay }}
-        </span>
-      {{- else -}}
-        <span class="hx-text-gray-600 dark:hx-text-gray-400">
-          {{ $versionDisplay }}
-        </span>
-      {{- end -}}
-    {{- end -}}
     {{- /* Add intermediate breadcrumb items */ -}}
     {{- range $breadcrumbItems -}}
       <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
