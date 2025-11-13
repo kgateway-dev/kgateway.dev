@@ -180,7 +180,7 @@ This step involves configuring a TrafficPolicy to delegate authorization with kg
 
 # Kyverno Configuration Policy/ Configuration Governance
 
-This ClusterPolicy ensures that any time a ServiceEntry is created for an external host, the developer must include the security label `security.corp/egress-approved: "true"`. This fulfills the requirement of using Kyverno for security governance on the configuration plane.
+This ClusterPolicy ensures that any time a ServiceEntry is created for an external host, the developer must include the security label `security.corp/egress-approved: "true"`. This ensures external destinations are subject to review and automated governance when they are configured (the control plane), rather than relying solely on runtime checks — Kyverno validates and blocks non-compliant configuration before it ever becomes active in the data plane.
 
 ```YAML
 kubectl apply -f - <<EOF
