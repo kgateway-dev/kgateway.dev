@@ -93,7 +93,9 @@
     <div class="flex items-center gap-8">
       <a href="/">{{ partial "utils/icon.html" (dict "name" "logo" "attributes" "id='logo'" ) }}</a>
       <a class="link flex items-center gap-2 whitespace-nowrap text-secondary-link" href="https://github.com/kgateway-dev/kgateway">
-        {{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }} GitHub
+        <span class="dark:hidden">{{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
+        <span class="hidden dark:inline">{{ partial "utils/icon.html" (dict "name" "github-white" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
+        GitHub
       </a>
       <a class="link flex items-center whitespace-nowrap text-secondary-link" href="/slack">
         {{ partial "utils/icon.html" (dict "name" "slack" "attributes" "class='fill-secondary-link w-10 h-10'") }}
