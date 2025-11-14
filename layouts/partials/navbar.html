@@ -46,6 +46,19 @@
   .search-results .prefix:has(+ li a[href*="/docs/{{$version}}/"]) ~ .prefix:has(+ li a[href*="/docs/{{$version}}/"]) {
     margin-top: 1.5rem;
   }
+
+  /* GitHub icon dark mode override */
+  .dark a[href*="github"] span.github-white-icon {
+    display: inline-block !important;
+  }
+  
+  /* GitHub icon size constraint */
+  a[href*="github"] svg {
+    max-width: 24px;
+    max-height: 24px;
+    width: 24px;
+    height: 24px;
+  }
 </style>
 
 <div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden">
@@ -96,7 +109,12 @@
         {{- if .Params.icon -}}
           {{- $rel := cond (eq .Params.icon "mastodon") "noreferer me" "noreferer" }}
           <a class="hx-p-2 hx-text-current" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
-            {{- partial "utils/icon.html" (dict "name" .Params.icon "attributes" "height=24") -}}
+            {{- if eq .Params.icon "github" -}}
+              <span class="hx-inline-block dark:hx-hidden">{{- partial "utils/icon.html" (dict "name" "github" "attributes" "height=24 width=24") -}}</span>
+              <span class="hx-hidden dark:hx-inline-block github-white-icon">{{- partial "utils/icon.html" (dict "name" "github-white" "attributes" "height=24 width=24") -}}</span>
+            {{- else -}}
+              {{- partial "utils/icon.html" (dict "name" .Params.icon "attributes" "height=24") -}}
+            {{- end -}}
             <span class="hx-sr-only">{{ or (T .Identifier) .Name | safeHTML }}</span>
           </a>
         {{- else -}}
