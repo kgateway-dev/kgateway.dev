@@ -5,7 +5,47 @@ author: Aryan Parashar
 excludeSearch: 
 ---
 
-[Istio Ambient Mesh](https://ambientmesh.io/docs/about/overview/) is a sidecar-less data plane model designed to reduce operational overhead and improve resource efficiency for service-to-service communication. Instead of using per-pod sidecar proxies, Ambient splits its data plane into two layers:
+Modern Kubernetes platforms already secure in-cluster (east–west) communication through service meshes like Istio. But the same rigor rarely applies to outbound (egress) traffic — calls leaving the cluster to reach APIs, model endpoints, or third-party services. Without standardized policies, teams often struggle to track which workloads are reaching out to the internet, whether those requests are properly authorized, and how to enforce consistent authentication without adding custom code in every service.
+
+These inconsistencies create both visibility gaps and compliance risks. Platform engineers also need to ensure that failures in external dependencies don’t cascade back into the cluster. The goal of this post is to design a policy-enforced, resilient egress path that is observable, auditable, and governed, using three key technologies working together: **[kgateway](https://kgateway.dev/docs/latest/quickstart/)** (an Envoy-based pluggable gateway), **[Istio Ambient Mesh](https://ambientmesh.io/docs/about/overview/)** (providing secure L4 identity and mTLS), and **[Kyverno](https://kyverno.io/docs/installation/)** (for external authorization and configuration governance).
+
+## The challenge with outgoing traffic
+
+In most clusters, outbound requests leave through arbitrary nodes or NAT gateways, bypassing the control that meshes offer internally. This leads to shadow egress — workloads connecting directly to external endpoints without policy or inspection. Authorization checks are often inconsistent, and operations teams have little visibility into which service made which request.
+
+Even when egress is centralized, resilience policies such as timeouts and retries vary across services, and new external hosts can appear without any governance review. Together, these issues create a fragile perimeter where traffic is secure inside the mesh, but uncontrolled once it leaves the cluster.
+
+
+## The role of an egress gateway
+
+An egress gateway solves this by acting as a single, managed exit point from the mesh. Every outbound HTTP(S) call passes through it, where you can consistently apply identity-aware routing, authorization policies, retry logic, and observability.
+
+In this post, we’ll show how kGateway, an Envoy-powered gateway built for Gateway API and Ambient Mesh, can serve as that controlled exit point. By combining it with Kyverno’s external authorization (ExtAuth) and Istio Ambient’s secure overlay, we can inspect and govern all outbound traffic without sidecars or additional proxies.
+
+
+## How the components work together and what does the Blog demonstrate
+
+At the foundation, Istio Ambient Mesh provides L4 security and workload identity via its ztunnel layer. On top of that, kgateway manages egress traffic through L7 routing and resilience features, while Kyverno acts on two planes — as an external authorization service at runtime and as a policy engine for governance during configuration.
+
+Together, they form a layered security and governance model for egress traffic. The Ollama container running outside the cluster serves as our real-world external endpoint — representing a model API or SaaS service — to validate that all outbound requests follow the intended security and control flow.
+
+This guide walks you through how to register an external host using an Istio ServiceEntry, route outbound traffic via a dedicated kgateway egress proxy, and then enforce Kyverno-based authorization at Layer 7.
+
+We will also introduce a Kyverno ClusterPolicy to add governance at the control plane, ensuring all new external ServiceEntries are properly labeled and approved. Finally, we’ll test resilience by pausing the external Ollama service and observing retry and timeout behaviors (503/504) enforced through kGateway’s TrafficPolicy.
+
+## Prequisites
+Before setting up the integration between kgateway, Istio Ambient Mesh, and Kyverno, ensure that your local or lab environment includes the following tools and configurations:
+* [Docker](https://docs.docker.com/get-docker/)
+* [kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/docs/user/quick-start/)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [Helm](https://helm.sh/docs/intro/install/)
+* [kgateway](https://kgateway.dev/docs/latest/quickstart/)
+* [Kyverno](https://kyverno.io/docs/installation/)
+
+
+# How Istio Ambient Mesh is different from Service Mesh
+
+Istio Ambient Mesh is a sidecar-less data plane model designed to reduce operational overhead and improve resource efficiency for service-to-service communication. Instead of using per-pod sidecar proxies, Ambient splits its data plane into two layers:
 
 * **Secure Overlay Layer (L4)** — Handled by the lightweight *ztunnel*, providing mTLS, identity, and network telemetry.
 * **Waypoint Proxy Layer (L7)** — Handles application-layer policies such as routing, authentication, RBAC, and external authorization.
@@ -15,15 +55,6 @@ This separation lets platform teams choose when L7 processing is necessary, redu
 ## Kgateway's integration with Ambient Mesh
 kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, Kgateway is the first project that can be used as a pluggable waypoint for Istio. 
 Kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
-
-### Prequisites
-Before setting up the integration between kgateway, Istio Ambient Mesh, and Kyverno, ensure that your local or lab environment includes the following tools and configurations:
-* [Docker](https://docs.docker.com/get-docker/)
-* [kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/docs/user/quick-start/)
-* [kubectl](https://kubernetes.io/docs/tasks/tools/)
-* [Helm](https://helm.sh/docs/intro/install/)
-* [kgateway](https://kgateway.dev/docs/latest/quickstart/)
-* [Kyverno](https://kyverno.io/docs/installation/)
 
 ## Prepare your kgateway environment
 Before integrating kagteway with Istio Ambient, ensure we have: 
