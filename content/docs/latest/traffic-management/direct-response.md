@@ -5,11 +5,11 @@ prev: /docs/traffic-management/destination-types
 next: /docs/traffic-management/match
 ---
 
-Use the DirectResponse API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
+Use the {{< gloss "DirectResponse" >}}DirectResponse{{< /gloss >}} API to directly respond to incoming requests without forwarding them to services. Instead, you return a pre-defined body and HTTP status code to the client.
 
 ## About direct responses
 
-When you configure a DirectResponse, the gateway proxy intercepts requests to specific routes and directly sends back a predefined response. Common use cases include: 
+When you configure a DirectResponse, the gateway proxy intercepts requests to specific routes and directly sends back a predefined response. Common use cases include:  
 
 * **Static responses**: You might have endpoints for which sending back static responses is sufficient.
 * **Health checks**: You might use direct responses when configuring health checks for the gateway. 
@@ -18,10 +18,10 @@ When you configure a DirectResponse, the gateway proxy intercepts requests to sp
 
 ### Limitations
 
-Consider the following limitations before creating DirectResponse resources in your cluster: 
-* You cannot configure multiple DirectResponse resources on the same route. <!-- If multiple DirectResponse resources are defined on the same route, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. -->
+Consider the following limitations before creating {{< gloss "DirectResponse" >}}DirectResponse{{< /gloss >}} resources in your cluster: 
+* You cannot configure multiple DirectResponse resources on the same route.
 * You cannot combine a DirectResponse with other route actions on the same route. For example, you cannot configure a DirectResponse and a `RequestRedirect` filter or `backendRefs` rule at the same time. If multiple route actions are defined, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. 
-* DirectResponse resources can be referenced by using an `ExtensionRef` filter only. If specified in a `backendRef` filter, the DirectResponse configuration is ignored. 
+* {{< gloss "DirectResponse" >}}DirectResponse{{< /gloss >}} resources can be referenced by using an `ExtensionRef` filter only. If specified in a `backendRef` filter, the DirectResponse configuration is ignored. 
 * No status information is currently populated to the DirectResponse resource.
 * The DirectResponse CRD currently does not show a description when you run `kubectl explain directresponse`. 
 
@@ -36,7 +36,7 @@ The following rules are applied during schema validation:
 
 ## Set up direct responses 
 
-1. Create a DirectResponse resource that sends back a 510 HTTP response code and a custom message to incoming requests. 
+1. Create a {{< gloss "DirectResponse" >}}DirectResponse{{< /gloss >}} resource that sends back a 510 HTTP response code and a custom message to incoming requests. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
