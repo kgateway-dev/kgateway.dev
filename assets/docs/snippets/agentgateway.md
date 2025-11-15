@@ -1,1 +1,1 @@
-agentgateway
+{{< gloss "Agentgateway" >}}agentgateway{{< /gloss >}}

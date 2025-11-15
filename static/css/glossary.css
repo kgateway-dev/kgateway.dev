@@ -1,0 +1,122 @@
+/* Glossary tooltip styles */
+.glossary-term {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  border-bottom: 1px dotted #666;
+  color: inherit;
+  text-decoration: none;
+}
+
+.glossary-term:hover {
+  border-bottom-color: #007acc;
+}
+
+/* Target ANY element inside glossary-term that contains tooltip content */
+.glossary-term > span {
+  visibility: hidden;
+  opacity: 0;
+  width: 280px;
+  background-color: #fff;
+  color: #333;
+  text-align: left;
+  border-radius: 6px;
+  padding: 12px;
+  position: absolute;
+  z-index: 1000;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e1e5e9;
+  transition: opacity 0.3s, visibility 0.3s;
+  pointer-events: none;
+}
+
+/* Tooltip arrow */
+.glossary-term > span::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #fff transparent transparent transparent;
+}
+
+.glossary-term:hover > span,
+.glossary-term:focus > span {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Style the content inside the tooltip */
+.glossary-term > span strong {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-size: 1.1em;
+}
+
+.glossary-term > span span {
+  margin: 0 0 8px 0;
+  font-size: 0.9em;
+  line-height: 1.4;
+  display: block;
+}
+
+.glossary-term > span a {
+  font-size: 0.85em;
+  color: #007acc;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.glossary-term > span a:hover {
+  text-decoration: underline;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .glossary-term > span {
+    width: 250px;
+    left: 0;
+    transform: none;
+  }
+  
+  .glossary-term > span::after {
+    left: 20px;
+  }
+}
+
+/* Mobile active state */
+.glossary-term.active > span {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Missing term style */
+.glossary-term.missing {
+  border-bottom-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+
+/* External term styling */
+.glossary-term.external {
+  border-bottom-color: #805ad5; /* Purple for external references */
+}
+
+.glossary-term.external:hover {
+  border-bottom-color: #6b46c1;
+}
+
+/* External indicator in tooltip */
+.glossary-term.external > .tooltip-content strong::after {
+  content: " (External)";
+  font-weight: normal;
+  font-size: 0.8em;
+  color: #805ad5;
+}

@@ -7,7 +7,7 @@ Use {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway for your a
 
 ## About ambient mesh
 
-Solo.io and Google collaborated to develop ambient mesh, a new “sidecarless” architecture for the Istio service mesh. Ambient mesh uses node-level ztunnels to route and secure Layer 4 traffic between pods with mutual TLS (mTLS). Waypoint proxies enforce Layer 7 traffic policies whenever needed. To onboard apps into the ambient mesh, you simply label the namespace the app belongs to. Because no sidecars need to be injected in to your apps, ambient mesh significantly reduces the complexity of adopting a service mesh.
+Solo.io and Google collaborated to develop {{< gloss "Ambient mesh" >}}ambient mesh{{< /gloss >}}, a new “sidecarless” architecture for the Istio service mesh. Ambient mesh uses node-level ztunnels to route and secure Layer 4 traffic between pods with mutual TLS (mTLS). Waypoint proxies enforce Layer 7 traffic policies whenever needed. To onboard apps into the ambient mesh, you simply label the namespace the app belongs to. Because no sidecars need to be injected in to your apps, ambient mesh significantly reduces the complexity of adopting a service mesh.
 
 To learn more about ambient, see the [ambient mesh documentation](https://ambientmesh.io/docs/about/). 
 

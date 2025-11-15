@@ -5,9 +5,9 @@ weight: 10
 
 Learn more about {{< reuse "/docs/snippets/kgateway.md" >}}, its architecture, and benefits.
 
-## API gateway {#api-gateway}
+## {{< gloss "API Gateway" >}}API gateway{{< /gloss >}} {#api-gateway}
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [{{< gloss "Envoy" >}}Envoy proxy{{< /gloss >}}](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
 
 ### What is an ingress?
 
