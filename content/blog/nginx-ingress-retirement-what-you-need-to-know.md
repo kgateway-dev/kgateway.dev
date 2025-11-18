@@ -88,26 +88,40 @@ After deployment, the status field for each resource lets you see whether resour
 
 ```yaml
 status:
-    ancestors:
-    - ancestorRef:
-        group: gateway.networking.k8s.io
-        kind: Gateway
-        name: http
-        namespace: kgateway-system
-      conditions:
-      - lastTransitionTime: "2025-11-17T23:06:21Z"
-        message: Policy accepted
-        observedGeneration: 1
-        reason: Valid
-        status: "True"
-        type: Accepted
-      - lastTransitionTime: "2025-11-17T23:06:21Z"
-        message: Attached to all targets
-        observedGeneration: 1
-        reason: Attached
-        status: "True"
-        type: Attached
-      controllerName: kgateway.dev/kgateway
+  addresses:
+  - type: IPAddress
+    value: 172.18.0.7
+  conditions:
+  ...
+  - lastTransitionTime: "2025-11-17T22:59:37Z"
+    message: Successfully accepted Gateway
+    observedGeneration: 1
+    reason: Accepted
+    status: "True"
+    type: Accepted
+  - lastTransitionTime: "2025-11-17T22:59:37Z"
+    message: Successfully programmed Gateway
+    observedGeneration: 1
+    reason: Programmed
+    status: "True"
+    type: Programmed
+  listeners:
+  - attachedRoutes: 1
+    conditions:
+    ...
+    - lastTransitionTime: "2025-11-17T22:59:37Z"
+      message: Successfully resolved all references
+      observedGeneration: 1
+      reason: ResolvedRefs
+      status: "True"
+      type: ResolvedRefs
+    - lastTransitionTime: "2025-11-17T22:59:37Z"
+      message: Successfully programmed Listener
+      observedGeneration: 1
+      reason: Programmed
+      status: "True"
+      type: Programmed
+    name: http
 ```
 
 ## Envoy Proxy
