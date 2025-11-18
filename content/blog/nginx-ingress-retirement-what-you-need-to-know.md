@@ -138,7 +138,7 @@ Performance matters. Regardless of whether your environment is bare-metal, virtu
 
 One of the most thorough benchmarks comes from John Howard, who recently published [v2](https://github.com/howardjohn/gateway-api-bench/blob/main/README-v2.md) with reproducible test scripts. We recommend checking it out, running the tests in your environment, and engaging with his findings.
 
-{{< reuse-image src="blog/nginx-ingress-retirement-1.png" width="750px" caption="Resource Consumption During Route Scale Test from John’s Benchmark" >}}
+{{< reuse-image src="blog/nginx-ingress-retirement-1.png" caption="Resource Consumption During Route Scale Test from John’s Benchmark" >}}
 
 ## Inference and Agentic AI
 
