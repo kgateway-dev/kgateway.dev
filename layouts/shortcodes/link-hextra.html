@@ -1,5 +1,17 @@
 {{- $path := .Get "path" -}}
 {{- $rel := .Page.RelPermalink -}}
-{{- $match := findRE `^/[^/]+/[^/]+` $rel -}}
-{{- $prefix := index $match 0 -}}
+{{- $match3 := findRE `^/[^/]+/[^/]+/[^/]+` $rel -}}
+{{- $match2 := findRE `^/[^/]+/[^/]+` $rel -}}
+{{- $prefix := "" -}}
+{{- $product := "" -}}
+{{- if $match3 -}}
+  {{- $prefix = index $match3 0 -}}
+  {{- $segments := split $prefix "/" -}}
+  {{- $product = index $segments 2 -}}
+{{- else if $match2 -}}
+  {{- $prefix = index $match2 0 -}}
+{{- end -}}
+{{- if and $product (hasPrefix $path (printf "/%s" $product)) -}}
+  {{- $path = strings.TrimPrefix (printf "/%s" $product) $path -}}
+{{- end -}}
 {{- $prefix }}{{ $path -}}
