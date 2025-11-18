@@ -23,7 +23,7 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-agw.md" >}}
+{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
 
 ## Step 1: Deploy MCP servers {#mcp-server-everythings}
 
