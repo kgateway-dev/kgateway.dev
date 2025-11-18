@@ -36,29 +36,9 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `llm` _[LLMProvider](#llmprovider)_ | The LLM configures the AI gateway to use a single LLM provider backend. |  |  |
-| `priorityGroups` _[PriorityGroup](#prioritygroup) array_ | PriorityGroups specifies a list of groups in priority order where each group defines<br />a set of LLM providers. The priority determines the priority of the backend endpoints chosen.<br />Note: provider names must be unique across all providers in all priority groups. Backend policies<br />may target a specific provider by name using targetRefs[].sectionName.<br /><br />Example configuration with two priority groups:<br />```yaml<br />priorityGroups:<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret<br />	          namespace: kgateway-system<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini-2<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway-2.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret-2<br />	          namespace: kgateway-system<br />```<br />TODO: enable this rule when we don't need to support older k8s versions where this rule breaks // +kubebuilder:validation:XValidation:message="provider names must be unique across groups",rule="self.map(pg, pg.providers.map(pp, pp.name)).map(p, self.map(pg, pg.providers.map(pp, pp.name)).filter(cp, cp != p).exists(cp, p.exists(pn, pn in cp))).exists(p, !p)" |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `priorityGroups` _[PriorityGroup](#prioritygroup) array_ | PriorityGroups specifies a list of groups in priority order where each group defines<br />a set of LLM providers. The priority determines the priority of the backend endpoints chosen.<br />Note: provider names must be unique across all providers in all priority groups. Backend policies<br />may target a specific provider by name using targetRefs[].sectionName.<br /><br />Example configuration with two priority groups:<br />```yaml<br />priorityGroups:<br />	- providers:<br />	  - azureopenai:<br />	      deploymentName: gpt-4o-mini<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway.openai.azure.com<br />	      authToken:<br />         kind: "SecretRef"<br />	        secretRef:<br />	          name: azure-secret<br />	- providers:<br />	  - azureopenai:<br />	      deploymentName: gpt-4o-mini-2<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway-2.openai.azure.com<br />	      authToken:<br />         kind: "SecretRef"<br />	        secretRef:<br />	          name: azure-secret-2<br />```<br />TODO: enable this rule when we don't need to support older k8s versions where this rule breaks // +kubebuilder:validation:XValidation:message="provider names must be unique across groups",rule="self.map(pg, pg.providers.map(pp, pp.name)).map(p, self.map(pg, pg.providers.map(pp, pp.name)).filter(cp, cp != p).exists(cp, p.exists(pn, pn in cp))).exists(p, !p)" |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 
 
-#### AIPolicy
-
-
-
-AIPolicy config is used to configure the behavior of the LLM provider
-on the level of individual routes. These route settings, such as prompt enrichment,
-retrieval augmented generation (RAG), and semantic caching, are applicable only
-for routes that send requests to an LLM provider backend.
-
-
-
-_Appears in:_
-- [TrafficPolicySpec](#trafficpolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `promptEnrichment` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts.<br />This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  |  |
-| `promptGuard` _[AIPromptGuard](#aipromptguard)_ | Set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.<br />Prompt guards can be used to reject requests based on the content of the prompt, as well as<br />mask responses based on the content of the response. |  |  |
-| `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields.<br />Defaults do _not_ override the user input fields, unless you explicitly set `override` to `true`. |  |  |
-| `modelAliases` _object (keys:string, values:string)_ | ModelAliases maps friendly model names to actual provider model names.<br />Example: \{"fast": "gpt-3.5-turbo", "smart": "gpt-4-turbo"\}<br />Note: This field is only applicable when using the agentgateway data plane. |  |  |
 
 
 #### AIPromptEnrichment
@@ -159,6 +139,24 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `request` _[PromptguardRequest](#promptguardrequest)_ | Prompt guards to apply to requests sent by the client. |  |  |
 | `response` _[PromptguardResponse](#promptguardresponse)_ | Prompt guards to apply to responses returned by the LLM provider. |  |  |
+
+
+#### APIKeyAuthenticationMode
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Strict Optional]
+
+_Appears in:_
+- [AgentAPIKeyAuthentication](#agentapikeyauthentication)
+
+| Field | Description |
+| --- | --- |
+| `Strict` | A valid API Key must be present.<br />This is the default option.<br /> |
+| `Optional` | If an API Key exists, validate it.<br />Warning: this allows requests without an API Key!<br /> |
 
 
 #### AWSGuardrailConfig
@@ -281,6 +279,24 @@ _Appears in:_
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
 
 
+#### AgentAPIKeyAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[APIKeyAuthenticationMode](#apikeyauthenticationmode)_ | Validation mode for api key authentication. | Strict | Enum: [Strict Optional] <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
+| `secretSelector` _[SecretSelector](#secretselector)_ | secretSelector selects multiple secrets containing API Keys. If the same key is defined in multiple secrets, the<br />behavior is undefined.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
+
+
 #### AgentAccessLog
 
 
@@ -313,6 +329,25 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `name` _string_ |  |  |  |
 | `expression` _[CELExpression](#celexpression)_ |  |  | MaxLength: 16384 <br />MinLength: 1 <br /> |
+
+
+#### AgentBasicAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[BasicAuthenticationMode](#basicauthenticationmode)_ | validation mode for basic auth authentication. | Strict | Enum: [Strict Optional] <br /> |
+| `realm` _string_ | realm specifies the 'realm' to return in the WWW-Authenticate header for failed authentication requests.<br />If unset, "Restricted" will be used. |  |  |
+| `users` _string array_ | users provides an inline list of username/password pairs that will be accepted.<br />Each entry represents one line of the htpasswd format: https://httpd.apache.org/docs/2.4/programs/htpasswd.html.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br />users:<br />- "user1:$apr1$ivPt0D4C$DmRhnewfHRSrb3DQC.WHC."<br />- "user2:$2y$05$r3J4d3VepzFkedkd/q1vI.pBYIpSqjfN0qOARV3ScUHysatnS0cL2" |  | MaxItems: 256 <br />MinItems: 1 <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing the .htaccess file. The Secret must have a key named '.htaccess',<br />and should contain the complete .htaccess file.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: basic-auth<br />stringData:<br />  .htaccess: \|<br />    alice:$apr1$3zSE0Abt$IuETi4l5yO87MuOrbSE4V.<br />    bob:$apr1$Ukb5LgRD$EPY2lIfY.A54jzLELNIId/ |  |  |
 
 
 #### AgentCSRFPolicy
@@ -445,6 +480,58 @@ _Appears in:_
 | `None` |  |
 
 
+#### AgentJWKS
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentJWTProvider](#agentjwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `remote` _[AgentRemoteJWKS](#agentremotejwks)_ | remote specifies how to reach the JSON Web Key Set from a remote address. |  |  |
+| `inline` _string_ | inline specifies an inline JSON Web Key Set used validate the signature of the JWT. |  | MaxLength: 65536 <br />MinLength: 2 <br /> |
+
+
+#### AgentJWTAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[JWTAuthenticationMode](#jwtauthenticationmode)_ | validation mode for JWT authentication. | Strict | Enum: [Strict Optional Permissive] <br /> |
+| `providers` _[AgentJWTProvider](#agentjwtprovider) array_ |  |  | MaxItems: 64 <br />MinItems: 1 <br /> |
+
+
+#### AgentJWTProvider
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentJWTAuthentication](#agentjwtauthentication)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `issuer` _string_ | issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  | MinLength: 1 <br /> |
+| `audiences` _string array_ | audiences specifies the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
+| `jwks` _[AgentJWKS](#agentjwks)_ | jwks defines the JSON Web Key Set used to validate the signature of the JWT. |  |  |
+
+
 #### AgentLocalRateLimitPolicy
 
 
@@ -535,6 +622,19 @@ _Appears in:_
 | `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the Rate Limit server to reach.<br />Supported types: Service and Backend. |  |  |
 | `domain` _string_ | domain specifies the domain under which this limit should apply.<br />This is an arbitrary string that enables a rate limit server to distinguish between different applications. |  |  |
 | `descriptors` _[AgentRateLimitDescriptor](#agentratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting. These values are passed to the rate limit service which applies<br />configured limits based on them. Each descriptor represents a single rate limit rule with one or more entries. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+
+
+#### AgentRemoteJWKS
+
+_Underlying type:_ _[struct{BackendRef sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference "json:\"backendRef\""}](#struct{backendref-sigsk8siogateway-apiapisv1backendobjectreference-"json:\"backendref\""})_
+
+
+
+
+
+_Appears in:_
+- [AgentJWKS](#agentjwks)
+
 
 
 
@@ -760,6 +860,9 @@ _Appears in:_
 | `timeouts` _[AgentTimeouts](#agenttimeouts)_ | timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | retry defines the policy for retrying requests. |  |  |
 | `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attahcment points),<br />all rules are merged. |  |  |
+| `jwtAuthentication` _[AgentJWTAuthentication](#agentjwtauthentication)_ | jwtAuthentication authenticates users based on JWT tokens. |  |  |
+| `basicAuthentication` _[AgentBasicAuthentication](#agentbasicauthentication)_ | basicAuthentication authenticates users based on the "Basic" authentication scheme (RFC 7617), where a username and password<br />are encoded in the request. |  |  |
+| `apiKeyAuthentication` _[AgentAPIKeyAuthentication](#agentapikeyauthentication)_ | apiKeyAuthentication authenticates users based on a configured API Key. |  |  |
 
 
 #### AlwaysOnConfig
@@ -1040,6 +1143,7 @@ _Appears in:_
 | `defaults` _[FieldDefault](#fielddefault) array_ | Provide defaults to merge with user input fields. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
 | `overrides` _[FieldDefault](#fielddefault) array_ |  |  | MaxItems: 64 <br />MinItems: 1 <br /> |
 | `modelAliases` _object (keys:string, values:string)_ | ModelAliases maps friendly model names to actual provider model names.<br />Example: \{"fast": "gpt-3.5-turbo", "smart": "gpt-4-turbo"\}<br />Note: This field is only applicable when using the agentgateway data plane.<br />TODO: should this use 'overrides', and we add CEL conditionals? |  | MaxProperties: 64 <br /> |
+| `promptCaching` _[PromptCachingConfig](#promptcachingconfig)_ | PromptCaching enables automatic prompt caching for supported providers (AWS Bedrock).<br />Reduces API costs by caching static content like system prompts and tool definitions.<br />Only applicable for Bedrock Claude 3+ and Nova models. |  |  |
 
 
 #### BackendAuth
@@ -1241,6 +1345,24 @@ _Appears in:_
 
 
 
+#### BasicAuthenticationMode
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Strict Optional]
+
+_Appears in:_
+- [AgentBasicAuthentication](#agentbasicauthentication)
+
+| Field | Description |
+| --- | --- |
+| `Strict` | A valid username and password must be present.<br />This is the default option.<br /> |
+| `Optional` | If a username and password exists, validate it.<br />Warning: this allows requests without a username!<br /> |
+
+
 #### BedrockConfig
 
 
@@ -1293,8 +1415,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected.<br />This field is only supported for kgateway (Envoy) data plane and is ignored by agentgateway.<br />For agentgateway, use json(request.body) or json(response.body) directly in CEL expressions. | AsString | Enum: [AsString AsJson] <br /> |
-| `value` _[Template](#template)_ | Value is the template to apply to generate the output value for the body.<br />Inja templates are supported for Envoy-based data planes only.<br />CEL expressions are supported for agentgateway data plane only.<br />The system will auto-detect the appropriate template format based on the data plane. |  |  |
+| `parseAs` _[BodyParseBehavior](#bodyparsebehavior)_ | ParseAs defines what auto formatting should be applied to the body.<br />This can make interacting with keys within a json body much easier if AsJson is selected. | AsString | Enum: [AsString AsJson] <br /> |
+| `value` _[InjaTemplate](#injatemplate)_ | Value is the template to apply to generate the output value for the body.<br />Only Inja templates are supported. |  |  |
 
 
 #### Buffer
@@ -1382,20 +1504,15 @@ enable shadow-only mode where policies will be evaluated and tracked, but not en
 add additional source origins that will be allowed in addition to the destination origin.
 
 
-Dataplane Support:
-- Envoy: Supports PercentageEnabled, PercentageShadowed, and AdditionalOrigins
-- Agentgateway: Only supports AdditionalOrigins (PercentageEnabled and PercentageShadowed are ignored)
-
-
 
 _Appears in:_
 - [TrafficPolicySpec](#trafficpolicyspec)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `percentageEnabled` _integer_ | Specifies the percentage of requests for which the CSRF filter is enabled.<br />Envoy: Supported<br />Agentgateway: Not supported (ignored) |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `percentageShadowed` _integer_ | Specifies that CSRF policies will be evaluated and tracked, but not enforced.<br />Envoy: Supported<br />Agentgateway: Not supported (ignored) |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin.<br />Envoy: Supported<br />Agentgateway: Supported |  | MaxItems: 16 <br /> |
+| `percentageEnabled` _integer_ | Specifies the percentage of requests for which the CSRF filter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `percentageShadowed` _integer_ | Specifies that CSRF policies will be evaluated and tracked, but not enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
 
 
 #### CommonAccessLogGrpcService
@@ -2433,7 +2550,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `name` _[HeaderName](#headername)_ | Name is the name of the header to interact with. |  |  |
-| `value` _[Template](#template)_ | Value is the Inja template to apply to generate the output value for the header. |  |  |
+| `value` _[InjaTemplate](#injatemplate)_ | Value is the Inja template to apply to generate the output value for the header. |  |  |
 
 
 #### HeaderValue
@@ -2592,6 +2709,20 @@ _Appears in:_
 | `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
 
 
+#### InjaTemplate
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [BodyTransformation](#bodytransformation)
+- [HeaderTransformation](#headertransformation)
+
+
+
 #### InsecureTLSMode
 
 _Underlying type:_ _string_
@@ -2646,6 +2777,25 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
 | `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
+
+
+#### JWTAuthenticationMode
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Strict Optional Permissive]
+
+_Appears in:_
+- [AgentJWTAuthentication](#agentjwtauthentication)
+
+| Field | Description |
+| --- | --- |
+| `Strict` | A valid token, issued by a configured issuer, must be present.<br />This is the default option.<br /> |
+| `Optional` | If a token exists, validate it.<br />Warning: this allows requests without a JWT token!<br /> |
+| `Permissive` | Requests are never rejected. This is useful for usage of claims in later steps (authorization, logging, etc).<br />Warning: this allows requests without a JWT token!<br /> |
 
 
 
@@ -3443,6 +3593,45 @@ _Appears in:_
 | `responseTrailerMode` _string_ | ResponseTrailerMode determines how to handle the response trailers | SKIP | Enum: [DEFAULT SEND SKIP] <br /> |
 
 
+#### PromptCachingConfig
+
+
+
+PromptCachingConfig configures automatic prompt caching for supported LLM providers.
+Currently only AWS Bedrock supports this feature (Claude 3+ and Nova models).
+
+
+When enabled, the gateway automatically inserts cache points at strategic locations
+to reduce API costs. Bedrock charges lower rates for cached tokens (90% discount).
+
+
+Example:
+
+
+	promptCaching:
+	  cacheSystem: true       # Cache system prompts
+	  cacheMessages: true     # Cache conversation history
+	  cacheTools: false       # Don't cache tool definitions
+	  minTokens: 1024         # Only cache if ≥1024 tokens
+
+
+Cost savings example:
+- Without caching: 10,000 tokens × $3/MTok = $0.03
+- With caching (90% cached): 1,000 × $3/MTok + 9,000 × $0.30/MTok = $0.0057 (81% savings)
+
+
+
+_Appears in:_
+- [BackendAI](#backendai)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `cacheSystem` _boolean_ | CacheSystem enables caching for system prompts.<br />Inserts a cache point after all system messages. | true |  |
+| `cacheMessages` _boolean_ | CacheMessages enables caching for conversation messages.<br />Caches all messages in the conversation for cost savings. | true |  |
+| `cacheTools` _boolean_ | CacheTools enables caching for tool definitions.<br />Inserts a cache point after all tool specifications. | false |  |
+| `minTokens` _integer_ | MinTokens specifies the minimum estimated token count<br />before caching is enabled. Uses rough heuristic (word count × 1.3) to estimate tokens.<br />Bedrock requires at least 1,024 tokens for caching to be effective. | 1024 | Minimum: 0 <br /> |
+
+
 #### PromptguardRequest
 
 
@@ -3748,7 +3937,7 @@ RouteType specifies how the AI gateway should process incoming requests
 based on the URL path and the API format expected.
 
 _Validation:_
-- Enum: [completions messages models passthrough]
+- Enum: [completions messages models passthrough responses anthropic_token_count]
 
 _Appears in:_
 - [LLMProvider](#llmprovider)
@@ -3760,6 +3949,8 @@ _Appears in:_
 | `messages` | RouteTypeMessages processes Anthropic /v1/messages format requests<br /> |
 | `models` | RouteTypeModels handles /v1/models endpoint (returns available models)<br /> |
 | `passthrough` | RouteTypePassthrough sends requests to upstream as-is without LLM processing<br /> |
+| `responses` | RouteTypeResponses processes OpenAI /v1/responses format requests<br /> |
+| `anthropic_token_count` | RouteTypeAnthropicTokenCount processes Anthropic /v1/messages/count_tokens format requests<br /> |
 
 
 #### Sampler
@@ -3813,6 +4004,22 @@ _Appears in:_
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `bootstrap` _[SdsBootstrap](#sdsbootstrap)_ | Initial SDS container configuration. |  |  |
+
+
+#### SecretSelector
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentAPIKeyAuthentication](#agentapikeyauthentication)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
 
 
 #### SelfManagedGateway
@@ -4129,20 +4336,6 @@ _Appears in:_
 | `1.3` |  |
 
 
-#### Template
-
-_Underlying type:_ _string_
-
-
-
-
-
-_Appears in:_
-- [BodyTransformation](#bodytransformation)
-- [HeaderTransformation](#headertransformation)
-
-
-
 #### Timeouts
 
 
@@ -4264,7 +4457,6 @@ _Appears in:_
 
 
 TrafficPolicySpec defines the desired state of a traffic policy.
-Note: Backend attachment is only supported for agentgateway.
 
 
 
@@ -4275,7 +4467,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname) array_ | TargetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelectorWithSectionName](#localpolicytargetselectorwithsectionname) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
-| `ai` _[AIPolicy](#aipolicy)_ | AI is used to configure AI-based policies for the policy. |  |  |
 | `transformation` _[TransformationPolicy](#transformationpolicy)_ | Transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
 | `extProc` _[ExtProcPolicy](#extprocpolicy)_ | ExtProc specifies the external processing configuration for the policy. |  |  |
 | `extAuth` _[ExtAuthPolicy](#extauthpolicy)_ | ExtAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
@@ -4287,7 +4478,7 @@ _Appears in:_
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
-| `rbac` _[Authorization](#authorization)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />With an Envoy-based Gateway, RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. In Envoy, this means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. In contrast, an<br />Agentgateway-based Gateway supports cumulative RBAC policies across different attachment points, such that<br />an RBAC policy attached to a route augments policies applied to the gateway or listener without overriding them. |  |  |
+| `rbac` _[Authorization](#authorization)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. This means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. |  |  |
 
 
 #### Transform
