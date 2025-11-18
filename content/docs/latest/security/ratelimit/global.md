@@ -80,7 +80,7 @@ When rate limiting is enabled, kgateway adds the following headers to responses.
 
 You can bring your own rate limit service that implements the Envoy Rate Limit gRPC protocol. 
 
-To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/rate_limit/testdata).
+To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/blob/main/test/e2e/features/rate_limit/global/testdata/).
 
 1. Create the `kgateway-test-extensions` namespace.
 
@@ -91,7 +91,7 @@ To get started, you can try out a demo rate limit service from the kgateway proj
 2. Deploy the rate limit service.
 
    ```bash
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
    ```
 
 ## Step 2: Define the rate limits {#rate-limits}
