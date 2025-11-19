@@ -1,0 +1,54 @@
+{{- /* Extract the current section (envoy or agentgateway) from the page URL */ -}}
+{{- $path := .Page.RelPermalink -}}
+{{- $segments := split $path "/" -}}
+{{- $condition := "" -}}
+
+{{- /* Check if we're in a docs section and extract the subsection */ -}}
+{{- if and (ge (len $segments) 3) (eq (index $segments 1) "docs") -}}
+  {{- $condition = index $segments 2 | lower -}}
+{{- end -}}
+
+{{- if ne $condition "" -}}
+  {{- /* Get the parameters from the shortcode invocation and lowercase them */ -}}
+  {{- $include := .Get "include-if" | default "" | lower -}}
+  {{- $include_if := slice -}}
+  {{- if ne $include "" -}}
+    {{- range split $include "," -}}
+      {{- $trimmed := replace . " " "" -}}
+      {{- $include_if = $include_if | append ($trimmed | lower) -}}
+    {{- end -}}
+  {{- end -}}
+  
+  {{- $exclude := .Get "exclude-if" | default "" | lower -}}
+  {{- $exclude_if := slice -}}
+  {{- if ne $exclude "" -}}
+    {{- range split $exclude "," -}}
+      {{- $trimmed := replace . " " "" -}}
+      {{- $exclude_if = $exclude_if | append ($trimmed | lower) -}}
+    {{- end -}}
+  {{- end -}}
+
+  {{- if and (in $include_if $condition) (in $exclude_if $condition) -}}
+    {{- /* condition appears in both parameters */ -}}
+    {{- errorf "Build condition %q appears in both include-if and exclude-if parameters of conditional-text shortcode on page %s" $condition .Position -}}
+  {{- end -}}
+
+  {{- if isset $.Params "include-if" -}}
+    {{- /* WARNING substring matches are matches as well! That means, if include-if="foobar", and buildcondition is "foo", you have a match! */ -}}
+    {{- if in $include_if $condition -}}
+<!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
+{{- .Inner -}}
+    {{- else -}}
+    {{- end -}}
+  {{- else -}}
+    {{- if isset $.Params "exclude-if" -}}
+      {{- /* WARNING substring matches are matches as well! That means, if exclude-if="foobar", and buildcondition is "foo", you have a match! */ -}}
+      {{- if in $exclude_if $condition -}}
+      {{- else -}}
+<!-- Do not indent the next Inner line, because the inner becomes a blockquote if the conditional-text is nested in another shortcode  -->
+{{- .Inner -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
