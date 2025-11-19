@@ -89,6 +89,16 @@ To establish a dedicated, policy-enforced egress path, we must combine three cor
 * Our target is an external Ollama container running on the host machine (host.docker.internal) on the default port 11434 and `ServiceEntries` injects the external Ollama endpoint into the Istio service registry for which we'll use static resolution for our local Docker Desktop bridge.
 * Define the Gateway resource, leveraging the kgateway GatewayClass to instantiate a dedicated proxy that is explicitly listening for outbound traffic to the Ollama host with an HTTPRoute.
 
+### Why a ServiceEntry is used instead of a `kgateway Backend`?
+
+kgateway also supports defining a **Backend** object (with static endpoints) that the HTTPRoute could reference directly. While that approach works for simple north-south scenarios, it keeps the external host outside of Istio’s service registry.
+
+Using a ServiceEntry delivers two mesh-native advantages:
+1. **Unified observability:** By registering the Ollama target with a ServiceEntry, Istio recognizes it as part of the mesh topology. That means ambient telemetry, metrics, and traces automatically include calls to the external service, in addition to the kgateway-specific stats. A kgateway Backend would only emit gateway-layer metrics.
+2. **Ambient mesh security:** Because the egress gateway itself participates in Ambient Mesh, Istio can enforce mTLS from the ztunnel layer to the gateway. ServiceEntries are the mechanism Ambient uses to represent external workloads, so mTLS and L4 policy continue to apply even though the destination lives outside the cluster.
+
+In short, a kgateway Backend is great when you only need Gateway API features, but combining a ServiceEntry with kgateway lets you extend Istio’s observability and identity controls all the way to that external dependency.
+
 ```yaml
 kubectl apply -f - <<EOF
 apiVersion: gateway.networking.k8s.io/v1
