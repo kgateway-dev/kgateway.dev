@@ -20,7 +20,7 @@ Even when egress is centralized, resilience policies such as timeouts and retrie
 
 An egress gateway solves this by acting as a single, managed exit point from the mesh. Every outbound HTTP(S) call passes through it, where you can consistently apply identity-aware routing, authorization policies, retry logic, and observability.
 
-In this post, we’ll show how kGateway, an Envoy-powered gateway built for Gateway API and Ambient Mesh, can serve as that controlled exit point. By combining it with Kyverno’s external authorization (ExtAuth) and Istio Ambient’s secure overlay, we can inspect and govern all outbound traffic without sidecars or additional proxies.
+In this post, we’ll show how kgateway, an Envoy-powered gateway built for Gateway API and Ambient Mesh, can serve as that controlled exit point. By combining it with Kyverno’s external authorization (ExtAuth) and Istio Ambient’s secure overlay, we can inspect and govern all outbound traffic without sidecars or additional proxies.
 
 
 ## How the components work together and what does the Blog demonstrate
@@ -31,7 +31,7 @@ Together, they form a layered security and governance model for egress traffic. 
 
 This guide walks you through how to register an external host using an Istio ServiceEntry, route outbound traffic via a dedicated kgateway egress proxy, and then enforce Kyverno-based authorization at Layer 7.
 
-We will also introduce a Kyverno ClusterPolicy to add governance at the control plane, ensuring all new external ServiceEntries are properly labeled and approved. Finally, we’ll test resilience by pausing the external Ollama service and observing retry and timeout behaviors (503/504) enforced through kGateway’s TrafficPolicy.
+We will also introduce a Kyverno ClusterPolicy to add governance at the control plane, ensuring all new external ServiceEntries are properly labeled and approved. Finally, we’ll test resilience by pausing the external Ollama service and observing retry and timeout behaviors (503/504) enforced through kgateway’s TrafficPolicy.
 
 ## Prequisites
 Before setting up the integration between kgateway, Istio Ambient Mesh, and Kyverno, ensure that your local or lab environment includes the following tools and configurations:
@@ -52,9 +52,9 @@ Istio Ambient Mesh is a sidecar-less data plane model designed to reduce operati
 
 This separation lets platform teams choose when L7 processing is necessary, reducing cost and computational overhead for workloads that only require transport security.
 
-## Kgateway's integration with Ambient Mesh
-kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, Kgateway is the first project that can be used as a pluggable waypoint for Istio. 
-Kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
+## kgateway's integration with Ambient Mesh
+kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, kgateway is the first project that can be used as a pluggable waypoint for Istio. 
+kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
 
 ## Prepare your kgateway environment
 Before integrating kagteway with Istio Ambient, ensure we have: 
@@ -73,7 +73,7 @@ Before integrating kagteway with Istio Ambient, ensure we have:
    ```
    172.17.0.2
    ```
-7. Deploy the Kyverno Authz Server as a GRPC server capable of processing Envoy External Authorization requests.
+6. Install the Kyverno Envoy authorization plugin that will receive external authorization (ExtAuth) calls from kgateway:
    ```
    helm install kyverno-authz-server --namespace default --create-namespace --wait \
    --version 0.1.0 --repo https://kyverno.github.io/kyverno-envoy-plugin \
@@ -82,9 +82,9 @@ Before integrating kagteway with Istio Ambient, ensure we have:
 
 While Istio ambient provides Authorization, Authentication and Egress still, there are several scenarios where kgateway can offer a more powerful alternative:
 
-## Securely Egress Traffic with kGateway + Istio Integration
+## Securely Egress Traffic with kgateway + Istio Integration
 
-To establish a dedicated, policy-enforced egress path, we must combine three core resources: the **Istio ServiceEntry** (to register the external host), the **kGateway Egress Gateway**, and the **HTTPRoute** (to apply the routing and security logic).
+To establish a dedicated, policy-enforced egress path, we must combine three core resources: the **Istio ServiceEntry** (to register the external host), the **kgateway Egress Gateway**, and the **HTTPRoute** (to apply the routing and security logic).
 
 * Our target is an external Ollama container running on the host machine (host.docker.internal) on the default port 11434 and `ServiceEntries` injects the external Ollama endpoint into the Istio service registry for which we'll use static resolution for our local Docker Desktop bridge.
 * Define the Gateway resource, leveraging the kgateway GatewayClass to instantiate a dedicated proxy that is explicitly listening for outbound traffic to the Ollama host with an HTTPRoute.
@@ -146,12 +146,12 @@ EOF
 ```
 ## Managing CEL based RBAC and integrating exAuth with Kyverno into our Request FLow
 
-While CEL RBAC (from the next section) is powerful for checking native Istio identities and headers, scenarios like API key validation, integration with corporate IdPs (Identity Providers), or checking complex external policies require delegating the decision outside the mesh proxy. This is where kGateway’s External Authorization (ExtAuth) feature, coupled with Kyverno, shines.
+While Istio Ambient gives us coarse authorization at L4, scenarios like header-based controls, API key validation, or integration with corporate IdPs require richer context. This is where [Kyverno](https://kyverno.io) enters the picture for the rest of the tutorial: it exposes an Envoy-compatible gRPC endpoint so that kgateway can delegate per-request decisions (ExtAuth) right before the traffic leaves the cluster, and later we’ll use the same engine to enforce configuration governance. kgateway’s External Authorization capability allows us to route every Ollama request through this Kyverno service.
 
-kGateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
+kgateway allows us to easily delegate the authorization step for the Ollama API call to an external gRPC service, implementing a Zero Trust defense-in-depth strategy. 
 ```YAML
 kubectl apply -f - <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1   # TrafficPolicy for ExtAuth + Corrected kGateway Resilience
+apiVersion: gateway.kgateway.dev/v1alpha1   # TrafficPolicy for ExtAuth + Corrected kgateway Resilience
 kind: TrafficPolicy
 metadata:
   name: ollama-external-auth-policy
@@ -173,6 +173,16 @@ spec:
     extensionRef:
       name: kyverno-authz-server
 ---
+EOF
+```
+
+The TrafficPolicy above does more than just hook up ExtAuth:
+
+- **Retries & timeouts** guarantee that kgateway will automatically re-attempt authorization calls if Kyverno is slow or briefly unavailable, instead of immediately failing user traffic.
+- **Fail-open vs fail-closed:** The GatewayExtension controls this stance. In regulated environments we typically fail closed (default), but for low-risk demos we can set `failOpen: true` so traffic continues if Kyverno is down, keeping user flows alive while logging the gap.
+
+```YAML
+kubectl apply -f - <<EOF
 
 apiVersion: gateway.kgateway.dev/v1alpha1   # GatewayExtension defines the Kyverno server endpoint
 kind: GatewayExtension
@@ -182,12 +192,23 @@ metadata:
 spec:
   type: ExtAuth
   extAuth:
+    failOpen: false   # keep requests blocked if Kyverno is unavailable
     grpcService:
       backendRef:
         name: kyverno-authz-server
         port: 9081
 ---
+EOF
+```
 
+In production you would tune `failOpen` per criticality: customer-facing payment traffic may prefer `false`, whereas internal experimentation clusters might temporarily set it to `true` during policy rollouts.
+
+## Authorization rules for Ollama traffic
+
+With traffic flowing through ExtAuth we now define the actual rules Kyverno must evaluate. For this tutorial we require a positive confirmation header before any prompt reaches the external model. The Envoy AuthorizationPolicy below expresses that business rule using CEL expressions:
+
+```YAML
+kubectl apply -f - <<EOF
 apiVersion: envoy.kyverno.io/v1alpha1   # Kyverno AuthorizationPolicy: RESTORING SECURITY (Conditional Access)
 kind: AuthorizationPolicy
 metadata:
@@ -207,11 +228,17 @@ spec:
         : envoy.Denied(403).WithBody("Access denied by Kyverno policy").Response()
 EOF
 ```
-This step involves configuring a TrafficPolicy to delegate authorization with kgateway native resiliency features for retires & timeouts then we have deployed a GatewayExtension to define the Kyverno server's network endpoint. AuthorizationPolicy will define the L7 logic through authorization rules with variables define based on the custom header presence.
+Here’s what this means operationally:
+
+- **Positive assertion header:** Only requests that carry `x-force-authorized: true` or `enabled` are forwarded to Ollama. This mirrors how enterprises often want application teams to explicitly “tag” the traffic as compliant with business policies.
+- **Deterministic deny path:** Anything else triggers a 403 with a human-readable reason so SREs can quickly debug missing headers.
+- **Failure policy:** We keep `failurePolicy: Fail` so that malformed requests or Kyverno evaluation errors default to “deny,” ensuring the external model never sees unaudited requests.
 
 # Kyverno Configuration Policy/ Configuration Governance
 
-This ClusterPolicy ensures that any time a ServiceEntry is created for an external host, the developer must include the security label `security.corp/egress-approved: "true"`. This ensures external destinations are subject to review and automated governance when they are configured (the control plane), rather than relying solely on runtime checks — Kyverno validates and blocks non-compliant configuration before it ever becomes active in the data plane.
+Runtime enforcement alone is not enough in real enterprises. Platform or security teams usually require an approval workflow before new egress endpoints are allowed. The ClusterPolicy below models that review step: every ServiceEntry must carry the `security.corp/egress-approved: "true"` label, signalling that an administrator verified the destination and its data-sharing risk.
+
+In a corporate process this label might be set only after a Jira ticket is approved or a risk assessment is completed. Without it, developers cannot onboard shadow endpoints, and Kyverno blocks the object at admission time.
 
 ```YAML
 kubectl apply -f - <<EOF
@@ -241,7 +268,7 @@ EOF
 
 ### Deploy the test client
 
-To test the security policies applied by kGateway, we use a simple Pod named curl-test-client. Its primary role is to serve as the mesh-enabled client that originates the outbound traffic, allowing us to test Layer 4 security (mTLS) and Layer 7 policies (CEL RBAC/ExtAuth). It is labeled for Ambient Mesh enrollment.
+To test the security policies applied by kgateway, we use a simple Pod named curl-test-client. Its primary role is to serve as the mesh-enabled client that originates the outbound traffic, allowing us to test Layer 4 security (mTLS) and Layer 7 policies (CEL RBAC/ExtAuth). It is labeled for Ambient Mesh enrollment.
 
 ```YAML
 kubectl apply -f - <<EOF
@@ -276,7 +303,7 @@ EOF
 We will use the client app that we previously deployed to execute tests against the `host.docker.internal` domain through the kgateway egress gateway.
 
 Authorized Test (With Required Header)
-This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kGateway to the Ollama container.
+This test should be allowed because the header x-force-authorized: true satisfies the Kyverno Envoy AuthorizationPolicy. The traffic is then proxied by kgateway to the Ollama container.
 ```sh
 kubectl exec -it deploy/curl-test-client -n default -- curl http://egress-kgateway.default:8080/ -v -H "Host: host.docker.internal" -H "x-force-authorized: true"
 ```
@@ -330,7 +357,7 @@ You should see an output similar to the following:
 }
 ```
 # Conclusion
-While Istio Ambient Mesh simplifies service-to-service security by removing sidecars and introducing a layered data plane model, this guide extended its capabilities to demonstrate how kGateway strengthens that foundation with fine-grained policy control, external authorization, and governance enforcement. This paves the way for platform teams to confidently manage both north-south and east-west traffic using a single control model — all while keeping the lightweight operational benefits that Ambient Mesh was designed for.
+While Istio Ambient Mesh simplifies service-to-service security by removing sidecars and introducing a layered data plane model, this guide extended its capabilities to demonstrate how kgateway strengthens that foundation with fine-grained policy control, external authorization, and governance enforcement. This paves the way for platform teams to confidently manage both north-south and east-west traffic using a single control model — all while keeping the lightweight operational benefits that Ambient Mesh was designed for.
 Through this Blog we addressed one of the most overlooked challenges in service mesh deployments on **How can we extend mesh-level security beyond internal workloads while ensuring Outbound traffic follows the same policy rigor, auditability, and compliance as in-cluster communication.**
 
 # Demo
