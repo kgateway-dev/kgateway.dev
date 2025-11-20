@@ -1,4 +1,4 @@
-Get started with {{< reuse "/docs/snippets/kgateway.md" >}}, a cloud-native Layer 7 proxy that is based on the [Envoy](https://www.envoyproxy.io/) and [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](https://gateway-api.sigs.k8s.io/) projects.
+Get started with {{< reuse "/docs/snippets/kgateway.md" >}}. {{< reuse "docs/snippets/kgateway-about.md" >}}
 
 ## Before you begin
 
