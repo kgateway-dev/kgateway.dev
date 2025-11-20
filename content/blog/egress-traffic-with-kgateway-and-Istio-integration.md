@@ -154,6 +154,16 @@ spec:
       group: "networking.istio.io"
 EOF
 ```
+### Enroll kgateway and workloads into Ambient Mesh
+
+For the egress gateway to participate in Ambient Mesh and benefit from mTLS and unified observability, we need to enroll the namespace where the gateway is deployed. This ensures traffic from mesh-enabled workloads to the gateway is secured via Ambient's ztunnel layer.
+
+```sh
+kubectl label ns default istio.io/dataplane-mode=ambient
+```
+
+This label instructs Istio to configure ztunnel sockets on all pods in the `default` namespace, including the kgateway egress proxy pods. Now traffic from mesh-enabled clients (like our test client) to the gateway will be secured with mTLS.
+
 ## Managing CEL based RBAC and integrating exAuth with Kyverno into our Request FLow
 
 While Istio Ambient gives us coarse authorization at L4, scenarios like header-based controls, API key validation, or integration with corporate IdPs require richer context. This is where [Kyverno](https://kyverno.io) enters the picture for the rest of the tutorial: it exposes an Envoy-compatible gRPC endpoint so that kgateway can delegate per-request decisions (ExtAuth) right before the traffic leaves the cluster, and later we’ll use the same engine to enforce configuration governance. kgateway’s External Authorization capability allows us to route every Ollama request through this Kyverno service.
