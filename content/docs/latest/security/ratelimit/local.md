@@ -4,7 +4,7 @@ weight: 5
 description: Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 ---
 
-Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
+Limit the number of requests that are allowed to enter the cluster before global {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}} and external auth policies are applied.  
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
@@ -12,7 +12,7 @@ Limit the number of requests that are allowed to enter the cluster before global
 
 ## About {#about}
 
-Local rate limiting is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
+Local {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}} is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
 
 Without local rate limiting, all requests are directly forwarded to a rate limit server that you set up where the request is either denied or allowed based on the global rate limiting settings that you configured. However, during an attack, too many requests might be forwarded to your rate limit servers and can cause overload or even failure.
 
@@ -262,7 +262,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
 
 ## Disable rate limiting for a route {#disable-route}
 
-Sometimes, you might want to disable rate limiting for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting `rateLimit.local` to `{}` in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. 
+Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}}  for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting `rateLimit.local` to `{}` in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. 
 
 1. Create a Gateway-level {{< reuse "docs/snippets/trafficpolicy.md" >}} to enforce local rate limiting on all routes. For more information, refer to the [Gateway configuration](#gateway).
 

@@ -3,7 +3,7 @@ title: Ingress
 weight: 10
 --- 
 
-Use {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway to control and secure traffic that enters your service mesh.
+Use {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway to control and secure traffic that enters your {{< gloss "Service Mesh" >}}service mesh{{< /gloss >}}.
 
 A service mesh is a dedicated infrastructure layer that you add your apps to, which ensures secure service-to-service communication across cloud networks. With a service mesh, you can solve problems such as service identity, mutual TLS communication, consistent L7 network telemetry gathering, service resilience, secure traffic routing between services across clusters, and policy enforcement, such as to enforce quotas or rate limit requests. To learn more about the benefits of using a service mesh, see [What is Istio](https://istio.io/latest/docs/overview/what-is-istio/) in the Istio documentation. 
 
@@ -23,7 +23,7 @@ The open source project Istio is the leading service mesh implementation that of
 
 ## About this guide
 
-In this guide, you learn how to use {{< reuse "/docs/snippets/kgateway.md" >}} as an ingress gateway proxy for the workloads in your Istio service mesh. You explore how to enable the Istio sidecar mesh integration in {{< reuse "/docs/snippets/kgateway.md" >}}, set up your ingress gateway proxy with a sidecar, and send secure mutual TLS traffic to the Bookinfo app as illustrated in the following image. 
+In this guide, you learn how to use {{< reuse "/docs/snippets/kgateway.md" >}} as an ingress gateway proxy for the workloads in your Istio {{< gloss "Service Mesh" >}}service mesh{{< /gloss >}}. You explore how to enable the Istio sidecar mesh integration in {{< reuse "/docs/snippets/kgateway.md" >}}, set up your ingress gateway proxy with a sidecar, and send secure mutual TLS traffic to the Bookinfo app as illustrated in the following image. 
 
 {{< reuse-image src="img/sidecar-ingress.svg" width="800px" >}}
 {{< reuse-image-dark srcDark="img/sidecar-ingress-dark.svg" width="800px" >}}

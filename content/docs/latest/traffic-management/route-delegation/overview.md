@@ -10,7 +10,7 @@ Delegate routing decisions to another HTTPRoute resource.
 
 As your environment grows, your gateways manage traffic for more and more routes. These routes typically belong to many different apps that are owned by different individuals or teams. Managing the routing rules for all of these routes can be cumbersome and route updates can easily impact the behavior of other routes. 
 
-Route delegation allows you to split up big and complex routing configurations into smaller routing configurations that are easier to maintain. The ownership for these routing configurations are then delegated to the teams that own the app or domain. 
+Route {{< gloss "Delegation" >}}Delegation{{< /gloss >}} allows you to split up big and complex routing configurations into smaller routing configurations that are easier to maintain. The ownership for these routing configurations are then delegated to the teams that own the app or domain. 
 
 For example, let's assume you have three apps (`app-a`, `app-b`, and `app-c`) that are owned by three different teams (`team-a`, `team-b`, and `team-c`). Instead of creating one routing configuration that includes the routing rules for all apps, you create a routing configuration for each app and delegate ownership for this configuration to the team that is responsible for that app. Each team can then further delegate routing decisions to other teams. 
 

@@ -56,7 +56,7 @@ Depending on your existing setup, you might want to use a different type of prox
 
 ## Service mesh gateway
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} integrates seamlessly with your Istio service mesh so that you can control and manage ingress, egress, and mesh-internal traffic. 
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} integrates seamlessly with your Istio service mesh so that you can control and manage ingress, {{< gloss "Egress" >}}egress{{< /gloss >}}, and mesh-internal traffic. 
 
 ### Ambient mesh
 
