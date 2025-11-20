@@ -4,7 +4,9 @@ weight: 200
 icon: lightbulb
 ---
 
-Learn about kgateway architecture, features, and benefits.
+{{< reuse "docs/snippets/kgateway-about.md" >}}
+
+To learn more about {{< reuse "docs/snippets/kgateway.md" >}}, review the following topics.
 
 {{< cards >}}
   {{< card link="overview" title="Overview" >}}
