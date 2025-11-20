@@ -472,12 +472,28 @@ _Underlying type:_ _string_
 
 
 _Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+- [AgentHostnameRewriteConfig](#agenthostnamerewriteconfig)
 
 | Field | Description |
 | --- | --- |
 | `Auto` |  |
 | `None` |  |
+
+
+#### AgentHostnameRewriteConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[AgentHostnameRewrite](#agenthostnamerewrite)_ | mode sets the hostname rewrite mode.<br /><br />The following may be specified:<br />* Auto: automatically set the Host header based on the destination.<br />* None: do not rewrite the Host header. The original Host header will be passed through.<br /><br />This setting defaults to Auto when connecting to hostname-based Backend types, and None otherwise (for Service or<br />IP-based Backends). |  |  |
 
 
 #### AgentJWKS
@@ -856,7 +872,7 @@ _Appears in:_
 | `cors` _[AgentCorsPolicy](#agentcorspolicy)_ | cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[AgentCSRFPolicy](#agentcsrfpolicy)_ | csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy.<br /><br />The CSRF policy has the following behavior:<br />* Safe methods (GET, HEAD, OPTIONS) are automatically allowed<br />* Requests without Sec-Fetch-Site or Origin headers are assumed to be same-origin or non-browser requests and are allowed.<br />* Otherwise, the Sec-Fetch-Site header is checked, with a fallback to comparing the Origin header to the Host header. |  |  |
 | `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | headerModifiers defines the policy to modify request and response headers. |  |  |
-| `hostRewrite` _[AgentHostnameRewrite](#agenthostnamerewrite)_ | hostRewrite specifies how to rewrite the Host header for requests.<br /><br />The following may be specified:<br />* Auto: automatically set the Host header based on the destination.<br />* None: do not rewrite the Host header. The original Host header will be passed through.<br /><br />TODO: not currently implemented |  | Enum: [Auto None] <br /> |
+| `hostRewrite` _[AgentHostnameRewriteConfig](#agenthostnamerewriteconfig)_ | hostRewrite specifies how to rewrite the Host header for requests.<br /><br />If the HTTPRoute `urlRewrite` filter already specifies a host rewrite, this setting is ignored. |  | Enum: [Auto None] <br /> |
 | `timeouts` _[AgentTimeouts](#agenttimeouts)_ | timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | retry defines the policy for retrying requests. |  |  |
 | `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attahcment points),<br />all rules are merged. |  |  |
@@ -1588,7 +1604,7 @@ _Appears in:_
 
 #### ComparisonFilter
 
-_Underlying type:_ _[struct{Op Op "json:\"op\""; Value int32 "json:\"value,omitempty\""}](#struct{op-op-"json:\"op\"";-value-int32-"json:\"value,omitempty\""})_
+_Underlying type:_ _[struct{Op Op "json:\"op\""; Value int32 "json:\"value\""}](#struct{op-op-"json:\"op\"";-value-int32-"json:\"value\""})_
 
 ComparisonFilter represents a filter based on a comparison.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
@@ -1603,7 +1619,7 @@ _Appears in:_
 
 #### Cookie
 
-_Underlying type:_ _[struct{Name string "json:\"name\""; Path *string "json:\"path,omitempty\""; TTL *k8s.io/apimachinery/pkg/apis/meta/v1.Duration "json:\"ttl,omitempty\""; Secure *bool "json:\"secure,omitempty\""; HttpOnly *bool "json:\"httpOnly,omitempty\""; SameSite *string "json:\"sameSite,omitempty\""}](#struct{name-string-"json:\"name\"";-path-*string-"json:\"path,omitempty\"";-ttl-*k8sioapimachinerypkgapismetav1duration-"json:\"ttl,omitempty\"";-secure-*bool-"json:\"secure,omitempty\"";-httponly-*bool-"json:\"httponly,omitempty\"";-samesite-*string-"json:\"samesite,omitempty\""})_
+
 
 
 
@@ -1612,6 +1628,14 @@ _Underlying type:_ _[struct{Name string "json:\"name\""; Path *string "json:\"pa
 _Appears in:_
 - [HashPolicy](#hashpolicy)
 
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name of the cookie. |  | MinLength: 1 <br /> |
+| `path` _string_ | Path is the name of the path for the cookie. |  |  |
+| `ttl` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | TTL specifies the time to live of the cookie.<br />If specified, a cookie with the TTL will be generated if the cookie is not present.<br />If the TTL is present and zero, the generated cookie will be a session cookie. |  |  |
+| `secure` _boolean_ | Secure specifies whether the cookie is secure.<br />If true, the cookie will only be sent over HTTPS. |  |  |
+| `httpOnly` _boolean_ | HttpOnly specifies whether the cookie is HTTP only, i.e. not accessible to JavaScript. |  |  |
+| `sameSite` _string_ | SameSite controls cross-site sending of cookies.<br />Supported values are Strict, Lax, and None. |  | Enum: [Strict Lax None] <br /> |
 
 
 #### CorsPolicy
@@ -2252,10 +2276,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit] <br /> |
+| `type` _[GatewayExtensionType](#gatewayextensiontype)_ | Deprecated: Setting this field has no effect.<br />Type indicates the type of the GatewayExtension to be used. |  | Enum: [ExtAuth ExtProc RateLimit JWTProviders] <br /> |
 | `extAuth` _[ExtAuthProvider](#extauthprovider)_ | ExtAuth configuration for ExtAuth extension type. |  |  |
 | `extProc` _[ExtProcProvider](#extprocprovider)_ | ExtProc configuration for ExtProc extension type. |  |  |
 | `rateLimit` _[RateLimitProvider](#ratelimitprovider)_ | RateLimit configuration for RateLimit extension type. |  |  |
+| `jwtProviders` _[NamedJWTProvider](#namedjwtprovider) array_ | JWTProviders configures named JWT providers.<br />If multiple providers are specified for a given JWT policy,<br />the providers will be `OR`-ed together and will allow validation to any of the providers. |  | MaxItems: 32 <br /> |
 
 
 #### GatewayExtensionStatus
@@ -2290,6 +2315,7 @@ _Appears in:_
 | `ExtAuth` | GatewayExtensionTypeExtAuth is the type for Extauth extensions.<br /> |
 | `ExtProc` | GatewayExtensionTypeExtProc is the type for ExtProc extensions.<br /> |
 | `RateLimit` | GatewayExtensionTypeRateLimit is the type for RateLimit extensions.<br /> |
+| `JWTProviders` | GatewayExtensionTypeJWTProvider is the type for the JWT Provider extensions<br /> |
 
 
 #### GatewayParameters
@@ -2297,7 +2323,7 @@ _Appears in:_
 
 
 A GatewayParameters contains configuration that is used to dynamically
-provision kgateway's data plane (Envoy proxy instance), based on a
+provision kgateway's data plane (Envoy or agentgateway proxy instance), based on a
 Kubernetes Gateway.
 
 
@@ -2477,7 +2503,7 @@ _Appears in:_
 
 #### Header
 
-_Underlying type:_ _[struct{Name string "json:\"name\""}](#struct{name-string-"json:\"name\""})_
+
 
 
 
@@ -2486,6 +2512,9 @@ _Underlying type:_ _[struct{Name string "json:\"name\""}](#struct{name-string-"j
 _Appears in:_
 - [HashPolicy](#hashpolicy)
 
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the name of the header to use as a component of the hash key. |  | MinLength: 1 <br /> |
 
 
 #### HeaderFilter
@@ -2536,6 +2565,23 @@ _Appears in:_
 
 
 
+#### HeaderSource
+
+
+
+HeaderSource configures how to retrieve a JWT from a header
+
+
+
+_Appears in:_
+- [JWTTokenSource](#jwttokensource)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `header` _string_ | Header is the name of the header. for example, "Authorization" |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
+| `prefix` _string_ | Prefix before the token. for example, "Bearer " |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
+
+
 #### HeaderTransformation
 
 
@@ -2577,8 +2623,7 @@ _Appears in:_
 
 
 
-HealthCheck contains the options to configure the health check.
-See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/health_check.proto) for more details.
+
 
 
 
@@ -2753,7 +2798,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
+| `image` _[Image](#image)_ | The container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `logLevel` _string_ | Log level for istio-proxy. Options include "info", "debug", "warning", and "error".<br />Default level is info Default is "warning". |  |  |
@@ -2766,7 +2811,7 @@ _Appears in:_
 
 
 
-IstioIntegration configures the Istio integration settings used by a kgateway's data plane (Envoy proxy instance)
+IstioIntegration configures the Istio integration settings used by kgateway's data plane
 
 
 
@@ -2777,6 +2822,39 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
 | `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
+
+
+#### JWKS
+
+
+
+JWKS (JSON Web Key Set) configures the source for the JWKS
+
+
+
+_Appears in:_
+- [JWTProvider](#jwtprovider)
+- [NamedJWTProvider](#namedjwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `local` _[LocalJWKS](#localjwks)_ | LocalJWKS configures getting the public keys to validate the JWT from a Kubernetes configmap,<br />or inline (raw string) JWKS. |  |  |
+
+
+#### JWTAuthentication
+
+
+
+JWTAuthentication defines the providers used to configure JWT authentication
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references a GatewayExtension that provides the jwt providers |  |  |
 
 
 #### JWTAuthenticationMode
@@ -2796,6 +2874,83 @@ _Appears in:_
 | `Strict` | A valid token, issued by a configured issuer, must be present.<br />This is the default option.<br /> |
 | `Optional` | If a token exists, validate it.<br />Warning: this allows requests without a JWT token!<br /> |
 | `Permissive` | Requests are never rejected. This is useful for usage of claims in later steps (authorization, logging, etc).<br />Warning: this allows requests without a JWT token!<br /> |
+
+
+#### JWTClaimToHeader
+
+
+
+JWTClaimToHeader allows copying verified claims to headers sent upstream
+
+
+
+_Appears in:_
+- [JWTProvider](#jwtprovider)
+- [NamedJWTProvider](#namedjwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the JWT claim name, for example, "sub". |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
+| `header` _string_ | Header is the header the claim will be copied to, for example, "x-sub". |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
+
+
+#### JWTProvider
+
+
+
+JWTProvider configures the JWT Provider
+If multiple providers are specified for a given JWT policy, the providers will be `OR`-ed together and will allow validation to any of the providers.
+
+
+
+_Appears in:_
+- [NamedJWTProvider](#namedjwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `issuer` _string_ | Issuer of the JWT. the 'iss' claim of the JWT must match this. |  | MaxLength: 2048 <br /> |
+| `audiences` _string array_ | Audiences is the list of audiences to be used for the JWT provider.<br />If specified an incoming JWT must have an 'aud' claim, and it must be in this list.<br />If not specified, the audiences will not be checked in the token. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `tokenSource` _[JWTTokenSource](#jwttokensource)_ | TokenSource configures where to find the JWT of the current provider. |  |  |
+| `claimsToHeaders` _[JWTClaimToHeader](#jwtclaimtoheader) array_ | ClaimsToHeaders is the list of claims to headers to be used for the JWT provider.<br />Optionally set the claims from the JWT payload that you want to extract and add as headers<br />to the request before the request is forwarded to the upstream destination.<br />Note: if ClaimsToHeaders is set, the Envoy route cache will be cleared.<br />This allows the JWT filter to correctly affect routing decisions. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `jwks` _[JWKS](#jwks)_ | JWKS is the source for the JSON Web Keys to be used to validate the JWT. |  |  |
+| `keepToken` _[KeepToken](#keeptoken)_ | KeepToken configures if the token is forwarded upstream.<br />If Remove, the header containing the token will be removed.<br />If Forward, the header containing the token will be forwarded upstream. | Remove | Enum: [Forward Remove] <br /> |
+
+
+#### JWTTokenSource
+
+
+
+JWTTokenSource configures the source for the JWTToken
+Exactly one of HeaderSource or QueryParameter must be specified.
+
+
+
+_Appears in:_
+- [JWTProvider](#jwtprovider)
+- [NamedJWTProvider](#namedjwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `header` _[HeaderSource](#headersource)_ | HeaderSource configures retrieving token from a header |  |  |
+| `queryParameter` _string_ | QueryParameter configures retrieving token from the query parameter |  |  |
+
+
+#### KeepToken
+
+_Underlying type:_ _string_
+
+KeepToken configures if the token is forwarded upstream.
+
+
+
+_Appears in:_
+- [JWTProvider](#jwtprovider)
+- [NamedJWTProvider](#namedjwtprovider)
+
+| Field | Description |
+| --- | --- |
+| `Forward` |  |
+| `Remove` |  |
 
 
 
@@ -2818,8 +2973,8 @@ _Appears in:_
 | `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If agentgateway is enabled, the EnvoyContainer values will be ignored. |  |  |
 | `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
 | `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
-| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  |  |
-| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the Envoy pod. |  |  |
+| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the proxy over<br />the network. |  |  |
+| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the proxy pods. |  |  |
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
 | `agentgateway` _[Agentgateway](#agentgateway)_ | Configure the agentgateway integration. If agentgateway is disabled, the<br />EnvoyContainer values will be used by default to configure the data<br />plane proxy. |  |  |
@@ -2891,7 +3046,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. |  |  |
+| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. | 2 |  |
 | `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
 
 
@@ -2958,6 +3113,24 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
+
+
+#### LocalJWKS
+
+
+
+LocalJWKS configures getting the public keys to validate the JWT from a Kubernetes ConfigMap,
+or inline (raw string) JWKS.
+
+
+
+_Appears in:_
+- [JWKS](#jwks)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `inline` _string_ | Inline is the JWKS as the raw, inline JWKS string<br />This can be an individual key, a key set or a pem block public key |  | MaxLength: 16384 <br />MinLength: 1 <br /> |
+| `configMapRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | ConfigMapRef configures storing the JWK in a Kubernetes ConfigMap in the same namespace as the GatewayExtension.<br />The ConfigMap must have a data key named 'jwks' that contains the JWKS. |  |  |
 
 
 #### LocalPolicyTargetReference
@@ -3300,6 +3473,28 @@ _Appears in:_
 
 
 
+#### NamedJWTProvider
+
+
+
+NamedJWTProvider is a named JWT provider entry.
+
+
+
+_Appears in:_
+- [GatewayExtensionSpec](#gatewayextensionspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ | Name is the unique name of the JWT provider. |  | MaxLength: 253 <br />MinLength: 1 <br /> |
+| `issuer` _string_ | Issuer of the JWT. the 'iss' claim of the JWT must match this. |  | MaxLength: 2048 <br /> |
+| `audiences` _string array_ | Audiences is the list of audiences to be used for the JWT provider.<br />If specified an incoming JWT must have an 'aud' claim, and it must be in this list.<br />If not specified, the audiences will not be checked in the token. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `tokenSource` _[JWTTokenSource](#jwttokensource)_ | TokenSource configures where to find the JWT of the current provider. |  |  |
+| `claimsToHeaders` _[JWTClaimToHeader](#jwtclaimtoheader) array_ | ClaimsToHeaders is the list of claims to headers to be used for the JWT provider.<br />Optionally set the claims from the JWT payload that you want to extract and add as headers<br />to the request before the request is forwarded to the upstream destination.<br />Note: if ClaimsToHeaders is set, the Envoy route cache will be cleared.<br />This allows the JWT filter to correctly affect routing decisions. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `jwks` _[JWKS](#jwks)_ | JWKS is the source for the JSON Web Keys to be used to validate the JWT. |  |  |
+| `keepToken` _[KeepToken](#keeptoken)_ | KeepToken configures if the token is forwarded upstream.<br />If Remove, the header containing the token will be removed.<br />If Forward, the header containing the token will be forwarded upstream. | Remove | Enum: [Forward Remove] <br /> |
+
+
 #### NamedLLMProvider
 
 
@@ -3339,6 +3534,7 @@ You can target only one object at a time.
 _Appears in:_
 - [ExtAuthPolicy](#extauthpolicy)
 - [ExtProcPolicy](#extprocpolicy)
+- [JWTAuthentication](#jwtauthentication)
 - [RateLimitPolicy](#ratelimitpolicy)
 
 | Field | Description | Default | Validation |
@@ -3411,8 +3607,7 @@ _Appears in:_
 
 
 
-OutlierDetection contains the options to configure passive health checks.
-See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/outlier#outlier-detection) for more details.
+
 
 
 
@@ -4153,7 +4348,7 @@ _Appears in:_
 
 #### SourceIP
 
-_Underlying type:_ _[struct{}](#struct{})_
+
 
 
 
@@ -4232,7 +4427,7 @@ _Appears in:_
 | `suffix` _string_ | The input string must have the suffix specified here.<br />Note: empty prefix is not allowed, please use regex instead.<br />Example: abc matches the value xyz.abc |  |  |
 | `contains` _string_ | The input string must contain the substring specified here.<br />Example: abc matches the value xyz.abc.def |  |  |
 | `safeRegex` _string_ | The input string must match the Google RE2 regular expression specified here.<br />See https://github.com/google/re2/wiki/Syntax for the syntax. |  |  |
-| `ignoreCase` _boolean_ | If true, indicates the exact/prefix/suffix/contains matching should be<br />case insensitive. This has no effect on the regex match.<br />For example, the matcher data will match both input string Data and data if this<br />option is set to true. | false |  |
+| `ignoreCase` _boolean_ | If true, indicates the exact/prefix/suffix/contains matching should be<br />case insensitive. This has no effect on the regex match.<br />For example, the matcher data will match both input string Data and data if this<br />option is set to true. |  |  |
 
 
 #### TCPKeepalive
@@ -4479,6 +4674,7 @@ _Appears in:_
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
 | `rbac` _[Authorization](#authorization)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. This means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. |  |  |
+| `jwt` _[JWTAuthentication](#jwtauthentication)_ | JWT specifies the JWT authentication configuration for the policy.<br />This defines the JWT providers and their configurations. |  |  |
 
 
 #### Transform
