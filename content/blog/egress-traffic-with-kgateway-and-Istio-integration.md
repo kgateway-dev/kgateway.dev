@@ -33,6 +33,29 @@ This guide walks you through how to register an external host using an Istio Ser
 
 We will also introduce a Kyverno ClusterPolicy to add governance at the control plane, ensuring all new external ServiceEntries are properly labeled and approved. Finally, we’ll test resilience by pausing the external Ollama service and observing retry and timeout behaviors (503/504) enforced through kgateway’s TrafficPolicy.
 
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph "Ambient Mesh (ztunnel layer)"
+        Client["curl-test-client\nNamespace: default\nLabel: istio.io/dataplane-mode=ambient"]
+        KGW["kGateway egress Gateway\nGatewayClass: kgateway"]
+    end
+
+    Client -->|"mTLS via ztunnel"| KGW
+    KGW -->|"ExtAuth gRPC"| KyvernoRuntime["Kyverno authz server\n(Envoy gRPC)"]
+    ServiceEntry -->|"DNS/MESH_EXTERNAL"| Ollama["External Ollama server\nDocker host :11434"]
+
+    subgraph "Control Plane Governance"
+        KyvernoAdmission["Kyverno ClusterPolicy\nsecurity.corp/egress-approved"]
+    end
+
+    KyvernoAdmission -.->|"validates"| ServiceEntry
+    KyvernoAdmission -.->|"watches"| KGW
+    KyvernoRuntime -.->|"status"| KyvernoAdmission
+
+```
+
 ## Prequisites
 Before setting up the integration between kgateway, Istio Ambient Mesh, and Kyverno, ensure that your local or lab environment includes the following tools and configurations:
 * [Docker](https://docs.docker.com/get-docker/)
