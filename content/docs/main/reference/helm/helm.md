@@ -32,7 +32,7 @@ A Helm chart for the kgateway project
 | image.registry | string |  | Set the default image registry. |
 | image.tag | string |  | Set the default image tag. |
 | imagePullSecrets | list |  | Set a list of image pull secrets for Kubernetes to use when pulling container images from your own private registry instead of the default kgateway registry. |
-| inferenceExtension | object |  | Configure the integration with the Gateway API Inference Extension project, which lets you use kgateway to route to AI inference workloads like LLMs that run locally in your Kubernetes cluster. Documentation for Inference Extension can be found here: https://kgateway.dev/docs/integrations/inference-extension/ |
+| inferenceExtension | object |  | Configure the integration with the Gateway API Inference Extension project, which lets you use kgateway to route to AI inference workloads like LLMs that run locally in your Kubernetes cluster. Documentation for Inference Extension can be found here: https://kgateway.dev/docs/latest/agentgateway/inference/ |
 | inferenceExtension.enabled | bool |  | Enable Inference Extension. If enabled, agentgateway.enabled should also be set to true. Enabling inference extension without agentgateway is deprecated in v2.1 and will not be supported in v2.2. |
 | nameOverride | string |  | Add a name to the default Helm base release, which is 'kgateway'. If you set 'nameOverride: "foo", the name of the resources that the Helm release creates become 'kgateway-foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace. |
 | nodeSelector | object |  | Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'. |
