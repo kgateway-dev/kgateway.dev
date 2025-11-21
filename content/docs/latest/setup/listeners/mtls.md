@@ -18,9 +18,9 @@ Create self-signed TLS certificates that you use for the mutual TLS connection b
 Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trust Certificate Authority. 
 {{< /callout >}}
 
-{{< callout type="info" >}}
+<!-- >
 When generating your Envoy certificates, make sure to use encryption algorithms that are supported in Envoy. To learn more about supported algorithms that you can use for your certificates and keys, see the <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ssl#certificate-selection">Envoy documentation</a>. 
-{{< /callout >}}
+-->
 
 1. Create a root certificate for the `example.com` domain. You use this certificate to sign the certificate for your client and gateway later. 
    ```shell
