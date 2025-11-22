@@ -197,7 +197,7 @@ spec:
       app: httpbin
   exportTo:
   - "." # To Makes the ServiceEntry visible across all namespaces for selector
-  EOF
+EOF
 ```
 
 **Ensure the selector matches the labels on your httpbin pods**
