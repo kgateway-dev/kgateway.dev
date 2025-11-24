@@ -8,7 +8,7 @@ Learn more about MCP and common challenges when adopting MCP in enterprise envir
 
 ## About MCP
 
-[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol that standardizes how Large Language Model (LLM) applications connect to various external data sources and tools. Without MCP, you need to implement custom integrations for each tool that your LLM application needs to access. However, this approach is hard to maintain and can cause issues when you want to scale your environment. With MCP, you can significantly speed up, simplify, and standardize these types of integrations.
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/introduction) is an open protocol... that standardizes how LLM applications connect to various external data sources and tools. Without MCP, you need to implement custom integrations for each tool that your LLM application needs to access. However, this approach is hard to maintain and can cause issues when you want to scale your environment. With MCP, you can significantly speed up, simplify, and standardize these types of integrations.
 
 An MCP server exposes external data sources and tools so that LLM applications can access them. Typically, you want to deploy these servers remotely and have authorization mechanisms in place so that LLM applications can safely access the data.
 
@@ -24,9 +24,9 @@ While MCP and A2A define the RPC communication protocol for agents and tools, th
 Agents typically do not operate in isolation. Instead, they interact with each other (agent-to-agent), with internal systems (agent-to-tool), and external or foundational models (agent-to-LLM). These interactions are often dynamic, multi-modal, and span organizational and data boundaries. 
 
 Such long-lived interactivity creates new vectors for risk and complexity, including: 
-* **Security**: How to handle authentication, authorization, and auditing of agent interactions across tools and services? 
+* **{{< gloss "Security" >}}Security{{< /gloss >}}**: How to handle authentication, authorization, and auditing of {{< gloss "Agents" >}}agents{{< /gloss >}} interactions across tools and services? 
 * **Governance**: How to enforce policies across autonomous workflows, such as data residency or access control? 
-* **Observability**: How to gain visibility into what agents are doing, when, and why? 
+* **{{< gloss "Observability (Logging, Monitoring, Tracing)" >}}Observability{{< /gloss >}}**: How to gain visibility into what agents are doing, when, and why? 
 * **Scalability and performance**: How to ensure low latency while securely handling retries, timeouts, and failures? 
 
 {{< reuse "docs/snippets/agentgateway-capital.md" >}} is designed to tackle these challenges at its core with built-in security, governance, and observability for all MCP and A2A communication between agents, tools, and LLMs. 

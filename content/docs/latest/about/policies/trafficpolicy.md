@@ -5,7 +5,7 @@ description: Use a TrafficPolicy resource to attach policies to one, multiple, o
 prev: /docs/about/policies
 ---
 
-Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
+Use a {{< gloss "TrafficPolicy" >}}TrafficPolicy{{< /gloss >}} resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
 
 ## Policy attachment {#policy-attachment-TrafficPolicy}
 
@@ -199,7 +199,7 @@ EOF
 
 Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 
-To attach a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway, you simply use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to reference the Gateway you want the policy to apply to as shown in the following example. 
+To attach a {{< gloss "TrafficPolicy" >}}TrafficPolicy{{< /gloss >}} to a Gateway, you simply use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to reference the Gateway you want the policy to apply to as shown in the following example. 
 
 ```yaml
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -278,7 +278,7 @@ spec:
 
 ## Policy priority and merging rules
 
-If you apply multiple {{< reuse "docs/snippets/trafficpolicies.md" >}} by using different attachment options, policies are merged based on specificy and priority. 
+If you apply multiple {{< gloss "TrafficPolicy" >}}TrafficPolicies{{< /gloss >}} by using different attachment options, policies are merged based on specificy and priority. 
 
 By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging](/docs/about/policies/merging/).
 

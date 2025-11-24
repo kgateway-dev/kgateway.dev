@@ -8,7 +8,7 @@ Learn more about the components that make up {{< reuse "/docs/snippets/kgateway.
 
 ## Component architecture
 
-The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control and data plane. These components work together to translate gateway custom resources into gateway proxy configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps.  {{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the Envoy-based kgateway proxy and the agentgateway proxy.
+The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} and {{< gloss "Data Plane" >}}data plane{{< /gloss >}}. These components work together to translate gateway custom resources into gateway {{< gloss "Proxy" >}}proxy{{< /gloss >}} configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps.  {{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the Envoy-based kgateway proxy and the agentgateway proxy.
 
 {{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
 {{< reuse-image-dark srcDark="img/gw-control-plane-components-dark.svg" caption="Component architecture" >}}
@@ -16,7 +16,7 @@ The following image shows the different components that make up the {{< reuse "/
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
 1. The config and secret watcher components in the `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
-2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "/docs/snippets/kgateway.md" >}} translation engine. 
+2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Translation" >}}translation{{< /gloss >}} engine. 
 3. The translation engine translates Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources into gateway proxy configuration. All gateway proxy configuration is consolidated into an xDS snapshot.
 4. The reporter receives a status report for every resource that is processed by the translator. 
 5. The reporter writes the resource status back to the etcd data store. 
@@ -54,6 +54,7 @@ The following image shows the different stages of a translation cycle for the di
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
 1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
+
 
 2. The next step in the translation cycle is to process all the functions on each Backend. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.
 

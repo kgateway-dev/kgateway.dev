@@ -8,7 +8,7 @@ description:
 
 ## What is an LLM?
 
-Large Language Models (LLMs) are very large, deep learning models that are pre-trained on massive amounts of unlabeled and self-supervised data, often containing billions of words. LLMs extract meanings from a sequence of text and can understand the relationship between words and phrases in it. Based on this understanding, the LLM can then predict and generate natural language, and perform related tasks, such as answering questions, summarizing text, translating between languages, or writing content. LLMs can be fine-tuned on a smaller, more specific data set so that it can perform a more specific task more accurately. 
+Large Language Model (LLMs) are very large, deep learning models that are pre-trained on massive amounts of unlabeled and self-supervised data, often containing billions of words. LLMs extract meanings from a sequence of text and can understand the relationship between words and phrases in it. Based on this understanding, the LLM can then predict and generate natural language, and perform related tasks, such as answering questions, summarizing text, translating between languages, or writing content. LLMs can be fine-tuned on a smaller, more specific data set so that it can perform a more specific task more accurately. 
 
 While LLMs were originally designed to be trained on text and natural language, they are now becoming multimodal, supporting different media types, such as images and videos. 
 

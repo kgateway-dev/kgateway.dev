@@ -4,7 +4,7 @@ weight: 10
 description: Bring your own external authorization service to protect requests that go through your Gateway. 
 ---
 
-Bring your own external authorization service to protect requests that go through your Gateway.
+Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}

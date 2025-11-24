@@ -1,0 +1,156 @@
+A2A:
+  short: "Agent-to-Agent Protocol for secure, policy-driven communication across agents."
+  
+  
+
+Agentgateway:
+  short: "An open-source data plane optimized for agentic AI connectivity."
+  
+  
+
+Agents:
+  short: "Autonomous AI components that interact with MCP tools, services, and other agents."
+  
+  
+
+Ambient mesh:
+  short: "A sidecarless service mesh mode using waypoint proxies and ztunnels."
+  
+  
+
+API Gateway:
+  short: "A centralized entry point that manages, secures, and routes API traffic."
+  
+  
+
+Backends:
+  short: "Destination services or endpoints that kgateway routes traffic to (Kubernetes services, AWS lambdas, external hosts)."
+  
+
+Cluster (Kubernetes):
+  short: "A Kubernetes cluster of control plane and worker nodes running workloads."
+  
+  
+
+Cluster (Envoy):
+  short: "In Envoy, a logical grouping of upstream endpoints used for load balancing."
+  
+  
+
+Control Plane:
+  short: "Components that manage and distribute configuration and policies to the data plane."
+  
+  
+
+Data Plane:
+  short: "Proxies (Envoy or agentgateway) that process live network traffic per configuration from the control plane."
+  
+  
+
+Delegation:
+  short: "A pattern to delegate route and policy ownership from a parent route to child routes."
+  
+  
+
+DirectResponse:
+  short: "A policy to return a custom response from the gateway without forwarding to a backend."
+  
+  
+
+Egress:
+  short: "Outbound traffic leaving the mesh or cluster, often routed through egress gateways."
+  
+  
+
+Envoy:
+  short: "High-performance Layer 7 proxy used by kgateway as the core data plane."
+  
+
+External Authorization:
+  short: "Delegate authorization decisions to an external service via an Envoy extension."
+  
+  
+
+Gateway Extension:
+  short: "CR to integrate external services with a Gateway, such as external auth, rate limiting, and ext proc."
+  
+  
+
+GatewayParameters:
+  short: "Resource that configures proxy template and runtime settings for a Gateway."
+  
+  
+
+HTTPListenerPolicy:
+  short: "A policy resource applied to HTTP/HTTPS listeners on a Gateway."
+  
+  
+
+Inference Extension Project:
+  short: "Mechanisms to integrate inference/AI processing into gateway traffic flows."
+  
+  
+
+Lambda:
+  short: "Serverless compute in Amazon Web Services (AWS) used as backend targets."
+  
+  
+
+Large Language Model (LLM):
+  short: "Pre-trained language models used for natural language tasks. LLM traffic can be managed via agentgateway."
+  
+  
+
+LLM Gateway / AI Gateway:
+  short: "A gateway pattern for managing LLM/AI traffic, often served by agentgateway."
+  
+  
+
+MCP (Model Context Protocol):
+  short: "Protocol for exchanging model context and metadata between LLM gateways, agents, and tools."
+  
+  
+
+Observability (Logging, Monitoring, Tracing):
+  short: "Telemetry systems (logs, metrics, traces) used to monitor kgateway."
+  
+  
+
+Proxy:
+  short: "Envoy- or agentgateway-based data plane process that terminates and forwards traffic."
+  
+  
+
+Rate Limiting:
+  short: "Policies that control request rates to protect backends and enforce quotas."
+  
+  
+
+Resiliency:
+  short: "Features that improve reliability, such as retries, timeouts, and circuit breakers."
+  
+  
+
+Security:
+  short: "Authentication, authorization, encryption and other protections for traffic."
+  
+  
+
+Service Mesh:
+  short: "Istio ambient layer for service-to-service communication."
+  
+  
+
+Traffic Management:
+  short: "Features to control routing, transformations, load balancing, and traffic shaping."
+  
+  
+
+TrafficPolicy:
+  short: "Policy resource for resilience, security, and other traffic behaviors."
+  
+  
+
+Translation:
+  short: "Conversion of Gateway API and CRDs into xDS config for the data plane."
+
