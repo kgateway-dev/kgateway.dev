@@ -20,13 +20,13 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
    ```
 4. Update the default Argo CD password for the admin user to `solo.io`.
    ```shell
-   # bcrypt(password)=$2a$10$g3bspLL4iTNQHxJpmPS0A.MtyOiVvdRk1Ds5whv.qSdnKUmqYVyxa
+   # bcrypt(password)=$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy
    # password: solo.io
    kubectl -n argocd patch secret argocd-secret \
      -p '{"stringData": {
-       "admin.password": "$2a$10$g3bspLL4iTNQHxJpmPS0A.MtyOiVvdRk1Ds5whv.qSdnKUmqYVyxa",
+       "admin.password": "$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy",
        "admin.passwordMtime": "'$(date +%FT%T%Z)'"
-     }}'
+  }}'
    ```
 
 ## Install
