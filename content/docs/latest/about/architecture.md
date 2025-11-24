@@ -53,7 +53,7 @@ The following image shows the different stages of a translation cycle for the di
 
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
-1. The translation cycle starts by defining <span>{{< gloss "Cluster (Envoy)" >}}Envoy clusters{{< /gloss >}} (https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto)</span> from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
+1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
 
 
 2. The next step in the translation cycle is to process all the functions on each Backend. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.

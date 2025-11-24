@@ -172,6 +172,22 @@ Supported parameters:
 
 Available versions: Check the `hugo.yaml` file's `versions` section in the [kgateway.dev repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/hugo.yaml#L129) for the current versions.
 
+### gloss
+
+Use the gloss shortcode to add inline glossary tooltips to terms in your documentation. When users hover over or click a glossary term, a tooltip displays the term's definition from the glossary data file.
+
+The shortcode takes a glossary key as the first argument and optionally accepts inner content for the displayed text. If no inner content is provided, the key itself is used as the display text.
+
+Example:
+
+```markdown
+The {{</* gloss "API Gateway" */>}}API Gateway{{</* /gloss */>}} manages traffic routing.
+
+You can also use it without inner content: {{</* gloss "Control Plane" */>}}
+```
+
+The glossary definitions are stored in `data/glossary.yaml`. Each entry should have a `short` field (displayed in the tooltip) and optionally a link field for a "Learn more" link.
+
 ## Redirects {#redirects}
 
 If you want to redirect a page to a new location, you can add a redirect rule to the [`static/_redirects` file in the `kgateway.dev` repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/static/_redirects).

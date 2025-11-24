@@ -5,7 +5,7 @@ description: Unleash developer productivity and accelerate AI innovation with AI
 icon: cognition
 ---
 
-{{< gloss "LLM Gateway / AI Gateway" >}}AI Gateway{{< /gloss >}} provides centralized management for LLM traffic, offering security, observability, and advanced routing through integration with {{< gloss "Inference Extension Project" >}}inference extensions{{< /gloss >}}.
+AI Gateway provides centralized management for LLM traffic, offering security, observability, and advanced routing through integration with {{< gloss "Inference Extension Project" >}}inference extensions{{< /gloss >}}.
 
 Explore what you can do with AI Gateway in the following guides.
 

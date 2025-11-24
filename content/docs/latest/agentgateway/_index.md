@@ -4,7 +4,7 @@ weight: 460
 description: Use kgateway with agentgateway. 
 ---
 
-{{< gloss "Agentgateway" >}}Agentgateway{{< /gloss >}} is an open source, highly available, highly scalable, and enterprise-grade {{< gloss "Data Plane" >}}data plane{{< /gloss >}} that provides AI connectivity for {{< gloss "Agents" >}}agents{{< /gloss >}} and tools in any environment.
+[Agentgateway](https://agentgateway.dev/) is an open source, highly available, highly scalable, and enterprise-grade {{< gloss "Data Plane" >}}data plane{{< /gloss >}} that provides AI connectivity for {{< gloss "Agents" >}}agents{{< /gloss >}} and tools in any environment.
 
 {{< cards >}}
   {{< card link="about" title="About" >}}

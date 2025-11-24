@@ -10,9 +10,9 @@ Unleash developer productivity and accelerate AI innovation with AI Gateway.
 
 ## About LLMs {#about-llms}
 
-A {{< gloss "Large Language Model (LLM)" >}}Large Language Model (LLM){{< /gloss >}} is a type of artificial intelligence (AI) model that is designed to understand, generate, and manipulate human language in a way that is both coherent and contextually relevant. In recent years, the number of LLM providers or open source LLM projects increased significantly, such as OpenAI, Llama2, and Mistral. These providers distribute LLM in various ways, such as through APIs and cloud-based platforms.
+A {{< gloss "Large Language Model (LLM)" >}}Large Language Model (LLM){{< /gloss >}} is a type of artificial intelligence (AI) model that is designed to understand, generate, and manipulate human language in a way that is both coherent and contextually relevant. In recent years, the number of LLM providers or open source LLM projects increased significantly, such as OpenAI, Llama2, and Mistral. These providers distribute LLMs in various ways, such as through APIs and cloud-based platforms.
 
-Because the AI technology landscape is fragmented, access to LLM can vary a lot. Developers must learn each AI API and AI platform, and implement provider-specific code so that the app can consume the AI services of each LLM provider. This redundancy can significantly decrease developer efficiency and make it difficult to scale and upgrade the app or integrate it with other platforms.
+Because the AI technology landscape is fragmented, access to LLMs can vary a lot. Developers must learn each AI API and AI platform, and implement provider-specific code so that the app can consume the AI services of each LLM provider. This redundancy can significantly decrease developer efficiency and make it difficult to scale and upgrade the app or integrate it with other platforms.
 
 ## About AI Gateway {#about-ai-gateway}
 
@@ -38,18 +38,18 @@ With AI Gateway, you can manage traffic to different models across LLM providers
 
 ### Prompt enrichment
 
-Prompts are basic building blocks for guiding LLM to produce relevant and accurate responses. By effectively managing both system prompts, which set initial guidelines, and user prompts, which provide specific context, you can significantly enhance the quality and coherence of the model's outputs. AI Gateway allows you to pre-configure and refactor system and user prompts, extract common AI provider settings so that you can reuse them across requests, dynamically append or prepend prompts to where you need them, and overwrite default settings on a per-route level.
+Prompts are basic building blocks for guiding LLMs to produce relevant and accurate responses. By effectively managing both system prompts, which set initial guidelines, and user prompts, which provide specific context, you can significantly enhance the quality and coherence of the model's outputs. AI Gateway allows you to pre-configure and refactor system and user prompts, extract common AI provider settings so that you can reuse them across requests, dynamically append or prepend prompts to where you need them, and overwrite default settings on a per-route level.
 
 ### Prompt guards
 
-Prompt guards are mechanisms that ensure that prompt-based interactions with a language model are secure, appropriate, and aligned with the intended use. These mechanisms help to filter, block, monitor, and control LLM inputs and outputs to filter offensive content, prevent misuse, and ensure ethical and responsible AI usage. With AI Gateway, you can set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.
+Prompt guards are mechanisms that ensure that prompt-based interactions with a language model are secure, appropriate, and aligned with the intended use. These mechanisms help to filter, block, monitor, and control LLMs inputs and outputs to filter offensive content, prevent misuse, and ensure ethical and responsible AI usage. With AI Gateway, you can set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data.
 
 ### Chat streaming
 
-AI Gateway supports chat streaming, which allows the LLM to stream out tokens as they are generated. The way that chat streaming is determined varies by AI provider.
+AI Gateway supports chat streaming, which allows the LLMs to stream out tokens as they are generated. The way that chat streaming is determined varies by AI provider.
 
 * OpenAI and most AI providers: Most providers send the `is-streaming` boolean as part of the request to determine whether or not a request should receive a streamed response. 
-* Google Gemini and Vertex AI: In contrast, the Gemini and Vertex AI providers change the path to determine streaming, such as the `streamGenerateContent` segment of the path in the Vertex AI streaming endpoint `https://generativelanguage.amazonaws.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=<key>`. To prevent the path you defined in your HTTPRoute from being overwritten by this streaming path, you instead indicate chat streaming for Gemini and Vertex AI by setting `spec.options.ai.routeType=CHAT_STREAMING` in your TrafficPolicies resource.
+* Google Gemini and Vertex AI: In contrast, the Gemini and Vertex AI providers change the path to determine streaming, such as the `streamGenerateContent` segment of the path in the Vertex AI streaming endpoint `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:streamGenerateContent?key=<key>`. To prevent the path you defined in your HTTPRoute from being overwritten by this streaming path, you instead indicate chat streaming for Gemini and Vertex AI by setting `spec.options.ai.routeType=CHAT_STREAMING` in your TrafficPolicies resource.
 
 ## Supported LLM providers {#supported-llm-providers}
 
