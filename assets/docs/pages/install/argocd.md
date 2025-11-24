@@ -26,7 +26,7 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
      -p '{"stringData": {
        "admin.password": "$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy",
        "admin.passwordMtime": "'$(date +%FT%T%Z)'"
-  }}'
+   }}'
    ```
 
 ## Install
