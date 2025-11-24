@@ -196,7 +196,7 @@ jobs:
               subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', f'content/docs/{url_path}/reference/api.md'], check=True)
               subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', f'content/docs/{url_path}/reference/api.md'], check=True)
               
-              # Additional post-processing to clean up complex struct types and YAML formatting
+              # Additional post-processing to clean up complex struct types
               import re
               api_file = f'content/docs/{url_path}/reference/api.md'
               with open(api_file, 'r') as f:
@@ -223,32 +223,6 @@ jobs:
                   '_Underlying type:_ _struct_',
                   content
               )
-              
-              # Fix YAML code blocks: convert tabs to spaces and remove excessive blank lines
-              def fix_yaml_block(match):
-                  yaml_content = match.group(1)
-                  # Convert tabs to 2 spaces
-                  yaml_content = yaml_content.replace('\t', '  ')
-                  # Remove leading/trailing blank lines
-                  lines = yaml_content.split('\n')
-                  # Remove blank lines at start
-                  while lines and not lines[0].strip():
-                      lines.pop(0)
-                  # Remove blank lines at end
-                  while lines and not lines[-1].strip():
-                      lines.pop()
-                  # Remove excessive consecutive blank lines (keep max 1)
-                  result = []
-                  prev_blank = False
-                  for line in lines:
-                      is_blank = not line.strip()
-                      if is_blank and prev_blank:
-                          continue
-                      result.append(line)
-                      prev_blank = is_blank
-                  return '```yaml\n' + '\n'.join(result) + '\n```'
-              
-              content = re.sub(r'```yaml\n(.*?)```', fix_yaml_block, content, flags=re.DOTALL)
               
               with open(api_file, 'w') as f:
                   f.write(content)
