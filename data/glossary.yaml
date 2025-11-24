@@ -1,5 +1,5 @@
 A2A:
-  short: "Agent-to-Agent Protocol — secure, policy-driven communication between sidecarless agents."
+  short: "Agent-to-Agent Protocol for secure, policy-driven communication across agents."
   
   
 
@@ -9,12 +9,12 @@ Agentgateway:
   
 
 Agents:
-  short: "Autonomous AI components that interact with services and other agents, often without sidecars."
+  short: "Autonomous AI components that interact with MCP tools, services, and other agents."
   
   
 
 Ambient mesh:
-  short: "A sidecar-less service mesh approach using waypoint proxies and ztunnels."
+  short: "A sidecarless service mesh mode using waypoint proxies and ztunnels."
   
   
 
@@ -24,7 +24,7 @@ API Gateway:
   
 
 Backends:
-  short: "Destination services or endpoints Kgateway routes traffic to (Kubernetes services, Lambdas, external hosts)."
+  short: "Destination services or endpoints that kgateway routes traffic to (Kubernetes services, AWS lambdas, external hosts)."
   
 
 Cluster (Kubernetes):
@@ -33,7 +33,7 @@ Cluster (Kubernetes):
   
 
 Cluster (Envoy):
-  short: "Envoy 'cluster' — a logical grouping of upstream endpoints used for load balancing."
+  short: "In Envoy, a logical grouping of upstream endpoints used for load balancing."
   
   
 
@@ -43,12 +43,12 @@ Control Plane:
   
 
 Data Plane:
-  short: "Proxies (Envoy/agentgateway) and agents that process live network traffic per control-plane config."
+  short: "Proxies (Envoy or agentgateway) that process live network traffic per configuration from the control plane."
   
   
 
 Delegation:
-  short: "A pattern to delegate route/policy ownership from a parent route to child routes."
+  short: "A pattern to delegate route and policy ownership from a parent route to child routes."
   
   
 
@@ -58,13 +58,12 @@ DirectResponse:
   
 
 Egress:
-  short: "Outbound traffic leaving the mesh/cluster, often routed through egress gateways."
+  short: "Outbound traffic leaving the mesh or cluster, often routed through egress gateways."
   
   
 
 Envoy:
-  short: "High-performance Layer 7 proxy used by Kgateway as the core data plane."
-  long: "The high-performance proxy used by Kgateway as the core data plane component for handling and routing traffic."
+  short: "High-performance Layer 7 proxy used by kgateway as the core data plane."
   
 
 External Authorization:
@@ -73,7 +72,7 @@ External Authorization:
   
 
 Gateway Extension:
-  short: "CR to integrate external services (auth, rate-limit, processors) with a Gateway."
+  short: "CR to integrate external services with a Gateway, such as external auth, rate limiting, and ext proc."
   
   
 
@@ -93,12 +92,12 @@ Inference Extension Project:
   
 
 Lambda:
-  short: "Serverless compute (e.g., AWS Lambda) used as backend targets."
+  short: "Serverless compute in Amazon Web Services (AWS) used as backend targets."
   
   
 
 Large Language Model (LLM):
-  short: "Pre-trained language models used for NLP tasks; traffic can be managed via agentgateway."
+  short: "Pre-trained language models used for natural language tasks. LLM traffic can be managed via agentgateway."
   
   
 
@@ -108,12 +107,12 @@ LLM Gateway / AI Gateway:
   
 
 MCP (Model Context Protocol):
-  short: "Protocol for exchanging model context and metadata between LLM gateways and tools."
+  short: "Protocol for exchanging model context and metadata between LLM gateways, agents, and tools."
   
   
 
 Observability (Logging, Monitoring, Tracing):
-  short: "Telemetry systems (logs, metrics, traces) used to monitor Kgateway."
+  short: "Telemetry systems (logs, metrics, traces) used to monitor kgateway."
   
   
 
@@ -128,7 +127,7 @@ Rate Limiting:
   
 
 Resiliency:
-  short: "Traffic-management features (retries, timeouts, circuit breakers) that improve reliability."
+  short: "Features that improve reliability, such as retries, timeouts, and circuit breakers."
   
   
 
@@ -138,20 +137,20 @@ Security:
   
 
 Service Mesh:
-  short: "Infrastructure layer for service-to-service communication; Kgateway supports ambient mesh and Istio."
+  short: "Istio ambient layer for service-to-service communication."
   
   
 
 Traffic Management:
-  short: "Features to control routing, transformations, load balancing and traffic shaping."
+  short: "Features to control routing, transformations, load balancing, and traffic shaping."
   
   
 
 TrafficPolicy:
-  short: "Policy resource for retries, timeouts, mirroring, and other traffic behaviors."
+  short: "Policy resource for resilience, security, and other traffic behaviors."
   
   
 
 Translation:
-  short: "Conversion of Gateway API/CRD config into xDS for the data plane."
+  short: "Conversion of Gateway API and CRDs into xDS config for the data plane."
 

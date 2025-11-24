@@ -3,3 +3,9 @@
    ```sh
    helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} | grep agentgateway
    ```
+
+   Example output: 
+   ```
+   agentgateway:
+     enabled: true
+   ```

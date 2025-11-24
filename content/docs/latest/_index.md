@@ -19,5 +19,4 @@ Welcome to the documentation for the kgateway open source project!
   {{< card link="operations" title="Operations" >}}
   {{< card link="reference" title="Reference" >}}
   {{< card link="faqs" title="FAQs" >}}
-  {{< card link="glossary" title="Glossary" >}}
 {{< /cards >}}
