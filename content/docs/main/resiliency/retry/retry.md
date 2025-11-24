@@ -21,7 +21,7 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "docs/snippets/prereq-x-channel.md" >}}
 
 ## Step 1: Set up your environment for retries
 

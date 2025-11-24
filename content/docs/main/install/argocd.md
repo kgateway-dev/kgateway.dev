@@ -54,7 +54,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
+   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the Gateway API experimental CRDs and enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
    
 2. Port-forward the Argo CD server on port 9999.
    
@@ -103,7 +103,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. 
  {{< callout type="warning" >}}
-   When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image.
+   When using the development build {{< reuse "docs/versions/patch-dev.md" >}} , add the `controller.image.pullPolicy=Always` parameter to ensure you get the latest image. You might also want to enable the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.
    {{< /callout >}}
    
    ```yaml
@@ -125,6 +125,8 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
          parameters:
          - name: controller.image.pullPolicy
            value: "Always"
+         - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
+           value: "true"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:

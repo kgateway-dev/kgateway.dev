@@ -375,3 +375,4 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    }
    ```
 
+{{< reuse "docs/snippets/agentgateway/llm-next.md" >}}

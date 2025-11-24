@@ -2,7 +2,7 @@
 title: kgateway v2.1 release blog
 toc: false
 publishDate: 2025-10-10T10:00:00-00:00
-author: Nadine Spies, Aryan Parashar, Nina Polshakova
+author: Nadine Spies, Aryan Parashar, Nina Polshakova, Michael Levan
 excludeSearch: true
 ---
 
@@ -22,7 +22,7 @@ agentgateway:
   enabled: true
 ```
 
-Then you create a Gateway with the `agentgateway` GatewayClass as shown here: 
+Then you create a Gateway with the `agentgateway` `GatewayClass` as shown here: 
 ```yaml
 kubectl apply -f- <<EOF
 kind: Gateway
@@ -51,7 +51,7 @@ You are now ready to try out agentgateway. Check out the [agentgateway guides](/
 Kgateway is now fully conformant with the Kubernetes Gateway API version 1.3.0 and Inference Extension version 1.0.0. To learn more, check out the conformance test reports: 
 
 * [Kubernetes Gateway API](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.3.0/kgateway)
-* [Inference Extension](https://github.com/kubernetes-sigs/gateway-api-inference-extension/tree/main/conformance/reports/v1.0.0/gateway/kgateway)
+* [Inference Extension](https://github.com/kubernetes-sigs/gateway-api-inference-extension/tree/main/conformance/reports/v1.0.2/gateway/kgateway)
 
 ### Global policy attachment {#v21-global-policy-attachment}
 
@@ -205,6 +205,14 @@ spec:
 ``` 
 
 Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies.
+
+## See the new features in action!
+
+Explore some of the new features from the v2.1 release or follow along with the [demo](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/kgateway-agentgateway-2.1-key-features).
+{{< youtube 95FRff2n1pk >}}
+
+You can also check out the agentgateway and kgateway integration in action routing to [Agent-to-Agent (A2A) workloads](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/a2a-k8s) and [Model Context Protocol (MCP) servers](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/mcp-connection-k8s-agentgateway):
+{{< youtube i7gAWTQypn8 >}}
 
 ##  🗑️ Deprecated or removed features
 

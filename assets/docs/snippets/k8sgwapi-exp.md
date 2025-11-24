@@ -10,8 +10,20 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 | 
 | [HTTPRoute rule attachment option]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-rule" >}}) | 1.3 |
 
+{{< version include-if="2.2.x" >}}
+{{< callout type="warning" >}}
+**Experimental feature gate**: To use experimental Gateway API features in kgateway version 2.2 or later, you must enable the `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES` environment variable in your kgateway controller deployment. This setting defaults to `false` and must be explicitly enabled. For example, you might upgrade your installation with the following Helm value:
+
+```yaml
+controller:
+  extraEnv:
+    KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
+```
+{{< /callout >}}
+{{< /version >}}
+
 **Sample command for version {{< reuse "docs/versions/k8s-gw-version.md" >}}**: Note that some CRDs are prefixed with `X` to indicate that the entire CRD is experimental and subject to change.
-     
+    
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-```  
+```

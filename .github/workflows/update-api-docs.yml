@@ -85,7 +85,7 @@ jobs:
           import re
           
           def resolve_tag_for_version(version, link_version):
-              '''Resolve the git tag to use for a given version'''
+              '''Resolve the git tag to use for a given version (for release triggers)'''
               if link_version == 'main':
                   return 'main'
               
@@ -119,17 +119,42 @@ jobs:
                   print(f'Error fetching tags for version {version}: {e}')
                   return None
           
-          def clone_repository(tag, kgateway_dir='kgateway'):
-              '''Clone the kgateway repository at the specified tag'''
+          def resolve_branch_for_version(version, link_version):
+              '''Resolve the git branch to use for a given version (for manual triggers)'''
+              if link_version == 'main':
+                  return 'main'
+              
+              # For other linkVersions, construct the branch name from the version
+              # e.g., version "2.1.x" -> branch "v2.1.x"
+              branch_name = f'v{version}'
+              
+              # Verify the branch exists in the remote repository
+              try:
+                  result = subprocess.run(['git', 'ls-remote', '--heads', 'https://github.com/kgateway-dev/kgateway.git', branch_name], 
+                                        capture_output=True, text=True, check=True)
+                  if result.stdout.strip():
+                      print(f'   Found branch: {branch_name}')
+                      return branch_name
+                  else:
+                      print(f'   Warning: Branch {branch_name} not found, trying to use it anyway')
+                      # Still return the branch name - clone will fail if it doesn't exist
+                      return branch_name
+              except subprocess.CalledProcessError as e:
+                  print(f'   Warning: Error checking branch {branch_name}: {e}')
+                  # Still return the branch name - clone will fail if it doesn't exist
+                  return branch_name
+          
+          def clone_repository(ref, kgateway_dir='kgateway'):
+              '''Clone the kgateway repository at the specified branch or tag'''
               # Clean up any existing directory
               if os.path.exists(kgateway_dir):
                   subprocess.run(['rm', '-rf', kgateway_dir], check=True)
               
               # Clone repository
-              if tag == 'main':
+              if ref == 'main':
                   subprocess.run(['git', 'clone', '--branch', 'main', '--depth', '1', 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
               else:
-                  subprocess.run(['git', 'clone', '--depth', '1', '--branch', tag, 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
+                  subprocess.run(['git', 'clone', '--depth', '1', '--branch', ref, 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
           
           def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
               '''Generate API reference documentation'''
@@ -239,7 +264,9 @@ jobs:
               return True
           
           # Main processing logic - determine target version
-          if '${{ github.event_name }}' == 'release':
+          is_release_trigger = '${{ github.event_name }}' == 'release'
+          
+          if is_release_trigger:
               # Release trigger: determine version from release tag
               release_tag = '${{ github.event.release.tag_name }}'
               print(f'🎉 Release trigger detected: {release_tag}')
@@ -282,17 +309,25 @@ jobs:
               
               print(f'\n🔄 Processing version: {version} (linkVersion: {link_version}, path: {url_path})')
               
-              # Resolve tag once per version
-              tag = resolve_tag_for_version(version, link_version)
-              if not tag:
-                  print(f'❌ Skipping version {version} - could not resolve tag')
+              # Resolve tag or branch based on trigger type
+              if is_release_trigger:
+                  # Use tags for release triggers
+                  ref = resolve_tag_for_version(version, link_version)
+                  ref_type = 'tag'
+              else:
+                  # Use branches for manual triggers
+                  ref = resolve_branch_for_version(version, link_version)
+                  ref_type = 'branch'
+              
+              if not ref:
+                  print(f'❌ Skipping version {version} - could not resolve {ref_type}')
                   continue
               
-              print(f'   Using tag: {tag}')
+              print(f'   Using {ref_type}: {ref}')
               
               # Clone repository once per version
               try:
-                  clone_repository(tag)
+                  clone_repository(ref)
                   print(f'   ✓ Cloned repository')
               except subprocess.CalledProcessError as e:
                   print(f'❌ Failed to clone repository for version {version}: {e}')

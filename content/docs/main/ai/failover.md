@@ -7,10 +7,6 @@ weight: 30
 
 Prioritize the failover of requests across different models from an LLM provider.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About failover {#about}
 
 Failover is a way to keep services running smoothly by automatically switching to a backup system when the main one fails or becomes unavailable.
@@ -27,13 +23,18 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider that fails over in the following order of priority. For more information, see the [Priority Groups API reference docs](/docs/reference/api/#prioritygroups).
+You can configure failover across multiple models and providers by using priority groups. Each priority group represents a set of providers that share the same priority level. Failover priority is determined by the order in which the priority groups are listed in the Backend. The priority group that is listed first is assigned the highest priority. Models within the same priority group are load balanced (round-robin), not prioritized.
 
-1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
+1. Create or update the Backend for your LLM providers.
+
+   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
+   {{% tab tabName="OpenAI model priority" %}}
    
-   1. OpenAI `gpt-4o` model
-   2. OpenAI `gpt-4.0-turbo` model
-   3. OpenAI `gpt-3.5-turbo` model
+   In this example, you configure separate priority groups for failover across multiple models from the same LLM provider, OpenAI. The priority order of the models is as follows:
+   
+   1. OpenAI `gpt-4o` model (highest priority)
+   2. OpenAI `gpt-4.0-turbo` model (fallback)
+   3. OpenAI `gpt-3.5-turbo` model (lowest priority)
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -49,28 +50,91 @@ In this example, you create a Backend with multiple pools for the same LLM provi
      ai:
        priorityGroups:
        - providers:
-         - openai:
+         - name: openai-gpt-4o
+           openai:
              model: "gpt-4o"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
-         - openai:
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+       - providers:
+         - name: openai-gpt-4.0-turbo
+           openai:
              model: "gpt-4.0-turbo"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
-         - openai:
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+       - providers:
+         - name: openai-gpt-3.5-turbo
+           openai:
              model: "gpt-3.5-turbo"
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
    EOF
    ```
+   
+   {{% /tab %}}
+   {{% tab tabName="Cost-based priority across providers" %}}
+   
+   In this example, you configure failover across multiple providers with cost-based priority. The first priority group contains cheaper models. Responses are load-balanced across these models. In the event that both models are unavailable, requests fall back to the second priority group of more premium models.
+   - Highest priority: Load balance across cheaper OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest` models.
+   - Fallback: Load balance across more premium OpenAI `gpt-4.0-turbo` and Anthropic `claude-opus-4-1` models.
 
-2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
+   Make sure that you configured both Anthropic and OpenAI providers.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     labels:
+       app: model-failover
+     name: model-failover
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     type: AI
+     ai:
+       priorityGroups:
+       - providers:
+         - name: openai-gpt-3.5-turbo
+           openai:
+             model: "gpt-3.5-turbo"
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+         - name: claude-haiku
+           anthropic:
+             model: "claude-3-5-haiku-latest"
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: anthropic-secret
+       - providers:
+         - name: openai-gpt-4.0-turbo
+           openai:
+             model: "gpt-4.0-turbo"
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: openai-secret
+         - name: claude-opus
+           anthropic:
+             model: "claude-opus-4-1"
+             authToken:
+               kind: SecretRef
+               secretRef:
+                 name: anthropic-secret
+   EOF
+   ```
+   
+   {{% /tab %}}
+   {{< /tabs >}}
+
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/` completions for OpenAI.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -104,7 +168,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    EOF
    ```
 
-3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend will automatically use the model from the first pool in the priority order.
+3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -131,7 +195,12 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    {{< /tab >}}
    {{< /tabs >}}
    
-   Example output: Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
+   Example output:
+
+   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
+   {{% tab tabName="OpenAI model priority" %}}
+   
+   Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
 
    ```json {linenos=table,hl_lines=[5],linenostart=1,filename="model-response.json"}
    {
@@ -155,6 +224,38 @@ In this example, you create a Backend with multiple pools for the same LLM provi
      ...
    }
    ```
+   
+   {{% /tab %}}
+   {{% tab tabName="Cost-based priority across providers" %}}
+   
+   Note the response is from the `claude-3-5-haiku-20241022` model. With the cost-based priority configuration, requests are load balanced across the cheaper models (OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest`) in the first priority group.
+
+   ```json {linenos=table,hl_lines=[2],linenostart=1,filename="model-response.json"}
+   {
+     "model": "claude-3-5-haiku-20241022",
+     "usage": {
+       "prompt_tokens": 11,
+       "completion_tokens": 299,
+       "total_tokens": 310
+     },
+     "choices": [
+       {
+         "message": {
+           "content": "Kubernetes (often abbreviated as K8s) is an open-source container orchestration platform designed to automate the deployment, scaling, and management of containerized applications. Here's a comprehensive overview:\n\nKey Features:\n1. Container Orchestration\n- Manages containerized applications\n- Handles deployment and scaling\n- Ensures high availability\n\n2. Core Components\n- Cluster: Group of machines (nodes)\n- Master Node: Controls the cluster\n- Worker Nodes: Run containerized applications\n- Pods: Smallest deployable units\n- Containers: Isolated application environments\n\n3. Main Capabilities\n- Automatic scaling\n- Self-healing\n- Load balancing\n- Rolling updates\n- Service discovery\n- Configuration management\n\n4. Key Concepts\n- Deployments: Define desired application state\n- Services: Network communication between components\n- Namespaces: Logical separation of resources\n- ConfigMaps: Configuration management\n- Secrets: Sensitive data management\n\n5. Benefits\n- Portability across different environments\n- Efficient resource utilization\n- Improved scalability\n- Enhanced reliability\n- Simplified management of complex applications\n\n6. Popular Use Cases\n- Microservices architecture\n- Cloud-native applications\n- Continuous deployment\n- Distributed systems\n\nKubernetes has become the standard for container orchestration in modern cloud-native application development.",
+           "role": "assistant"
+         },
+         "index": 0,
+         "finish_reason": "stop"
+       }
+     ],
+     "id": "msg_016PLweC4jgJnpwH7V1tZaqj",
+     "created": 1762790436,
+     "object": "chat.completion"
+   }
+   ```
+   
+   {{% /tab %}}
+   {{< /tabs >}}
 
 ## Cleanup
 

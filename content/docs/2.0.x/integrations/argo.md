@@ -18,18 +18,21 @@ description: Use kgateway with Argo Rollouts.
    kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/latest/download/install.yaml
    ```
 
-2. Change the config map for the Argo Rollouts pod to install the Argo Rollout Gateway API plug-in. 
+2. Change the config map for the Argo Rollouts pod to install the Argo Rollouts Gateway API plug-in as shown in the following example. Alternatively, you could install the Argo Rollouts Helm chart instead to use init containers to achieve the same thing. For more information about either method, refer to the [Argo Rollouts docs](https://rollouts-plugin-trafficrouter-gatewayapi.readthedocs.io/en/v0.8.0/installation/).
    ```yaml
    cat <<EOF | kubectl apply -f -
    apiVersion: v1
    kind: ConfigMap
    metadata:
-     name: argo-rollouts-config 
+     name: argo-rollouts-config
      namespace: argo-rollouts
    data:
      trafficRouterPlugins: |-
        - name: "argoproj-labs/gatewayAPI"
-         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.0.0-rc1/gateway-api-plugin-linux-amd64"
+	     # example uses amd64 and v0.8.0
+	     # for other builds and versions,
+		 # see https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases
+         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.8.0/gatewayapi-plugin-amd64"
    EOF
    ```
 

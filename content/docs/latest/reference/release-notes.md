@@ -7,8 +7,7 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ## v2.1.0 {#v210}
 
-<!-- TODO release 2.1 
-For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.1.0).-->
+For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.1.0).
 
 ### 🔥 Breaking changes {#v21-breaking-changes}
 

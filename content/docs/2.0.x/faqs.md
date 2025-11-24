@@ -8,7 +8,7 @@ prev: /docs/reference
 
 ## What is kgateway?
 
-Kgateway is an open source, cloud-native Layer 7 proxy that is based on [Envoy](https://www.envoyproxy.io/). The kgateway project implements gateway routing by using [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](https://gateway-api.sigs.k8s.io/) resources.
+{{< reuse "docs/snippets/kgateway-about.md" >}}
 
 ## Why would I want to use kgateway?
 
