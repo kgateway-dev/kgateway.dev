@@ -54,12 +54,6 @@ menu:
     - name: Blog
       url: /blog
       weight: 2
-    - name: Get Started
-      weight: 3
-      url: /docs/envoy/latest/quickstart/
-    - name: Why kgateway
-      weight: 4
-      url: /docs/envoy/latest/about/overview/
     - name: Search
       weight: 5
       params:

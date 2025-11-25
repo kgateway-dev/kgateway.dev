@@ -54,9 +54,44 @@
 
   .dropdown-content {
     display: none;
+    min-width: 160px;
   }
 
   .dropdown:hover .dropdown-content {display: block;}
+  
+  .navbar-dropdown-content {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    padding-top: 0.25rem;
+  }
+  
+  /* Create a hover bridge between trigger and dropdown */
+  .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 0.5rem;
+    z-index: 49;
+  }
+  
+  .dark .navbar-dropdown-content {
+    background-color: rgb(17, 24, 39);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Dark mode hover styles for dropdown items */
+  .dark .navbar-dropdown-content a:hover {
+    background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+    color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+  }
 
   {{- /* Build the search path pattern based on subSection and version */ -}}
   {{- $searchPathPattern := "" -}}
@@ -169,8 +204,26 @@
           {{- end -}}
         {{- end -}}
 
+        {{/* Check if this is the Docs menu item and render as dropdown */}}
+        {{- if eq .Name "Docs" -}}
+          {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
+          {{- $activeClass := cond $active "hx-font-medium" "hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200" -}}
+          <div class="dropdown hx-relative -hx-ml-2 hx-hidden md:hx-inline-block">
+            <a
+              title="{{ or (T .Identifier) .Name | safeHTML }}"
+              href="{{ $link }}"
+              class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-whitespace-nowrap hx-p-2 {{ $activeClass }}"
+            >
+              <span class="hx-text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx-ml-1 hx-mb-0.5 hx-inline hx-w-4 hx-h-4'") }}
+            </a>
+            <div class="dropdown-content navbar-dropdown-content">
+              <a href="/docs/envoy/latest" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Kgateway (Envoy)</a>
+              <a href="/docs/agentgateway/latest" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Agentgateway</a>
+            </div>
+          </div>
         {{/* Display icon menu item */}}
-        {{- if .Params.icon -}}
+        {{- else if .Params.icon -}}
           {{- $rel := cond (eq .Params.icon "mastodon") "noreferer me" "noreferer" }}
           <a class="hx-p-2 hx-text-current" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
             {{- if eq .Params.icon "github" -}}
