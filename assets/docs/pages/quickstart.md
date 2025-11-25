@@ -1,4 +1,4 @@
-Get started with {{< reuse "/docs/snippets/kgateway.md" >}}, a control plane for managing a cloud-native Layer 7 proxy that is based on the {{% conditional-text include-if="envoy" %}}[Envoy](https://www.envoyproxy.io/){{% /conditional-text %}} {{% conditional-text include-if="agentgateway" %}}[agentgateway](https://agentgateway.dev/){{% /conditional-text %}}and [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](https://gateway-api.sigs.k8s.io/) projects.
+Get started with {{< reuse "/docs/snippets/kgateway.md" >}}, a control plane for managing a cloud-native Layer 7 proxy that is based on the [Envoy](https://www.envoyproxy.io/) or [agentgateway](https://agentgateway.dev/) data planes and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](https://gateway-api.sigs.k8s.io/) project.
 
 ## Before you begin
 
@@ -18,16 +18,9 @@ Good job! You now have the {{< reuse "/docs/snippets/kgateway.md" >}} control pl
 
 ## Next steps
 
-{{% conditional-text include-if="envoy" %}}
-
 {{< icon "kgateway" >}} [Set up an API gateway with an httpbin sample app]({{< link-hextra path="/install/sample-app/" >}}). This guide uses the Envoy-based {{< reuse "/docs/snippets/kgateway.md" >}} proxy to set up an API gateway. Then, deploy a sample httpbin app, configure a basic HTTP listener on the API gateway, and route traffic to httpbin by using an HTTPRoute resource.
 
-{{% /conditional-text %}}
-{{% conditional-text include-if="agentgateway" %}}
-
 {{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool server]({{< link-hextra path="/agentgateway/setup/" >}}). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
-
-{{% /conditional-text %}}
 
 ## Cleanup
 

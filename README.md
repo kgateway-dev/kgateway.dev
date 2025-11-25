@@ -7,7 +7,7 @@
 * `hugo extended v0.135.0`
 
 #### To run `kgateway.dev` locally:
-1. `git@github.com:solo-io/docs-kgw-agw-split.git`
+1. `git@github.com:kgateway-dev/kgateway.dev.git`
 2. `cd kgateway.dev`
 3. `npm install`
 4. `hugo server`
