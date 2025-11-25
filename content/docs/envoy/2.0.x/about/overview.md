@@ -3,11 +3,15 @@ title: Overview
 weight: 10
 ---
 
-Learn more about {{< reuse "/docs/snippets/kgateway.md" >}}, its architecture, and benefits.
+{{< reuse "docs/snippets/kgateway-about.md" >}}
+
+In this topic, you learn about the basics of API gateways for microservices, the extensions that {{< reuse "/docs/snippets/kgateway.md" >}} provides beyond typical API gateway functionality, and the default API gateway proxy setup.
+
+To learn about AI gateway functionality, see the [AI Gateway overview]({{< link-hextra path="/ai/about/" >}}).
 
 ## API gateway {#api-gateway}
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
+The {{< reuse "/docs/snippets/kgateway.md" >}} data plane is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
 
 ### What is an ingress?
 

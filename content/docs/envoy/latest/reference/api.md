@@ -1549,7 +1549,7 @@ _Appears in:_
 
 
 A GatewayParameters contains configuration that is used to dynamically
-provision kgateway's data plane (Envoy proxy instance), based on a
+provision kgateway's data plane (Envoy or agentgateway proxy instance), based on a
 Kubernetes Gateway.
 
 
@@ -1974,7 +1974,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
+| `image` _[Image](#image)_ | The container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details. |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `logLevel` _string_ | Log level for istio-proxy. Options include "info", "debug", "warning", and "error".<br />Default level is info Default is "warning". |  |  |
@@ -1987,7 +1987,7 @@ _Appears in:_
 
 
 
-IstioIntegration configures the Istio integration settings used by a kgateway's data plane (Envoy proxy instance)
+IstioIntegration configures the Istio integration settings used by kgateway's data plane
 
 
 
@@ -2020,8 +2020,8 @@ _Appears in:_
 | `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If agentgateway is enabled, the EnvoyContainer values will be ignored. |  |  |
 | `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
 | `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
-| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the Envoy proxy over<br />the network. |  |  |
-| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the Envoy pod. |  |  |
+| `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the proxy over<br />the network. |  |  |
+| `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the proxy pods. |  |  |
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
 | `aiExtension` _[AiExtension](#aiextension)_ | Deprecated: `aiExtension` is deprecated in v2.1 and will be removed in v2.2.<br />Prefer to use `agentgateway` instead.<br /><br />Configuration for the AI extension. |  |  |

@@ -1,0 +1,21 @@
+{{ $key := .Get 0 }}
+{{ $entry := index site.Data.glossary $key }}
+
+{{ if $entry }}
+<span class="glossary-term" tabindex="0" data-glossary-term="{{ $key }}">
+  {{ .Inner | default $key }}
+  <span class="tooltip-content">
+    <strong>{{ $key }}</strong>
+    <span>{{ $entry.short }}</span>
+    {{ if $entry.link }}
+    <a href="{{ $entry.link }}" class="tooltip-link" target="_blank">
+      Learn more
+    </a>
+    {{ end }}
+  </span>
+</span>
+{{ else }}
+{{ .Inner | default $key }}
+{{ end }}
+
+

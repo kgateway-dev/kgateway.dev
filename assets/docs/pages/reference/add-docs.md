@@ -31,7 +31,7 @@ When you understand the audience and the intended use for the content that you w
 
 |Content type |	Goals | Audiences |
 | -- | -- | -- |
-|Concepts | Concepts explain key principles of kgateway, its functionality, features, and underlying technologies. For example, you might want to describe the external authentication flow in kgateway and how the components interact with each other. Concepts do not include sequences of steps. Instead, links might be provided to corresponding guides that explain how to set up and use the feature that you described in your concept. | New useres or users that are unfamiliar with the project and the feature it provides. |
+|Concepts | Concepts explain key principles of kgateway, its functionality, features, and underlying technologies. For example, you might want to describe the external authentication flow in kgateway and how the components interact with each other. Concepts do not include sequences of steps. Instead, links might be provided to corresponding guides that explain how to set up and use the feature that you described in your concept. | New users or users that are unfamiliar with the project and the feature it provides. |
 | Guides | Guides provide the steps or procedure to accomplish a certain task. For example, you might want to write a guide for how to set up external authentication in kgateway. Guides give only minimal information about how the feature works, but can include links to related concepts. | Users that want to try out kgateway. | 
 | Setup pages | Setup pages focus on steps for how to install, configure, and set up kgateway. | New or existing uses who want to install kgateway. 
 | Reference pages| Reference pages provide detailed information about certain kgateway components, its CLI, Helm values, and API. Most reference content is automatically generated from the code. | Users with advanced and deep technical knowledge of the project. | 
@@ -195,6 +195,22 @@ Supported parameters:
 - `exclude-if`: Shows content only when the current version does not match the specified version
 
 Available versions: Check the `hugo.yaml` file's `versions` section in the [kgateway.dev repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/hugo.yaml#L129) for the current versions.
+
+### gloss
+
+Use the gloss shortcode to add inline glossary tooltips to terms in your documentation. When users hover over or click a glossary term, a tooltip displays the term's definition from the glossary data file.
+
+The shortcode takes a glossary key as the first argument and optionally accepts inner content for the displayed text. If no inner content is provided, the key itself is used as the display text.
+
+Example:
+
+```markdown
+The {{</* gloss "API Gateway" */>}}API Gateway{{</* /gloss */>}} manages traffic routing.
+
+You can also use it without inner content: {{</* gloss "Control Plane" */>}}
+```
+
+The glossary definitions are stored in `data/glossary.yaml`. Each entry should have a `short` field (displayed in the tooltip) and optionally a link field for a "Learn more" link.
 
 ## Redirects {#redirects}
 
