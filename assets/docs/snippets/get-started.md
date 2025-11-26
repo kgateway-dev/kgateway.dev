@@ -36,7 +36,6 @@
    ```
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     --set agentgateway.enabled=true  \
      --set controller.image.pullPolicy=Always
    ```
    {{< /version >}}
@@ -49,7 +48,6 @@
    ```
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-     --set agentgateway.enabled=true  \
      --set controller.image.pullPolicy=Always \
      --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
    ```

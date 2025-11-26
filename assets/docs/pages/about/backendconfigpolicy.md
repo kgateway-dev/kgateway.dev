@@ -1,9 +1,3 @@
----
-title: BackendConfigPolicy
-weight: 10
-description: 
----
-
 Use a BackendConfigPolicy resource to configure connection settings for a backend.  
 
 {{< callout type="warning" >}} 
@@ -88,5 +82,3 @@ spec:
     maxHeadersCount: 15
     maxRequestsPerConnection: 100
 ```
-
-

@@ -1,6 +1,6 @@
 ---
 linkTitle: "Kgateway 2.0.x"
-title: Welcome
+title: Kgateway 2.0.x
 ---
 
 Welcome to the documentation for the kgateway open source project! 
