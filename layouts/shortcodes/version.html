@@ -6,8 +6,15 @@
 {{- $parts := split $trimmed "/" -}}
 {{- $version := "" -}}
 
+{{- /* Extract version from path: /docs/envoy/latest/... or /docs/agentgateway/latest/... or /docs/latest/... */ -}}
 {{- if and (ge (len $parts) 2) (eq (index $parts 0) "docs") -}}
-    {{- $version = index $parts 1 -}}
+    {{- /* Check if we have a section (envoy/agentgateway) before the version */ -}}
+    {{- if and (ge (len $parts) 3) (or (eq (index $parts 1) "envoy") (eq (index $parts 1) "agentgateway")) -}}
+        {{- $version = index $parts 2 -}}
+    {{- else -}}
+        {{- /* Legacy path format: /docs/{version}/... */ -}}
+        {{- $version = index $parts 1 -}}
+    {{- end -}}
 {{- end -}}
 
 {{ $condition := $version }}
