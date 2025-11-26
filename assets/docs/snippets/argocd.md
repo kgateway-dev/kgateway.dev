@@ -23,7 +23,7 @@
 
 3. Open the [Argo CD UI](https://localhost:9999/).
 
-4. Log in with the `admin` username and `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` password.
+4. Log in with the `admin` username and `solo.io` password.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
    {{< reuse-image-dark srcDark="img/argocd-welcome.png" >}}

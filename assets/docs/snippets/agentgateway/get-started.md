@@ -13,7 +13,7 @@
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Deploy the kgateway CRDs by using Helm.
+2. Deploy the CRDs for the kgateway control plane and agentgateway data plane by using Helm.
    {{< version include-if="2.2.x" >}}
    ```sh
    helm upgrade -i --create-namespace --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
@@ -27,13 +27,8 @@
    ```
    {{< /version >}}
 
-3. Install kgateway by using Helm. Make sure to enable the agentgateway feature flag, `--set agentgateway.enabled=true`. {{< version include-if="2.2.x" >}} To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.{{< /version >}}
+3. Install the kgateway control plane by using Helm. Make sure to enable the agentgateway feature flag, `--set agentgateway.enabled=true`. {{< version include-if="2.2.x" >}} To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.{{< /version >}}
    {{< version include-if="2.1.x" >}}
-   ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} \
-   kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-   --set controller.image.pullPolicy=Always
-   ```
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
      --set agentgateway.enabled=true  \
@@ -41,12 +36,6 @@
    ```
    {{< /version >}}
    {{< version include-if="2.2.x" >}}
-   ```sh
-   helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} \
-   kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-   --set controller.image.pullPolicy=Always \
-   --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
-   ```
    ```sh
    helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/patch-dev.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
      --set agentgateway.enabled=true  \

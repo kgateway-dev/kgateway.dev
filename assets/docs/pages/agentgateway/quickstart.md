@@ -1,8 +1,10 @@
-Get started with {{< reuse "/docs/snippets/agentgateway.md" >}}. {{< reuse "docs/snippets/agentgateway/about.md" >}}
+Use the kgateway control plane to deploy and manage the lifecycle of {{< reuse "/docs/snippets/agentgateway.md" >}} proxies on Kubernetes. </br></br>
+
+{{< reuse "docs/snippets/agentgateway/about.md" >}}
 
 ## Before you begin
 
-These quick start steps assume that you have a Kubernetes cluster, `kubectl`, and `helm` already set up. For quick testing, you can use [Kind](https://kind.sigs.k8s.io/).
+These quickstart steps assume that you have a Kubernetes cluster, `kubectl`, and `helm` already set up. For quick testing, you can use [Kind](https://kind.sigs.k8s.io/).
 
 ```sh
 kind create cluster
@@ -18,7 +20,9 @@ Good job! You now have the {{< reuse "/docs/snippets/kgateway.md" >}} control pl
 
 ## Next steps
 
-{{< icon "agentgateway" >}} [Set up an AI gateway with an MCP sample tool server]({{< link-hextra path="/setup/" >}}). This guide uses the agentgateway proxy to set up an AI gateway that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
+{{< icon "agentgateway" >}} [Create an agentgateway proxy]({{< link-hextra path="/setup/" >}}) that you can use for Model Context Protocol (MCP), agent-to-agent (A2A), large language model (LLM), and more AI-related use cases. For example, you can follow the [guide]({{< link-hextra path="/mcp/static-mcp/" >}}) to use agentgateway to proxy traffic to a sample MCP tool server. The example deploys a sample MCP server with a `fetch` tool, exposes the tool with agentgateway, and tests the tool with the MCP Inspector UI.
+
+For other examples, see the [LLM consumption]({{< link-hextra path="/llm/" >}}), [inference routing]({{< link-hextra path="/inference/" >}}), [MCP]({{< link-hextra path="/mcp/" >}}), or [agent connectivity]({{< link-hextra path="/agent/" >}}) guides. 
 
 ## Cleanup
 
