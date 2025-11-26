@@ -1,23 +1,15 @@
 You can use the pre-built Grafana dashboards to observe the control and data plane statuses. 
 
-1. Create Grafana dashboards for the control and data plane metrics. For example, you can download the following sample Grafana dashboard configurations: 
-     
-   * [Envoy dashboard](../envoy.json)
-     ```sh
-     curl -L "https://kgateway.dev/docs/main/envoy/observability/envoy.json" >> envoy.json 
-     ```
+1. Create a Grafana dashboard for the control metrics. You can download the following sample Grafana dashboard configuration: 
    * [Kgateway operations dashboard](../kgateway.json) 
      ```sh
-     curl -L "http://kgateway.dev/docs/main/envoy/observability/kgateway.json" >> kgateway.json 
+     curl -L "http://kgateway.dev/docs/main/agentgateway/observability/kgateway.json" >> kgateway.json 
      ```
 
-2. Import the Grafana dashboards.
+2. Import the Grafana dashboard.
    ```sh
-   kubectl -n telemetry create cm envoy-dashboard \
-   --from-file=envoy.json
    kubectl -n telemetry create cm kgateway-dashboard \
    --from-file=kgateway.json
-   kubectl label -n telemetry cm envoy-dashboard grafana_dashboard=1
    kubectl label -n telemetry cm kgateway-dashboard grafana_dashboard=1
    ```
 
@@ -37,30 +29,8 @@ open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jso
 2. Open Grafana in your browser by using the following URL: [http://localhost:3000](http://localhost:3000)
 {{% /tab %}}
    {{< /tabs >}}
-      
-4. Go to **Dashboards** > **Envoy** to open the Envoy dashboard that you imported. Verify that you see Envoy-specific data, such as the number of clusters, request rates, or active connections. You can also see metrics for the traffic that you generated for the httpbin app. 
-      
-   {{< reuse-image src="img/envoy-dashboard.png" >}}
-   {{< reuse-image-dark srcDark="img/envoy-dashboard.png" >}}
-   
-   | Metric | Description |
-   | -- | -- |
-   | Total clusters added | The total number of Envoy clusters that were added to the Envoy cluster manager.  |
-   | Total clusters modified | The total number of Envoy clusters that were modified. |
-   | HTTP request rate by gateway | The per-second HTTP request rate (QPS) over the last 5 minutes for each Envoy listener/HTTP connection manager. |
-   | Active clusters | The number of warmed clusters that are ready to serve traffic. |
-   | Warming clusters | The number of clusters that are in the warming phase. These clusters cannot serve traffic.|
-   | Total clusters removed | The number of removed clusters.|
-   | Envoy upstream request rate by Envoy cluster | The per-second rate of upstream requests for each cluster over the last 5 minutes. | 
-   | Total active connections by Envoy cluster | The total number of active connections to each upstream cluster. |
-   | ExtAuthZ denied/error | The average rate of extauth errors over the last 5 minutes. |
-   | Envoy upstream request latency by Envoy cluster | The 90th percentile response time for each Envoy cluster over the last 5 minutes.|
-   | Envoy upstream failure rate by Envoy cluster | The rate of failed upstream connection attempts per cluster over the last 5 minutes. |
-   | Envoy upstream request rate | The HTTP request rate to each upstream cluster. | 
-   | Total active connections by gateways | The total number of active connections each gateway has to its upstream clusters.|
-   | Envoy upstream request latency | The 90th percentile upstream request latency for each cluster. | 
-      
-5. Go to **Dashboards** > **Kgateway Operations** to open the Kgateway Operations dashboard that you imported. Verify that you see kgateway metrics, such as the translation and reconciliation time, total number of operations, or the number of resources in your cluster. 
+            
+4. Go to **Dashboards** > **Kgateway Operations** to open the Kgateway Operations dashboard that you imported. Verify that you see kgateway metrics, such as the translation and reconciliation time, total number of operations, or the number of resources in your cluster. 
       
    {{< reuse-image src="img/kgateway-dashboard.png" >}}
    {{< reuse-image-dark srcDark="img/kgateway-dashboard.png" >}}
