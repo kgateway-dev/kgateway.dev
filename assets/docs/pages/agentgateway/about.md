@@ -1,4 +1,4 @@
-[Agentgateway](https://agentgateway.dev/) is an open source, highly available, highly scalable, and enterprise-grade data plane that provides AI connectivity for agents and tools in any environment. You can use {{< reuse "/docs/snippets/kgateway.md" >}} as the control plane to quickly spin up and manage the lifecycle of agentgateway proxies in Kubernetes environments. The control plane translates Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} custom resources into proxy configuration for the agentgateway data plane.
+{{< reuse "docs/snippets/agentgateway/about.md" >}}
 
 Agentgateway supports many agent connectivity use cases, including the following:
 

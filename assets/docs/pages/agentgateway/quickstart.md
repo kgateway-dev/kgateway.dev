@@ -1,4 +1,4 @@
-Get started with [{{< reuse "/docs/snippets/agentgateway.md" >}}](https://agentgateway.dev/). {{< reuse "docs/snippets/agentgateway/about.md" >}}
+Get started with {{< reuse "/docs/snippets/agentgateway.md" >}}. {{< reuse "docs/snippets/agentgateway/about.md" >}}
 
 ## Before you begin
 
