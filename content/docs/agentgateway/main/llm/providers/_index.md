@@ -14,5 +14,6 @@ Learn how to configure agentgateway for a particular LLM.
   {{< card link="openai" title="OpenAI" >}}
   {{< card link="openai-compatible" title="OpenAI-Compatible Providers" >}}
   {{< card link="vertex" title="Vertex AI" >}}
+  {{< card link="multiple-endpoints" title="Multiple endpoints" >}}
 {{< /cards >}}
 

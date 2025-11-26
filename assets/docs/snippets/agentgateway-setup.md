@@ -1,4 +1,4 @@
-1. Create a Gateway that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. The following example sets up Gateway that uses the [default agentgateway proxy template](https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/helm/agentgateway/templates/deployment.yaml). 
+1. Create a Gateway that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. The following example sets up a Gateway that uses the [default agentgateway proxy template](https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/helm/agentgateway/templates/deployment.yaml). 
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -38,7 +38,7 @@
    agentgateway   1/1     1            1           6m11s
    ```
 
-3. Get the external address of the gateway and save it in an environment variable.
+3. Get the external address of the agentgateway proxy and save it in an environment variable.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
