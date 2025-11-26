@@ -82,5 +82,5 @@ Resulting merged policy's headers: The child and grandchild values merge with th
 
 For more information, check out the following guides:
 
-* {{< reuse "docs/snippets/trafficpolicy.md" >}}'s [Policy priority and merging rules](../policies/trafficpolicy/#policy-priority-and-merging-rules)
-* [Policy inheritance and overrides](../../traffic-management/route-delegation/inheritance/) for both Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} policies.
+* {{< reuse "docs/snippets/trafficpolicy.md" >}}'s [Policy priority and merging rules](../trafficpolicy/#policy-priority-and-merging-rules)
+* [Policy inheritance and overrides](../../../traffic-management/route-delegation/inheritance/) for both Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} policies.
