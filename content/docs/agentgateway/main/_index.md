@@ -14,5 +14,4 @@ description: Use kgateway with agentgateway.
   {{< card link="mcp" title="MCP connectivity" >}}
   {{< card link="agent" title="Agent connectivity" >}}
   {{< card link="routes" title="Routes" >}}
-  {{< card link="nacks" title="Monitoring agentgateways for NACKs" >}}
 {{< /cards >}}
