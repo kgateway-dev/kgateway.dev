@@ -2,13 +2,9 @@
 
 In this topic, you learn about the basics of API gateways for microservices, the extensions that {{< reuse "/docs/snippets/kgateway.md" >}} provides beyond typical API gateway functionality, and the default API gateway proxy setup.
 
-{{< version include-if="2.2.x,2.1.x" >}}
-To learn about AI gateway functionality, see the [agentgateway docs](../../agentgateway/).
-{{< /version >}}
-
-{{< version include-if="2.0.x" >}}
-To learn about AI gateway functionality, see the [AI Gateway overview]({{< link-hextra path="/ai/about/" >}}).
-{{< /version >}}
+{{< callout icon="agentgateway" >}}
+Looking for an AI gateway to connect agents, MCP tools, and LLMs? Check out the [agentgateway data plane docs](../../agentgateway/).
+{{< /callout >}}
 
 ## API gateway {#api-gateway}
 
