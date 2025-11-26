@@ -16,5 +16,5 @@ description: Use kgateway with agentgateway.
   {{< card link="agent" title="Agent connectivity" >}}
   {{< card link="rbac" title="CEL-based RBAC" >}}
   {{< card link="configuration" title="Configuration" >}}
-  {{< card link="routes" title="Routes" >}}
+  {{< card link="observability" title="Observability" >}}
 {{< /cards >}}
