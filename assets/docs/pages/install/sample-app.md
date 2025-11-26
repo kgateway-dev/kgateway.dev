@@ -1,9 +1,3 @@
----
-title: Sample HTTP app
-weight: 40
-description: Deploy httpbin as a sample app.
----
-
 The httpbin app lets you test your API gateway by sending requests to it and receiving responses.
 
 Review the following diagram to understand the setup.
@@ -287,3 +281,4 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
    ```sh
    kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
+

@@ -1,6 +1,6 @@
 Enable server-side TLS encryption for the xDS gRPC server in the {{< reuse "docs/snippets/kgateway.md" >}} control plane. For more information about the server, see the [Architecture]({{< link-hextra path="/about/architecture" >}}) docs.
 
-TLS encryption is disabled by default. When enabled, the control plane mounts a `kgateway-xds-cert` TLS secret that you create and propogates the CA bundle to any kgateway and agentgateway data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
+TLS encryption is disabled by default. When enabled, the control plane mounts a `kgateway-xds-cert` TLS secret that you create and propogates the CA bundle to any kgateway data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
 
 ## Before you begin
 

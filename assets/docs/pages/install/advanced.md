@@ -16,20 +16,6 @@ You can update several installation settings in your Helm values file. For examp
 
 For more information, see the [Helm reference docs]({{< link-hextra path="/reference/helm/" >}}).
 
-{{< version include-if="2.2.x,2.1.x" >}}
-
-## Agentgateway and AI extensions {#agentgateway-ai-extensions}
-
-To enable the [agentgateway]({{< link-hextra path="/agentgateway/" >}}) integration, set the following values in your Helm values file.
-
-```yaml
-
-agentgateway:
-  enabled: true
-```
-
-{{< /version >}}
-
 ## Development builds
 
 When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
