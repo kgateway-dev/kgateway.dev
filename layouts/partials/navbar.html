@@ -1,8 +1,6 @@
-{{- $logoPath := .Site.Params.navbar.logo.path | default "images/logo.svg" -}}
 {{- $logoLink := .Site.Params.navbar.logo.link | default .Site.Home.RelPermalink -}}
 {{- $logoWidth := .Site.Params.navbar.logo.width | default "20" -}}
 {{- $logoHeight := .Site.Params.navbar.logo.height | default "20" -}}
-{{- $logoDarkPath := .Site.Params.navbar.logo.dark | default $logoPath -}}
 
 {{- $navWidth := "hx-max-w-[90rem]" -}}
 {{- with .Site.Params.navbar.width -}}
@@ -15,7 +13,38 @@
 
 {{- $pagelink := page.RelPermalink -}}
 {{ $parts := split $pagelink "/" }}
-{{ $version := index $parts 2 }}
+{{- $version := "" -}}
+{{- /* Extract version from path: /docs/envoy/latest/... or /docs/agentgateway/latest/... */ -}}
+{{- if and (ge (len $parts) 4) (eq (index $parts 1) "docs") -}}
+  {{- $version = index $parts 3 -}}
+{{- end -}}
+
+{{- /* Determine logo based on section */ -}}
+{{- $subSection := "" -}}
+{{- if and (ge (len $parts) 3) (eq (index $parts 1) "docs") -}}
+  {{- $subSection = index $parts 2 -}}
+{{- end -}}
+
+{{- $logoPath := .Site.Params.navbar.logo.path | default "images/logo.svg" -}}
+{{- $logoDarkPath := .Site.Params.navbar.logo.dark | default $logoPath -}}
+{{- $useResource := false -}}
+{{- $logoResource := "" -}}
+{{- $logoDarkResource := "" -}}
+
+{{- /* Override logo paths based on section */ -}}
+{{- if eq $subSection "envoy" -}}
+  {{- $logoResource = resources.Get "img/logo-kgateway.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-kgateway-light-on-transparent.svg" -}}
+  {{- if $logoResource -}}
+    {{- $useResource = true -}}
+  {{- end -}}
+{{- else if eq $subSection "agentgateway" -}}
+  {{- $logoResource = resources.Get "img/logo-agentgateway.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-agentgateway-light-on-transparent.svg" -}}
+  {{- if $logoResource -}}
+    {{- $useResource = true -}}
+  {{- end -}}
+{{- end -}}
 
 <style>
   .dropdown {
@@ -25,27 +54,72 @@
 
   .dropdown-content {
     display: none;
+    min-width: 160px;
   }
 
   .dropdown:hover .dropdown-content {display: block;}
+  
+  .navbar-dropdown-content {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    right: 0;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    padding-top: 0.25rem;
+  }
+  
+  /* Create a hover bridge between trigger and dropdown */
+  .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 0.5rem;
+    z-index: 49;
+  }
+  
+  .dark .navbar-dropdown-content {
+    background-color: rgb(17, 24, 39);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Dark mode hover styles for dropdown items */
+  .dark .navbar-dropdown-content a:hover {
+    background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+    color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+  }
 
+  {{- /* Build the search path pattern based on subSection and version */ -}}
+  {{- $searchPathPattern := "" -}}
+  {{- if and $subSection $version -}}
+    {{- $searchPathPattern = printf "/docs/%s/%s/" $subSection $version -}}
+  {{- else if $version -}}
+    {{- $searchPathPattern = printf "/docs/%s/" $version -}}
+  {{- end -}}
+
+  {{- if $searchPathPattern -}}
   /* Hide section headers for non-selected versions */
-  .search-results .prefix:has(+ li a:not([href*="{{$version}}"]) ){
+  .search-results .prefix:has(+ li a:not([href*="{{$searchPathPattern}}"]) ){
     display: none;
   }
 
   /* Hide articles for non-selected versions */
-  .search-results li a:not([href*="/docs/{{$version}}/"]) {
+  .search-results li a:not([href*="{{$searchPathPattern}}"]) {
     display: none;
   }
 
   /* Fix top margin when first item returned is hidden */
-  .search-results .prefix:has(+ li a[href*="/docs/{{$version}}/"]) {
+  .search-results .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) {
     margin-top: 0;
   }
-  .search-results .prefix:has(+ li a[href*="/docs/{{$version}}/"]) ~ .prefix:has(+ li a[href*="/docs/{{$version}}/"]) {
+  .search-results .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) ~ .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) {
     margin-top: 1.5rem;
   }
+  {{- end -}}
 
   /* GitHub icon dark mode override */
   .dark a[href*="github"] span.github-white-icon {
@@ -67,22 +141,47 @@
   <nav class="hx-mx-auto hx-flex hx-items-center hx-justify-end hx-gap-2 hx-h-16 hx-px-6 {{ $navWidth }}">
     <a class="hx-flex hx-items-center hover:hx-opacity-75 ltr:hx-mr-auto rtl:hx-ml-auto" href="{{ $logoLink }}">
       {{- if (.Site.Params.navbar.displayLogo | default true) }}
-        <img class="hx-block dark:hx-hidden" src="{{ $logoPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
-        <img class="hx-hidden dark:hx-block" src="{{ $logoDarkPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+        {{- if $useResource -}}
+          <img class="hx-block dark:hx-hidden" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- if $logoDarkResource -}}
+            <img class="hx-hidden dark:hx-block" src="{{ $logoDarkResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- else -}}
+            <img class="hx-hidden dark:hx-block" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- end -}}
+        {{- else -}}
+          <img class="hx-block dark:hx-hidden" src="{{ $logoPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          <img class="hx-hidden dark:hx-block" src="{{ $logoDarkPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+        {{- end -}}
       {{- end }}
       {{- if (.Site.Params.navbar.displayTitle | default true) }}
         <span class="hx-mx-2 hx-font-extrabold hx-inline hx-select-none" title="{{ .Site.Title }}">{{- .Site.Title -}}</span>
       {{- end }}
     </a>
 
-    {{ if site.Params.versions }}
+    {{- /* Get versions for current section */ -}}
+    {{- $versions := site.Params.versions -}}
+    {{- $subSection := "" -}}
+    {{- if and (ge (len $parts) 3) (eq (index $parts 1) "docs") -}}
+      {{- $subSection = index $parts 2 -}}
+      {{- if and $subSection (isset site.Params.sections $subSection) -}}
+        {{- $versions = (index site.Params.sections $subSection).versions -}}
+      {{- end -}}
+    {{- end -}}
+    
+    {{ if $versions }}
     <div class="dropdown px-2 cursor-pointer">
         <button class="btn" type="button">
-          {{- range site.Params.versions -}}
-            {{- if in $version .linkVersion -}}
+          {{- $foundVersion := false -}}
+          {{- range $versions -}}
+            {{- if eq $version .linkVersion -}}
                {{- printf "%s" .dropdown -}}
-            {{ break }}
+               {{- $foundVersion = true -}}
+               {{ break }}
             {{- end -}}
+          {{- end -}}
+          {{- if not $foundVersion -}}
+            {{- /* Fallback if version not found */ -}}
+            {{- $version -}}
           {{- end -}}
           {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
         </button>
@@ -105,8 +204,26 @@
           {{- end -}}
         {{- end -}}
 
+        {{/* Check if this is the Docs menu item and render as dropdown */}}
+        {{- if eq .Name "Docs" -}}
+          {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
+          {{- $activeClass := cond $active "hx-font-medium" "hx-text-gray-600 hover:hx-text-gray-800 dark:hx-text-gray-400 dark:hover:hx-text-gray-200" -}}
+          <div class="dropdown hx-relative -hx-ml-2 hx-hidden md:hx-inline-block">
+            <a
+              title="{{ or (T .Identifier) .Name | safeHTML }}"
+              href="{{ $link }}"
+              class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-whitespace-nowrap hx-p-2 {{ $activeClass }}"
+            >
+              <span class="hx-text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx-ml-1 hx-mb-0.5 hx-inline hx-w-4 hx-h-4'") }}
+            </a>
+            <div class="dropdown-content navbar-dropdown-content">
+              <a href="/docs/envoy/latest" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Kgateway (Envoy)</a>
+              <a href="/docs/agentgateway/latest" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Agentgateway</a>
+            </div>
+          </div>
         {{/* Display icon menu item */}}
-        {{- if .Params.icon -}}
+        {{- else if .Params.icon -}}
           {{- $rel := cond (eq .Params.icon "mastodon") "noreferer me" "noreferer" }}
           <a class="hx-p-2 hx-text-current" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
             {{- if eq .Params.icon "github" -}}

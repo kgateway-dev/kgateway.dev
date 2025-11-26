@@ -1,0 +1,92 @@
+{{- $path := .RelPermalink -}}
+{{- $segments := split $path "/" -}}
+{{- $section := index $segments 1 -}}  {{- /* "docs" */ -}}
+{{- $subSection := index $segments 2 -}}  {{- /* "envoy" or "agentgateway" */ -}}
+{{- $currentVersion := "" -}}
+{{- $versionDisplay := "" -}}
+
+{{- /* Extract current version from path */ -}}
+{{- if and (ge (len $segments) 4) (eq $section "docs") -}}
+  {{- $currentVersion = index $segments 3 -}}
+{{- end -}}
+
+{{- /* Get versions for current section to find display name */ -}}
+{{- $versions := site.Params.versions -}}
+{{- if and $subSection (isset site.Params.sections $subSection) -}}
+  {{- $versions = (index site.Params.sections $subSection).versions -}}
+{{- end -}}
+
+{{- /* Find the display name for current version */ -}}
+{{- range $versions -}}
+  {{- if eq .linkVersion $currentVersion -}}
+    {{- $versionDisplay = .dropdown -}}
+    {{- break -}}
+  {{- end -}}
+{{- end -}}
+
+{{- /* Set product name based on subsection */ -}}
+{{- $productName := "" -}}
+{{- if eq $subSection "envoy" -}}
+  {{- $productName = "Kgateway Docs" -}}
+{{- else if eq $subSection "agentgateway" -}}
+  {{- $productName = "Agentgateway Docs" -}}
+{{- end -}}
+
+{{- /* Only show breadcrumb if we're in a docs section with version */ -}}
+{{- if and (eq $section "docs") $subSection $currentVersion $productName -}}
+  {{- /* Check if this is the version index page (e.g., /docs/envoy/latest/) */ -}}
+  {{- $isVersionIndex := false -}}
+  {{- $pathAfterVersion := after 4 $segments -}}
+  {{- /* Filter out empty segments */ -}}
+  {{- $pathSegments := slice -}}
+  {{- range $pathAfterVersion -}}
+    {{- if ne . "" -}}
+      {{- $pathSegments = $pathSegments | append . -}}
+    {{- end -}}
+  {{- end -}}
+  {{- if eq (len $pathSegments) 0 -}}
+    {{- $isVersionIndex = true -}}
+  {{- end -}}
+  
+  {{- /* Build breadcrumb items for intermediate paths */ -}}
+  {{- $breadcrumbItems := slice -}}
+  {{- if not $isVersionIndex -}}
+    {{- $basePath := printf "/docs/%s/%s/" $subSection $currentVersion -}}
+    {{- $currentPath := $basePath -}}
+    {{- range $index, $segment := $pathSegments -}}
+      {{- $currentPath = printf "%s%s/" $currentPath $segment -}}
+      {{- $page := $.Site.GetPage $currentPath -}}
+      {{- if $page -}}
+        {{- $title := $page.Title -}}
+        {{- if eq $title "" -}}
+          {{- $title = $page.LinkTitle -}}
+        {{- end -}}
+        {{- if eq $title "" -}}
+          {{- $title = $segment -}}
+        {{- end -}}
+        {{- $isLast := eq $index (sub (len $pathSegments) 1) -}}
+        {{- $breadcrumbItems = $breadcrumbItems | append (dict "title" $title "url" $currentPath "isLast" $isLast) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  
+  <nav class="hx-mb-4 hx-flex hx-items-center hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+    <a href="/docs/{{ $subSection }}/{{ $currentVersion }}/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+      {{ $productName }}
+    </a>
+    {{- /* Add intermediate breadcrumb items */ -}}
+    {{- range $breadcrumbItems -}}
+      <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
+      {{- if .isLast -}}
+        <span class="hx-text-gray-900 dark:hx-text-gray-100">
+          {{ .title }}
+        </span>
+      {{- else -}}
+        <a href="{{ .url }}" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+          {{ .title }}
+        </a>
+      {{- end -}}
+    {{- end -}}
+  </nav>
+{{- end -}}
+

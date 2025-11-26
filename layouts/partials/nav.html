@@ -86,6 +86,23 @@
   }
 
   .dropdown:hover .dropdown-content {display: block;}
+  
+  /* Create a hover bridge between trigger and dropdown */
+  .dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    height: 0.5rem;
+    z-index: 49;
+  }
+  
+  /* Dark mode hover styles for dropdown items */
+  .dark .dropdown-content a:hover {
+    background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+    color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+  }
 </style>
 
 <nav class="navbar py-[1.875rem] px-12 xl:px-25 fixed top-0 border-b-white border-b w-full hidden lg:block z-20">
@@ -113,9 +130,13 @@
         </div>
       </div>
       <a class="link whitespace-nowrap text-secondary-link" href="/blog">Blog</a>
-      <a class="link whitespace-nowrap text-secondary-link" href="/docs/quickstart/">Get Started</a>
-      <a class="link whitespace-nowrap text-secondary-link" href="/docs/about/overview/">Why kgateway?</a>
-      <a class="link whitespace-nowrap text-secondary-link" href="/docs/">Docs</a>
+      <div class="dropdown">
+        <a class="link whitespace-nowrap text-secondary-link" href="/docs/">Docs {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</a>
+        <div class="dropdown-content rounded-l bg-white dark:bg-gray-900 absolute" style="top: calc(100% + 0.25rem); padding-top: 0.25rem;">
+          <a href="/docs/envoy/latest" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Kgateway (Envoy)</a>
+          <a href="/docs/agentgateway/latest" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Agentgateway</a>
+        </div>
+      </div>
       <!-- <a class="whitespace-nowrap bg-secondary-bg text-white rounded-lg p-5" href="/">Contact Us</a> -->
     </div>
   </div>
@@ -140,9 +161,9 @@
     <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/labs">Labs</a>
     <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/videos">Videos</a>
     <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/blog">Blog</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/quickstart/">Get Started</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/about/overview/">Why kgateway?</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white py-5" href="/docs/">Docs</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/">Docs</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 pl-8" href="/docs/envoy/latest">Kgateway (Envoy)</a>
+    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 pl-8" href="/docs/agentgateway/latest">Agentgateway</a>
     <!-- <a class="whitespace-nowrap text-center text-white rounded-lg mb-10 mt-[3.125rem] p-6 bg-primary-bg font-semibold" href="/">
       Contact Us
     </a> -->

@@ -54,12 +54,6 @@ menu:
     - name: Blog
       url: /blog
       weight: 2
-    - name: Get Started
-      weight: 3
-      url: /docs/latest/quickstart/
-    - name: Why kgateway
-      weight: 4
-      url: /docs/latest/about/overview/
     - name: Search
       weight: 5
       params:
@@ -131,6 +125,7 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
+  # Global versions (for backward compatibility)
   versions:
     - version: "2.2.x"
       dropdown: "2.2 (main)"
@@ -144,3 +139,31 @@ params:
       dropdown: "2.0"
       linkVersion: "2.0.x"
       url: "/2.0.x"
+  
+  # Section-specific configurations
+  sections:
+    envoy:
+      versions:
+        - version: "2.2.x"
+          dropdown: "2.2 (main)"
+          linkVersion: "main"
+          url: "/main"
+        - version: "2.1.x"
+          dropdown: "2.1 (latest)"
+          linkVersion: "latest"
+          url: "/latest"
+        - version: "2.0.x"
+          dropdown: "2.0"
+          linkVersion: "2.0.x"
+          url: "/2.0.x"
+    
+    agentgateway:
+      versions:
+        - version: "2.2.x"
+          dropdown: "2.2 (main)"
+          linkVersion: "main"
+          url: "/main"
+        - version: "2.1.x"
+          dropdown: "2.1 (latest)"
+          linkVersion: "latest"
+          url: "/latest"

@@ -82,6 +82,30 @@ Use the link-hextra shortcode to link to a topic within the documentation in a w
 [AI Backend API docs]({{</* link-hextra path="/reference/api/#aibackend" */>}})
 ```
 
+### conditional-text
+
+Use the conditional-text shortcode to conditionally display content based on whether the page is in the `content/docs/envoy` or `content/docs/agentgateway` section. This is particularly useful when creating reusable content in the `assets/docs` directory that needs to differ between Envoy-based kgateway and agentgateway documentation. The shortcode automatically detects the current section from the page URL and shows or hides content accordingly.
+
+The following example shows how to use conditional-text in an assets file that can be reused in both sections:
+
+Content in `assets/docs/snippets/example-install.md`:
+```markdown
+{{</* conditional-text include-if="envoy" */>}}
+Install kgateway using the Envoy-based proxy configuration.
+{{</* /conditional-text */>}}
+{{</* conditional-text include-if="agentgateway" */>}}
+Install kgateway using the agentgateway configuration.
+{{</* /conditional-text */>}}
+```
+
+When this snippet is reused via `{{</* reuse "docs/snippets/example-install.md" */>}}`:
+- In pages under `docs/envoy/`, only the first paragraph is displayed.
+- In pages under `docs/agentgateway/`, only the second paragraph is displayed.
+
+Supported parameters:
+- `include-if`: Shows content only when the current section matches the specified value (e.g., `"envoy"`, `"agentgateway"`, or `"envoy,agentgateway"` for multiple sections)
+- `exclude-if`: Shows content only when the current section does not match the specified value
+
 ### reuse
 You can use the reuse shortcode to reuse content in multiple places while maintaining a single source of truth. A common use case for this shortcode is a reference to the latest version, product names, or short paragraphs. The source of the reused content is stored as a markdown file in the `assets/docs` directory. 
 

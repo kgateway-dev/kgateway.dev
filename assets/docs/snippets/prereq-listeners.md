@@ -1,4 +1,4 @@
-1. Follow the [Get started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+1. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
 2. Deploy a [sample httpbin app]({{< link-hextra path="/install/sample-app/" >}}).
 

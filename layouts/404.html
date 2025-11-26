@@ -9,9 +9,13 @@
     var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
     var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
     if (match) {
-        if (docsVersions.includes(match[1])) {
+        var matchedPath = match[1];
+        // Skip redirect for section names (envoy, agentgateway)
+        if (matchedPath === "envoy" || matchedPath === "agentgateway") {
+            // Let the section-specific redirects handle these
+        } else if (docsVersions.includes(matchedPath)) {
             // match is a valid docs version, redirect to base docs page for that version
-            window.location.assign(window.location.origin + "/docs/" + match[1]);
+            window.location.assign(window.location.origin + "/docs/" + matchedPath);
         } else {
             // match is not a valid docs version, insert `latest` after docs and retry
             window.location.assign(window.location.href.replace("/docs/", "/docs/latest/"));
