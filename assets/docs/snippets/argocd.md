@@ -61,8 +61,15 @@
    ```
 
 6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. You might also need the following parameters:
+   {{% conditional-text include-if="envoy" %}}
    * **Development builds**: `controller.image.pullPolicy=Always` to ensure you get the latest image.
    * **Experimental Gateway API features**: `controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` to enable experimental features such as TCPRoutes.
+   {{% /conditional-text %}}
+   {{% conditional-text include-if="agentgateway" %}}
+   * **Agentgateway**: `agentgateway.enabled=true` to enable the agentgateway data plane.
+   * **Development builds**: `controller.image.pullPolicy=Always` to ensure you get the latest image.
+   * **Experimental Gateway API features**: `controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` to enable experimental features such as TCPRoutes.
+   {{% /conditional-text %}}
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -83,6 +90,10 @@
          parameters:
          - name: controller.image.pullPolicy
            value: "Always"
+         {{% conditional-text include-if="agentgateway" %}}
+         - name: agentgateway.enabled
+           value: "true"
+         {{% /conditional-text %}}
          - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
            value: "true"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
@@ -111,10 +122,10 @@
    kgateway-helm-6b5bb4db6b-c2pkq   1/1     Running   0          4m4s
    ```
 
-8. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
+8. Verify that the {{% conditional-text include-if="envoy" %}}`{{< reuse "/docs/snippets/gatewayclass.md" >}}`{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}`{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}`{{% /conditional-text %}} GatewayClass is created. You can optionally take a look at how the gateway class is configured by adding the `-o yaml` option to your command.
    
    ```sh
-   kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
+   kubectl get gatewayclass {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}
    ```
 
 9. Open the Argo CD UI and verify that you see the Argo CD application with a `Healthy` and `Synced` status.

@@ -1,5 +1,12 @@
-In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >}} in a Kubernetes cluster by using [Helm](https://helm.sh/). Helm is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.
+In this installation guide, you install the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} in a Kubernetes cluster by using [Helm](https://helm.sh/). Helm is a popular package manager for Kubernetes configuration files. This approach is flexible for adopting to your own command line, continuous delivery, or other workflows.
 
+{{% conditional-text include-if="envoy" %}}
+As part of the default control plane installation, you enable the Envoy-based {{< reuse "/docs/snippets/kgateway.md" >}} data plane.
+
+{{% /conditional-text %}}
+{{% conditional-text include-if="agentgateway" %}}
+As part of the control plane installation, you enable the {{< reuse "/docs/snippets/agentgateway.md" >}} data plane.
+{{% /conditional-text %}}
 ## Before you begin
 
 1. Create or use an existing Kubernetes cluster. 
@@ -63,26 +70,56 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       
       {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
 {{% tab tabName="Basic installation" %}}
+{{% conditional-text include-if="envoy" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}}
 ```
+{{% /conditional-text %}}
+{{% conditional-text include-if="agentgateway" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \
+--set agentgateway.enabled=true
+```
+{{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Custom values" %}}
+{{% conditional-text include-if="envoy" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
+{{% /conditional-text %}}
+{{% conditional-text include-if="agentgateway" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \
+--set agentgateway.enabled=true \
+-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Development" %}}
 When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
+{{% conditional-text include-if="envoy" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
 --set controller.image.pullPolicy=Always \
 --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
 ```
+{{% /conditional-text %}}
+{{% conditional-text include-if="agentgateway" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/patch-dev.md" >}} \
+--set controller.image.pullPolicy=Always \
+--set agentgateway.enabled=true \
+--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
+```
+{{% /conditional-text %}}
 {{% /tab %}}
       {{< /tabs >}}
 
@@ -96,7 +133,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
       TEST SUITE: None
       ```
 
-1. Verify that the control plane is up and running. 
+4. Verify that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -109,20 +146,28 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
    {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-2. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
+5. Verify that the {{% conditional-text include-if="envoy" %}}`{{< reuse "/docs/snippets/gatewayclass.md" >}}`{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}`{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}`{{% /conditional-text %}} GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
 
    ```sh
-   kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
+   kubectl get gatewayclass {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}
    ```
 
 ## Next steps
 
+
+{{% conditional-text include-if="envoy" %}}
 Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
 - Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](../../about/overview). 
 - [Deploy an API gateway and sample app](../sample-app/) to test out routing to an app.
 - Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
 - Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides. 
+{{% /conditional-text %}}
+{{% conditional-text include-if="agentgateway" %}}
+Now that you have the {{< reuse "/docs/snippets/kgateway.md" >}} control plane set up and running, check out the following guides to start using the {{< reuse "/docs/snippets/agentgateway.md" >}} data plane.
+- Learn more about [{{< reuse "/docs/snippets/agentgateway.md" >}}, its features and benefits](../../about/overview). 
+- [Set up an agentgateway proxy](../../setup/) to start routing to AI workloads.
+{{% /conditional-text %}}
 
 ## Cleanup
 
