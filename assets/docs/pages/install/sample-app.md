@@ -1,9 +1,3 @@
----
-title: Sample HTTP app
-weight: 40
-description: Deploy httpbin as a sample app.
----
-
 The httpbin app lets you test your API gateway by sending requests to it and receiving responses.
 
 Review the following diagram to understand the setup.
@@ -68,7 +62,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
      name: http
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -89,7 +83,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    
    ```txt
    NAME   CLASS      ADDRESS                                  PROGRAMMED   AGE
-   http   {{< reuse "/docs/snippets/gatewayclass.md" >}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
+   http   {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
 3. Verify that the gateway proxy pod is running.
@@ -287,3 +281,4 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
    ```sh
    kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
+

@@ -1,5 +1,5 @@
 ---
-title: Setup
+title: Agentgateway setup
 weight: 15
 description:
 ---
