@@ -4,6 +4,12 @@
 {{ end }}
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found | kgateway</title>
+  {{- partial "custom/head-end.html" . -}}
+</head>
 
 <script>
     var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
@@ -24,7 +30,9 @@
 </script>
 
 <body
-    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; height:100vh; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center'>
+    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; margin: 0; padding-top: 100px;'>
+    {{- partial "nav.html" . -}}
+    <div style="height: calc(100vh - 100px); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <div>
         <style>
             body {
@@ -57,5 +65,4 @@
         </div>
     </div>
 </body>
-
 </html>
