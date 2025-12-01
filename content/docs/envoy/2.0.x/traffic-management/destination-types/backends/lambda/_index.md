@@ -3,7 +3,7 @@ title: AWS Lambda
 weight: 30
 ---
 
-Use kgateway to route traffic requests directly to an [Amazon Web Services (AWS) {{< gloss "Lambda" >}}Lambda{{< /gloss >}}] (https://aws.amazon.com/lambda/resources/) function.
+Use kgateway to route traffic requests directly to an [Amazon Web Services (AWS) Lambda] (https://aws.amazon.com/lambda/resources/) function.
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
