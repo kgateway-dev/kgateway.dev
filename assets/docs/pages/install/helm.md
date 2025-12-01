@@ -18,7 +18,7 @@ As part of the control plane installation, you enable the {{< reuse "/docs/snipp
 
 Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm.
 
-1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. If you need to use an experimental feature such as TCPRoutes, install the Gateway API experimental CRDs and enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).
+1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}.
    
    {{< tabs items="Standard, Experimental" tabTotal="2" >}}
    {{% tab tabName="Standard" %}}
@@ -71,6 +71,7 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
       {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
 {{% tab tabName="Basic installation" %}}
 {{% conditional-text include-if="envoy" %}}
+Note: If you need to use an experimental feature such as TCPRoutes, enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}}
