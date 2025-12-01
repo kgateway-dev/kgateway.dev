@@ -191,10 +191,41 @@ jobs:
               
               os.remove('./out.md')
               
-              # Format the generated docs
+              # Format the generated docs with sed commands
               subprocess.run(['sed', '-i', 's/Required: {}/Required/g', f'content/docs/{url_path}/reference/api.md'], check=True)
               subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', f'content/docs/{url_path}/reference/api.md'], check=True)
               subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', f'content/docs/{url_path}/reference/api.md'], check=True)
+              
+              # Additional post-processing to clean up complex struct types
+              import re
+              api_file = f'content/docs/{url_path}/reference/api.md'
+              with open(api_file, 'r') as f:
+                  content = f.read()
+              
+              # Replace complex struct type definitions with simple "struct"
+              # Pattern matches: _Underlying type:_ _[struct{...}...]_
+              content = re.sub(
+                  r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              # Handle empty struct{} patterns
+              content = re.sub(
+                  r'_Underlying type:_ _\[struct\{\}\]\(#struct\{\}\)_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              # Also handle cases without the link wrapper
+              content = re.sub(
+                  r'_Underlying type:_ _struct\{[^\}]+\}_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              with open(api_file, 'w') as f:
+                  f.write(content)
               
               print(f'    ✓ Generated API docs in content/docs/{url_path}/reference/api.md')
               return True
