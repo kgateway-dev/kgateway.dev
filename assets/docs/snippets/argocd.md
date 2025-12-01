@@ -89,11 +89,9 @@
          skipCrds: false
          parameters:
          - name: controller.image.pullPolicy
-           value: "Always"
-         {{% conditional-text include-if="agentgateway" %}}
+           value: "Always"{{% conditional-text include-if="agentgateway" %}}
          - name: agentgateway.enabled
-           value: "true"
-         {{% /conditional-text %}}
+           value: "true"{{% /conditional-text %}}
          - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
            value: "true"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
