@@ -126,7 +126,7 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
 
 ## Step 3: Verify the connection {#verify}
 
-Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspector) to verify that you can connect to your sample MCP server through agentgateway.
+Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspector) to verify that you can connect to your sample MCP server through agentgateway.
 
 1. Get the agentgateway address.
    
