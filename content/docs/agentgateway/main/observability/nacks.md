@@ -1,5 +1,5 @@
 ---
-title: Monitoring agentgateway for NACKs
+title: Monitoring agentgateway proxies for NACKs
 weight: 80
 ---
 

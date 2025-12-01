@@ -9,4 +9,5 @@ Route to Model Context Protocol (MCP) servers through  {{< reuse "docs/snippets/
   {{< card link="about" title="About" >}}
   {{< card link="static-mcp" title="Static MCP" >}}
   {{< card link="dynamic-mcp" title="Dynamic MCP" >}}
+  {{< card link="https" title="Connect via HTTPS" >}}
 {{< /cards >}}
