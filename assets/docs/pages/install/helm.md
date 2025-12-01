@@ -16,7 +16,7 @@ As part of the control plane installation, you enable the {{< reuse "/docs/snipp
 
 ## Install
 
-Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
+Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm.
 
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}. If you need to use an experimental feature such as TCPRoutes, install the Gateway API experimental CRDs and enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).
    
@@ -66,7 +66,7 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm.
       open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
       ```
       
-   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Helm. This command installs the control plane into it. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
+   2. Install {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
       {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
 {{% tab tabName="Basic installation" %}}
@@ -158,7 +158,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 {{% conditional-text include-if="envoy" %}}
 Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
 - Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](../../about/overview). 
-- [Deploy an API gateway and sample app](../sample-app/) to test out routing to an app.
+- [Deploy an API gateway and sample app](../sample-app/) to test out routing to the httpbin sample app.
 - Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
 - Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides. 
