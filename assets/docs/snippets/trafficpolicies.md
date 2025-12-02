@@ -1,1 +1,1 @@
-TrafficPolicies
+{{% conditional-text include-if="envoy" %}}TrafficPolicies{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}AgentgatewayTrafficPolicies{{% /conditional-text %}}
