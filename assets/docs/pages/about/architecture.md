@@ -1,4 +1,4 @@
-Learn more about the components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. These components work together to provide traffic management, security, and resiliency for your apps.
+Learn more about the components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} control and data plane. These components work together to provide traffic management, security, and resiliency for your apps.
 
 ## Component architecture
 

@@ -44,47 +44,31 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    EOF
    ```
 
-4. Create a Backend resource using the `openai` provider type with custom host and port overrides.
-   
+4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: AgentgatewayBackend
    metadata:
      name: mistral
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     type: AI
      ai:
-       llm:
+       provider:
          openai:
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: mistral-secret
-           model: "mistral-medium-2505"
+           model: mistral-medium-2505
          host: api.mistral.ai
-         port: 443
-         path:
-           full: "/v1/chat/completions"
+         port: 443 
+         path: "/v1/chat/completions"
+     policies:
+       auth:
+         secretRef:
+           name: mistral-secret
+       tls: 
+         sni: api.mistral.ai
    EOF
    ```
-
-   {{% reuse "docs/snippets/review-table.md" %}}
-
-   | Setting     | Description |
-   |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. |
-   | `openai`    | Use the `openai` provider type for OpenAI-compatible providers. |
-   | `host`       | **Required**: The hostname of the OpenAI-compatible provider, such as `api.mistral.ai`. |
-   | `port`       | **Required**: The port number (typically `443` for HTTPS). Both `host` and `port` must be set together. |
-   | `path`       | Optional: Override the API path. Defaults to `/v1/chat/completions` if not specified. |
-   | `authHeader` | Optional: Override the authentication header format. Defaults to `Authorization: Bearer <token>`. |
-   | `authToken`  | Configure the authentication token. The token is sent in the header specified by `authHeader`. Defaults to the `Authorization` header. |
-   | `model`      | Optional: Override the model name. If unset, the model name is taken from the request. For models, see the [Mistral docs](https://docs.mistral.ai/getting-started/models). |
-
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -110,37 +94,10 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
        - name: mistral
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: AgentgatewayBackend
    EOF
    ```
-6. Create a BackendTLSPolicy to enable TLS for the external Mistral API.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: BackendTLSPolicy
-   metadata:
-     name: mistral-tls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     targetRefs:
-     - name: mistral
-       kind: Backend
-       group: gateway.kgateway.dev
-     validation:
-       hostname: api.mistral.ai
-       wellKnownCACertificates: System
-   EOF
-   ```
-
-   {{% reuse "docs/snippets/review-table.md" %}}
-
-   | Setting                    | Description |
-   |----------------------------|-------------|
-   | `targetRefs`               | References the Backend resource to apply TLS to. |
-   | `validation.hostname`       | The hostname to validate in the server certificate (must match the `host` value in your Backend, e.g., `api.mistral.ai`). |
-   | `validation.wellKnownCACertificates` | Use the system's trusted CA certificates to verify the server certificate. |
-7. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -203,7 +160,6 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
      "object": "chat.completion"
    }
    ```
- 
 
 ### DeepSeek example {#deepseek}
 
@@ -231,30 +187,29 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
      Authorization: $DEEPSEEK_API_KEY
    EOF
    ```
-   
-4. Create a Backend resource using the `openai` provider type with custom host and port overrides.
-   
+
+4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: AgentgatewayBackend
    metadata:
      name: deepseek
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     type: AI
      ai:
-       llm:
+       provider:
          openai:
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: deepseek-secret
-           model: "deepseek-chat"
-         host: "api.deepseek.com"
-         port: 443
-         path:
-           full: "/v1/chat/completions"
+           model: deepseek-chat
+         host: api.deepseek.com
+         port: 443 
+         path: "/v1/chat/completions"
+     policies:
+       auth:
+         secretRef:
+           name: deepseek-secret
+       tls: 
+         sni: api.deepseek.com
    EOF
    ```
 
@@ -280,39 +235,11 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
        - name: deepseek
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: AgentgatewayBackend
    EOF
    ```
 
-6. Create a BackendTLSPolicy to enable TLS for the external DeepSeek API.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: BackendTLSPolicy
-   metadata:
-     name: deepseek-tls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     targetRefs:
-     - name: deepseek
-       kind: Backend
-       group: gateway.kgateway.dev
-     validation:
-       hostname: api.deepseek.com
-       wellKnownCACertificates: System
-   EOF
-   ```
-
-   {{% reuse "docs/snippets/review-table.md" %}}
-
-   | Setting                    | Description |
-   |----------------------------|-------------|
-   | `targetRefs`               | References the Backend resource to apply TLS to. |
-   | `validation.hostname`      | The hostname to validate in the server certificate (must match the `host` value in your Backend, e.g., `api.deepseek.com`). |
-   | `validation.wellKnownCACertificates` | Use the system's trusted CA certificates to verify the server certificate. |
-
-7. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

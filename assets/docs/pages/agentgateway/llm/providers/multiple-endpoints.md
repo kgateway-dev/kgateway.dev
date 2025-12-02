@@ -16,36 +16,35 @@ Paths are matched in order, and the first match determines how the request is ha
 
 ## Configure multiple endpoints
 
-Configure access to multiple endpoints in your LLM provider, such as for chat completions, embeddings, and models through the same Backend. The following steps use OpenAI as an example.
+Configure access to multiple endpoints in your LLM provider, such as for chat completions, embeddings, and models through the same Agentgatewaybackend. The following steps use OpenAI as an example.
 
-1. Update your Backend resource to include a `routes` field that maps API paths to route types.
-
+1. Update your AgentgatewayBackend resource to include a `routes` field that maps API paths to route types.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: AgentgatewayBackend
    metadata:
      name: openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     type: AI
      ai:
-       llm:
+       provider:
          openai:
-           authToken:
-             kind: SecretRef
-             secretRef:
-               name: openai-secret
-           model: "gpt-3.5-turbo"
-         routes:
+           model: gpt-3.5-turbo  # Optional: specify default model
+        # host: api.openai.com  # Optional: custom host if needed
+        # port: 443  # Optional: custom port
+     policies:
+       auth:
+         secretRef:
+           name: openai-secret
+       ai: 
+         routes: 
            "/v1/chat/completions": "completions"
            "/v1/embeddings": "passthrough"
            "/v1/models": "passthrough"
            "*": "passthrough"
    EOF
    ```
-
-   {{% reuse "docs/snippets/review-table.md" %}}
 
    | Setting | Description |
    |---------|-------------|
@@ -54,7 +53,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
    | `v1/models` | Routes to the models endpoint with passthrough processing. This endpoint is used to get basic information about the models that are available. For more information, see the [OpenAI API docs for the endpoint](https://platform.openai.com/docs/api-reference/models/list).|
    | `*` | Matches any path that doesn't match the specific endpoints otherwise set. Typically, you set this value to `passthrough` to pass through to the provider API without LLM-specific processing.|
 
-2. Create an HTTPRoute resource that routes traffic to the OpenAI Backend along the `/openai` path matcher. Note that because you set up the `routes` map on the Backend, you do not need to create any URLRewrite filters to point your route matcher to the correct LLM provider endpoint.
+2. Create an HTTPRoute resource that routes traffic to the OpenAI Backend along the `/openai` path matcher. Note that because you set up the `routes` map on the AgentgatewayBackend, you do not need to create any URLRewrite filters to point your route matcher to the correct LLM provider endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -76,10 +75,9 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: AgentgatewayBackend
    EOF
    ```
-
 3. Send requests to different OpenAI endpoints. With the routes configured, you can access different OpenAI endpoints by including the full path in your requests:
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}

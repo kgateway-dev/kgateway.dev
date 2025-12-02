@@ -20,6 +20,7 @@
      Authorization: $GOOGLE_KEY
    EOF
    ```
+   {{% version include-if="2.1.x" %}}
 
 3. Create a Backend resource to define the Gemini destination.
 
@@ -82,8 +83,55 @@
          kind: Backend
    EOF
    ```
+   {{% /version %}}{{% version include-if="2.2.x" %}}
+4. Create an AgentgatewayBackend resource to configure an LLM provider that references the AI API key secret.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
+   metadata:
+     name: google
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     ai:
+       provider:
+         gemini:
+           model: gemini-1.5-flash-001
+     policies:
+       auth:
+         secretRef:
+           name: google-secret
+   EOF
+   ```
 
-5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: google
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     parentRefs:
+       - name: agentgateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /gemini
+       backendRefs:
+       - name: google
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         group: gateway.kgateway.dev
+         kind: AgentgatewayBackend
+   EOF
+   ```
+   {{% /version %}}
+
+6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
