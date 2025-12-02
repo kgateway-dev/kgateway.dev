@@ -1,0 +1,1 @@
+{{% conditional-text include-if="envoy" %}}Envoy-based {{< reuse "docs/snippets/kgateway.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "docs/snippets/agentgateway.md" >}}{{< /conditional-text %}}
