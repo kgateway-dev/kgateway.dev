@@ -362,7 +362,7 @@ _Appears in:_
 
 #### AlwaysOnConfig
 
-_Underlying type:_ _[struct{}](#struct{})_
+_Underlying type:_ _struct_
 
 AlwaysOnConfig specified the AlwaysOn samplerc
 
@@ -896,7 +896,7 @@ _Appears in:_
 
 #### ComparisonFilter
 
-_Underlying type:_ _[struct{Op Op "json:\"op,omitempty\""; Value int32 "json:\"value,omitempty\""}](#struct{op-op-"json:\"op,omitempty\"";-value-int32-"json:\"value,omitempty\""})_
+_Underlying type:_ _struct_
 
 ComparisonFilter represents a filter based on a comparison.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
@@ -911,7 +911,7 @@ _Appears in:_
 
 #### Cookie
 
-_Underlying type:_ _[struct{Name string "json:\"name\""; Path *string "json:\"path,omitempty\""; TTL *k8s.io/apimachinery/pkg/apis/meta/v1.Duration "json:\"ttl,omitempty\""; Secure *bool "json:\"secure,omitempty\""; HttpOnly *bool "json:\"httpOnly,omitempty\""; SameSite *string "json:\"sameSite,omitempty\""}](#struct{name-string-"json:\"name\"";-path-*string-"json:\"path,omitempty\"";-ttl-*k8sioapimachinerypkgapismetav1duration-"json:\"ttl,omitempty\"";-secure-*bool-"json:\"secure,omitempty\"";-httponly-*bool-"json:\"httponly,omitempty\"";-samesite-*string-"json:\"samesite,omitempty\""})_
+_Underlying type:_ _struct_
 
 
 
@@ -1155,7 +1155,7 @@ _Appears in:_
 
 #### EnvironmentResourceDetectorConfig
 
-_Underlying type:_ _[struct{}](#struct{})_
+_Underlying type:_ _struct_
 
 EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
 
@@ -1729,7 +1729,7 @@ _Appears in:_
 
 #### Header
 
-_Underlying type:_ _[struct{Name string "json:\"name\""}](#struct{name-string-"json:\"name\""})_
+_Underlying type:_ _struct_
 
 
 
@@ -2468,7 +2468,7 @@ _Appears in:_
 
 #### MetadataPathSegment
 
-_Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
+_Underlying type:_ _struct_
 
 Specifies a segment in a path for retrieving values from Metadata.
 
@@ -3365,7 +3365,7 @@ _Appears in:_
 
 #### SourceIP
 
-_Underlying type:_ _[struct{}](#struct{})_
+_Underlying type:_ _struct_
 
 
 
