@@ -28,6 +28,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      Authorization: $AZURE_OPENAI_API_KEY
    EOF
    ```
+   {{% version include-if="2.1.x" %}}
    
 4. Create a Backend resource to configure an LLM provider that references the Azure OpenAI API key secret.
    
@@ -89,6 +90,67 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
          kind: Backend
    EOF
    ```
+   {{% /version %}}{{% version include-if="2.2.x" %}}
+4. Create a Backend resource to configure an LLM provider that references the Azure OpenAI API key secret.
+   
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
+   metadata:
+     name: azure-openai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     ai:
+       provider:
+         azureopenai:
+           endpoint: my-endpoint.cognitiveservices.azure.com
+           deploymentName: gpt-4o-mini
+           apiVersion: 2024-02-15-preview
+     policies:
+       auth:
+         secretRef:
+           name: azure-openai-secret
+   EOF
+   ```
+
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#azureopenaiconfig" >}}).
+
+   | Setting     | Description |
+   |-------------|-------------|
+   | `ai.provider.azureopenai` | Define the LLM provider that you want to use. The example uses Azure OpenAI. |
+   | `azureopenai.endpoint`     | The endpoint of the Azure OpenAI deployment that you created, such as `my-endpoint.cognitiveservices.azure.com`. |
+   | `azureopenai.deployment`    | The name of the Azure OpenAI model deployment to use. For more information, see the [Azure OpenAI model docs](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-sold-directly-by-azure?view=foundry-classic&tabs=global-standard-aoai%2Cstandard-chat-completions%2Cglobal-standard&pivots=azure-openai).|
+   | `azureopenai.apiVersion`    | The version of the Azure OpenAI API to use. For more information, see the [Azure OpenAI API version reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#api-specs).|
+   | `policies.auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
+
+5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/azure-openai` path to the Backend that you previously created. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: azure-openai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     parentRefs:
+       - name: agentgateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /azure-openai
+       backendRefs:
+       - name: azure-openai
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         group: gateway.kgateway.dev
+         kind: AgentgatewayBackend
+   EOF
+   ```
+
+   {{% /version %}}
 
 6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    

@@ -110,14 +110,13 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#agentgatewaybackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
-   | `ai`        | Define the AI backend configuration. The example uses Anthropic (`spec.ai.provider.anthropic`). |
-   | `model`     | Optional: Override the model name, such as `claude-3-opus-20240229`. If unset, the model name is taken from the request. |
-   | `auth`      | Configure the authentication token for Anthropic API. The example refers to the secret that you previously created. The token is automatically sent in the `x-api-key` header. |
+   | `ai.provider.anthropic` | Define the LLM provider that you want to use. The example uses Anthropic. |
+   | `anthropic.model`     | The model to use to generate responses. In this example, you use the `claude-3-opus-20240229` model. |
+   | `policies.auth` | Provide the credentials to use to access the Anthropic API.  The example refers to the secret that you previously created. The token is automatically sent in the `x-api-key` header.|
 
 5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
 
