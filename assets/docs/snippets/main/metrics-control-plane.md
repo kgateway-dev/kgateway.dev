@@ -4,6 +4,8 @@ kgateway_agentgateway_xds_rejects_total|counter||Total number of xDS responses r
 kgateway_controller_reconcile_duration_seconds|histogram|controller, name, namespace|Reconcile duration for controller
 kgateway_controller_reconciliations_running|gauge|controller, name, namespace|Number of reconciliations currently running
 kgateway_controller_reconciliations_total|counter|controller, name, namespace, result|Total number of controller reconciliations
+kgateway_envoy_xds_rejects_active|gauge|gateway_namespace, gateway_name, type_url|Number of xDS responses currently rejected by envoy proxy
+kgateway_envoy_xds_rejects_total|counter|gateway_namespace, gateway_name, type_url|Total number of xDS responses rejected by envoy proxy
 kgateway_resources_managed|gauge|namespace, parent, resource|Current number of resources managed
 kgateway_resources_status_sync_duration_seconds|histogram|gateway, namespace, resource|Duration of time for a resource update to receive a status report
 kgateway_resources_status_syncs_completed_total|counter|gateway, namespace, resource|Total number of status syncs completed for resources
