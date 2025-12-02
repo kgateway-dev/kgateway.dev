@@ -52,7 +52,8 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    kubectl get httproute <name> -n <namespace> -o yaml
    ```
 
-3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.{{% conditional-text include-if="envoy" %}}
+3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
+   {{< conditional-text include-if="envoy" >}}
    
    ```sh
    kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000 &  
@@ -70,9 +71,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    | listeners | See the listeners that are configured on your gateway. | 
    | logging | Review the log level that is set for each component. |  
    | stats/prometheus | View metrics that Envoy emitted and sent to the built-in Prometheus instance. |
-   {{% /conditional-text %}}
+
+   {{< /conditional-text >}}
    
-   {{% conditional-text include-if="agentgateway" %}}
+   {{< conditional-text include-if="agentgateway" >}}
    ```sh
    kubectl port-forward deploy/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 15000 &  
    ```
@@ -87,9 +89,9 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    {{< reuse-image src="img/agw-ui-landing.png" caption="Figure: Read-only agentgateway UI.">}}
    {{< reuse-image-dark srcDark="img/agw-ui-landing-dark.png" caption="Figure: Read-only agentgateway UI.">}}
 
-   {{% /conditional-text %}}
+   {{< /conditional-text >}}
 
-4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command.{{% conditional-text include-if="envoy" %}}
+4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command.{{< conditional-text include-if="envoy" >}}
 
    * If you have not already, [set the log level for the Envoy gateway proxy to `debug`](#gateway-debug-logging).
    
@@ -101,7 +103,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    export GATEWAY_NAME=http
    kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} deployment/$GATEWAY_NAME
    ```
-   {{% /conditional-text %}}
+   {{< /conditional-text >}}
 
 
 {{% conditional-text include-if="envoy" %}}

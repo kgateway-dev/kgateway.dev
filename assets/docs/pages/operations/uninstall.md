@@ -152,24 +152,23 @@ For ArgoCD installations, use the following steps to clean up your environment.
 
 ## Uninstall optional components {#optional}
 
-Remove any optional components that you no longer need, such as sample apps.
+Remove any optional components that you no longer need{{< conditional-text include-if="envoy" >}}, such as sample apps{{< /conditional-text >}}.
 
 1. If you no longer need the Prometheus stack to monitor resources in your cluster, uninstall the release and delete the namespace.
    
    ```sh
    helm uninstall kube-prometheus-stack -n monitoring
    kubectl delete namespace monitoring
-   ```
-
-2. Remove the httpbin sample app.
+   ``` 
+{{< conditional-text include-if="envoy" >}}2. Remove the httpbin sample app.
    
    ```sh
    kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
-   ```{{% conditional-text include-if="envoy" %}}
+   ```
 
 3. Remove the Petstore sample app.
    
    ```sh
    kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
    ```
-{{% /conditional-text %}}
+{{< /conditional-text >}}
