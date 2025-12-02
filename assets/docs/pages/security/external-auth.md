@@ -1,10 +1,4 @@
----
-title: External auth
-weight: 10
-description: Bring your own external authorization service to protect requests that go through your Gateway. 
----
-
-{{< reuse "docs/pages/security/external-auth.md" >}}
+Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
@@ -53,7 +47,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
 {{< /callout >}}
 
 {{< callout type="info" >}}
-Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `{{< reuse "docs/snippets/namespace.md" >}}` namespace, and the TrafficPolicy, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
+Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `{{< reuse "docs/snippets/namespace.md" >}}` namespace, and the TrafficPolicy, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [Policy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
 {{< /callout >}}
 
 1. Deploy your external authorization service. The following example uses the [Istio external authorization service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes. This service is configured to allow requests with the `x-ext-authz: allow` header.
@@ -108,7 +102,7 @@ Note that in the following example, resources are created in the same namespace 
    EOF
    ```
 
-3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [TrafficPolicy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
+3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [Policy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -288,7 +282,12 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
        kind: HTTPRoute
        name: httpbin
      extAuth:
+   {{< version include-if="2.2.x,2.1.x" >}}
        disable: {}
+   {{< /version >}}
+   {{< version exclude-if="2.2.x,2.1.x" >}}
+       enablement: DisableAll
+   {{< /version >}}
    EOF
    ```
 
@@ -329,3 +328,4 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    ```sh
    kubectl delete gatewayextension,deployment,service -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ext-authz
    ```
+

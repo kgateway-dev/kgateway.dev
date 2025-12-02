@@ -1,10 +1,4 @@
----
-title: Access logging
-weight: 10
-description: Capture an access log for all the requests that enter the gateway. 
----
-
-{{< reuse "docs/pages/security/access-logging.md" >}} 
+Capture an access log for all the requests that enter the gateway. 
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
@@ -23,7 +17,7 @@ Envoy exposes a lot of data that can be used when customizing access logs. The f
 * The downstream (client) address, connection information, TLS configuration, and timing
 * The backend (service) address, connection information, TLS configuration, timing, and Envoy routing information
 * Relevant Envoy configuration, such as rate of sampling (if used)
-* Filter-specific context that is published to Envoy’s dynamic metadata during the filter chain
+* Filter-specific context that is published to Envoy's dynamic metadata during the filter chain
 
 ### Additional HTTP properties 
 
