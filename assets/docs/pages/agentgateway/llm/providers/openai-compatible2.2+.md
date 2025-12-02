@@ -68,7 +68,20 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
          sni: api.mistral.ai
    EOF
    ```
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+
+   | Setting     | Description |
+   |-------------|-------------|
+   | `ai.provider.openai` | Define the OpenAI-compatible provider. |
+   | `openai.model`     | The model to use, such as `mistral-medium-2505`.  |
+   | `openai.host` | **Required**: The hostname of the OpenAI-compatible provider, such as `api.mistral.ai`.  | 
+   | `openai.port` | **Required**: The port number (typically `443` for HTTPS). Both `host` and `port` must be set together. |
+   | `openai.path` | Optional: Override the API path. Defaults to `/v1/chat/completions` if not specified. | 
+   | `policies.auth` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created.|
+   | `policies.tls.sni` | The hostname for which to validate the server certificate (must match the `host` value). |
+
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the AgentgatewayBackend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -213,7 +226,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    EOF
    ```
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
    ```yaml
    kubectl apply -f- <<EOF

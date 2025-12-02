@@ -141,7 +141,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    | `bedrock.region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `policies.auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
 
-4. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+4. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock AgentgatewayBackend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
    ```yaml
    kubectl apply -f- <<EOF                                             
    apiVersion: gateway.networking.k8s.io/v1

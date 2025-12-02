@@ -118,7 +118,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    | `anthropic.model`     | The model to use to generate responses. In this example, you use the `claude-3-opus-20240229` model. |
    | `policies.auth` | Provide the credentials to use to access the Anthropic API.  The example refers to the secret that you previously created. The token is automatically sent in the `x-api-key` header.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF

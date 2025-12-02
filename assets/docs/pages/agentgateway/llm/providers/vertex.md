@@ -120,7 +120,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
            name: vertex-ai-secret
    EOF
    ```
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
