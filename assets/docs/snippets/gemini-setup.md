@@ -42,7 +42,7 @@
                kind: SecretRef
                secretRef:
                  name: google-secret
-             model: gemini-1.5-flash-latest
+             model: gemini-2.5-flash-lite
      type: AI
    EOF
    ```
@@ -52,9 +52,9 @@
    | Setting      | Description                                                                                                                                                                                                                                                                                                           |
    | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
    | `gemini`     | The Gemini AI provider.                                                                                                                                                                                                                                                                                               |
-   | `apiVersion` | The API version of Gemini that is compatible with the model that you plan to use. In this example, you must use `v1beta` because the `gemini-1.5-flash-latest` model is not compatible with the `v1` API version. For more information, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/api-versions). |
+   | `apiVersion` | The API version of Gemini that is compatible with the model that you plan to use. In this example, you must use `v1beta` because the `gemini-2.5-flash-lite` model is not compatible with the `v1` API version. For more information, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/api-versions). |
    | `authToken`  | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step.                                                                                                                                                                          |
-   | `model`      | The model to use to generate responses. In this example, you use the `gemini-1.5-flash-latest` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                                                                                                        |
+   | `model`      | The model to use to generate responses. In this example, you use the `gemini-2.5-flash-lite` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                                                                                                        |
 
 4. Create an HTTPRoute resource to route requests to the Gemini backend. Note that {{< reuse "/docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/gemini`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
 
@@ -96,7 +96,7 @@
      ai:
        provider:
          gemini:
-           model: gemini-1.5-flash-001
+           model: gemini-2.5-flash-lite
      policies:
        auth:
          secretRef:
@@ -104,7 +104,15 @@
    EOF
    ```
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+   {{% reuse "docs/snippets/review-table.md" %}} For more information, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+
+   | Setting     | Description |
+   |-------------|-------------|
+   | `ai.provider.gemini` | Define the Gemini provider. |
+   | `gemini.model`     | The model to use to generate responses. In this example, you use the `gemini-2.5-flash-lite` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                             |
+   | `policies.auth` | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step.   |
+
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
