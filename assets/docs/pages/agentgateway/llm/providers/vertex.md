@@ -32,7 +32,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      Authorization: $VERTEX_AI_API_KEY
    EOF
    ```
-   
+   {{% version include-if="2.1.x" %}}   
 4. Create a Backend resource to configure an LLM provider that references the Vertex AI API key secret.
    
    ```yaml
@@ -98,6 +98,54 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
          kind: Backend
    EOF
    ```
+   {{% /version %}}{{% version include-if="2.2.x" %}}
+4. Create an AgentgatewayBackend resource to configure an LLM provider that references the AI API key secret.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
+   metadata:
+     name: vertex-ai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     ai:
+       provider:
+         vertexai:
+           model: gemini-pro
+           projectId: "my-gcp-project"
+           region: "us-central1"
+     policies:
+       auth:
+         secretRef:
+           name: vertex-ai-secret
+   EOF
+   ```
+5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: vertex-ai
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     parentRefs:
+       - name: agentgateway
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+     - matches:
+       - path:
+           type: PathPrefix
+           value: /vertex
+       backendRefs:
+       - name: vertex-ai
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         group: gateway.kgateway.dev
+         kind: AgentgatewayBackend
+   EOF
+   ```
+   {{% /version %}}
 
 6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the API.
    

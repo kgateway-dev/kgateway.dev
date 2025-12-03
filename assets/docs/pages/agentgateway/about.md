@@ -12,7 +12,7 @@ Agentgateway supports many agent connectivity use cases, including the following
 
 For more information about how kgateway integrates with agentgateway, see the [Architecture](../../about/architecture/) topic.
 
-For more information about agentgateway resources, see the [Agentgateway docs](https://agentgateway.dev/docs/about/).
+For more information about agentgateway resources, see the [Agentgateway upstream docs](https://agentgateway.dev/docs/about/).
 
 ## Agentgateway resource configuration {#resources}
 
@@ -32,7 +32,7 @@ Review the following table to understand how to configure agentgateway resources
 
 To use agentgateway features, you must enable the agentgateway feature in {{< reuse "docs/snippets/kgateway.md" >}}. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
 
-1. Upgrade or install {{< reuse "/docs/snippets/kgateway.md" >}} with the agentgateway and AI Gateway feature enabled. 
+1. Upgrade or install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane to enable the agentgateway data plane. 
 
    ```shell
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
@@ -58,6 +58,8 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
    * [MCP connectivity]({{< link-hextra path="/agentgateway/mcp/" >}})
    * [Agent connectivity]({{< link-hextra path="/agentgateway/agent/" >}})
 
+
+<!--
 ## More considerations
 
 Review the following considerations for using agentgateway.
@@ -68,4 +70,6 @@ Review the following considerations for using agentgateway.
 - Configuring your agentgateway proxy as a Dynamic Forward Proxy (DFP) is currently not supported.
 - [Header modifier filters](../../traffic-management/header-control/) in {{< reuse "docs/snippets/trafficpolicy.md" >}} are not supported for agentgateway proxies. You can still use header modifier filters in the Gateway API-native HTTPRoutes.
 - Retries and timeouts cannot be configured on an agentgateway proxy.
-- In transformation policies, response-based transformations are not supported. Also note that the `parseAs` field is not supported, but you can use the `json()` function directly in CEL expressions instead.<!--TODO agentgateway response transformations-->
+- In transformation policies, response-based transformations are not supported. Also note that the `parseAs` field is not supported, but you can use the `json()` function directly in CEL expressions instead
+
+-->
