@@ -47,7 +47,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
 4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: mistral
@@ -106,7 +106,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
        backendRefs:
        - name: mistral
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```
@@ -204,7 +204,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
 4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: deepseek
@@ -247,7 +247,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
        backendRefs:
        - name: deepseek
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```

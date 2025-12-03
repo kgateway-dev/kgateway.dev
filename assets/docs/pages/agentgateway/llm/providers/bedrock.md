@@ -114,7 +114,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
 3. Create an AgentgatewayBackend resource to configure your LLM provider. Make sure to reference the secret that holds your credentials to access the LLM. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: bedrock
@@ -161,7 +161,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
        backendRefs:
        - name: bedrock
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```

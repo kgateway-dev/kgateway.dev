@@ -100,7 +100,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: azure-openai
@@ -150,7 +150,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        backendRefs:
        - name: azure-openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```

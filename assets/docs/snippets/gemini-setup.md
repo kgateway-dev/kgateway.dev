@@ -87,7 +87,7 @@
 4. Create an AgentgatewayBackend resource to configure an LLM provider that references the AI API key secret.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: google
@@ -133,7 +133,7 @@
        backendRefs:
        - name: google
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```

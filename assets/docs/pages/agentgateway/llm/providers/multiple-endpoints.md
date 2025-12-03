@@ -21,7 +21,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
 1. Update your AgentgatewayBackend resource to include a `routes` field that maps API paths to route types.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
+   apiVersion: agentgateway.dev/v1alpha1
    kind: AgentgatewayBackend
    metadata:
      name: openai
@@ -74,7 +74,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
        backendRefs:
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
+         group: agentgateway.dev
          kind: AgentgatewayBackend
    EOF
    ```
