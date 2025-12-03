@@ -56,3 +56,4 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 kubectl delete httplistenerpolicy accept-http10 -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
+
