@@ -91,7 +91,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 
    {{< /conditional-text >}}
 
-4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command.{{< conditional-text include-if="envoy" >}}
+4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. {{< conditional-text include-if="envoy" >}}You can fetch the latest logs for all the components with the following command.
 
    * If you have not already, [set the log level for the Envoy gateway proxy to `debug`](#gateway-debug-logging).
    
