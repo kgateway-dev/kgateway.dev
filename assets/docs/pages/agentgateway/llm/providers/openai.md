@@ -138,12 +138,6 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        - path:
            type: PathPrefix
            value: /openai
-       filters:
-       - type: URLRewrite
-         urlRewrite:
-           path:
-             type: ReplaceFullPath
-             replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}

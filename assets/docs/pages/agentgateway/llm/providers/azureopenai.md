@@ -7,7 +7,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 ## Set up access to Azure OpenAI
 
 1. [Deploy a Microsoft Foundry Model](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/how-to/deploy-foundry-models?view=foundry) in the Foundry portal.  
-2. Go to the Foundry portal to access your model deployment. From the **Details** tab, retrieve the endpoint and key to access your model deployment. The endpoint includes several information that you later need to configure your Azure OpenAI backend, such as the base URL, your deployment model name, and API version. 
+2. Go to the Foundry portal to access your model deployment. From the **Details** tab, retrieve the endpoint and key to access your model deployment. Later, you use this endpoint information to configure your Azure OpenAI backend, including the base URL, your deployment model name, and API version.
 
    For example, the following URL `https://my-endpoint.cognitiveservices.azure.com/openai/deployments/gpt-4.1-mini/chat/completions?api-version=2025-01-01-preview` is composed of the following details: 
    * `my-endpoint.cognitiveservices.azure.com` as the base URL

@@ -12,7 +12,7 @@ Agentgateway supports many agent connectivity use cases, including the following
 
 For more information about how kgateway integrates with agentgateway, see the [Architecture](../../about/architecture/) topic.
 
-For more information about agentgateway resources, see the [Agentgateway open source docs](https://agentgateway.dev/docs/about/).
+For more information about agentgateway resources, see the [Agentgateway upstream docs](https://agentgateway.dev/docs/about/).
 
 ## Agentgateway resource configuration {#resources}
 
