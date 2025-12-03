@@ -26,7 +26,6 @@ To learn more about CSRF, you can try out the [CSRF sandbox](https://www.envoypr
 
 ## Set up CSRF 
 
-{{< version include-if="2.2.x,2.1.x" >}}
 Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSRF rules. 
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSRF rules. The following example allows request from only the `allowThisOne.example.com` origin.
@@ -83,65 +82,6 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSR
    ```
 
 3. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource.
-{{< /version >}}
-{{< version exclude-if="2.2.x,2.1.x" >}}
-Use a TrafficPolicy resource to define your CSRF rules. 
-
-1. Create a TrafficPolicy resource to define your CSRF rules. The following example allows request from only the `allowThisOne.example.com` origin.
-   
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
-   metadata:
-     name: csrf
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     csrf:
-       percentageEnabled: 100
-       additionalOrigins:
-       - exact: allowThisOne.example.com
-         ignoreCase: false
-   EOF
-   ```
-
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs](/docs/reference/api/#csrfpolicy).
-
-   | Field | Description |
-   |-------|-------------|
-   | `targetRefs` | The policy targets the `httpbin` HTTPRoute resource that you created before you began. |
-   | `percentageEnabled` | The percentage of requests for which the CSRF policy is enabled. A value of `100` means that all requests are enforced by the CSRF rules. |
-   | `additionalOrigins` | Additional origins that the CSRF policy allows, besides the destination origin. Possible values include `exact`, `prefix`, `suffix`, `contains`, `safeRegex`, and an `ignoreCase` boolean. At least one of `exact`, `prefix`, `suffix`, `contains`, or `safeRegex` must be set. The example allows requests from the `allowThisOne.example.com` exact origin. |
-   
-2. Send a request to the httpbin app on the `www.example.com` domain. Verify that you get back a 403 HTTP response code because no origin is set in your request. 
-
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl -vi -X POST http://$INGRESS_GW_ADDRESS:8080/post -H "host: www.example.com:8080"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi -X POST localhost:8080/post -H "host: www.example.com"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-   
-   Example output: 
-   
-   ```console
-   HTTP/1.1 403 Forbidden
-   ...
-   Invalid origin
-   ```
-
-3. Send another request to the httpbin app. This time, you include the `allowThisOne.example.com` origin header. Verify that you get back a 200 HTTP response code, because the origin matches the origin that you specified in the TrafficPolicy resource.
-{{< /version >}}
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -225,15 +165,6 @@ Use a TrafficPolicy resource to define your CSRF rules.
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< version include-if="2.2.x,2.1.x" >}}
 ```sh
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} csrf -n httpbin
 ```
-{{< /version >}}
-{{< version exclude-if="2.2.x,2.1.x" >}}
-```sh
-kubectl delete TrafficPolicy csrf -n httpbin
-kubectl delete httproute httpbin-csrf -n httpbin
-```
-{{< /version >}}
-

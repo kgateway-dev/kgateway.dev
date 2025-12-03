@@ -1,4 +1,3 @@
-{{< version include-if="2.2.x,2.1.x" >}}
 Originate a one-way TLS connection from the Gateway to a backend. 
 
 {{< callout type="warning" >}}
@@ -27,7 +26,9 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server.
 
+{{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
+{{< /callout >}}
 
 ### Deploy the sample app
 
@@ -447,5 +448,3 @@ kubectl delete backend httpbin-org
 ```
 {{% /tab %}}
 {{< /tabs >}}
-{{< /version >}}
-
