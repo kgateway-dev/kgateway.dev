@@ -1,6 +1,6 @@
 Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgateway.md" >}} setup.
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} consists of the control plane and an [Envoy-based](https://www.envoyproxy.io) {{< reuse "/docs/snippets/kgateway.md" >}} or {{< reuse "/docs/snippets/agentgateway.md" >}} data plane. If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy.
+{{< reuse "/docs/snippets/kgateway-capital.md" >}} consists of the control plane and an {{< reuse "/docs/snippets/data-plane.md" >}} data plane. If you experience issues in your environment, such as policies that are not applied or traffic that is not routed correctly, in a lot of cases, these errors can be observed at the proxy.
 
 ## Debug the control plane {#control-plane}
 
@@ -22,7 +22,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    | `/debug/pprof` | View the pprof profile of the control plane. A profile shows you the stack traces of the call sequences, such as Go routines, that led to particular events, such as memory allocation. The endpoint includes descriptions of each available profile.|
    | `/logging` | Review the current logging levels of each component in the control plane. You can also interactively set the log level by component, such as to enable `DEBUG` logs. |
    | `/snapshots/krt` | View the current krt snapshot, or the point-in-time view of the transformed Kubernetes resources and their sync status that the control plane processed. These resources are then used to generate gateway configuration that is sent to the gateway proxies for routing decisions. |
-   | `/snapshots/xds` | View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. |  
+   | `/snapshots/xds` | {{% conditional-text include-if="envoy" %}}View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. For snapshots to be present, you must have a Gateway resource that creates a connected, Envoy-based kgateway proxy.{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}The xDS snapshot is used for Envoy-based kgateway proxies, not agentgateway proxies.{{% /conditional-text %}} | 
 
 ## Debug your gateway setup
 
@@ -52,7 +52,8 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    kubectl get httproute <name> -n <namespace> -o yaml
    ```
 
-3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.{{% conditional-text include-if="envoy" %}}
+3. Access the debugging interface of your gateway proxy on your localhost. Configuration might be missing on the gateway or might be applied to the wrong route. For example, if you apply multiple policies to the same route by using the `targetRefs` section, only the oldest policy is applied. The newer policy configuration might be ignored and not applied to the gateway.
+   {{< conditional-text include-if="envoy" >}}
    
    ```sh
    kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000 &  
@@ -70,9 +71,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    | listeners | See the listeners that are configured on your gateway. | 
    | logging | Review the log level that is set for each component. |  
    | stats/prometheus | View metrics that Envoy emitted and sent to the built-in Prometheus instance. |
-   {{% /conditional-text %}}
+
+   {{< /conditional-text >}}
    
-   {{% conditional-text include-if="agentgateway" %}}
+   {{< conditional-text include-if="agentgateway" >}}
    ```sh
    kubectl port-forward deploy/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 15000 &  
    ```
@@ -87,9 +89,9 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    {{< reuse-image src="img/agw-ui-landing.png" caption="Figure: Read-only agentgateway UI.">}}
    {{< reuse-image-dark srcDark="img/agw-ui-landing-dark.png" caption="Figure: Read-only agentgateway UI.">}}
 
-   {{% /conditional-text %}}
+   {{< /conditional-text >}}
 
-4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. You can fetch the latest logs for all the components with the following command.{{% conditional-text include-if="envoy" %}}
+4. Review the logs for each component. Each component logs the sync loops that it runs, such as syncing with various environment signals like the Kubernetes API. {{< conditional-text include-if="envoy" >}}You can fetch the latest logs for all the components with the following command.
 
    * If you have not already, [set the log level for the Envoy gateway proxy to `debug`](#gateway-debug-logging).
    
@@ -101,7 +103,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    export GATEWAY_NAME=http
    kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} deployment/$GATEWAY_NAME
    ```
-   {{% /conditional-text %}}
+   {{< /conditional-text >}}
 
 
 {{% conditional-text include-if="envoy" %}}
@@ -228,6 +230,8 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
 
 {{% /conditional-text %}}
 
+{{% conditional-text include-if="envoy" %}}
+
 ## Policy not applied {#trafficpolicy}
 
 As part of debugging, you might have noticed that your HTTPRoute or Gateway had an attached {{< reuse "docs/snippets/trafficpolicy.md" >}}. The {{< reuse "docs/snippets/trafficpolicy.md" >}}'s status might say `Accepted` and seem normal. However, when you checked the gateway configuration, the policy is not applied to the selected routes. Review the following common reasons for missing policies.
@@ -258,6 +262,8 @@ As part of debugging, you might have noticed that your HTTPRoute or Gateway had 
        - group: ""
          kind: Service
    ```
+
+{{% /conditional-text %}}
 
 <!-- TODO: CLI
 ## Before you begin

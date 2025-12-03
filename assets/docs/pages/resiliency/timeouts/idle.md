@@ -15,7 +15,7 @@ Note that the idle timeout configures the timeout for the entire connection from
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Set up idle stream timeouts
+## Set up idle timeouts
 
 1. Create an HTTPListenerPolicy with your idle timeout configuration. In this example, you apply an idle timeout of 30 seconds.
 
@@ -97,5 +97,3 @@ Note that the idle timeout configures the timeout for the entire connection from
 ```sh
 kubectl delete httplistenerpolicy idle-time -n {{< reuse "docs/snippets/namespace.md" >}} 
 ```
-
-
