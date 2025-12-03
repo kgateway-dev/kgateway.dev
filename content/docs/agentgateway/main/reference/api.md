@@ -19,6 +19,7 @@ weight: 10
 - [GatewayExtension](#gatewayextension)
 - [GatewayParameters](#gatewayparameters)
 - [HTTPListenerPolicy](#httplistenerpolicy)
+- [ListenerPolicy](#listenerpolicy)
 - [TrafficPolicy](#trafficpolicy)
 
 
@@ -652,7 +653,7 @@ _Appears in:_
 
 #### AgentRemoteJWKS
 
-_Underlying type:_ _[struct{JwksUri string "json:\"jwksUri,omitempty\""; CacheDuration *k8s.io/apimachinery/pkg/apis/meta/v1.Duration "json:\"cacheDuration,omitempty\""; BackendRef sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference "json:\"backendRef,omitempty\""}](#struct{jwksuri-string-"json:\"jwksuri,omitempty\"";-cacheduration-*k8sioapimachinerypkgapismetav1duration-"json:\"cacheduration,omitempty\"";-backendref-sigsk8siogateway-apiapisv1backendobjectreference-"json:\"backendref,omitempty\""})_
+_Underlying type:_ _struct_
 
 
 
@@ -660,6 +661,7 @@ _Underlying type:_ _[struct{JwksUri string "json:\"jwksUri,omitempty\""; CacheDu
 
 _Appears in:_
 - [AgentJWKS](#agentjwks)
+- [MCPAuthentication](#mcpauthentication)
 
 
 
@@ -926,7 +928,7 @@ _Appears in:_
 
 #### AgentgatewayPolicyBackendSimple
 
-_Underlying type:_ _[struct{TCP *BackendTCP "json:\"tcp,omitempty\""; TLS *BackendTLS "json:\"tls,omitempty\""; HTTP *BackendHTTP "json:\"http,omitempty\""; Auth *BackendAuth "json:\"auth,omitempty\""}](#struct{tcp-*backendtcp-"json:\"tcp,omitempty\"";-tls-*backendtls-"json:\"tls,omitempty\"";-http-*backendhttp-"json:\"http,omitempty\"";-auth-*backendauth-"json:\"auth,omitempty\""})_
+_Underlying type:_ _struct_
 
 
 
@@ -1012,7 +1014,7 @@ _Appears in:_
 
 #### AlwaysOnConfig
 
-_Underlying type:_ _[struct{}](#struct{})_
+_Underlying type:_ _struct_
 
 AlwaysOnConfig specified the AlwaysOn samplerc
 
@@ -1309,6 +1311,7 @@ _Appears in:_
 | `loadBalancer` _[LoadBalancer](#loadbalancer)_ | LoadBalancer contains the options necessary to configure the load balancer. |  |  |
 | `healthCheck` _[HealthCheck](#healthcheck)_ | HealthCheck contains the options necessary to configure the health check. |  |  |
 | `outlierDetection` _[OutlierDetection](#outlierdetection)_ | OutlierDetection contains the options necessary to configure passive health checking. |  |  |
+| `circuitBreakers` _[CircuitBreakers](#circuitbreakers)_ | CircuitBreakers contains the options necessary to configure circuit breaking.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking) for more details. |  |  |
 
 
 
@@ -1543,6 +1546,26 @@ _Appears in:_
 | `additionalOrigins` _[StringMatcher](#stringmatcher) array_ | Specifies additional source origins that will be allowed in addition to the destination origin. |  | MaxItems: 16 <br /> |
 
 
+#### CircuitBreakers
+
+
+
+CircuitBreakers contains the options to configure circuit breaker thresholds for the default priority.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/circuit_breaker.proto) for more details.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxConnections` _integer_ | MaxConnections is the maximum number of connections that will be made to<br />the upstream cluster. If not specified, defaults to 1024. |  | Minimum: 1 <br /> |
+| `maxPendingRequests` _integer_ | MaxPendingRequests is the maximum number of pending requests that are<br />allowed to the upstream cluster. If not specified, defaults to 1024. |  | Minimum: 1 <br /> |
+| `maxRequests` _integer_ | MaxRequests is the maximum number of parallel requests that are allowed<br />to the upstream cluster. If not specified, defaults to 1024. |  | Minimum: 1 <br /> |
+| `maxRetries` _integer_ | MaxRetries is the maximum number of parallel retries that are allowed<br />to the upstream cluster. If not specified, defaults to 3. |  | Minimum: 0 <br /> |
+
+
 #### CommonAccessLogGrpcService
 
 
@@ -1616,7 +1639,7 @@ _Appears in:_
 
 #### ComparisonFilter
 
-_Underlying type:_ _[struct{Op Op "json:\"op\""; Value int32 "json:\"value\""}](#struct{op-op-"json:\"op\"";-value-int32-"json:\"value\""})_
+_Underlying type:_ _struct_
 
 ComparisonFilter represents a filter based on a comparison.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
@@ -1865,7 +1888,7 @@ _Appears in:_
 
 #### EnvironmentResourceDetectorConfig
 
-_Underlying type:_ _[struct{}](#struct{})_
+_Underlying type:_ _struct_
 
 EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
 
@@ -2235,6 +2258,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `handshakeTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | handshakeTimeout specifies the deadline for a TLS handshake to complete.<br />If unset, this defaults to 15s. |  |  |
+| `alpnProtocols` _string_ | alpnProtocols sets the Application Level Protocol Negotiation (ALPN) value to use in the TLS handshake.<br /><br />If not present, defaults to ["h2", "http/1.1"]. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### GRPCRetryBackoff
@@ -2872,6 +2896,7 @@ _Appears in:_
 
 
 JWKS (JSON Web Key Set) configures the source for the JWKS
+Exactly one of LocalJWKS or RemoteJWKS must be specified.
 
 
 
@@ -2882,6 +2907,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `local` _[LocalJWKS](#localjwks)_ | LocalJWKS configures getting the public keys to validate the JWT from a Kubernetes configmap,<br />or inline (raw string) JWKS. |  |  |
+| `remote` _[RemoteJWKS](#remotejwks)_ | RemoteJWKS configures getting the public keys to validate the JWT from a remote JWKS server. |  |  |
 
 
 #### JWTAuthentication
@@ -2898,6 +2924,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `extensionRef` _[NamespacedObjectReference](#namespacedobjectreference)_ | ExtensionRef references a GatewayExtension that provides the jwt providers |  |  |
+| `disable` _[PolicyDisable](#policydisable)_ | Disable all JWT filters.<br />Can be used to disable JWT policies applied at a higher level in the config hierarchy. |  |  |
 
 
 #### JWTAuthenticationMode
@@ -2956,7 +2983,7 @@ _Appears in:_
 | `tokenSource` _[JWTTokenSource](#jwttokensource)_ | TokenSource configures where to find the JWT of the current provider. |  |  |
 | `claimsToHeaders` _[JWTClaimToHeader](#jwtclaimtoheader) array_ | ClaimsToHeaders is the list of claims to headers to be used for the JWT provider.<br />Optionally set the claims from the JWT payload that you want to extract and add as headers<br />to the request before the request is forwarded to the upstream destination.<br />Note: if ClaimsToHeaders is set, the Envoy route cache will be cleared.<br />This allows the JWT filter to correctly affect routing decisions. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 | `jwks` _[JWKS](#jwks)_ | JWKS is the source for the JSON Web Keys to be used to validate the JWT. |  |  |
-| `keepToken` _[KeepToken](#keeptoken)_ | KeepToken configures if the token is forwarded upstream.<br />If Remove, the header containing the token will be removed.<br />If Forward, the header containing the token will be forwarded upstream. | Remove | Enum: [Forward Remove] <br /> |
+| `forwardToken` _boolean_ | ForwardToken configures if the JWT token is forwarded to the upstream backend.<br />If true, the header containing the token will be forwarded upstream.<br />If false or not set, the header containing the token will be removed. |  |  |
 
 
 #### JWTTokenSource
@@ -2976,24 +3003,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `header` _[HeaderSource](#headersource)_ | HeaderSource configures retrieving token from a header |  |  |
 | `queryParameter` _string_ | QueryParameter configures retrieving token from the query parameter |  |  |
-
-
-#### KeepToken
-
-_Underlying type:_ _string_
-
-KeepToken configures if the token is forwarded upstream.
-
-
-
-_Appears in:_
-- [JWTProvider](#jwtprovider)
-- [NamedJWTProvider](#namedjwtprovider)
-
-| Field | Description |
-| --- | --- |
-| `Forward` |  |
-| `Remove` |  |
 
 
 
@@ -3047,6 +3056,46 @@ _Appears in:_
 | `host` _string_ | Host specifies the hostname to send the requests to.<br />If not specified, the default hostname for the provider is used. |  |  |
 | `port` _integer_ | Port specifies the port to send the requests to. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
 | `path` _string_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
+
+
+#### ListenerPolicy
+
+
+
+ListenerPolicy is used for configuring Envoy listener-level settings that apply to all protocol types (HTTP, HTTPS, TCP, TLS).
+These policies can only target `Gateway` objects.
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `gateway.kgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `ListenerPolicy` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[ListenerPolicySpec](#listenerpolicyspec)_ |  |  |  |
+| `status` _[PolicyStatus](#policystatus)_ |  |  |  |
+
+
+#### ListenerPolicySpec
+
+
+
+ListenerPolicySpec defines the desired state of a listener policy.
+
+
+
+_Appears in:_
+- [ListenerPolicy](#listenerpolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to.<br />Only supports `Gateway` resources |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select `Gateway` resources to attach the policy to. |  |  |
+| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />When set, Envoy will expect connections to include the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
 
 
 #### LoadBalancer
@@ -3186,6 +3235,7 @@ You can target only one object at a time.
 _Appears in:_
 - [BackendConfigPolicySpec](#backendconfigpolicyspec)
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [ListenerPolicySpec](#listenerpolicyspec)
 - [LocalPolicyTargetReferenceWithSectionName](#localpolicytargetreferencewithsectionname)
 
 | Field | Description | Default | Validation |
@@ -3233,6 +3283,7 @@ Instead, use targetRefs to attach the policy.
 _Appears in:_
 - [BackendConfigPolicySpec](#backendconfigpolicyspec)
 - [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [ListenerPolicySpec](#listenerpolicyspec)
 - [LocalPolicyTargetSelectorWithSectionName](#localpolicytargetselectorwithsectionname)
 
 | Field | Description | Default | Validation |
@@ -3318,6 +3369,24 @@ _Appears in:_
 | `WeightedLb` | https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/locality_weight#locality-weighted-load-balancing<br />Locality weighted load balancing enables weighting assignments across different zones and geographical locations by using explicit weights.<br />This field is required to enable locality weighted load balancing.<br /> |
 
 
+#### MCPAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [BackendMCP](#backendmcp)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `resourceMetadata` _object (keys:string, values:[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io))_ | ResourceMetadata defines the metadata to use for MCP resources. |  |  |
+| `provider` _[McpIDP](#mcpidp)_ | McpIDP specifies the identity provider to use for authentication |  | Enum: [Auth0 Keycloak] <br /> |
+| `issuer` _string_ | Issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  |  |
+| `audiences` _string array_ | audiences specify the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
+| `jwks` _[AgentRemoteJWKS](#agentremotejwks)_ | jwks defines the remote JSON Web Key used to validate the signature of the JWT. |  |  |
 
 
 #### MCPBackend
@@ -3352,6 +3421,23 @@ _Appears in:_
 | --- | --- |
 | `StreamableHTTP` | MCPProtocolStreamableHTTP specifies Streamable HTTP must be used as the protocol<br /> |
 | `SSE` | MCPProtocolSSE specifies Server-Sent Events (SSE) must be used as the protocol<br /> |
+
+
+#### McpIDP
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [MCPAuthentication](#mcpauthentication)
+
+| Field | Description |
+| --- | --- |
+| `Auth0` |  |
+| `Keycloak` |  |
 
 
 #### McpSelector
@@ -3502,7 +3588,7 @@ _Appears in:_
 
 #### MetadataPathSegment
 
-_Underlying type:_ _[struct{Key string "json:\"key\""}](#struct{key-string-"json:\"key\""})_
+_Underlying type:_ _struct_
 
 Specifies a segment in a path for retrieving values from Metadata.
 
@@ -3532,7 +3618,7 @@ _Appears in:_
 | `tokenSource` _[JWTTokenSource](#jwttokensource)_ | TokenSource configures where to find the JWT of the current provider. |  |  |
 | `claimsToHeaders` _[JWTClaimToHeader](#jwtclaimtoheader) array_ | ClaimsToHeaders is the list of claims to headers to be used for the JWT provider.<br />Optionally set the claims from the JWT payload that you want to extract and add as headers<br />to the request before the request is forwarded to the upstream destination.<br />Note: if ClaimsToHeaders is set, the Envoy route cache will be cleared.<br />This allows the JWT filter to correctly affect routing decisions. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 | `jwks` _[JWKS](#jwks)_ | JWKS is the source for the JSON Web Keys to be used to validate the JWT. |  |  |
-| `keepToken` _[KeepToken](#keeptoken)_ | KeepToken configures if the token is forwarded upstream.<br />If Remove, the header containing the token will be removed.<br />If Forward, the header containing the token will be forwarded upstream. | Remove | Enum: [Forward Remove] <br /> |
+| `forwardToken` _boolean_ | ForwardToken configures if the JWT token is forwarded to the upstream backend.<br />If true, the header containing the token will be forwarded upstream.<br />If false or not set, the header containing the token will be removed. |  |  |
 
 
 #### NamedLLMProvider
@@ -3703,6 +3789,7 @@ _Appears in:_
 | `livenessProbe` _[Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#probe-v1-core)_ | If specified, the pod's liveness probe. Periodic probe of container service readiness.<br />Container will be restarted if the probe fails. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#probe-v1-core<br />for details. |  |  |
 | `topologySpreadConstraints` _[TopologySpreadConstraint](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#topologyspreadconstraint-v1-core) array_ | If specified, the pod's topology spread constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#topologyspreadconstraint-v1-core<br />for details. |  |  |
 | `extraVolumes` _[Volume](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volume-v1-core) array_ | Additional volumes to add to the pod. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volume-v1-core<br />for details. |  |  |
+| `priorityClassName` _string_ | If specified, the pod's PriorityClass. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podspec-v1-core<br />for details |  |  |
 
 
 #### PolicyAncestorStatus
@@ -3740,6 +3827,7 @@ _Appears in:_
 - [CorsPolicy](#corspolicy)
 - [ExtAuthPolicy](#extauthpolicy)
 - [ExtProcPolicy](#extprocpolicy)
+- [JWTAuthentication](#jwtauthentication)
 
 
 
@@ -3911,6 +3999,20 @@ _Appears in:_
 | `strategy` _[DeploymentStrategy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#deploymentstrategy-v1-apps)_ | The deployment strategy to use to replace existing pods with new<br />ones. The Kubernetes default is a RollingUpdate with 25% maxUnavailable,<br />25% maxSurge.<br /><br />E.g., to recreate pods, minimizing resources for the rollout but causing downtime:<br />strategy:<br />  type: Recreate<br />E.g., to roll out as a RollingUpdate but with non-default parameters:<br />strategy:<br />  type: RollingUpdate<br />  rollingUpdate:<br />    maxSurge: 100% |  |  |
 
 
+#### ProxyProtocolConfig
+
+
+
+ProxyProtocolConfig configures the PROXY protocol listener filter.
+The presence of this configuration enables PROXY protocol support.
+
+
+
+_Appears in:_
+- [ListenerPolicySpec](#listenerpolicyspec)
+
+
+
 #### RateLimit
 
 
@@ -4042,6 +4144,24 @@ _Appears in:_
 | `matches` _string array_ | A list of regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  |  |
 | `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [SSN CREDIT_CARD PHONE_NUMBER EMAIL] <br /> |
 | `action` _[Action](#action)_ | The action to take if a regex pattern is matched in a request or response.<br />This setting applies only to request matches. PromptguardResponse matches are always masked by default.<br />Defaults to `MASK`. | MASK |  |
+
+
+#### RemoteJWKS
+
+
+
+
+
+
+
+_Appears in:_
+- [JWKS](#jwks)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
+| `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
 
 
 #### ResourceDetector
@@ -4361,6 +4481,27 @@ _Appears in:_
 | `routePrefixRewrite` _string_ | The Envoy stats endpoint to which the metrics are written |  |  |
 | `enableStatsRoute` _boolean_ | Enables an additional route to the stats cluster defaulting to /stats |  |  |
 | `statsRoutePrefixRewrite` _string_ | The Envoy stats endpoint with general metrics for the additional stats route |  |  |
+| `matcher` _[StatsMatcher](#statsmatcher)_ | Matcher configures inclusion or exclusion lists for Envoy stats.<br />Only one of inclusionList or exclusionList may be set.<br />If unset, Envoy's default stats emission behavior applies. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
+
+
+#### StatsMatcher
+
+
+
+StatsMatcher specifies either an inclusion or exclusion list for Envoy stats.
+See Envoy's envoy.config.metrics.v3.StatsMatcher for details.
+
+_Validation:_
+- MaxProperties: 1
+- MinProperties: 1
+
+_Appears in:_
+- [StatsConfig](#statsconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `inclusionList` _[StringMatcher](#stringmatcher) array_ | inclusionList specifies which stats to include, using string matchers. |  | MaxItems: 16 <br /> |
+| `exclusionList` _[StringMatcher](#stringmatcher) array_ | exclusionList specifies which stats to exclude, using string matchers. |  | MaxItems: 16 <br /> |
 
 
 #### StatusCodeFilter
@@ -4387,6 +4528,7 @@ Specifies the way to match a string.
 
 _Appears in:_
 - [CSRFPolicy](#csrfpolicy)
+- [StatsMatcher](#statsmatcher)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |

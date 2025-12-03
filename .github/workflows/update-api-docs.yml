@@ -179,62 +179,69 @@ jobs:
               
               os.remove(f'crd-ref-docs-config-{link_version}.yaml')
               
-              os.makedirs(f'content/docs/{url_path}/reference/', exist_ok=True)
-              
-              # Create API reference file with frontmatter
-              with open(f'content/docs/{url_path}/reference/api.md', 'w') as f:
-                  f.write('---\n')
-                  f.write('title: API reference\n')
-                  f.write('weight: 10\n')
-                  f.write('---\n\n')
-                  f.write(open('./out.md').read())
+              # Read the generated content once
+              with open('./out.md') as f:
+                  generated_content = f.read()
               
               os.remove('./out.md')
               
-              # Format the generated docs with sed commands
-              subprocess.run(['sed', '-i', 's/Required: {}/Required/g', f'content/docs/{url_path}/reference/api.md'], check=True)
-              subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', f'content/docs/{url_path}/reference/api.md'], check=True)
-              subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', f'content/docs/{url_path}/reference/api.md'], check=True)
+              # Generate docs for both envoy and agentgateway directories
+              for doc_dir in ['envoy', 'agentgateway']:
+                  target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
+                  os.makedirs(target_path, exist_ok=True)
+                  
+                  api_file = f'{target_path}api.md'
+                  
+                  # Create API reference file with frontmatter
+                  with open(api_file, 'w') as f:
+                      f.write('---\n')
+                      f.write('title: API reference\n')
+                      f.write('weight: 10\n')
+                      f.write('---\n\n')
+                      f.write(generated_content)
+                  
+                  # Format the generated docs with sed commands
+                  subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
+                  subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
+                  subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
+                  
+                  # Additional post-processing to clean up complex struct types
+                  import re
+                  with open(api_file, 'r') as f:
+                      content = f.read()
+                  
+                  # Replace complex struct type definitions with simple "struct"
+                  # Pattern matches: _Underlying type:_ _[struct{...}...]_
+                  content = re.sub(
+                      r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
+                      '_Underlying type:_ _struct_',
+                      content
+                  )
+                  
+                  # Handle empty struct{} patterns
+                  content = re.sub(
+                      r'_Underlying type:_ _\[struct\{\}\]\(#struct\{\}\)_',
+                      '_Underlying type:_ _struct_',
+                      content
+                  )
+                  
+                  # Also handle cases without the link wrapper
+                  content = re.sub(
+                      r'_Underlying type:_ _struct\{[^\}]+\}_',
+                      '_Underlying type:_ _struct_',
+                      content
+                  )
+                  
+                  with open(api_file, 'w') as f:
+                      f.write(content)
+                  
+                  print(f'    ✓ Generated API docs in {api_file}')
               
-              # Additional post-processing to clean up complex struct types
-              import re
-              api_file = f'content/docs/{url_path}/reference/api.md'
-              with open(api_file, 'r') as f:
-                  content = f.read()
-              
-              # Replace complex struct type definitions with simple "struct"
-              # Pattern matches: _Underlying type:_ _[struct{...}...]_
-              content = re.sub(
-                  r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
-                  '_Underlying type:_ _struct_',
-                  content
-              )
-              
-              # Handle empty struct{} patterns
-              content = re.sub(
-                  r'_Underlying type:_ _\[struct\{\}\]\(#struct\{\}\)_',
-                  '_Underlying type:_ _struct_',
-                  content
-              )
-              
-              # Also handle cases without the link wrapper
-              content = re.sub(
-                  r'_Underlying type:_ _struct\{[^\}]+\}_',
-                  '_Underlying type:_ _struct_',
-                  content
-              )
-              
-              with open(api_file, 'w') as f:
-                  f.write(content)
-              
-              print(f'    ✓ Generated API docs in content/docs/{url_path}/reference/api.md')
               return True
           
           def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway'):
               '''Generate Helm chart reference documentation'''
               print(f'  → Generating Helm docs for version {version}')
-              
-              os.makedirs(f'content/docs/{url_path}/reference/helm/', exist_ok=True)
               
               # Generate Helm docs for each chart
               charts = ['kgateway:helm', 'kgateway-crds:crds']
@@ -255,19 +262,26 @@ jobs:
                       '--dry-run'
                   ], capture_output=True, text=True, check=True)
                   
-                  with open(f'content/docs/{url_path}/reference/helm/{file_name}.md', 'w') as f:
-                      f.write(result.stdout)
-                  
-                  # Remove badge line and following empty line
-                  subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', f'content/docs/{url_path}/reference/helm/{file_name}.md'], check=True)
-                  
-                  # Remove backticks from the Default column in the table
-                  subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', f'content/docs/{url_path}/reference/helm/{file_name}.md'], check=True)
+                  # Write to both envoy and agentgateway directories
+                  for doc_dir in ['envoy', 'agentgateway']:
+                      target_path = f'content/docs/{doc_dir}/{url_path}/reference/helm/'
+                      os.makedirs(target_path, exist_ok=True)
+                      
+                      helm_file = f'{target_path}{file_name}.md'
+                      
+                      with open(helm_file, 'w') as f:
+                          f.write(result.stdout)
+                      
+                      # Remove badge line and following empty line
+                      subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', helm_file], check=True)
+                      
+                      # Remove backticks from the Default column in the table
+                      subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', helm_file], check=True)
+                      
+                      print(f'    ✓ Generated Helm docs in {target_path}')
                   
                   generated_any = True
               
-              if generated_any:
-                  print(f'    ✓ Generated Helm docs in content/docs/{url_path}/reference/helm/')
               return generated_any
           
           def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgateway'):
@@ -420,7 +434,7 @@ jobs:
             - Helm chart reference documentation
             - Control plane metrics documentation
             - Each version uses the latest corresponding tag from the kgateway repository
-            - Docs are placed in versioned directories (`content/docs/{VERSION}/` and `assets/docs/snippets/{VERSION}/`)
+            - Docs are placed in versioned directories (`content/docs/envoy/{VERSION}/` and `content/docs/agentgateway/{VERSION}/` for API and Helm docs, and `assets/docs/snippets/{VERSION}/` for metrics)
           branch: api-gen-update
           branch-suffix: timestamp
           delete-branch: true
