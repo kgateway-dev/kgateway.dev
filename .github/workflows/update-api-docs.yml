@@ -244,7 +244,7 @@ jobs:
               print(f'  → Generating Helm docs for version {version}')
               
               # Generate Helm docs for each chart
-              charts = ['kgateway:helm', 'kgateway-crds:crds']
+              charts = ['kgateway:kgateway', 'kgateway-crds:kgateway-crds']
               generated_any = False
               
               for chart in charts:
@@ -262,23 +262,58 @@ jobs:
                       '--dry-run'
                   ], capture_output=True, text=True, check=True)
                   
-                  # Write to both envoy and agentgateway directories
-                  for doc_dir in ['envoy', 'agentgateway']:
-                      target_path = f'content/docs/{doc_dir}/{url_path}/reference/helm/'
-                      os.makedirs(target_path, exist_ok=True)
-                      
-                      helm_file = f'{target_path}{file_name}.md'
-                      
-                      with open(helm_file, 'w') as f:
-                          f.write(result.stdout)
-                      
-                      # Remove badge line and following empty line
-                      subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', helm_file], check=True)
-                      
-                      # Remove backticks from the Default column in the table
-                      subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', helm_file], check=True)
-                      
-                      print(f'    ✓ Generated Helm docs in {target_path}')
+                  # Write the raw helm-docs output to assets directory
+                  # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
+                  # This prevents overwriting when promoting versions
+                  assets_path = f'assets/docs/pages/reference/helm/{version}/'
+                  os.makedirs(assets_path, exist_ok=True)
+                  
+                  helm_file = f'{assets_path}{file_name}.md'
+                  
+                  with open(helm_file, 'w') as f:
+                      f.write(result.stdout)
+                  
+                  # Remove badge line and following empty line
+                  subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', helm_file], check=True)
+                  
+                  # Remove backticks from the Default column in the table
+                  subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', helm_file], check=True)
+                  
+                  # Remove the title (# heading) and description lines from the top
+                  # These will be hardcoded in the content files instead
+                  # Remove lines 1-3 which contain: title, blank line, description
+                  subprocess.run(['sed', '-i', '1,3d', helm_file], check=True)
+                  
+                  # Additional cleanup using Python to remove control characters and emojis
+                  with open(helm_file, 'r', encoding='utf-8') as f:
+                      content = f.read()
+                  
+                  # Remove ASCII control characters (0x00-0x1F) that helm-docs inserts for empty values
+                  # These show as "SOH", "STX", etc. in editors but render as empty in browsers
+                  # Also remove emojis and other special symbols
+                  import unicodedata
+                  cleaned_content = []
+                  for char in content:
+                      # Keep regular characters, newlines, tabs, and pipe symbols
+                      if char in ['\n', '\t', '\r'] or ord(char) >= 32:
+                          # Also filter out emoji/symbol unicode categories for table cells
+                          if unicodedata.category(char)[0] != 'So' or char in [' ', '\n', '\t', '\r']:
+                              cleaned_content.append(char)
+                      # Skip control characters (ord < 32, except newline/tab/carriage return)
+                  
+                  content = ''.join(cleaned_content)
+                  
+                  # Add a note for charts with no configurable values (like kgateway-crds)
+                  # Check if there's no Values section or no table
+                  if '## Values' not in content or ('## Values' in content and '|-----|' not in content):
+                      # Simply append the note to the end of the content
+                      note = '\n\n{{< callout type="info" >}}\nNo configurable values are currently available for this chart.\n{{< /callout >}}\n'
+                      content = content.rstrip() + note
+                  
+                  with open(helm_file, 'w', encoding='utf-8') as f:
+                      f.write(content)
+                  
+                  print(f'    ✓ Generated Helm docs in {helm_file}')
                   
                   generated_any = True
               
@@ -434,7 +469,11 @@ jobs:
             - Helm chart reference documentation
             - Control plane metrics documentation
             - Each version uses the latest corresponding tag from the kgateway repository
-            - Docs are placed in versioned directories (`content/docs/envoy/{VERSION}/` and `content/docs/agentgateway/{VERSION}/` for API and Helm docs, and `assets/docs/snippets/{VERSION}/` for metrics)
+            
+            **File locations:**
+            - API docs: `content/docs/{envoy,agentgateway}/{VERSION}/reference/api.md`
+            - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
+            - Metrics docs: `assets/docs/snippets/{VERSION}/metrics-control-plane.md`
           branch: api-gen-update
           branch-suffix: timestamp
           delete-branch: true
