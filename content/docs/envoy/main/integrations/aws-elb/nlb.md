@@ -1,9 +1,9 @@
 ---
 title: AWS NLB
-weight: 20
+weight: 10
 ---
 
-In this guide you explore how to expose the kgateway proxy with an AWS network load balancer (NLB). The following use cases are covered:
+In this guide you explore how to expose the {{< reuse "docs/snippets/kgateway.md" >}} proxy with an AWS network load balancer (NLB). The following use cases are covered:
 
 * **NLB HTTP**: Create an HTTP listener on the NLB that exposes an HTTP endpoint on your gateway proxy. Traffic from the NLB to the proxy is not secured. 
 * **TLS passthrough**: Expose an HTTPS endpoint of your gateway with an NLB. The NLB passes through HTTPS traffic to the gateway proxy where the traffic is terminated. 
@@ -16,7 +16,30 @@ Keep in mind the following considerations when working with an NLB:
 ## Before you begin
 
 1. Create or use an existing AWS account. 
-2. Follow the [Get started guide](/docs/quickstart/) to install kgateway, set up a gateway resource, and deploy the httpbin sample app.
+2. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+3. Deploy the httpbin sample app. For more information, see the [sample app guide]({{< link-hextra path="/install/sample-app#deploy-app/" >}}).
+   1. Create the httpbin app.
+      ```shell
+      kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
+      ```
+
+      Example output:
+      ```txt
+      namespace/httpbin created
+      serviceaccount/httpbin created
+      service/httpbin created
+      deployment.apps/httpbin created
+      ```
+   2. Verify that the httpbin app is running.
+      ```sh
+      kubectl -n httpbin get pods
+      ```
+
+      Example output: 
+      ```txt
+      NAME                      READY   STATUS    RESTARTS   AGE
+      httpbin-d57c95548-nz98t   2/2     Running   0          18s
+      ```
 
 ## Step 1: Deploy the AWS Load Balancer controller
 
@@ -24,14 +47,14 @@ Keep in mind the following considerations when working with an NLB:
    
 ## Step 2: Deploy your gateway proxy
 
-1. Create a GatewayParameters resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
+1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with custom AWS annotations. These annotations instruct the AWS load balancer controller to expose the gateway proxy with a public-facing AWS NLB. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: GatewayParameters
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: custom-gw-params
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      kube: 
        service:
@@ -47,11 +70,11 @@ Keep in mind the following considerations when working with an NLB:
    | `aws-load-balancer-type: "external"` | Instruct Kubernetes to pass the Gateway's service configuration to the AWS load balancer controller that you created earlier instead of using the built-in capabilities in Kubernetes. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/nlb/#configuration). | 
    | `aws-load-balancer-scheme: internet-facing ` | Create the NLB with a public IP addresses that is accessible from the internet. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/nlb/#prerequisites).  | 
    | `aws-load-balancer-nlb-target-type: "instance"` | Use the Gateway's instance ID to register it as a target with the NLB. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/nlb/#instance-mode_1).  | 
-   
+
 2. Depending on the annotations that you use on your gateway proxy, you can configure the NLB in different ways. 
 
-   {{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-   {{% tab %}}
+   {{< tabs tabTotal="2" items="Simple HTTP,TLS passthrough" >}}
+   {{% tab tabName="Simple HTTP" %}}
 
    Create a simple NLB that accepts HTTP traffic on port 80 and forwards this traffic to the HTTP listener on your gateway proxy. 
 
@@ -65,14 +88,14 @@ Keep in mind the following considerations when working with an NLB:
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: aws-cloud
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: custom-gw-params
-         group: gateway.kgateway.dev
-         kind: GatewayParameters        
+         group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}        
      listeners:
      - protocol: HTTP
        port: 80
@@ -84,7 +107,7 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab tabName="TLS passthrough" %}}
    Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminate TLS traffic at the gateway proxy for added security. 
 
    {{< reuse-image src="/img/elb-tls-passthrough.svg" >}}
@@ -93,21 +116,21 @@ Keep in mind the following considerations when working with an NLB:
    1. Create a self-signed TLS certificate to configure your gateway proxy with an HTTPS listener. 
       {{< reuse "docs/snippets/listeners-https-create-cert.md" >}}
 
-   2. Create a Gateway with an HTTPS listener that terminates incoming TLS traffic. Make sure to reference the custom GatewayParameters resource and the Kubernetes secret that contains the TLS certificate information. 
+   2. Create a Gateway with an HTTPS listener that terminates incoming TLS traffic. Make sure to reference the custom {{< reuse "docs/snippets/gatewayparameters.md" >}} resource and the Kubernetes secret that contains the TLS certificate information. 
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: gateway.networking.k8s.io/v1
       kind: Gateway
       metadata:
         name: aws-cloud
-        namespace: kgateway-system
+        namespace: {{< reuse "docs/snippets/namespace.md" >}}
       spec:
-        gatewayClassName: kgateway
+        gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
         infrastructure:
           parametersRef:
             name: custom-gw-params
-            group: gateway.kgateway.dev
-            kind: GatewayParameters
+            group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+            kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
         listeners:
           - name: https
             port: 443
@@ -128,30 +151,30 @@ Keep in mind the following considerations when working with an NLB:
 
 3. Verify that your gateway is created. 
    ```sh
-   kubectl get gateway aws-cloud -n kgateway-system
+   kubectl get gateway aws-cloud -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
 4. Verify that the gateway service is exposed with an AWS NLB and assigned an AWS hostname. 
    ```sh
-   kubectl get services aws-cloud -n kgateway-system
+   kubectl get services aws-cloud -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
    Example output: 
    ```console
    NAME        TYPE           CLUSTER-IP      EXTERNAL-IP                                                                     PORT(S)        AGE
-   aws-cloud   LoadBalancer   172.20.39.233   k8s-kgateway-awscloud-edaaecf0c5-2d48d93624e3a4bf.elb.us-east-2.amazonaws.com   80:30565/TCP   12s
+   aws-cloud   LoadBalancer   172.20.39.233   k8s-{{< reuse "docs/snippets/alb-elb-name.md" >}}-awscloud-edaaecf0c5-2d48d93624e3a4bf.elb.us-east-2.amazonaws.com   80:30565/TCP   12s
    ```
 
 5. Review the NLB in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 
    2. In the left navigation, go to **Load Balancing > Load Balancers**.
-   3. Find and open the NLB that was created for you, with a name such as `k8s-kgateway-awscloud-<hash>`.
+   3. Find and open the NLB that was created for you, with a name such as `k8s-{{< reuse "docs/snippets/alb-elb-name.md" >}}-awscloud-<hash>`.
    4. On the **Resource map** tab, verify that the load balancer points to EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
 
 ## Step 3: Test traffic to the NLB {#test-traffic}
 
-{{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-{{% tab %}}
+{{< tabs tabTotal="2" items="Simple HTTP,TLS passthrough" >}}
+{{% tab tabName="Simple HTTP" %}}
    
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
@@ -164,7 +187,7 @@ Keep in mind the following considerations when working with an NLB:
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "www.nlb.com"
      rules:
@@ -176,7 +199,7 @@ Keep in mind the following considerations when working with an NLB:
 
 2. Get the AWS hostname of the NLB. 
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -193,7 +216,7 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
 {{% /tab %}}
-{{% tab %}}
+{{% tab tabName="TLS passthrough" %}}
 
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
@@ -206,7 +229,7 @@ Keep in mind the following considerations when working with an NLB:
    spec:
      parentRefs:
        - name: aws-cloud
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "https.example.com"
      rules:
@@ -218,7 +241,7 @@ Keep in mind the following considerations when working with an NLB:
 
 2. Get the IP address that is associated with the NLB's AWS hostname. 
    ```sh
-   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n kgateway-system aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+   export INGRESS_GW_HOSTNAME=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} aws-cloud -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
    echo $INGRESS_GW_HOSTNAME
    export INGRESS_GW_ADDRESS=$(dig +short ${INGRESS_GW_HOSTNAME} | head -1)
    echo $INGRESS_GW_ADDRESS
@@ -275,10 +298,10 @@ Keep in mind the following considerations when working with an NLB:
 
 1. Delete the Ingress and Gateway resources.
    ```sh
-   kubectl delete gatewayparameters custom-gw-params -n kgateway-system
-   kubectl delete gateway aws-cloud -n kgateway-system
-   kubectl delete httproute httpbin-elb -n kgateway-system
-   kubectl delete secret tls -n kgateway-system
+   kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} custom-gw-params -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete gateway aws-cloud -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete httproute httpbin-elb -n httpbin
+   kubectl delete secret https -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 2. Delete the AWS IAM resources that you created.

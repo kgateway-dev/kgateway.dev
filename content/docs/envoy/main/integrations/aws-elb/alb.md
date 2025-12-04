@@ -1,9 +1,9 @@
 ---
 title: AWS ALB
-weight: 10
+weight: 20
 ---
 
-In this guide you explore how to expose the kgateway proxy with an AWS application load balancer (ALB). 
+In this guide you explore how to expose the {{< reuse "docs/snippets/kgateway.md" >}} proxy with an AWS application load balancer (ALB). 
 
 {{< callout type="warning" >}}
 The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
@@ -12,20 +12,42 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 ## Before you begin
 
 1. Create or use an existing AWS account. 
-2. Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do not need to set up a Gateway as you create a custom Gateway as part of this guide.
-3. Follow the [Sample app guide]({{< link-hextra path="/install/sample-app#deploy-app/" >}}) to deploy the httpbin sample app.
+2. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+3. Deploy the httpbin sample app. For more information, see the [sample app guide]({{< link-hextra path="/install/sample-app#deploy-app/" >}}).
+   1. Create the httpbin app.
+      ```shell
+      kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
+      ```
+
+      Example output:
+      ```txt
+      namespace/httpbin created
+      serviceaccount/httpbin created
+      service/httpbin created
+      deployment.apps/httpbin created
+      ```
+   2. Verify that the httpbin app is running.
+      ```sh
+      kubectl -n httpbin get pods
+      ```
+
+      Example output: 
+      ```txt
+      NAME                      READY   STATUS    RESTARTS   AGE
+      httpbin-d57c95548-nz98t   2/2     Running   0          18s
+      ```
    
 ## Step 1: Deploy gateway proxy resources
  
 1. Create a Gateway resource with an HTTP listener. You later pair this Gateway with an AWS ALB. 
    ```yaml
-   kubectl apply -n kgateway-system -f- <<EOF
+   kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f- <<EOF
    kind: Gateway
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: alb
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -55,7 +77,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    spec:
      parentRefs:
        - name: alb
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -81,7 +103,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    spec:
      parentRefs:
        - name: alb
-         namespace: kgateway-system
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "albtest.com"
      rules:
@@ -105,7 +127,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    apiVersion: networking.k8s.io/v1
    kind: Ingress
    metadata:
-     namespace: kgateway-system
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: alb
      annotations:
        alb.ingress.kubernetes.io/scheme: internet-facing
@@ -134,7 +156,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 6. Review the load balancer in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 
    2. In the left navigation, go to **Load Balancing > Load Balancers**.
-   3. Find and open the ALB that was created for you, with a name such as `k8s-gateway-alb-<hash>`. Note that it might take a few minutes for the ALB to provision.
+   3. Find and open the ALB that was created for you, with a name such as `k8s-{{< reuse "docs/snippets/alb-elb-name.md" >}}-alb-<hash>`. Note that it might take a few minutes for the ALB to provision.
    4. On the **Resource map** tab, verify that the load balancer points to healthy EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
       {{< reuse-image src="img/alb.png" >}}
       {{< reuse-image-dark srcDark="img/alb.png" >}}
@@ -164,17 +186,17 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 1. Delete the Ingress, HTTPRoute, DirectResponse, and Gateway resources.
    ```sh
-   kubectl delete ingress alb -n kgateway-system
+   kubectl delete ingress alb -n {{< reuse "docs/snippets/namespace.md" >}}
    kubectl delete httproute httpbin-alb -n httpbin
    kubectl delete httproute httpbin-healthcheck -n httpbin
    kubectl delete directresponse httpbin-healthcheck-dr -n httpbin
-   kubectl delete gateway alb -n kgateway-system
+   kubectl delete gateway alb -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 2. Delete the AWS IAM resources that you created.
    ```sh
-   aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${IAM_POLICY_NAME}
    eksctl delete iamserviceaccount --name=${IAM_SA} --cluster=${CLUSTER_NAME}
+   aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/${IAM_POLICY_NAME}
    ```
 
 3. Uninstall the Helm release for the `aws-load-balancer-controller`.
