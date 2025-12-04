@@ -27,9 +27,9 @@
 {{- /* Set product name based on subsection */ -}}
 {{- $productName := "" -}}
 {{- if eq $subSection "envoy" -}}
-  {{- $productName = "Kgateway Envoy data plane" -}}
+  {{- $productName = "Envoy data plane for kgateway" -}}
 {{- else if eq $subSection "agentgateway" -}}
-  {{- $productName = "Agentgateway data plane in kgateway" -}}
+  {{- $productName = "Agentgateway data plane for kgateway" -}}
 {{- end -}}
 
 {{- /* Only show breadcrumb if we're in a docs section with version */ -}}
