@@ -27,6 +27,7 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
    ```
    {{% /tab %}}
    {{% tab tabName="Experimental" %}}
+   CRDs in the experimental channel are required to use some experimental features in the Gateway API. Guides that require experimental CRDs note this requirement in their prerequisites.
    ```sh
    kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```

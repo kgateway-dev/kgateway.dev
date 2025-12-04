@@ -44,7 +44,7 @@ sequenceDiagram
 
 ### Behavior with other AI features {#about-behavior}
 
-Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs]({{< link-hextra path="reference/api/#aitrafficpolicy" >}}).
+Keep in mind the following behaviors when using function calling with other agentgateway features. For more details about these features, see the [API docs]({{< link-hextra path="reference/api/#aitrafficpolicy" >}}).
 
 * Streaming responses: You can stream responses that call functions.
 * Semantic caching: Function calls are not cached.
@@ -67,13 +67,13 @@ Each AI provider has a different way of handling function calling. For example, 
 
 ## Example of function calling {#function-call}
 
-Send a function call to an LLM through AI Gateway. In the following steps, you use an example `get_weather` function with an OpenAI LLM. 
+Send a function call to an LLM through agentgateway. In the following steps, you use an example `get_weather` function with an OpenAI LLM. 
 
 {{< callout type="info" >}}
 Keep in mind that for a real use case, you must develop your own app that is capable of sending requests to the LLM and executing a tool, such as to retrieve the latest weather information for a given location.
 {{< /callout >}}
 
-1. Send a request through the AI Gateway to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers). The following example demonstrates a response that you might configure your app to send through the AI Gateway to the LLM.
+1. Send a request through the agentgateway proxy to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers). The following example demonstrates a response that you might configure your app to send through the agentgateway proxy to the LLM.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
@@ -153,7 +153,7 @@ Keep in mind that for a real use case, you must develop your own app that is cap
    
    | Field | Description |
    |-------|-------------|
-   | `$INGRESS_GW_ADDRESS:8080/openai` | The address of the AI Gateway that you set up before you began, along with the path to your AI provider, such as `openai`. |
+   | `$INGRESS_GW_ADDRESS:8080/openai` | The address of the agentgateway proxy that you set up before you began, along with the path to your AI provider, such as `openai`. |
    | `model` | The model to use for the function call, such as `gpt-3.5-turbo`. |
    | `messages` | The messages to send to the model. The example shows a user message asking about the weather in Columbus. |
    | `parallel_tool_calls` | Whether to call multiple tools at the same time. |
@@ -212,9 +212,9 @@ Keep in mind that for a real use case, you must develop your own app that is cap
     }
     ```
 
-4. From the app, return the result of the function call to the LLM through the AI Gateway. Make sure that the app includes the `tool_call_id` for each tool call.
+4. From the app, return the result of the function call to the LLM through the agentgateway proxy. Make sure that the app includes the `tool_call_id` for each tool call.
    
-   * The following example sends another curl through AI Gateway to the LLM to simulate a response that your app might send. Unlike the first request, this request does not suggest a tool call. Instead, you provide the results from executing the suggested function as part of the message, along with the assistant role that called the tool. 
+   * The following example sends another curl through the agentgateway proxy to the LLM to simulate a response that your app might send. Unlike the first request, this request does not suggest a tool call. Instead, you provide the results from executing the suggested function as part of the message, along with the assistant role that called the tool. 
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
 
