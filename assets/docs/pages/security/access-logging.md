@@ -382,3 +382,5 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 kubectl delete HTTPListenerPolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
+
+

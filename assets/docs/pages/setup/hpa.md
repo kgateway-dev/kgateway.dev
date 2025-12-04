@@ -94,3 +94,5 @@ kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/lat
 ```
 
 
+
+
