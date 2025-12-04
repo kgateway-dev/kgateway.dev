@@ -1,7 +1,7 @@
 ```mermaid
 graph LR
-    Client -->|inference request| kgateway
-    kgateway -->|routes to| InferencePool
+    Client -->|inference request| agentgateway
+    agentgateway -->|routes to| InferencePool
     subgraph  
         subgraph InferencePool
             direction LR
@@ -9,6 +9,6 @@ graph LR
             InferenceModel_v2
             InferenceModel_v3
         end
-        kgateway
+        agentgateway
     end
 ```

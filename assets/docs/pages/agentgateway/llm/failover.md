@@ -271,7 +271,7 @@ You can configure failover across multiple models and providers by using priorit
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
-   curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
+   curl -v "$INGRESS_GW_ADDRESS/model" -H content-type:application/json -d '{
      "messages": [
        {
          "role": "user",

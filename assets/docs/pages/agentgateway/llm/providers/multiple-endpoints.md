@@ -84,7 +84,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    **Chat completions:**
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai/v1/chat/completions" \
+   curl "$INGRESS_GW_ADDRESS/openai/v1/chat/completions" \
      -H content-type:application/json \
      -d '{
        "model": "gpt-3.5-turbo",
@@ -94,7 +94,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
 
    **Embeddings:**
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai/v1/embeddings" \
+   curl "$INGRESS_GW_ADDRESS/openai/v1/embeddings" \
      -H content-type:application/json \
      -d '{
        "model": "text-embedding-ada-002",
@@ -104,7 +104,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
 
    **Models list:**
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai/v1/models" | jq
+   curl "$INGRESS_GW_ADDRESS/openai/v1/models" | jq
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}

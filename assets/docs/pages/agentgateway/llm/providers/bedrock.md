@@ -171,7 +171,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/bedrock" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/bedrock" -H content-type:application/json -d '{
        "model": "",
        "messages": [
          {

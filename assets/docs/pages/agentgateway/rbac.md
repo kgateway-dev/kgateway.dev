@@ -26,8 +26,6 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
    metadata:
      name: rbac
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io

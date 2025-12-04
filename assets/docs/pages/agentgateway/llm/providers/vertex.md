@@ -152,7 +152,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/vertex" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/vertex" -H content-type:application/json  -d '{
       "model": "",
       "messages": [
         {
