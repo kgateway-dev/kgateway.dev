@@ -44,12 +44,12 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    EOF
    ```
 
-4. Create a Backend resource using the `openai` provider type with custom host and port overrides.
+4. Create a {{< reuse "docs/snippets/backend.md" >}} resource using the `openai` provider type with custom host and port overrides.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: mistral
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -74,7 +74,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`      | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`        | Define the AI backend configuration. |
    | `openai`    | Use the `openai` provider type for OpenAI-compatible providers. |
    | `host`       | **Required**: The hostname of the OpenAI-compatible provider, such as `api.mistral.ai`. |
@@ -84,7 +84,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    | `authToken`  | Configure the authentication token. The token is sent in the header specified by `authHeader`. Defaults to the `Authorization` header. |
    | `model`      | Optional: Override the model name. If unset, the model name is taken from the request. For models, see the [Mistral docs](https://docs.mistral.ai/getting-started/models). |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -110,7 +110,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
        - name: mistral
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
 6. Create a BackendTLSPolicy to enable TLS for the external Mistral API.
@@ -125,7 +125,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    spec:
      targetRefs:
      - name: mistral
-       kind: Backend
+       kind: {{< reuse "docs/snippets/backend.md" >}}
        group: gateway.kgateway.dev
      validation:
        hostname: api.mistral.ai
@@ -137,7 +137,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
 
    | Setting                    | Description |
    |----------------------------|-------------|
-   | `targetRefs`               | References the Backend resource to apply TLS to. |
+   | `targetRefs`               | References the {{< reuse "docs/snippets/backend.md" >}} resource to apply TLS to. |
    | `validation.hostname`       | The hostname to validate in the server certificate (must match the `host` value in your Backend, e.g., `api.mistral.ai`). |
    | `validation.wellKnownCACertificates` | Use the system's trusted CA certificates to verify the server certificate. |
 7. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
@@ -232,12 +232,12 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    EOF
    ```
    
-4. Create a Backend resource using the `openai` provider type with custom host and port overrides.
+4. Create a {{< reuse "docs/snippets/backend.md" >}} resource using the `openai` provider type with custom host and port overrides.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: deepseek
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -258,7 +258,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    EOF
    ```
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -280,7 +280,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
        - name: deepseek
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
 
@@ -296,7 +296,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    spec:
      targetRefs:
      - name: deepseek
-       kind: Backend
+       kind: {{< reuse "docs/snippets/backend.md" >}}
        group: gateway.kgateway.dev
      validation:
        hostname: api.deepseek.com
@@ -308,7 +308,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
 
    | Setting                    | Description |
    |----------------------------|-------------|
-   | `targetRefs`               | References the Backend resource to apply TLS to. |
+   | `targetRefs`               | References the {{< reuse "docs/snippets/backend.md" >}} resource to apply TLS to. |
    | `validation.hostname`      | The hostname to validate in the server certificate (must match the `host` value in your Backend, e.g., `api.deepseek.com`). |
    | `validation.wellKnownCACertificates` | Use the system's trusted CA certificates to verify the server certificate. |
 

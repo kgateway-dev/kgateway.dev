@@ -35,12 +35,12 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    ```
    {{% version include-if="2.1.x" %}}
    
-4. Create a Backend resource to configure an LLM provider that references the Azure OpenAI key secret.
+4. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the Azure OpenAI key secret.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: azure-openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -63,14 +63,14 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 
    | Setting           | Description |
    |-------------------|-------------|
-   | `type`            | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`            | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`               | Define the AI backend configuration. The example uses Azure OpenAI (`spec.ai.llm.azureopenai`). |
    | `endpoint`         | The endpoint of the Azure OpenAI deployment that you created, such as `my-endpoint.cognitiveservices.azure.com`. |
    | `deploymentName`   | The name of the Azure OpenAI model deployment to use. For more information, see the [Azure OpenAI model docs](https://learn.microsoft.com/en-us/azure/ai-foundry/foundry-models/concepts/models-sold-directly-by-azure?view=foundry-classic&tabs=global-standard-aoai%2Cstandard-chat-completions%2Cglobal-standard&pivots=azure-openai). |
    | `apiVersion`       | The version of the Azure OpenAI API to use. For more information, see the [Azure OpenAI API version reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#api-specs). |
    | `authToken`        | Configure the authentication token for Azure OpenAI API. The example refers to the secret that you previously created. The token is automatically sent in the `api-key` header. |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/azure-openai` path to the Backend that you previously created. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/azure-openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -92,16 +92,16 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        - name: azure-openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}{{% version include-if="2.2.x" %}}
-4. Create an AgentgatewayBackend resource to configure Azure OpenAI LLM provider.
+4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure Azure OpenAI LLM provider.
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: azure-openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -129,7 +129,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    | `azureopenai.apiVersion`    | The version of the Azure OpenAI API to use. For more information, see the [Azure OpenAI API version reference](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference#api-specs).|
    | `policies.auth` | Configure the authentication token for Azure OpenAI API. The example refers to the secret that you previously created. The token is automatically sent in the `api-key` header.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/azure-openai` path to the Backend that you previously created. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/azure-openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -150,8 +150,8 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        backendRefs:
        - name: azure-openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
-         kind: AgentgatewayBackend
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
 

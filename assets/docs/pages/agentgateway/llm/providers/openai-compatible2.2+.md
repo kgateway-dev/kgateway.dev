@@ -44,11 +44,11 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    EOF
    ```
 
-4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
+4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: mistral
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -81,7 +81,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    | `policies.auth` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created.|
    | `policies.tls.sni` | The hostname for which to validate the server certificate (must match the `host` value). |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the AgentgatewayBackend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -106,8 +106,8 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
        backendRefs:
        - name: mistral
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
-         kind: AgentgatewayBackend
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
 6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
@@ -201,11 +201,11 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    EOF
    ```
 
-4. Create an AgentgatewayBackend resource to configure your LLM provider and reference the AI API key secret that you created earlier.
+4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure your LLM provider and reference the AI API key secret that you created earlier.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: deepseek
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -226,7 +226,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    EOF
    ```
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the Backend resource.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the OpenAI chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -247,8 +247,8 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
        backendRefs:
        - name: deepseek
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
-         kind: AgentgatewayBackend
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
 

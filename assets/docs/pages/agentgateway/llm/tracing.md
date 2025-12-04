@@ -89,7 +89,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 2. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that references the ConfigMap that you created. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: tracing
@@ -341,6 +341,6 @@ kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}}   tracing -n {
 kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
 helm uninstall opentelemetry-collector-traces -n telemetry
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete backend google -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret google-secret -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

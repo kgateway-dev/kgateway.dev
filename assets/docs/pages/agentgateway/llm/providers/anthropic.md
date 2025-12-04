@@ -30,12 +30,12 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    ```
    {{% version include-if="2.1.x" %}}
    
-4. Create a Backend resource to configure an LLM provider that references the Anthropic API key secret.
+4. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the Anthropic API key secret.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: anthropic
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -57,13 +57,13 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`      | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`        | Define the AI backend configuration. The example uses Anthropic (`spec.ai.llm.anthropic`). |
    | `authToken` | Configure the authentication token for Anthropic API. The example refers to the secret that you previously created. The token is automatically sent in the `x-api-key` header. |
    | `model`     | Optional: Override the model name, such as `claude-3-opus-20240229`. If unset, the model name is taken from the request. |
    | `apiVersion` | Optional: A version header to pass to the Anthropic API. For more information, see the [Anthropic API versioning docs](https://docs.anthropic.com/en/api/versioning). |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -85,16 +85,16 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        - name: anthropic
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}} {{% version include-if="2.2.x" %}}
-4. Create an AgentgatewayBackend resource to configure your LLM provider that references the Anthropic API key secret.
+4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure your LLM provider that references the Anthropic API key secret.
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: anthropic
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -118,7 +118,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    | `anthropic.model`     | The model to use to generate responses. In this example, you use the `claude-3-opus-20240229` model. |
    | `policies.auth` | Provide the credentials to use to access the Anthropic API. The example refers to the secret that you previously created. The token is automatically sent in the `x-api-key` header.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/anthropic` path. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint to the Anthropic `/v1/messages` endpoint.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -139,8 +139,8 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
        backendRefs:
        - name: anthropic
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         group: gateway.kgateway.dev
-         kind: AgentgatewayBackend
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}

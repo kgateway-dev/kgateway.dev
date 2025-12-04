@@ -30,7 +30,7 @@ For more information, see the [Semantic conventions for generative AI metrics](h
 
 To view the logs: 
 ```sh
-kubectl logs <agentgateway-pod> -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl logs deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
 Example for a successful request to the OpenAI LLM: 
