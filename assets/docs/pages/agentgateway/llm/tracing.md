@@ -341,6 +341,6 @@ kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}}   tracing -n {
 kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
 helm uninstall opentelemetry-collector-traces -n telemetry
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{% version include-if="2.1.x" %}}backend{{% /version%}}{{% version include-if="2.2.x" %}}agentgatewaybackend{{% /version%}} google -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret google-secret -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

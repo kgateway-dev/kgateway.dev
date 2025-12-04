@@ -7,7 +7,7 @@ Prompt guards are mechanisms that ensure that prompt-based interactions with a l
 You can set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data. In this tutorial, you learn how to block any request with a `credit card` string in the request body and mask credit card numbers that are returned by the LLM.
 
 {{% version include-if="2.2.x" %}}
-Prompt guards can be configured directly in an AgentgatewayBackend resource or in a separate AgentgatewayPolicy resource. 
+Prompt guards can be configured directly in an {{< reuse "docs/snippets/backend.md" >}} resource or in a separate AgentgatewayPolicy resource. 
 {{% /version %}}
 
 ## Before you begin

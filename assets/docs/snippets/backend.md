@@ -1,0 +1,1 @@
+{{% conditional-text include-if="envoy" %}}Backend{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{% version include-if="2.1.x" %}}Backend{{% /version %}}{{% version include-if="2.2.x" %}}AgentgatewayBackend{{% /version %}}{{% /conditional-text %}}

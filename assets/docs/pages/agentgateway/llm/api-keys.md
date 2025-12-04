@@ -15,7 +15,7 @@ You can choose between the following options to provide an API key to agentgatew
 
 ### Inline token {#inline}
 
-Provide the token directly in the configuration for the Backend. This option is the least secure. Only use this option for quick tests such as trying out AI Gateway.
+Provide the token directly in the configuration for the {{< reuse "docs/snippets/backend.md" >}}. This option is the least secure. Only use this option for quick tests such as trying out AI Gateway.
 
 1. Get the token from your LLM provider, such as an API key to OpenAI.
 
@@ -23,12 +23,12 @@ Provide the token directly in the configuration for the Backend. This option is 
    export TOKEN=<your-ai-provider-token>
    ```
    {{% version include-if="2.1.x" %}}
-2. Provide the token inline in the Backend configuration.
+2. Provide the token inline in the {{< reuse "docs/snippets/backend.md" >}} configuration.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      labels:
        app: agentgateway
@@ -50,12 +50,12 @@ Provide the token directly in the configuration for the Backend. This option is 
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`      | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example uses an inline token. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+3. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -85,16 +85,16 @@ Provide the token directly in the configuration for the Backend. This option is 
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}{{% version include-if="2.2.x" %}}
 
-4. Provide the token inline in the AgentgatewayBackend configuration.
+4. Provide the token inline in the {{< reuse "docs/snippets/backend.md" >}} configuration.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -117,7 +117,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    | `openai.model`     | The OpenAI model to use, such as `gpt-3.5-turbo`.  |
    | `policies.auth` | Configure the authentication token for the OpenAI API. The example uses an inline token.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -139,7 +139,7 @@ Provide the token directly in the configuration for the Backend. This option is 
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: agentgateway.dev
-         kind: AgentgatewayBackend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}
@@ -218,7 +218,7 @@ Provide the token directly in the configuration for the Backend. This option is 
 
 ### API key in a secret {#api-key}
 
-Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% version include-if="2.1.x" %}}Backend{{% /version %}}{{% version include-if="2.2.x" %}}AgentgatewayBackend{{% /version %}} configuration. This option is more secure than an inline token, because the API key is encoded and you can restrict access to secrets through RBAC rules. Like the inline option, the API key and secret are fairly simple to create and set up. You might use this option in proofs of concept, controlled development and staging environments, or well-controlled prod environments that use secrets.
+Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< reuse "docs/snippets/backend.md" >}} configuration. This option is more secure than an inline token, because the API key is encoded and you can restrict access to secrets through RBAC rules. Like the inline option, the API key and secret are fairly simple to create and set up. You might use this option in proofs of concept, controlled development and staging environments, or well-controlled prod environments that use secrets.
 
 1. [Create an API key to access the OpenAI API](https://platform.openai.com/api-keys). If you use another AI provider, create an API key for that provider's AI instead, and be sure to modify the example commands in these tutorials to use your provider's AI API instead.
 
@@ -246,12 +246,12 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
    ```
    {{% version include-if="2.1.x" %}}
    
-4. Create a Backend resource to configure an LLM provider that references the AI API key secret.
+4. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      labels:
        app: agentgateway
@@ -274,12 +274,12 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`      | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -309,16 +309,16 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}{{% version include-if="2.2.x" %}}
 
-4. Create an AgentgatewayBackend resource to configure an LLM provider that references the AI API key secret.
+4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -344,7 +344,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
    | `openai.model`     | The OpenAI model to use, such as `gpt-3.5-turbo`.  |
    | `policies.auth` | Configure the authentication token for OpenAI API. The example refers to the secret that you previously created.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. 
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -366,7 +366,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: agentgateway.dev
-         kind: AgentgatewayBackend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}
@@ -445,20 +445,20 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{% v
 
 ### Passthrough token {#passthrough}
 
-Pass through an existing token directly from the client or a successful OpenID Connect (OIDC) connect flow before the request is sent to the {{% version include-if="2.1.x" %}}Backend{{% /version %}}{{% version include-if="2.2.x" %}}AgentgatewayBackend{{% /version %}}. This option is useful for environments where you set up federated identity for backend clients so that they are already authenticated to the LLM providers that you create Backends for. Currently, the request must place the token in the `Authorization` header.
+Pass through an existing token directly from the client or a successful OpenID Connect (OIDC) connect flow before the request is sent to the {{< reuse "docs/snippets/backend.md" >}}. This option is useful for environments where you set up federated identity for backend clients so that they are already authenticated to the LLM providers that you create {{< reuse "docs/snippets/backend.md" >}}s for. Currently, the request must place the token in the `Authorization` header.
 
 1. Make sure that your client is set up as follows:
 
-   * The client that sends a request to the {{% version include-if="2.1.x" %}}Backend{{% /version %}}{{% version include-if="2.2.x" %}}AgentgatewayBackend{{% /version %}} can authenticate to the LLM provider, such as through an OIDC flow or API key.
-   * The authenticated token or API key is sent in requests to the {{% version include-if="2.1.x" %}}Backend{{% /version %}}{{% version include-if="2.2.x" %}}AgentgatewayBackend{{% /version %}} in an `Authorization` header.
+   * The client that sends a request to the {{< reuse "docs/snippets/backend.md" >}} can authenticate to the LLM provider, such as through an OIDC flow or API key.
+   * The authenticated token or API key is sent in requests to the {{< reuse "docs/snippets/backend.md" >}} in an `Authorization` header.
    {{% version include-if="2.1.x" %}}
 
-2. Configure the Backend to use passthrough auth.
+2. Configure the {{< reuse "docs/snippets/backend.md" >}} to use passthrough auth.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      labels:
        app: agentgateway
@@ -479,12 +479,12 @@ Pass through an existing token directly from the client or a successful OpenID C
 
    | Setting     | Description |
    |-------------|-------------|
-   | `type`      | Set to `AI` to configure this Backend for an AI provider. |
+   | `type`      | Set to `AI` to configure this {{< reuse "docs/snippets/backend.md" >}} for an AI provider. |
    | `ai`        | Define the AI backend configuration. The example uses OpenAI (`spec.ai.llm.openai`). |
    | `authToken` | Configure the authentication token for OpenAI API. The example uses passthrough authentication. |
    | `model`     | The OpenAI model to use, such as `gpt-3.5-turbo`. |
 
-3. Create an HTTPRoute resource that routes incoming traffic to the Backend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+3. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -514,16 +514,16 @@ Pass through an existing token directly from the client or a successful OpenID C
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}{{% version include-if="2.2.x" %}}
 
-4. Configure the AgentgatewayBackend to use passthrough auth.
+4. Configure the {{< reuse "docs/snippets/backend.md" >}} to use passthrough auth.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -546,7 +546,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    | `openai.model`     | The OpenAI model to use, such as `gpt-3.5-turbo`.  |
    | `policies.auth` | Configure the authentication token for OpenAI API. The example uses passthrough authentication.|
 
-5. Create an HTTPRoute resource that routes incoming traffic to the AgentgatewayBackend. The following example sets up a route on the `/openai` path to the Backend that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -568,12 +568,12 @@ Pass through an existing token directly from the client or a successful OpenID C
        - name: openai
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: agentgateway.dev
-         kind: AgentgatewayBackend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{% /version %}}
 
-4. Trigger your authenticated client to send a request to the Backend, and verify that you get back a successful response. For example, you might instruct your client to send a curl request through the AI Gateway. Note that the request includes the `Authorization` header, which is required for passthrough authentication.
+4. Trigger your authenticated client to send a request to the {{< reuse "docs/snippets/backend.md" >}}, and verify that you get back a successful response. For example, you might instruct your client to send a curl request through the AI Gateway. Note that the request includes the `Authorization` header, which is required for passthrough authentication.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

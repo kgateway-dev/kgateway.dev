@@ -11,7 +11,7 @@ Prompts are basic building blocks for guiding LLMs to produce relevant and accur
 Note that system and user prompts are not mutually exclusive, and can be combined in a single request to an LLM. For example, in the following steps, the prompt `Parse the unstructured text into CSV format: Seattle, Los Angeles, and Chicago are cities in North America. London, Paris, and Berlin are cities in Europe.` contains both system prompt and user prompt components.
 
 {{% version include-if="2.2.x" %}}
-Prompt enrichment can be configured directly in an AgentgatewayBackend resource or in a separate AgentgatewayPolicy resource. 
+Prompt enrichment can be configured directly in an {{< reuse "docs/snippets/backend.md" >}} resource or in a separate AgentgatewayPolicy resource. 
 {{% /version %}}
 
 ## Before you begin

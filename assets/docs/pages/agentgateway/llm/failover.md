@@ -15,9 +15,9 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-You can configure failover across multiple models and providers by using priority groups. Each priority group represents a set of providers that share the same priority level. Failover priority is determined by the order in which the priority groups are listed in the Backend. The priority group that is listed first is assigned the highest priority. Models within the same priority group are load balanced (round-robin), not prioritized.
+You can configure failover across multiple models and providers by using priority groups. Each priority group represents a set of providers that share the same priority level. Failover priority is determined by the order in which the priority groups are listed in the {{< reuse "docs/snippets/backend.md" >}}. The priority group that is listed first is assigned the highest priority. Models within the same priority group are load balanced (round-robin), not prioritized.
 
-1. Create or update the Backend for your LLM providers.
+1. Create or update the {{< reuse "docs/snippets/backend.md" >}} for your LLM providers.
 
    {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
    {{% tab tabName="OpenAI model priority" %}}
@@ -32,7 +32,7 @@ You can configure failover across multiple models and providers by using priorit
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -70,7 +70,7 @@ You can configure failover across multiple models and providers by using priorit
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -118,7 +118,7 @@ You can configure failover across multiple models and providers by using priorit
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -163,7 +163,7 @@ You can configure failover across multiple models and providers by using priorit
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: model-failover
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -207,7 +207,7 @@ You can configure failover across multiple models and providers by using priorit
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the Backend that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/completions` for OpenAI.
+2. Create an HTTPRoute resource that routes incoming traffic on the `/model` path to the {{< reuse "docs/snippets/backend.md" >}} that you created in the previous step. In this example, the URLRewrite filter rewrites the path from `/model` to the path of the API in the LLM provider that you want to use, such as `/v1/chat/completions` for OpenAI.
 
    {{< version include-if="2.1.x" >}}
    ```yaml
@@ -236,7 +236,7 @@ You can configure failover across multiple models and providers by using priorit
        - name: model-failover
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
-         kind: Backend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{< /version >}}
@@ -261,12 +261,12 @@ You can configure failover across multiple models and providers by using priorit
        - name: model-failover
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: agentgateway.dev
-         kind: AgentgatewayBackend
+         kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{< /version >}}
 
-3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first priority group (highest priority).
+3. Send a request to observe the failover. In your request, do not specify a model. Instead, the {{< reuse "docs/snippets/backend.md" >}} automatically uses the model from the first priority group (highest priority).
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -298,7 +298,7 @@ You can configure failover across multiple models and providers by using priorit
    {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
    {{% tab tabName="OpenAI model priority" %}}
    
-   Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
+   Note the response is from the `gpt-4o` model, which is the first model in the priority order from the {{< reuse "docs/snippets/backend.md" >}}.
 
    ```json {linenos=table,hl_lines=[5],linenostart=1,filename="model-response.json"}
    {
@@ -359,20 +359,10 @@ You can configure failover across multiple models and providers by using priorit
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{% version include-if="2.1.x" %}}
-
 ```shell
-kubectl delete backend model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
-{{% /version %}}
-{{% version include-if="2.2.x" %}}
-
-```shell
-kubectl delete agentgatewaybackend model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete httproute model-failover -n {{< reuse "docs/snippets/namespace.md" >}}
-```
-{{% /version %}}
 
 ## Next
 
