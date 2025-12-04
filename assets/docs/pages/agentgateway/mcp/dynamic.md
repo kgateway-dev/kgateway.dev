@@ -64,17 +64,16 @@ Deploy an MCP server that you want {{< reuse "docs/snippets/agentgateway.md" >}}
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
    metadata:
      name: mcp-backend
    spec:
-     type: MCP
      mcp:
        targets:
          - name: mcp-server-everything
            selector:
-             service:
+             services:
                matchLabels:
                  app: mcp-server-everything
    EOF
@@ -100,7 +99,7 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
      gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
        - protocol: HTTP
-         port: 8080
+         port: 80
          name: http
          allowedRoutes:
            namespaces:
@@ -138,8 +137,8 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
      rules:
        - backendRefs:
            - name: mcp-backend
-             group: gateway.kgateway.dev
-             kind: Backend
+             group: agentgateway.dev
+             kind: AgentgatewayBackend
    EOF
    ```
 
@@ -171,7 +170,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
 
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>:8080/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
+   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
    * Click **Connect**.
 
 4. From the menu bar, click the **Tools** tab, then click **List Tools**.

@@ -28,7 +28,7 @@ In the following example, you explore how to refactor system and user prompts to
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
        "model": "gpt-3.5-turbo",
        "messages": [
          {
@@ -73,7 +73,7 @@ In the following example, you explore how to refactor system and user prompts to
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
       "messages": [
         {
@@ -182,7 +182,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts 
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
       "messages": [
         {
@@ -228,7 +228,7 @@ To overwrite a setting that you added to a {{< reuse "docs/snippets/trafficpolic
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
       "messages": [
         {
@@ -290,7 +290,7 @@ To overwrite a setting that you added to a {{< reuse "docs/snippets/trafficpolic
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
       "model": "gpt-3.5-turbo",
       "messages": [
         {

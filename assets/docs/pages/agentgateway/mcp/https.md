@@ -13,16 +13,15 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
    export GH_PAT=<personal-access-token>
    ```
 
-2. Create a Backend for the remote GitHub MCP server. The server requires you to connect to it by using the HTTPS protocol. Because of that, you set the `mcp.targets.static.port` field to 443. 
+2. Create a Backend for the remote GitHub MCP server. The server requires you to connect to it by using the HTTPS protocol. Because of that, you set the `mcp.targets.static.port` field to 443.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
    metadata:
      name: github-mcp-backend
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     type: MCP
      mcp:
        targets:
        - name: mcp-target
@@ -84,8 +83,8 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
                    value: "Bearer ${GH_PAT}"
          backendRefs:
          - name: github-mcp-backend
-           group: gateway.kgateway.dev
-           kind: Backend  
+           group: agentgateway.dev
+           kind: AgentgatewayBackend
    EOF
    ```
    
@@ -104,7 +103,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:8080 -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl port-forward deployment/agentgateway 8080:80 -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -116,7 +115,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address, port, and the `/mcp-github` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>:8080/mcp-github`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp-github`.
+   * **URL**: Enter the agentgateway address, port, and the `/mcp-github` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>/mcp-github`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp-github`.
    * Click **Connect**.
 
 4. From the menu bar, click the **Tools** tab. Then from the **Tools** pane, click **List Tools** and select the `get_issue` tool. 
@@ -128,9 +127,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 
    {{< reuse-image src="img/mcp-inspector-gh.png" >}}
    {{< reuse-image-dark srcDark="img/mcp-inspector-gh-dark.png" >}}
-   
 
-   
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}

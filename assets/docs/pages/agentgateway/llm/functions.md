@@ -79,7 +79,7 @@ Keep in mind that for a real use case, you must develop your own app that is cap
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json  -d '{
      "model": "gpt-3.5-turbo",
      "messages": [
        {
@@ -153,7 +153,7 @@ Keep in mind that for a real use case, you must develop your own app that is cap
    
    | Field | Description |
    |-------|-------------|
-   | `$INGRESS_GW_ADDRESS:8080/openai` | The address of the agentgateway proxy that you set up before you began, along with the path to your AI provider, such as `openai`. |
+   | `$INGRESS_GW_ADDRESS/openai` | The address of the agentgateway proxy that you set up before you began, along with the path to your AI provider, such as `openai`. |
    | `model` | The model to use for the function call, such as `gpt-3.5-turbo`. |
    | `messages` | The messages to send to the model. The example shows a user message asking about the weather in Columbus. |
    | `parallel_tool_calls` | Whether to call multiple tools at the same time. |
@@ -220,7 +220,7 @@ Keep in mind that for a real use case, you must develop your own app that is cap
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H "Content-Type: application/json" -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H "Content-Type: application/json" -d '{
      "model": "gpt-3.5-turbo",
      "messages": [
        {

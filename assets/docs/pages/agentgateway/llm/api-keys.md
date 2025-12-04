@@ -149,7 +149,7 @@ Provide the token directly in the configuration for the {{< reuse "docs/snippets
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json  -d '{
       "model": "",
       "messages": [
         {
@@ -237,8 +237,6 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< r
    metadata:
      name: openai-secret
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    type: Opaque
    stringData:
      Authorization: $OPENAI_API_KEY
@@ -253,8 +251,6 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< r
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
-     labels:
-       app: agentgateway
      name: openai
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
@@ -376,7 +372,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< r
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json  -d '{
       "model": "",
       "messages": [
         {
@@ -578,7 +574,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H "Authorization: Bearer $TOKEN" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H "Authorization: Bearer $TOKEN" -H content-type:application/json -d '{
       "model": "",
       "messages": [
         {

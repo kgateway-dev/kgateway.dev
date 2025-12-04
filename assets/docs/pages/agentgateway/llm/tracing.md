@@ -104,13 +104,11 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
    ```yaml
    kubectl apply -f- <<EOF
-   kind: Gateway
    apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
    metadata:
      name: agentgateway
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    spec:
      gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
      infrastructure:
@@ -120,7 +118,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}  
      listeners:
      - protocol: HTTP
-       port: 8080
+       port: 80
        name: http
        allowedRoutes:
          namespaces:
@@ -135,7 +133,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    
    Example output: 
    ```console
-   NAMESPACE            NAME                                         READY   STATUS    RESTARTS   AGE
+   NAMESPACE            NAME                                 READY   STATUS    RESTARTS   AGE
    {{< reuse "docs/snippets/namespace.md" >}}      agentgateway-8b5dc4874-bl79q         1/1     Running   0          12s
    ```
 
@@ -149,7 +147,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -240,14 +238,6 @@ data:
         otlpEndpoint: http://jaeger-collector.jaeger.svc.cluster.local:4317
         otlpProtocol: grpc
         randomSampling: true
-        fields:
-          add:
-            gen_ai.operation.name: '"chat"'
-            gen_ai.system: "llm.provider"
-            gen_ai.request.model: "llm.request_model"
-            gen_ai.response.model: "llm.response_model"
-            gen_ai.usage.completion_tokens: "llm.output_tokens"
-            gen_ai.usage.prompt_tokens: "llm.input_tokens"
 ```
 {{% /tab %}}
 {{% tab tabName="Langfuse" %}}
@@ -271,10 +261,8 @@ data:
             gen_ai.system: "llm.provider"
             gen_ai.prompt: "llm.prompt"
             gen_ai.completion: 'llm.completion.map(c, {"role":"assistant", "content": c})'
-            gen_ai.usage.completion_tokens: "llm.output_tokens"
-            gen_ai.usage.prompt_tokens: "llm.input_tokens"
-            gen_ai.request.model: "llm.request_model"
-            gen_ai.response.model: "llm.response_model"
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
             gen_ai.request: "flatten(llm.params)"
 ```
 {{% /tab %}}
@@ -295,11 +283,11 @@ data:
             span.name: '"openai.chat"'
             openinference.span.kind: '"LLM"'
             llm.system: "llm.provider"
-            llm.input_messages: 'flatten_recursive(llm.prompt.map(c, {"message": c}))'
-            llm.output_messages: 'flatten_recursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
-            llm.token_count.completion: "llm.output_tokens"
-            llm.token_count.prompt: "llm.input_tokens"
-            llm.token_count.total: "llm.total_tokens"
+            llm.input_messages: 'flattenRecursive(llm.prompt.map(c, {"message": c}))'
+            llm.output_messages: 'flattenRecursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
+            llm.token_count.completion: "llm.outputTokens"
+            llm.token_count.prompt: "llm.inputTokens"
+            llm.token_count.total: "llm.totalTokens"
 ```
 {{% /tab %}}
 {{% tab tabName="OpenLLMetry" %}}
@@ -319,13 +307,11 @@ data:
             span.name: '"openai.chat"'
             gen_ai.operation.name: '"chat"'
             gen_ai.system: "llm.provider"
-            gen_ai.prompt: "flatten_recursive(llm.prompt)"
-            gen_ai.completion: 'flatten_recursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
-            gen_ai.usage.completion_tokens: "llm.output_tokens"
-            gen_ai.usage.prompt_tokens: "llm.input_tokens"
-            gen_ai.request.model: "llm.request_model"
-            gen_ai.response.model: "llm.response_model"
-            gen_ai.request: "flatten(llm.params)"
+            gen_ai.prompt: "flattenRecursive(llm.prompt)"
+            gen_ai.completion: 'flattenRecursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
+            llm.usage.total_tokens: 'llm.totalTokens'
             llm.is_streaming: "llm.streaming"
 ```
 {{% /tab %}}

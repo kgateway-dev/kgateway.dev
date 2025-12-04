@@ -128,7 +128,7 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
      gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
-       port: 8080
+       port: 80
        name: http
    EOF
    ```
@@ -157,7 +157,6 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    spec:
      parentRefs:
        - name: agentgateway
-         namespace: default
      rules:
        - backendRefs:
            - name: a2a-agent
@@ -178,7 +177,7 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:8080
+   kubectl port-forward deployment/agentgateway 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -188,7 +187,7 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -X POST http://$INGRESS_GW_ADDRESS:8080/ \
+   curl -X POST http://$INGRESS_GW_ADDRESS/ \
      -H "Content-Type: application/json" \
        -v \
        -d '{
