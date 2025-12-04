@@ -80,6 +80,8 @@ Keep in mind the following considerations when working with an NLB:
 
    {{< reuse-image src="/img/elb-http.svg" >}}
    {{< reuse-image-dark srcDark="/img/elb-http.svg" >}}
+
+   This Gateway resource references the custom GatewayParameters resource that you created.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
