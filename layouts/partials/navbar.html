@@ -25,6 +25,11 @@
   {{- $subSection = index $parts 2 -}}
 {{- end -}}
 
+{{- /* Increase logo size for agentgateway section to accommodate two-line logo */ -}}
+{{- if eq $subSection "agentgateway" -}}
+  {{- $logoHeight = "50" -}}
+{{- end -}}
+
 {{- $logoPath := .Site.Params.navbar.logo.path | default "images/logo.svg" -}}
 {{- $logoDarkPath := .Site.Params.navbar.logo.dark | default $logoPath -}}
 {{- $useResource := false -}}
@@ -39,8 +44,8 @@
     {{- $useResource = true -}}
   {{- end -}}
 {{- else if eq $subSection "agentgateway" -}}
-  {{- $logoResource = resources.Get "img/logo-agentgateway.svg" -}}
-  {{- $logoDarkResource = resources.Get "img/logo-agentgateway-light-on-transparent.svg" -}}
+  {{- $logoResource = resources.Get "img/logo-agentgateway-kgateway.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-agentgateway-kgateway-light-on-transparent.svg" -}}
   {{- if $logoResource -}}
     {{- $useResource = true -}}
   {{- end -}}
@@ -133,6 +138,12 @@
     width: 24px;
     height: 24px;
   }
+  
+  /* Override logo size for agentgateway section - more specific than .nav-container a img */
+  .nav-container a img.agentgateway-logo {
+    height: 50px !important;
+    max-height: 50px !important;
+  }
 </style>
 
 <div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden">
@@ -142,11 +153,11 @@
     <a class="hx-flex hx-items-center hover:hx-opacity-75 ltr:hx-mr-auto rtl:hx-ml-auto" href="{{ $logoLink }}">
       {{- if (.Site.Params.navbar.displayLogo | default true) }}
         {{- if $useResource -}}
-          <img class="hx-block dark:hx-hidden" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          <img class="hx-block dark:hx-hidden {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ end }}" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
           {{- if $logoDarkResource -}}
-            <img class="hx-hidden dark:hx-block" src="{{ $logoDarkResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+            <img class="hx-hidden dark:hx-block {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ end }}" src="{{ $logoDarkResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
           {{- else -}}
-            <img class="hx-hidden dark:hx-block" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+            <img class="hx-hidden dark:hx-block {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ end }}" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
           {{- end -}}
         {{- else -}}
           <img class="hx-block dark:hx-hidden" src="{{ $logoPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
