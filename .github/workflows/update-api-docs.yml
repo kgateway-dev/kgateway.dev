@@ -301,6 +301,9 @@ jobs:
                   if '## Values' not in content or ('## Values' in content and '|-----|' not in content):
                       note = '\n\n{{< callout type="info" >}}\nNo configurable values are currently available for this chart.\n{{< /callout >}}\n'
                       content = content.rstrip() + note
+              else:
+                  # Normalize any bare type=info callouts that might slip in
+                  content = content.replace('{{< callout type=info >}}', '{{< callout type="info" >}}')
                   
                   with open(helm_file, 'w', encoding='utf-8') as f:
                       f.write(content)
