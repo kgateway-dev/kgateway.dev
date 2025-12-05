@@ -345,3 +345,6 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    kubectl delete gatewayextension,deployment,service -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ext-authz
    ```
 
+
+
+

@@ -325,3 +325,6 @@ kubectl delete -A gateways,httproutes,xlistenersets -l example=httpbin-mydomain
 {{< /tabs >}}
 
 
+
+
+

@@ -428,3 +428,6 @@ kubectl delete secret nginx-server-certs
 
 
 
+
+
+

@@ -14,3 +14,6 @@ You can configure different types of timeouts by using a Kubernetes Gateway API-
 | [Per-try timeout]({{< link-hextra path="/resiliency/retry/per-try-timeout" >}}) | Set a shorter timeout for retries than the overall request timeout.  | <ul><li>HTTPRoute</li><li>{{< reuse "docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute </li><li>HTTPRoute rule</li><li>Gateway listener ({{< reuse "docs/snippets/trafficpolicy.md" >}} only)</li></ul> | 
 
 
+
+
+
