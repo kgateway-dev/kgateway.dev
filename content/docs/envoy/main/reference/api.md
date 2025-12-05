@@ -132,6 +132,24 @@ _Appears in:_
 | `response` _[PromptguardResponse](#promptguardresponse) array_ | Prompt guards to apply to responses returned by the LLM provider. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
 
+#### APIKeyAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[APIKeyAuthenticationMode](#apikeyauthenticationmode)_ | Validation mode for api key authentication. | Strict | Enum: [Strict Optional] <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
+| `secretSelector` _[SecretSelector](#secretselector)_ | secretSelector selects multiple secrets containing API Keys. If the same key is defined in multiple secrets, the<br />behavior is undefined.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
+
+
 #### APIKeyAuthenticationMode
 
 _Underlying type:_ _string_
@@ -142,7 +160,7 @@ _Validation:_
 - Enum: [Strict Optional]
 
 _Appears in:_
-- [AgentAPIKeyAuthentication](#agentapikeyauthentication)
+- [APIKeyAuthentication](#apikeyauthentication)
 
 | Field | Description |
 | --- | --- |
@@ -167,6 +185,23 @@ _Appears in:_
 | `version` _string_ | GuardrailVersion is the version of the Guardrail policy to use for the backend. |  |  |
 
 
+#### AccessLog
+
+
+
+accessLogs specifies how per-request access logs are emitted.
+
+
+
+_Appears in:_
+- [Frontend](#frontend)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `filter` _[CELExpression](#celexpression)_ | filter specifies a CEL expression that is used to filter logs. A log will only be emitted if the expression evaluates<br />to 'true'. |  |  |
+| `attributes` _[LogTracingAttributes](#logtracingattributes)_ | attributes specifies customizations to the key-value pairs that are logged |  |  |
+
+
 #### Action
 
 _Underlying type:_ _string_
@@ -183,485 +218,6 @@ _Appears in:_
 | --- | --- |
 | `MASK` | Mask the matched data in the request.<br /> |
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
-
-
-#### AgentAPIKeyAuthentication
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mode` _[APIKeyAuthenticationMode](#apikeyauthenticationmode)_ | Validation mode for api key authentication. | Strict | Enum: [Strict Optional] <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
-| `secretSelector` _[SecretSelector](#secretselector)_ | secretSelector selects multiple secrets containing API Keys. If the same key is defined in multiple secrets, the<br />behavior is undefined.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier. The value can either be:<br />* A string, representing the API Key.<br />* A JSON object, with two fields, `key` and `metadata`. `key` contains the API Key. `metadata` contains arbitrary JSON<br />  metadata associated with the key, which may be used by other policies. For example, you may write an authorization<br />  policy allow `apiKey.group == 'sales'`.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: \|<br />    \{<br />      "key": "k-123",<br />      "metadata": \{<br />        "group": "sales",<br />        "created_at": "2024-10-01T12:00:00Z",<br />      \}<br />    \}<br />  client2: "k-456" |  |  |
-
-
-#### AgentAccessLog
-
-
-
-accessLogs specifies how per-request access logs are emitted.
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `filter` _[CELExpression](#celexpression)_ | filter specifies a CEL expression that is used to filter logs. A log will only be emitted if the expression evaluates<br />to 'true'. |  |  |
-| `attributes` _[AgentLogTracingFields](#agentlogtracingfields)_ | attributes specifies customizations to the key-value pairs that are logged |  |  |
-
-
-#### AgentAttributeAdd
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentLogTracingFields](#agentlogtracingfields)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `name` _string_ |  |  |  |
-| `expression` _[CELExpression](#celexpression)_ |  |  |  |
-
-
-#### AgentBasicAuthentication
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mode` _[BasicAuthenticationMode](#basicauthenticationmode)_ | validation mode for basic auth authentication. | Strict | Enum: [Strict Optional] <br /> |
-| `realm` _string_ | realm specifies the 'realm' to return in the WWW-Authenticate header for failed authentication requests.<br />If unset, "Restricted" will be used. |  |  |
-| `users` _string array_ | users provides an inline list of username/password pairs that will be accepted.<br />Each entry represents one line of the htpasswd format: https://httpd.apache.org/docs/2.4/programs/htpasswd.html.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br />users:<br />- "user1:$apr1$ivPt0D4C$DmRhnewfHRSrb3DQC.WHC."<br />- "user2:$2y$05$r3J4d3VepzFkedkd/q1vI.pBYIpSqjfN0qOARV3ScUHysatnS0cL2" |  | MaxItems: 256 <br />MinItems: 1 <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing the .htaccess file. The Secret must have a key named '.htaccess',<br />and should contain the complete .htaccess file.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: basic-auth<br />stringData:<br />  .htaccess: \|<br />    alice:$apr1$3zSE0Abt$IuETi4l5yO87MuOrbSE4V.<br />    bob:$apr1$Ukb5LgRD$EPY2lIfY.A54jzLELNIId/ |  |  |
-
-
-#### AgentCSRFPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `additionalOrigins` _string array_ | additionalOrigin specifies additional source origins that will be allowed in addition to the destination origin. The<br />`Origin` consists of a scheme and a host, with an optional port, and takes the form `<scheme>://<host>(:<port>)`. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-
-
-#### AgentCorsPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-
-
-#### AgentDynamicForwardProxyBackend
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
-
-
-
-#### AgentExtAuthBody
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentExtAuthPolicy](#agentextauthpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `maxSize` _integer_ | maxSize specifies how large in bytes the largest body that will be buffered and sent to the authorization server. If<br />the body size is larger than maxSize, then the request will be rejected with a response. |  | Minimum: 1 <br /> |
-
-
-#### AgentExtAuthPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the External Authorization server to reach.<br /><br />Supported types: Service and Backend. |  |  |
-| `forwardBody` _[AgentExtAuthBody](#agentextauthbody)_ | forwardBody configures whether to include the HTTP body in the request. If enabled, the request body will be<br />buffered. |  |  |
-| `contextExtensions` _object (keys:string, values:string)_ | contextExtensions specifies additional arbitrary key-value pairs to send to the authorization server. |  | MaxProperties: 64 <br /> |
-
-
-#### AgentExtProcPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the External Processor server to reach.<br />Supported types: Service and Backend. |  |  |
-
-
-#### AgentHeaderName
-
-_Underlying type:_ _string_
-
-AgentHeaderName is the name of a header.
-
-_Validation:_
-- MaxLength: 256
-- MinLength: 1
-- Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
-
-_Appears in:_
-- [AgentHeaderTransformation](#agentheadertransformation)
-- [AgentTransform](#agenttransform)
-
-
-
-#### AgentHeaderTransformation
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentTransform](#agenttransform)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `name` _[AgentHeaderName](#agentheadername)_ | the name of the header to add. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
-| `value` _[CELExpression](#celexpression)_ | value is the CEL expression to apply to generate the output value for the header. |  |  |
-
-
-#### AgentHostnameRewrite
-
-_Underlying type:_ _string_
-
-
-
-
-
-_Appears in:_
-- [AgentHostnameRewriteConfig](#agenthostnamerewriteconfig)
-
-| Field | Description |
-| --- | --- |
-| `Auto` |  |
-| `None` |  |
-
-
-#### AgentHostnameRewriteConfig
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mode` _[AgentHostnameRewrite](#agenthostnamerewrite)_ | mode sets the hostname rewrite mode.<br /><br />The following may be specified:<br />* Auto: automatically set the Host header based on the destination.<br />* None: do not rewrite the Host header. The original Host header will be passed through.<br /><br />This setting defaults to Auto when connecting to hostname-based Backend types, and None otherwise (for Service or<br />IP-based Backends). |  |  |
-
-
-#### AgentJWKS
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentJWTProvider](#agentjwtprovider)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `remote` _[AgentRemoteJWKS](#agentremotejwks)_ | remote specifies how to reach the JSON Web Key Set from a remote address. |  |  |
-| `inline` _string_ | inline specifies an inline JSON Web Key Set used validate the signature of the JWT. |  | MaxLength: 65536 <br />MinLength: 2 <br /> |
-
-
-#### AgentJWTAuthentication
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mode` _[JWTAuthenticationMode](#jwtauthenticationmode)_ | validation mode for JWT authentication. | Strict | Enum: [Strict Optional Permissive] <br /> |
-| `providers` _[AgentJWTProvider](#agentjwtprovider) array_ |  |  | MaxItems: 64 <br />MinItems: 1 <br /> |
-
-
-#### AgentJWTProvider
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentJWTAuthentication](#agentjwtauthentication)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `issuer` _string_ | issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  |  |
-| `audiences` _string array_ | audiences specifies the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
-| `jwks` _[AgentJWKS](#agentjwks)_ | jwks defines the JSON Web Key Set used to validate the signature of the JWT. |  |  |
-
-
-#### AgentLocalRateLimitPolicy
-
-
-
-AgentLocalRateLimitPolicy represents a policy for local rate limiting.
-It defines the configuration for rate limiting using a token bucket mechanism.
-
-
-
-_Appears in:_
-- [AgentRateLimit](#agentratelimit)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `requests` _integer_ | requests specifies the number of HTTP requests per unit of time that are allowed. Requests exceeding this limit will fail with<br />a 429 error. |  | Minimum: 1 <br /> |
-| `tokens` _integer_ | tokens specifies the number of LLM tokens per unit of time that are allowed. Requests exceeding this limit will fail<br />with a 429 error.<br /><br />Both input and output tokens are counted. However, token counts are not known until the request completes. As a<br />result, token-based rate limits will apply to future requests only. |  | Minimum: 1 <br /> |
-| `unit` _[LocalRateLimitUnit](#localratelimitunit)_ | unit specifies the unit of time that requests are limited based on. |  | Enum: [Seconds Minutes Hours] <br /> |
-| `burst` _integer_ | burst specifies an allowance of requests above the request-per-unit that should be allowed within a short period of time. |  |  |
-
-
-#### AgentLogTracingFields
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentAccessLog](#agentaccesslog)
-- [AgentTracing](#agenttracing)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `remove` _string array_ | remove lists the default fields that should be removed. For example, "http.method". |  | MaxItems: 32 <br />MinItems: 1 <br /> |
-| `add` _[AgentAttributeAdd](#agentattributeadd) array_ | add specifies additional key-value pairs to be added to each entry.<br />The value is a CEL expression. If the CEL expression fails to evaluate, the pair will be excluded. |  | MinItems: 1 <br /> |
-
-
-#### AgentRateLimit
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `local` _[AgentLocalRateLimitPolicy](#agentlocalratelimitpolicy) array_ | Local defines a local rate limiting policy. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `global` _[AgentRateLimitPolicy](#agentratelimitpolicy)_ | Global defines a global rate limiting policy using an external service. |  |  |
-
-
-#### AgentRateLimitDescriptor
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentRateLimitPolicy](#agentratelimitpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `entries` _[AgentRateLimitDescriptorEntry](#agentratelimitdescriptorentry) array_ | entries are the individual components that make up this descriptor. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `unit` _[RateLimitUnit](#ratelimitunit)_ | unit defines what to use as the cost function. If unspecified, Requests is used. |  | Enum: [Requests Tokens] <br /> |
-
-
-
-
-#### AgentRateLimitPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentRateLimit](#agentratelimit)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the Rate Limit server to reach.<br />Supported types: Service and Backend. |  |  |
-| `domain` _string_ | domain specifies the domain under which this limit should apply.<br />This is an arbitrary string that enables a rate limit server to distinguish between different applications. |  |  |
-| `descriptors` _[AgentRateLimitDescriptor](#agentratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting. These values are passed to the rate limit service which applies<br />configured limits based on them. Each descriptor represents a single rate limit rule with one or more entries. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-
-
-#### AgentRemoteJWKS
-
-_Underlying type:_ _struct_
-
-
-
-
-
-_Appears in:_
-- [AgentJWKS](#agentjwks)
-- [MCPAuthentication](#mcpauthentication)
-
-
-
-
-
-#### AgentStaticBackend
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `host` _string_ | host to connect to. |  |  |
-| `port` _integer_ | port to connect to. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
-
-
-#### AgentTimeouts
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `request` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | request specifies a timeout for an individual request from the gateway to a backend. This covers the time from when<br />the request first starts being sent from the gateway to when the full response has been received from the backend. |  |  |
-
-
-#### AgentTracing
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the OTLP server to reach.<br />Supported types: Service and Backend. |  |  |
-| `protocol` _[TracingProtocol](#tracingprotocol)_ | protocol specifies the OTLP protocol variant to use. | HTTP | Enum: [HTTP GRPC] <br /> |
-| `attributes` _[AgentLogTracingFields](#agentlogtracingfields)_ | attributes specifies customizations to the key-value pairs that are included in the trace |  |  |
-| `randomSampling` _[CELExpression](#celexpression)_ | randomSampling is an expression to determine the amount of random sampling. Random sampling will initiate a new<br />trace span if the incoming request does not have a trace initiated already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, random sampling is disabled. |  |  |
-| `clientSampling` _[CELExpression](#celexpression)_ | clientSampling is an expression to determine the amount of client sampling. Client sampling determines whether to<br />initiate a new trace span if the incoming request does have a trace already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, client sampling is 100% enabled. |  |  |
-
-
-#### AgentTransform
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentTransformationPolicy](#agenttransformationpolicy)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `set` _[AgentHeaderTransformation](#agentheadertransformation) array_ | set is a list of headers and the value they should be set to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `add` _[AgentHeaderTransformation](#agentheadertransformation) array_ | add is a list of headers to add to the request and what that value should be set to. If there is already a header<br />with these values then append the value as an extra entry. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `remove` _[AgentHeaderName](#agentheadername) array_ | Remove is a list of header names to remove from the request/response. |  | MaxItems: 16 <br />MaxLength: 256 <br />MinItems: 1 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
-| `body` _[CELExpression](#celexpression)_ | body controls manipulation of the HTTP body. |  |  |
-
-
-#### AgentTransformationPolicy
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `request` _[AgentTransform](#agenttransform)_ | request is used to modify the request path. |  |  |
-| `response` _[AgentTransform](#agenttransform)_ | response is used to modify the response path. |  |  |
 
 
 #### AgentgatewayBackend
@@ -698,11 +254,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `static` _[AgentStaticBackend](#agentstaticbackend)_ | static represents a static hostname. |  |  |
+| `static` _[StaticBackend](#staticbackend)_ | static represents a static hostname. |  |  |
 | `ai` _[AIBackend](#aibackend)_ | ai represents a LLM backend. |  |  |
 | `mcp` _[MCPBackend](#mcpbackend)_ | mcp represents an MCP backend |  |  |
-| `dynamicForwardProxy` _[AgentDynamicForwardProxyBackend](#agentdynamicforwardproxybackend)_ | dynamicForwardProxy configures the proxy to dynamically send requests to the destination based on the incoming<br />request HTTP host header, or TLS SNI for TLS traffic.<br /><br />Note: this Backend type enables users to send trigger the proxy to send requests to arbitrary destinations. Proper<br />access controls must be put in place when using this backend type. |  |  |
-| `policies` _[AgentgatewayPolicyBackendFull](#agentgatewaypolicybackendfull)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy;<br />policies are merged on a field-level basis, with policies on the Backend (this field) taking precedence. |  |  |
+| `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | dynamicForwardProxy configures the proxy to dynamically send requests to the destination based on the incoming<br />request HTTP host header, or TLS SNI for TLS traffic.<br /><br />Note: this Backend type enables users to send trigger the proxy to send requests to arbitrary destinations. Proper<br />access controls must be put in place when using this backend type. |  |  |
+| `policies` _[BackendFull](#backendfull)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy;<br />policies are merged on a field-level basis, with policies on the Backend (this field) taking precedence. |  |  |
 
 
 #### AgentgatewayBackendStatus
@@ -719,25 +275,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#condition-v1-meta) array_ | Conditions is the list of conditions for the backend. |  | MaxItems: 8 <br /> |
-
-
-#### AgentgatewayKeepalive
-
-
-
-TCP Keepalive settings
-
-
-
-_Appears in:_
-- [BackendTCP](#backendtcp)
-- [FrontendTCP](#frontendtcp)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `retries` _integer_ | retries specifies the maximum number of keep-alive probes to send before dropping the connection.<br />If unset, this defaults to 9. |  | Maximum: 64 <br />Minimum: 1 <br /> |
-| `time` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | time specifies the number of seconds a connection needs to be idle before keep-alive probes start being sent.<br />If unset, this defaults to 180s. |  |  |
-| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | interval specifies the number of seconds between keep-alive probes.<br />If unset, this defaults to 180s. |  |  |
 
 
 #### AgentgatewayPolicy
@@ -761,92 +298,6 @@ _Appears in:_
 | `status` _[PolicyStatus](#policystatus)_ | status defines the current state of AgentgatewayPolicy. |  |  |
 
 
-#### AgentgatewayPolicyBackendAI
-
-
-
-
-
-
-
-_Appears in:_
-- [NamedLLMProvider](#namedllmprovider)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `ai` _[BackendAI](#backendai)_ | ai specifies settings for AI workloads. This is only applicable when connecting to a Backend of type 'ai'. |  |  |
-
-
-#### AgentgatewayPolicyBackendFull
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
-- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `ai` _[BackendAI](#backendai)_ | ai specifies settings for AI workloads. This is only applicable when connecting to a Backend of type 'ai'. |  |  |
-| `mcp` _[BackendMCP](#backendmcp)_ | mcp specifies settings for MCP workloads. This is only applicable when connecting to a Backend of type 'mcp'. |  |  |
-
-
-#### AgentgatewayPolicyBackendMCP
-
-
-
-
-
-
-
-_Appears in:_
-- [McpTarget](#mcptarget)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `mcp` _[BackendMCP](#backendmcp)_ | mcp specifies settings for MCP workloads. This is only applicable when connecting to a Backend of type 'mcp'. |  |  |
-
-
-#### AgentgatewayPolicyBackendSimple
-
-_Underlying type:_ _struct_
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicyBackendAI](#agentgatewaypolicybackendai)
-- [AgentgatewayPolicyBackendFull](#agentgatewaypolicybackendfull)
-- [AgentgatewayPolicyBackendMCP](#agentgatewaypolicybackendmcp)
-- [OpenAIModeration](#openaimoderation)
-
-
-
-#### AgentgatewayPolicyFrontend
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `tcp` _[FrontendTCP](#frontendtcp)_ | tcp defines settings on managing incoming TCP connections. |  |  |
-| `tls` _[FrontendTLS](#frontendtls)_ | tls defines settings on managing incoming TLS connections. |  |  |
-| `http` _[FrontendHTTP](#frontendhttp)_ | http defines settings on managing incoming HTTP requests. |  |  |
-| `accessLog` _[AgentAccessLog](#agentaccesslog)_ | AccessLoggingConfig contains access logging configuration |  |  |
-| `tracing` _[AgentTracing](#agenttracing)_ | Tracing contains various settings for OpenTelemetry tracer.<br />TODO: not currently implemented |  |  |
-
-
 #### AgentgatewayPolicySpec
 
 
@@ -862,40 +313,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _LocalPolicyTargetReferenceWithSectionName array_ | targetRefs specifies the target resources by reference to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _LocalPolicyTargetSelectorWithSectionName array_ | targetSelectors specifies the target selectors to select resources to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `frontend` _[AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)_ | frontend defines settings for how to handle incoming traffic.<br /><br />A frontend policy can only target a Gateway. Listener and ListenerSet are not valid targets.<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. For example, policy A sets 'tcp' and 'tls', and policy B sets 'tls', the effective policy would be 'tcp' from<br />policy A, and 'tls' from policy B. |  |  |
-| `traffic` _[AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)_ | traffic defines settings for how process traffic.<br /><br />A traffic policy can target a Gateway (optionally, with a sectionName indicating the listener), ListenerSet, Route<br />(optionally, with a sectionName indicating the route rule).<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. Precedence is given to more precise policies: Gateway < Listener < Route < Route Rule. For example, policy A<br />sets 'timeouts' and 'retries', and policy B sets 'retries', the effective policy would be 'timeouts' from policy A,<br />and 'retries' from policy B. |  |  |
-| `backend` _[AgentgatewayPolicyBackendFull](#agentgatewaypolicybackendfull)_ | backend defines settings for how to connect to destination backends.<br /><br />A backend policy can target a Gateway (optionally, with a sectionName indicating the listener), ListenerSet, Route<br />(optionally, with a sectionName indicating the route rule), or a Service/Backend (optionally, with a sectionName<br />indicating the port (for Service) or sub-backend (for Backend).<br /><br />Note that a backend policy applies when connecting to a specific destination backend. Targeting a higher level<br />resource, like Gateway, is just a way to easily apply a policy to a group of backends.<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. Precedence is given to more precise policies: Gateway < Listener < Route < Route Rule < Backend/Service. For<br />example, if a Gateway policy sets 'tcp' and 'tls', and a Backend policy sets 'tls', the effective policy would be<br />'tcp' from the Gateway, and 'tls' from the Backend. |  |  |
-
-
-#### AgentgatewayPolicyTraffic
-
-
-
-
-
-
-
-_Appears in:_
-- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `phase` _[PolicyPhase](#policyphase)_ | The phase to apply the traffic policy to. If the phase is PreRouting, the targetRef must be a Gateway or a Listener.<br />PreRouting is typically used only when a policy needs to influence the routing decision.<br /><br />Even when using PostRouting mode, the policy can target the Gateway/Listener. This is a helper for applying the policy<br />to all routes under that Gateway/Listener, and follows the merging logic described above.<br /><br />Note: PreRouting and PostRouting rules do not merge together. These are independent execution phases. That is, all<br />PreRouting rules will merge and execute, then all PostRouting rules will merge and execute.<br /><br />If unset, this defaults to PostRouting. |  | Enum: [PreRouting PostRouting] <br /> |
-| `transformation` _[AgentTransformationPolicy](#agenttransformationpolicy)_ | transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
-| `extProc` _[AgentExtProcPolicy](#agentextprocpolicy)_ | extProc specifies the external processing configuration for the policy. |  |  |
-| `extAuth` _[AgentExtAuthPolicy](#agentextauthpolicy)_ | extAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
-| `rateLimit` _[AgentRateLimit](#agentratelimit)_ | rateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
-| `cors` _[AgentCorsPolicy](#agentcorspolicy)_ | cors specifies the CORS configuration for the policy. |  |  |
-| `csrf` _[AgentCSRFPolicy](#agentcsrfpolicy)_ | csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy.<br /><br />The CSRF policy has the following behavior:<br />* Safe methods (GET, HEAD, OPTIONS) are automatically allowed<br />* Requests without Sec-Fetch-Site or Origin headers are assumed to be same-origin or non-browser requests and are allowed.<br />* Otherwise, the Sec-Fetch-Site header is checked, with a fallback to comparing the Origin header to the Host header. |  |  |
-| `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | headerModifiers defines the policy to modify request and response headers. |  |  |
-| `hostRewrite` _[AgentHostnameRewriteConfig](#agenthostnamerewriteconfig)_ | hostRewrite specifies how to rewrite the Host header for requests.<br /><br />If the HTTPRoute `urlRewrite` filter already specifies a host rewrite, this setting is ignored. |  | Enum: [Auto None] <br /> |
-| `timeouts` _[AgentTimeouts](#agenttimeouts)_ | timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
-| `retry` _[Retry](#retry)_ | retry defines the policy for retrying requests. |  |  |
-| `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attahcment points),<br />all rules are merged. |  |  |
-| `jwtAuthentication` _[AgentJWTAuthentication](#agentjwtauthentication)_ | jwtAuthentication authenticates users based on JWT tokens. |  |  |
-| `basicAuthentication` _[AgentBasicAuthentication](#agentbasicauthentication)_ | basicAuthentication authenticates users based on the "Basic" authentication scheme (RFC 7617), where a username and password<br />are encoded in the request. |  |  |
-| `apiKeyAuthentication` _[AgentAPIKeyAuthentication](#agentapikeyauthentication)_ | apiKeyAuthentication authenticates users based on a configured API Key. |  |  |
-| `directResponse` _[DirectResponse](#directresponse)_ | direct response configures the policy to send a direct response to the client. |  |  |
+| `frontend` _[Frontend](#frontend)_ | frontend defines settings for how to handle incoming traffic.<br /><br />A frontend policy can only target a Gateway. Listener and ListenerSet are not valid targets.<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. For example, policy A sets 'tcp' and 'tls', and policy B sets 'tls', the effective policy would be 'tcp' from<br />policy A, and 'tls' from policy B. |  |  |
+| `traffic` _[Traffic](#traffic)_ | traffic defines settings for how process traffic.<br /><br />A traffic policy can target a Gateway (optionally, with a sectionName indicating the listener), ListenerSet, Route<br />(optionally, with a sectionName indicating the route rule).<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. Precedence is given to more precise policies: Gateway < Listener < Route < Route Rule. For example, policy A<br />sets 'timeouts' and 'retries', and policy B sets 'retries', the effective policy would be 'timeouts' from policy A,<br />and 'retries' from policy B. |  |  |
+| `backend` _[BackendFull](#backendfull)_ | backend defines settings for how to connect to destination backends.<br /><br />A backend policy can target a Gateway (optionally, with a sectionName indicating the listener), ListenerSet, Route<br />(optionally, with a sectionName indicating the route rule), or a Service/Backend (optionally, with a sectionName<br />indicating the port (for Service) or sub-backend (for Backend).<br /><br />Note that a backend policy applies when connecting to a specific destination backend. Targeting a higher level<br />resource, like Gateway, is just a way to easily apply a policy to a group of backends.<br /><br />When multiple policies are selected for a given request, they are merged on a field-level basis, but not a deep<br />merge. Precedence is given to more precise policies: Gateway < Listener < Route < Route Rule < Backend/Service. For<br />example, if a Gateway policy sets 'tcp' and 'tls', and a Backend policy sets 'tls', the effective policy would be<br />'tcp' from the Gateway, and 'tls' from the Backend. |  |  |
 
 
 #### AnthropicConfig
@@ -913,6 +333,23 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `model` _string_ | Optional: Override the model name, such as `gpt-4o-mini`.<br />If unset, the model name is taken from the request. |  |  |
+
+
+#### AttributeAdd
+
+
+
+
+
+
+
+_Appears in:_
+- [LogTracingAttributes](#logtracingattributes)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ |  |  |  |
+| `expression` _[CELExpression](#celexpression)_ |  |  |  |
 
 
 #### AzureOpenAIConfig
@@ -951,12 +388,97 @@ _Appears in:_
 
 
 
+#### BackendFull
 
 
 
 
 
 
+
+_Appears in:_
+- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
+- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ai` _[BackendAI](#backendai)_ | ai specifies settings for AI workloads. This is only applicable when connecting to a Backend of type 'ai'. |  |  |
+| `mcp` _[BackendMCP](#backendmcp)_ | mcp specifies settings for MCP workloads. This is only applicable when connecting to a Backend of type 'mcp'. |  |  |
+
+
+
+
+
+
+#### BackendSimple
+
+_Underlying type:_ _struct_
+
+
+
+
+
+_Appears in:_
+- [BackendFull](#backendfull)
+- [BackendWithAI](#backendwithai)
+- [BackendWithMCP](#backendwithmcp)
+- [OpenAIModeration](#openaimoderation)
+
+
+
+
+
+
+
+#### BackendWithAI
+
+
+
+
+
+
+
+_Appears in:_
+- [NamedLLMProvider](#namedllmprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `ai` _[BackendAI](#backendai)_ | ai specifies settings for AI workloads. This is only applicable when connecting to a Backend of type 'ai'. |  |  |
+
+
+#### BackendWithMCP
+
+
+
+
+
+
+
+_Appears in:_
+- [McpTarget](#mcptarget)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mcp` _[BackendMCP](#backendmcp)_ | mcp specifies settings for MCP workloads. This is only applicable when connecting to a Backend of type 'mcp'. |  |  |
+
+
+#### BasicAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[BasicAuthenticationMode](#basicauthenticationmode)_ | validation mode for basic auth authentication. | Strict | Enum: [Strict Optional] <br /> |
+| `realm` _string_ | realm specifies the 'realm' to return in the WWW-Authenticate header for failed authentication requests.<br />If unset, "Restricted" will be used. |  |  |
+| `users` _string array_ | users provides an inline list of username/password pairs that will be accepted.<br />Each entry represents one line of the htpasswd format: https://httpd.apache.org/docs/2.4/programs/htpasswd.html.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br />users:<br />- "user1:$apr1$ivPt0D4C$DmRhnewfHRSrb3DQC.WHC."<br />- "user2:$2y$05$r3J4d3VepzFkedkd/q1vI.pBYIpSqjfN0qOARV3ScUHysatnS0cL2" |  | MaxItems: 256 <br />MinItems: 1 <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | secretRef references a Kubernetes secret storing the .htaccess file. The Secret must have a key named '.htaccess',<br />and should contain the complete .htaccess file.<br /><br />Note: passwords should be the hash of the password, not the raw password. Use the `htpasswd` or similar commands<br />to generate a hash. MD5, bcrypt, crypt, and SHA-1 are supported.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: basic-auth<br />stringData:<br />  .htaccess: \|<br />    alice:$apr1$3zSE0Abt$IuETi4l5yO87MuOrbSE4V.<br />    bob:$apr1$Ukb5LgRD$EPY2lIfY.A54jzLELNIId/ |  |  |
 
 
 #### BasicAuthenticationMode
@@ -969,7 +491,7 @@ _Validation:_
 - Enum: [Strict Optional]
 
 _Appears in:_
-- [AgentBasicAuthentication](#agentbasicauthentication)
+- [BasicAuthentication](#basicauthentication)
 
 | Field | Description |
 | --- | --- |
@@ -1001,21 +523,50 @@ _Appears in:_
 _Underlying type:_ _string_
 
 BuiltIn regex patterns for specific types of strings in prompts.
-For example, if you specify `CREDIT_CARD`, any credit card numbers
+For example, if you specify `CreditCard`, any credit card numbers
 in the request or response are matched.
 
 _Validation:_
-- Enum: [SSN CREDIT_CARD PHONE_NUMBER EMAIL]
+- Enum: [Ssn CreditCard PhoneNumber Email]
 
 _Appears in:_
 - [Regex](#regex)
 
 | Field | Description |
 | --- | --- |
-| `SSN` | Default regex matching for Social Security numbers.<br /> |
-| `CREDIT_CARD` | Default regex matching for credit card numbers.<br /> |
-| `PHONE_NUMBER` | Default regex matching for phone numbers.<br /> |
-| `EMAIL` | Default regex matching for email addresses.<br /> |
+| `Ssn` | Default regex matching for Social Security numbers.<br /> |
+| `CreditCard` | Default regex matching for credit card numbers.<br /> |
+| `PhoneNumber` | Default regex matching for phone numbers.<br /> |
+| `Email` | Default regex matching for email addresses.<br /> |
+
+
+#### CORS
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+
+
+#### CSRF
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `additionalOrigins` _string array_ | additionalOrigin specifies additional source origins that will be allowed in addition to the destination origin. The<br />`Origin` consists of a scheme and a host, with an optional port, and takes the form `<scheme>://<host>(:<port>)`. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### CustomResponse
@@ -1046,12 +597,75 @@ DirectResponse defines the policy to send a direct response to the client.
 
 
 _Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+- [Traffic](#traffic)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `status` _integer_ | StatusCode defines the HTTP status code to return for this route. |  | Maximum: 599 <br />Minimum: 200 <br /> |
 | `body` _string_ | Body defines the content to be returned in the HTTP response body.<br />The maximum length of the body is restricted to prevent excessively large responses.<br />If this field is omitted, no body is included in the response. |  | MaxLength: 4096 <br />MinLength: 1 <br /> |
+
+
+#### DynamicForwardProxyBackend
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
+
+
+
+#### ExtAuth
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the External Authorization server to reach.<br /><br />Supported types: Service and Backend. |  |  |
+| `forwardBody` _[ExtAuthBody](#extauthbody)_ | forwardBody configures whether to include the HTTP body in the request. If enabled, the request body will be<br />buffered. |  |  |
+| `contextExtensions` _object (keys:string, values:string)_ | contextExtensions specifies additional arbitrary key-value pairs to send to the authorization server. |  | MaxProperties: 64 <br /> |
+
+
+#### ExtAuthBody
+
+
+
+
+
+
+
+_Appears in:_
+- [ExtAuth](#extauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `maxSize` _integer_ | maxSize specifies how large in bytes the largest body that will be buffered and sent to the authorization server. If<br />the body size is larger than maxSize, then the request will be rejected with a response. |  | Minimum: 1 <br /> |
+
+
+#### ExtProc
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the External Processor server to reach.<br />Supported types: Service and Backend. |  |  |
 
 
 #### FieldDefault
@@ -1117,6 +731,26 @@ _Appears in:_
 | `value` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | The field default value, which can be any JSON Data Type. |  |  |
 
 
+#### Frontend
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tcp` _[FrontendTCP](#frontendtcp)_ | tcp defines settings on managing incoming TCP connections. |  |  |
+| `tls` _[FrontendTLS](#frontendtls)_ | tls defines settings on managing incoming TLS connections. |  |  |
+| `http` _[FrontendHTTP](#frontendhttp)_ | http defines settings on managing incoming HTTP requests. |  |  |
+| `accessLog` _[AccessLog](#accesslog)_ | AccessLoggingConfig contains access logging configuration |  |  |
+| `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for OpenTelemetry tracer.<br />TODO: not currently implemented |  |  |
+
+
 #### FrontendHTTP
 
 
@@ -1126,7 +760,7 @@ _Appears in:_
 
 
 _Appears in:_
-- [AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)
+- [Frontend](#frontend)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1149,11 +783,11 @@ _Appears in:_
 
 
 _Appears in:_
-- [AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)
+- [Frontend](#frontend)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `keepalive` _[AgentgatewayKeepalive](#agentgatewaykeepalive)_ | keepalive defines settings for enabling TCP keepalives on the connection. |  |  |
+| `keepalive` _[Keepalive](#keepalive)_ | keepalive defines settings for enabling TCP keepalives on the connection. |  |  |
 
 
 #### FrontendTLS
@@ -1165,7 +799,7 @@ _Appears in:_
 
 
 _Appears in:_
-- [AgentgatewayPolicyFrontend](#agentgatewaypolicyfrontend)
+- [Frontend](#frontend)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1190,6 +824,24 @@ _Appears in:_
 | `model` _string_ | Optional: Override the model name, such as `gemini-2.5-pro`.<br />If unset, the model name is taken from the request. |  |  |
 
 
+#### GlobalRateLimit
+
+
+
+
+
+
+
+_Appears in:_
+- [RateLimits](#ratelimits)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the Rate Limit server to reach.<br />Supported types: Service and Backend. |  |  |
+| `domain` _string_ | domain specifies the domain under which this limit should apply.<br />This is an arbitrary string that enables a rate limit server to distinguish between different applications. |  |  |
+| `descriptors` _[RateLimitDescriptor](#ratelimitdescriptor) array_ | Descriptors define the dimensions for rate limiting. These values are passed to the rate limit service which applies<br />configured limits based on them. Each descriptor represents a single rate limit rule with one or more entries. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+
+
 #### HTTPVersion
 
 _Underlying type:_ _string_
@@ -1205,6 +857,73 @@ _Appears in:_
 | --- | --- |
 | `HTTP1` |  |
 | `HTTP2` |  |
+
+
+#### HeaderName
+
+_Underlying type:_ _string_
+
+An HTTP Header Name.
+
+_Validation:_
+- MaxLength: 256
+- MinLength: 1
+- Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+
+_Appears in:_
+- [HeaderTransformation](#headertransformation)
+- [Transform](#transform)
+
+
+
+#### HeaderTransformation
+
+
+
+
+
+
+
+_Appears in:_
+- [Transform](#transform)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _[HeaderName](#headername)_ | the name of the header to add. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+| `value` _[CELExpression](#celexpression)_ | value is the CEL expression to apply to generate the output value for the header. |  |  |
+
+
+#### HostnameRewrite
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[HostnameRewriteMode](#hostnamerewritemode)_ | mode sets the hostname rewrite mode.<br /><br />The following may be specified:<br />* Auto: automatically set the Host header based on the destination.<br />* None: do not rewrite the Host header. The original Host header will be passed through.<br /><br />This setting defaults to Auto when connecting to hostname-based Backend types, and None otherwise (for Service or<br />IP-based Backends). |  |  |
+
+
+#### HostnameRewriteMode
+
+_Underlying type:_ _string_
+
+
+
+
+
+_Appears in:_
+- [HostnameRewrite](#hostnamerewrite)
+
+| Field | Description |
+| --- | --- |
+| `Auto` |  |
+| `None` |  |
 
 
 #### InsecureTLSMode
@@ -1224,6 +943,40 @@ _Appears in:_
 | `Hostname` | InsecureTLSModeHostname enables verifying the CA certificate, but disables verification of the hostname/SAN.<br />Note this is still, generally, very "insecure" as the name suggests.<br /> |
 
 
+#### JWKS
+
+
+
+
+
+
+
+_Appears in:_
+- [JWTProvider](#jwtprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `remote` _[RemoteJWKS](#remotejwks)_ | remote specifies how to reach the JSON Web Key Set from a remote address. |  |  |
+| `inline` _string_ | inline specifies an inline JSON Web Key Set used validate the signature of the JWT. |  | MaxLength: 65536 <br />MinLength: 2 <br /> |
+
+
+#### JWTAuthentication
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[JWTAuthenticationMode](#jwtauthenticationmode)_ | validation mode for JWT authentication. | Strict | Enum: [Strict Optional Permissive] <br /> |
+| `providers` _[JWTProvider](#jwtprovider) array_ |  |  | MaxItems: 64 <br />MinItems: 1 <br /> |
+
+
 #### JWTAuthenticationMode
 
 _Underlying type:_ _string_
@@ -1234,13 +987,50 @@ _Validation:_
 - Enum: [Strict Optional Permissive]
 
 _Appears in:_
-- [AgentJWTAuthentication](#agentjwtauthentication)
+- [JWTAuthentication](#jwtauthentication)
 
 | Field | Description |
 | --- | --- |
 | `Strict` | A valid token, issued by a configured issuer, must be present.<br />This is the default option.<br /> |
 | `Optional` | If a token exists, validate it.<br />Warning: this allows requests without a JWT token!<br /> |
 | `Permissive` | Requests are never rejected. This is useful for usage of claims in later steps (authorization, logging, etc).<br />Warning: this allows requests without a JWT token!<br /> |
+
+
+#### JWTProvider
+
+
+
+
+
+
+
+_Appears in:_
+- [JWTAuthentication](#jwtauthentication)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `issuer` _string_ | issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  |  |
+| `audiences` _string array_ | audiences specifies the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
+| `jwks` _[JWKS](#jwks)_ | jwks defines the JSON Web Key Set used to validate the signature of the JWT. |  |  |
+
+
+#### Keepalive
+
+
+
+TCP Keepalive settings
+
+
+
+_Appears in:_
+- [BackendTCP](#backendtcp)
+- [FrontendTCP](#frontendtcp)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `retries` _integer_ | retries specifies the maximum number of keep-alive probes to send before dropping the connection.<br />If unset, this defaults to 9. |  | Maximum: 64 <br />Minimum: 1 <br /> |
+| `time` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | time specifies the number of seconds a connection needs to be idle before keep-alive probes start being sent.<br />If unset, this defaults to 180s. |  |  |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | interval specifies the number of seconds between keep-alive probes.<br />If unset, this defaults to 180s. |  |  |
 
 
 #### LLMProvider
@@ -1268,6 +1058,26 @@ _Appears in:_
 | `path` _string_ | Path specifies the URL path to use for the LLM provider API requests.<br />This is useful when you need to route requests to a different API endpoint while maintaining<br />compatibility with the original provider's API structure.<br />If not specified, the default path for the provider is used. |  |  |
 
 
+#### LocalRateLimit
+
+
+
+Policy for local rate limiting. Local rate limits are handled locally on a per-proxy basis, without co-ordination
+between instances of the proxy.
+
+
+
+_Appears in:_
+- [RateLimits](#ratelimits)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `requests` _integer_ | requests specifies the number of HTTP requests per unit of time that are allowed. Requests exceeding this limit will fail with<br />a 429 error. |  | Minimum: 1 <br /> |
+| `tokens` _integer_ | tokens specifies the number of LLM tokens per unit of time that are allowed. Requests exceeding this limit will fail<br />with a 429 error.<br /><br />Both input and output tokens are counted. However, token counts are not known until the request completes. As a<br />result, token-based rate limits will apply to future requests only. |  | Minimum: 1 <br /> |
+| `unit` _[LocalRateLimitUnit](#localratelimitunit)_ | unit specifies the unit of time that requests are limited based on. |  | Enum: [Seconds Minutes Hours] <br /> |
+| `burst` _integer_ | burst specifies an allowance of requests above the request-per-unit that should be allowed within a short period of time. |  |  |
+
+
 #### LocalRateLimitUnit
 
 _Underlying type:_ _string_
@@ -1277,13 +1087,31 @@ _Underlying type:_ _string_
 
 
 _Appears in:_
-- [AgentLocalRateLimitPolicy](#agentlocalratelimitpolicy)
+- [LocalRateLimit](#localratelimit)
 
 | Field | Description |
 | --- | --- |
 | `Seconds` |  |
 | `Minutes` |  |
 | `Hours` |  |
+
+
+#### LogTracingAttributes
+
+
+
+
+
+
+
+_Appears in:_
+- [AccessLog](#accesslog)
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `remove` _string array_ | remove lists the default fields that should be removed. For example, "http.method". |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `add` _[AttributeAdd](#attributeadd) array_ | add specifies additional key-value pairs to be added to each entry.<br />The value is a CEL expression. If the CEL expression fails to evaluate, the pair will be excluded. |  | MinItems: 1 <br /> |
 
 
 #### MCPAuthentication
@@ -1303,7 +1131,7 @@ _Appears in:_
 | `provider` _[McpIDP](#mcpidp)_ | McpIDP specifies the identity provider to use for authentication |  | Enum: [Auth0 Keycloak] <br /> |
 | `issuer` _string_ | Issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  |  |
 | `audiences` _string array_ | audiences specify the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
-| `jwks` _[AgentRemoteJWKS](#agentremotejwks)_ | jwks defines the remote JSON Web Key used to validate the signature of the JWT. |  |  |
+| `jwks` _[RemoteJWKS](#remotejwks)_ | jwks defines the remote JSON Web Key used to validate the signature of the JWT. |  |  |
 
 
 #### MCPBackend
@@ -1391,7 +1219,7 @@ _Appears in:_
 | `port` _integer_ | Port is the port number of the MCPBackend target. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
 | `path` _string_ | Path is the URL path of the MCPBackend target endpoint.<br />Defaults to "/sse" for SSE protocol or "/mcp" for StreamableHTTP protocol if not specified. |  |  |
 | `protocol` _[MCPProtocol](#mcpprotocol)_ | Protocol is the protocol to use for the connection to the MCPBackend target. |  | Enum: [StreamableHTTP SSE] <br /> |
-| `policies` _[AgentgatewayPolicyBackendMCP](#agentgatewaypolicybackendmcp)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy, or<br />in the top level AgentgatewayBackend. Policies are merged on a field-level basis, with order: AgentgatewayPolicy <<br />AgentgatewayBackend < AgentgatewayBackend MCP (this field). |  |  |
+| `policies` _[BackendWithMCP](#backendwithmcp)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy, or<br />in the top level AgentgatewayBackend. Policies are merged on a field-level basis, with order: AgentgatewayPolicy <<br />AgentgatewayBackend < AgentgatewayBackend MCP (this field). |  |  |
 
 
 #### McpTargetSelector
@@ -1443,7 +1271,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `name` _[SectionName](#sectionname)_ | Name of the provider. Policies can target this provider by name. |  |  |
-| `policies` _[AgentgatewayPolicyBackendAI](#agentgatewaypolicybackendai)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy, or<br />in the top level AgentgatewayBackend. policies are merged on a field-level basis, with order: AgentgatewayPolicy <<br />AgentgatewayBackend < AgentgatewayBackend LLM provider (this field). |  |  |
+| `policies` _[BackendWithAI](#backendwithai)_ | policies controls policies for communicating with this backend. Policies may also be set in AgentgatewayPolicy, or<br />in the top level AgentgatewayBackend. policies are merged on a field-level basis, with order: AgentgatewayPolicy <<br />AgentgatewayBackend < AgentgatewayBackend LLM provider (this field). |  |  |
 | `openai` _[OpenAIConfig](#openaiconfig)_ | OpenAI provider |  |  |
 | `azureopenai` _[AzureOpenAIConfig](#azureopenaiconfig)_ | Azure OpenAI provider |  |  |
 | `anthropic` _[AnthropicConfig](#anthropicconfig)_ | Anthropic provider |  |  |
@@ -1486,7 +1314,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `model` _string_ | model specifies the moderation model to use. For example, `omni-moderation`. |  |  |
-| `policies` _[AgentgatewayPolicyBackendSimple](#agentgatewaypolicybackendsimple)_ | policies controls policies for communicating with OpenAI. |  |  |
+| `policies` _[BackendSimple](#backendsimple)_ | policies controls policies for communicating with OpenAI. |  |  |
 
 
 #### PolicyPhase
@@ -1499,7 +1327,7 @@ _Validation:_
 - Enum: [PreRouting PostRouting]
 
 _Appears in:_
-- [AgentgatewayPolicyTraffic](#agentgatewaypolicytraffic)
+- [Traffic](#traffic)
 
 | Field | Description |
 | --- | --- |
@@ -1599,6 +1427,42 @@ _Appears in:_
 | `webhook` _[Webhook](#webhook)_ | Configure a webhook to forward responses to for prompt guarding. |  |  |
 
 
+#### RateLimitDescriptor
+
+
+
+
+
+
+
+_Appears in:_
+- [GlobalRateLimit](#globalratelimit)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `entries` _[RateLimitDescriptorEntry](#ratelimitdescriptorentry) array_ | entries are the individual components that make up this descriptor. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `unit` _[RateLimitUnit](#ratelimitunit)_ | unit defines what to use as the cost function. If unspecified, Requests is used. |  | Enum: [Requests Tokens] <br /> |
+
+
+
+
+
+
+#### RateLimits
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `local` _[LocalRateLimit](#localratelimit) array_ | Local defines a local rate limiting policy. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `global` _[GlobalRateLimit](#globalratelimit)_ | Global defines a global rate limiting policy using an external service. |  |  |
 
 
 #### Regex
@@ -1616,8 +1480,24 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `matches` _string array_ | A list of regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  |  |
-| `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [SSN CREDIT_CARD PHONE_NUMBER EMAIL] <br /> |
+| `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [Ssn CreditCard PhoneNumber Email] <br /> |
 | `action` _[Action](#action)_ | The action to take if a regex pattern is matched in a request or response.<br />This setting applies only to request matches. PromptguardResponse matches are always masked by default.<br />Defaults to `MASK`. | MASK |  |
+
+
+#### RemoteJWKS
+
+_Underlying type:_ _struct_
+
+
+
+
+
+_Appears in:_
+- [JWKS](#jwks)
+- [MCPAuthentication](#mcpauthentication)
+
+
+
 
 
 #### RouteType
@@ -1628,19 +1508,19 @@ RouteType specifies how the AI gateway should process incoming requests
 based on the URL path and the API format expected.
 
 _Validation:_
-- Enum: [completions messages models passthrough responses anthropic_token_count]
+- Enum: [Completions Messages Models Passthrough Responses AnthropicTokenCount]
 
 _Appears in:_
 - [BackendAI](#backendai)
 
 | Field | Description |
 | --- | --- |
-| `completions` | RouteTypeCompletions processes OpenAI /v1/chat/completions format requests<br /> |
-| `messages` | RouteTypeMessages processes Anthropic /v1/messages format requests<br /> |
-| `models` | RouteTypeModels handles /v1/models endpoint (returns available models)<br /> |
-| `passthrough` | RouteTypePassthrough sends requests to upstream as-is without LLM processing<br /> |
-| `responses` | RouteTypeResponses processes OpenAI /v1/responses format requests<br /> |
-| `anthropic_token_count` | RouteTypeAnthropicTokenCount processes Anthropic /v1/messages/count_tokens format requests<br /> |
+| `Completions` | RouteTypeCompletions processes OpenAI /v1/chat/completions format requests<br /> |
+| `Messages` | RouteTypeMessages processes Anthropic /v1/messages format requests<br /> |
+| `Models` | RouteTypeModels handles /v1/models endpoint (returns available models)<br /> |
+| `Passthrough` | RouteTypePassthrough sends requests to upstream as-is without LLM processing<br /> |
+| `Responses` | RouteTypeResponses processes OpenAI /v1/responses format requests<br /> |
+| `AnthropicTokenCount` | RouteTypeAnthropicTokenCount processes Anthropic /v1/messages/count_tokens format requests<br /> |
 
 
 #### SecretSelector
@@ -1652,11 +1532,64 @@ _Appears in:_
 
 
 _Appears in:_
-- [AgentAPIKeyAuthentication](#agentapikeyauthentication)
+- [APIKeyAuthentication](#apikeyauthentication)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
+
+
+#### StaticBackend
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayBackendSpec](#agentgatewaybackendspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `host` _string_ | host to connect to. |  |  |
+| `port` _integer_ | port to connect to. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
+
+
+#### Timeouts
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `request` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | request specifies a timeout for an individual request from the gateway to a backend. This covers the time from when<br />the request first starts being sent from the gateway to when the full response has been received from the backend. |  |  |
+
+
+#### Tracing
+
+
+
+
+
+
+
+_Appears in:_
+- [Frontend](#frontend)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the OTLP server to reach.<br />Supported types: Service and Backend. |  |  |
+| `protocol` _[TracingProtocol](#tracingprotocol)_ | protocol specifies the OTLP protocol variant to use. | HTTP | Enum: [HTTP GRPC] <br /> |
+| `attributes` _[LogTracingAttributes](#logtracingattributes)_ | attributes specifies customizations to the key-value pairs that are included in the trace |  |  |
+| `randomSampling` _[CELExpression](#celexpression)_ | randomSampling is an expression to determine the amount of random sampling. Random sampling will initiate a new<br />trace span if the incoming request does not have a trace initiated already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, random sampling is disabled. |  |  |
+| `clientSampling` _[CELExpression](#celexpression)_ | clientSampling is an expression to determine the amount of client sampling. Client sampling determines whether to<br />initiate a new trace span if the incoming request does have a trace already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, client sampling is 100% enabled. |  |  |
 
 
 #### TracingProtocol
@@ -1668,12 +1601,79 @@ _Underlying type:_ _string_
 
 
 _Appears in:_
-- [AgentTracing](#agenttracing)
+- [Tracing](#tracing)
 
 | Field | Description |
 | --- | --- |
 | `HTTP` |  |
 | `GRPC` |  |
+
+
+#### Traffic
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayPolicySpec](#agentgatewaypolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `phase` _[PolicyPhase](#policyphase)_ | The phase to apply the traffic policy to. If the phase is PreRouting, the targetRef must be a Gateway or a Listener.<br />PreRouting is typically used only when a policy needs to influence the routing decision.<br /><br />Even when using PostRouting mode, the policy can target the Gateway/Listener. This is a helper for applying the policy<br />to all routes under that Gateway/Listener, and follows the merging logic described above.<br /><br />Note: PreRouting and PostRouting rules do not merge together. These are independent execution phases. That is, all<br />PreRouting rules will merge and execute, then all PostRouting rules will merge and execute.<br /><br />If unset, this defaults to PostRouting. |  | Enum: [PreRouting PostRouting] <br /> |
+| `transformation` _[Transformation](#transformation)_ | transformation is used to mutate and transform requests and responses<br />before forwarding them to the destination. |  |  |
+| `extProc` _[ExtProc](#extproc)_ | extProc specifies the external processing configuration for the policy. |  |  |
+| `extAuth` _[ExtAuth](#extauth)_ | extAuth specifies the external authentication configuration for the policy.<br />This controls what external server to send requests to for authentication. |  |  |
+| `rateLimit` _[RateLimits](#ratelimits)_ | rateLimit specifies the rate limiting configuration for the policy.<br />This controls the rate at which requests are allowed to be processed. |  |  |
+| `cors` _[CORS](#cors)_ | cors specifies the CORS configuration for the policy. |  |  |
+| `csrf` _[CSRF](#csrf)_ | csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy.<br /><br />The CSRF policy has the following behavior:<br />* Safe methods (GET, HEAD, OPTIONS) are automatically allowed<br />* Requests without Sec-Fetch-Site or Origin headers are assumed to be same-origin or non-browser requests and are allowed.<br />* Otherwise, the Sec-Fetch-Site header is checked, with a fallback to comparing the Origin header to the Host header. |  |  |
+| `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | headerModifiers defines the policy to modify request and response headers. |  |  |
+| `hostRewrite` _[HostnameRewrite](#hostnamerewrite)_ | hostRewrite specifies how to rewrite the Host header for requests.<br /><br />If the HTTPRoute `urlRewrite` filter already specifies a host rewrite, this setting is ignored. |  | Enum: [Auto None] <br /> |
+| `timeouts` _[Timeouts](#timeouts)_ | timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
+| `retry` _[Retry](#retry)_ | retry defines the policy for retrying requests. |  |  |
+| `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attahcment points),<br />all rules are merged. |  |  |
+| `jwtAuthentication` _[JWTAuthentication](#jwtauthentication)_ | jwtAuthentication authenticates users based on JWT tokens. |  |  |
+| `basicAuthentication` _[BasicAuthentication](#basicauthentication)_ | basicAuthentication authenticates users based on the "Basic" authentication scheme (RFC 7617), where a username and password<br />are encoded in the request. |  |  |
+| `apiKeyAuthentication` _[APIKeyAuthentication](#apikeyauthentication)_ | apiKeyAuthentication authenticates users based on a configured API Key. |  |  |
+| `directResponse` _[DirectResponse](#directresponse)_ | direct response configures the policy to send a direct response to the client. |  |  |
+
+
+#### Transform
+
+
+
+
+
+
+
+_Appears in:_
+- [Transformation](#transformation)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `set` _[HeaderTransformation](#headertransformation) array_ | set is a list of headers and the value they should be set to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `add` _[HeaderTransformation](#headertransformation) array_ | add is a list of headers to add to the request and what that value should be set to. If there is already a header<br />with these values then append the value as an extra entry. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `remove` _[HeaderName](#headername) array_ | Remove is a list of header names to remove from the request/response. |  | MaxItems: 16 <br />MaxLength: 256 <br />MinItems: 1 <br />MinLength: 1 <br />Pattern: `^:?[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+| `body` _[CELExpression](#celexpression)_ | body controls manipulation of the HTTP body. |  |  |
+
+
+#### Transformation
+
+
+
+
+
+
+
+_Appears in:_
+- [Traffic](#traffic)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `request` _[Transform](#transform)_ | request is used to modify the request path. |  |  |
+| `response` _[Transform](#transform)_ | response is used to modify the response path. |  |  |
 
 
 #### VertexAIConfig
