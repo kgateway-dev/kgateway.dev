@@ -20,6 +20,9 @@ jobs:
       pull-requests: write
     
     steps:
+      - name: Echo workflow SHA
+        run: echo "workflow_sha=$GITHUB_SHA"
+
       - name: Checkout docs repository
         uses: actions/checkout@v4
         with:
