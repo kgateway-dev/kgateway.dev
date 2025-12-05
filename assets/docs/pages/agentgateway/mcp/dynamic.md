@@ -69,12 +69,11 @@ Deploy an MCP server that you want {{< reuse "docs/snippets/agentgateway.md" >}}
    metadata:
      name: mcp-backend
    spec:
-     type: MCP
      mcp:
        targets:
          - name: mcp-server-everything
            selector:
-             service:
+             services:
                matchLabels:
                  app: mcp-server-everything
    EOF

@@ -10,7 +10,7 @@ kind create cluster
 
 ## Install
 
-The following steps get you started with a basic installation. For detailed instructions, see the [installation guides]({{< link-hextra path="/install">}}).
+The following steps get you started with a basic installation. For detailed instructions, see the [installation guides]({{< link-hextra path="/install" >}}).
 
 {{< reuse "docs/snippets/get-started.md" >}}
 

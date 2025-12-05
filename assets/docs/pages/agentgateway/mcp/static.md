@@ -57,7 +57,6 @@ Deploy a Model Context Protocol (MCP) server that you want {{< reuse "docs/snipp
    metadata:
      name: mcp-backend
    spec:
-     type: MCP
      mcp:
        targets:
        - name: mcp-target
