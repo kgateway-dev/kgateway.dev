@@ -114,56 +114,24 @@ EOF
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
-Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
+Create an HTTPRoute resource that routes incoming traffic to the A2A server.
 
-1. Create a Gateway resource that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. Kgateway automatically creates an {{< reuse "docs/snippets/agentgateway.md" >}} proxy for you.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: Gateway
-   metadata:
-     name: agentgateway
-   spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
-     listeners:
-     - protocol: HTTP
-       port: 8080
-       name: http
-   EOF
-   ```
-
-2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
-
-   ```sh
-   kubectl get gateway agentgateway
-   ```
-
-   Example output: 
-   
-   ```txt
-   NAME           CLASS          ADDRESS                                  PROGRAMMED   AGE
-   agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
-   ```
-
-3. Create an HTTPRoute resource that routes incoming traffic to the A2A server.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: a2a
-   spec:
-     parentRefs:
-       - name: agentgateway
-         namespace: default
-     rules:
-       - backendRefs:
-           - name: a2a-agent
-             port: 9090
-   EOF
-   ```
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: a2a
+spec:
+  parentRefs:
+  - name: agentgateway
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  rules:
+  - backendRefs:
+      - name: a2a-agent
+        port: 9090
+EOF
+```
 
 ## Step 3: Verify the connection {#verify}
 
@@ -172,13 +140,13 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -o=jsonpath="{.status.addresses[0].value}")
+   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
    echo $INGRESS_GW_ADDRESS
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:8080
+   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -188,7 +156,7 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -X POST http://$INGRESS_GW_ADDRESS:8080/ \
+   curl -X POST http://$INGRESS_GW_ADDRESS/ \
      -H "Content-Type: application/json" \
        -v \
        -d '{
@@ -264,6 +232,5 @@ Route to the A2A server with {{< reuse "docs/snippets/agentgateway.md" >}}.
 ```sh
 kubectl delete Deployment a2a-agent
 kubectl delete Service a2a-agent
-kubectl delete Gateway agentgateway
 kubectl delete HTTPRoute a2a
 ```

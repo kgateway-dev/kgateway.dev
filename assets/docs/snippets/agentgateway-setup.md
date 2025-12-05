@@ -1,18 +1,16 @@
 1. Create a Gateway that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. The following example sets up a Gateway that uses the [default agentgateway proxy template](https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/helm/agentgateway/templates/deployment.yaml). 
    ```yaml
    kubectl apply -f- <<EOF
-   kind: Gateway
    apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
    metadata:
      name: agentgateway
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    spec:
      gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
-       port: 8080
+       port: 80
        name: http
        allowedRoutes:
          namespaces:
@@ -48,7 +46,7 @@
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}

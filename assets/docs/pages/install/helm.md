@@ -79,11 +79,19 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
+{{% version include-if="2.1.x" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 --set agentgateway.enabled=true
 ```
+{{% /version %}}
+{{% version include-if="2.2.x" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} 
+```
+{{% /version %}}
 {{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Custom values" %}}
@@ -95,12 +103,21 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
+{{% version include-if="2.1.x" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
---version {{< reuse "docs/versions/helm-version-flag.md" >}} \
---set agentgateway.enabled=true \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \ 
+--set agentgateway.enabled=true \ 
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
+{{% /version %}}
+{{% version include-if="2.2.x" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \ 
+-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+```
+{{% /version %}}
 {{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Development" %}}
@@ -114,6 +131,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
+{{% version include-if="2.1.x" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
@@ -121,6 +139,15 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 --set agentgateway.enabled=true \
 --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
 ```
+{{% /version %}}
+{{% version include-if="2.2.x" %}}
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version v{{< reuse "docs/versions/patch-dev.md" >}} \
+--set controller.image.pullPolicy=Always \
+--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
+```
+{{% /version %}}
 {{% /conditional-text %}}
 {{% /tab %}}
       {{< /tabs >}}

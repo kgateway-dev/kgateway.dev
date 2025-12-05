@@ -19,6 +19,7 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
 ## Set up RBAC permissions
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your CEL rules. The following example allows requests with the `x-llm: gemini` header.
+   {{< version include-if="2.1.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -26,8 +27,6 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
    metadata:
      name: rbac
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -39,7 +38,30 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
            - "request.headers['x-llm'] == 'gemini'"
    EOF
    ```
-   
+   {{< /version >}}{{< version include-if="2.2.x" >}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: rbac-policy
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+       - group: gateway.networking.k8s.io
+         kind: HTTPRoute
+         name: google
+     traffic: 
+       authorization: 
+         action: Allow
+         policy: 
+           matchExpressions:
+             - "request.headers['x-llm'] == 'gemini'"
+   EOF
+   ```
+
+   {{< /version >}}
+
 2. Send a request to the LLM provider API without the `llm` header. Verify that the request is denied with a 403 HTTP response code. 
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
@@ -118,8 +140,8 @@ Configure access to an LLM provider such as Gemini. You can use any other LLM pr
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -l app=agentgateway
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} rbac-policy -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete backend google -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret google-secret -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

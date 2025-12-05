@@ -101,7 +101,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -v "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl -v "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
      "messages": [
        {
@@ -151,7 +151,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
      "messages": [
        {
@@ -278,7 +278,7 @@ In the next step, you instruct agentgateway to mask credit card numbers that are
 
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
+   curl "$INGRESS_GW_ADDRESS/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
      "messages": [
        {
