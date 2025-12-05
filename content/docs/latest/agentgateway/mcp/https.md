@@ -6,4 +6,4 @@ description:
 
 Configure your agentgateway proxy to connect to an MCP server by using the HTTPS protocol. 
 
-{{< reuse "docs/pages/agentgateway/mcp-https.md" >}}
+{{< reuse "docs/pages/agentgateway/mcp/https.md" >}}

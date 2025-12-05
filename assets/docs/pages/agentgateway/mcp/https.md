@@ -147,7 +147,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
          backendRefs:
          - name: github-mcp-backend
            group: gateway.kgateway.dev
-           kind: {{< reuse "docs/snippets/namespace.md" >}}
+           kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
    {{< /version >}}
