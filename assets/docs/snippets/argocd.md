@@ -66,7 +66,6 @@
    * **Experimental Gateway API features**: `controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` to enable experimental features such as TCPRoutes.
    {{% /conditional-text %}}
    {{% conditional-text include-if="agentgateway" %}}
-   * **Agentgateway**: `agentgateway.enabled=true` to enable the agentgateway data plane.
    * **Development builds**: `controller.image.pullPolicy=Always` to ensure you get the latest image.
    * **Experimental Gateway API features**: `controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` to enable experimental features such as TCPRoutes.
    {{% /conditional-text %}}
@@ -89,9 +88,7 @@
          skipCrds: false
          parameters:
          - name: controller.image.pullPolicy
-           value: "Always"{{% conditional-text include-if="agentgateway" %}}
-         - name: agentgateway.enabled
-           value: "true"{{% /conditional-text %}}
+           value: "Always"
          - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
            value: "true"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts

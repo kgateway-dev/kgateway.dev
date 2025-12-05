@@ -13,8 +13,6 @@
    metadata:
      name: google-secret
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    type: Opaque
    stringData:
      Authorization: $GOOGLE_KEY
@@ -65,12 +63,9 @@
    metadata:
      name: google
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-     labels:
-       app: agentgateway
    spec:
      parentRefs:
        - name: agentgateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -78,7 +73,6 @@
            value: /gemini
        backendRefs:
        - name: google
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
@@ -88,7 +82,7 @@
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: A{{< reuse "docs/snippets/backend.md" >}}
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: google
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -124,7 +118,6 @@
    spec:
      parentRefs:
        - name: agentgateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -132,7 +125,6 @@
            value: /gemini
        backendRefs:
        - name: google
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
          group: agentgateway.dev
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
@@ -145,7 +137,7 @@
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
 
    ````sh
-   curl -vik "$INGRESS_GW_ADDRESS:8080/gemini" -H content-type:application/json  -d '{
+   curl -vik "$INGRESS_GW_ADDRESS/gemini" -H content-type:application/json  -d '{
      "model": "",
      "messages": [
       {"role": "user", "content": "Explain how AI works in simple terms."}

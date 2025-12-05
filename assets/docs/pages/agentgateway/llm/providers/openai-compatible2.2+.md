@@ -115,7 +115,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/mistral" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/mistral" -H content-type:application/json  -d '{
       "model": "",
       "messages": [
         {
@@ -257,7 +257,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/deepseek" -H content-type:application/json  -d '{
+   curl "$INGRESS_GW_ADDRESS/deepseek" -H content-type:application/json  -d '{
       "model": "",
       "messages": [
         {

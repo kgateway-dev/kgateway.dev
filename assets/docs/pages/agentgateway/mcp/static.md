@@ -52,12 +52,11 @@ Deploy a Model Context Protocol (MCP) server that you want {{< reuse "docs/snipp
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: AgentgatewayBackend
    metadata:
      name: mcp-backend
    spec:
-     type: MCP
      mcp:
        targets:
        - name: mcp-target
@@ -84,7 +83,7 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
      gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
-       port: 8080
+       port: 80
        name: http
        allowedRoutes:
          namespaces:
@@ -101,7 +100,7 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
    Example output: 
    
    ```txt
-   NAME            CLASS          ADDRESS                                  PROGRAMMED   AGE
+   NAME           CLASS          ADDRESS                                  PROGRAMMED   AGE
    agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
@@ -119,8 +118,8 @@ Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
      rules:
        - backendRefs:
          - name: mcp-backend
-           group: gateway.kgateway.dev
-           kind: Backend   
+           group: agentgateway.dev
+           kind: AgentgatewayBackend
    EOF
    ```
 
@@ -139,7 +138,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:8080
+   kubectl port-forward deployment/agentgateway 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -151,7 +150,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
    
 3. From the MCP Inspector menu, connect to your agentgateway address as follows:
    * **Transport Type**: Select `Streamable HTTP`.
-   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>:8080/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
+   * **URL**: Enter the agentgateway address, port, and the `/mcp` path. If your agentgateway proxy is exposed with a LoadBalancer server, use `http://<lb-address>/mcp`. In local test setups where you port-forwarded the agentgateway proxy on your local machine, use `http://localhost:8080/mcp`.
    * Click **Connect**.
 
    {{< reuse-image src="img/mcp-inspector-connected.png" >}}
