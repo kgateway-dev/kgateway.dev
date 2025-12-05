@@ -326,6 +326,13 @@ jobs:
                   with open(helm_file, 'w', encoding='utf-8') as f:
                       f.write(content)
                   
+                  # Debug: log first lines after cleanup to ensure defaults remain
+                  print('---- helm-docs post-cleanup (first 40 lines) ----')
+                  with open(helm_file, 'r', encoding='utf-8') as f:
+                      cleaned_preview = f.read().splitlines()[:40]
+                  print('\n'.join(cleaned_preview))
+                  print('---- end helm-docs post-cleanup ----')
+                  
                   print(f'    ✓ Generated Helm docs in {helm_file}')
                   
                   generated_any = True
