@@ -1,9 +1,4 @@
----
-title: AWS ALB
-weight: 10
----
-
-{{< reuse "docs/pages/integrations/aws-elb/alb.md" >}} 
+In this guide you explore how to expose the kgateway proxy with an AWS application load balancer (ALB). 
 
 {{< callout type="warning" >}}
 The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
@@ -181,3 +176,4 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    ```sh
    helm uninstall aws-load-balancer-controller -n kube-system
    ```
+

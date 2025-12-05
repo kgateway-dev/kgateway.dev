@@ -1,9 +1,4 @@
----
-title: AWS NLB
-weight: 20
----
-
-{{< reuse "docs/pages/integrations/aws-elb/nlb.md" >}}
+In this guide you explore how to expose the kgateway proxy with an AWS network load balancer (NLB). The following use cases are covered:
 
 * **NLB HTTP**: Create an HTTP listener on the NLB that exposes an HTTP endpoint on your gateway proxy. Traffic from the NLB to the proxy is not secured. 
 * **TLS passthrough**: Expose an HTTPS endpoint of your gateway with an NLB. The NLB passes through HTTPS traffic to the gateway proxy where the traffic is terminated. 
@@ -291,3 +286,4 @@ Keep in mind the following considerations when working with an NLB:
    ```sh
    helm uninstall aws-load-balancer-controller -n kube-system
    ```
+
