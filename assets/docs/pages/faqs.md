@@ -39,7 +39,7 @@ Kgateway can be deployed complementary to a service mesh like Istio. Istio solve
 * Function routing such as AWS Lambda
 * AI Gateway, MCP server, and other unique kgateway features
 
-For examples, see the [Istio integration guides](/docs/integrations/istio/).
+For examples, see the [Istio integration guides]({{< link-hextra path="/docs/integrations/istio/" >}}).
 
 ## What license is kgateway under?
 
