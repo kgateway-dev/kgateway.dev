@@ -28,6 +28,8 @@ Review the following table to understand how to configure agentgateway resources
 | Target | The details of the backend, such as the tools in an MCP backend. | Services and Backends. |
 | Policies | Policies for how agentgateway processes incoming requests.<ul><li>Request Header Modifier: Add, set, or remove HTTP request headers.</li><li>Response Header Modifier: Add, set, or remove HTTP response headers.</li><li>Request Redirect: Redirect incoming requests to a different scheme, authority, path, or status code.</li><li>URL Rewrite: Rewrite the authority or path of requests before forwarding.</li><li>Request Mirror: Mirror a percentage of requests to an additional backend for testing or analysis.</li><li>CORS: Configure Cross-Origin Resource Sharing (CORS) settings for allowed origins, headers, methods, and credentials.</li><li>A2A: Enable agent-to-agent (A2A) communication features.</li><li>Backend Auth: Set up authentication for backend services such as passthrough, key, GCP, AWS, and so on.</li><li>Timeout: Set request and backend timeouts.</li><li>Retry: Configure retry attempts, backoff, and which response codes should trigger retries.</li></ul> | Policies in HTTPRoutes and Backends. |
 
+{{% version include-if="2.1.x" %}}
+
 ## Feature enablement
 
 To use agentgateway features, you must enable the agentgateway feature in {{< reuse "docs/snippets/kgateway.md" >}}. Additionally, to route to AI providers, enable the AI Gateway feature alongside AI gateway.
@@ -58,7 +60,7 @@ To use agentgateway features, you must enable the agentgateway feature in {{< re
    * [MCP connectivity]({{< link-hextra path="/agentgateway/mcp/" >}})
    * [Agent connectivity]({{< link-hextra path="/agentgateway/agent/" >}})
 
-
+{{% /version %}}
 <!--
 ## More considerations
 
