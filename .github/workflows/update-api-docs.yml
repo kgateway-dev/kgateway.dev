@@ -276,39 +276,51 @@ jobs:
                   # Remove badge line and following empty line
                   subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', helm_file], check=True)
                   
-                  # Remove backticks from the Default column in the table
-                  subprocess.run(['sed', '-i', 's/| \`\([^\`]*\)\` |/| \1 |/g', helm_file], check=True)
-                  
                   # Remove the title (# heading) and description lines from the top
                   # These will be hardcoded in the content files instead
                   # Remove lines 1-3 which contain: title, blank line, description
                   subprocess.run(['sed', '-i', '1,3d', helm_file], check=True)
                   
-                  # Additional cleanup using Python to remove control characters and emojis
+                  # Add a note for charts with no configurable values (like kgateway-crds)
                   with open(helm_file, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
-                  # Remove ASCII control characters (0x00-0x1F) that helm-docs inserts for empty values
-                  # These show as "SOH", "STX", etc. in editors but render as empty in browsers
-                  # Also remove emojis and other special symbols
-                  import unicodedata
-                  cleaned_content = []
-                  for char in content:
-                      # Keep regular characters, newlines, tabs, and pipe symbols
-                      if char in ['\n', '\t', '\r'] or ord(char) >= 32:
-                          # Also filter out emoji/symbol unicode categories for table cells
-                          if unicodedata.category(char)[0] != 'So' or char in [' ', '\n', '\t', '\r']:
-                              cleaned_content.append(char)
-                      # Skip control characters (ord < 32, except newline/tab/carriage return)
+                  # Normalize any bare type=info callouts before further processing
+                  content = content.replace('{{< callout type=info >}}', '{{< callout type="info" >}}')
                   
-                  content = ''.join(cleaned_content)
-                  
-                  # Add a note for charts with no configurable values (like kgateway-crds)
-                  # Check if there's no Values section or no table
+                  # If no values table, append callout (once). Otherwise normalize callout quotes.
                   if '## Values' not in content or ('## Values' in content and '|-----|' not in content):
-                      # Simply append the note to the end of the content
                       note = '\n\n{{< callout type="info" >}}\nNo configurable values are currently available for this chart.\n{{< /callout >}}\n'
-                      content = content.rstrip() + note
+                      if '{{< callout' not in content:
+                          content = content.rstrip() + note
+                  
+                  # Swap Default and Description columns in the values table
+                  swapped_lines = []
+                  in_table = False
+                  for line in content.splitlines():
+                      stripped = line.strip()
+                      if stripped.startswith('| Key ') and 'Default' in line and 'Description' in line:
+                          in_table = True
+                          swapped_lines.append('| Key | Type | Description | Default |')
+                          continue
+                      if in_table and stripped.startswith('|-----'):
+                          swapped_lines.append('|-----|------|-------------|---------|')
+                          continue
+                      if in_table:
+                          if not stripped.startswith('|'):
+                              in_table = False
+                              swapped_lines.append(line)
+                              continue
+                          parts = [p.strip() for p in line.split('|')]
+                          # Expect 6 elements with leading/trailing blanks; ensure we have enough
+                          if len(parts) >= 6:
+                              key, typ, default, desc = parts[1], parts[2], parts[3], parts[4]
+                              swapped_lines.append(f'| {key} | {typ} | {desc} | {default} |')
+                          else:
+                              swapped_lines.append(line)
+                      else:
+                          swapped_lines.append(line)
+                  content = '\n'.join(swapped_lines)
                   
                   with open(helm_file, 'w', encoding='utf-8') as f:
                       f.write(content)
@@ -408,6 +420,7 @@ jobs:
               # Clone repository once per version
               try:
                   clone_repository(ref)
+                  subprocess.run(['git', '-C', 'kgateway', 'rev-parse', 'HEAD'], check=True)
                   print(f'   ✓ Cloned repository')
               except subprocess.CalledProcessError as e:
                   print(f'❌ Failed to clone repository for version {version}: {e}')
