@@ -25,6 +25,11 @@
   {{- $subSection = index $parts 2 -}}
 {{- end -}}
 
+{{- /* Increase logo size for kgateway envoy section to accommodate two-line logo */ -}}
+{{- if eq $subSection "envoy" -}}
+  {{- $logoHeight = "50" -}}
+{{- end -}}
+
 {{- /* Increase logo size for agentgateway section to accommodate two-line logo */ -}}
 {{- if eq $subSection "agentgateway" -}}
   {{- $logoHeight = "50" -}}
@@ -44,8 +49,8 @@
     {{- $useResource = true -}}
   {{- end -}}
 {{- else if eq $subSection "agentgateway" -}}
-  {{- $logoResource = resources.Get "img/logo-agentgateway-kgateway.svg" -}}
-  {{- $logoDarkResource = resources.Get "img/logo-agentgateway-kgateway-light-on-transparent.svg" -}}
+  {{- $logoResource = resources.Get "img/logo-agentgateway-kgateway3.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-agentgateway-kubernetes-light-on-transparent.svg" -}}
   {{- if $logoResource -}}
     {{- $useResource = true -}}
   {{- end -}}
@@ -141,6 +146,12 @@
   
   /* Override logo size for agentgateway section - more specific than .nav-container a img */
   .nav-container a img.agentgateway-logo {
+    height: 50px !important;
+    max-height: 50px !important;
+  }
+
+  /* Override logo size for agentgateway section - more specific than .nav-container a img */
+  .nav-container a img.envoy-logo {
     height: 50px !important;
     max-height: 50px !important;
   }
