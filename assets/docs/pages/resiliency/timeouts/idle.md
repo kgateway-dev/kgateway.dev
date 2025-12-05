@@ -98,3 +98,4 @@ Note that the idle timeout configures the timeout for the entire connection from
 kubectl delete httplistenerpolicy idle-time -n {{< reuse "docs/snippets/namespace.md" >}} 
 ```
 
+
