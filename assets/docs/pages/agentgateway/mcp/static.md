@@ -2,7 +2,7 @@ Route to a Model Context Protocol (MCP) server through a static address. For mor
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 ## Step 1: Deploy an MCP server {#mcp-server}
 
@@ -48,12 +48,30 @@ Deploy a Model Context Protocol (MCP) server that you want {{< reuse "docs/snipp
    EOF
    ```
 
-2. Create a Backend that sets up the {{< reuse "docs/snippets/agentgateway.md" >}} target details for the MCP server. 
-
+2. Create a {{< reuse "docs/snippets/backend.md" >}} that sets up the {{< reuse "docs/snippets/agentgateway.md" >}} target details for the MCP server. 
+   {{< version include-if="2.1.x" >}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
+   metadata:
+     name: mcp-backend
+   spec:
+     type: MCP
+     mcp:
+       targets:
+       - name: mcp-target
+         static:
+           host: mcp-website-fetcher.default.svc.cluster.local
+           port: 80
+           protocol: SSE   
+   EOF
+   ```
+   {{< /version >}}{{< version include-if="2.2.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
-   kind: AgentgatewayBackend
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: mcp-backend
    spec:
@@ -66,62 +84,52 @@ Deploy a Model Context Protocol (MCP) server that you want {{< reuse "docs/snipp
            protocol: SSE   
    EOF
    ```
+   {{< /version >}}
 
 ## Step 2: Route with agentgateway {#agentgateway}
 
-Route to the MCP server with {{< reuse "docs/snippets/agentgateway.md" >}}.
+Create an HTTPRoute resource that routes to the {{< reuse "docs/snippets/backend.md" >}} that you created in the previous step.
 
-1. Create a Gateway resource that uses the `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}` GatewayClass. Kgateway automatically spins up an {{< reuse "docs/snippets/agentgateway.md" >}} proxy for you.
+{{< version include-if="2.1.x" >}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mcp
+spec:
+  parentRefs:
+  - name: agentgateway
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}  
+  rules:
+    - backendRefs:
+      - name: mcp-backend
+        group: gateway.kgateway.dev
+        kind: {{< reuse "docs/snippets/backend.md" >}}  
+EOF
+```
+{{< /version >}}
 
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: Gateway
-   metadata:
-     name: agentgateway
-   spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
-     listeners:
-     - protocol: HTTP
-       port: 80
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
-   EOF
-   ```
-
-2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
-
-   ```sh
-   kubectl get gateway agentgateway
-   ```
-
-   Example output: 
-   
-   ```txt
-   NAME           CLASS          ADDRESS                                  PROGRAMMED   AGE
-   agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
-   ```
-
-3. Create an HTTPRoute resource that routes to the Backend that you created in the previous step.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: HTTPRoute
-   metadata:
-     name: mcp
-   spec:
-     parentRefs:
-     - name: agentgateway
-     rules:
-       - backendRefs:
-         - name: mcp-backend
-           group: agentgateway.dev
-           kind: AgentgatewayBackend
-   EOF
-   ```
+{{< version include-if="2.2.x" >}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: mcp
+spec:
+  parentRefs:
+  - name: agentgateway
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}  
+  rules:
+  - 
+    backendRefs:
+    - name: mcp-backend
+      group: agentgateway.dev
+      kind: {{< reuse "docs/snippets/backend.md" >}}  
+EOF
+```
+{{< /version >}}
 
 ## Step 3: Verify the connection {#verify}
 
@@ -132,13 +140,13 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -o=jsonpath="{.status.addresses[0].value}")
+   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
    echo $INGRESS_GW_ADDRESS
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway 8080:80
+   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}  8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -170,7 +178,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
 ```sh
 kubectl delete Deployment mcp-website-fetcher
 kubectl delete Service mcp-website-fetcher
-kubectl delete Backend mcp-backend
-kubectl delete Gateway agentgateway
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} mcp-backend
 kubectl delete HTTPRoute mcp
 ```
+
