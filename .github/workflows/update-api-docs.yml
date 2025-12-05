@@ -20,6 +20,9 @@ jobs:
       pull-requests: write
     
     steps:
+      - name: Echo workflow SHA
+        run: echo "workflow_sha=$GITHUB_SHA"
+
       - name: Checkout docs repository
         uses: actions/checkout@v4
         with:
@@ -262,6 +265,11 @@ jobs:
                       '--dry-run'
                   ], capture_output=True, text=True, check=True)
                   
+                  # Debug: log first lines of raw helm-docs output
+                  print('---- helm-docs raw output (first 40 lines) ----')
+                  print('\n'.join(result.stdout.splitlines()[:40]))
+                  print('---- end helm-docs raw output ----')
+                  
                   # Write the raw helm-docs output to assets directory
                   # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
                   # This prevents overwriting when promoting versions
@@ -321,6 +329,13 @@ jobs:
                   
                   with open(helm_file, 'w', encoding='utf-8') as f:
                       f.write(content)
+                  
+                  # Debug: log first lines after cleanup to ensure defaults/columns remain
+                  print('---- helm-docs post-cleanup (first 40 lines) ----')
+                  with open(helm_file, 'r', encoding='utf-8') as f:
+                      cleaned_preview = f.read().splitlines()[:40]
+                  print('\n'.join(cleaned_preview))
+                  print('---- end helm-docs post-cleanup ----')
                   
                   print(f'    ✓ Generated Helm docs in {helm_file}')
                   
