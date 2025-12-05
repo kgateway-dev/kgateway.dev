@@ -20,9 +20,6 @@ jobs:
       pull-requests: write
     
     steps:
-      - name: Echo workflow SHA
-        run: echo "workflow_sha=$GITHUB_SHA"
-
       - name: Checkout docs repository
         uses: actions/checkout@v4
         with:
@@ -265,11 +262,6 @@ jobs:
                       '--dry-run'
                   ], capture_output=True, text=True, check=True)
                   
-                  # Debug: log first lines of raw helm-docs output
-                  print('---- helm-docs raw output (first 40 lines) ----')
-                  print('\n'.join(result.stdout.splitlines()[:40]))
-                  print('---- end helm-docs raw output ----')
-                  
                   # Write the raw helm-docs output to assets directory
                   # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
                   # This prevents overwriting when promoting versions
@@ -293,13 +285,14 @@ jobs:
                   with open(helm_file, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
+                  # Normalize any bare type=info callouts before further processing
+                  content = content.replace('{{< callout type=info >}}', '{{< callout type="info" >}}')
+                  
                   # If no values table, append callout (once). Otherwise normalize callout quotes.
                   if '## Values' not in content or ('## Values' in content and '|-----|' not in content):
                       note = '\n\n{{< callout type="info" >}}\nNo configurable values are currently available for this chart.\n{{< /callout >}}\n'
                       if '{{< callout' not in content:
                           content = content.rstrip() + note
-                  # Normalize any bare type=info callouts that might slip in
-                  content = content.replace('{{< callout type=info >}}', '{{< callout type="info" >}}')
                   
                   # Swap Default and Description columns in the values table
                   swapped_lines = []
@@ -331,13 +324,6 @@ jobs:
                   
                   with open(helm_file, 'w', encoding='utf-8') as f:
                       f.write(content)
-                  
-                  # Debug: log first lines after cleanup to ensure defaults/columns remain
-                  print('---- helm-docs post-cleanup (first 40 lines) ----')
-                  with open(helm_file, 'r', encoding='utf-8') as f:
-                      cleaned_preview = f.read().splitlines()[:40]
-                  print('\n'.join(cleaned_preview))
-                  print('---- end helm-docs post-cleanup ----')
                   
                   print(f'    ✓ Generated Helm docs in {helm_file}')
                   
