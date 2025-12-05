@@ -1,6 +1,6 @@
 {{< version exclude-if="2.0.x" >}}
 {{< callout type="warning" >}}
-The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](../../agentgateway/) instead.
+The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](../../../../../../../agentgateway/) instead.
 {{< /callout >}}
 {{< /version >}}
 {{< version include-if="2.0.x" >}}
@@ -273,11 +273,16 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    kubectl label ns httpbin istio.io/dataplane-mode=ambient
    ```
 
-## Create a waypoint proxy
+{{% version exclude-if="2.0.x" %}}
 
-Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deploy {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy in your cluster. 
+## Enable the waypoint integration {#waypoint-integration}
 
-{{< version exclude-if="2.0.x" >}}
+Enable the waypoint integration for Envoy-based kgateway proxies. 
+
+{{< callout type="warning" >}}
+Note that the waypoint integration is deprecated for kgateway proxies and is planned to be removed in version 2.2.
+{{< /callout >}}
+
 1. Enable the waypoint integration in your kgateway Helm chart. 
    ```sh
    helm get values {{< reuse "/docs/snippets/kgateway.md" >}} -n {{< reuse "/docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/docs/snippets/kgateway.md" >}}.yaml
@@ -300,12 +305,14 @@ Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deplo
    kgateway            kgateway.dev/kgateway   True       2d19h
    kgateway-waypoint   kgateway.dev/kgateway   True       1s
    ```
+{{% /version %}}
+
+## Create a waypoint proxy
+
+Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deploy {{< reuse "/docs/snippets/kgateway.md" >}} as a waypoint proxy in your cluster.
   
-3. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
-1. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step. 
-{{< /version >}}
+1. Create a waypoint proxy in the httpbin namespace. Note that creating a waypoint proxy does not automatically enforce Layer 7 policies for the apps in your cluster. To assign a waypoint, you must label your apps. You learn how to label your apps in a later step.
+
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -322,12 +329,8 @@ Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deplo
    EOF
    ```
 
-{{< version exclude-if="2.0.x" >}}
-4. Wait for the waypoint proxy to deploy successfully.
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
 2. Wait for the waypoint proxy to deploy successfully.
-{{< /version >}}
+
    ```sh
    kubectl -n httpbin rollout status deploy {{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
@@ -337,23 +340,15 @@ Use the `{{< reuse "/docs/snippets/waypoint-class.md" >}}` GatewayClass to deplo
    deployment "{{< reuse "/docs/snippets/waypoint-class.md" >}}" successfully rolled out
    ```
 
-{{< version exclude-if="2.0.x" >}}
-5. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
 3. Label the httpbin2 and httpbin3 apps to use the waypoint proxy that you created.
-{{< /version >}}
+
    ```sh
    kubectl -n httpbin label svc httpbin2 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
    kubectl -n httpbin label svc httpbin3 istio.io/use-waypoint={{< reuse "/docs/snippets/waypoint-class.md" >}}
    ```
 
-{{< version exclude-if="2.0.x" >}}
-6. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
 4. Send a request from the client app to httpbin2 and httpbin3. Verify that the request succeeds. 
-{{< /version >}}
+
    ```sh
     kubectl -n httpbin exec deploy/client -- curl -s http://httpbin2:8000/get
     kubectl -n httpbin exec deploy/client -- curl -s http://httpbin3:8000/get
