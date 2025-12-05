@@ -293,32 +293,34 @@ jobs:
                   with open(helm_file, 'r', encoding='utf-8') as f:
                       content = f.read()
                   
+                  # If no values table, append callout (once). Otherwise normalize callout quotes.
                   if '## Values' not in content or ('## Values' in content and '|-----|' not in content):
                       note = '\n\n{{< callout type="info" >}}\nNo configurable values are currently available for this chart.\n{{< /callout >}}\n'
-                      content = content.rstrip() + note
-              else:
+                      if '{{< callout' not in content:
+                          content = content.rstrip() + note
                   # Normalize any bare type=info callouts that might slip in
                   content = content.replace('{{< callout type=info >}}', '{{< callout type="info" >}}')
                   
                   # Swap Default and Description columns in the values table
-                  lines = content.splitlines()
                   swapped_lines = []
                   in_table = False
-                  for line in lines:
-                      if line.strip().startswith('| Key ') and 'Default' in line and 'Description' in line:
+                  for line in content.splitlines():
+                      stripped = line.strip()
+                      if stripped.startswith('| Key ') and 'Default' in line and 'Description' in line:
                           in_table = True
                           swapped_lines.append('| Key | Type | Description | Default |')
                           continue
-                      if in_table and line.strip().startswith('|-----'):
+                      if in_table and stripped.startswith('|-----'):
                           swapped_lines.append('|-----|------|-------------|---------|')
                           continue
                       if in_table:
-                          if not line.strip().startswith('|'):
+                          if not stripped.startswith('|'):
                               in_table = False
                               swapped_lines.append(line)
                               continue
                           parts = [p.strip() for p in line.split('|')]
-                          if len(parts) >= 5:
+                          # Expect 6 elements with leading/trailing blanks; ensure we have enough
+                          if len(parts) >= 6:
                               key, typ, default, desc = parts[1], parts[2], parts[3], parts[4]
                               swapped_lines.append(f'| {key} | {typ} | {desc} | {default} |')
                           else:
