@@ -156,6 +156,128 @@ jobs:
               else:
                   subprocess.run(['git', 'clone', '--depth', '1', '--branch', ref, 'https://github.com/kgateway-dev/kgateway.git', kgateway_dir], check=True)
           
+          def is_version_2_2_or_later(version):
+              '''Check if version is 2.2.x or later'''
+              try:
+                  # Parse version string (e.g., "2.2.x", "2.1.x", "main")
+                  if version == 'main':
+                      return True  # main is always latest
+                  parts = version.split('.')
+                  if len(parts) >= 2:
+                      major = int(parts[0])
+                      minor = int(parts[1].replace('x', '0'))
+                      return major > 2 or (major == 2 and minor >= 2)
+                  return False
+              except (ValueError, IndexError):
+                  return False
+          
+          def extract_package_section(content, package_name):
+              '''Extract a specific package section from generated markdown'''
+              import re
+              
+              lines = content.split('\n')
+              
+              # Find the Packages section header
+              packages_start = None
+              packages_end = None
+              
+              for i, line in enumerate(lines):
+                  if line.strip() == '## Packages':
+                      packages_start = i
+                  elif packages_start is not None and line.strip().startswith('## ') and not line.strip() == '## Packages':
+                      packages_end = i
+                      break
+              
+              if packages_start is None:
+                  return None
+              
+              if packages_end is None:
+                  packages_end = len(lines)
+              
+              # Extract and filter the Packages list
+              packages_section = ['## Packages']
+              found_package = False
+              
+              for i in range(packages_start + 1, packages_end):
+                  line = lines[i]
+                  # Check if this line contains the target package
+                  if package_name in line:
+                      packages_section.append(line)
+                      found_package = True
+                  elif found_package and line.strip() == '':
+                      # Add empty line after packages list
+                      packages_section.append('')
+                      break
+              
+              if not found_package:
+                  return None
+              
+              # Find the package section header
+              # Pattern: ## package.name/v1alpha1
+              package_header_pattern = rf'^## {re.escape(package_name)}$'
+              
+              package_start_idx = None
+              
+              # Find the start of the package section
+              for i, line in enumerate(lines):
+                  if re.match(package_header_pattern, line.strip()):
+                      package_start_idx = i
+                      break
+              
+              if package_start_idx is None:
+                  return None
+              
+              # Find the end of the package section (next ## header or end of file)
+              package_end_idx = len(lines)
+              for i in range(package_start_idx + 1, len(lines)):
+                  if lines[i].startswith('## '):
+                      package_end_idx = i
+                      break
+              
+              # Extract the package section content
+              package_section_lines = lines[package_start_idx:package_end_idx]
+              
+              # Combine packages section and package content
+              result = '\n'.join(packages_section + package_section_lines)
+              return result
+          
+          def _post_process_api_docs(api_file):
+              '''Apply post-processing to API docs file'''
+              # Format the generated docs with sed commands
+              subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
+              subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
+              subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
+              
+              # Additional post-processing to clean up complex struct types
+              import re
+              with open(api_file, 'r') as f:
+                  content = f.read()
+              
+              # Replace complex struct type definitions with simple "struct"
+              # Pattern matches: _Underlying type:_ _[struct{...}...]_
+              content = re.sub(
+                  r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              # Handle empty struct{} patterns
+              content = re.sub(
+                  r'_Underlying type:_ _\[struct\{\}\]\(#struct\{\}\)_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              # Also handle cases without the link wrapper
+              content = re.sub(
+                  r'_Underlying type:_ _struct\{[^\}]+\}_',
+                  '_Underlying type:_ _struct_',
+                  content
+              )
+              
+              with open(api_file, 'w') as f:
+                  f.write(content)
+          
           def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
               '''Generate API reference documentation'''
               print(f'  → Generating API docs for version {version}')
@@ -185,59 +307,77 @@ jobs:
               
               os.remove('./out.md')
               
-              # Generate docs for both envoy and agentgateway directories
-              for doc_dir in ['envoy', 'agentgateway']:
-                  target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
-                  os.makedirs(target_path, exist_ok=True)
-                  
-                  api_file = f'{target_path}api.md'
-                  
-                  # Create API reference file with frontmatter
-                  with open(api_file, 'w') as f:
-                      f.write('---\n')
-                      f.write('title: API reference\n')
-                      f.write('weight: 10\n')
-                      f.write('---\n\n')
-                      f.write(generated_content)
-                  
-                  # Format the generated docs with sed commands
-                  subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
-                  subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
-                  subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
-                  
-                  # Additional post-processing to clean up complex struct types
-                  import re
-                  with open(api_file, 'r') as f:
-                      content = f.read()
-                  
-                  # Replace complex struct type definitions with simple "struct"
-                  # Pattern matches: _Underlying type:_ _[struct{...}...]_
-                  content = re.sub(
-                      r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
-                      '_Underlying type:_ _struct_',
-                      content
-                  )
-                  
-                  # Handle empty struct{} patterns
-                  content = re.sub(
-                      r'_Underlying type:_ _\[struct\{\}\]\(#struct\{\}\)_',
-                      '_Underlying type:_ _struct_',
-                      content
-                  )
-                  
-                  # Also handle cases without the link wrapper
-                  content = re.sub(
-                      r'_Underlying type:_ _struct\{[^\}]+\}_',
-                      '_Underlying type:_ _struct_',
-                      content
-                  )
-                  
-                  with open(api_file, 'w') as f:
-                      f.write(content)
-                  
-                  print(f'    ✓ Generated API docs in {api_file}')
+              # Check if version is 2.2.x or later
+              split_api = is_version_2_2_or_later(version)
               
-              return True
+              if split_api:
+                  # For 2.2.x+, split by package
+                  print(f'    Version {version} uses split API - generating separate docs per package')
+                  
+                  # Extract agentgateway.dev/v1alpha1 package
+                  agentgateway_content = extract_package_section(generated_content, 'agentgateway.dev/v1alpha1')
+                  if agentgateway_content:
+                      target_path = f'content/docs/agentgateway/{url_path}/reference/'
+                      os.makedirs(target_path, exist_ok=True)
+                      api_file = f'{target_path}api.md'
+                      
+                      with open(api_file, 'w') as f:
+                          f.write('---\n')
+                          f.write('title: API reference\n')
+                          f.write('weight: 10\n')
+                          f.write('---\n\n')
+                          f.write(agentgateway_content)
+                      
+                      # Apply post-processing
+                      _post_process_api_docs(api_file)
+                      print(f'    ✓ Generated agentgateway API docs in {api_file}')
+                  else:
+                      print(f'    ⚠ Warning: Could not extract agentgateway.dev/v1alpha1 package')
+                  
+                  # Extract gateway.kgateway.dev/v1alpha1 package
+                  envoy_content = extract_package_section(generated_content, 'gateway.kgateway.dev/v1alpha1')
+                  if envoy_content:
+                      target_path = f'content/docs/envoy/{url_path}/reference/'
+                      os.makedirs(target_path, exist_ok=True)
+                      api_file = f'{target_path}api.md'
+                      
+                      with open(api_file, 'w') as f:
+                          f.write('---\n')
+                          f.write('title: API reference\n')
+                          f.write('weight: 10\n')
+                          f.write('---\n\n')
+                          f.write(envoy_content)
+                      
+                      # Apply post-processing
+                      _post_process_api_docs(api_file)
+                      print(f'    ✓ Generated envoy API docs in {api_file}')
+                  else:
+                      print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
+                  
+                  return True
+              else:
+                  # For earlier versions, write same content to both directories (legacy behavior)
+                  print(f'    Version {version} uses unified API - generating same docs for both sections')
+                  
+                  for doc_dir in ['envoy', 'agentgateway']:
+                      target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
+                      os.makedirs(target_path, exist_ok=True)
+                      
+                      api_file = f'{target_path}api.md'
+                      
+                      # Create API reference file with frontmatter
+                      with open(api_file, 'w') as f:
+                          f.write('---\n')
+                          f.write('title: API reference\n')
+                          f.write('weight: 10\n')
+                          f.write('---\n\n')
+                          f.write(generated_content)
+                      
+                      # Apply post-processing
+                      _post_process_api_docs(api_file)
+                      print(f'    ✓ Generated API docs in {api_file}')
+                  
+                  return True
           
           def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway'):
               '''Generate Helm chart reference documentation'''
