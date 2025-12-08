@@ -3530,6 +3530,24 @@ _Appears in:_
 | `omitDefaultSecurityContext` _boolean_ | OmitDefaultSecurityContext is used to control whether or not<br />`securityContext` fields should be rendered for the various generated<br />Deployments/Containers that are dynamically provisioned by the deployer.<br /><br />When set to true, no `securityContexts` will be provided and will left<br />to the user/platform to be provided.<br /><br />This should be enabled on platforms such as Red Hat OpenShift where the<br />`securityContext` will be dynamically added to enforce the appropriate<br />level of security. |  |  |
 
 
+#### ListenerConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [ListenerPolicySpec](#listenerpolicyspec)
+- [ListenerPortConfig](#listenerportconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />When set, Envoy will expect connections to include the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
+| `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
+
+
 #### ListenerPolicy
 
 
@@ -3567,8 +3585,25 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target resources by reference to attach the policy to.<br />Only supports `Gateway` resources |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select `Gateway` resources to attach the policy to. |  |  |
-| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />When set, Envoy will expect connections to include the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
-| `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
+| `default` _[ListenerConfig](#listenerconfig)_ | Default specifies default listener configuration for all Listeners, unless a per-port<br />configuration is defined. |  |  |
+| `perPort` _[ListenerPortConfig](#listenerportconfig) array_ | Per port configuration allows overriding the listener config per port. Once set, this<br />configuration completely replaces the default configuration for all listeners handling traffic<br />that match this port. Unspecified fields in per-port configuration will not inherit values from default. |  | MaxItems: 64 <br /> |
+
+
+#### ListenerPortConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [ListenerPolicySpec](#listenerpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `port` _integer_ | The Port indicates the Port Number to which the Listener configuration will be<br />applied. This configuration will be applied to all Listeners handling<br />traffic that match this port. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
+| `listener` _[ListenerConfig](#listenerconfig)_ | Listener stores the configuration that will be applied to all Listeners handling<br />matching the given port. |  |  |
 
 
 #### LoadBalancer
@@ -4010,7 +4045,7 @@ The presence of this configuration enables PROXY protocol support.
 
 
 _Appears in:_
-- [ListenerPolicySpec](#listenerpolicyspec)
+- [ListenerConfig](#listenerconfig)
 
 
 
