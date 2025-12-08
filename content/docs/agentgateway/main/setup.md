@@ -4,7 +4,7 @@ weight: 15
 description:
 ---
 
-Set up an {{< reuse "docs/snippets/agentgateway.md" >}} proxy. 
+Set up an agentgateway proxy. 
 
 ## Before you begin
 
