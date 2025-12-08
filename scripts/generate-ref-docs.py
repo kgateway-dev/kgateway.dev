@@ -266,6 +266,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(agentgateway_content)
             
             # Apply post-processing
@@ -286,6 +287,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(envoy_content)
             
             # Apply post-processing
@@ -311,6 +313,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(generated_content)
             
             # Apply post-processing
