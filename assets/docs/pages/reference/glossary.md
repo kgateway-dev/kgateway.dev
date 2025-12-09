@@ -53,6 +53,8 @@ In kgateway, two types of proxies can act as API Gateways:
 - The **Envoy-based Kgateway proxy** (traditional API and service mesh traffic)  
 - **Agentgateway** (AI/LLM-specific traffic)
 
+{{< reuse "docs/snippets/control-plane-note.md" >}}
+
 ### Backends
 Destination services or endpoints that kgateway routes traffic to, such as Kubernetes Services, Lambdas, external hosts, or custom backends. These backends are connected to routes for forwarding traffic.
 
@@ -68,6 +70,8 @@ A logical group of upstream endpoints used by Envoy for load balancing. The Envo
 The system that configures and manages the data plane.  
 In kgateway, the control plane distributes routing rules, policies, and extension configuration to the supported data plane proxies: the Envoy-based kgateway proxy and the agentgateway proxy.
 
+{{< reuse "docs/snippets/control-plane-note.md" >}}
+
 ### CRDs (Custom Resource Definitions)
 Extend the Kubernetes API with custom resource types.
 
@@ -79,7 +83,9 @@ Extend the Kubernetes API with custom resource types.
 The layer that actually processes live traffic. Kgateway supports the following data plane proxies:
 
 - Envoy-based Kgateway proxies
-- Agentgateway (for AI workloads) 
+- Agentgateway (for AI workloads)
+
+{{< reuse "docs/snippets/control-plane-note.md" >}} 
 
 ### Delegation
 A way to share routing responsibility across teams or namespaces. A parent route delegates part of its routing logic to child routes, allowing flexible ownership.
