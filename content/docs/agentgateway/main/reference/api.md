@@ -13,6 +13,7 @@ weight: 10
 
 ### Resource Types
 - [AgentgatewayBackend](#agentgatewaybackend)
+- [AgentgatewayParameters](#agentgatewayparameters)
 - [AgentgatewayPolicy](#agentgatewaypolicy)
 
 
@@ -275,6 +276,156 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#condition-v1-meta) array_ | Conditions is the list of conditions for the backend. |  | MaxItems: 8 <br /> |
+
+
+#### AgentgatewayParameters
+
+
+
+
+
+
+
+
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `apiVersion` _string_ | `agentgateway.dev/v1alpha1` | | |
+| `kind` _string_ | `AgentgatewayParameters` | | |
+| `kind` _string_ | Kind is a string value representing the REST resource this object represents.<br />Servers may infer this from the endpoint the client submits requests to.<br />Cannot be updated.<br />In CamelCase.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds |  |  |
+| `apiVersion` _string_ | APIVersion defines the versioned schema of this representation of an object.<br />Servers should convert recognized schemas to the latest internal value, and<br />may reject unrecognized values.<br />More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources |  |  |
+| `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[AgentgatewayParametersSpec](#agentgatewayparametersspec)_ | spec defines the desired state of AgentgatewayParameters. |  |  |
+| `status` _[AgentgatewayParametersStatus](#agentgatewayparametersstatus)_ | status defines the current state of AgentgatewayParameters. |  |  |
+
+
+#### AgentgatewayParametersConfigs
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `logging` _[AgentgatewayParametersLogging](#agentgatewayparameterslogging)_ | logging configuration for Agentgateway. By default, all logs are set to "info" level. |  |  |
+| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br />  rawConfig:<br />    binds:<br />    - port: 3000<br />      listeners:<br />      - routes:<br />        - policies:<br />            cors:<br />              allowOrigins:<br />                - "*"<br />              allowHeaders:<br />                - mcp-protocol-version<br />                - content-type<br />                - cache-control<br />          backends:<br />          - mcp:<br />              targets:<br />              - name: everything<br />                stdio:<br />                  cmd: npx<br />                  args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
+
+
+#### AgentgatewayParametersLogging
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParametersConfigs](#agentgatewayparametersconfigs)
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `level` _string_ | Logging level in standard RUST_LOG syntax, e.g. 'info', the default, or<br />by module, comma-separated. E.g.,<br />"rmcp=warn,hickory_server::server::server_future=off,typespec_client_core::http::policies::logging=warn" |  |  |
+| `format` _[AgentgatewayParametersLoggingFormat](#agentgatewayparametersloggingformat)_ |  |  | Enum: [json text] <br /> |
+
+
+#### AgentgatewayParametersLoggingFormat
+
+_Underlying type:_ _string_
+
+The default logging format is text.
+
+_Validation:_
+- Enum: [json text]
+
+_Appears in:_
+- [AgentgatewayParametersLogging](#agentgatewayparameterslogging)
+
+| Field | Description |
+| --- | --- |
+| `json` |  |
+| `text` |  |
+
+
+#### AgentgatewayParametersObjectMetadata
+
+
+
+
+
+
+
+_Appears in:_
+- [KubernetesResourceOverlay](#kubernetesresourceoverlay)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `labels` _object (keys:string, values:string)_ | Map of string keys and values that can be used to organize and categorize<br />(scope and select) objects. May match selectors of replication controllers<br />and services.<br />More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels |  |  |
+| `annotations` _object (keys:string, values:string)_ | Annotations is an unstructured key value map stored with a resource that may be<br />set by external tools to store and retrieve arbitrary metadata. They are not<br />queryable and should be preserved when modifying objects.<br />More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations |  |  |
+
+
+#### AgentgatewayParametersOverlays
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `deployment` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deployment allows specifying overrides for the generated Deployment resource. |  |  |
+| `service` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | service allows specifying overrides for the generated Service resource. |  |  |
+| `serviceAccount` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccount allows specifying overrides for the generated ServiceAccount resource. |  |  |
+
+
+#### AgentgatewayParametersSpec
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParameters](#agentgatewayparameters)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `logging` _[AgentgatewayParametersLogging](#agentgatewayparameterslogging)_ | logging configuration for Agentgateway. By default, all logs are set to "info" level. |  |  |
+| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br />  rawConfig:<br />    binds:<br />    - port: 3000<br />      listeners:<br />      - routes:<br />        - policies:<br />            cors:<br />              allowOrigins:<br />                - "*"<br />              allowHeaders:<br />                - mcp-protocol-version<br />                - content-type<br />                - cache-control<br />          backends:<br />          - mcp:<br />              targets:<br />              - name: everything<br />                stdio:<br />                  cmd: npx<br />                  args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
+| `deployment` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deployment allows specifying overrides for the generated Deployment resource. |  |  |
+| `service` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | service allows specifying overrides for the generated Service resource. |  |  |
+| `serviceAccount` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccount allows specifying overrides for the generated ServiceAccount resource. |  |  |
+
+
+#### AgentgatewayParametersStatus
+
+
+
+The current conditions of the AgentgatewayParameters. This is not currently implemented.
+
+
+
+_Appears in:_
+- [AgentgatewayParameters](#agentgatewayparameters)
+
 
 
 #### AgentgatewayPolicy
@@ -926,6 +1077,28 @@ _Appears in:_
 | `None` |  |
 
 
+#### Image
+
+
+
+A container image. See https://kubernetes.io/docs/concepts/containers/images
+for details.
+
+
+
+_Appears in:_
+- [AgentgatewayParametersConfigs](#agentgatewayparametersconfigs)
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `registry` _string_ | The image registry. |  |  |
+| `repository` _string_ | The image repository (name). |  |  |
+| `tag` _string_ | The image tag. |  |  |
+| `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
+| `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
+
+
 #### InsecureTLSMode
 
 _Underlying type:_ _string_
@@ -1031,6 +1204,27 @@ _Appears in:_
 | `retries` _integer_ | retries specifies the maximum number of keep-alive probes to send before dropping the connection.<br />If unset, this defaults to 9. |  | Maximum: 64 <br />Minimum: 1 <br /> |
 | `time` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | time specifies the number of seconds a connection needs to be idle before keep-alive probes start being sent.<br />If unset, this defaults to 180s. |  |  |
 | `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | interval specifies the number of seconds between keep-alive probes.<br />If unset, this defaults to 180s. |  |  |
+
+
+#### KubernetesResourceOverlay
+
+
+
+KubernetesResourceOverlay provides a mechanism to customize generated
+Kubernetes resources using [Strategic Merge
+Patch](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md)
+semantics.
+
+
+
+_Appears in:_
+- [AgentgatewayParametersOverlays](#agentgatewayparametersoverlays)
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `metadata` _[AgentgatewayParametersObjectMetadata](#agentgatewayparametersobjectmetadata)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
+| `spec` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | Spec provides an opaque mechanism to configure the resource Spec.<br />This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec)<br />and will be merged with the generated configuration using **Strategic Merge Patch** semantics.<br />The patch is applied after all other fields are applied.<br />If you merge-patch the same resource from AgentgatewayParameters on the<br />GatewayClass and also from AgentgatewayParameters on the Gateway, then<br />the GatewayClass merge-patch happens first.<br /><br /># Strategic Merge Patch & Deletion Guide<br /><br />This merge strategy allows you to override individual fields, merge lists, or delete items<br />without needing to provide the entire resource definition.<br /><br />**1. Replacing Values (Scalars):**<br />Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.<br /><br />**2. Merging Lists (Append/Merge):**<br />Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`)<br />will append your items to the generated list, or update existing items if keys match.<br /><br />**3. Deleting List Items ($patch: delete):**<br />To remove an item from a generated list (e.g., removing a default sidecar), you must use<br />the special `$patch: delete` directive.<br /><br />  spec:<br />    containers:<br />      - name: agent-gateway<br />        # Delete the securityContext using $patch: delete<br />        securityContext:<br />          $patch: delete<br /><br />**4. Deleting/Clearing Map Fields (null):**<br />To remove a map field or a scalar entirely, set its value to `null`.<br /><br />  spec:<br />    template:<br />      spec:<br />        nodeSelector: null  # Removes default nodeSelector<br /><br />**5. Replacing Lists Entirely ($patch: replace):**<br />If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.<br /><br />  service:<br />    spec:<br />      ports:<br />        - $patch: replace<br />        - name: http<br />          port: 80<br />          targetPort: 8080<br />          protocol: TCP<br />        - name: https<br />          port: 443<br />          targetPort: 8443<br />          protocol: TCP |  | Type: object <br /> |
 
 
 #### LLMProvider
@@ -1550,6 +1744,24 @@ _Appears in:_
 | `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
 
 
+#### ShutdownSpec
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParametersConfigs](#agentgatewayparametersconfigs)
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `min` _integer_ | Minimum time (in seconds) to wait before allowing Agentgateway to<br />terminate. Refer to the CONNECTION_MIN_TERMINATION_DEADLINE environment<br />variable for details. |  | Maximum: 3.1536e+07 <br />Minimum: 0 <br /> |
+| `max` _integer_ | Maximum time (in seconds) to wait before allowing Agentgateway to<br />terminate. Refer to the TERMINATION_GRACE_PERIOD_SECONDS environment<br />variable for details. |  | Maximum: 3.1536e+07 <br />Minimum: 0 <br /> |
+
+
 #### StaticBackend
 
 
@@ -1721,6 +1933,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the webhook server to reach.<br /><br />Supported types: Service and Backend. |  |  |
-| `forwardHeaderMatches` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
+| `forwardHeaderMatches` _HTTPHeaderMatch array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
 
 
