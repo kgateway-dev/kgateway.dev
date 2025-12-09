@@ -28,7 +28,7 @@ You can configure failover across multiple models and providers by using priorit
    2. OpenAI `gpt-5.1` model (fallback)
    3. OpenAI `gpt-3.5-turbo` model (lowest priority)
 
-   {{% version include-if="2.1.x" %}}
+   {{< version include-if="2.1.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -66,7 +66,7 @@ You can configure failover across multiple models and providers by using priorit
                  name: openai-secret
    EOF
    ```
-   {{% /version %}}{{% version include-if="2.2.x" %}}
+   {{< /version >}}{{< version include-if="2.2.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
@@ -102,7 +102,7 @@ You can configure failover across multiple models and providers by using priorit
    EOF
    ```
 
-   {{% /version %}}
+   {{< /version >}}
    
    {{% /tab %}}
    {{% tab tabName="Cost-based priority across providers" %}}
@@ -113,7 +113,7 @@ You can configure failover across multiple models and providers by using priorit
 
    Make sure that you configured both Anthropic and OpenAI providers.
 
-   {{% version include-if="2.1.x" %}}
+   {{< version include-if="2.1.x" >}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -158,8 +158,8 @@ You can configure failover across multiple models and providers by using priorit
                  name: anthropic-secret
    EOF
    ```
-   {{% /version %}}
-   {{% version include-if="2.2.x" %}}
+   {{< /version >}}
+   {{< version include-if="2.2.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
@@ -202,7 +202,7 @@ You can configure failover across multiple models and providers by using priorit
                      name: anthropic-secret
    EOF
    ```
-   {{% /version %}}
+   {{< /version >}}
    
    {{% /tab %}}
    {{< /tabs >}}

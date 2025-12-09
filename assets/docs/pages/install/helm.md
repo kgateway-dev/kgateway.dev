@@ -19,7 +19,6 @@ As part of the control plane installation, you enable the {{< reuse "/docs/snipp
 Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm.
 
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}.
-   
    {{< tabs items="Standard, Experimental" tabTotal="2" >}}
    {{% tab tabName="Standard" %}}
    ```sh
@@ -79,19 +78,19 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 --set agentgateway.enabled=true
 ```
-{{% /version %}}
-{{% version include-if="2.2.x" %}}
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} 
 ```
-{{% /version %}}
+{{< /version >}}
 {{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Custom values" %}}
@@ -103,21 +102,21 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \ 
 --set agentgateway.enabled=true \ 
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
-{{% /version %}}
-{{% version include-if="2.2.x" %}}
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \ 
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
-{{% /version %}}
+{{< /version >}}
 {{% /conditional-text %}}
 {{% /tab %}}
 {{% tab tabName="Development" %}}
@@ -131,7 +130,7 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 ```
 {{% /conditional-text %}}
 {{% conditional-text include-if="agentgateway" %}}
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
@@ -139,15 +138,15 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 --set agentgateway.enabled=true \
 --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
 ```
-{{% /version %}}
-{{% version include-if="2.2.x" %}}
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
 --set controller.image.pullPolicy=Always \
 --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
 ```
-{{% /version %}}
+{{< /version >}}
 {{% /conditional-text %}}
 {{% /tab %}}
       {{< /tabs >}}

@@ -56,9 +56,8 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
       ```
    {{% /tab %}}
    {{< /tabs >}}
-   {{% version include-if="2.1.x" %}}
 
-3. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
+{{< version include-if="2.1.x" >}}2. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -91,7 +90,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    | `region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
 
-4. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
+3. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
    ```yaml
    kubectl apply -f- <<EOF                                             
    apiVersion: gateway.networking.k8s.io/v1
@@ -115,9 +114,9 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
-   {{% /version %}}{{% version include-if="2.2.x" %}}
+   {{< /version >}}{{< version include-if="2.2.x" >}}
 
-3. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure your LLM provider. Make sure to reference the secret that holds your credentials to access the LLM. 
+2. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure your LLM provider. Make sure to reference the secret that holds your credentials to access the LLM. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
@@ -147,7 +146,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
    | `bedrock.region`    | The AWS region where your Bedrock model is deployed. Multiple regions are not supported. |
    | `policies.auth` | Provide the credentials to use to access the Amazon Bedrock API. The example refers to the secret that you previously created. To use IRSA, omit the `auth` settings.|
 
-4. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
+3. Create an HTTPRoute resource to route requests through your agentgateway proxy to the Bedrock {{< reuse "docs/snippets/backend.md" >}}. Note that {{< reuse "docs/snippets/kgateway.md" >}} automatically rewrites the endpoint that you set up (such as `/bedrock`) to the appropriate chat completion endpoint of the LLM provider for you, based on the LLM provider that you set up in the {{< reuse "docs/snippets/backend.md" >}} resource.
    ```yaml
    kubectl apply -f- <<EOF                                             
    apiVersion: gateway.networking.k8s.io/v1
@@ -171,8 +170,9 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
-   {{% /version %}}
-5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+   {{< /version >}}
+   
+4. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

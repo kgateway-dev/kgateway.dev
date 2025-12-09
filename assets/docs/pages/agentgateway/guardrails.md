@@ -222,7 +222,7 @@ The webhook server is configured to take the following actions:
 
 Configure a {{< reuse "docs/snippets/trafficpolicy.md" >}} to use the webhook server for prompt guarding.
 
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 
 ```yaml
 kubectl apply -f - <<EOF
@@ -259,8 +259,8 @@ EOF
 | `ai.promptGuard` | The AI prompt guarding configuration that you want to set up. In this example, you configure the webhook server for both request and response guardrails. |
 | `webhook.host` and `.port` | The host address and port number of the webhook server. For this example, you use the LoadBalancer service address as the webhook server address. If the webhook service is deployed in the same cluster as the gateway proxy, you can also use the Kubernetes DNS name of the service, such as `ai-guardrail-webhook.{{< reuse "docs/snippets/namespace.md" >}}.svc.cluster.local`. The example webhook server is configured to use port 8000. |
 
-{{% /version %}}
-{{% version include-if="2.2.x" %}}
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
 
 ```yaml
 kubectl apply -f - <<EOF
@@ -300,7 +300,7 @@ EOF
 | `backend.ai.promptGuard` | The AI prompt guarding configuration that you want to set up. In this example, you configure the webhook server for both request and response guardrails. |
 | `webhook.backendRef` | The reference to the webhook server service. The example webhook server is configured to use port 8000. |
 
-{{% /version %}}
+{{< /version >}}
 
 
 ### Step 3: Test the webhook server {#test-webhook-server}

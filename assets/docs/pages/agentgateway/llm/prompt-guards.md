@@ -6,9 +6,9 @@ Prompt guards are mechanisms that ensure that prompt-based interactions with a l
 
 You can set up prompt guards to block unwanted requests to the LLM provider and mask sensitive data. In this tutorial, you learn how to block any request with a `credit card` string in the request body and mask credit card numbers that are returned by the LLM.
 
-{{% version include-if="2.2.x" %}}
+{{< version include-if="2.2.x" >}}
 Prompt guards can be configured directly in an {{< reuse "docs/snippets/backend.md" >}} resource or in a separate AgentgatewayPolicy resource. 
-{{% /version %}}
+{{< /version >}}
 
 ## Before you begin
 
@@ -18,7 +18,7 @@ Prompt guards can be configured directly in an {{< reuse "docs/snippets/backend.
 
 Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptGuard` field to deny requests to the LLM provider that include the `credit card` string in the request body.
 
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 
 1. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and add a custom prompt guard. The following example parses requests sent to the LLM provider to identify a regex pattern match that is named `CC` for debugging purposes. The proxy blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
 
@@ -50,7 +50,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
    EOF
    ```
 
-   {{% /version %}}{{% version include-if="2.2.x" %}}
+   {{< /version >}}{{< version include-if="2.2.x" >}}
 1. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and add a custom prompt guard. The proxy blocks any requests that contain the `credit card` string in the request body. These requests are automatically denied with a custom response message.
 
    ```yaml
@@ -80,7 +80,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
    EOF
    ```
 
-   {{% /version %}}
+   {{< /version >}}
 
    {{< callout type="info" >}}
    You can also reject requests that contain strings of inappropriate content itself, such as credit card numbers, by using the <code>promptGuard.request.regex.builtins</code> field. Besides <code>CREDIT_CARD</code> in this example, you can also specify <code>EMAIL</code>, <code>PHONE_NUMBER</code>, and <code>SSN</code>.
@@ -217,7 +217,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
 
 In the next step, you instruct agentgateway to mask credit card numbers that are returned by the LLM.
 
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 1. Add the following credit card response matcher to the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. This time, use the built-in credit card regex match instead of a custom one.
    
    ```yaml
@@ -243,7 +243,7 @@ In the next step, you instruct agentgateway to mask credit card numbers that are
              - CREDIT_CARD
    EOF
    ```
-   {{% /version %}}{{% version include-if="2.2.x" %}}
+   {{< /version >}}{{< version include-if="2.2.x" >}}
 1. Add the following credit card response matcher to the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. This time, use the built-in credit card regex match instead of a custom one.
    
    ```yaml
@@ -270,7 +270,7 @@ In the next step, you instruct agentgateway to mask credit card numbers that are
                action: MASK
    EOF
    ```
-   {{% /version %}}
+   {{< /version >}}
 
 2. Send another request to the AI API and include a fake VISA credit card number. Verify that the VISA number is detected and masked in your response.
    

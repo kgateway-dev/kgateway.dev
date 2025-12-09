@@ -27,7 +27,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      Authorization: $OPENAI_API_KEY
    EOF
    ``` 
-{{% version include-if="2.1.x" %}}   
+{{< version include-if="2.1.x" >}}   
 4. Create a {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    ```yaml
    kubectl apply -f- <<EOF
@@ -88,7 +88,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ``` 
-   {{% /version %}} {{% version include-if="2.2.x" %}}
+   {{< /version >}} {{< version include-if="2.2.x" >}}
 
 4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    ```yaml
@@ -145,7 +145,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
-   {{% /version %}}
+   {{< /version >}}
 
 6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
    
