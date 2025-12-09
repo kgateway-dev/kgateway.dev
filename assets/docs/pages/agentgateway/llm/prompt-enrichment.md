@@ -10,9 +10,10 @@ Prompts are basic building blocks for guiding LLMs to produce relevant and accur
 
 Note that system and user prompts are not mutually exclusive, and can be combined in a single request to an LLM. For example, in the following steps, the prompt `Parse the unstructured text into CSV format: Seattle, Los Angeles, and Chicago are cities in North America. London, Paris, and Berlin are cities in Europe.` contains both system prompt and user prompt components.
 
-{{% version include-if="2.2.x" %}}
+{{< version include-if="2.2.x" >}}
+</br>
 Prompt enrichment can be configured directly in an {{< reuse "docs/snippets/backend.md" >}} resource or in a separate AgentgatewayPolicy resource. 
-{{% /version %}}
+{{< /version >}}
 
 ## Before you begin
 
@@ -124,7 +125,7 @@ In the following example, you explore how to refactor system and user prompts to
 
 Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts by appending or prepending system and user prompts to each request. This way, you can centrally manage common prompts that you want to add to each request.
 
-{{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
 
@@ -149,8 +150,8 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts 
            content: "Parse the unstructured text into CSV format."
    EOF
    ```
-   {{% /version %}}{{% version include-if="2.2.x" %}}
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
+   {{< /version >}}{{< version include-if="2.2.x" >}}
+1. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich your prompts and configure additional settings. The following example prepends a system prompt of `Parse the unstructured text into CSV format.` to each request that is sent to the `openai` HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -174,7 +175,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to enrich prompts 
              content: "Parse the unstructured text into CSV format."
    EOF
    ```
-   {{% /version %}}
+   {{< /version >}}
 
 2. Send a request without a system prompt. Although the system prompt instructions are missing in the request, the unstructured text in the user prompt is still transformed into structured CSV format. This is because the system prompt is automatically prepended from the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource before it is sent to the LLM provider.
 

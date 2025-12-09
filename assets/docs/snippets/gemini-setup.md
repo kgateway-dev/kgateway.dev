@@ -18,7 +18,7 @@
      Authorization: $GOOGLE_KEY
    EOF
    ```
-   {{% version include-if="2.1.x" %}}
+{{< version include-if="2.1.x" >}}
 
 3. Create a {{< reuse "docs/snippets/backend.md" >}} resource to define the Gemini destination.
 
@@ -77,8 +77,8 @@
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
-   {{% /version %}}{{% version include-if="2.2.x" %}}
-4. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
+   {{< /version >}}{{< version include-if="2.2.x" >}}
+3. Create an {{< reuse "docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
@@ -106,7 +106,7 @@
    | `gemini.model`     | The model to use to generate responses. In this example, you use the `gemini-2.5-flash-lite` model. For more models, see the [Google AI docs](https://ai.google.dev/gemini-api/docs/models).                                             |
    | `policies.auth` | The authentication token to use to authenticate to the LLM provider. The example refers to the secret that you created in the previous step.   |
 
-5. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
+4. Create an HTTPRoute resource that routes incoming traffic to the {{< reuse "docs/snippets/backend.md" >}}. The following example sets up a route on the `/openai` path to the {{< reuse "docs/snippets/backend.md" >}} that you previously created. The `URLRewrite` filter rewrites the path from `/openai` to the path of the API in the LLM provider that you want to use, `/v1/chat/completions`.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -129,9 +129,9 @@
          kind: {{< reuse "docs/snippets/backend.md" >}}
    EOF
    ```
-   {{% /version %}}
+   {{< /version >}}
 
-6. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
+5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
