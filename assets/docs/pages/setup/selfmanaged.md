@@ -53,7 +53,7 @@ Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do no
    
 5. Create your own gateway proxy deployment. Note that this deployment needs to have valid Envoy configuration that includes the correct name and namespace of your Gateway resource to successfully bootstrap your gateway proxy and bind it to the Gateway resource. You can use the following template as a starting point to build your own Envoy configuration. To bind your gateway proxy with the Gateway resource, ensure that you replace `$GATEWAY_NAME` and `$GATEWAY_NAMESPACE` with the name of the Gateway that you created earlier. 
    
-   Example deployment template in the [GitHub `proxy-deployment.yaml` file](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml).
+   Example deployment template in the {{< version include-if="2.2.x" >}}[GitHub `deployment.yaml` file](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/pkg/kgateway/helm/envoy/templates/deployment.yaml){{< /version >}}{{< version include-if="2.0.x,2.1.x" >}}[GitHub `proxy-deployment.yaml` file](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml){{< /version >}}.
    
    Example configuration to update in the ConfigMap `data.envoy.yaml` section:
 
@@ -155,8 +155,3 @@ Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do no
 kubectl delete gatewayparameters self-managed -n kgateway-system
 kubectl delete gateway self-managed -n kgateway-system
 ```
-
-
-
-
-
