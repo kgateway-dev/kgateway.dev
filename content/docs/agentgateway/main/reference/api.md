@@ -526,6 +526,34 @@ _Appears in:_
 
 
 
+#### BackendAI
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `prompt` _[AIPromptEnrichment](#aipromptenrichment)_ | Enrich requests sent to the LLM provider by appending and prepending system prompts. This can be configured only for LLM providers that use the `CHAT` or `CHAT_STREAMING` API route type. |  | Optional |
+| `promptGuard` _[AIPromptGuard](#aipromptguard)_ | promptGuard enables adding guardrails to LLM requests and responses. |  | Optional |
+| `defaults` _[FieldDefault](#fielddefault)_ array | Provide defaults to merge with user input fields. If the field is already set, the field in the request is used. |  | Optional <br />MinItems: 1 <br />MaxItems: 64 |
+| `overrides` _[FieldDefault](#fielddefault)_ array | Provide overrides to merge with user input fields. If the field is already set, the field will be overwritten. |  | Optional <br />MinItems: 1 <br />MaxItems: 64 |
+| `modelAliases` object (keys:string, values:_[string](#string)_) | ModelAliases maps friendly model names to actual provider model names. Example: {"fast": "gpt-3.5-turbo", "smart": "gpt-4-turbo"} Note: This field is only applicable when using the agentgateway data plane. |  | Optional <br />MinItems: 1 <br />MaxItems: 64 |
+| `promptCaching` _[PromptCachingConfig](#promptcachingconfig)_ | promptCaching enables automatic prompt caching for supported providers (AWS Bedrock). Reduces API costs by caching static content like system prompts and tool definitions. Only applicable for Bedrock Claude 3+ and Nova models. |  | Optional |
+| `routes` object (keys:string, values:_[RouteType](#routetype)_) | routes defines how to identify the type of traffic to handle. The keys are URL path suffixes matched using ends-with comparison (e.g., "/v1/chat/completions"). The special "*" wildcard matches any path. If not specified, all traffic defaults to "completions" type. |  | Optional |
+
+#### BackendAuth
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _[string](#string)_ | key provides an inline key to use as the value of the Authorization header. This option is the least secure; usage of a Secret is preferred. |  | Optional <br />MaxLength: 2048 |
+| `secretRef` _[LocalObjectReference](#localobjectreference)_ | secretRef references a Kubernetes secret storing the key to use the authorization value. This must be stored in the 'Authorization' key. |  | Optional <br />MaxLength: 2048 |
+| `passthrough` _[BackendAuthPassthrough](#backendauthpassthrough)_ | passthrough passes through an existing token that has been sent by the client and validated. Other policies, like JWT and API Key authentication, will strip the original client credentials. Passthrough backend authentication causes the original token to be added back into the request. If there are no client authentication policies on the request, the original token would be unchanged, so this would have no effect. |  | Optional |
+
 #### BackendAuthPassthrough
 
 
@@ -561,12 +589,30 @@ _Appears in:_
 
 
 
+#### BackendHTTP
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional <br />Enum: [HTTP1;HTTP2
+	// +optional
+] |
+
+#### BackendMCP
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `authorization` _[Authorization](#authorization)_ | authorization defines MCPBackend level authorization. Unlike authorization at the HTTP level, which will reject unauthorized requests with a 403 error, this policy works at the MCPBackend level.  List operations, such as list_tools, will have each item evaluated. Items that do not meet the rule will be filtered.  Get or call operations, such as call_tool, will evaluate the specific item and reject requests that do not meet the rule. |  | Optional |
+| `authentication` _[MCPAuthentication](#mcpauthentication)_ | authentication defines MCPBackend specific authentication rules. |  | Optional |
+
 #### BackendSimple
-
-_Underlying type:_ _struct_
-
-
-
 
 
 _Appears in:_
@@ -575,11 +621,46 @@ _Appears in:_
 - [BackendWithMCP](#backendwithmcp)
 - [OpenAIModeration](#openaimoderation)
 
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `tcp` _[BackendTCP](#backendtcp)_ | tcp defines settings for managing TCP connections to the backend. |  | Optional |
+| `tls` _[BackendTLS](#backendtls)_ | tls defines settings for managing TLS connections to the backend.  If this field is set, TLS will be initiated to the backend; the system trusted CA certificates will be used to validate the server, and the SNI will automatically be set based on the destination. |  | Optional |
+| `http` _[BackendHTTP](#backendhttp)_ | http defines settings for managing HTTP requests to the backend. |  | Optional |
+| `auth` _[BackendAuth](#backendauth)_ | auth defines settings for managing authentication to the backend |  | Optional |
+#### BackendTCP
 
 
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `keepalive` _[Keepalive](#keepalive)_ | keepAlive defines settings for enabling TCP keepalives on the connection. |  | Optional |
+| `connectTimeout` _[Duration](#duration)_ | connectTimeout defines the deadline for establishing a connection to the destination. |  | Optional <br />XValidation |
+
+#### BackendTLS
 
 
+_Appears in:_
+- [Various types](#various-types)
 
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mtlsCertificateRef` _[LocalObjectReference](#localobjectreference)_ array | mtlsCertificateRef enables mutual TLS to the backend, using the specified key (tls.key) and cert (tls.crt) from the refenced Secret.  An optional 'ca.cert' field, if present, will be used to verify the server certificate if present. If caCertificateRefs is also specified, the caCertificateRefs field takes priority.  If unspecified, no client certificate will be used.  |  | Optional <br />MaxItems: 1 |
+| `caCertificateRefs` _[LocalObjectReference](#localobjectreference)_ array | caCertificateRefs defines the CA certificate ConfigMap to use to verify the server certificate. If unset, the system's trusted certificates are used.  |  | Optional <br />MaxItems: 1 |
+| `insecureSkipVerify` _[InsecureTLSMode](#insecuretlsmode)_ | insecureSkipVerify originates TLS but skips verification of the backend's certificate. WARNING: This is an insecure option that should only be used if the risks are understood.  There are two modes: * All disables all TLS verification * Hostname verifies the CA certificate is trusted, but ignores any mismatch of hostname/SANs. Note that this method is still insecure; prefer setting verifySubjectAltNames to customize the valid hostnames if possible.  |  | Optional <br />Enum: [All;Hostname
+	// +optional
+] |
+| `sni` _[SNI](#sni)_ | sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically set based on the destination hostname. |  | Optional <br />Enum: [All;Hostname
+	// +optional
+	InsecureSkipVerify *InsecureTLSMode `json:"insecureSkipVerify,omitempty"`
+
+	// sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically
+	// set based on the destination hostname.
+	// +optional
+] |
+| `verifySubjectAltNames` _[ShortString](#shortstring)_ array | verifySubjectAltNames specifies the Subject Alternative Names (SAN) to verify in the server certificate. If not present, the destination hostname is automatically used.  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
+| `alpnProtocols` _[[]TinyString](#[]tinystring)_ | alpnProtocols sets the Application Level Protocol Negotiation (ALPN) value to use in the TLS handshake.  If not present, defaults to ["h2", "http/1.1"].  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
 
 #### BackendWithAI
 
@@ -1642,6 +1723,19 @@ _Appears in:_
 
 
 
+#### RateLimitDescriptorEntry
+
+A descriptor entry defines a single entry in a rate limit descriptor.
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _[TinyString](#tinystring)_ | name specifies the name of the descriptor. |  | Required |
+| `expression` _[CELExpression](#celexpression)_ | expression is a Common Expression Language (CEL) expression that defines the value for the descriptor.  For example, to rate limit based on the Client IP: `source.address`.  See https://agentgateway.dev/docs/reference/cel/ for more info. |  | Required |
+
 #### RateLimits
 
 
@@ -1680,18 +1774,16 @@ _Appears in:_
 
 #### RemoteJWKS
 
-_Underlying type:_ _struct_
-
-
-
-
 
 _Appears in:_
 - [JWKS](#jwks)
 - [MCPAuthentication](#mcpauthentication)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `uri` _[string](#string)_ | IdP jwks endpoint. Default tls settings are used to connect to this url. |  | Optional <br />Pattern |
+| `cacheDuration` _[Duration](#duration)_ |  | 5m | Optional <br />Pattern <br />XValidation |
+| `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Not implemented yet, only jwksUri is currently supported. Supported types: Service and Backend. | 5m | Optional <br />XValidation |
 #### Retry
 
 
