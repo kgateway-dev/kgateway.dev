@@ -4,8 +4,7 @@
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
 | affinity | object | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. | `{}` |
-| agentgateway | object | Enable the integration with Agent Gateway, which lets you use kgateway to help manage agent connectivity across MCP servers, A2A agents, and REST APIs. | `{"enabled":true}` |
-| controller | object | Configure the kgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"kgateway","tag":""},"logLevel":"info","replicaCount":1,"service":{"ports":{"agwGrpc":9978,"grpc":9977,"health":9093,"metrics":9092},"type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
+| controller | object | Configure the kgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"kgateway","tag":""},"logLevel":"info","replicaCount":1,"service":{"ports":{"grpc":9977,"health":9093,"metrics":9092},"type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
 | controller.extraEnv | object | Add extra environment variables to the controller container. | `{}` |
 | controller.image | object | Configure the controller container image. | `{"pullPolicy":"","registry":"","repository":"kgateway","tag":""}` |
 | controller.image.pullPolicy | string | Set the image pull policy for the controller. | `""` |
@@ -14,17 +13,16 @@
 | controller.image.tag | string | Set the image tag for the controller. | `""` |
 | controller.logLevel | string | Set the log level for the controller. | `"info"` |
 | controller.replicaCount | int | Set the number of controller pod replicas. | `1` |
-| controller.service | object | Configure the controller service. | `{"ports":{"agwGrpc":9978,"grpc":9977,"health":9093,"metrics":9092},"type":"ClusterIP"}` |
-| controller.service.ports | object | Set the service ports for gRPC and health endpoints. | `{"agwGrpc":9978,"grpc":9977,"health":9093,"metrics":9092}` |
+| controller.service | object | Configure the controller service. | `{"ports":{"grpc":9977,"health":9093,"metrics":9092},"type":"ClusterIP"}` |
+| controller.service.ports | object | Set the service ports for gRPC and health endpoints. | `{"grpc":9977,"health":9093,"metrics":9092}` |
 | controller.service.type | string | Set the service type for the controller. | `"ClusterIP"` |
 | controller.strategy | object | Change the rollout strategy from the Kubernetes default of a RollingUpdate with 25% maxUnavailable, 25% maxSurge. E.g., to recreate pods, minimizing resources for the rollout but causing downtime: strategy:   type: Recreate E.g., to roll out as a RollingUpdate but with non-default parameters: strategy:   type: RollingUpdate   rollingUpdate:     maxSurge: 100% | `{}` |
 | controller.xds | object | Configure TLS settings for the xDS gRPC servers. | `{"tls":{"enabled":false}}` |
 | controller.xds.tls.enabled | bool | Enable TLS encryption for xDS communication. When enabled, both the main xDS server (port 9977) and agent gateway xDS server (port 9978) will use TLS. When TLS is enabled, you must create a Secret named 'kgateway-xds-cert' in the kgateway installation namespace. The Secret must be of type 'kubernetes.io/tls' with 'tls.crt', 'tls.key', and 'ca.crt' data fields present. | `false` |
 | deploymentAnnotations | object | Add annotations to the kgateway deployment. | `{}` |
 | discoveryNamespaceSelectors | list | List of namespace selectors (OR'ed): each entry can use 'matchLabels' or 'matchExpressions' (AND'ed within each entry if used together). Kgateway includes the selected namespaces in config discovery. For more information, see the docs https://kgateway.dev/docs/latest/install/advanced/#namespace-discovery. | `[]` |
-| envoy | object | Enable the integration with Envoy | `{"enabled":true}` |
 | fullnameOverride | string | Override the full name of resources created by the Helm chart, which is 'kgateway'. If you set 'fullnameOverride: "foo", the full name of the resources that the Helm release creates become 'foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace. | `""` |
-| gatewayClassParametersRefs | object | Map of GatewayClass names to GatewayParameters references that will be set on    the default GatewayClasses managed by kgateway. Each entry must define both the    name and namespace of the GatewayParameters resource.    The default GatewayClasses managed by kgateway are:    - kgateway    - kgateway-waypoint    - agentgateway    Example:    gatewayClassParametersRefs:      kgateway:        name: shared-gwp        namespace: kgateway-system | `{}` |
+| gatewayClassParametersRefs | object | Map of GatewayClass names to GatewayParameters references that will be set on    the default GatewayClasses managed by kgateway. Each entry must define both the    name and namespace of the GatewayParameters resource.    The default GatewayClasses managed by kgateway are:    - kgateway    - kgateway-waypoint    Example:    gatewayClassParametersRefs:      kgateway:        name: shared-gwp        namespace: kgateway-system | `{}` |
 | image | object | Configure the default container image for the components that Helm deploys. You can override these settings for each particular component in that component's section, such as 'controller.image' for the kgateway control plane. If you use your own private registry, make sure to include the imagePullSecrets. | `{"pullPolicy":"IfNotPresent","registry":"cr.kgateway.dev/kgateway-dev","tag":""}` |
 | image.pullPolicy | string | Set the default image pull policy. | `"IfNotPresent"` |
 | image.registry | string | Set the default image registry. | `"cr.kgateway.dev/kgateway-dev"` |
