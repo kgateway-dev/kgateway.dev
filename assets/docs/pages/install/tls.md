@@ -4,7 +4,8 @@ TLS encryption is disabled by default. When enabled, the control plane mounts a 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< conditional-text include-if="envoy" >}}{{< reuse "docs/snippets/prereq.md" >}}{{< /conditional-text >}}
+{{< conditional-text include-if="agentgateway" >}}{{< reuse "docs/snippets/agentgateway-prereq.md" >}}{{< /conditional-text >}}
 
 ## Step 1: Set up cert-manager {#cert-manager}
 
