@@ -116,7 +116,7 @@ metadata:
     example: mcp-route
 spec:
   parentRefs:
-    - name: agentgateway
+    - name: agentgateway-proxy
       namespace: {{< reuse "docs/snippets/namespace.md" >}}
   rules:
     - backendRefs:
@@ -137,7 +137,7 @@ metadata:
     example: mcp-route
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}
   rules:
   - backendRefs:

@@ -45,7 +45,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-     - name: agentgateway
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
        - matches:
@@ -123,7 +123,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-     - name: agentgateway
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
        - matches:

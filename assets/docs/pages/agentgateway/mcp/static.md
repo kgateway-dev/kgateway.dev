@@ -98,7 +98,7 @@ metadata:
   name: mcp
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}  
   rules:
     - backendRefs:
@@ -118,7 +118,7 @@ metadata:
   name: mcp
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}  
   rules:
   - 

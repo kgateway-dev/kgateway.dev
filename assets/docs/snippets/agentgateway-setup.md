@@ -4,10 +4,10 @@
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: agentgateway
+     name: agentgateway-proxy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 80
@@ -21,32 +21,32 @@
 2. Verify that the agentgateway proxy is created. 
 
    * Gateway: Note that it might take a few minutes for an address to be assigned.
-   * Pod for `agentgateway` proxy: The pod has one container: `agent-gateway`.
+   * Pod for `agentgateway-proxy`: The pod has one container: `agent-gateway`.
 
    ```sh
-   kubectl get gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
-   kubectl get deployment agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl get gateway agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl get deployment agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
    Example output: 
    ```
    NAME           CLASS          ADDRESS                                                                  PROGRAMMED   AGE
-   agentgateway   {{< reuse "docs/snippets/agw-gatewayclass.md" >}}   a1cff4bd974a34d8b882b2fa01d357f0-119963959.us-east-2.elb.amazonaws.com   True         6m9s
+   agentgateway-proxy   {{< reuse "docs/snippets/agw-gatewayclass.md" >}}   a1cff4bd974a34d8b882b2fa01d357f0-119963959.us-east-2.elb.amazonaws.com   True         6m9s
    NAME           READY   UP-TO-DATE   AVAILABLE   AGE
-   agentgateway   1/1     1            1           6m11s
+   agentgateway-proxy   1/1     1            1           6m11s
    ```
 
 3. Get the external address of the agentgateway proxy and save it in an environment variable.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgatewa-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}

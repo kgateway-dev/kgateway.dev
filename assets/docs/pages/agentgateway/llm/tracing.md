@@ -87,6 +87,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    ```
 
 2. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that references the ConfigMap that you created. 
+   {{< version include-if="2.1.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
@@ -100,6 +101,20 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
          customConfigMapName: agent-gateway-config
    EOF
    ```
+   {{< /version >}}
+   {{< version include-if="2.2.x" >}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: tracing
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     customConfigMapName: agent-gateway-config
+   EOF
+   ```
+   {{< /version >}}
 
 3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
    ```yaml

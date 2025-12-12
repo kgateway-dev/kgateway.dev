@@ -92,7 +92,7 @@ Set up OpenAI-compatible provider access to [Mistral AI](https://mistral.ai/) mo
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -237,7 +237,7 @@ Set up OpenAI-compatible provider access to [DeepSeek](https://www.deepseek.com/
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:

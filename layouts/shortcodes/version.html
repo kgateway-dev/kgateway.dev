@@ -31,7 +31,7 @@
 {{- $currentVersionToml := "" -}}
 
 {{- /* First pass: determine if content should be rendered */ -}}
-{{ range .Site.Params.versions }} 
+{{- range .Site.Params.versions -}} 
  {{- if in $condition .linkVersion -}}
    {{- $versionToml := .version -}}
    {{- $currentVersionToml = $versionToml -}}

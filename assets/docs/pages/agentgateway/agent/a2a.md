@@ -124,7 +124,7 @@ metadata:
   name: a2a
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}
   rules:
   - backendRefs:
