@@ -27,7 +27,7 @@
 {{- /* Set product name based on subsection */ -}}
 {{- $productName := "" -}}
 {{- if eq $subSection "envoy" -}}
-  {{- $productName = "Kgateway with Envoy Proxy" -}}
+  {{- $productName = "Kgateway with Envoy" -}}
 {{- else if eq $subSection "agentgateway" -}}
   {{- $productName = "Kgateway with agentgateway" -}}
 {{- end -}}
