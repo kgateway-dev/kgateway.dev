@@ -1,1 +1,1 @@
-cr.kgateway.dev/kgateway-dev
+{{% conditional-text include-if="envoy" %}}cr.kgateway.dev/kgateway-dev{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< version include-if="2.2.x" >}}ghcr.io/kgateway-dev{{< /version >}}{{< version include-if="2.1.x" >}}cr.kgateway.dev/kgateway-dev{{< /version >}}{{% /conditional-text %}}

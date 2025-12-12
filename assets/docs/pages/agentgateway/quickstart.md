@@ -29,5 +29,5 @@ For other examples, see the [LLM consumption]({{< link-hextra path="/llm/" >}}),
 No longer need {{< reuse "/docs/snippets/kgateway.md" >}}? Uninstall with the following command:
 
 ```sh
-helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
+helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

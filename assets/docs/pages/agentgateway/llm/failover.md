@@ -219,7 +219,7 @@ You can configure failover across multiple models and providers by using priorit
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -250,7 +250,7 @@ You can configure failover across multiple models and providers by using priorit
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:

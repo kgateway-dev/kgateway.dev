@@ -1,1 +1,1 @@
-kgateway-crds
+{{% conditional-text include-if="envoy" %}}kgateway-crds{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< version include-if="2.1.x" >}}kgateway-crds{{< /version >}}{{< version include-if="2.2.x" >}}agentgateway-crds{{< /version >}}{{% /conditional-text %}}

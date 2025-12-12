@@ -65,7 +65,7 @@
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
      rules:
      - matches:
        - path:
@@ -117,7 +117,7 @@
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
      rules:
      - matches:
        - path:

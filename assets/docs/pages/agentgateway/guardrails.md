@@ -88,6 +88,8 @@ To optimize guardrail webhook performance, you can update the {{< reuse "docs/sn
 
 Example configuration file:
 
+{{< version include-if="2.1.x" >}}
+
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
@@ -106,6 +108,27 @@ spec:
         value: "60"
 EOF
 ```
+
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: agw-override
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  env:
+  - name: GUARDRAIL_WEBHOOK_MAX_CONNECTIONS
+    value: "50"
+  - name: GUARDRAIL_WEBHOOK_KEEPALIVE_SECONDS
+    value: "60"
+EOF
+```
+
+{{< /version >}}
 
 ### More information
 
@@ -450,6 +473,6 @@ EOF
 2. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
    ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} openai-opt
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} openai-prompt-guard
    ```
 

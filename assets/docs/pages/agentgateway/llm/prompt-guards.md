@@ -267,7 +267,7 @@ In the next step, you instruct agentgateway to mask credit card numbers that are
            response:
            - regex:
                builtins: 
-                 - CREDIT_CARD
+                 - CreditCard
                action: MASK
    EOF
    ```

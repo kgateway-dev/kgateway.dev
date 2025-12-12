@@ -94,7 +94,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -150,7 +150,7 @@ Configure [Amazon Bedrock](https://aws.amazon.com/bedrock/) as an LLM provider i
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
