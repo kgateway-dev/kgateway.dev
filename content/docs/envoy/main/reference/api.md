@@ -155,9 +155,9 @@ _Appears in:_
 
 
 
-Agentgateway configures the agentgateway dataplane integration.
-The agentgateway dataplane is automatically used when the Gateway references a GatewayClass
-with controllerName: kgateway.dev/agentgateway.
+Agentgateway is obsolete and retained only for backwards compatibility.  Use
+the agentgateway.dev AgentgatewayParameters API to configure agentgateway
+deployments.
 
 
 
@@ -166,6 +166,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `enabled` _boolean_ | Obsolete: This field is no longer used. The agentgateway dataplane is<br />automatically enabled when the Gateway references a GatewayClass with<br />controllerName: agentgateway.dev/agentgateway. Use the AgentgatewayParameters<br />API to configure agentgateway deployments. Any values specified here are ignored. |  |  |
 | `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  |  |
 | `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: IfNotPresent |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
@@ -1853,14 +1854,14 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `deployment` _[ProxyDeployment](#proxydeployment)_ | Use a Kubernetes deployment as the proxy workload type. Currently, this is the only<br />supported workload type. |  |  |
-| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy.<br />If the Gateway uses a GatewayClass with controllerName: kgateway.dev/agentgateway,<br />the EnvoyContainer values will be ignored. |  |  |
+| `envoyContainer` _[EnvoyContainer](#envoycontainer)_ | Configuration for the container running Envoy. |  |  |
 | `sdsContainer` _[SdsContainer](#sdscontainer)_ | Configuration for the container running the Secret Discovery Service (SDS). |  |  |
 | `podTemplate` _[Pod](#pod)_ | Configuration for the pods that will be created. |  |  |
 | `service` _[Service](#service)_ | Configuration for the Kubernetes Service that exposes the proxy over<br />the network. |  |  |
 | `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the proxy pods. |  |  |
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
-| `agentgateway` _[Agentgateway](#agentgateway)_ | Configure the agentgateway integration. If agentgateway is disabled, the<br />EnvoyContainer values will be used by default to configure the data<br />plane proxy. |  |  |
+| `agentgateway` _[Agentgateway](#agentgateway)_ | Obsolete: This field is no longer used. Agentgateway configuration is now<br />determined automatically based on the GatewayClass controllerName<br />(agentgateway.dev/agentgateway). Use the AgentgatewayParameters API to<br />configure agentgateway deployments. Any values specified here are ignored. |  |  |
 | `omitDefaultSecurityContext` _boolean_ | OmitDefaultSecurityContext is used to control whether or not<br />`securityContext` fields should be rendered for the various generated<br />Deployments/Containers that are dynamically provisioned by the deployer.<br /><br />When set to true, no `securityContexts` will be provided and will left<br />to the user/platform to be provided.<br /><br />This should be enabled on platforms such as Red Hat OpenShift where the<br />`securityContext` will be dynamically added to enforce the appropriate<br />level of security. |  |  |
 
 
@@ -2212,6 +2213,60 @@ _Appears in:_
 | `forwardToken` _boolean_ | ForwardToken configures if the JWT token is forwarded to the upstream backend.<br />If true, the header containing the token will be forwarded upstream.<br />If false or not set, the header containing the token will be removed. |  |  |
 
 
+#### OAuth2CookieConfig
+
+
+
+
+
+
+
+_Appears in:_
+- [OAuth2Provider](#oauth2provider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `domain` _string_ | CookieDomain specifies the domain to set on the access and ID token cookies.<br />If set, the cookies will be set for the specified domain and all its subdomains. This is useful when requests<br />to subdomains are not required to be re-authenticated after the user has logged into the parent domain.<br />If not set, the cookies will default to the host of the request, not including the subdomains. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` <br /> |
+| `names` _[OAuth2CookieNames](#oauth2cookienames)_ | Names specifies the names of the cookies used to store the tokens.<br />If not set, the default names will be used. |  |  |
+| `sameSite` _[OAuth2CookieSameSite](#oauth2cookiesamesite)_ | SameSite specifies the SameSite attribute for the OAuth2 cookies.<br />If not set, the default is Lax. |  | Enum: [Lax Strict None] <br /> |
+
+
+#### OAuth2CookieNames
+
+
+
+OAuth2CookieNames specifies the names of the cookies used to store the tokens.
+
+
+
+_Appears in:_
+- [OAuth2CookieConfig](#oauth2cookieconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `accessToken` _string_ | AccessToken specifies the name of the cookie used to store the access token. |  | MinLength: 1 <br /> |
+| `idToken` _string_ | IDToken specifies the name of the cookie used to store the ID token. |  | MinLength: 1 <br /> |
+
+
+#### OAuth2CookieSameSite
+
+_Underlying type:_ _string_
+
+OAuth2CookieSameSite specifies the SameSite attribute for OAuth2 cookies
+
+_Validation:_
+- Enum: [Lax Strict None]
+
+_Appears in:_
+- [OAuth2CookieConfig](#oauth2cookieconfig)
+
+| Field | Description |
+| --- | --- |
+| `Lax` | OAuth2CookieSameSiteLax specifies the Lax SameSite attribute for OAuth2 cookies<br /> |
+| `Strict` | OAuth2CookieSameSiteStrict specifies the Strict SameSite attribute for OAuth2 cookies<br /> |
+| `None` | OAuth2CookieSameSiteNone specifies the None SameSite attribute for OAuth2 cookies<br /> |
+
+
 #### OAuth2Credentials
 
 
@@ -2227,6 +2282,22 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `clientID` _string_ | ClientID specifies the client ID issued to the client during the registration process.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1 for more details. |  | MinLength: 1 <br /> |
 | `clientSecretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | ClientSecretRef specifies a Secret that contains the client secret stored in the key 'client-secret'<br />to use in the authentication request to obtain the access token.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-2.3.1 for more details. |  |  |
+
+
+#### OAuth2DenyRedirectMatcher
+
+
+
+OAuth2DenyRedirectMatcher specifies the matcher to match requests that should be denied redirects to the authorization endpoint.
+
+
+
+_Appears in:_
+- [OAuth2Provider](#oauth2provider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `headers` _HTTPHeaderMatch array_ | Headers specifies the list of HTTP headers to match on requests that should be denied redirects. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### OAuth2Policy
@@ -2268,6 +2339,8 @@ _Appears in:_
 | `credentials` _[OAuth2Credentials](#oauth2credentials)_ | Credentials specifies the Oauth2 client credentials to use for authentication. |  |  |
 | `issuerURI` _string_ | IssuerURI specifies the OpenID provider's issuer URL to discover the OpenID provider's configuration.<br />The Issuer must be a URI RFC 3986 [RFC3986] with a scheme component that must be https, a host component,<br />and optionally, port and path components and no query or fragment components.<br />It discovers the authorizationEndpoint, tokenEndpoint, and endSessionEndpoint if specified in the discovery response.<br />Refer to https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig for more details.<br />Note that the OpenID provider configuration is cached and only refreshed periodically when the GatewayExtension object<br />is reprocessed. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?$` <br /> |
 | `endSessionEndpoint` _[HttpsUri](#httpsuri)_ | EndSessionEndpoint specifies the URL that redirects a user's browser to in order to initiate a single logout<br />across all applications and the OpenID provider. Users are directed to this endpoint when they access the logout path.<br />This should only be set when the OpenID provider supports RP-Initiated Logout and "openid" is included in the list of scopes.<br />Refer to https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
+| `cookies` _[OAuth2CookieConfig](#oauth2cookieconfig)_ | Cookies specifies the configuration for the OAuth2 cookies. |  |  |
+| `denyRedirect` _[OAuth2DenyRedirectMatcher](#oauth2denyredirectmatcher)_ | DenyRedirectMatcher specifies the matcher to match requests that should be denied redirects to the authorization endpoint.<br />Matching requests will receive a 401 Unauthorized response instead of being redirected.<br />This is useful for AJAX requests where redirects should be avoided. |  |  |
 
 
 #### Op
