@@ -503,6 +503,22 @@ _Appears in:_
 | `expression` _[CELExpression](#celexpression)_ |  |  |  |
 
 
+#### AwsAuth
+
+
+
+AwsAuth specifies the authentication method to use for the backend.
+
+
+
+_Appears in:_
+- [BackendAuth](#backendauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
+
+
 #### AzureOpenAIConfig
 
 
