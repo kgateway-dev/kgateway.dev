@@ -10,14 +10,16 @@ Configure agentgateway with {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
 In upstream agentgateway, you can manage [configuration](https://agentgateway.dev/docs/configuration/overview/) via a YAML or JSON file. The configuration features of agentgateway are captured in the [schema of the agentgateway codebase](https://github.com/agentgateway/agentgateway/tree/main/schema). 
 
-Unlike in the upstream agentgateway project, you do not configure these features in a raw configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. Instead, you configure them in a Kubernetes Gateway API-native way as explained in the guides throughout this doc set. 
+Unlike in the upstream agentgateway project, you do not configure these features in a raw configuration file in the agentgateway proxy. Instead, you configure them in a Kubernetes Gateway API-native way as explained in the guides throughout this doc set. 
 
-However, you still might want to pass in your upstream configuration file in {{< reuse "/docs/snippets/agw-kgw.md" >}}. This can be useful in the following use cases:
+However, you still might want to pass in custom configuration to your agentgateway proxy. This can be useful in the following use cases:
 
 - Migrating from upstream to {{< reuse "/docs/snippets/agw-kgw.md" >}}. 
 - Using a feature that is not yet exposed via the Kubernetes Gateway or {{< reuse "/docs/snippets/agw-kgw.md" >}} APIs.
 
 ### Step 1: Create agentgateway configuration {#agentgateway-configuration}
+
+{{< version include-if="2.1.x" >}}
 
 Use a ConfigMap to pass upstream configuration settings directly to the agentgateway proxy. 
 
@@ -65,7 +67,7 @@ Use a ConfigMap to pass upstream configuration settings directly to the agentgat
    EOF
    ```
 
-3. Create a Gateway resource that sets up an agentgateway proxy that uses your {{< reuse "docs/snippets/gatewayparameters.md" >}}. Set the port to a dummy value like `3030` to avoid conflicts with the binds defined in your ConfigMap.
+3. Create a Gateway resource for your agentgateway proxy that uses the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. Set the port to a dummy value like `3030` to avoid conflicts with the binds defined in your {{< reuse "docs/snippets/gatewayparameters.md" >}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -90,6 +92,64 @@ Use a ConfigMap to pass upstream configuration settings directly to the agentgat
              from: All
    EOF
    ```
+  
+{{< /version >}} 
+{{< version include-if="2.2.x" >}}
+
+1. Create an {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example sets up a simple direct response listener on port 3000 that returns a `200 OK` response with the body `"hello!"` for requests to the `/direct` path.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: agentgateway-config
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     rawConfig:
+       binds: 
+       - port: 3000
+         listeners: 
+         - protocol: HTTP
+           routes: 
+           - name: direct-response
+             matches: 
+             - path: 
+                 pathPrefix: /direct
+             policies: 
+               directResponse:
+                 body: "hello!"
+                 status: 200
+   EOF
+   ```
+
+2. Create a Gateway resource that sets up an agentgateway proxy that uses your {{< reuse "docs/snippets/gatewayparameters.md" >}}. Set the port to a dummy value like `3030` to avoid conflicts with the binds defined in your {{< reuse "docs/snippets/gatewayparameters.md" >}} resource.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     name: agentgateway-config
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     infrastructure:
+       parametersRef:
+         name: agentgateway-config
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}       
+     listeners:
+       - name: http
+         port: 3030
+         protocol: HTTP
+         allowedRoutes:
+           namespaces:
+             from: All
+   EOF
+   ```
+
+{{< /version>}}
+
 
 ### Step 2: Verify the configuration {#verify-configuration}
 
@@ -159,6 +219,6 @@ Use a ConfigMap to pass upstream configuration settings directly to the agentgat
 
 ```bash
 kubectl delete Gateway agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete ConfigMap agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} {{< version exclude-if="2.2.x" >}}
+kubectl delete ConfigMap agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} {{< /version >}}
 ```

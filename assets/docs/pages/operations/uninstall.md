@@ -44,7 +44,7 @@ Did you use Argo CD to install {{< reuse "/docs/snippets/kgateway.md" >}}? Skip 
    kubectl delete -n <namespace> gateway <gateway-name>
    ```
 
-7. Uninstall {{< reuse "/docs/snippets/kgateway.md" >}}.
+7. Uninstall the control plane.
    
    1. Uninstall the {{< reuse "/docs/snippets/helm-kgateway.md" >}} Helm release.
       
@@ -52,7 +52,7 @@ Did you use Argo CD to install {{< reuse "/docs/snippets/kgateway.md" >}}? Skip 
       helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
       ```
 
-   2. Delete the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs.
+   2. Delete the CRDs.
 
       ```sh
       helm uninstall {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -67,7 +67,7 @@ Did you use Argo CD to install {{< reuse "/docs/snippets/kgateway.md" >}}? Skip 
    4. Confirm that the CRDs are deleted.
 
       ```sh
-      kubectl get crds | grep kgateway
+      kubectl get crds | grep {{< reuse "/docs/snippets/helm-kgateway.md" >}}
       ```
 
 8. Remove the Kubernetes Gateway API CRDs. If you installed a different version or channel of the Kubernetes Gateway API, update the following command accordingly.
@@ -89,7 +89,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
 
 2. Open the [Argo CD UI](https://localhost:9999/applications).
 
-3. Log in with the `admin` username and `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` password.
+3. Log in with the `admin` username and `solo.io` password.
 4. Find the application that you want to delete and click **x**. 
 5. Select **Foreground** and click **Ok**. 
 6. Verify that the pods were removed from the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
@@ -111,7 +111,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    
 2. Log in to the Argo CD UI. 
    ```sh
-   argocd login localhost:9999 --username admin --password {{< reuse "/docs/snippets/helm-kgateway.md" >}} --insecure
+   argocd login localhost:9999 --username admin --password solo.io --insecure
    ```
    
 3. Delete the {{< reuse "/docs/snippets/helm-kgateway.md" >}} application.
