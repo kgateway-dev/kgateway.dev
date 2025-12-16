@@ -25,7 +25,7 @@
    {{< /version >}}
    {{< version include-if="2.1.x" >}}
    ```sh
-   helm upgrade -i {{< reuse "docs/snippets/helm-kgateway-crds.md" >}} oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds\
+   helm upgrade -i {{< reuse "docs/snippets/helm-kgateway-crds.md" >}} oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} \
    --version v{{< reuse "docs/versions/n-patch.md" >}} 
    ```

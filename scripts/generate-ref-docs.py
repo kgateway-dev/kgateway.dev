@@ -328,7 +328,13 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
     print(f'  → Generating Helm docs for version {version}')
     
     # Generate Helm docs for each chart
-    charts = ['kgateway:kgateway', 'kgateway-crds:kgateway-crds']
+    # Format: 'directory:filename' where directory is under install/helm/
+    charts = [
+        'kgateway:kgateway',
+        'kgateway-crds:kgateway-crds',
+        'agentgateway:agentgateway',
+        'agentgateway-crds:agentgateway-crds'
+    ]
     generated_any = False
     
     for chart in charts:

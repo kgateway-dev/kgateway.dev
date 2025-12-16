@@ -56,11 +56,11 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 
 ## Configure your proxy
 
+{{< version include-if="2.1.x" >}}
+
 1. Create a ConfigMap with your agentgateway tracing configuration. The following example collects additional information about the request to the LLM and adds this information to the trace. The trace is then sent to the collector that you set up earlier. To learn more about the fields that you can configure, see the [agentgateway docs](https://agentgateway.dev/docs/reference/cel/#context-reference).
 
-   {{< callout type="info" >}}
    For more tracing providers, see [Other tracing configurations](#other-tracing-configurations).
-   {{< /callout>}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: v1
@@ -87,7 +87,6 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    ```
 
 2. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that references the ConfigMap that you created. 
-   {{< version include-if="2.1.x" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
@@ -101,20 +100,6 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
          customConfigMapName: agent-gateway-config
    EOF
    ```
-   {{< /version >}}
-   {{< version include-if="2.2.x" >}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-   metadata:
-     name: tracing
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     customConfigMapName: agent-gateway-config
-   EOF
-   ```
-   {{< /version >}}
 
 3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
    ```yaml
@@ -122,7 +107,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
    metadata:
-     name: agentgateway
+     name: agentgateway-proxy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
@@ -149,23 +134,110 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    Example output: 
    ```console
    NAMESPACE            NAME                                 READY   STATUS    RESTARTS   AGE
-   {{< reuse "docs/snippets/namespace.md" >}}      agentgateway-8b5dc4874-bl79q         1/1     Running   0          12s
+   {{< reuse "docs/snippets/namespace.md" >}}      agentgateway-proxy-8b5dc4874-bl79q         1/1     Running   0          12s
    ```
 
 5. Get the external address of the gateway and save it in an environment variable.
+   {{< /version >}}
+   {{< version include-if="2.1.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
+
+   {{< /version >}}
+
+{{< version exclude-if="2.1.x" >}}
+
+1. Create an {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your tracing configuration. 
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: tracing
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     rawConfig:
+       config: 
+         tracing:
+           otlpEndpoint: http://opentelemetry-collector-traces.telemetry.svc.cluster.local:4317 # replace with your telemetry collector endpoint
+           otlpProtocol: grpc # replace with your telemetry collector protocol
+           randomSampling: true
+           fields:
+             add:
+               gen_ai.operation.name: '"chat"'
+               gen_ai.system: "llm.provider"
+               gen_ai.request.model: "llm.requestModel"
+               gen_ai.response.model: "llm.responseModel"
+               gen_ai.usage.completion_tokens: "llm.outputTokens"
+               gen_ai.usage.prompt_tokens: "llm.inputTokens"
+   EOF
+   ```
+
+2. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     name: agentgateway-proxy
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     infrastructure:
+       parametersRef:
+         name: tracing
+         group: agentgateway.dev
+         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}  
+     listeners:
+     - protocol: HTTP
+       port: 80
+       name: http
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+3. Verify that your {{< reuse "docs/snippets/agentgateway.md" >}} proxy is up and running. 
+   ```sh
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+   
+   Example output: 
+   ```console
+   NAMESPACE            NAME                                 READY   STATUS    RESTARTS   AGE
+   {{< reuse "docs/snippets/namespace.md" >}}      agentgateway-proxy-8b5dc4874-bl79q         1/1     Running   0          12s
+   ```
+
+4. Get the external address of the gateway and save it in an environment variable.
+   {{< /version >}}{{% version exclude-if="2.1.x" %}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS  
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+ 
+   {{% /version %}}
+
    
 ## Set up access to Gemini
 
@@ -177,12 +249,12 @@ Configure access to an LLM provider such as Gemini and send a sample request. Yo
 
 1. Get the logs of the agentgateway proxy. In the CLI output, find the `trace.id`.
    ```sh
-   kubectl logs deploy/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl logs deploy/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
    Example output:
    ```console{hl_lines=[5]}
-   info	request gateway={{< reuse "docs/snippets/namespace.md" >}}/agentgateway listener=http 
+   info	request gateway={{< reuse "docs/snippets/namespace.md" >}}/agentgateway-proxy listener=http 
    route={{< reuse "docs/snippets/namespace.md" >}}/google endpoint=generativelanguage.googleapis.com:443
    src.addr=127.0.0.1:49576 http.method=POST http.host=localhost 
    http.path=/gemini http.version=HTTP/1.1 http.status=200 
@@ -238,6 +310,8 @@ Configure access to an LLM provider such as Gemini and send a sample request. Yo
 ## Other tracing configurations
 
 Review common tracing providers configurations that you can use with agentgateway.
+
+{{< version include-if="2.1.x" >}}
 
 {{< tabs tabTotal="4" items="Jaeger,Langfuse,Phoenix (Arize),OpenLLMetry" >}}
 {{% tab tabName="Jaeger" %}}
@@ -332,16 +406,136 @@ data:
 {{% /tab %}}
 {{< /tabs >}}
 
+{{< /version >}}
+
+{{< version exclude-if="2.1.x" >}}
+
+{{< tabs tabTotal="4" items="Jaeger,Langfuse,Phoenix (Arize),OpenLLMetry" >}}
+{{% tab tabName="Jaeger" %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: jaeger-tracing-config
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  rawConfig:
+    config: 
+      tracing:
+        otlpEndpoint: http://jaeger-collector.jaeger.svc.cluster.local:4317
+        otlpProtocol: grpc
+        randomSampling: true
+        fields:
+          add:
+            gen_ai.operation.name: '"chat"'
+            gen_ai.system: "llm.provider"
+            gen_ai.request.model: "llm.requestModel"
+            gen_ai.response.model: "llm.responseModel"
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
+EOF
+```
+{{% /tab %}}
+{{% tab tabName="Langfuse" %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: langfuse-tracing-config
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  rawConfig:
+    config: 
+      tracing:
+        otlpEndpoint: https://us.cloud.langfuse.com/api/public/otel
+        otlpProtocol: http
+        headers:
+          Authorization: "Basic <base64-encoded-credentials>"
+        randomSampling: true
+        fields:
+          add:
+            gen_ai.operation.name: '"chat"'
+            gen_ai.system: "llm.provider"
+            gen_ai.prompt: "llm.prompt"
+            gen_ai.completion: 'llm.completion.map(c, {"role":"assistant", "content": c})'
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
+            gen_ai.request: "flatten(llm.params)"
+EOF
+```
+{{% /tab %}}
+{{% tab tabName="Phoenix (Arize)" %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: phoenix-tracing-config
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  rawConfig:
+    config: 
+      tracing:
+        otlpEndpoint: http://localhost:4317
+        randomSampling: true
+        fields:
+          add:
+            span.name: '"openai.chat"'
+            openinference.span.kind: '"LLM"'
+            llm.system: "llm.provider"
+            llm.input_messages: 'flattenRecursive(llm.prompt.map(c, {"message": c}))'
+            llm.output_messages: 'flattenRecursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
+            llm.token_count.completion: "llm.outputTokens"
+            llm.token_count.prompt: "llm.inputTokens"
+            llm.token_count.total: "llm.totalTokens"
+EOF
+```
+{{% /tab %}}
+{{% tab tabName="OpenLLMetry" %}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: openllmetry-tracing-config
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  rawConfig:
+    config: 
+      tracing:
+        otlpEndpoint: http://localhost:4317
+        randomSampling: true
+        fields:
+          add:
+            span.name: '"openai.chat"'
+            gen_ai.operation.name: '"chat"'
+            gen_ai.system: "llm.provider"
+            gen_ai.prompt: "flattenRecursive(llm.prompt)"
+            gen_ai.completion: 'flattenRecursive(llm.completion.map(c, {"role":"assistant", "content": c}))'
+            gen_ai.usage.completion_tokens: "llm.outputTokens"
+            gen_ai.usage.prompt_tokens: "llm.inputTokens"
+            llm.usage.total_tokens: 'llm.totalTokens'
+            llm.is_streaming: "llm.streaming"
+EOF
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}}   tracing -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} tracing -n {{< reuse "docs/snippets/namespace.md" >}} 
 helm uninstall opentelemetry-collector-traces -n telemetry
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete {{< reuse "docs/snippets/backend.md" >}} google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret google-secret -n {{< reuse "docs/snippets/namespace.md" >}}
+{{< version exclude-if="2.2.x" >}}
+kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}} {{< /version >}}
 ```

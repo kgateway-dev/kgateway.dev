@@ -1,4 +1,4 @@
-Use the kgateway control plane to deploy and manage the lifecycle of {{< reuse "/docs/snippets/agentgateway.md" >}} proxies on Kubernetes. </br></br>
+Use the {{< reuse "/docs/snippets/kgateway.md" >}} control plane to deploy and manage the lifecycle of agentgateway proxies on Kubernetes. </br></br>
 
 {{< reuse "docs/snippets/agentgateway/about.md" >}}
 

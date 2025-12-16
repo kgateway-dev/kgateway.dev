@@ -1,4 +1,4 @@
-You can use this guide to upgrade the version of {{< reuse "/docs/snippets/kgateway.md" >}} for your control plane and data plane components, or to apply changes to the components' configuration settings.
+You can use this guide to upgrade the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and data plane components, or to apply changes to the components' configuration settings.
 
 <!-- TODO upgrade guide when we have a minor version
 ## Considerations
@@ -139,13 +139,13 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 
 ## Upgrade {#upgrade-steps}
 
-1. Set the version to upgrade {{< reuse "/docs/snippets/kgateway.md" >}} in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
+1. Set the version you want to upgrade to in an environment variable, such as the latest patch version (`{{< reuse "docs/versions/n-patch.md" >}}`) .
    
    ```sh
    export NEW_VERSION={{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
+2. Apply the new CRDs for the control and data plane by using Helm.
 
    1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
@@ -186,7 +186,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
 
    3. Make any changes that you want by editing your `values.yaml` Helm values file or preparing the `--set` flags. For development v{{< reuse "docs/versions/patch-dev.md" >}} builds, include the `controller.image.pullPolicy=Always` setting or refer to the exact image digest to avoid using cached images.
 
-4. Upgrade the kgateway Helm installation.
+4. Upgrade the kgateway control plane Helm installation.
    * Make sure to include your Helm values when you upgrade either as a configuration file or with `--set` flags. Otherwise, any previous custom values that you set might be overwritten.
    * When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.{{< version include-if="2.2.x,2.1.x" >}}
    * To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.
@@ -199,7 +199,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
      --version {{< reuse "docs/versions/helm-version-upgrade.md" >}} 
    ```
    
-5. Verify that {{< reuse "/docs/snippets/kgateway.md" >}} runs the upgraded version.
+5. Verify that the control plane runs the upgraded version.
    
    ```sh
    kubectl -n {{< reuse "docs/snippets/namespace.md" >}} get pod -l app.kubernetes.io/name={{< reuse "/docs/snippets/helm-kgateway.md" >}} -o jsonpath='{.items[0].spec.containers[0].image}'
@@ -207,10 +207,10 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    
    Example output:
    ```
-   {{< reuse "/docs/snippets/helm-path.md" >}}/{{< reuse "/docs/snippets/helm-kgateway.md" >}}:{{< reuse "docs/versions/n-patch.md" >}}
+   {{< reuse "/docs/snippets/helm-path.md" >}}/kgateway:{{< reuse "docs/versions/n-patch.md" >}}
    ```
 
-6. Confirm that the {{< reuse "/docs/snippets/kgateway.md" >}} control plane is up and running. 
+6. Confirm that the control plane is up and running. 
    
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
