@@ -23,10 +23,10 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
    # bcrypt(password)=$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy
    # password: gateway
    kubectl -n argocd patch secret argocd-secret \
-    -p '{"stringData": {                                                                                                      
+    -p '{"stringData": {                         
     "admin.password": "$2y$10$f6GlB5V/8OzCduEDEgBU.ugVn4vzxgT7cq7vuCebZAKoADaNve9Ve",
-    "admin.passwordMtime": "'$(date +%FT%T%Z)'"                         
-   }}' 
+    "admin.passwordMtime": "'$(date +%FT%T%Z)'"
+    }}' 
    ```
 
 ## Install
