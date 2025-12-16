@@ -18,15 +18,15 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
    kubectl -n argocd rollout status deploy/argocd-repo-server
    kubectl -n argocd rollout status deploy/argocd-server   
    ```
-4. Update the default Argo CD password for the admin user to `solo.io`.
+4. Update the default Argo CD password for the admin user to `gateway`.
    ```shell
    # bcrypt(password)=$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy
-   # password: solo.io
+   # password: gateway
    kubectl -n argocd patch secret argocd-secret \
-     -p '{"stringData": {
-       "admin.password": "$2a$10$79yaoOg9dL5MO8pn8hGqtO4xQDejSEVNWAGQR268JHLdrCw6UCYmy",
-       "admin.passwordMtime": "'$(date +%FT%T%Z)'"
-   }}'
+    -p '{"stringData": {                                                                                                      
+    "admin.password": "$2y$10$f6GlB5V/8OzCduEDEgBU.ugVn4vzxgT7cq7vuCebZAKoADaNve9Ve",
+    "admin.passwordMtime": "'$(date +%FT%T%Z)'"                         
+   }}' 
    ```
 
 ## Install
