@@ -7,7 +7,7 @@
      name: agentgateway-proxy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 80
