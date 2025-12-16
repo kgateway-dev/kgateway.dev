@@ -5,19 +5,6 @@ description: Unleash developer productivity and accelerate AI innovation with AI
 icon: cognition
 ---
 
-Explore what you can do with AI Gateway in the following guides.
+Interested in using kgateway as an AI Gateway? Check out using [kgateway with an agentgateway data plane](https://kgateway.dev/docs/agentgateway/main/). </br></br>
 
-{{< cards >}}
-  {{< card link="about" title="About AI Gateway" >}}
-  {{< card link="setup" title="Set up AI Gateway" >}}
-  {{< card link="cloud-providers" title="LLM cloud providers" >}}
-  {{< card link="ollama" title="Ollama for local LLMs" >}}
-  {{< card link="auth" title="Authenticate LLM providers" >}}
-  {{< card link="failover" title="Model failover" >}}
-  {{< card link="functions" title="Function calling" >}}
-  {{< card link="prompt-enrichment" title="Prompt enrichment" >}}
-  {{< card link="prompt-guards" title="Prompt guards" >}}
-  {{< card link="observability" title="AI Gateway metrics" >}}
-  {{< card link="cleanup" title="Cleanup" >}}
-  {{< card link="/docs/integrations/inference-extension" title="Inference Extension for local LLMs" icon="bookmark" >}}
-{{< /cards >}}
+{{< reuse "docs/snippets/agentgateway/about.md" >}}
