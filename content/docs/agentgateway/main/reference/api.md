@@ -221,6 +221,44 @@ _Appears in:_
 | `REJECT` | Reject the request if the regex matches content in the request.<br /> |
 
 
+#### AgentExtAuthGRPC
+
+
+
+
+
+
+
+_Appears in:_
+- [ExtAuth](#extauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `contextExtensions` _object (keys:string, values:string)_ | contextExtensions specifies additional arbitrary key-value pairs to send to the authorization server in the `context_extensions` field. |  | MaxProperties: 64 <br /> |
+| `requestMetadata` _object (keys:string, values:[CELExpression](#celexpression))_ | requestMetadata specifies metadata to be sent *to* the authorization server.<br />This maps to the `metadata_context.filter_metadata` field of the request, and allows dynamic CEL expressions.<br />If unset, by default the `envoy.filters.http.jwt_authn` key is set if the JWT policy is used as well, for compatibility. |  | MaxProperties: 64 <br /> |
+
+
+#### AgentExtAuthHTTP
+
+
+
+
+
+
+
+_Appears in:_
+- [ExtAuth](#extauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `path` _[CELExpression](#celexpression)_ | path specifies the path to send to the authorization server. If unset, this defaults to the original request path.<br />This is a CEL expression, which allows customizing the path based on the incoming request.<br />For example, to add a prefix: `path: '"/prefix/" + request.path'`. |  |  |
+| `redirect` _[CELExpression](#celexpression)_ | redirect defines an optional expression to determine a path to redirect to on authorization failure.<br />This is useful to redirect to a sign-in page. |  |  |
+| `allowedRequestHeaders` _string array_ | allowedRequestHeaders specifies what additional headers from the client request<br />will be sent to the authorization server.<br /><br />If unset, the following headers are sent by default: `Authorization`. |  | MaxItems: 64 <br /> |
+| `addRequestHeaders` _object (keys:string, values:[CELExpression](#celexpression))_ | addRequestHeaders specifies what additional headers to add to the request to the authorization server.<br />While allowedRequestHeaders just passes the original headers through, addRequestHeaders allows defining custom headers<br />based on CEL Expressions. |  | MaxProperties: 64 <br /> |
+| `allowedResponseHeaders` _string array_ | allowedResponseHeaders specifies what headers from the authorization response<br />will be copied into the request to the backend. |  | MaxItems: 64 <br /> |
+| `responseMetadata` _object (keys:string, values:[CELExpression](#celexpression))_ | responseMetadata specifies what metadata fields should be constructed *from* the authorization response. These will be<br />included under the `extauthz` variable in future CEL expressions. Setting this is useful to do things like logging<br />usernames, without needing to include them as headers to the backend (as `allowedResponseHeaders` would). |  | MaxProperties: 64 <br /> |
+
+
 #### AgentgatewayBackend
 
 
@@ -799,8 +837,9 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the External Authorization server to reach.<br /><br />Supported types: Service and Backend. |  |  |
+| `grpc` _[AgentExtAuthGRPC](#agentextauthgrpc)_ | grpc specifies that the gRPC External Authorization<br />[protocol](https://www.envoyproxy.io/docs/envoy/latest/api-v3/service/auth/v3/external_auth.proto) should be used. |  |  |
+| `http` _[AgentExtAuthHTTP](#agentextauthhttp)_ | http specifies that the HTTP protocol should be used for connecting to the authorization server.<br />The authorization server must return a `200` status code, otherwise the request is considered an authorization failure. |  |  |
 | `forwardBody` _[ExtAuthBody](#extauthbody)_ | forwardBody configures whether to include the HTTP body in the request. If enabled, the request body will be<br />buffered. |  |  |
-| `contextExtensions` _object (keys:string, values:string)_ | contextExtensions specifies additional arbitrary key-value pairs to send to the authorization server. |  | MaxProperties: 64 <br /> |
 
 
 #### ExtAuthBody
@@ -1240,7 +1279,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `metadata` _[AgentgatewayParametersObjectMetadata](#agentgatewayparametersobjectmetadata)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `spec` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | Spec provides an opaque mechanism to configure the resource Spec.<br />This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec)<br />and will be merged with the generated configuration using **Strategic Merge Patch** semantics.<br />The patch is applied after all other fields are applied.<br />If you merge-patch the same resource from AgentgatewayParameters on the<br />GatewayClass and also from AgentgatewayParameters on the Gateway, then<br />the GatewayClass merge-patch happens first.<br /><br /># Strategic Merge Patch & Deletion Guide<br /><br />This merge strategy allows you to override individual fields, merge lists, or delete items<br />without needing to provide the entire resource definition.<br /><br />**1. Replacing Values (Scalars):**<br />Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.<br /><br />**2. Merging Lists (Append/Merge):**<br />Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`)<br />will append your items to the generated list, or update existing items if keys match.<br /><br />**3. Deleting List Items ($patch: delete):**<br />To remove an item from a generated list (e.g., removing a default sidecar), you must use<br />the special `$patch: delete` directive.<br /><br />  spec:<br />    containers:<br />      - name: agent-gateway<br />        # Delete the securityContext using $patch: delete<br />        securityContext:<br />          $patch: delete<br /><br />**4. Deleting/Clearing Map Fields (null):**<br />To remove a map field or a scalar entirely, set its value to `null`.<br /><br />  spec:<br />    template:<br />      spec:<br />        nodeSelector: null  # Removes default nodeSelector<br /><br />**5. Replacing Lists Entirely ($patch: replace):**<br />If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.<br /><br />  service:<br />    spec:<br />      ports:<br />        - $patch: replace<br />        - name: http<br />          port: 80<br />          targetPort: 8080<br />          protocol: TCP<br />        - name: https<br />          port: 443<br />          targetPort: 8443<br />          protocol: TCP |  | Type: object <br /> |
+| `spec` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | Spec provides an opaque mechanism to configure the resource Spec.<br />This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec)<br />and will be merged with the generated configuration using **Strategic Merge Patch** semantics.<br />The patch is applied after all other fields are applied.<br />If you merge-patch the same resource from AgentgatewayParameters on the<br />GatewayClass and also from AgentgatewayParameters on the Gateway, then<br />the GatewayClass merge-patch happens first.<br /><br /># Strategic Merge Patch & Deletion Guide<br /><br />This merge strategy allows you to override individual fields, merge lists, or delete items<br />without needing to provide the entire resource definition.<br /><br />**1. Replacing Values (Scalars):**<br />Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.<br /><br />**2. Merging Lists (Append/Merge):**<br />Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`)<br />will append your items to the generated list, or update existing items if keys match.<br /><br />**3. Deleting List Items ($patch: delete):**<br />To remove an item from a generated list (e.g., removing a default sidecar), you must use<br />the special `$patch: delete` directive.<br /><br />  spec:<br />    containers:<br />      - name: agentgateway<br />        # Delete the securityContext using $patch: delete<br />        securityContext:<br />          $patch: delete<br /><br />**4. Deleting/Clearing Map Fields (null):**<br />To remove a map field or a scalar entirely, set its value to `null`.<br /><br />  spec:<br />    template:<br />      spec:<br />        nodeSelector: null  # Removes default nodeSelector<br /><br />**5. Replacing Lists Entirely ($patch: replace):**<br />If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.<br /><br />  service:<br />    spec:<br />      ports:<br />        - $patch: replace<br />        - name: http<br />          port: 80<br />          targetPort: 8080<br />          protocol: TCP<br />        - name: https<br />          port: 443<br />          targetPort: 8443<br />          protocol: TCP |  | Type: object <br /> |
 
 
 #### LLMProvider
