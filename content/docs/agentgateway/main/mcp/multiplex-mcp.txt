@@ -18,12 +18,12 @@ To federate multiple MCP servers on the same gateway, you can use a label select
 This approach makes it easier for you to add more MCP servers by adding labels. It also lets your clients access tools from multiple MCP servers through a single endpoint and MCP connection.
 
 {{< callout type="warning" >}}
-Note that only streamable HTTP is currently supported for label selectors. If you have SSE, use a [static MCP Backend](#static).
+Note that only streamable HTTP is currently supported for label selectors. If you have SSE, use a [static MCP Backend](../static).
 {{< /callout >}}
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 ## Step 1: Deploy MCP servers {#mcp-server-everythings}
 
@@ -75,21 +75,20 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
    EOF
    ```
 
-2. Create a Backend that selects the MCP server that you just created.
+2. Create an {{< reuse "docs/snippets/backend.md" >}} that selects the MCP server that you just created.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: mcp-server-everything
    spec:
-     type: MCP
      mcp:
-       name: mcp-virtual-server
        targets:
-         - selectors:
-             serviceSelector:
+         - name: mcp-virtual-server
+           selector:
+             services:
                matchLabels:
                  app: mcp-server-everything
    EOF
@@ -137,17 +136,15 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: Backend
+   apiVersion: agentgateway.dev/v1alpha1
+   kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
      name: mcp-website-fetcher
    spec:
-     type: MCP
      mcp:
-       name: mcp-website-fetcher
        targets:
-       - static:
-           name: mcp-website-fetcher
+       - name: mcp-website-fetcher
+         static:
            host: mcp-website-fetcher.default.svc.cluster.local
            port: 80
            protocol: SSE   
@@ -158,41 +155,7 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
 
 Route to the federated MCP servers with agentgateway.
 
-1. Create a Gateway resource that uses the `agentgateway` GatewayClass. Kgateway automatically creates an agentgateway proxy for you.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: Gateway
-   metadata:
-     name: agentgateway
-   spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
-     listeners:
-     - protocol: HTTP
-       port: 8080
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
-   EOF
-   ```
-
-2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
-
-   ```sh
-   kubectl get gateway agentgateway
-   ```
-
-   Example output: 
-   
-   ```txt
-   NAME           CLASS          ADDRESS                                  PROGRAMMED   AGE
-   agentgateway   agentgateway   1234567890.us-east-2.elb.amazonaws.com   True         93s
-   ```
-
-3. Create an HTTPRoute resource that routes to the Backends that you created in the previous step.
-
+1. Create an HTTPRoute resource that routes to the {{< reuse "docs/snippets/backend.md" >}}s that you created in the previous step.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -201,20 +164,20 @@ Route to the federated MCP servers with agentgateway.
      name: mcp
    spec:
      parentRefs:
-     - name: agentgateway
-       namespace: default
+     - name: agentgateway-proxy
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
          - name: mcp-server-everything
-           group: gateway.kgateway.dev
-           kind: Backend   
+           group: agentgateway.dev
+           kind: {{< reuse "docs/snippets/backend.md" >}} 
          - name: mcp-website-fetcher
-           group: gateway.kgateway.dev
-           kind: Backend   
+           group: agentgateway.dev
+           kind: {{< reuse "docs/snippets/backend.md" >}}  
    EOF
    ```
 
-4. Check that the HTTPRoute is `Accepted`, selects the Gateway, and includes backend rules for both the Backends that you created.
+2. Check that the HTTPRoute is `Accepted`, selects the Gateway, and includes backend rules for both the Backends that you created.
 
    ```sh
    kubectl describe httproute mcp
@@ -238,16 +201,16 @@ Route to the federated MCP servers with agentgateway.
      Parent Refs:
        Group:        gateway.networking.k8s.io
        Kind:         Gateway
-       Name:         agentgateway
-       Namespace:    default
+       Name:         agentgateway-proxy 
+       Namespace:    {{< reuse "docs/snippets/namespace.md" >}}
      Rules:
        Backend Refs:
-         Group:   gateway.kgateway.dev
-         Kind:    Backend
+         Group:   agentgateway.dev
+         Kind:    {{< reuse "docs/snippets/backend.md" >}}
          Name:    mcp-server-everything
          Weight:  1
-         Group:   gateway.kgateway.dev
-         Kind:    Backend
+         Group:   agentgateway.dev
+         Kind:    {{< reuse "docs/snippets/backend.md" >}}
          Name:    mcp-website-fetcher
          Weight:  1
        Matches:
@@ -273,7 +236,7 @@ Route to the federated MCP servers with agentgateway.
        Parent Ref:
          Group:  gateway.networking.k8s.io
          Kind:   Gateway
-         Name:   agentgateway   
+         Name:   agentgateway-proxy   
    ```
 
 
@@ -324,11 +287,10 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete Deployment mcp-server-everything mcp-website-fetcher
-kubectl delete Service mcp-server-everything mcp-website-fetcher
-kubectl delete Backend mcp-server-everything mcp-website-fetcher
-kubectl delete Gateway agentgateway
-kubectl delete HTTPRoute mcp
+kubectl delete Deployment mcp-server-everything mcp-website-fetcher -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete Service mcp-server-everything mcp-website-fetcher -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} mcp-server-everything mcp-website-fetcher -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete HTTPRoute mcp -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
 <!-- TODO CLI steps
