@@ -6,11 +6,6 @@ By default, Envoy terminates the connection to a downstream or upstream service 
 
 Note that the idle timeout configures the timeout for the entire connection from a downstream service to the gateway proxy, and to the upstream service. If you want to set a timeout for a single stream, configure the [idle stream timeout]({{< link-hextra path="/resiliency/timeouts/idle-stream/" >}}) instead. 
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

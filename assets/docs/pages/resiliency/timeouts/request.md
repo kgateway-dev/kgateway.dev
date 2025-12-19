@@ -1,9 +1,5 @@
 Change the default route-level timeout of 15 seconds with an HTTPRoute or {{< reuse "docs/snippets/kgateway.md" >}} {{< reuse "docs/snippets/trafficpolicy.md" >}}. To ensure that your apps are available even if they are temporarily unavailable, you can use timeouts alongside [Retries]({{< link-hextra path="/resiliency/retry/" >}}).
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
@@ -53,7 +49,7 @@ Specify timeouts for a specific route.
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Option 2: GlooTrafficPolicy"  %}}
+   {{% tab tabName="Option 2: EnterpriseKgatewayTrafficPolicy"  %}}
    1.  Install the experimental channel of the Kubernetes Gateway API to use this feature.
        ```sh
        kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml

@@ -70,7 +70,7 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="HTTPRoute (GlooTrafficPolicy)" %}}
+   {{% tab tabName="HTTPRoute (EnterpriseKgatewayTrafficPolicy)" %}}
    1. Create an HTTPRoute to route requests along the `retry.example` domain to the httpbin app. Note that you add a name `timeout` to your HTTPRoute rule so that you can configure the per-try timeout for that rule later. 
       ```yaml
       kubectl apply -f- <<EOF

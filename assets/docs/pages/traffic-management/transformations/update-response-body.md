@@ -5,14 +5,6 @@ In this guide, you use the following methods to transform a JSON body:
 * Directly access fields in the JSON body and inject them into a custom JSON body.
 * Use the `replace_with_random` Inja function to replace specific patterns in the JSON body.
 
-{{< version exclude-if="2.0.x" >}}
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}} {{< reuse "docs/snippets/agentgateway-capital.md" >}}
-{{< /callout >}}
-
-<!--TODO agentgateway transformations-->
-{{< /version >}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

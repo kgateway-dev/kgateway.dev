@@ -1,9 +1,5 @@
 Manage idle and stale connections with TCP keepalive.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About TCP keepalive
 
 With keepalive, the kernel sends probe packets with only an acknowledgement flag (ACK) to the TCP socket of the destination after the connection was idle for a specific amount of time. This way, the connection does not have to be re-established repeatedly, which could otherwise lead to latency spikes. If the destination returns the packet with an acknowledgement flag (ACK), the connection is determined to be alive. If not, the probe can fail a certain number of times before the connection is considered stale. {{< reuse "docs/snippets/kgateway-capital.md" >}} can then close the stale connection, which can help avoid longer timeouts and retries on broken or stale connections.
