@@ -1,8 +1,3 @@
----
-title: Multiplex MCP
-weight: 30
----
-
 To federate multiple MCP servers on the same gateway, you can use a label selector in the MCP Backend.
 
 This approach makes it easier for you to add more MCP servers by adding labels. It also lets your clients access tools from multiple MCP servers through a single endpoint and MCP connection.
@@ -65,26 +60,7 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
    EOF
    ```
 
-2. Create an {{< reuse "docs/snippets/backend.md" >}} that selects the MCP server that you just created.
-
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: agentgateway.dev/v1alpha1
-   kind: {{< reuse "docs/snippets/backend.md" >}}
-   metadata:
-     name: mcp-server-everything
-   spec:
-     mcp:
-       targets:
-         - name: mcp-server-everything
-           selector:
-             services:
-               matchLabels:
-                 app: mcp-server-everything
-   EOF
-   ```
-
-3. Create another MCP server workload with a website fetcher tool.
+2. Create another MCP server workload with a website fetcher tool.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -122,22 +98,27 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
    EOF
    ```
 
-4. Create an {{< reuse "docs/snippets/backend.md" >}} for the MCP server. 
+3. Create an {{< reuse "docs/snippets/backend.md" >}} that selects both MCP servers that you created.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: agentgateway.dev/v1alpha1
    kind: {{< reuse "docs/snippets/backend.md" >}}
    metadata:
-     name: mcp-website-fetcher
+     name: mcp
    spec:
      mcp:
        targets:
-       - name: mcp-website-fetcher
-         static:
-           host: mcp-website-fetcher.default.svc.cluster.local
-           port: 80
-           protocol: StreamableHTTP
+         - name: mcp-server-everything
+           selector:
+             services:
+               matchLabels:
+                 app: mcp-server-everything
+         - name: mcp-website-fetcher
+           static:
+             host: mcp-website-fetcher.default.svc.cluster.local
+             port: 80
+             protocol: SSE
    EOF
    ```
 
@@ -145,7 +126,7 @@ Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway 
 
 Route to the federated MCP servers with agentgateway.
 
-1. Create an HTTPRoute resource that routes to the {{< reuse "docs/snippets/backend.md" >}}s that you created in the previous steps
+1. Create an HTTPRoute resource that routes to the {{< reuse "docs/snippets/backend.md" >}} that you created in the previous step.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -158,12 +139,9 @@ Route to the federated MCP servers with agentgateway.
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
-         - name: mcp-server-everything
+         - name: mcp
            group: agentgateway.dev
            kind: {{< reuse "docs/snippets/backend.md" >}} 
-         - name: mcp-website-fetcher
-           group: agentgateway.dev
-           kind: {{< reuse "docs/snippets/backend.md" >}}  
    EOF
    ```
 
@@ -196,12 +174,8 @@ Route to the federated MCP servers with agentgateway.
      Rules:
        Backend Refs:
          Group:   agentgateway.dev
-         Kind:    {{< reuse "docs/snippets/backend.md" >}}
-         Name:    mcp-server-everything
-         Weight:  1
-         Group:   agentgateway.dev
-         Kind:    {{< reuse "docs/snippets/backend.md" >}}
-         Name:    mcp-website-fetcher
+         Kind:    AgentgatewayBackend
+         Name:    mcp
          Weight:  1
        Matches:
          Path:
@@ -210,23 +184,24 @@ Route to the federated MCP servers with agentgateway.
    Status:
      Parents:
        Conditions:
-         Last Transition Time:  2025-12-18T16:16:16Z
-         Message:               Route is accepted
-         Observed Generation:   1
+         Last Transition Time:  2025-12-19T03:13:18Z
+         Message:               
+         Observed Generation:   2
          Reason:                Accepted
          Status:                True
          Type:                  Accepted
-         Last Transition Time:  2025-12-18T16:17:22Z
-         Message:               Route has valid refs
-         Observed Generation:   1
+         Last Transition Time:  2025-12-19T14:24:01Z
+         Message:               
+         Observed Generation:   2
          Reason:                ResolvedRefs
          Status:                True
          Type:                  ResolvedRefs
        Controller Name:         agentgateway.dev/agentgateway
        Parent Ref:
-         Group:  gateway.networking.k8s.io
-         Kind:   Gateway
-         Name:   agentgateway-proxy   
+         Group:      gateway.networking.k8s.io
+         Kind:       Gateway
+         Name:       agentgateway-proxy
+         Namespace:  agentgateway-system
    ```
 
 
@@ -245,7 +220,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -261,13 +236,16 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
    * Click **Connect**.
 
-4. From the menu bar, click the **Tools** tab. You should now see tools from both MCP servers:
-   * **From `mcp-server-everything`**: Tools like `echo`, `add`, etc.
-   * **From `mcp-website-fetcher`**: A `fetch` tool. 
+4. From the menu bar, click the **Tools** tab, and then **List tools**. Verify that you see the tools from both servers. The name of the tools are prepended with the name of the MCP server
+   * **`mcp-server-everything-3001_*`**: Tools from the `server-everything` MCP server, like `echo`, `add`, etc.
+   * **`mcp-website-fetcher_fetch`**: The `fetch` tool from the website fetcher MCP server.
+
+   {{< reuse-image src="img/mcp-multiplex.png" >}}
+   {{< reuse-image-dark srcDark="img/mcp-multiplex-dark.png" >}}
 
 5. Test the federated tools:
-   * **Test the `echo` tool**: Click **List Tools** and select the `echo` tool. In the **message** field, enter any string, such as `Hello world`, and click **Run Tool**. Verify that your string is echoed back. 
-   * **Test the `fetch` tool**: Click **List Tools** and select the `fetch` tool. In the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
+   * **Test the `mcp-server-everything-3001_echo` tool**: Click **List Tools** and select the `echo` tool. In the **message** field, enter any string, such as `Hello world`, and click **Run Tool**. Verify that your string is echoed back. 
+   * **Test the `mcp-website-fetcher_fetch` tool**: Click **List Tools** and select the `fetch` tool. In the **url** field, enter a website URL, such as `https://lipsum.com/`, and click **Run Tool**.
    
 
 ## Cleanup
@@ -277,80 +255,6 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 ```sh
 kubectl delete Deployment mcp-server-everything mcp-website-fetcher
 kubectl delete Service mcp-server-everything mcp-website-fetcher 
-kubectl delete {{< reuse "docs/snippets/backend.md" >}} mcp-server-everything mcp-website-fetcher
+kubectl delete {{< reuse "docs/snippets/backend.md" >}} mcp
 kubectl delete HTTPRoute mcp 
 ```
-
-<!-- TODO CLI steps
-
-You can verify the connection to the MCP server through a command line tool with `curl` requests or a user interface that is provided by the MCP Inspector tool.
-
-### Curl requests in terminal {#cli}
-
-1. Get the address of the Gateway for your MCP routes.
-   
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n default agentgateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"  %}}
-   ```sh
-   kubectl port-forward deployment/agentgateway -n default 8080:8080
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-2. Send a request through the Gateway to start a session.
-
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl -v $INGRESS_GW_ADDRESS:8080/sse
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"  %}}
-   ```sh
-   curl -v localhost:8080/sse
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-   Example output:
-   ```
-   event: endpoint
-   data: ?sessionId=c1a54dcb-be11-4f91-91b5-a1abf67deca2
-   ```
-
-3. Save the session ID from the output as an environment variable. In the example, the session ID is `c1a54dcb-be11-4f91-91b5-a1abf67deca2`.
-
-   ```sh
-   export SESSION_ID=c1a54dcb-be11-4f91-91b5-a1abf67deca2
-   ``` 
-
-4. Send a request to initialize the connection with your MCP server.
-
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl "$INGRESS_GW_ADDRESS:8080/mcp?sessionId=$SESSION_ID" -v \
-     -H "Accept: text/event-stream,application/json" \
-     --json '{"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"roots":{}},"clientInfo":{"name":"claude-code","version":"1.0.60"}},"jsonrpc":"2.0","id":0}'
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl "http://localhost:8080/mcp?sessionId=$SESSION_ID" -v \
-     -H "Accept: text/event-stream,application/json" \
-     --json '{"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{"roots":{}},"clientInfo":{"name":"claude-code","version":"1.0.60"}},"jsonrpc":"2.0","id":0}'
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-   **Note**: If you encounter connection issues, try using the MCP Inspector tool instead, which handles the protocol negotiation automatically.
-
-### Browser-based MCP Inspector {#ui}
-
--->
