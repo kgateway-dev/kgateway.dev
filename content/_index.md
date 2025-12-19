@@ -10,20 +10,20 @@ excludeSearch: true
   <div class="py-8 lg:py-16 flex items-center px-6">
     <div class="text-center mx-auto inline-block">
       <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most widely deployed gateway in Kubernetes for microservices and AI agents</h1>
-      <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">kgateway is:</h2>
+      <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">Kgateway is a control plane for:</h2>
     </div>
   </div>
 
   <div class="flex gap-8 flex-wrap justify-center px-8 md:px-12 xl:px-25">
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <a href="/docs/about/overview" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/envoylatest/about/overview" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-api-gateway.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An Advanced Ingress Controller and Next-Gen API Gateway</h3>
         </div>
         <p class="text-primary-text text-center px-4 md:min-h-24">Aggregate web APIs and apply functions like authentication, authorization and rate limiting in one place.</p>
       </a>
-      <a href="/docs/ai/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/agentgateway/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/use-case-ai.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An AI Gateway that Supports and Secures LLM Consumption</h3>
@@ -32,14 +32,14 @@ excludeSearch: true
       </a>
     </div>
     <div class="flex gap-8 flex-wrap w-full md:w-auto">
-      <a href="/docs/integrations/inference-extension/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/agentgateway/latest/inference/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-ingress.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">An Inference Gateway for your own Generative Models</h3>
         </div>
         <p class="text-primary-text text-center px-4 md:min-h-24">Intelligently route to AI inference workloads in Kubernetes environments.</p>
       </a>
-      <a href="/docs/integrations/agentgateway/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
+      <a href="/docs/agentgateway/" class="flex md:flex-col items-start bg-card-bg px-4 py-[3.75rem] gap-[1.6875rem] md:gap-[3.125rem] w-full md:w-[17.875rem] min-h-[7.4375rem] md:min-h-[25rem] flex-wrap justify-center rounded-xl">
         <div class="flex flex-row md:flex-col gap-8 justify-center items-center">
           <img src="/feature-mcp.svg" />
           <h3 class="font-semibold text-[1.25rem] md:text-[1.5625rem] leading-[1.71875rem] text-primary-text font-heading text-center min-h-16">A Native MCP and Agent-to-Agent Gateway</h3>
@@ -56,8 +56,8 @@ excludeSearch: true
       About kgateway
     </h2>
     <div class="flex gap-8 flex-wrap justify-center text-l lg:text-xl px-4">
-      <p class="text-primary-text max-w-4xl mx-auto">kgateway is the most mature and widely deployed Envoy-based gateway in the market today. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls, to advanced AI gateway use cases for safety, security, and governance when serving models or integrating applications with third-party LLMs. kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
-      <p class="text-primary-text max-w-4xl mx-auto">kgateway was launched in 2018 as <b>Gloo</b>. Since then, the project has steadily evolved to become the most trusted and feature-rich API gateway for Kubernetes, processing billions of API requests for many of the world's biggest companies.</p>
+      <p class="text-primary-text max-w-4xl mx-auto">Kgateway is a control plane for the most mature and widely deployed Envoy-based data plane gateway proxy in the market today, as well as the agentgateway data plane for AI workloads. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls, to advanced AI gateway use cases for safety, security, and governance when serving models or integrating applications with third-party LLMs. Kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
+      <p class="text-primary-text max-w-4xl mx-auto">Kgateway was launched in 2018 as <b>Gloo</b>. Since then, the project has steadily evolved to become the most trusted and feature-rich API gateway for Kubernetes, processing billions of API requests for many of the world's biggest companies.</p>
     </div>
   </div>
 </section>
