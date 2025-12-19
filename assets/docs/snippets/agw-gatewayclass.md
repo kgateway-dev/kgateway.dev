@@ -1,1 +1,1 @@
-{{< version include-if="2.1.x" >}}agentgateway{{< /version >}}{{< version include-if="2.2.x" >}}agentgateway-v2{{< /version >}}
+agentgateway

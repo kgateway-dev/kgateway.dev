@@ -2,7 +2,7 @@ With {{< reuse "docs/snippets/agentgateway.md" >}}, you can route to agent-to-ag
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}). 
 
 <!-- Steps to build image locally from kgateway repo
 ## Step 1: Deploy an A2A server {#a2a-server}
@@ -140,13 +140,13 @@ EOF
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
+   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
    echo $INGRESS_GW_ADDRESS
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -175,7 +175,7 @@ EOF
          ]
        }
      }
-     }'
+     }' | jq
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
@@ -199,7 +199,7 @@ EOF
          ]
        }
      }
-     }'
+     }' | jq
    ```
    {{% /tab %}}
    {{< /tabs >}}

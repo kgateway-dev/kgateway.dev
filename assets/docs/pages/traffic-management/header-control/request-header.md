@@ -46,7 +46,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    |`spec.rules.filters.requestHeaderModifier.add`|The name and value of the request header that you want to add. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
@@ -176,7 +176,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -224,7 +224,7 @@ Setting headers is similar to adding headers. If the request does not include th
    |`spec.rules.filters.requestHeaderModifier.set`|The name and value of the request header that you want to set. |
    |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
@@ -349,7 +349,7 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -436,7 +436,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    |`spec.rules.filters.requestHeaderModifier.remove`|The name of the request header that you want to remove. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
@@ -525,7 +525,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -579,7 +579,7 @@ You can return dynamic information about the request in the request header. For 
    |`spec.rules.filters.requestHeaderModifier.set`|The request header that you want to set. In this example, the `x-client-ip` header is set to the downstream remote address without the port. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}  
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}  
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -671,7 +671,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="GlooTrafficPolicy" %}}
+   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
