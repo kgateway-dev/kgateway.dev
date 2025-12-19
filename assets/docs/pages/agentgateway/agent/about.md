@@ -2,7 +2,7 @@ Learn about what agents are and how they work.
 
 ## About A2A
 
-Agent-to-agent, or [A2A](https://github.com/a2aproject/A2A), is an open protocol... that enables communication and interoperability between opaque agentic applications. Developed by Google, A2A defines a common language that enables agents to show their capabilities and help them negotiate how they interact with the user, such as via text, forms, or bidirectional audio or video, irrespective of the framework or vendor they are built on.
+Agent-to-agent, or [A2A](https://github.com/a2aproject/A2A), is an open protocol that enables communication and interoperability between opaque agentic applications. Developed by Google, A2A defines a common language that enables agents to show their capabilities and help them negotiate how they interact with the user, such as via text, forms, or bidirectional audio or video, irrespective of the framework or vendor they are built on.
 
 With A2A, agents can:
 
