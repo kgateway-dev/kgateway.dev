@@ -189,14 +189,15 @@ sequenceDiagram
       --header "mcp-protocol-version: 2024-11-05" \
       --method tools/call \
       --tool-name search_repositories \
-      --header "Authorization: Bearer $Bob_JWT" \
+      --header "Authorization: Bearer $BOB_JWT" \
       --tool-arg query="user:facebook"
       ```
 
       Example output: 
       ```console
-      Failed to connect to MCP server: Streamable HTTP error: 
-      Error POSTing to endpoint: authorization failed
+      Failed to call tool search_repositories: Streamable HTTP error: 
+      Error POSTing to endpoint: {"jsonrpc":"2.0","id":2,"error":{"code":-32603,"message":
+      "failed to send message: unauthorized tool call"}}
       ```
    {{% /tab %}}
    {{% tab tabName="UI" %}}

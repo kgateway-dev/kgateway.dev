@@ -22,7 +22,7 @@ You can choose between the following options to provide custom configuration to 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup/" >}}). 
 
 ## Step 1: Create agentgateway configuration {#agentgateway-configuration}
 
@@ -140,7 +140,7 @@ You can add your custom configuration to the {{< reuse "docs/snippets/gatewaypar
      infrastructure:
        parametersRef:
          name: agentgateway-config
-         group: agentgateway.dev
+         group: {{< reuse "docs/snippets/gatewayparam-group.md" >}}
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}       
      listeners:
        - name: http
@@ -154,7 +154,7 @@ You can add your custom configuration to the {{< reuse "docs/snippets/gatewaypar
 
 3. Check the pod logs to verify that the agentgateway logs are displayed in JSON format. 
    ```sh
-   kubectl logs -l app.kubernetes.io/name=agentgateway-config -n agentgateway-system
+   kubectl logs deployment/agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
    Example output: 
@@ -210,7 +210,7 @@ Use the `rawConfig` option to pass in raw upstream configuration to your agentga
      infrastructure:
        parametersRef:
          name: agentgateway-config
-         group: agentgateway.dev
+         group: {{< reuse "docs/snippets/gatewayparam-group.md" >}}  
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}       
      listeners:
        - name: http
@@ -225,7 +225,7 @@ Use the `rawConfig` option to pass in raw upstream configuration to your agentga
 3. Check the pod logs to verify that agentgateway loaded the configuration from the ConfigMap, such as by searching for the port binding.
 
    ```bash
-   kubectl logs -l app.kubernetes.io/name=agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} | grep 3000
+   kubectl logs deployment/agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} | grep 3000
    ```
    
    Example output:
@@ -283,7 +283,7 @@ Use the `rawConfig` option to pass in raw upstream configuration to your agentga
 2. Check the pod logs to verify that agentgateway loaded the configuration from the ConfigMap, such as by searching for the port binding.
 
    ```bash
-   kubectl logs -l app.kubernetes.io/name=agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} | grep 3000
+   kubectl logs deployment/agentgateway-config -n {{< reuse "docs/snippets/namespace.md" >}} | grep 3000
    ```
    
    Example output:

@@ -352,7 +352,7 @@ You can limit access to the MCP server based on specific JWT claims with CEL-bas
 
    2. Verify that the request fails, because the JWT does not have the `sub=alice` claim. 
       {{< reuse-image src="img/mcp-github-error.png" >}}
-   {{< reuse-image-dark srcDark="img/mcp-github-error-dark.png" >}}
+      {{< reuse-image-dark srcDark="img/mcp-github-error-dark.png" >}}
 
    {{% /tab %}}
    {{< /tabs >}}
