@@ -52,12 +52,12 @@ You can configure your agentgateway proxy to validate JWT tokens that are sent b
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/gloo-gateway/#jwtenterprise" >}}) or the [JWT guide]({{< link-hextra path="/security/jwt/overview" >}}) for more examples.
+   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#jwtprovider" >}}).
 
    | Field | Description |
    | ----- | ----- |
    | `issuer` | The principal that issued the JWT, usually a URL or an email address. If specified, the `iss` field in the JWT of the incoming request must match this field, or else the request is denied. If omitted, the `iss` field in the JWT is not checked. |
-   | `jwks` | The JSON Web Key Set (JWKS) to use to verify the JWT. In this example, a local JWKS is provided inline. To use JWTs with Solo Enterprise for agentgateway, make sure that the JWTs return Key ID (`kid`) and expiration date (`exp`) values in the JWT header.|
+   | `jwks` | The JSON Web Key Set (JWKS) to use to verify the JWT. In this example, a local JWKS is provided inline. To use JWTs with {{< reuse "docs/snippets/agentgateway.md" >}}, make sure that the JWTs return Key ID (`kid`) and expiration date (`exp`) values in the JWT header.|
 
 2. Save the JWT tokens for the users Alice and Bob. You can optionally create other JWT tokens by using the [JWT generator tool](https://github.com/kgateway-dev/kgateway/blob/main/hack/utils/jwt/jwt-generator.go). Note that to use JWTs with agentgateway proxies, make sure that the JWTs return Key ID (`kid`) and expiration date (`exp`) values in the JWT header.
    
@@ -275,7 +275,7 @@ You can limit access to the MCP server based on specific JWT claims with CEL-bas
    EOF
    ```
 
-2. Send a request to the MCP server with Alice's JWT token. Verify that the request fails, because the JWT contains the `sub=alice` claim. 
+2. Send a request to the MCP server with Alice's JWT token. Verify that the request succeeds, because the JWT contains the `sub=alice` claim. 
    {{< tabs tabTotal="2" items="CLI,UI" >}}
    {{% tab tabName="CLI" %}}
    ```sh
@@ -288,7 +288,7 @@ You can limit access to the MCP server based on specific JWT claims with CEL-bas
    --header "Authorization: Bearer $ALICE_JWT"
    ```
 
-   Verify that the connection succeeds and that you see the GitHub user output. 
+   Example output: 
    ```console
    {
      "content": [

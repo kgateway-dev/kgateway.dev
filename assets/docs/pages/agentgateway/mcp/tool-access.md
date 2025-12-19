@@ -114,7 +114,7 @@ sequenceDiagram
 
 ## Limit tool access
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your RBAC rules for the MCP tools. In the following example, you only want to allow access to the `get_me` tool if the JWT has a `sub` of `alice`. 
+1. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} with your RBAC rules for the MCP tools. In the following example, you only want to allow access to the `get_me` tool if the JWT has a `sub` of `alice`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}

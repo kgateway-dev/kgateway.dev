@@ -12,7 +12,7 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 
 ## Step 1: Deploy the MCP servers {#mcp-server-everythings}
 
-Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway to proxy traffic to. The following example sets up two MCP servers with different tools: one `npx` based MCP server that provides various utility tools and an MCP sesrver with a website `fetch` tool.
+Deploy multiple Model Context Protocol (MCP) servers that you want agentgateway to proxy traffic to. The following example sets up two MCP servers with different tools: one `npx` based MCP server that provides various utility tools and an MCP server with a website `fetch` tool.
 
 1. Create an MCP server (`mcp-server-everything`) that provides various utility tools. Notice that the Service uses the `appProtocol: kgateway.dev/mcp` setting. This way, {{< reuse "docs/snippets/kgateway.md" >}} configures the agentgateway proxy to look for an equivalent {{< reuse "docs/snippets/backend.md" >}} resource.
 
@@ -145,7 +145,7 @@ Route to the federated MCP servers with agentgateway.
    EOF
    ```
 
-2. Check that the HTTPRoute is `Accepted`, selects the Gateway, and includes backend rules for both the {{< reuse "docs/snippets/backend.md" >}}s that you created.
+2. Check that the HTTPRoute is `Accepted`, selects the Gateway, and includes backend rules for the {{< reuse "docs/snippets/backend.md" >}} that you created.
 
    ```sh
    kubectl describe httproute mcp
@@ -236,7 +236,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
    * **URL**: Enter the agentgateway address and the `/mcp` path, such as `${INGRESS_GW_ADDRESS}/mcp` or `http://localhost:8080/mcp`.
    * Click **Connect**.
 
-4. From the menu bar, click the **Tools** tab, and then **List tools**. Verify that you see the tools from both servers. The name of the tools are prepended with the name of the MCP server
+4. From the menu bar, click the **Tools** tab, and then **List tools**. Verify that you see the tools from both servers. The name of the tools are prepended with the names of the MCP servers that you set up in the {{< reuse "docs/snippets/backend.md" >}}.
    * **`mcp-server-everything-3001_*`**: Tools from the `server-everything` MCP server, like `echo`, `add`, etc.
    * **`mcp-website-fetcher_fetch`**: The `fetch` tool from the website fetcher MCP server.
 
