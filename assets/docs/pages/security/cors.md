@@ -39,7 +39,7 @@ You can configure the CORS policy at two levels:
 Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 {{< version exclude-if="2.0.x" >}}
-{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in GlooTrafficPolicy" >}}
+{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab tabName="CORS in HTTPRoute" %}}
 Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
@@ -68,7 +68,7 @@ spec:
               - POST
               - OPTIONS               
             allowOrigins:
-              - "https://example.com/"
+              - "https://example.com"
             exposeHeaders:
             - Origin
             - X-HTTPRoute-Header
@@ -79,7 +79,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="CORS in GlooTrafficPolicy" %}}
+{{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml
@@ -101,7 +101,7 @@ EOF
          - "POST"
          - "OPTIONS"               
        allowOrigins:
-         - "https://example.com/"
+         - "https://example.com"
        exposeHeaders:
        - "Origin"
        - "X-TrafficPolicy-Header"
@@ -169,7 +169,7 @@ spec:
               - POST
               - OPTIONS               
             allowOrigins:
-              - "https://example.com/"
+              - "https://example.com"
             exposeHeaders:
             - Origin
             - X-HTTPRoute-Header
@@ -198,7 +198,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS GET localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com/" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
@@ -210,7 +210,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
-   {{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in GlooTrafficPolicy" >}}
+   {{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
    {{% tab tabName="CORS in HTTPRoute" %}}
 
    ```console {hl_lines=[7,8,9]}
@@ -232,7 +232,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    ...
    ```
    {{% /tab %}}
-   {{% tab tabName="CORS in GlooTrafficPolicy" %}}
+   {{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
    ```console {hl_lines=[7,8,9]}
    HTTP/1.1 200 OK
    x-correlation-id: aaaaaaaa
@@ -288,7 +288,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS GET localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com/" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
@@ -320,13 +320,13 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 {{< version exclude-if="2.0.x" >}}
-{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in GlooTrafficPolicy" >}}
+{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
 {{% tab tabName="CORS in HTTPRoute" %}}
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 ```
 {{% /tab %}}
-{{% tab tabName="CORS in GlooTrafficPolicy" %}}
+{{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cors -n httpbin

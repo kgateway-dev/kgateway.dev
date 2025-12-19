@@ -329,16 +329,10 @@ You can limit access to the MCP server based on specific JWT claims with CEL-bas
    --header "Authorization: Bearer $BOB_JWT"
    ```
 
-   Verify that the connection also succeeds and that you see the GitHub user output. 
+   Example output: 
    ```console
-   {
-     "content": [
-       {
-         "type": "text",
-         "text": "{\"login\":\"MyUser\",\"id\":11234567,\"profile_url\":\"https://github.com/MyUser\",\"avatar_url\":\"https://avatars.githubusercontent.com/u/11234567?v=4\",\"details\":{\"name\":\"My User\",\"company\":\"Solo.io\",\"public_repos\":11,\"public_gists\":1,\"followers\":1,\"following\":0,\"created_at\":\"2016-03-07T18:33:49Z\",\"updated_at\":\"2025-12-08T19:38:04Z\"}}"
-       }
-     ]
-   }
+   Failed to connect to MCP server: Streamable HTTP error: 
+   Error POSTing to endpoint: authorization failed
    ```
    {{% /tab %}}
    {{% tab tabName="UI" %}}

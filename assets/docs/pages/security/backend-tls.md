@@ -38,7 +38,7 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
 1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
 
 2. Verify that the NGINX server is running.

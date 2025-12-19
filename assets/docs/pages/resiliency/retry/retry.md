@@ -180,7 +180,7 @@ Set up retries to the reviews app.
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
    | `timeouts` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
    {{% /tab %}}
-   {{% tab tabName="HTTPRoute (GlooTrafficPolicy)" %}}
+   {{% tab tabName="HTTPRoute (EnterpriseKgatewayTrafficPolicy)" %}}
    1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. Note that you add a name `timeout` to your HTTPRoute rule so that you can later attach the retry policy to that rule.
       ```yaml
       kubectl apply -f- <<EOF

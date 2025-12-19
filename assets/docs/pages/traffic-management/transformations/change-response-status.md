@@ -138,7 +138,7 @@ Update the response status based on headers being present in a response.
 
    {
      "foo": [
-       "bar2"
+       "baz"
      ]
    }
    ```

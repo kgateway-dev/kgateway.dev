@@ -4,10 +4,6 @@ Configure passive health checks and remove unhealthy hosts from the load balanci
 
 Outlier detection is an important part of building resilient apps. An outlier detection policy sets up several conditions, such as retries and ejection percentages, that {{< reuse "docs/snippets/kgateway.md" >}} uses to determine if a service is unhealthy. In case an unhealthy service is detected, the outlier detection policy defines how the service is removed from the pool of healthy destinations to send traffic to. Your apps then have time to recover before they are added back to the load-balancing pool and checked again for consecutive errors.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

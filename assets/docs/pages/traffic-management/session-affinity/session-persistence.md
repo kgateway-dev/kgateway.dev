@@ -69,9 +69,9 @@ spec:
         idleTimeout: 10s
 ```
 
-{{% callout type="info" %}}
+{{< callout type="info" >}}
 Note that `sessionPersistence.idleTimeout` is currently not supported in Envoy-based gateway proxies. Setting this value has no effect on the gateway proxy. 
-{{% /callout %}}
+{{< /callout >}}
 
 {{< reuse "/docs/snippets/review-table.md" >}}
 

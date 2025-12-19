@@ -109,7 +109,7 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
 3. Get the logs for the gateway pod and verify that you see a stdout JSON entry for each request that you sent to the httpbin app. 
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq --sort-keys
+   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq
    ```
    
    Example output: 
