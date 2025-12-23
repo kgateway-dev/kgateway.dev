@@ -11,6 +11,7 @@ import sys
 import subprocess
 import os
 import re
+import platform
 
 
 def resolve_tag_for_version(version, link_version):
@@ -176,9 +177,16 @@ def extract_package_section(content, package_name):
 def _post_process_api_docs(api_file):
     '''Apply post-processing to API docs file'''
     # Format the generated docs with sed commands
-    subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
-    subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
-    subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
+    # macOS sed requires an extension argument, use '' for in-place editing
+    # Use an empty string (not '') to avoid creating backup files
+    if platform.system() == 'Darwin':
+        subprocess.run(['sed', '-i', '', 's/Required: {}/Required/g', api_file], check=True)
+        subprocess.run(['sed', '-i', '', 's/Optional: {}/Optional/g', api_file], check=True)
+        subprocess.run(['sed', '-i', '', '/^# API Reference$/,/^$/d', api_file], check=True)
+    else:
+        subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
+        subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
+        subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
     
     # Additional post-processing to clean up complex struct types
     with open(api_file, 'r') as f:
@@ -225,7 +233,8 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         config_content = f.read()
     
     # Substitute environment variables in config (handle both $VAR and ${VAR} formats)
-    kube_version = os.environ.get('KUBE_VERSION', '')
+    # Use default '1.31' if KUBE_VERSION is not set or empty
+    kube_version = os.environ.get('KUBE_VERSION') or '1.31'
     config_content = config_content.replace('${KUBE_VERSION}', kube_version)
     
     with open(f'crd-ref-docs-config-{link_version}.yaml', 'w') as f:
@@ -245,7 +254,9 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     with open('./out.md') as f:
         generated_content = f.read()
     
-    os.remove('./out.md')
+    # Keep out.md for debugging - uncomment next line to remove after processing
+    # os.remove('./out.md')
+    print(f'    ℹ Intermediate file saved at: {os.path.abspath("./out.md")}')
     
     # Check if version is 2.2.x or later
     split_api = is_version_2_2_or_later(version)
@@ -271,6 +282,23 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             
             # Apply post-processing
             _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            agentgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/agentgateway'
+            if os.path.exists(agentgateway_api_dir):
+                # Pass KUBE_VERSION to the subprocess (use the same value used for crd-ref-docs)
+                env = os.environ.copy()
+                # Use the kube_version variable set earlier in this function (line 237)
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, agentgateway_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into agentgateway API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
             print(f'    ✓ Generated agentgateway API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract agentgateway.dev/v1alpha1 package')
@@ -292,6 +320,23 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             
             # Apply post-processing
             _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            envoy_api_dir = f'{kgateway_dir}/api/v1alpha1/envoy'
+            if os.path.exists(envoy_api_dir):
+                # Pass KUBE_VERSION to the subprocess (use the same value used for crd-ref-docs)
+                env = os.environ.copy()
+                # Use the kube_version variable set earlier in this function (line 237)
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, envoy_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into envoy API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
             print(f'    ✓ Generated envoy API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
@@ -364,12 +409,16 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
             f.write(result.stdout)
         
         # Remove badge line and following empty line
-        subprocess.run(['sed', '-i', '/!\[Version:/,/^$/d', helm_file], check=True)
-        
-        # Remove the title (# heading) and description lines from the top
-        # These will be hardcoded in the content files instead
-        # Remove lines 1-3 which contain: title, blank line, description
-        subprocess.run(['sed', '-i', '1,3d', helm_file], check=True)
+        # macOS sed requires an extension argument, use empty string for in-place editing
+        if platform.system() == 'Darwin':
+            subprocess.run(['sed', '-i', '', '/!\\[Version:/,/^$/d', helm_file], check=True)
+            # Remove the title (# heading) and description lines from the top
+            # These will be hardcoded in the content files instead
+            # Remove lines 1-3 which contain: title, blank line, description
+            subprocess.run(['sed', '-i', '', '1,3d', helm_file], check=True)
+        else:
+            subprocess.run(['sed', '-i', '/!\\[Version:/,/^$/d', helm_file], check=True)
+            subprocess.run(['sed', '-i', '1,3d', helm_file], check=True)
         
         # Add a note for charts with no configurable values (like kgateway-crds)
         with open(helm_file, 'r', encoding='utf-8') as f:
