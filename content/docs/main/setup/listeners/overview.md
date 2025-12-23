@@ -78,7 +78,7 @@ To use ListenerSets, you must have the following environment:
 1. Install the Kubernetes Gateway API v1.3.0 or later experimental channel, which includes the `XListenerSet` CRD.
    
    ```sh
-   kubectl apply --kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v1.3.0"
+   kubectl apply --server-side --kustomize "https://github.com/kubernetes-sigs/gateway-api/config/crd/experimental?ref=v{{< reuse "docs/versions/k8s-gw-version.md" >}}"
    ```
 
 2. Follow the [Get Started guide](/docs/quickstart/) to install {{< reuse "docs/snippets/kgateway.md" >}}.

@@ -38,9 +38,10 @@ You can configure the CORS policy at two levels:
 
 Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
-{{< version exclude-if="2.0.x" >}}
-{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-{{% tab tabName="CORS in HTTPRoute" %}}
+{{% version exclude-if="2.0.x" %}}
+
+### CORS in HTTPRoute
+
 Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
 ```yaml
@@ -78,8 +79,9 @@ spec:
           port: 8000
 EOF
 ```
-{{% /tab %}}
-{{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
+
+### CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}
+
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml
@@ -137,9 +139,7 @@ EOF
    EOF
    ```
 
-{{% /tab %}}
-{{< /tabs >}}
-{{< /version >}}
+{{% /version %}}
 {{< version include-if="2.0.x" >}}
 
 Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
@@ -210,8 +210,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
-   {{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-   {{% tab tabName="CORS in HTTPRoute" %}}
+   **CORS in HTTPRoute**
 
    ```console {hl_lines=[7,8,9]}
    HTTP/1.1 200 OK
@@ -231,8 +230,8 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    ...
    ```
-   {{% /tab %}}
-   {{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
+   
+   **CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}**
    ```console {hl_lines=[7,8,9]}
    HTTP/1.1 200 OK
    x-correlation-id: aaaaaaaa
@@ -250,8 +249,6 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    server: envoy
    content-length: 0
    ```
-   {{% /tab %}}
-   {{< /tabs >}}
    {{< /version >}}
    {{< version include-if="2.0.x" >}}Note the `Origin` and `X-HTTPRoute-Header` headers.
 
@@ -320,19 +317,17 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 {{< version exclude-if="2.0.x" >}}
-{{< tabs tabTotal="2" items="CORS in HTTPRoute,CORS in TrafficPolicy" >}}
-{{% tab tabName="CORS in HTTPRoute" %}}
+**CORS in HTTPRoute**
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 ```
-{{% /tab %}}
-{{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
+
+**CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}**
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cors -n httpbin
 ```
-{{% /tab %}}
-{{< /tabs >}}
+
 {{< /version >}}
 {{< version include-if="2.0.x" >}}
 

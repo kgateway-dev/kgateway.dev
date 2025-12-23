@@ -21,10 +21,10 @@ Do not edit or change the default {{< reuse "docs/snippets/gatewayparameters.md"
 {{< /callout >}} 
 
 {{% conditional-text include-if="envoy" %}}
-If you do not want to use the default gateway proxy template to bootstrap your proxies, you can choose to create a self-managed gateway. With self-managed gateways, you are responsible for defining the proxy deployment template that you want to bootstrap your proxies with. For more information, see [Self-managed gateways (BYO)](../selfmanaged/).
+{{< reuse "docs/snippets/byo-gateway.md" >}}
 {{% /conditional-text %}}
 
-## {{< reuse "docs/snippets/gatewayparameters.md" >}}
+## {{< reuse "docs/snippets/gatewayparameters.md" >}} {#gatewayparameters}
 
 {{< reuse "docs/snippets/gatewayparameters-about.md" >}}
 

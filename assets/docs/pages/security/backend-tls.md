@@ -134,7 +134,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 
    ```shell
    kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/configmap.yaml" >}}
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml" >}}
    EOF
    ```
 
@@ -395,7 +395,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
@@ -408,7 +408,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
@@ -422,7 +422,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    **Note**: Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
 
    ```sh
-   kubectl rollout restart -n kgateway-system deployment/kgateway
+   kubectl rollout restart -n kgateway-system deployment/{{< reuse "docs/snippets/pod-name.md" >}}
    ```
 {{% /tab %}}
 {{< /tabs >}}
