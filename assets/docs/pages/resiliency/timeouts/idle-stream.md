@@ -6,11 +6,6 @@ By default, Envoy closes all idle request and response streams after 5 minutes i
 
 You can change the default idle stream timeout setting with a {{< reuse "docs/snippets/trafficpolicy.md" >}}.  While idle streams are a concept in the HTTP/2 and HTTP/3 protocols, Envoy also maps an HTTP/1 request to a stream. Because of that, you can apply idle stream timeouts to HTTP/1 traffic too. 
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

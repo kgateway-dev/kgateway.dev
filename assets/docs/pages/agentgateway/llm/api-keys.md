@@ -68,7 +68,7 @@ Provide the token directly in the configuration for the {{< reuse "docs/snippets
        app: agentgateway
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -128,7 +128,7 @@ Provide the token directly in the configuration for the {{< reuse "docs/snippets
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -287,7 +287,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< r
        app: agentgateway
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -350,7 +350,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the {{< r
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -491,7 +491,7 @@ Pass through an existing token directly from the client or a successful OpenID C
        app: agentgateway
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:
@@ -551,7 +551,7 @@ Pass through an existing token directly from the client or a successful OpenID C
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:

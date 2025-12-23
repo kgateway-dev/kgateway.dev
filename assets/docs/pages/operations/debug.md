@@ -76,7 +76,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
    
    {{< conditional-text include-if="agentgateway" >}}
    ```sh
-   kubectl port-forward deploy/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} 15000 &  
+   kubectl port-forward deploy/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 15000 &  
    ```
 
    Open your browser to the following endpoints.

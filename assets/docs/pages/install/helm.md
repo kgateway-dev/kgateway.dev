@@ -51,7 +51,9 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
 
    2. Deploy the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs by using Helm. This command creates the {{< reuse "docs/snippets/namespace.md" >}} namespace and creates the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs in the cluster.
       ```sh
-      helm upgrade -i --create-namespace --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} 
+      helm upgrade -i --create-namespace \
+        --namespace {{< reuse "docs/snippets/namespace.md" >}} \
+        --version {{< reuse "docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} 
       ```
 
 3. Install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart.
@@ -174,10 +176,10 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
    {{< reuse "/docs/snippets/helm-kgateway.md" >}}-78658959cd-cz6jt             1/1     Running   0          12s
    ```
 
-5. Verify that the {{% conditional-text include-if="envoy" %}}`{{< reuse "/docs/snippets/gatewayclass.md" >}}`{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}`{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}`{{% /conditional-text %}} GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
+5. Verify that the `{{< reuse "/docs/snippets/gatewayclass.md" >}}` GatewayClass is created. You can optionally take a look at how the GatewayClass is configured by adding the `-o yaml` option to your command. 
 
    ```sh
-   kubectl get gatewayclass {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}
+   kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
 
 ## Next steps

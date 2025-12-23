@@ -64,7 +64,7 @@ Configure access to multiple endpoints in your LLM provider, such as for chat co
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      parentRefs:
-       - name: agentgateway
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      rules:
      - matches:

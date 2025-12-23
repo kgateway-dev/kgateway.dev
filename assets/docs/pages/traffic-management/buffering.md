@@ -143,9 +143,3 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
      }
    }
    ```
-
-{{< version exclude-if="2.0.x" >}}
-{{< reuse "docs/snippets/buffering-route.md" >}}
-{{< /version >}}
-
-{{< reuse "docs/snippets/buffering-cleanup.md" >}}

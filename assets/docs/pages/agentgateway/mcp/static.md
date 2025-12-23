@@ -98,7 +98,7 @@ metadata:
   name: mcp
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}  
   rules:
     - backendRefs:
@@ -118,7 +118,7 @@ metadata:
   name: mcp
 spec:
   parentRefs:
-  - name: agentgateway
+  - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}  
   rules:
   - 
@@ -139,13 +139,13 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/docs/tools/inspecto
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
+   export INGRESS_GW_ADDRESS=$(kubectl get gateway agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} -o=jsonpath="{.status.addresses[0].value}")
    echo $INGRESS_GW_ADDRESS
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"%}}
    ```sh
-   kubectl port-forward deployment/agentgateway -n {{< reuse "docs/snippets/namespace.md" >}}  8080:80
+   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}  8080:80
    ```
    {{% /tab %}}
    {{< /tabs >}}

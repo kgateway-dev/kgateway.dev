@@ -1,10 +1,11 @@
 Enable server-side TLS encryption for the xDS gRPC server in the {{< reuse "docs/snippets/kgateway.md" >}} control plane. For more information about the server, see the [Architecture]({{< link-hextra path="/about/architecture" >}}) docs.
 
-TLS encryption is disabled by default. When enabled, the control plane mounts a `kgateway-xds-cert` TLS secret that you create and propogates the CA bundle to any kgateway data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
+TLS encryption is disabled by default. When enabled, the control plane mounts a `{{< reuse "docs/snippets/pod-name.md" >}}-xds-cert` TLS secret that you create and propogates the CA bundle to any {{< reuse "docs/snippets/pod-name.md" >}} data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< conditional-text include-if="envoy" >}}{{< reuse "docs/snippets/prereq.md" >}}{{< /conditional-text >}}
+{{< conditional-text include-if="agentgateway" >}}{{< reuse "docs/snippets/agentgateway-prereq.md" >}}{{< /conditional-text >}}
 
 ## Step 1: Set up cert-manager {#cert-manager}
 
@@ -29,7 +30,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    apiVersion: cert-manager.io/v1
    kind: Issuer
    metadata:
-     name: kgateway-xds-root-issuer
+     name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-root-issuer
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      selfSigned: {}
@@ -37,15 +38,15 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    apiVersion: cert-manager.io/v1
    kind: Certificate
    metadata:
-     name: kgateway-xds-ca
+     name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     secretName: kgateway-xds-ca-secret
+     secretName: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca-secret
      issuerRef:
-       name: kgateway-xds-root-issuer
+       name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-root-issuer
        kind: Issuer
      isCA: true
-     commonName: kgateway-xds-ca
+     commonName: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca
      duration: 1h
      renewBefore: 5m
      privateKey:
@@ -54,7 +55,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    EOF
    ```
 
-4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `kgateway-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
+4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `{{< reuse "docs/snippets/pod-name.md" >}}-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
 
    {{< callout type="info" >}}The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.{{< /callout >}}
    
@@ -63,21 +64,21 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    apiVersion: cert-manager.io/v1
    kind: Issuer
    metadata:
-     name: kgateway-xds-ca-issuer
+     name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca-issuer
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      ca:
-       secretName: kgateway-xds-ca-secret
+       secretName: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca-secret
    ---
    apiVersion: cert-manager.io/v1
    kind: Certificate
    metadata:
-     name: kgateway-xds-cert
+     name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-cert
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     secretName: kgateway-xds-cert
+     secretName: {{< reuse "docs/snippets/pod-name.md" >}}-xds-cert
      issuerRef:
-       name: kgateway-xds-ca-issuer
+       name: {{< reuse "docs/snippets/pod-name.md" >}}-xds-ca-issuer
        kind: Issuer
      isCA: false
      dnsNames:
@@ -139,13 +140,13 @@ Now that the control plane is up and running, verify the TLS connection.
 1. Port-forward the control plane service on port 9977.
 
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9977
+   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} {{% conditional-text include-if="envoy" %}}9977{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}9978{{% /conditional-text %}}
    ```
 
 2. Send a request to the control plane in plaintext without TLS authentication. You get back an `authentication failed` error.
 
    ```sh
-   grpcurl -plaintext localhost:9977 list
+   grpcurl -plaintext localhost:{{% conditional-text include-if="envoy" %}}9977{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}9978{{% /conditional-text %}} list
    ```
 
    Example output:

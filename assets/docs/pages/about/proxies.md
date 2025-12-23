@@ -24,6 +24,8 @@ For more information, see the other docs in this [About](../) section.
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following gateway proxies. You can use both gateway proxies in the same Kubernetes cluster, depending on your use case.
 
+{{< reuse "docs/snippets/control-plane-note.md" >}}
+
 | Gateway proxy | Primary use cases | Description |
 | --- | --- | --- |
 | {{< icon "kgateway" >}} kgateway | API, ingress, egress, service mesh | The kgateway project includes its own proxy that is based on Envoy, an L3/L4/L7 network proxy. Beyond Envoy, kgateway provides a set of extensions for advanced configuration, security, and traffic management features. You can also integrate kgateway with the Istio service mesh in sidecar and ambient modes. For more information, see the [kgateway FAQs](../../faqs/) and [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/what_is_envoy). |

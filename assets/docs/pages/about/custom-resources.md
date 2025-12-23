@@ -58,7 +58,7 @@ A {{< gloss "Gateway Extension" >}}GatewayExtension{{< /gloss >}} is a {{< reuse
 
 ### GatewayParameters
 
-When you create a Gateway resource, a [default gateway proxy template](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml) is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the {{< gloss "GatewayParameters" >}}GatewayParameters{{< /gloss >}} resource are used to configure the gateway proxy.
+When you create a Gateway resource, a [default gateway proxy template](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}{{< reuse "docs/versions/github-kgateway-deployment.md" >}}) is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the {{< gloss "GatewayParameters" >}}GatewayParameters{{< /gloss >}} resource are used to configure the gateway proxy.
 
 To learn more about the default gateway setup and how these resource interact with each other, see [Default gateway proxy setup](/docs/setup/default/). 
 
@@ -76,5 +76,4 @@ Kgateway uses the following custom resources to attach policies to routes and ga
 
 For workloads within your cluster, you can can route incoming traffic to their Kubernetes Service. But what if you have external services such as static hostnames or AWS Lambda functions that you want to route traffic to?
 
-You can use a kgateway Backend resource to accomplish this task. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/). 
-
+You can use a kgateway Backend resource to accomplish this task. Similar to using Kubernetes Services, you reference the Backend in your HTTPRoute resource. For more information about Backends, see [Backends](/docs/traffic-management/destination-types/backends/).

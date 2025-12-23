@@ -373,8 +373,8 @@ Steps to weight routes:
 For more examples of weighted routes, review the following examples from the kgateway GitHub repository.
 
 {{< cards >}}
-  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml" title="Weighted route input" icon="external-link" >}}
-  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/internal/kgateway/translator/gateway/testutils/outputs/route-sort-weighted.yaml" title="Weighted route output" icon="external-link" >}}
+  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/pkg/kgateway/translator/gateway/testutils/inputs/route-sort-weighted.yaml" title="Weighted route input" icon="external-link" >}}
+  {{< card link="https://github.com/kgateway-dev/kgateway/blob/main/pkg/kgateway/translator/gateway/testutils/outputs/route-sort-weighted.yaml" title="Weighted route output" icon="external-link" >}}
 {{< /cards >}}
 
 ## Cleanup {#cleanup}

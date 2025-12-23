@@ -1,4 +1,4 @@
-Use the kgateway control plane to deploy and manage the lifecycle of {{< reuse "/docs/snippets/agentgateway.md" >}} proxies on Kubernetes. </br></br>
+Use the {{< reuse "/docs/snippets/kgateway.md" >}} control plane to deploy and manage the lifecycle of agentgateway proxies on Kubernetes. </br></br>
 
 {{< reuse "docs/snippets/agentgateway/about.md" >}}
 
@@ -29,5 +29,5 @@ For other examples, see the [LLM consumption]({{< link-hextra path="/llm/" >}}),
 No longer need {{< reuse "/docs/snippets/kgateway.md" >}}? Uninstall with the following command:
 
 ```sh
-helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
+helm uninstall {{< reuse "/docs/snippets/helm-kgateway.md" >}} {{< reuse "/docs/snippets/helm-kgateway-crds.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

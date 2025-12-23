@@ -141,26 +141,29 @@ Define the load balancing algorithm that you want to use for your backend app in
       ```sh
       open http://localhost:19000/config_dump
       ```
-   3. Search for the `lb_policy` field, and verify that the policy that you set is listed, along with your other load balancing settings. For example, the following output shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`, and settings for the slow start window.
+   3. Search for the `load_balancing_policy` field, and verify that the policy that you set is listed, along with your other load balancing settings. For example, the following output shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`, and settings for the slow start window.
       ```json
       ...
-      "lb_policy": "LEAST_REQUEST",
-      "metadata": {},
-      "common_lb_config": {
-       "consistent_hashing_lb_config": {}
-      },
-      "ignore_health_on_host_removal": true,
-      "least_request_lb_config": {
-       "choice_count": 3,
-       "slow_start_config": {
-        "slow_start_window": "10s",
-        "aggression": {
-         "default_value": 1.5,
-         "runtime_key": "upstream.kube_httpbin_httpbin_9000.slowStart.aggression"
-        },
-        "min_weight_percent": {
-         "value": 10
-        }
+      "load_balancing_policy": {
+       "policies": [
+        {
+         "typed_extension_config": {
+          "name": "envoy.load_balancing_policies.least_request",
+          "typed_config": {
+           "@type": "type.googleapis.com/envoy.extensions.load_balancing_policies.least_request.v3.LeastRequest",
+           "choice_count": 3,
+           "slow_start_config": {
+            "slow_start_window": "10s",
+            "aggression": {
+             "default_value": 1.5,
+             "runtime_key": "httpbin-lb-policy.httpbin.slowStart.aggression"
+            },
+            "min_weight_percent": {
+             "value": 10
+            }
+           }
+          }
+         }
        }
       }
       ...

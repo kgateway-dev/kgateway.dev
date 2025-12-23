@@ -15,40 +15,19 @@
    {{< /tabs >}}
 
 2. Deploy the kgateway CRDs by using Helm.
-   {{< version include-if="2.2.x" >}}
-   ```sh
-   helm upgrade -i kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
-   --create-namespace --namespace kgateway-system \
-   --version v{{< reuse "docs/versions/patch-dev.md" >}} \
-   --set controller.image.pullPolicy=Always
-   ```
-   {{< /version >}}
-   {{< version include-if="2.0.x,2.1.x" >}}
    ```sh
    helm upgrade -i kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --create-namespace --namespace kgateway-system \
    --version v{{< reuse "docs/versions/n-patch.md" >}} 
    ```
-   {{< /version >}}
 
-3. Install kgateway by using Helm. {{< version include-if="2.2.x" >}} To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.{{< /version >}}
-   {{< version include-if="2.1.x,2.0.x" >}}
+3. Install kgateway by using Helm. 
    ```sh
    helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --namespace kgateway-system \
    --version v{{< reuse "docs/versions/n-patch.md" >}} \
    --set controller.image.pullPolicy=Always
    ```
-   {{< /version >}}
-   {{< version include-if="2.2.x" >}}
-   ```sh
-   helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
-   --namespace kgateway-system \
-   --version v{{< reuse "docs/versions/patch-dev.md" >}} \
-   --set controller.image.pullPolicy=Always \
-   --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
-   ```
-   {{< /version >}}
 
 4. Make sure that the `kgateway` control plane is running.
 
