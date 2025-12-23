@@ -69,7 +69,7 @@ spec:
               - POST
               - OPTIONS               
             allowOrigins:
-              - "https://example.com/"
+              - "https://example.com"
             exposeHeaders:
             - Origin
             - X-HTTPRoute-Header
@@ -80,7 +80,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="CORS in GlooTrafficPolicy" %}}
+{{% tab tabName="CORS in EnterpriseKgatewayTrafficPolicy" %}}
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 
    ```yaml

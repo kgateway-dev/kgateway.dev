@@ -308,7 +308,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    {{< /callout >}}
 
    ```sh
-   kubectl rollout restart -n kgateway-system deployment/kgateway
+   kubectl rollout restart -n kgateway-system deployment/{{< reuse "docs/snippets/pod-name.md" >}}
    ```
    
 ### External service

@@ -422,7 +422,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    **Note**: Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
 
    ```sh
-   kubectl rollout restart -n kgateway-system deployment/kgateway
+   kubectl rollout restart -n kgateway-system deployment/{{< reuse "docs/snippets/pod-name.md" >}}
    ```
 {{% /tab %}}
 {{< /tabs >}}
