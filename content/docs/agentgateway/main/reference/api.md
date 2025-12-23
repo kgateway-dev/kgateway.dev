@@ -210,15 +210,16 @@ _Underlying type:_ _string_
 Action to take if a regex pattern is matched in a request or response.
 This setting applies only to request matches. PromptguardResponse matches are always masked by default.
 
-
+_Validation:_
+- Enum: [Mask Reject]
 
 _Appears in:_
 - [Regex](#regex)
 
 | Field | Description |
 | --- | --- |
-| `MASK` | Mask the matched data in the request.<br /> |
-| `REJECT` | Reject the request if the regex matches content in the request.<br /> |
+| `Mask` | Mask the matched data in the request.<br /> |
+| `Reject` | Reject the request if the regex matches content in the request.<br /> |
 
 
 #### AgentExtAuthGRPC
@@ -320,7 +321,10 @@ _Appears in:_
 
 
 
-
+AgentgatewayParameters are configuration that is used to dynamically
+provision the agentgateway data plane. Labels and annotations that apply to
+all resources may be specified at a higher level; see
+https://gateway-api.sigs.k8s.io/reference/spec/#gatewayinfrastructure
 
 
 
@@ -351,8 +355,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `logging` _[AgentgatewayParametersLogging](#agentgatewayparameterslogging)_ | logging configuration for Agentgateway. By default, all logs are set to "info" level. |  |  |
-| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br />  rawConfig:<br />    binds:<br />    - port: 3000<br />      listeners:<br />      - routes:<br />        - policies:<br />            cors:<br />              allowOrigins:<br />                - "*"<br />              allowHeaders:<br />                - mcp-protocol-version<br />                - content-type<br />                - cache-control<br />          backends:<br />          - mcp:<br />              targets:<br />              - name: everything<br />                stdio:<br />                  cmd: npx<br />                  args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
-| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
+| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br /><br />	rawConfig:<br />	  binds:<br />	  - port: 3000<br />	    listeners:<br />	    - routes:<br />	      - policies:<br />	          cors:<br />	            allowOrigins:<br />	              - "*"<br />	            allowHeaders:<br />	              - mcp-protocol-version<br />	              - content-type<br />	              - cache-control<br />	        backends:<br />	        - mcp:<br />	            targets:<br />	            - name: everything<br />	              stdio:<br />	                cmd: npx<br />	                args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: cr.agentgateway.dev<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
@@ -443,8 +447,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `logging` _[AgentgatewayParametersLogging](#agentgatewayparameterslogging)_ | logging configuration for Agentgateway. By default, all logs are set to "info" level. |  |  |
-| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br />  rawConfig:<br />    binds:<br />    - port: 3000<br />      listeners:<br />      - routes:<br />        - policies:<br />            cors:<br />              allowOrigins:<br />                - "*"<br />              allowHeaders:<br />                - mcp-protocol-version<br />                - content-type<br />                - cache-control<br />          backends:<br />          - mcp:<br />              targets:<br />              - name: everything<br />                stdio:<br />                  cmd: npx<br />                  args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
-| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: ghcr.io/agentgateway<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
+| `rawConfig` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | rawConfig provides an opaque mechanism to configure the agentgateway<br />config file (the agentgateway binary has a '-f' option to specify a<br />config file, and this is that file).  This will be merged with<br />configuration derived from typed fields like<br />AgentgatewayParametersLogging.Format, and those typed fields will take<br />precedence.<br /><br />Example:<br /><br />	rawConfig:<br />	  binds:<br />	  - port: 3000<br />	    listeners:<br />	    - routes:<br />	      - policies:<br />	          cors:<br />	            allowOrigins:<br />	              - "*"<br />	            allowHeaders:<br />	              - mcp-protocol-version<br />	              - content-type<br />	              - cache-control<br />	        backends:<br />	        - mcp:<br />	            targets:<br />	            - name: everything<br />	              stdio:<br />	                cmd: npx<br />	                args: ["@modelcontextprotocol/server-everything"] |  | Type: object <br /> |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: cr.agentgateway.dev<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: <omitted, relying on Kubernetes defaults which depend on the tag> |  |  |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
@@ -1216,6 +1220,7 @@ _Validation:_
 
 _Appears in:_
 - [JWTAuthentication](#jwtauthentication)
+- [MCPAuthentication](#mcpauthentication)
 
 | Field | Description |
 | --- | --- |
@@ -1279,7 +1284,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `metadata` _[AgentgatewayParametersObjectMetadata](#agentgatewayparametersobjectmetadata)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
-| `spec` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | Spec provides an opaque mechanism to configure the resource Spec.<br />This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec)<br />and will be merged with the generated configuration using **Strategic Merge Patch** semantics.<br />The patch is applied after all other fields are applied.<br />If you merge-patch the same resource from AgentgatewayParameters on the<br />GatewayClass and also from AgentgatewayParameters on the Gateway, then<br />the GatewayClass merge-patch happens first.<br /><br /># Strategic Merge Patch & Deletion Guide<br /><br />This merge strategy allows you to override individual fields, merge lists, or delete items<br />without needing to provide the entire resource definition.<br /><br />**1. Replacing Values (Scalars):**<br />Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.<br /><br />**2. Merging Lists (Append/Merge):**<br />Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`)<br />will append your items to the generated list, or update existing items if keys match.<br /><br />**3. Deleting List Items ($patch: delete):**<br />To remove an item from a generated list (e.g., removing a default sidecar), you must use<br />the special `$patch: delete` directive.<br /><br />  spec:<br />    containers:<br />      - name: agentgateway<br />        # Delete the securityContext using $patch: delete<br />        securityContext:<br />          $patch: delete<br /><br />**4. Deleting/Clearing Map Fields (null):**<br />To remove a map field or a scalar entirely, set its value to `null`.<br /><br />  spec:<br />    template:<br />      spec:<br />        nodeSelector: null  # Removes default nodeSelector<br /><br />**5. Replacing Lists Entirely ($patch: replace):**<br />If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.<br /><br />  service:<br />    spec:<br />      ports:<br />        - $patch: replace<br />        - name: http<br />          port: 80<br />          targetPort: 8080<br />          protocol: TCP<br />        - name: https<br />          port: 443<br />          targetPort: 8443<br />          protocol: TCP |  | Type: object <br /> |
+| `spec` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | Spec provides an opaque mechanism to configure the resource Spec.<br />This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec)<br />and will be merged with the generated configuration using **Strategic Merge Patch** semantics.<br />The patch is applied after all other fields are applied.<br />If you merge-patch the same resource from AgentgatewayParameters on the<br />GatewayClass and also from AgentgatewayParameters on the Gateway, then<br />the GatewayClass merge-patch happens first.<br /><br /># Strategic Merge Patch & Deletion Guide<br /><br />This merge strategy allows you to override individual fields, merge lists, or delete items<br />without needing to provide the entire resource definition.<br /><br />**1. Replacing Values (Scalars):**<br />Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.<br /><br />**2. Merging Lists (Append/Merge):**<br />Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`)<br />will append your items to the generated list, or update existing items if keys match.<br /><br />**3. Deleting List Items ($patch: delete):**<br />To remove an item from a generated list (e.g., removing a default sidecar), you must use<br />the special `$patch: delete` directive.<br /><br />	spec:<br />	  containers:<br />	    - name: agentgateway<br />	      # Delete the securityContext using $patch: delete<br />	      securityContext:<br />	        $patch: delete<br /><br />**4. Deleting/Clearing Map Fields (null):**<br />To remove a map field or a scalar entirely, set its value to `null`.<br /><br />	spec:<br />	  template:<br />	    spec:<br />	      nodeSelector: null  # Removes default nodeSelector<br /><br />**5. Replacing Lists Entirely ($patch: replace):**<br />If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.<br /><br />	service:<br />	  spec:<br />	    ports:<br />	      - $patch: replace<br />	      - name: http<br />	        port: 80<br />	        targetPort: 8080<br />	        protocol: TCP<br />	      - name: https<br />	        port: 443<br />	        targetPort: 8443<br />	        protocol: TCP |  | Type: object <br /> |
 
 
 #### LLMProvider
@@ -1381,6 +1386,7 @@ _Appears in:_
 | `issuer` _string_ | Issuer identifies the IdP that issued the JWT. This corresponds to the 'iss' claim (https://tools.ietf.org/html/rfc7519#section-4.1.1). |  |  |
 | `audiences` _string array_ | audiences specify the list of allowed audiences that are allowed access. This corresponds to the 'aud' claim (https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3).<br />If unset, any audience is allowed. |  | MaxItems: 64 <br />MinItems: 1 <br /> |
 | `jwks` _[RemoteJWKS](#remotejwks)_ | jwks defines the remote JSON Web Key used to validate the signature of the JWT. |  |  |
+| `mode` _[JWTAuthenticationMode](#jwtauthenticationmode)_ | validation mode for JWT authentication. |  | Enum: [Strict Optional Permissive] <br /> |
 
 
 #### MCPBackend
@@ -1730,7 +1736,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `matches` _string array_ | A list of regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  |  |
 | `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [Ssn CreditCard PhoneNumber Email] <br /> |
-| `action` _[Action](#action)_ | The action to take if a regex pattern is matched in a request or response.<br />This setting applies only to request matches. PromptguardResponse matches are always masked by default.<br />Defaults to `MASK`. | MASK |  |
+| `action` _[Action](#action)_ | The action to take if a regex pattern is matched in a request or response.<br />This setting applies only to request matches. PromptguardResponse matches are always masked by default.<br />Defaults to `Mask`. | Mask | Enum: [Mask Reject] <br /> |
 
 
 #### RemoteJWKS
@@ -1768,7 +1774,7 @@ RouteType specifies how the AI gateway should process incoming requests
 based on the URL path and the API format expected.
 
 _Validation:_
-- Enum: [Completions Messages Models Passthrough Responses AnthropicTokenCount]
+- Enum: [Completions Messages Models Passthrough Responses AnthropicTokenCount Embeddings]
 
 _Appears in:_
 - [BackendAI](#backendai)
@@ -1781,6 +1787,7 @@ _Appears in:_
 | `Passthrough` | RouteTypePassthrough sends requests to upstream as-is without LLM processing<br /> |
 | `Responses` | RouteTypeResponses processes OpenAI /v1/responses format requests<br /> |
 | `AnthropicTokenCount` | RouteTypeAnthropicTokenCount processes Anthropic /v1/messages/count_tokens format requests<br /> |
+| `Embeddings` | RouteTypeEmbeddings processes OpenAI /v1/embeddings format requests<br /> |
 
 
 #### SecretSelector
