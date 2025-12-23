@@ -24,7 +24,7 @@ Do not edit or change the default {{< reuse "docs/snippets/gatewayparameters.md"
 If you do not want to use the default gateway proxy template to bootstrap your proxies, you can choose to create a self-managed gateway. With self-managed gateways, you are responsible for defining the proxy deployment template that you want to bootstrap your proxies with. For more information, see [Self-managed gateways (BYO)](../selfmanaged/).
 {{% /conditional-text %}}
 
-## {{< reuse "docs/snippets/gatewayparameters.md" >}}
+## {{< reuse "docs/snippets/gatewayparameters.md" >}} {#gatewayparameters}
 
 {{< reuse "docs/snippets/gatewayparameters-about.md" >}}
 
