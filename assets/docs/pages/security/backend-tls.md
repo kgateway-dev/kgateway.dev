@@ -134,7 +134,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 
    ```shell
    kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/configmap.yaml" >}}
+   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml" >}}
    EOF
    ```
 
@@ -395,7 +395,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
@@ -408,7 +408,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
