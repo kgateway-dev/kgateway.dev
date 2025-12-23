@@ -4,7 +4,7 @@ The configuration that is used to spin up a gateway proxy is stored in several c
 | -- | -- | 
 | Create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource (recommended) | To adjust the settings on the gateway proxy, you can create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This approach allows you to spin up gateway proxies with different configurations. Keep in mind that you must maintain the {{< reuse "docs/snippets/gatewayparameters.md" >}} resources that you created manually. The values in these resources are not automatically updated during upgrades.  | 
 | Change default proxy settings | You can change some of the values for the default gateway proxy updating the values in the {{< reuse "docs/snippets/kgateway.md" >}} Helm chart. The values that you set in your Helm chart are automatically rolled out to the gateway proxies.  |
-| Create self-managed gateways with custom proxy templates | If you want to change the [default gateway proxy template]({{< link-hextra path="/setup/default/#gateway-proxy-template" >}}) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)]({{< link-hextra path="/setup/selfmanaged" >}}). | 
+| Create self-managed gateways with custom proxy templates | {{< reuse "docs/snippets/byo-gateway.md" >}} | 
 
 ## Customize the gateway proxy 
 
