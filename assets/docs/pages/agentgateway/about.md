@@ -1,4 +1,4 @@
-{{< reuse "docs/snippets/agentgateway/about.md" >}}
+{{% reuse "docs/snippets/agentgateway/about.md" %}}
 
 Agentgateway supports many agent connectivity use cases, including the following:
 

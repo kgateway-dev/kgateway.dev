@@ -4,4 +4,4 @@ weight: 20
 description:
 ---
 
-{{< reuse "docs/pages/agentgateway/llm/providers/gemini.md" >}}
+{{% reuse "docs/pages/agentgateway/llm/providers/gemini.md" %}}

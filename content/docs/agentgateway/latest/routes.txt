@@ -3,17 +3,17 @@ title: Routes
 weight: 70
 ---
 
-The {{< reuse "docs/snippets/agentgateway.md" >}} data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.
+The {{% reuse "docs/snippets/agentgateway.md" %}} data plane supports the Gateway API routing resources, including HTTPRoute, GRPCRoute, TCPRoute, and TLSRoute.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+{{% reuse "docs/snippets/agentgateway-prereq.md" %}}
 
 ## HTTP
 
-Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy HTTP requests to your backend services.
+Use {{% reuse "docs/snippets/agentgateway.md" %}} to proxy HTTP requests to your backend services.
 
-1. Follow the [Sample HTTP app]({{< link-hextra path="/install/sample-app/" >}}) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass, and an HTTPRoute.
+1. Follow the [Sample HTTP app]({{< link-hextra path="/install/sample-app/" >}}) instructions to create a sample HTTP app, a Gateway with an HTTP listener that uses the `{{% reuse "/docs/snippets/agw-gatewayclass.md" %}}` GatewayClass, and an HTTPRoute.
 
 2. Check out the following guides for more advanced routing use cases.
 
@@ -24,11 +24,11 @@ Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy HTTP requests to your
 
 ## Routes to external services {#static}
 
-Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for an external HTTP service. Then, use an HTTPRoute to route traffic to that service through your agentgateway proxy. When you set up your Gateway, make sure to use the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
+Follow the [Static backend](../../traffic-management/destination-types/backends/static/) guide to create a static backend for an external HTTP service. Then, use an HTTPRoute to route traffic to that service through your agentgateway proxy. When you set up your Gateway, make sure to use the `{{% reuse "/docs/snippets/agw-gatewayclass.md" %}}` GatewayClass.
 
 ## gRPC
 
-Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your backend services.
+Use {{% reuse "docs/snippets/agentgateway.md" %}} to proxy gRPC requests to your backend services.
 
 1. Deploy a gRPC sample echo app and a sample gRPC curl client.
 
@@ -96,7 +96,7 @@ Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your
    EOF
    ```
 
-2. Create a Gateway that uses the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass and an HTTP listener that can be used for gRPC.
+2. Create a Gateway that uses the `{{% reuse "/docs/snippets/agw-gatewayclass.md" %}}` GatewayClass and an HTTP listener that can be used for gRPC.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -105,7 +105,7 @@ Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your
    metadata:
      name: agentgateway
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
      listeners:
        - protocol: HTTP
          port: 8080
@@ -187,7 +187,7 @@ Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your
    }
    ```
 
-6. Optional: {{< reuse "docs/snippets/cleanup.md" >}}
+6. Optional: {{% reuse "docs/snippets/cleanup.md" %}}
    
    ```sh
    kubectl delete Deployment grpc-echo
@@ -201,7 +201,7 @@ Use {{< reuse "docs/snippets/agentgateway.md" >}} to proxy gRPC requests to your
 
 Follow the [TCP listener guide](../../setup/listeners/tcp/) to create a TCP listener and a TCPRoute. 
 
-Make sure to create the Gateway with the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
+Make sure to create the Gateway with the `{{% reuse "/docs/snippets/agw-gatewayclass.md" %}}` GatewayClass.
 
 Example TCP listener configuration:
 
@@ -213,11 +213,11 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: tcp-gateway
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{% reuse "docs/snippets/namespace.md" %}}
   labels:
     app: tcp-echo
 spec:
-  gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+  gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
   listeners:
   - protocol: TCP
     port: 8000
@@ -228,11 +228,11 @@ spec:
 EOF
 ```
  
-{{< reuse "docs/snippets/review-table.md" >}}
+{{% reuse "docs/snippets/review-table.md" %}}
  
 |Setting|Description|
 |--|--|
-|`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{< reuse "docs/snippets/agentgateway.md" >}}, set the `gatewayClassName` to `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}`. |
+|`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{% reuse "docs/snippets/agentgateway.md" %}}, set the `gatewayClassName` to `{{% reuse "docs/snippets/agw-gatewayclass.md" %}}`. |
 |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TCP Gateway that listens for incoming traffic on port 8000. The Gateway can serve TCPRoutes from any namespace. |
 
 {{% /tab %}}
@@ -246,11 +246,11 @@ EOF
    kind: Gateway
    metadata:
      name: tcp-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{% reuse "docs/snippets/namespace.md" %}}
      labels:
        app: tcp-echo
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
      allowedListeners:
        namespaces:
          from: All
@@ -264,13 +264,13 @@ EOF
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{% reuse "docs/snippets/review-table.md" %}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{< reuse "docs/snippets/agentgateway.md" >}}, set the `gatewayClassName` to `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}`.|
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{% reuse "docs/snippets/agentgateway.md" %}}, set the `gatewayClassName` to `{{% reuse "docs/snippets/agw-gatewayclass.md" %}}`.|
    |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
-   |`spec.listeners`|{{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8000 in the ListenerSet that you create later.|
+   |`spec.listeners`|{{% reuse "docs/snippets/generic-listener.md" %}} In this example, the generic listener is configured on port 80, which differs from port 8000 in the ListenerSet that you create later.|
 
 2. Create a ListenerSet that configures a TCP listener for the Gateway.
 
@@ -280,13 +280,13 @@ EOF
    kind: XListenerSet
    metadata:
      name: my-tcp-listenerset
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{% reuse "docs/snippets/namespace.md" %}}
      labels:
        app: tcp-echo
    spec:
      parentRef:
        name: tcp-gateway
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{% reuse "docs/snippets/namespace.md" %}}
        kind: Gateway
        group: gateway.networking.k8s.io
      listeners:
@@ -299,7 +299,7 @@ EOF
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{% reuse "docs/snippets/review-table.md" %}}
 
    |Setting|Description|
    |--|--|
@@ -310,7 +310,7 @@ EOF
 
 ## TLS
 
-Follow the [TLS listener guide](../../setup/listeners/tls/) to create a TLS listener and a TLSRoute. Make sure to create the Gateway with the `{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}` GatewayClass.
+Follow the [TLS listener guide](../../setup/listeners/tls/) to create a TLS listener and a TLSRoute. Make sure to create the Gateway with the `{{% reuse "/docs/snippets/agw-gatewayclass.md" %}}` GatewayClass.
 
 Example TLS listener configuration:
 
@@ -324,9 +324,9 @@ Example TLS listener configuration:
    kind: Gateway
    metadata:
      name: tls-passthrough
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{% reuse "docs/snippets/namespace.md" %}}
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
      listeners:
      - name: tls
        protocol: TLS
@@ -340,11 +340,11 @@ Example TLS listener configuration:
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{% reuse "docs/snippets/review-table.md" %}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{< reuse "docs/snippets/agentgateway.md" >}}, set the `gatewayClassName` to `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}`.|
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{% reuse "docs/snippets/agentgateway.md" %}}, set the `gatewayClassName` to `{{% reuse "docs/snippets/agw-gatewayclass.md" %}}`.|
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TLS passthrough Gateway that listens for incoming traffic for the `nginx.example.com` domain on port 8443. The Gateway can serve TLS routes from any namespace.|
    |`spec.listeners.tls.mode`|The TLS mode for incoming requests. In this example, TLS requests are passed through to the backend service without being terminated at the Gateway.|
 
@@ -359,9 +359,9 @@ Example TLS listener configuration:
    kind: Gateway
    metadata:
      name: tls-passthrough
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{% reuse "docs/snippets/namespace.md" %}}
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
      allowedListeners:
        namespaces:
          from: All
@@ -375,13 +375,13 @@ Example TLS listener configuration:
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{% reuse "docs/snippets/review-table.md" %}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{< reuse "docs/snippets/agentgateway.md" >}}, set the `gatewayClassName` to `{{< reuse "docs/snippets/agw-gatewayclass.md" >}}`. |
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. For {{% reuse "docs/snippets/agentgateway.md" %}}, set the `gatewayClassName` to `{{% reuse "docs/snippets/agw-gatewayclass.md" %}}`. |
    |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
-   |`spec.listeners`|{{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later.|
+   |`spec.listeners`|{{% reuse "docs/snippets/generic-listener.md" %}} In this example, the generic listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later.|
 
 2. Create a ListenerSet that configures a TLS passthrough listener for the Gateway.
 
@@ -391,11 +391,11 @@ Example TLS listener configuration:
    kind: XListenerSet
    metadata:
      name: my-tls-listenerset
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{% reuse "docs/snippets/namespace.md" %}}
    spec:
      parentRef:
        name: tls-passthrough
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{% reuse "docs/snippets/namespace.md" %}}
        kind: Gateway
        group: gateway.networking.k8s.io
      listeners:
@@ -411,7 +411,7 @@ Example TLS listener configuration:
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{% reuse "docs/snippets/review-table.md" %}}
 
    |Setting|Description|
    |--|--|

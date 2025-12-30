@@ -5,4 +5,4 @@ weight: 1
 next: /docs/about
 ---
 
-{{< reuse "docs/pages/agentgateway/quickstart.md" >}}
+{{% reuse "docs/pages/agentgateway/quickstart.md" %}}
