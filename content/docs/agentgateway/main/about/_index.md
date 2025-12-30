@@ -10,4 +10,5 @@ To learn more about {{< reuse "docs/snippets/agentgateway.md" >}}, review the fo
 {{< cards >}}
   {{< card link="overview" title="Overview" >}}
   {{< card link="architecture" title="Architecture" >}}
+  {{< card link="gateway-api" title="Gateway API" >}}
 {{< /cards >}}
