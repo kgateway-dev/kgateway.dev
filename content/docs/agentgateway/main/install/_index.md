@@ -4,7 +4,7 @@ weight: 14
 icon: settings
 ---
 
-Learn how to install the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} to use with {{< reuse "/docs/snippets/agentgateway.md" >}} {{< gloss "Data Plane" >}}data plane{{< /gloss >}} proxies.
+Learn how to install the {{% reuse "/docs/snippets/kgateway.md" %}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} to use with {{% reuse "/docs/snippets/agentgateway.md" %}} {{< gloss "Data Plane" >}}data plane{{< /gloss >}} proxies.
 
 {{< cards >}}
   {{< card link="helm" title="Helm" >}}

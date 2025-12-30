@@ -3,7 +3,7 @@ title: API reference
 weight: 10
 ---
 
-{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}
+{{% reuse "/docs/snippets/api-ref-docs-intro.md" %}}
 
 ## Packages
 - [agentgateway.dev/v1alpha1](#agentgatewaydevv1alpha1)
