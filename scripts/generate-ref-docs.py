@@ -295,6 +295,48 @@ def _post_process_api_docs(api_file):
     content = re.sub(r' <br />XValidation \|', '', content)
     content = re.sub(r'Enum: \[HTTP1;HTTP2$', '', content, flags=re.MULTILINE)
     
+    # Clean up duplicate "Required <br />Optional" patterns
+    # A field should be either Required OR Optional, not both
+    # If both are present, use heuristics to determine which is correct:
+    # - If there's a default value, it's Optional
+    # - Otherwise, prefer Required (since +required is explicit)
+    lines = content.split('\n')
+    cleaned_validation_lines = []
+    for line in lines:
+        if '|' in line and line.strip().startswith('|'):
+            # Check if this is a table row with validation column
+            parts = line.split('|')
+            if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
+                validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                default_col = parts[-3].strip() if len(parts) > 2 else ''
+                
+                # Check if validation column has both Required and Optional
+                if 'Required' in validation_col and 'Optional' in validation_col:
+                    # Determine which one to keep
+                    # If there's a default value, it's Optional; otherwise, it's Required
+                    if default_col and default_col.strip():
+                        # Has a default value, so it should be Optional
+                        # Remove "Required <br />" or "Required" from the validation column
+                        validation_col = re.sub(r'Required\s*<br\s*/>\s*', '', validation_col)
+                        validation_col = re.sub(r'Required\s+', '', validation_col)
+                        validation_col = re.sub(r'<br\s*/>\s*Required', '', validation_col)
+                        validation_col = re.sub(r'\s+Required', '', validation_col)
+                    else:
+                        # No default value, so it should be Required
+                        # Remove "Optional <br />" or "Optional" from the validation column
+                        validation_col = re.sub(r'Optional\s*<br\s*/>\s*', '', validation_col)
+                        validation_col = re.sub(r'Optional\s+', '', validation_col)
+                        validation_col = re.sub(r'<br\s*/>\s*Optional', '', validation_col)
+                        validation_col = re.sub(r'\s+Optional', '', validation_col)
+                    
+                    # Reconstruct the line with cleaned validation column
+                    parts[-2] = ' ' + validation_col + ' '
+                    line = '|'.join(parts)
+        
+        cleaned_validation_lines.append(line)
+    
+    content = '\n'.join(cleaned_validation_lines)
+    
     # Final pass: ensure all table rows are on a single line
     # Remove any remaining continuation lines that might have been missed
     lines = content.split('\n')

@@ -1836,8 +1836,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `jwksPath` _[string](#string)_ | Path to IdP jwks endpoint, relative to the root, commonly ".well-known/jwks.json". |  | Required <br />MinLength: 1 <br />MaxLength: 2000 |
-| `cacheDuration` _[Duration](#duration)_ |  | 5m | Required <br />Optional <br />MinLength: 1 <br />MaxLength: 2000 |
-| `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Supported types are Service and (static) Backend. An AgentgatewayPolicy containing backend tls config can then be attached to the service/backend in order to set tls options for a connection to the remote jwks source. | 5m | Required <br />Optional |
+| `cacheDuration` _[Duration](#duration)_ |  | 5m | Optional |
+| `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Supported types are Service and (static) Backend. An AgentgatewayPolicy containing backend tls config can then be attached to the service/backend in order to set tls options for a connection to the remote jwks source. |  | Required |
 #### Retry
 
 
