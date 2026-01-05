@@ -188,7 +188,7 @@ def _post_process_api_docs(api_file):
         subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
         subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
     
-    # Additional post-processing to clean up complex struct types
+    # Additional post-processing to clean up complex struct types and Go code artifacts
     with open(api_file, 'r') as f:
         content = f.read()
     
@@ -213,6 +213,155 @@ def _post_process_api_docs(api_file):
         '_Underlying type:_ _struct_',
         content
     )
+    
+    # Clean up Go code comments and struct definitions that leak into validation column
+    # The issue is that table cells can span multiple lines, and Go code is being appended
+    # We need to process line by line and remove continuation lines that contain Go code
+    
+    lines = content.split('\n')
+    cleaned_lines = []
+    i = 0
+    
+    while i < len(lines):
+        line = lines[i]
+        
+        # Check if this is a table row (contains |)
+        if '|' in line and line.strip().startswith('|'):
+            # Check if the validation column (last column before final |) contains Go code artifacts
+            parts = line.split('|')
+            if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
+                validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                
+                # Check if validation column has Go code patterns or if there are continuation lines
+                has_go_code = ('//' in validation_col or '`json:' in validation_col or 
+                              '*HTTPVersion' in validation_col or 
+                              validation_col.endswith('HTTP2') or
+                              '<br />XValidation' in validation_col)
+                
+                if has_go_code:
+                    # Clean up the validation column - keep only valid parts on a single line
+                    # Remove everything after the first Go code pattern
+                    clean_validation = re.split(r'//|`json:|[*][A-Z][a-zA-Z0-9_]*\s+`| <br />XValidation', validation_col)[0].strip()
+                    # Remove trailing incomplete validation rules
+                    clean_validation = re.sub(r' <br />XValidation.*$', '', clean_validation)
+                    # Remove trailing Enum values that got cut off (e.g., "Enum: [HTTP1;HTTP2" without closing bracket)
+                    if clean_validation.startswith('Enum:') and '[' in clean_validation and not clean_validation.endswith(']'):
+                        # If it's an incomplete enum, remove it entirely to avoid broken syntax
+                        clean_validation = re.sub(r'Enum: \[[^\]]*$', '', clean_validation).strip()
+                    # Ensure no line breaks are embedded in the validation column
+                    clean_validation = clean_validation.replace('\n', ' ').replace('\r', ' ').strip()
+                    # Reconstruct the line with cleaned validation column
+                    parts[-2] = ' ' + clean_validation + ' '
+                    line = '|'.join(parts)
+                
+                # Check for continuation lines (lines that start with tab/space and contain Go code)
+                # These are part of the same table cell. Markdown tables require single-line rows,
+                # so we must remove all continuation lines.
+                j = i + 1
+                continuation_lines_to_skip = 0
+                while j < len(lines):
+                    next_line = lines[j]
+                    next_stripped = next_line.strip()
+                    
+                    # Stop if we hit a new table row (starts with |)
+                    if next_stripped.startswith('|'):
+                        break
+                    
+                    # Check if this is a continuation line (starts with tab/space) containing Go code
+                    # or closing a table cell (like "] |")
+                    if (next_line.startswith('\t') or (next_line.startswith(' ') and not next_stripped.startswith('|'))):
+                        # Check if it contains Go code patterns or is closing a table cell
+                        if ('//' in next_line or '`json:' in next_line or '*HTTPVersion' in next_line or 
+                            'XValidation' in next_line or 'Version *HTTPVersion' in next_line or
+                            next_stripped == ']' or next_stripped == '] |' or
+                            next_stripped.startswith(']') or 'kubebuilder' in next_line.lower()):
+                            continuation_lines_to_skip += 1
+                            j += 1
+                            continue
+                    
+                    # If we get here, it's not a continuation line
+                    break
+                
+                # Skip all the continuation lines we found
+                if continuation_lines_to_skip > 0:
+                    i += continuation_lines_to_skip
+        
+        cleaned_lines.append(line)
+        i += 1
+    
+    content = '\n'.join(cleaned_lines)
+    
+    # Final cleanup: remove any remaining incomplete validation rules
+    content = re.sub(r' <br />XValidation \|', '', content)
+    content = re.sub(r'Enum: \[HTTP1;HTTP2$', '', content, flags=re.MULTILINE)
+    
+    # Clean up duplicate "Required <br />Optional" patterns
+    # A field should be either Required OR Optional, not both
+    # If both are present, use heuristics to determine which is correct:
+    # - If there's a default value, it's Optional
+    # - Otherwise, prefer Required (since +required is explicit)
+    lines = content.split('\n')
+    cleaned_validation_lines = []
+    for line in lines:
+        if '|' in line and line.strip().startswith('|'):
+            # Check if this is a table row with validation column
+            parts = line.split('|')
+            if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
+                validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                default_col = parts[-3].strip() if len(parts) > 2 else ''
+                
+                # Check if validation column has both Required and Optional
+                if 'Required' in validation_col and 'Optional' in validation_col:
+                    # Determine which one to keep
+                    # If there's a default value, it's Optional; otherwise, it's Required
+                    if default_col and default_col.strip():
+                        # Has a default value, so it should be Optional
+                        # Remove "Required <br />" or "Required" from the validation column
+                        validation_col = re.sub(r'Required\s*<br\s*/>\s*', '', validation_col)
+                        validation_col = re.sub(r'Required\s+', '', validation_col)
+                        validation_col = re.sub(r'<br\s*/>\s*Required', '', validation_col)
+                        validation_col = re.sub(r'\s+Required', '', validation_col)
+                    else:
+                        # No default value, so it should be Required
+                        # Remove "Optional <br />" or "Optional" from the validation column
+                        validation_col = re.sub(r'Optional\s*<br\s*/>\s*', '', validation_col)
+                        validation_col = re.sub(r'Optional\s+', '', validation_col)
+                        validation_col = re.sub(r'<br\s*/>\s*Optional', '', validation_col)
+                        validation_col = re.sub(r'\s+Optional', '', validation_col)
+                    
+                    # Reconstruct the line with cleaned validation column
+                    parts[-2] = ' ' + validation_col + ' '
+                    line = '|'.join(parts)
+        
+        cleaned_validation_lines.append(line)
+    
+    content = '\n'.join(cleaned_validation_lines)
+    
+    # Final pass: ensure all table rows are on a single line
+    # Remove any remaining continuation lines that might have been missed
+    lines = content.split('\n')
+    final_lines = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        # If this is a table row and the next line is a continuation (not starting with |),
+        # we need to skip it to maintain single-line table rows
+        if '|' in line and line.strip().startswith('|') and i + 1 < len(lines):
+            next_line = lines[i + 1]
+            next_stripped = next_line.strip()
+            # If next line doesn't start a new table row and contains Go code or closes a cell, skip it
+            if not next_stripped.startswith('|') and (
+                '//' in next_line or '`json:' in next_line or 
+                '*HTTPVersion' in next_line or 'XValidation' in next_line or
+                next_stripped == ']' or next_stripped == '] |' or
+                'kubebuilder' in next_line.lower()
+            ):
+                i += 1
+                continue
+        final_lines.append(line)
+        i += 1
+    
+    content = '\n'.join(final_lines)
     
     with open(api_file, 'w') as f:
         f.write(content)
@@ -254,9 +403,8 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     with open('./out.md') as f:
         generated_content = f.read()
     
-    # Keep out.md for debugging - uncomment next line to remove after processing
-    # os.remove('./out.md')
-    print(f'    ℹ Intermediate file saved at: {os.path.abspath("./out.md")}')
+    # Clean up temporary file
+    os.remove('./out.md')
     
     # Check if version is 2.2.x or later
     split_api = is_version_2_2_or_later(version)

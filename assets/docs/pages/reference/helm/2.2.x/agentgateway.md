@@ -4,12 +4,12 @@
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
 | affinity | object | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. | `{}` |
-| controller | object | Configure the agentgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"kgateway","tag":""},"logLevel":"info","replicaCount":1,"service":{"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
+| controller | object | Configure the agentgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"controller","tag":""},"logLevel":"info","replicaCount":1,"service":{"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
 | controller.extraEnv | object | Add extra environment variables to the controller container. | `{}` |
-| controller.image | object | Configure the controller container image. | `{"pullPolicy":"","registry":"","repository":"kgateway","tag":""}` |
+| controller.image | object | Configure the controller container image. | `{"pullPolicy":"","registry":"","repository":"controller","tag":""}` |
 | controller.image.pullPolicy | string | Set the image pull policy for the controller. | `""` |
 | controller.image.registry | string | Set the image registry for the controller. | `""` |
-| controller.image.repository | string | Set the image repository for the controller. | `"kgateway"` |
+| controller.image.repository | string | Set the image repository for the controller. | `"controller"` |
 | controller.image.tag | string | Set the image tag for the controller. | `""` |
 | controller.logLevel | string | Set the log level for the controller. | `"info"` |
 | controller.replicaCount | int | Set the number of controller pod replicas. | `1` |
