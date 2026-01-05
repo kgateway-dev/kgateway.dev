@@ -611,6 +611,7 @@ _Appears in:_
 | `key` _[string](#string)_ | key provides an inline key to use as the value of the Authorization header. This option is the least secure; usage of a Secret is preferred. |  | Optional <br />MaxLength: 2048 |
 | `secretRef` _[LocalObjectReference](#localobjectreference)_ | secretRef references a Kubernetes secret storing the key to use the authorization value. This must be stored in the 'Authorization' key. |  | Optional <br />MaxLength: 2048 |
 | `passthrough` _[BackendAuthPassthrough](#backendauthpassthrough)_ | passthrough passes through an existing token that has been sent by the client and validated. Other policies, like JWT and API Key authentication, will strip the original client credentials. Passthrough backend authentication causes the original token to be added back into the request. If there are no client authentication policies on the request, the original token would be unchanged, so this would have no effect. |  | Optional |
+| `aws` _[AwsAuth](#awsauth)_ | TODO: azure, gcp Auth specifies an explicit AWS authentication method for the backend. When omitted, we will try to use the default AWS SDK authentication methods.  |  | Optional |
 
 #### BackendAuthPassthrough
 
@@ -658,6 +659,12 @@ _Appears in:_
 | `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional <br />Enum: [HTTP1;HTTP2
 	// +optional
 ] |
+| `requestTimeout` _[Duration](#duration)_ | requestTimeout specifies the deadline for receiving a response from the backend. |  | Optional <br />Enum: [HTTP1;HTTP2
+	// +optional
+	Version *HTTPVersion `json:"version,omitempty"`
+
+	// requestTimeout specifies the deadline for receiving a response from the backend.
+	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9] <br />XValidation |
 
 #### BackendMCP
 
@@ -817,7 +824,7 @@ For example, if you specify `CreditCard`, any credit card numbers
 in the request or response are matched.
 
 _Validation:_
-- Enum: [Ssn CreditCard PhoneNumber Email]
+- Enum: [Ssn CreditCard PhoneNumber Email CaSin]
 
 _Appears in:_
 - [Regex](#regex)
@@ -828,6 +835,7 @@ _Appears in:_
 | `CreditCard` | Default regex matching for credit card numbers.<br /> |
 | `PhoneNumber` | Default regex matching for phone numbers.<br /> |
 | `Email` | Default regex matching for email addresses.<br /> |
+| `CaSin` | Default regex matching for Canadian Social Insurance Numbers.<br /> |
 
 
 #### CORS
@@ -1484,6 +1492,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `targets` _[McpTargetSelector](#mcptargetselector) array_ | Targets is a list of MCPBackend targets to use for this backend.<br />Policies targeting MCPBackend targets must use targetRefs[].sectionName<br />to select the target by name. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `sessionRouting` _[SessionRouting](#sessionrouting)_ | SessionRouting configures MCP session behavior for requests.<br />Defaults to Stateful if not set. |  | Enum: [Stateful Stateless] <br /> |
 
 
 #### MCPProtocol
@@ -1829,7 +1838,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `matches` _string array_ | A list of regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  |  |
-| `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [Ssn CreditCard PhoneNumber Email] <br /> |
+| `builtins` _[BuiltIn](#builtin) array_ | A list of built-in regex patterns to match against the request or response.<br />Matches and built-ins are additive. |  | Enum: [Ssn CreditCard PhoneNumber Email CaSin] <br /> |
 | `action` _[Action](#action)_ | The action to take if a regex pattern is matched in a request or response.<br />This setting applies only to request matches. PromptguardResponse matches are always masked by default.<br />Defaults to `Mask`. | Mask | Enum: [Mask Reject] <br /> |
 
 
@@ -1842,9 +1851,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `uri` _[string](#string)_ | IdP jwks endpoint. Default tls settings are used to connect to this url. |  | Optional <br />Pattern |
-| `cacheDuration` _[Duration](#duration)_ |  | 5m | Optional <br />Pattern <br />XValidation |
-| `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Not implemented yet, only jwksUri is currently supported. Supported types: Service and Backend. | 5m | Optional <br />XValidation |
+| `jwksPath` _[string](#string)_ | Path to IdP jwks endpoint, relative to the root, commonly ".well-known/jwks.json". |  | Required <br />MinLength: 1 <br />MaxLength: 2000 |
+| `cacheDuration` _[Duration](#duration)_ |  | 5m | Required <br />Optional <br />MinLength: 1 <br />MaxLength: 2000 <br />XValidation |
+| `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Supported types are Service and (static) Backend. An AgentgatewayPolicy containing backend tls config can then be attached to the service/backend in order to set tls options for a connection to the remote jwks source. | 5m | Required <br />Optional <br />XValidation |
 #### Retry
 
 
@@ -1896,6 +1905,24 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
+
+
+#### SessionRouting
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Stateful Stateless]
+
+_Appears in:_
+- [MCPBackend](#mcpbackend)
+
+| Field | Description |
+| --- | --- |
+| `Stateful` | Stateful mode creates an MCP session (via mcp-session-id) and internally<br />ensures requests for that session are routed to a consistent backend replica.<br /> |
+| `Stateless` |  |
 
 
 #### ShutdownSpec
