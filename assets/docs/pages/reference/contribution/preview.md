@@ -18,7 +18,9 @@ The kgateway documentation is built by using the static site generator Hugo. As 
    ```sh
    npm install
    ```
-   
+
+4. Install the version of [Golang](https://go.dev/doc/install) used in `go.mod` and make sure `go` is in your `$PATH`.
+
 ## Build the site locally
 
 1. Build the site locally. 
@@ -27,4 +29,3 @@ The kgateway documentation is built by using the static site generator Hugo. As 
    ```
 
 2. Open the site. The local preview is available at [localhost:1313](localhost:1313). 
-
