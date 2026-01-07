@@ -1,6 +1,6 @@
 Review the ports that are used by kgateway.
 
-Kgateway deploys containers that listen on certain ports for incoming traffic. In the following sections, you can review the pods and services that make up kgateway, and the ports that these pods and services listen on. ,<!--Note that if you choose to set up mutual TLS (mTLS) for communication between kgateway components, alternate ports and traffic flows are used. -->
+Kgateway deploys containers that listen on certain ports for incoming traffic. In the following sections, you can review the pods and services that make up kgateway, and the ports that these pods and services listen on. <!--Note that if you choose to set up mutual TLS (mTLS) for communication between kgateway components, alternate ports and traffic flows are used. -->
 
 <!--
 

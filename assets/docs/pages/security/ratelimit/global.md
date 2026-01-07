@@ -86,7 +86,7 @@ To get started, you can try out a demo rate limit service from the kgateway proj
 2. Deploy the rate limit service.
 
    ```bash
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
    ```
 
 ## Step 2: Define the rate limits {#rate-limits}
@@ -453,8 +453,8 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/kubernetes/e2e/features/rate_limit/testdata/rate-limit-server.yaml
-kubectl delete gatewayextension global-ratelimit
-kubectl delete trafficpolicy ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit
+kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
+kubectl delete gatewayextension global-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete trafficpolicy ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete namespace kgateway-test-extensions
 ```

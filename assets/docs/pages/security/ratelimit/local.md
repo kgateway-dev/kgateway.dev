@@ -400,8 +400,9 @@ Sometimes, you might want to disable {{< version include-if="2.2.x,2.1.x" >}}{{<
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}} local-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}} disable-ratelimit -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} local-ratelimit -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} local-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} disable-ratelimit -n httpbin
 kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
 ```
