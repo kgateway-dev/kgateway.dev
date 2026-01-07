@@ -656,15 +656,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional <br />Enum: [HTTP1;HTTP2
-	// +optional
-] |
-| `requestTimeout` _[Duration](#duration)_ | requestTimeout specifies the deadline for receiving a response from the backend. |  | Optional <br />Enum: [HTTP1;HTTP2
-	// +optional
-	Version *HTTPVersion `json:"version,omitempty"`
-
-	// requestTimeout specifies the deadline for receiving a response from the backend.
-	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9] <br />XValidation |
+| `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional |
+| `requestTimeout` _[Duration](#duration)_ | requestTimeout specifies the deadline for receiving a response from the backend. |  | Optional |
 
 #### BackendMCP
 
@@ -713,17 +706,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `mtlsCertificateRef` _[LocalObjectReference](#localobjectreference)_ array | mtlsCertificateRef enables mutual TLS to the backend, using the specified key (tls.key) and cert (tls.crt) from the refenced Secret.  An optional 'ca.cert' field, if present, will be used to verify the server certificate if present. If caCertificateRefs is also specified, the caCertificateRefs field takes priority.  If unspecified, no client certificate will be used.  |  | Optional <br />MaxItems: 1 |
 | `caCertificateRefs` _[LocalObjectReference](#localobjectreference)_ array | caCertificateRefs defines the CA certificate ConfigMap to use to verify the server certificate. If unset, the system's trusted certificates are used.  |  | Optional <br />MaxItems: 1 |
-| `insecureSkipVerify` _[InsecureTLSMode](#insecuretlsmode)_ | insecureSkipVerify originates TLS but skips verification of the backend's certificate. WARNING: This is an insecure option that should only be used if the risks are understood.  There are two modes: * All disables all TLS verification * Hostname verifies the CA certificate is trusted, but ignores any mismatch of hostname/SANs. Note that this method is still insecure; prefer setting verifySubjectAltNames to customize the valid hostnames if possible.  |  | Optional <br />Enum: [All;Hostname
-	// +optional
-] |
-| `sni` _[SNI](#sni)_ | sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically set based on the destination hostname. |  | Optional <br />Enum: [All;Hostname
-	// +optional
-	InsecureSkipVerify *InsecureTLSMode `json:"insecureSkipVerify,omitempty"`
-
-	// sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically
-	// set based on the destination hostname.
-	// +optional
-] |
+| `insecureSkipVerify` _[InsecureTLSMode](#insecuretlsmode)_ | insecureSkipVerify originates TLS but skips verification of the backend's certificate. WARNING: This is an insecure option that should only be used if the risks are understood.  There are two modes: * All disables all TLS verification * Hostname verifies the CA certificate is trusted, but ignores any mismatch of hostname/SANs. Note that this method is still insecure; prefer setting verifySubjectAltNames to customize the valid hostnames if possible.  |  | Optional |
+| `sni` _[SNI](#sni)_ | sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically set based on the destination hostname. |  | Optional |
 | `verifySubjectAltNames` _[ShortString](#shortstring)_ array | verifySubjectAltNames specifies the Subject Alternative Names (SAN) to verify in the server certificate. If not present, the destination hostname is automatically used.  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
 | `alpnProtocols` _[[]TinyString](#[]tinystring)_ | alpnProtocols sets the Application Level Protocol Negotiation (ALPN) value to use in the TLS handshake.  If not present, defaults to ["h2", "http/1.1"].  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
 
