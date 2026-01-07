@@ -4,4 +4,4 @@ weight: 100
 description:
 ---
 
-{{< reuse "docs/pages/agentgateway/llm/tracing.md" >}}
+{{% reuse "docs/pages/agentgateway/llm/tracing.md" %}}

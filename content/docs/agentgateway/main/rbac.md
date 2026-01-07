@@ -4,4 +4,4 @@ weight: 65
 description:
 ---
 
-{{< reuse "docs/pages/agentgateway/rbac.md" >}}
+{{% reuse "docs/pages/agentgateway/rbac.md" %}}

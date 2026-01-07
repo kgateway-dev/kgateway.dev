@@ -4,5 +4,5 @@ weight: 20
 description:
 ---
 
-{{< reuse "docs/pages/agentgateway/llm/providers/vertex.md" >}}
+{{% reuse "docs/pages/agentgateway/llm/providers/vertex.md" %}}
 
