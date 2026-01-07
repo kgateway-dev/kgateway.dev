@@ -133,7 +133,7 @@ EOF
 ### More information
 
 * [Example scenario](#example-scenario) of a simple Python webhook server that integrates with the Guardrail Webhook API.
-* [Guardrail Webhook API reference docs](../redocly.html).
+* [Guardrail Webhook API reference docs](../openapi-spec/).
 
 ## Example scenario
 
@@ -475,4 +475,3 @@ EOF
    ```sh
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} openai-prompt-guard
    ```
-
