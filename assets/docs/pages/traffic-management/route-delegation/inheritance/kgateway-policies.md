@@ -4,10 +4,6 @@ Learn how policy inheritance and overrides work for {{< reuse "/docs/snippets/kg
 Want to learn more about policy inheritance and overrides for Kubernetes Gateway API-native policies? See [Native Gateway API policies](/docs/traffic-management/route-delegation/inheritance/native-policies/). 
 {{< /callout >}}
 
-{{< callout type="warning" >}} 
-{{< reuse "docs/versions/warn-2-1-only.md" >}} 
-{{< /callout >}}
-
 ## About policy inheritance
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}

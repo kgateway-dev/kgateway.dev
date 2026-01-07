@@ -150,7 +150,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
 {{% /tab %}}
 {{< /tabs >}}
 
-{{< conditional-text include-if="envoy" >}}
+{{% conditional-text include-if="envoy" %}}
 
 ## Uninstall optional components {#optional}
 
@@ -173,4 +173,4 @@ Remove any optional components that you no longer need, such as sample apps.
    ```sh
    kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
    ```
-{{< /conditional-text >}}
+{{% /conditional-text %}}
