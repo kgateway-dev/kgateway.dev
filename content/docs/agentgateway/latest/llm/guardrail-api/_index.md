@@ -8,5 +8,5 @@ Use the Guardrail Webhook API to set up your own custom guardrail controls for {
 
 {{< cards >}}
   {{< card link="guardrails" title="Guardrails guide" >}}
-  {{< card link="redocly.html" title="Guardrail Webhook API reference" >}}
+  {{< card link="openapi-spec" title="Guardrail Webhook API reference" >}}
 {{< /cards >}}
