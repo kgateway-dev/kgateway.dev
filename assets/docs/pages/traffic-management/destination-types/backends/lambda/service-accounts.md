@@ -56,7 +56,6 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
           --client-id-list sts.amazonaws.com \
           --thumbprint-list "$(openssl s_client -servername $(echo ${OIDC_PROVIDER} | cut -d/ -f1) -showcerts -connect $(echo ${OIDC_PROVIDER} | cut -d/ -f1):443 </dev/null 2>/dev/null | openssl x509 -fingerprint -noout -sha1 | cut -d= -f2 | tr -d ':')"
         ```
-         
 
 3. Create an IAM policy to allow access to the following four Lambda actions. Note that the permissions to discover and invoke functions are listed in the same policy. In a more advanced setup, you might separate discovery and invocation permissions into two IAM policies.
    ```sh
