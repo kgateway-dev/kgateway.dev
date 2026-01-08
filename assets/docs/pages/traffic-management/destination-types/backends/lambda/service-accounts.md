@@ -18,6 +18,8 @@ In this guide, you follow these steps:
 * Annotate the gateway proxy service account with the IRSA
 * Set up routing to your function by creating `Upstream` and `HTTPRoute` resources
 
+## Before you begin
+
 {{< callout type="warning" >}}
 This guide requires you to enable IAM settings in your EKS cluster, such as the AWS Pod Identity Webhook, **before** you deploy {{< reuse "/docs/snippets/kgateway.md" >}} components that are created during installation, such as the Gateway CRD and the gateway proxy service account. You might use this guide with a fresh EKS test cluster to try out Lambda function invocation with {{< reuse "/docs/snippets/kgateway.md" >}} service accounts.
 {{< /callout >}}
@@ -34,13 +36,27 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
    export AWS_ACCOUNT_ID=<account_id>
    ```
 
-2. Check whether your EKS cluster has an OIDC provider.
-   ```sh
-   export OIDC_PROVIDER=$(aws eks describe-cluster --name ${CLUSTER_NAME} --region ${AWS_CLUSTER_REGION} --query "cluster.identity.oidc.issuer" --output text | sed -e "s/^https:\/\///")
-   echo $OIDC_PROVIDER
-   ```
-   * If an OIDC provider in the format `oidc.eks.<region>.amazonaws.com/id/<cluster_id>` is returned, continue to the next step. 
-   * If an OIDC provider is not returned, follow the AWS documentation to [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html), and then run this command again to save the OIDC provider in an environment variable.
+2. Save and verify your cluster's OIDC provider details.
+   1. Get the OIDC provider for your cluster, in the format `oidc.eks.<region>.amazonaws.com/id/<cluster_id>`.
+      ```sh
+      export OIDC_PROVIDER=$(aws eks describe-cluster --name ${CLUSTER_NAME} --region ${AWS_CLUSTER_REGION} --query "cluster.identity.oidc.issuer" --output text | sed -e "s/^https:\/\///")
+      echo $OIDC_PROVIDER
+      ```
+      * If an OIDC provider is not returned, follow the AWS documentation to [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html), and then run this command again to save the OIDC provider in an environment variable.
+   2. Verify that the OIDC provider is listed as an entry in AWS IAM.
+      ```sh
+      aws iam list-open-id-connect-providers \
+        --query "OpenIDConnectProviderList[?contains(Arn, '${OIDC_PROVIDER}')].Arn" \
+        --output text
+      ```
+      * If your OIDC provider is not returned, add it to IAM.
+        ```sh
+        aws iam create-open-id-connect-provider \
+          --url "https://${OIDC_PROVIDER}" \
+          --client-id-list sts.amazonaws.com \
+          --thumbprint-list "$(openssl s_client -servername $(echo ${OIDC_PROVIDER} | cut -d/ -f1) -showcerts -connect $(echo ${OIDC_PROVIDER} | cut -d/ -f1):443 </dev/null 2>/dev/null | openssl x509 -fingerprint -noout -sha1 | cut -d= -f2 | tr -d ':')"
+        ```
+         
 
 3. Create an IAM policy to allow access to the following four Lambda actions. Note that the permissions to discover and invoke functions are listed in the same policy. In a more advanced setup, you might separate discovery and invocation permissions into two IAM policies.
    ```sh
@@ -134,10 +150,10 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 3. Deploy the Amazon EKS Pod Identity Webhook.
    ```sh
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/gloo-gateway/1-19/enterprise/lambda/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/kgateway/2-1/default/data/steps/deploy-amazon-pod-identity-webhook/auth.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/kgateway/2-1/default/data/steps/deploy-amazon-pod-identity-webhook/deployment-base.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/kgateway/2-1/default/data/steps/deploy-amazon-pod-identity-webhook/mutatingwebhook.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/workshops/refs/heads/master/kgateway/2-1/default/data/steps/deploy-amazon-pod-identity-webhook/service.yaml
    ```
 
 4. Verify that the webhook deployment completes.
@@ -149,7 +165,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
 
 Be sure that you [deployed the Amazon EKS Pod Identity Webhook](#webhook) to your cluster first before you continue to install {{< reuse "/docs/snippets/kgateway.md" >}}.
 
-{{< reuse "docs/snippets/get-started.md" >}}
+{{< reuse "docs/snippets/envoy/get-started.md" >}}
 
 ## Annotate the gateway proxy service account {#annotate}
 
@@ -297,12 +313,16 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl $INGRESS_GW_ADDRESS:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
+   curl -H "Host: lambda.${AWS_LAMBDA_REGION}.amazonaws.com" \
+     $INGRESS_GW_ADDRESS:8080/echo \
+     -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl localhost:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
+   curl -H "Host: lambda.${AWS_LAMBDA_REGION}.amazonaws.com" \
+     $INGRESS_GW_ADDRESS:8080/echo \
+     -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
    {{< /tabs >}}
