@@ -43,7 +43,7 @@ Save your AWS details, and create an IRSA for the gateway proxy pod to use.
       echo $OIDC_PROVIDER
       ```
       * If an OIDC provider is not returned, follow the AWS documentation to [Create an IAM OIDC provider for your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html), and then run this command again to save the OIDC provider in an environment variable.
-   2. Verify that the OIDC provider is listed as an entry in AWS IAM.
+   2. Verify that the OIDC provider's ARN is listed as an entry in AWS IAM.
       ```sh
       aws iam list-open-id-connect-providers \
         --query "OpenIDConnectProviderList[?contains(Arn, '${OIDC_PROVIDER}')].Arn" \
