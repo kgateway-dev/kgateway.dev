@@ -5,6 +5,6 @@ description: Unleash developer productivity and accelerate AI innovation with AI
 icon: cognition
 ---
 
-Interested in using kgateway as an AI Gateway? Check out using [kgateway with an agentgateway data plane](https://kgateway.dev/docs/agentgateway/main/). </br></br>
+Interested in using kgateway as an AI Gateway? Check out using [kgateway with an agentgateway data plane](https://agentgateway.dev/docs). </br></br>
 
 {{< reuse "docs/snippets/agentgateway/about.md" >}}
