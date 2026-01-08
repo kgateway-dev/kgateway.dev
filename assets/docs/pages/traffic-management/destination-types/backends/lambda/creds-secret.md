@@ -16,17 +16,17 @@ Create a Kubernetes secret that contains your AWS access key and secret key. You
    export ACCOUNT_ID=<account_id>
    ````
 
-2. Save your IAM user access key (prefixed `AKIA...`) and secret key as environment variables. Make sure that `AWS_SESSION_TOKEN` is **not** set.
+2. Save your IAM user access key (prefixed `AKIA...`) and secret key as environment variables. Make sure that the `AWS_SESSION_TOKEN` is **not** set.
    ```bash
    export AWS_ACCESS_KEY_ID="<AKIA-access-key>"
    export AWS_SECRET_ACCESS_KEY="<secret-key>"
    ```
-   If you do not have a long-lived IAM user access keypair, you can create one for your IAM user.
+   If you do not have a long-lived IAM user access key pair, you can create one for your IAM user.
    * AWS console:
      1. Navigate to **IAM → Users → (your user)**.
      2. In the **Security credentials** tab, scroll to the **Access keys** panel, and click **Create access key**.
      3. Select the CLI option, and create the access key.
-     4. Copy the output cccess key ID (prefixed `AKIA...`) and secret access key.
+     4. Copy the output access key ID (prefixed `AKIA...`) and secret access key.
    * `aws` CLI:
      ```bash
      aws iam create-access-key --user-name <iam-user-name>
