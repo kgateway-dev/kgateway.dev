@@ -16,6 +16,7 @@ Welcome to the documentation for the kgateway open source project!
   {{< card link="integrations" title="Integrations" >}}
   {{< card link="observability" title="Observability" >}}
   {{< card link="operations" title="Operations" >}}
+  {{< card link="migrate" title="Migrate from Ingress" >}}
   {{< card link="reference" title="Reference" >}}
   {{< card link="faqs" title="FAQs" >}}
 {{< /cards >}}
