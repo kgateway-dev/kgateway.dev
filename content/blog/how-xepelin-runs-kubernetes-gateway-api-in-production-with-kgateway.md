@@ -15,7 +15,7 @@ Xepelin’s platform runs on AWS using Kubernetes with EKS. We operate multiple 
 - Improve observability
 - Reduce infrastructure costs
 
-{{< reuse-image src="blog/kgateway-at-xepelin-1.png" >}}
+{{< reuse-image src="blog/kgateway-at-xepelin-1.svg" caption="Legacy traffic architecture at Xepelin based on AWS API Gateway, Lambda authorizers, and per-service Network Load Balancers, which led to operational complexity and high infrastructure costs." >}}
 
 As we operate the AWS API Gateway which controls all incoming traffic to the EKS clusters, with Lambda authorizers and Network Load Balancers (NLBs), we started to hit several issues:
 - A large number of NLBs, leading to high infrastructure costs.
@@ -128,7 +128,7 @@ From a security standpoint, we can integrate our own custom external auth servic
 
 Overall, this model based on an internal IDP, Gateway API, kgateway, and custom external auth gave us a traffic layer that is **predictable, fast to operate, and easy to scale**. kgateway did not just replace the previous architecture, it became a core platform component that we continue to build on.
 
-{{< reuse-image src="blog/kgateway-at-xepelin-2.png" >}}
+{{< reuse-image src="blog/kgateway-at-xepelin-2.svg" caption="Current traffic architecture using kgateway and the Kubernetes Gateway API, with centralized ingress, shared gateways, and declarative routing managed entirely inside Kubernetes." >}}
 
 ### How we use kgateway telemetry
 We currently use kgateway telemetry across two distinct layers. On one side, we rely on access logs for each gateway. On the other, we consume metrics from both the control plane and the data plane, with most of the focus on the data plane.
@@ -141,21 +141,21 @@ We primarily monitor:
 - Latencies
 - Throughput
 - Errors and timeouts
-- Envoy response codes and states
+- Envoy response codes and flags
 
 What makes these metrics especially valuable is their **level of granularity**. We can break them down by **backend service, Gateway API resource, environment, and even custom tags**. This is straightforward to achieve thanks to kgateway’s native OpenTelemetry integration, which allows us to enrich telemetry without locking ourselves into a specific observability vendor.
 
 In production, we send these metrics to Datadog. In development and testing environments, we send them to Prometheus and visualize them in Grafana. The model stays the same, only the backend changes.
 
-{{< reuse-image src="blog/kgateway-at-xepelin-3.png" >}}
+{{< reuse-image src="blog/kgateway-at-xepelin-3.svg" caption="Datadog dashboards built from Envoy and kgateway metrics, providing detailed visibility into request rates, latencies, errors, and traffic behavior per service." >}}
 
 Through our Grafana dashboards, we can easily drill into response codes and investigate non-200 responses in more detail when needed.
 
-{{< reuse-image src="blog/kgateway-at-xepelin-4.png" >}}
+{{< reuse-image src="blog/kgateway-at-xepelin-4.svg" caption="Per-request Envoy access logs from kgateway, including HTTP status codes, request paths, upstream services, and end-to-end request duration." >}}
 
 #### Logs: understanding individual requests
 In parallel, we rely heavily on Envoy access logs to gain detailed visibility at the individual request level. Currently, these logs are sent to Amazon CloudWatch, with the option to route them to Loki in the future.
-Access logs are critical when something does not look right. Metrics tell you that something is wrong; logs tell you exactly what happened. More than once, Envoy response codes and states found in access logs helped us determine whether an issue originated in the backend, the gateway, or somewhere in between.
+Access logs are critical when something does not look right. Metrics tell you that something is wrong; logs tell you exactly what happened. More than once, Envoy response codes and flags found in access logs helped us determine whether an issue originated in the backend, the gateway, or somewhere in between.
 
 #### Metrics and logs together
 In day-to-day operations, the real value comes from using metrics and logs together. Metrics help us detect issues quickly, while logs allow us to understand them in depth.
