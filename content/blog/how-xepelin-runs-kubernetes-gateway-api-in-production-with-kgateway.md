@@ -94,7 +94,7 @@ Kgateway fit well because it:
 
 #### Comparison with other tools
 We also evaluated Kong and Traefik before we decided on kgateway:
-| **Feature / Tool**                      | **kgateway**           | **Kong**                                    | **Traefik**                       |
+| **Feature / Tool**                      | **Kgateway**           | **Kong**                                    | **Traefik**                       |
 |-----------------------------------------|------------------------|---------------------------------------------|-----------------------------------|
 | _Core technology_                       | Envoy                  | Nginx/OpenResty                             | Go (open source)                  |
 | _Native Gateway API support_            | Yes                    | Yes                                         | Yes                               |
