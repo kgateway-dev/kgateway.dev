@@ -34,7 +34,7 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/docs/snippets/kgat
 
 You can set the log level for the Envoy proxy to get more detailed logs. Envoy log level options include `trace`, `debug`, `info`, `warn`, `error`, `critical`, and `off`. The default log level is `info`. For more information, see [Debugging Envoy](https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy).
 
-1. Create a GatewayParameters resource to add any custom settings to the gateway. For other settings, see the [GatewayParameters API docs](../../reference/api/#gatewayparametersspec) or check out the [Gateway customization guides](../../setup/customize/).
+1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to add any custom settings to the gateway. For other settings, see the [{{< reuse "docs/snippets/gatewayparameters.md" >}} API docs]({{< link-hextra path="/reference/api/#gatewayparametersspec" >}}) or check out the [Gateway customization guides](../../setup/customize/).
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -51,7 +51,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    EOF
    ```
 
-2. Create a Gateway resource that references your custom GatewayParameters. 
+2. Create a Gateway resource that references your custom {{< reuse "docs/snippets/gatewayparameters.md" >}}. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -69,7 +69,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}      
      listeners:
      - protocol: HTTP
-       port: 80
+       port: 8080
        name: http
        allowedRoutes:
          namespaces:
@@ -77,7 +77,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    EOF
    ```
 
-3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the GatewayParameters resource. 
+3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. 
    
    ```sh
    kubectl get pods -l app.kubernetes.io/name=debug-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
