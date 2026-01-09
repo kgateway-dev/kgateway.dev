@@ -19,9 +19,8 @@ Xepelin’s platform runs on AWS using Kubernetes with EKS. We operate multiple 
 
 As we operate the AWS API Gateway which controls all incoming traffic to the EKS clusters, with Lambda authorizers and Network Load Balancers (NLBs), we started to hit several issues:
 - A large number of NLBs, leading to high infrastructure costs.
-- Fragmented traffic management, where Kubernetes specifications handled the Service (type LoadBalancer) configuration, while AWS API Gateway routes were created and modified separately using Terraform or the AWS Console. This split ownership resulted in a disjointed workflow and increased operational complexity when managing traffic changes end to end.
+- Fragmented traffic management, where Kubernetes specifications handled the Service (type LoadBalancer) configuration, while AWS API Gateway routes were created and modified separately using Terraform or the AWS Console. This split ownership resulted in a disjointed workflow and increased operational complexity when managing traffic changes end-to-end.
 - Fragmented observability across the traffic path, which made it impossible to have centralized metrics and end-to-end visibility across the API Gateway → NLB → Kubernetes Service chain. As a result, diagnosing issues such as sporadic 503 errors was slow and required manual investigation across multiple systems.
-
 
 Our initial model relied heavily on Kubernetes Services of type **LoadBalancer**, with AWS API Gateway routing traffic directly to the NLBs created by those services. This resulted in a large number of Network Load Balancers and steadily increasing operational costs.
 
@@ -34,7 +33,7 @@ The existing architecture had been in place for years and **did not scale well**
 
 With that in mind, we focused on the following aspects.
 
-#### Transparent and Low-friction Migration
+#### Transparent and low-friction migration
 One of the main challenges was replicating the behavior that already existed in AWS API Gateway, especially the Lambda Authorizer.
 
 This authorizer received each request, performed several validations, and interacted with AWS services such as Secrets Manager.
@@ -42,18 +41,18 @@ This authorizer received each request, performed several validations, and intera
 With kgateway, we were able to replicate this behavior thanks to its tight integration with Envoy and its support for external authorization.
 
 #### Full, first-class support for Gateway API
-Full, native support for Kubernetes Gateway API was a key requirement for us.
+Full, native support for the Kubernetes Gateway API was a key requirement for us.
 
-We wanted Gateway API to be the primary way to model north–south traffic, not an optional layer. kgateway stood out because Gateway API is at the core of its design, which made it a natural fit for how we manage routing and traffic behavior in production.
+We wanted the Gateway API to be the primary way to model north–south traffic, not an optional layer. Kgateway stood out because the Gateway API is at the core of its design, which made it a natural fit for how we manage routing and traffic behavior in production.
 
 #### Built on Envoy
-kgateway is built on top of Envoy, one of the most widely used and powerful proxies in the cloud-native ecosystem. Envoy provides:
+Kgateway is built on top of Envoy, one of the most widely used and powerful proxies in the cloud-native ecosystem. Envoy provides:
 
 - Rich metrics per proxy and per route (counters, gauges, histograms)
 - Detailed visibility into request rates, latencies, errors, and upstream/downstream behavior
 - Advanced flexibility around timeouts, retries, circuit breaking, and more
 
-#### History and Maturity: Born as Gloo
+#### History and maturity: Born as Gloo
 Before being called kgateway, the project was known as Gloo and was developed by Solo.io. This was an important factor for us because:
 
 - It has been proven across hundreds of production deployments
@@ -62,7 +61,7 @@ Before being called kgateway, the project was known as Gloo and was developed by
 
 This track record was a major advantage over newer or less widely adopted alternatives.
 
-#### Advanced observability with Native OpenTelemetry Integration
+#### Advanced observability with native OpenTelemetry integration
 
 ##### Metrics
 - Control plane: The kgateway control plane exposes Prometheus metrics that give full visibility into how synchronization and reconciliation are behaving.
@@ -73,7 +72,7 @@ This allows metrics to be consumed directly by our existing observability stack 
 Envoy access logs from the data plane are very easy to expose using resources managed by the kgateway controller itself. It also provides native exporters to OpenTelemetry collectors.
 
 ##### Traces
-kgateway includes native trace exporters that can send traces directly to OpenTelemetry collectors.
+Kgateway includes native trace exporters that can send traces directly to OpenTelemetry collectors.
 
 #### Fast synchronization and near-immediate feedback
 One aspect that turned out to be more important than expected was synchronization speed between Kubernetes resources and the gateway data plane.
@@ -87,7 +86,7 @@ The primary goal of this migration was to fix north–south traffic routing, spe
 - Enforcing external security policies
 
 Beyond that, we wanted an architecture that could evolve toward a service mesh capable of handling east–west traffic.
-kgateway fit well because it:
+Kgateway fit well because it:
 - Uses Envoy as its data plane
 - Integrates cleanly with Gateway API
 - Can act as an ingress for a future service mesh
@@ -113,7 +112,7 @@ We also evaluated Kong and Traefik before we decided on kgateway:
 | _Licensing model_                       | Open source            | Open source (OSS) + Enterprise subscription | Open source + Commercial products |
 | _Production maturity_                   | Very high (ex-Gloo)    | High                                        | High                              |
 
-### How Xepelin Uses Kgateway
+### How Xepelin uses kgateway
 Today, kgateway is the core of our traffic layer at Xepelin. We use it consistently across production, development, and testing environments, which allows us to keep the same operational model throughout the entire service lifecycle.
 
 When traffic reaches the platform, either through an Application Load Balancer for public traffic or a Network Load Balancer for internal traffic, both flows pass through Envoy proxies in the kgateway data plane. From there, all routing is handled declaratively within Kubernetes.
@@ -124,9 +123,10 @@ Synchronization speed is another key advantage. From the moment an HTTPRoute is 
 
 Beyond basic routing, we rely on kgateway extensions to control advanced behavior. Using BackendPolicies such as BackendConfigPolicy, we tune Envoy-specific parameters including upstream keep-alives, backend timeouts, and connection handling. We also apply native rate limiting, allowing us to protect services and standardize limits without relying on external systems.
 
-From a security standpoint, we can integrate our own custom external auth service with kgateway. This internally developed service can be enabled and configured per gateway or per route. It allowed us to replicate, and evolve, the Lambda Authorizer model we used previously, while keeping authorization logic decoupled from the gateway and fully Kubernetes-native.
+From a security standpoint, we can integrate our own custom external auth service with kgateway. This internally developed service can be enabled and configured per gateway or per route. It allowed us to replicate and evolve the Lambda Authorizer model we used previously, while keeping authorization logic decoupled from the gateway and fully Kubernetes-native.
 
-Overall, this model based on an internal IDP, Gateway API, kgateway, and custom external auth gave us a traffic layer that is **predictable, fast to operate, and easy to scale**. kgateway did not just replace the previous architecture, it became a core platform component that we continue to build on.
+Overall, this model based on an internal IDP, Gateway API, kgateway, and custom external auth gave us a traffic layer that is **predictable, fast to operate, and easy to scale**. 
+Kgateway did not just replace the previous architecture, it became a core platform component that we continue to build on.
 
 {{< reuse-image src="blog/kgateway-at-xepelin-2.svg" caption="Current traffic architecture using kgateway and the Kubernetes Gateway API, with centralized ingress, shared gateways, and declarative routing managed entirely inside Kubernetes." >}}
 
@@ -179,27 +179,27 @@ In practice, kgateway helped us move away from maintaining large amounts of repe
 ### Challenges and lessons learned
 Adopting kgateway was very positive overall, but it also came with important lessons that we now consider essential for stable operation.
 
-#### Every Backend is Different
+#### Every backend is different
 Each application, seen by Envoy as an upstream, maintains its own connection pool. There is no single configuration that works for everything. Defining well-tuned BackendPolicies per service, including keep-alives, timeouts, and retries, was critical to achieving stable connections and avoiding intermittent errors.
 
-#### Gateway API Requires a Mindset Shift
+#### Gateway API requires a mindset shift
 Coming from traditional Ingress and load balancer models, it takes time to adjust to the Gateway API way of modeling traffic. Concepts like Gateways, HTTPRoutes, and namespace-level delegation are not complex, but they are different. Once the model clicks, things start to make a lot more sense.
 
-#### The community Helped a Lot
+#### The community helped a lot
 During adoption, we had many questions around both design and implementation. Our experience with the kgateway community was extremely positive—responses were clear and fast, helping us move forward without getting stuck.
 
-#### North–south traffic Still Requires Careful Tuning
+#### North–south traffic still requires careful tuning
 Even though kgateway abstracts much of the complexity, timeouts and keep-alives still need to be aligned across ALBs, NLBs, Envoy, and backends. When these settings are misaligned, hard-to-debug issues can appear unless strong telemetry is in place.
 
-#### Without Telemetry, This Would Be Impossible to Operate
+#### Without telemetry, this would be impossible to operate
 Having metrics and logs from day one was critical. On multiple occasions, Envoy telemetry was what allowed us to pinpoint whether an issue lived in the gateway, the backend, or outside the cluster.
 
-#### External Auth is Flexible—but Not Trivial
+#### External auth is flexible, but not trivial
 Moving authorization outside the gateway was the right decision, but it requires careful design around latency, timeouts, and resilience. Authorization remains part of the critical request path, and it must be treated as such.
 
 Overall, kgateway solved many structural problems for us, but like any core platform component, it works best when operated with clear practices and good operational discipline. These lessons are now baked into how we design and run the traffic layer at Xepelin.
 
-### Wrapping Up
-We are very happy with all the features we explored with kgateway, including built-in external authorization, native OpenTelemetry integration, and high-performance routing. We’re also testing the Waypoint proxy integration with Istio ambient mesh in a proof-of-concept phase, and so far it has helped us validate our future service mesh architecture. 
+### Wrapping up
+We are very happy with all the features we explored with kgateway, including built-in external authorization, native OpenTelemetry integration, and high-performance routing. We’re also testing the waypoint proxy integration with Istio ambient mesh in a proof-of-concept phase, and so far it has helped us validate our future service mesh architecture. 
 
 We look forward to continuing to work with the kgateway community and exploring the AI gateway capabilities that kgateway is bringing into this space. If you are looking for an alternative for Ingress NGINX, we highly recommend you check out kgateway and reach out to the [community](https://kgateway.dev/slack/) for questions.
