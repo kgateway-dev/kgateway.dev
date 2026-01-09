@@ -1,9 +1,5 @@
 Limit the number of requests that are allowed to enter the cluster before global {{< version include-if="2.2.x,2.1.x" >}}{{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}rate limiting{{< /version >}} and external auth policies are applied.  
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About {#about}
 
 Local {{< version include-if="2.2.x,2.1.x" >}}{{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}rate limiting{{< /version >}} is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
@@ -27,12 +23,12 @@ When a token is available in the token bucket it can be assigned to an incoming 
 
 ### Local rate limiting
 
-In {{< reuse "docs/snippets/kgateway.md" >}}, you use a [{{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}}]({{< link-hextra path="/about/policies/trafficpolicy/" >}}) to set up local rate limiting for your routes. You can choose between the following attachment options: 
-* **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}} to the route you want to rate limit. For an example, see [Route configuration](#route). 
+In {{< reuse "docs/snippets/kgateway.md" >}}, you use a [{{< reuse "docs/snippets/trafficpolicy.md" >}}]({{< link-hextra path="/about/policies/trafficpolicy/" >}}) to set up local rate limiting for your routes. You can choose between the following attachment options: 
+* **A particular route in an HTTPRoute resource**: Use the `extensionRef` filter in the HTTPRoute to attach the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the route you want to rate limit. For an example, see [Route configuration](#route). 
 * **All routes in an HTTPRoute**: Use the `targetRefs` section in the {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}} to attach the policy to a particular HTTPRoute resource. 
 * **All routes that the Gateway serves**: Use the `targetRefs` section in the {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicy{{< /version >}} to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a{{< version include-if="2.2.x,2.1.x" >}} {{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}} TrafficPolicy{{< /version >}} to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [Multiple `targetRefs` {{< version include-if="2.2.x,2.1.x" >}}{{< reuse "docs/snippets/trafficpolicy.md" >}}{{< /version >}}{{< version exclude-if="2.2.x,2.1.x" >}}TrafficPolicies{{< /version >}}]({{< link-hextra path="/about/policies/trafficpolicy/#multiple-targetrefs-TrafficPolicies" >}}). 
+Note that if you apply a policy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [{{< reuse "docs/snippets/trafficpolicy.md" >}}]({{< link-hextra path="/about/policies/trafficpolicy/#multiple-targetrefs-TrafficPolicies" >}}). 
 
 ## Before you begin
 
