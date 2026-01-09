@@ -453,4 +453,6 @@ kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/h
 kubectl delete gatewayextension global-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete namespace kgateway-test-extensions
+kgateway-test-extensions
 ```
+

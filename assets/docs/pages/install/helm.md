@@ -9,7 +9,10 @@ As part of the control plane installation, you enable the {{< reuse "/docs/snipp
 {{% /conditional-text %}}
 ## Before you begin
 
-{{< reuse "docs/snippets/envoy/prereq.md" >}}
+1. Create or use an existing Kubernetes cluster. 
+2. Install the following command-line tools.
+   * [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use.
+   * [`helm`](https://helm.sh/docs/intro/install/), the Kubernetes package manager.
 
 ## Install
 
@@ -31,12 +34,11 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
    {{< /tabs >}}
    Example output: 
    ```console
-   customresourcedefinition.apiextensions.k8s.io/backendtlspolicies.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
 
 2. Apply the {{< reuse "/docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
