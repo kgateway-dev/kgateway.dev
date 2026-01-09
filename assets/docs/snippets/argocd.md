@@ -6,11 +6,12 @@
    
    Example output: 
    ```console
+   customresourcedefinition.apiextensions.k8s.io/backendtlspolicies.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gatewayclasses.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/gateways.gateway.networking.k8s.io created
+   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/httproutes.gateway.networking.k8s.io created
    customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io created
-   customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
    
    {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
@@ -23,7 +24,7 @@
 
 3. Open the [Argo CD UI](https://localhost:9999/).
 
-4. Log in with the `admin` username and `solo.io` password.
+4. Log in with the `admin` username and `gateway` password.
    
    {{< reuse-image src="img/argocd-welcome.png" >}}
    {{< reuse-image-dark srcDark="img/argocd-welcome.png" >}}

@@ -89,7 +89,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
 
 2. Open the [Argo CD UI](https://localhost:9999/applications).
 
-3. Log in with the `admin` username and `solo.io` password.
+3. Log in with the `admin` username and `gateway` password.
 4. Find the application that you want to delete and click **x**. 
 5. Select **Foreground** and click **Ok**. 
 6. Verify that the pods were removed from the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
@@ -100,6 +100,16 @@ For ArgoCD installations, use the following steps to clean up your environment.
    Example output: 
    ```txt
    No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
+   ```
+
+6. Remove the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
+   ```sh
+   kubectl delete namespace {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+7. Remove the `argocd` namespace. 
+   ```sh
+   kubectl delete namespace argocd
    ```
 
 {{% /tab %}}
@@ -147,6 +157,17 @@ For ArgoCD installations, use the following steps to clean up your environment.
    ```txt  
    No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
+
+6. Remove the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
+   ```sh
+   kubectl delete namespace {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+7. Remove the `argocd` namespace. 
+   ```sh
+   kubectl delete namespace argocd
+   ```
+
 {{% /tab %}}
 {{< /tabs >}}
 
