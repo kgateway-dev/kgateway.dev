@@ -1,7 +1,7 @@
 ---
 title: How Xepelin Runs Kubernetes Gateway API in Production with kgateway
 toc: false
-publishDate: 2026-01-08T00:00:00-00:00
+publishDate: 2026-01-09T00:00:00-00:00
 author: Javier Orellana, DevOps / Platform Engineer, Xepelin
 excludeSearch: true
 ---
