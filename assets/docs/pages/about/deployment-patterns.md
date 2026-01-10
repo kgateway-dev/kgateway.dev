@@ -4,7 +4,7 @@ The flexibility of {{< reuse "/docs/snippets/kgateway.md" >}} allows you to depl
 
 ## API Gateway and ingress controller
 
-Use {{< reuse "docs/snippets/kgateway.md" >}}'s Envoy gateway proxy as a fast and flexible Kubernetes-native ingress controller and next-generation API gateway to aggregate and provide uniform access to your APIs. 
+Use the gateway proxy as a fast and flexible Kubernetes-native ingress controller and next-generation API gateway to aggregate and provide uniform access to your APIs. 
 
 ### Simple ingress
 

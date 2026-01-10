@@ -337,16 +337,6 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
    ```
 
 
-## More resources
-
-For more examples of attaching policies to different resources, review each policy's docs.
-
-{{< cards >}}
-  {{< card link="../../policies/backendconfigpolicy/#policy-attachment-backendconfigpolicy" title="BackendConfigPolicy" >}}
-  {{< card link="../../policies/httplistenerpolicy/#policy-attachment-listeneroption" title="HTTPListenerPolicy" >}}
-  {{< card link="../../policies/trafficpolicy/#policy-attachment-trafficpolicy" title="TrafficPolicy" >}}
-{{< /cards >}}
-
 ## Cleanup {#cleanup}
 
 {{< reuse "docs/snippets/cleanup.md" >}}

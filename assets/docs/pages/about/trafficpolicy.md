@@ -1,4 +1,4 @@
-Use a {{< gloss "TrafficPolicy" >}}TrafficPolicy{{< /gloss >}} resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
+Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
 
 ## Policy attachment {#policy-attachment-TrafficPolicy}
 
@@ -192,7 +192,7 @@ EOF
 
 Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
 
-To attach a {{< gloss "TrafficPolicy" >}}TrafficPolicy{{< /gloss >}} to a Gateway, you simply use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to reference the Gateway you want the policy to apply to as shown in the following example. 
+To attach a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway, you simply use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to reference the Gateway you want the policy to apply to as shown in the following example. 
 
 ```yaml
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -271,15 +271,15 @@ spec:
 
 ## Policy priority and merging rules
 
-If you apply multiple {{< gloss "TrafficPolicy" >}}TrafficPolicies{{< /gloss >}} by using different attachment options, policies are merged based on specificy and priority. 
+If you apply multiple {{< reuse "docs/snippets/trafficpolicies.md" >}} by using different attachment options, policies are merged based on specificy and priority. 
 
-By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging](/docs/about/policies/merging/).
+By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
 
 * If you apply multiple {{< reuse "docs/snippets/trafficpolicies.md" >}} that define the same top-level policy, the policies are not merged and only the oldest policy is enforced. Policies with a later timestamp are ignored. 
 * {{< reuse "docs/snippets/trafficpolicies.md" >}} that define different top-level policies are merged and are enforced in combination. 
 * In addition to the timestamp, the attachment option of a policy determines the policy priority. In general, more specific policy targets have higher priority and take precedence over less specific policies. For example, a policy targeting an individual route has higher priority than a policy targeting all the routes in an HTTPRoute resource. However, keep in mind that these rules might be different in a route delegation setup. For more information, see [Policy inheritance and overrides in delegation setups](#delegation). 
 * Lower priority policies can augment higher priority policies by defining other top-level policies. For example, if you already attached a local rate limiting policy to a Gateway listener by using the `targetRefs.sectionName` option, you can add another {{< reuse "docs/snippets/trafficpolicy.md" >}} that defines a transformation policy and apply that policy to the entire Gateway. 
-* Native Kubernetes Gateway API policies have higher priority than any kgateway policies that must be attached via the `targetRefs` or `extensionRef` option.
+* Native Kubernetes Gateway API policies have higher priority than any kgateway-native policies that must be attached via the `targetRefs` or `extensionRef` option.
 
 ### Priority order
 
@@ -289,8 +289,8 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 
 | Priority | Attachment option | Description | 
 | -- | -- | -- | 
-| 1 | [Gateway listener policy](#attach-to-listener) | A {{< reuse "docs/snippets/trafficpolicy.md" >}} references a Gateway listener by using the `targetRefs.sectionName` field has the highest priority. Note that if you have multiple Gateway listener policies that define the same top-level policy, only the one with the oldest timestamp is applied. |
-| 2 | [Gateway policy](#attach-to-gateway) | A {{< reuse "docs/snippets/trafficpolicy.md" >}} references a Gateway in the `targetRefs` section has the lowest priority. This policy can still augment any higher priority policies by defining different top-level policies. Note that if you have multiple Gateway policies that all define the same top-level policy, only the one with the oldest timestamp is applied. |
+| 1 | [Gateway listener policy](#attach-to-listener) | A {{< reuse "docs/snippets/trafficpolicy.md" >}} that references a Gateway listener by using the `targetRefs.sectionName` field has the highest priority. Note that if you have multiple Gateway listener policies that define the same top-level policy, only the one with the oldest timestamp is applied. |
+| 2 | [Gateway policy](#attach-to-gateway) | A {{< reuse "docs/snippets/trafficpolicy.md" >}} that references a Gateway in the `targetRefs` section has the lowest priority. This policy can still augment any higher priority policies by defining different top-level policies. Note that if you have multiple Gateway policies that all define the same top-level policy, only the one with the oldest timestamp is applied. |
 
 **HTTPRoute**: 
 
@@ -312,11 +312,11 @@ The way policies are inherited along the route delegation chain depends on the t
 
 {{< reuse "docs/snippets/policy-inheritance-native.md" >}}
 
-For an example, see the policy inheritance guide for [Native Gateway API policies](/docs/traffic-management/route-delegation/inheritance/native-policies/). 
+For an example, see the policy inheritance guide for [Native Gateway API policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/native-policies/" >}}). 
 
-#### kgateway policies
+#### Kgateway policies
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-For an example, see the policy inheritance guide for [kgateway policies](/docs/traffic-management/route-delegation/inheritance/kgateway-policies/). 
+For an example, see the policy inheritance guide for [kgateway policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/kgateway-policies/" >}}). 
 
