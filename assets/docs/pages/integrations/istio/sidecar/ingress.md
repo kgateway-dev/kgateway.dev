@@ -109,7 +109,7 @@ Create a GatewayParameters resource to configure the revisioned istiod service a
          image:
            registry: cr.kgateway.dev/kgateway-dev
            repository: sds
-           tag: v2.1.0-main
+           tag: v{{< reuse "docs/versions/n-patch.md" >}} 
    EOF
    ```  
 {{% /tab %}}
@@ -128,7 +128,7 @@ spec:
       image:
         registry: cr.kgateway.dev/kgateway-dev
         repository: sds
-        tag: v2.1.0-main
+        tag: v{{< reuse "docs/versions/n-patch.md" >}} 
 EOF
 ```
 {{% /tab %}}
