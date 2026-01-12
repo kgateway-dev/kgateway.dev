@@ -196,13 +196,37 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
    
    ```txt
    HTTP/1.1 200 OK
-   server: envoy
-   date: Wed, 17 Jan 2024 17:32:21 GMT
-   content-type: application/json
-   content-length: 211
-   access-control-allow-origin: *
    access-control-allow-credentials: true
-   x-envoy-upstream-service-time: 2
+   access-control-allow-origin: *
+   content-type: application/json; encoding=utf-8
+   date: Thu, 13 Feb 2025 18:49:32 GMT
+   content-length: 330
+   x-envoy-upstream-service-time: 4
+   server: envoy
+   ```
+   ```json
+   {
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Host": [
+         "www.example.com"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ],
+       "X-Envoy-Expected-Rq-Timeout-Ms": [
+         "15000"
+       ],
+       "X-Forwarded-Proto": [
+         "http"
+       ],
+       "X-Request-Id": [
+         "26be0bcd-d941-48f4-ac3b-d5ac288ac46f"
+       ]
+     }
+   }
    ```
 {{% /tab %}}
 {{% tab tabName="Port-forward for local testing"%}}
