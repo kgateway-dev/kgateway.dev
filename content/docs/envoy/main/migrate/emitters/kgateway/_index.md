@@ -253,7 +253,7 @@ Currently supported:
 - Regex-mode is implemented by converting HTTPRoute path matches to `RegularExpression`. Some ingress-nginx details (such as case-insensitive `~*` behavior)
   may not be reproduced exactly depending on the underlying Gateway API/Envoy behavior and the patterns provided.
 
-## Supported but not tranlated Annotations
+## Supported but not translated Annotations
 
 The following annotations have equivalents in kgateway but are not (as of yet) translated by this tool.
 
