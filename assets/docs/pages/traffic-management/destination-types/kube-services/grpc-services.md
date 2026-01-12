@@ -12,8 +12,8 @@ The GRPCRoute approach is more readable, less error-prone, and aligns with the G
 
 ## Before you begin
 
-1. [Install {{< reuse "/docs/snippets/kgateway.md" >}}](/docs/quickstart/).
-2. [Install `grpcurl` for testing](https://github.com/fullstorydev/grpcurl).
+1. [Install {{< reuse "/docs/snippets/kgateway.md" >}}](/docs/quickstart/) in a cluster.
+2. [Install `grpcurl` ](https://github.com/fullstorydev/grpcurl) for testing on your computer.
 
 ## Deploy a sample gRPC service {#sample-grpc}
 
@@ -108,6 +108,11 @@ Steps to set up the sample gRPC service:
      - group: ""
        kind: Service
    EOF
+   ```
+
+   Example output:
+   ```txt
+   referencegrant.gateway.networking.k8s.io/allow-grpc-route-to-echo created
    ```
 
 ## Set up the Gateway for gRPC routes {#gateway}

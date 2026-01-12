@@ -36,11 +36,23 @@
    agentgateway-proxy   1/1     1            1           6m11s
    ```
 
-3. Get the external address of the agentgateway proxy and save it in an environment variable.
+3. Verify that the external IP has been created and is not `pending`.
+
+   ```sh
+   kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy
+   ```
+
+   Example output:
+   ```txt
+   NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+   agentgateway-proxy   LoadBalancer   172.20.200.127   <pending>     80:30752/TCP   7m6s
+   ```
+
+4. Get the external address of the agentgateway proxy and save it in an environment variable.
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgatewa-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
