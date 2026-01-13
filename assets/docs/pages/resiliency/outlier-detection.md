@@ -62,7 +62,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
 
 4. Review the logs for both replicas. Verify that you see log entries for the 5 requests spread across both replicas. For example, one replica might have 2 log entries and the other one 3. 
    ```sh
-   kubectl logs <httpbin-replica> -n httpbin -f
+   kubectl logs -l app=httpbin -n httpbin -f --prefix
    ``` 
    
    Example output for one request: 
