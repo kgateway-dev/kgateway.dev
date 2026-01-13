@@ -24,7 +24,7 @@ Deploy a sample gRPC service for testing purposes. The sample service has two AP
 
 Steps to set up the sample gRPC service:
 
-1. Deploy the gRPC echo server and client.
+1. Deploy the gRPC echo server.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -32,6 +32,9 @@ Steps to set up the sample gRPC service:
    kind: Deployment
    metadata:
      name: grpc-echo
+     namespace: default
+     labels:
+       app: grpc-echo
    spec:
      selector:
        matchLabels:
@@ -66,6 +69,9 @@ Steps to set up the sample gRPC service:
    kind: Service
    metadata:
      name: grpc-echo-svc
+     namespace: default
+     labels:
+       app: grpc-echo
    spec:
      type: ClusterIP
      ports:
@@ -75,18 +81,6 @@ Steps to set up the sample gRPC service:
          appProtocol: kubernetes.io/h2c
      selector:
        app: grpc-echo
-   ---
-   apiVersion: v1
-   kind: Pod
-   metadata:
-     name: grpcurl-client
-   spec:
-     containers:
-       - name: grpcurl
-         image: docker.io/fullstorydev/grpcurl:v1.8.7-alpine
-         command:
-           - sleep
-           - "infinity"
    EOF
    ```
 
@@ -99,6 +93,8 @@ Steps to set up the sample gRPC service:
    metadata:
      name: allow-grpc-route-to-echo
      namespace: default
+     labels:
+       app: grpc-echo
    spec:
      from:
      - group: gateway.networking.k8s.io
@@ -131,6 +127,9 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
      -n {{< reuse "docs/snippets/namespace.md" >}} \
      --key grpc.example.com.key \
      --cert grpc.example.com.crt
+  
+   kubectl label secret grpc-example-com-cert app=grpc-echo \
+     -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 2. Create a Gateway resource with an HTTPS listener.
@@ -356,7 +355,7 @@ Explore the traffic management, resiliency, and security policies that you can a
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```bash
-kubectl delete -A gateways,grpcroutes,pod,svc,secrets -l app=grpc-echo
-kubectl delete referencegrant allow-grpc-route-to-echo -n default
+kubectl delete --all-namespaces \
+  deployments,gateways,grpcroutes,referencegrants,services,secrets \
+  --selector app=grpc-echo
 ```
-
