@@ -4,8 +4,6 @@ Learn more about the components that make up the {{< reuse "/docs/snippets/kgate
 
 The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} and {{< gloss "Data Plane" >}}data plane{{< /gloss >}}. These components work together to translate gateway custom resources into gateway {{< gloss "Proxy" >}}proxy{{< /gloss >}} configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps. 
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the Envoy-based {{< reuse "docs/snippets/kgateway.md" >}} proxy and the {{< reuse "docs/snippets/agentgateway.md" >}} proxy. {{< reuse "docs/snippets/control-plane-note.md" >}}
-
 {{% conditional-text include-if="envoy" %}}
 
 {{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
