@@ -23,7 +23,7 @@ Note that only streamable HTTP is currently supported for label selectors. If yo
 
 ## Before you begin
 
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+{{% reuse "docs/snippets/agentgateway-prereq.md" %}}
 
 ## Step 1: Deploy MCP servers {#mcp-server-everythings}
 
@@ -167,7 +167,7 @@ Route to the federated MCP servers with agentgateway.
    metadata:
      name: agentgateway
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/agw-gatewayclass.md" >}}
+     gatewayClassName: {{% reuse "/docs/snippets/agw-gatewayclass.md" %}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -321,7 +321,7 @@ Use the [MCP Inspector tool](https://modelcontextprotocol.io/legacy/tools/inspec
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{% reuse "docs/snippets/cleanup.md" %}}
 
 ```sh
 kubectl delete Deployment mcp-server-everything mcp-website-fetcher

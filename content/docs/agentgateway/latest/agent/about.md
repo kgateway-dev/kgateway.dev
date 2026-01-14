@@ -4,4 +4,4 @@ weight: 10
 description:
 ---
 
-{{< reuse "docs/pages/agentgateway/agent/about.md" >}}
+{{% reuse "docs/pages/agentgateway/agent/about.md" %}}
