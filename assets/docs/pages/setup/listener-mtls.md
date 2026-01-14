@@ -15,7 +15,7 @@ In addition, you can choose between the following validation modes:
 
 ## About this guide
 
-In this guide, you learn how to apply default certificate validation configuration for all HTTPS listeners on a Gateway and how to override this configuration for a specific port. You further explore different validation modes to allow secure and insecure connections to the gateway. 
+In this guide, you learn how to apply default certificate validation configuration for all HTTPS listeners on a Gateway and how to override this configuration for a specific port. You further explore secure and insecure certificate validation modes, and use TLS annotations to limit connections to clients that present certificates with a specific Subject Alt Name and certificate hash. 
 
 Throughout this guide, you use self-signed TLS certificates for the Certificate Authority. These certificates are used to sign the TLS certificates for the gateway proxy (server) and httpbin client. 
 
