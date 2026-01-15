@@ -29,7 +29,7 @@ Self-signed certificates are used for demonstration purposes. Do not use self-si
 
 5. Install the experimental channel of the Kubernetes Gateway API. This API is required to use the FrontendTLS configuration on a Gateway.   
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
 
@@ -110,6 +110,9 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      -extensions v3_req -extfile <(echo "[v3_req]"; echo "subjectAltName=DNS:example.com,DNS:*.example.com")
    ```
 
+7. Continue with configuring a [Default configuration for all listeners](#default). Alternatively, you can explore how to [override the default configuration for a specific port](#perport). 
+
+
 ## Default configuration for all listeners {#default}
 
 1. Create a Gateway with a default frontend TLS configuration that applies to all listeners that handle HTTPS traffic. The following example configures two HTTPS listeners on the Gateway. Both listeners use the same server TLS credentials to terminate incoming HTTPS connections. The validation mode is set to `AllowValidOnly` to allow connection only if a valid certificate is presented during the TLS handshake. 
@@ -167,7 +170,6 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      namespace: httpbin
      labels:
        example: httpbin-route
-       gateway: https
    spec:
      hostnames:
      - "example.com"
@@ -196,7 +198,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Send a request to the httpbin app without a client certificate. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
+6. Send a request to the httpbin app without a client certificate on both 8443 and 8444 ports. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
    {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
    {{% tab tabName="LoadBalancer IP address" %}}
    ```sh
@@ -342,7 +344,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
 In this example, you override the default certificate validation configuration for port 8444. 
 
 1. Update your Gateway to add in port-specific validation configuration for port 8444. In the following example, you override the default certificate validation for port 8444. This configuration allows requests, even if an invalid certificate was presented during the TLS handshake. Port 8443 continues to only allow connections if a valid certificate is presented. 
-   ```yaml
+   ```yaml {hl_lines=[18,19,20,21,22,23,24,25,26]}
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: Gateway
@@ -673,7 +675,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    EOF
    ```
 
-5. Repeat the request to the httpbin app with your client certificate. Verify that the request now succeeds.
+5. Repeat the request to the httpbin app with your client certificate. Verify that the request now fails.
    {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
    {{% tab tabName="LoadBalancer IP address" %}}
    ```sh
