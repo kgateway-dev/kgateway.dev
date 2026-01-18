@@ -1,6 +1,6 @@
 ---
-title: Secure access to MCP servers
-weight: 50
+title: JWT auth for services
+weight: 55
 ---
 
 {{< reuse "docs/pages/agentgateway/mcp/mcp-access.md" >}}
