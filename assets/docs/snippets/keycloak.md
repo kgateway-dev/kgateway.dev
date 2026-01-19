@@ -100,7 +100,7 @@ Install and configure Keycloak:
 
 10. In the Keycloak admin console, go to **Clients**, and verify that you can see a client ID that equals the output of `$KEYCLOAK_CLIENT`. 
 
-## Retrieve JWKS path and issue URL {#configure}
+## Retrieve JWKS path and issuer URL {#configure}
 
 You might integrate OIDC with your apps. In such cases, you might need particular details from the OIDC provider to fully set up your apps. To use Keycloak for OAuth protection of these apps, you need certain settings and information from Keycloak.
 

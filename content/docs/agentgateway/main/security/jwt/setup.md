@@ -202,9 +202,9 @@ traffic:
 
 By default, the JWT validation mode is set to `Strict` and allows connections to a backend destination only if a valid JWT was provided as part of the request. 
 
-To allow requests, even if no JWT was provided or if the JWT cannot be validated, use the `Permissive` or `Optional` mode. 
+To allow requests, even if no JWT was provided or if the JWT cannot be validated, use the `Permissive` or `Optional` modes. 
 
-**Optional**:
+**Optional**
 
 The JWT is optional. If a JWT is provided during the request, the agentgateway proxy validates it. In the case that the JWT validation fails, the request is denied. However, keep in mind that if no JWT is provided during the request, the request is explicitly allowed. 
 

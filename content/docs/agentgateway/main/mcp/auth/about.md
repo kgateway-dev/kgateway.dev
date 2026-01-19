@@ -9,11 +9,11 @@ To secure your MCP server, you configure it with an authorization server. Typica
 
 For MCP clients, such as the MCP inspector tool, Visual Studio Code, or Claude Code to successfully authenticate with the authorization server and obtain the tokens to access the MCP server, the authorization server must comply to the [MCP OAuth 2.0 specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization).
 
-The MCP OAuth specification extends the standard OAuth 2.0 Authorization Code Flow with MCP-specific resource metadata and discovery endpoints so that clients can dynamically register with the authorization server, obtain their client ID, and pursue with the OAuth flow to receive the access token. The MCP client then uses this token gain access to the tools that are exposed on the MCP server. 
+The MCP OAuth specification extends the standard OAuth 2.0 Authorization Code Flow with MCP-specific resource metadata and discovery endpoints so that clients can dynamically register with the authorization server, obtain their client ID, and continue with the OAuth flow to receive the access token. The MCP client then uses this token to gain access to the tools that are exposed on the MCP server. 
 
 ### Challenges
 
-Most IdP providers do not comply to the MCP OAuth specification and therefore do not expose the resource and authorization server metadata in a format that an MCP client can understand. Because of that, clients cannot dynamically register with the IdP to obtain their client ID. Instead, they must manually register with each IdP that they want to use. In cases where MCP clients, IdPs, and MCP servers are not in the same environment or are owned by different teams and organizations, pre-registration of clients can become unfeasible. 
+Most IdPs do not comply to the MCP OAuth specification and therefore do not expose the resource and authorization server metadata in a format that an MCP client can understand. Because of that, clients cannot dynamically register with the IdP to obtain their client ID. Instead, they must manually register with each IdP that they want to use. In cases where MCP clients, IdPs, and MCP servers are not in the same environment or are owned by different teams and organizations, pre-registration of clients can become unfeasible. 
 
 ### Agentgateway to fill in the gaps
 

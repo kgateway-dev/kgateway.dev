@@ -87,7 +87,7 @@ With Keycloak deployed and your MCP backend configured, you can now create an {{
    | `resourceMetadata.scopesSupported` | The scopes that the client can request for accessing the MCP server. | 
    | `resourceMetadat.bearerMethodsSupported` | Methods to provide the bearer token when authenticating with the server. In this example, the bearer token can be provided as a header, query parameter, or as part of the body. |
 
-2. Verify the policy was accepted.
+2. Verify that the policy was accepted.
    ```sh
    kubectl get {{< reuse "docs/snippets/trafficpolicy.md" >}} mcp-echo-authn -o yaml
    ```
@@ -173,7 +173,7 @@ With Keycloak deployed and your MCP backend configured, you can now create an {{
    1. In the **OAuth Flow Progress** card, click **Continue** to start the **Metadata Discovery** phase. Verify that the step succeeds and that you see the authorization server metadata. The metadata include information about the location of the authorization server, supported scopes, and ways to provide the bearer token. 
       {{< reuse-image src="img/oauth-resource-metadata.png" >}}
       {{< reuse-image-dark srcDark="img/oauth-resource-metadata-dark.png" >}}
-   2. Click **Continue** to start the **Client registration** phase. Verify that the MCP inspector tool successfully registered as a client in Keycloak and to assigned a client ID. 
+   2. Click **Continue** to start the **Client registration** phase. Verify that the MCP inspector tool successfully registered as a client in Keycloak and is assigned a client ID. 
       {{< reuse-image src="img/oauth-client-registration.png" >}}
       {{< reuse-image-dark srcDark="img/oauth-client-registration-dark.png" >}}
    3. Click **Continue** to start the **Preparing Authorization** phase. Verify that you get back a URL to log in to Keycloak with your credentials. Open the link in your browser and log in with the user `user1` and password `password`. 
@@ -193,7 +193,7 @@ With Keycloak deployed and your MCP backend configured, you can now create an {{
       3. In the **Custom Headers** card, click **Add**. 
       4. Add the following values: 
          * header name: `Authorization`
-         * header value: `Bearer <value of access_token>
+         * header value: `Bearer <value of access_token>`
       5. Click **Connect** to connect to your MCP server. 
       {{< reuse-image src="img/oauth-connect-to-server.png" >}}
       {{< reuse-image-dark srcDark="img/oauth-connect-to-server-dark.png" >}}

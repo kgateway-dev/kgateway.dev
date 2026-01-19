@@ -19,7 +19,7 @@ This guide walks you through how to set up CEL-based transformations for the Ope
 {{< reuse "docs/snippets/agw-prereq-llm.md" >}}
 
 {{< callout type="info" >}}
-Note that this guide assumes that you want to apply external auth to the OpenAI LLM provider. You can use other LLM providers or apply external auth to an MCP server or agent. Make sure to adjust these steps to apply to your {{< reuse "docs/snippets/backend.md" >}} type.
+Note that this guide assumes that you want to apply the policy to the OpenAI LLM provider. You can use other LLM providers or apply external auth to an MCP server or agent. Make sure to adjust these steps to apply to your {{< reuse "docs/snippets/backend.md" >}} type.
 {{< /callout >}}
 
 ## Set up transformations
