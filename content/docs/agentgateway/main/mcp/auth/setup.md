@@ -14,6 +14,10 @@ In this guide, you explore how to configure the agentgateway proxy to protect a 
 1. Set up an [agentgateway proxy]({{< link-hextra path="/setup/" >}}).
 2. Follow the steps to set up an [MCP server with a fetch tool]({{< link-hextra path="/mcp/static-mcp/" >}}).
 3. Follow the steps to [set up Keycloak]({{< link-hextra path="/mcp/auth/keycloak/" >}}). 
+4. Install the experimental channel Gateway API. 
+   ```sh
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```  
 
 ## Configure MCP auth
 
