@@ -14,10 +14,13 @@ Set up an agentgateway proxy.
 
 {{< reuse "docs/snippets/agentgateway-setup.md" >}}
 
+
 ## Next
 
 Explore how you can use {{< reuse "docs/snippets/agentgateway.md" >}} by checking out guides for the most common use cases: 
-* [LLM consumption]({{< link-hextra path="/agentgateway/llm" >}}) 
-* [Inference routing]({{< link-hextra path="/agentgateway/inference" >}}) 
-* [MCP connectivity]({{< link-hextra path="/agentgateway/mcp" >}}) 
-* [Agent connectivity]({{< link-hextra path="/agentgateway/agent" >}}) 
+* [LLM consumption]({{< link-hextra path="/llm" >}}) 
+* [Inference routing]({{< link-hextra path="/inference" >}}) 
+* [MCP connectivity]({{< link-hextra path="/mcp" >}}) 
+* [Agent connectivity]({{< link-hextra path="/agent" >}}) 
+
+You can also install the [httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}) and use this app to test traffic management, security, and resiliency guides with your agentgateway proxy. 
