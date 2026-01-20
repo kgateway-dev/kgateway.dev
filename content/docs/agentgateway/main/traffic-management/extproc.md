@@ -61,7 +61,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
          containers:
            - name: ext-proc-grpc
              # Source code for this image is in test/e2e/features/agentgateway/extproc/example
-             image: ghcr.io/kgateway-dev/extproc-server:0.0.1
+             image: gcr.io/solo-test-236622/ext-proc-example-basic-sink:0.0.2
              imagePullPolicy: IfNotPresent
              ports:
                - containerPort: 18080
