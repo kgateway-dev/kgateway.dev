@@ -1,6 +1,6 @@
 ---
 title: Tracing
-weight:
+weight: 90
 ---
 
 Integrate your agentgateway proxy with an OpenTelemetry (OTEL) collector and configure custom metadata for your traces with an {{< reuse "docs/snippets/trafficpolicy.md" >}}.
@@ -73,7 +73,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    spec:
      targetRefs:
        - kind: Gateway
-         name: agentgatewy-proxy
+         name: agentgateway-proxy
          group: gateway.networking.k8s.io
      frontend:
        tracing:
@@ -118,12 +118,46 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Get the agentgateway proxy trace ID. 
+2. Get the trace ID from your request from the agentgateway proxy logs. 
    ```sh
    kubectl logs deploy/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 3. Get the logs of the collector and search for the trace ID. Verify that you see the additional tracing attributes that you configured initially.
    ```sh
-   kubectl logs deploy/opentelemetry-collector-traces -n telemetry
+   kubectl logs deploy/opentelemetry-collector-traces -n telemetry \
+   | grep -A 25 "Trace ID\s\+: <trace_id>"
+   ```
+
+   Example output: 
+   ```console {hl_lines=[27,28]}
+   Trace ID       : 2864d2f682a85ba0c44cb5122d2d11e5
+    Parent ID      : 
+    ID             : 947515b6316f7931
+    Name           : POST /*
+    Kind           : Server
+    Start time     : 2026-01-20 16:28:30.717325796 +0000 UTC
+    End time       : 2026-01-20 16:28:30.717960087 +0000 UTC
+    Status code    : Unset
+    Status message : 
+   Attributes:
+     -> gateway: Str(agentgateway-system/agentgateway-proxy)
+     -> listener: Str(http)
+     -> route: Str(httpbin/httpbin)
+     -> endpoint: Str(10.244.0.31:8080)
+     -> src.addr: Str(127.0.0.1:50314)
+     -> http.method: Str(POST)
+     -> http.host: Str(www.example.com)
+     -> http.path: Str(/post)
+     -> http.version: Str(HTTP/1.1)
+     -> http.status: Int(200)
+     -> trace.id: Str(2864d2f682a85ba0c44cb5122d2d11e5)
+     -> span.id: Str(947515b6316f7931)
+     -> protocol: Str(http)
+     -> duration: Str(0ms)
+     -> url.scheme: Str(http)
+     -> network.protocol.version: Str(1.1)
+     -> request: Str(custom-tracing)
+     -> host: Str(www.example.com)
+
    ```
