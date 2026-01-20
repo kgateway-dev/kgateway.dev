@@ -360,6 +360,7 @@ _Appears in:_
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
+| `istio` _[IstioSpec](#istiospec)_ | Configure Istio integration. If enabled, Agentgateway can natively connect to Istio enabled pods with mTLS. |  |  |
 
 
 #### AgentgatewayParametersLogging
@@ -431,6 +432,8 @@ _Appears in:_
 | `deployment` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deployment allows specifying overrides for the generated Deployment resource. |  |  |
 | `service` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | service allows specifying overrides for the generated Service resource. |  |  |
 | `serviceAccount` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccount allows specifying overrides for the generated ServiceAccount resource. |  |  |
+| `podDisruptionBudget` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | podDisruptionBudget allows creating a PodDisruptionBudget for the agentgateway proxy.<br />If absent, no PDB is created. If present, a PDB is created with its selector<br />automatically configured to target the agentgateway proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated PDB. |  |  |
+| `horizontalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | horizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for the agentgateway proxy.<br />If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef<br />automatically configured to target the agentgateway proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated HPA. |  |  |
 
 
 #### AgentgatewayParametersSpec
@@ -452,9 +455,12 @@ _Appears in:_
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. These override any existing<br />values. If you want to delete an environment variable entirely, use<br />`$patch: delete` with AgentgatewayParametersOverlays instead. Note that<br />[variable<br />expansion](https://kubernetes.io/docs/tasks/inject-data-application/define-interdependent-environment-variables/)<br />does apply, but is highly discouraged -- to set dependent environment<br />variables, you can use $(VAR_NAME), but it's highly<br />discouraged. `$$(VAR_NAME)` avoids expansion and results in a literal<br />`$(VAR_NAME)`. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
 | `shutdown` _[ShutdownSpec](#shutdownspec)_ | Shutdown delay configuration.  How graceful planned or unplanned data<br />plane changes happen is in tension with how quickly rollouts of the data<br />plane complete. How long a data plane pod must wait for shutdown to be<br />perfectly graceful depends on how you have configured your Gateways. |  |  |
+| `istio` _[IstioSpec](#istiospec)_ | Configure Istio integration. If enabled, Agentgateway can natively connect to Istio enabled pods with mTLS. |  |  |
 | `deployment` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deployment allows specifying overrides for the generated Deployment resource. |  |  |
 | `service` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | service allows specifying overrides for the generated Service resource. |  |  |
 | `serviceAccount` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccount allows specifying overrides for the generated ServiceAccount resource. |  |  |
+| `podDisruptionBudget` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | podDisruptionBudget allows creating a PodDisruptionBudget for the agentgateway proxy.<br />If absent, no PDB is created. If present, a PDB is created with its selector<br />automatically configured to target the agentgateway proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated PDB. |  |  |
+| `horizontalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | horizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for the agentgateway proxy.<br />If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef<br />automatically configured to target the agentgateway proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated HPA. |  |  |
 
 
 #### AgentgatewayParametersStatus
@@ -656,8 +662,15 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional |
-| `requestTimeout` _[Duration](#duration)_ | requestTimeout specifies the deadline for receiving a response from the backend. |  | Optional |
+| `version` _[HTTPVersion](#httpversion)_ | version specifies the HTTP protocol version to use when connecting to the backend. If not specified, the version is automatically determined: * Service types can specify it with 'appProtocol' on the Service port. * If traffic is identified as gRPC, HTTP2 is used. * If the incoming traffic was plaintext HTTP, the original protocol will be used. * If the incoming traffic was HTTPS, HTTP1 will be used. This is because most clients will transparently upgrade HTTPS traffic to HTTP2, even if the backend doesn't support it |  | Optional <br />Enum: [HTTP1;HTTP2
+	// +optional
+] |
+| `requestTimeout` _[Duration](#duration)_ | requestTimeout specifies the deadline for receiving a response from the backend. |  | Optional <br />Enum: [HTTP1;HTTP2
+	// +optional
+	Version *HTTPVersion `json:"version,omitempty"`
+
+	// requestTimeout specifies the deadline for receiving a response from the backend.
+	// +kubebuilder:validation:XValidation:rule="matches(self, '^([0-9] <br />XValidation |
 
 #### BackendMCP
 
@@ -706,8 +719,17 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `mtlsCertificateRef` _[LocalObjectReference](#localobjectreference)_ array | mtlsCertificateRef enables mutual TLS to the backend, using the specified key (tls.key) and cert (tls.crt) from the refenced Secret.  An optional 'ca.cert' field, if present, will be used to verify the server certificate if present. If caCertificateRefs is also specified, the caCertificateRefs field takes priority.  If unspecified, no client certificate will be used.  |  | Optional <br />MaxItems: 1 |
 | `caCertificateRefs` _[LocalObjectReference](#localobjectreference)_ array | caCertificateRefs defines the CA certificate ConfigMap to use to verify the server certificate. If unset, the system's trusted certificates are used.  |  | Optional <br />MaxItems: 1 |
-| `insecureSkipVerify` _[InsecureTLSMode](#insecuretlsmode)_ | insecureSkipVerify originates TLS but skips verification of the backend's certificate. WARNING: This is an insecure option that should only be used if the risks are understood.  There are two modes: * All disables all TLS verification * Hostname verifies the CA certificate is trusted, but ignores any mismatch of hostname/SANs. Note that this method is still insecure; prefer setting verifySubjectAltNames to customize the valid hostnames if possible.  |  | Optional |
-| `sni` _[SNI](#sni)_ | sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically set based on the destination hostname. |  | Optional |
+| `insecureSkipVerify` _[InsecureTLSMode](#insecuretlsmode)_ | insecureSkipVerify originates TLS but skips verification of the backend's certificate. WARNING: This is an insecure option that should only be used if the risks are understood.  There are two modes: * All disables all TLS verification * Hostname verifies the CA certificate is trusted, but ignores any mismatch of hostname/SANs. Note that this method is still insecure; prefer setting verifySubjectAltNames to customize the valid hostnames if possible.  |  | Optional <br />Enum: [All;Hostname
+	// +optional
+] |
+| `sni` _[SNI](#sni)_ | sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically set based on the destination hostname. |  | Optional <br />Enum: [All;Hostname
+	// +optional
+	InsecureSkipVerify *InsecureTLSMode `json:"insecureSkipVerify,omitempty"`
+
+	// sni specifies the Server Name Indicator (SNI) to be used in the TLS handshake. If unset, the SNI is automatically
+	// set based on the destination hostname.
+	// +optional
+] |
 | `verifySubjectAltNames` _[ShortString](#shortstring)_ array | verifySubjectAltNames specifies the Subject Alternative Names (SAN) to verify in the server certificate. If not present, the destination hostname is automatically used.  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
 | `alpnProtocols` _[[]TinyString](#[]tinystring)_ | alpnProtocols sets the Application Level Protocol Negotiation (ALPN) value to use in the TLS handshake.  If not present, defaults to ["h2", "http/1.1"].  |  | Optional <br />MinItems: 1 <br />MaxItems: 16 |
 
@@ -849,6 +871,31 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `additionalOrigins` _string array_ | additionalOrigin specifies additional source origins that will be allowed in addition to the destination origin. The<br />`Origin` consists of a scheme and a host, with an optional port, and takes the form `<scheme>://<host>(:<port>)`. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+
+
+#### CipherSuite
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [TLS13_AES_256_GCM_SHA384 TLS13_AES_128_GCM_SHA256 TLS13_CHACHA20_POLY1305_SHA256 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256]
+
+_Appears in:_
+- [FrontendTLS](#frontendtls)
+
+| Field | Description |
+| --- | --- |
+| `TLS13_AES_256_GCM_SHA384` | TLS 1.3 cipher suites<br /> |
+| `TLS13_AES_128_GCM_SHA256` |  |
+| `TLS13_CHACHA20_POLY1305_SHA256` |  |
+| `TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384` | TLS 1.2 cipher suites<br /> |
+| `TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256` |  |
+| `TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256` |  |
+| `TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384` |  |
+| `TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256` |  |
+| `TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256` |  |
 
 
 #### CustomResponse
@@ -1031,7 +1078,7 @@ _Appears in:_
 | `tls` _[FrontendTLS](#frontendtls)_ | tls defines settings on managing incoming TLS connections. |  |  |
 | `http` _[FrontendHTTP](#frontendhttp)_ | http defines settings on managing incoming HTTP requests. |  |  |
 | `accessLog` _[AccessLog](#accesslog)_ | AccessLoggingConfig contains access logging configuration |  |  |
-| `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for OpenTelemetry tracer.<br />TODO: not currently implemented |  |  |
+| `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for OpenTelemetry tracer. |  |  |
 
 
 #### FrontendHTTP
@@ -1088,6 +1135,9 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `handshakeTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | handshakeTimeout specifies the deadline for a TLS handshake to complete.<br />If unset, this defaults to 15s. |  |  |
 | `alpnProtocols` _string_ | alpnProtocols sets the Application Level Protocol Negotiation (ALPN) value to use in the TLS handshake.<br /><br />If not present, defaults to ["h2", "http/1.1"]. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `minProtocolVersion` _[TLSVersion](#tlsversion)_ | MinTLSVersion configures the minimum TLS version to support. |  | Enum: [1.2 1.3] <br /> |
+| `maxProtocolVersion` _[TLSVersion](#tlsversion)_ | MaxTLSVersion configures the maximum TLS version to support. |  | Enum: [1.2 1.3] <br /> |
+| `cipherSuites` _[CipherSuite](#ciphersuite) array_ | CipherSuites configures the list of cipher suites for a TLS listener.<br />The value is a comma-separated list of cipher suites, e.g "TLS13_AES_256_GCM_SHA384,TLS13_AES_128_GCM_SHA256".<br />Use in the TLS options field of a TLS listener. |  | Enum: [TLS13_AES_256_GCM_SHA384 TLS13_AES_128_GCM_SHA256 TLS13_CHACHA20_POLY1305_SHA256 TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384 TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256 TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256] <br /> |
 
 
 #### GeminiConfig
@@ -1246,6 +1296,24 @@ _Appears in:_
 | --- | --- |
 | `All` | InsecureTLSModeInsecure disables all TLS verification<br /> |
 | `Hostname` | InsecureTLSModeHostname enables verifying the CA certificate, but disables verification of the hostname/SAN.<br />Note this is still, generally, very "insecure" as the name suggests.<br /> |
+
+
+#### IstioSpec
+
+
+
+
+
+
+
+_Appears in:_
+- [AgentgatewayParametersConfigs](#agentgatewayparametersconfigs)
+- [AgentgatewayParametersSpec](#agentgatewayparametersspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `caAddress` _string_ | The address of the Istio CA. If unset, defaults to `https://istiod.istio-system.svc:15012`. |  |  |
+| `trustDomain` _string_ | The Istio trust domain. If not set, defaults to `cluster.local`. |  |  |
 
 
 #### JWKS
@@ -1838,6 +1906,23 @@ _Appears in:_
 | `jwksPath` _[string](#string)_ | Path to IdP jwks endpoint, relative to the root, commonly ".well-known/jwks.json". |  | Required <br />MinLength: 1 <br />MaxLength: 2000 |
 | `cacheDuration` _[Duration](#duration)_ |  | 5m | Required <br />Optional <br />MinLength: 1 <br />MaxLength: 2000 <br />XValidation |
 | `backendRef` _[BackendObjectReference](#backendobjectreference)_ | backendRef references the remote JWKS server to reach. Supported types are Service and (static) Backend. An AgentgatewayPolicy containing backend tls config can then be attached to the service/backend in order to set tls options for a connection to the remote jwks source. | 5m | Required <br />Optional <br />XValidation |
+#### ResourceAdd
+
+
+
+
+
+
+
+_Appears in:_
+- [Tracing](#tracing)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _string_ |  |  |  |
+| `expression` _[CELExpression](#celexpression)_ |  |  |  |
+
+
 #### Retry
 
 
@@ -1873,6 +1958,7 @@ _Appears in:_
 | `Responses` | RouteTypeResponses processes OpenAI /v1/responses format requests<br /> |
 | `AnthropicTokenCount` | RouteTypeAnthropicTokenCount processes Anthropic /v1/messages/count_tokens format requests<br /> |
 | `Embeddings` | RouteTypeEmbeddings processes OpenAI /v1/embeddings format requests<br /> |
+| `Realtime` | RouteTypeRealtime processes OpenAI /v1/realtime requests<br /> |
 
 
 #### SecretSelector
@@ -1944,6 +2030,24 @@ _Appears in:_
 | `port` _integer_ | port to connect to. |  | Maximum: 65535 <br />Minimum: 1 <br /> |
 
 
+#### TLSVersion
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [1.2 1.3]
+
+_Appears in:_
+- [FrontendTLS](#frontendtls)
+
+| Field | Description |
+| --- | --- |
+| `1.2` | agentgateway currently only supports TLS 1.2 and TLS 1.3<br /> |
+| `1.3` |  |
+
+
 #### Timeouts
 
 
@@ -1973,9 +2077,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the OTLP server to reach.<br />Supported types: Service and Backend. |  |  |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | backendRef references the OTLP server to reach.<br />Supported types: Service and AgentgatewayBackend. |  |  |
 | `protocol` _[TracingProtocol](#tracingprotocol)_ | protocol specifies the OTLP protocol variant to use. | HTTP | Enum: [HTTP GRPC] <br /> |
-| `attributes` _[LogTracingAttributes](#logtracingattributes)_ | attributes specifies customizations to the key-value pairs that are included in the trace |  |  |
+| `attributes` _[LogTracingAttributes](#logtracingattributes)_ | attributes specify customizations to the key-value pairs that are included in the trace. |  |  |
+| `resources` _[ResourceAdd](#resourceadd) array_ | resources describe the entity producing telemetry and specify the resources to be included in the trace. |  |  |
 | `randomSampling` _[CELExpression](#celexpression)_ | randomSampling is an expression to determine the amount of random sampling. Random sampling will initiate a new<br />trace span if the incoming request does not have a trace initiated already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, random sampling is disabled. |  |  |
 | `clientSampling` _[CELExpression](#celexpression)_ | clientSampling is an expression to determine the amount of client sampling. Client sampling determines whether to<br />initiate a new trace span if the incoming request does have a trace already. This should evaluate to a float between<br />0.0-1.0, or a boolean (true/false) If unspecified, client sampling is 100% enabled. |  |  |
 

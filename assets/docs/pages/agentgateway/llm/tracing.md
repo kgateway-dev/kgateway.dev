@@ -56,108 +56,6 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 
 ## Configure your proxy
 
-{{< version include-if="2.1.x" >}}
-
-1. Create a ConfigMap with your agentgateway tracing configuration. The following example collects additional information about the request to the LLM and adds this information to the trace. The trace is then sent to the collector that you set up earlier. To learn more about the fields that you can configure, see the [agentgateway docs](https://agentgateway.dev/docs/reference/cel/#context-reference).
-
-   For more tracing providers, see [Other tracing configurations](#other-tracing-configurations).
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: v1
-   kind: ConfigMap
-   metadata:
-     name: agent-gateway-config
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   data:
-     config.yaml: |-
-       config:
-         tracing:
-           otlpEndpoint: http://opentelemetry-collector-traces.telemetry.svc.cluster.local:4317
-           otlpProtocol: grpc
-           randomSampling: true
-           fields:
-             add:
-               gen_ai.operation.name: '"chat"'
-               gen_ai.system: "llm.provider"
-               gen_ai.request.model: "llm.requestModel"
-               gen_ai.response.model: "llm.responseModel"
-               gen_ai.usage.completion_tokens: "llm.outputTokens"
-               gen_ai.usage.prompt_tokens: "llm.inputTokens"
-   EOF
-   ```
-
-2. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that references the ConfigMap that you created. 
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-   metadata:
-     name: tracing
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     kube:
-       agentgateway:
-         customConfigMapName: agent-gateway-config
-   EOF
-   ```
-
-3. Create your {{< reuse "docs/snippets/agentgateway.md" >}} proxy. Make sure to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created so that your proxy starts with the custom tracing configuration.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: Gateway
-   metadata:
-     name: agentgateway-proxy
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     gatewayClassName: {{< reuse "docs/snippets/agw-gatewayclass.md" >}}
-     infrastructure:
-       parametersRef:
-         name: tracing
-         group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}  
-         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}  
-     listeners:
-     - protocol: HTTP
-       port: 80
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
-   EOF
-   ```
-
-4. Verify that your {{< reuse "docs/snippets/agentgateway.md" >}} proxy is up and running. 
-   ```sh
-   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
-   ```
-   
-   Example output: 
-   ```console
-   NAMESPACE            NAME                                 READY   STATUS    RESTARTS   AGE
-   {{< reuse "docs/snippets/namespace.md" >}}      agentgateway-proxy-8b5dc4874-bl79q         1/1     Running   0          12s
-   ```
-
-5. Get the external address of the gateway and save it in an environment variable.
-   {{< /version >}}
-   {{< version include-if="2.1.x" >}}
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
-   echo $INGRESS_GW_ADDRESS  
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   kubectl port-forward deployment/agentgateway-proxy -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
-
-   {{< /version >}}
-
-{{< version exclude-if="2.1.x" >}}
-
 1. Create an {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your tracing configuration. 
    ```yaml
    kubectl apply -f- <<EOF
@@ -221,7 +119,6 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    ```
 
 4. Get the external address of the gateway and save it in an environment variable.
-   {{< /version >}}{{% version exclude-if="2.1.x" %}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -235,8 +132,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
    ```
    {{% /tab %}}
    {{< /tabs >}}
- 
-   {{% /version %}}
+
 
    
 ## Set up access to Gemini
@@ -324,6 +220,5 @@ helm uninstall opentelemetry-collector-traces -n telemetry
 kubectl delete httproute google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete {{< reuse "docs/snippets/backend.md" >}} google -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret google-secret -n {{< reuse "docs/snippets/namespace.md" >}}
-{{< version exclude-if="2.2.x" >}}
-kubectl delete configmap agent-gateway-config -n {{< reuse "docs/snippets/namespace.md" >}} {{< /version >}}
+
 ```

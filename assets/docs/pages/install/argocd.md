@@ -38,12 +38,20 @@ Install {{< reuse "/docs/snippets/kgateway.md" >}} by using Argo CD.
 
 ## Next steps
 
-Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
+Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your gateway capabilities.
+
+{{% conditional-text include-if="envoy" %}}
 - Learn more about [{{< reuse "/docs/snippets/kgateway.md" >}}, its features and benefits](../../about/overview). 
 - [Deploy an API gateway and sample app](../sample-app/) to test out routing to an app.
 - Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
 - Secure your routes with external authentication and rate limiting policies by using the [Security](../../security) guides. 
+{{% /conditional-text %}}
+
+{{% conditional-text include-if="agentgateway" %}}
+- [Set up your agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
+- Review the [LLM consumption]({{< link-hextra path="/llm/" >}}), [inference routing]({{< link-hextra path="/inference/" >}}), [MCP]({{< link-hextra path="/mcp/" >}}), or [agent connectivity]({{< link-hextra path="/agent/" >}}) guides to learn more about common agentgateway use cases. 
+{{% /conditional-text %}}
 
 ## Cleanup
 

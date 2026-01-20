@@ -1,5 +1,5 @@
 ---
-title: Control access to tools
+title: Tool access
 weight: 60
 ---
 

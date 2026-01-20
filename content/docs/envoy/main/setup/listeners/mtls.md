@@ -1,5 +1,5 @@
 ---
-title: Mutual TLS (mTLS)
+title: mTLS (FrontendTLS)
 weight: 10 
 description:
 ---
