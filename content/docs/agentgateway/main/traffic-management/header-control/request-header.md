@@ -1,6 +1,6 @@
 ---
 title: Request headers
-weight:
+weight: 25
 ---
 
 Use the `RequestHeaderModifier` filter to add, append, overwrite, or remove request headers for a specific route. 
