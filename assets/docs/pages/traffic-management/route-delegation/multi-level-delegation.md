@@ -1,6 +1,6 @@
 Create a 3-level route delegation hierarchy with a parent, child, and grandchild HTTPRoute resource.
 
-{{< version exclude-if="2.0.x" >}}
+{{< version exclude-if="2.0.x,2.2.x" >}}
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}

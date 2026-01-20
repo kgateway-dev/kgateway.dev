@@ -1,6 +1,6 @@
 Set up basic route delegation between a parent and two child HTTPRoute resources.
 
-{{< version exclude-if="2.0.x" >}}
+{{< version exclude-if="2.0.x,2.2.x" >}}
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}

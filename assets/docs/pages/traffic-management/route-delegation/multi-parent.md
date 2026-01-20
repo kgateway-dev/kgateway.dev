@@ -1,6 +1,6 @@
 Set up route delegation for a child HTTPRoute resource that can receive traffic from one or more parent HTTPRoute resources.
 
-{{< version exclude-if="2.0.x" >}}
+{{< version exclude-if="2.0.x,2.2.x" >}}
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
