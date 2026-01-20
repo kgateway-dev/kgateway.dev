@@ -1,0 +1,9 @@
+---
+title: More OAuth features
+description: Review more OAuth features that you can use, such as cookie options, and storing sessions in Redis, and logout path.
+weight: 30
+---
+
+## About
+
+{{< reuse "conrefs/pages/security/oauth-more-examples.md" >}}
