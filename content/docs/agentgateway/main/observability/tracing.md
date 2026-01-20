@@ -3,7 +3,7 @@ title: Tracing
 weight: 90
 ---
 
-Integrate your agentgateway proxy with an OpenTelemetry (OTEL) collector and configure custom metadata for your traces with an {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+Integrate your agentgateway proxy with an OpenTelemetry (OTel) collector and configure custom metadata for your traces with an {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 ## Before you begin
 

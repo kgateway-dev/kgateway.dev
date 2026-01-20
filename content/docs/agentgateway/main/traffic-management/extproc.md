@@ -122,7 +122,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
 
 You can enable ExtProc for a particular route in an HTTPRoute resource. 
    
-1. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} that ... 
+1. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} that enables external processing for the agentgateway-proxy.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
