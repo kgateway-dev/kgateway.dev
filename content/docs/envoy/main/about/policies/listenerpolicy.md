@@ -13,6 +13,8 @@ Learn more about how you can attach policies to gateway listeners.
 
 ### Option 1: Attach the policy to all listeners on the gateway (`targetRefs`) -->
 
+### All listeners on a gateway
+
 You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRef` section in the ListenerPolicy resource. 
 
 The following ListenerPolicy resource sets a request read and write buffer limit and applies this policy to a Gateway resource that is named `http`.
@@ -29,23 +31,24 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-  perConnectionBufferLimitBytes: 10485760
+  default:
+    perConnectionBufferLimitBytes: 1024
 EOF
 ```
-<!--
-### Option 2: Attach the policy to a particular listener on the gateway (`targetRefs.sectionName`)
 
-Instead of attaching a policy to all the listeners that are defined on the gateway, you can target a particular listener by using the `spec.targetRefs.sectionName` field in the ListenerPolicy resource. 
+### Specific port
+
+Instead of attaching a policy to all the listeners that are defined on the gateway, you can target a particular port by using the `spec.perPort` field in the ListenerPolicy resource. 
 
 The following Gateway resource defines two listeners, an HTTP (`http`) and HTTPS (`https`) listener. 
 
-```console {hl_lines=[8,15]}
+```yaml {hl_lines=[8,15]}
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
   name: http
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
   listeners:
   - name: http
     protocol: HTTP
@@ -68,9 +71,9 @@ spec:
         from: All
 ```
 
-To apply the policy to only the `https` listener, you specify the listener name in the `spec.targetRefs.sectionName` field in the ListenerPolicy resource as shown in the following example. 
+To apply the policy to only the `https` listener, you specify the port in the `spec.perPort` field in the ListenerPolicy resource as shown in the following example. 
 
-```console {hl_lines=[11]}
+```yaml {hl_lines=[11,12,13]}
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: ListenerPolicy
 metadata:
@@ -81,15 +84,11 @@ spec:
   - group: gateway.networking.k8s.io
     kind: Gateway
     name: http
-    sectionName: https
-  options:
-    accessLoggingService:
-      accessLog:
-      - fileSink:
-          path: /dev/stdout
-          stringFormat: ""
+  perPort: 
+    - port: 443
+      listener: 
+        perConnectionBufferLimitBytes: 1024
 ```
--->
 
 ## Conflicting policies
 

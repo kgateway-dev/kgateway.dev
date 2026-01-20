@@ -11,11 +11,11 @@ For MCP clients, such as the MCP inspector tool, Visual Studio Code, or Claude C
 
 The MCP OAuth specification extends the standard OAuth 2.0 Authorization Code Flow with MCP-specific resource metadata and discovery endpoints so that clients can dynamically register with the authorization server, obtain their client ID, and continue with the OAuth flow to receive the access token. The MCP client then uses this token to gain access to the tools that are exposed on the MCP server. 
 
-### Challenges
+## Challenges
 
 Most IdPs do not comply to the MCP OAuth specification and therefore do not expose the resource and authorization server metadata in a format that an MCP client can understand. Because of that, clients cannot dynamically register with the IdP to obtain their client ID. Instead, they must manually register with each IdP that they want to use. In cases where MCP clients, IdPs, and MCP servers are not in the same environment or are owned by different teams and organizations, pre-registration of clients can become unfeasible. 
 
-### Agentgateway to fill in the gaps
+## Agentgateway to fill in the gaps
 
 Instead of pre-registering MCP clients, you can use agentgateway to register MCP clients dynamically with your IdP. The agentgateway proxy implements the MCP OAuth 2.0 specification, and can therefore facilitate the client registration process on behalf of the MCP client by translating the MCP OAuth information into configuration that the IdP understands. 
 

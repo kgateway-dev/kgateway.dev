@@ -8,7 +8,7 @@ Secure your applications with JSON Web Token (JWT) authentication by using the a
 ## Before you begin
 
 1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
-2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}})
+2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
 
 
 {{< reuse "docs/snippets/keycloak.md" >}}
@@ -111,6 +111,8 @@ Now that JWT authentication is configured, test the setup by obtaining a token f
      -d "username=user1" \
      -d "password=password" \
      | jq -r '.access_token')
+   
+   echo $ACCESS_TOKEN
    ```
 
 3. Repeat the request to the httpbin app. This time, include the JWT token that you received in the previous step. Verify that the request succeeds and you get back a 200 HTTP response code. 
