@@ -14,21 +14,35 @@ With this approach, you have the flexibility to apply your requirements to all t
 
 ### How it works
 
-The following diagram shows an example for how request header manipulation works when an external processing server is used. 
+The following diagram shows how request header manipulation works when an external processing server is used.
 
-{{< reuse-image src="img/extproc.svg" width="400" caption="Request header manipulation with external processing" >}}
-{{< reuse-image-dark srcDark="img/extproc.svg" width="400" caption="Request header manipulation with external processing" >}}
+```mermaid
+sequenceDiagram
+    participant Downstream as Downstream Service
+    participant Gateway as Gateway
+    participant ExtProc as ExtProc Server
+    participant Upstream as Upstream Application
+    
+    Downstream->>Gateway: 1. Send request with headers
+    
+    Gateway->>ExtProc: 2. Extract and send header information
+    
+    ExtProc->>ExtProc: 3. Modify, add, or remove headers
+    
+    ExtProc-->>Gateway: 4. Return modified headers
+    
+    Gateway->>Gateway: 5. Add modified headers to request
+    
+    Gateway->>Upstream: 6. Forward request to upstream
+    
+    Upstream-->>Gateway: 7. Return response
 
-1. The downstream service sends a request with headers to the Envoy gateway. 
-2. The gateway extracts the header information and sends it to the external processing server. 
-3. The external processing server modifies, adds, or removes the request headers. 
-4. The modified request headers are sent back to the gateway. 
-5. The modified headers are added to the request.
-6. The request is forwarded to the upstream application. 
+    Gateway->>Downstream: 8. Forward response
+```
 
 ### ExtProc server considerations
 
-The ExtProc server is a gRPC interface that must be able to respond to events in the lifecycle of an HTTP request. When the ExtProc filter is enabled in Gloo Gateway and a request or response is received on the gateway, the filter communicates with the ExtProc server by using bidirectional gRPC streams.
+The ExtProc server is a gRPC interface that must be able to respond to events in the lifecycle of an HTTP request. When ExtProc is enabled and a request or response is received on the gateway proxy, the proxy communicates with the ExtProc server by using bidirectional gRPC streams.
 
 To implement your own ExtProc server, make sure that you follow [Envoy's technical specification for an external processor](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor). This guide uses a sample ExtProc server that you can use to try out the ExtProc functionality.
 
@@ -61,7 +75,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
          containers:
            - name: ext-proc-grpc
              # Source code for this image is in test/e2e/features/agentgateway/extproc/example
-             image: gcr.io/solo-test-236622/ext-proc-example-basic-sink:0.0.2
+             image: gcr.io/solo-test-236622/ext-proc-example-basic-sink:0.0.7
              imagePullPolicy: IfNotPresent
              ports:
                - containerPort: 18080
@@ -90,6 +104,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
        "header1": "value1",
        "header2": "value2"
      },
+     {
      "removeHeaders": [ "header3", "header4" ],
      }
    }
@@ -103,7 +118,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
 3. Continue with configuring ExtProc for a [route](#route) or [gateway](#gateway).
 -->
 
-## Set up ExtProc for a route {#route}
+## Set up ExtProc
 
 You can enable ExtProc for a particular route in an HTTPRoute resource. 
    
@@ -163,56 +178,16 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
          "true"
        ],
        "Host": [
-         "extproc.example"
+         "www.example.com"
        ],
        "Instructions": [
          "{\"addHeaders\":{\"extproc\":\"true\"}}"
        ],
        "User-Agent": [
          "curl/8.7.1"
-       ],
-   ...
-   ```
-
-6. Send a request along the `/get` path. Verify that you get back a 200 HTTP response code. However, because this route is not configured for ExtProc, you do not see the `"extproctest": "true"` header in your response.
-
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-
-   {{% tab tabName="Cloud Provider LoadBalancer"  %}}
-   ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: www.example.com" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
-   ```
-   {{% /tab %}}
-
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi http://localhost:8080/get -H "host: www.example.com" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
-   ```
-   {{% /tab %}}
-
-   {{< /tabs >}}
-
-   Example output:
-
-   ```json
-   < HTTP/1.1 200 OK
-   HTTP/1.1 200 OK
-   ...
-   < 
-   {
-     "headers": {
-       "Accept": [
-         "*/*"
-       ],
-       "Host": [
-         "extproc.example"
-       ],
-       "Instructions": [
-         "{\"addHeaders\":{\"extproc\":\"true\"}}"
-       ],
-       "User-Agent": [
-         "curl/8.7.1"
-       ],
+       ]
+     }
+   }
    ...
    ```
 
