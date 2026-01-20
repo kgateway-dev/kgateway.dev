@@ -44,8 +44,8 @@
 
    Example output:
    ```txt
-   NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
-   agentgateway-proxy   LoadBalancer   172.20.200.127   <pending>     80:30752/TCP   7m6s
+   NAME                 TYPE           CLUSTER-IP       EXTERNAL-IP                                            PORT(S)        AGE
+   agentgateway-proxy   LoadBalancer   172.20.200.127   ab56b2563813e4ee3aa7f149702061ec-340422164.us-east-1.elb.amazonaws.com   80:30752/TCP   7m6s
    ```
 
 4. Get the external address of the agentgateway proxy and save it in an environment variable.
