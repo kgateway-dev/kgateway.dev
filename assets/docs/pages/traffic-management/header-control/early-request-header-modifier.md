@@ -2,7 +2,7 @@ Early request header modification allows you to add, set, or remove HTTP request
 
 This capability is especially useful for security and sanitization use cases, where you want to ensure that sensitive headers cannot be faked by downstream clients and are only set by trusted components such as external authentication services.
 
-Early request header modification is configured on an `HTTPListenerPolicy` using the `earlyRequestHeaderModifier` field. This policy is attached directly to a Gateway and applies header mutations before route selection.
+Early request header modification is configured on a `ListenerPolicy` using the `earlyRequestHeaderModifier` field. This policy is attached directly to a Gateway and applies header mutations before route selection.
 
 The configuration uses the standard Gateway API `HTTPHeaderFilter` format and supports the following operations:
 
@@ -69,12 +69,12 @@ Remove a header that is reserved for use by another service, such as an external
    }
    ```
 
-2. Create an HTTPListenerPolicy to remove the `x-user-id` header.
+2. Create a ListenerPolicy to remove the `x-user-id` header.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: remove-header
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -83,9 +83,11 @@ Remove a header that is reserved for use by another service, such as an external
        - group: gateway.networking.k8s.io
          kind: Gateway
          name: http
-     earlyRequestHeaderModifier:
-       remove:
-         - x-user-id
+     default:
+       httpSettings:
+         earlyRequestHeaderModifier:
+           remove:
+             - x-user-id
    EOF
    ```
 
@@ -149,5 +151,5 @@ Remove a header that is reserved for use by another service, such as an external
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httplistenerpolicy remove-header -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete listenerpolicy remove-header -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
