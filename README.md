@@ -6,6 +6,8 @@
 * `Node.js v18.18.2 or greater`
 * `hugo extended v0.135.0`
 
+One way to get hugo is with `CGO_ENABLED=1 go install -tags extended github.com/gohugoio/hugo@v0.135.0` which installs inside the directory printed by `go env GOBIN`
+
 #### To run `kgateway.dev` locally:
 1. `git@github.com:kgateway-dev/kgateway.dev.git`
 2. `cd kgateway.dev`
