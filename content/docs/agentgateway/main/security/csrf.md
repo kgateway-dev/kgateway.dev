@@ -18,10 +18,7 @@ To help prevent CSRF attacks, you can enable CSRF protection for your gateway or
 Note that because CSRF attacks specifically target state-changing requests, the filter only acts on HTTP requests that have a state-changing method such as `POST` or `PUT`.
 {{< /callout >}}
 
-## Before you begin
-
-1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
-2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
+{{< reuse "docs/snippets/agentgateway/prereq.md" >}}
 
 ## Set up CSRF protection
 

@@ -7,9 +7,7 @@ Use the `ResponseHeaderModifier` filter to add, append, overwrite, or remove hea
 
 For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPHeaderFilter).
 
-## Before you begin
-
-{{< reuse "docs/snippets/agentgateway-prereq.md" >}}
+{{< reuse "docs/snippets/agentgateway/prereq.md" >}}
 
 ## Add response headers {#add-response-headers-route}
 
@@ -25,7 +23,7 @@ Add headers to incoming requests before they are sent back to the client. If the
      namespace: httpbin
    spec:
      parentRefs:
-     - name: http
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
@@ -44,7 +42,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `agentgateway-proxy` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.add`|The name and value of the response header that you want to add. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
@@ -104,7 +102,7 @@ Setting headers is similar to adding headers. If the response does not include t
      namespace: httpbin
    spec:
      parentRefs:
-     - name: http
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
@@ -123,7 +121,7 @@ Setting headers is similar to adding headers. If the response does not include t
 
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` Gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `agentgateway-proxy` Gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.set`|The name and value of the response header that you want to set. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
@@ -213,7 +211,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
      namespace: httpbin
    spec:
      parentRefs:
-     - name: http
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
@@ -231,7 +229,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `agentgateway-proxy` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.remove`|The name of the response header that you want to remove. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
@@ -296,7 +294,7 @@ You can return dynamic information about the response in the response header. Fo
      namespace: httpbin
    spec:
      parentRefs:
-     - name: http
+     - name: agentgateway-proxy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
@@ -315,7 +313,7 @@ You can return dynamic information about the response in the response header. Fo
    
    |Setting|Description|
    |--|--|
-   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` Gateway that was created as part of the get started guide. |
+   |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `agentgateway-proxy` Gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to responses. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.set`|The response header that you want to set. In this example, the `x-response-code` header is set to the HTTP response code. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |

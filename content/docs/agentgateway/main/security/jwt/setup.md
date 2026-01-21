@@ -5,11 +5,7 @@ weight: 10
 
 Secure your applications with JSON Web Token (JWT) authentication by using the agentgateway proxy and an identity provider like Keycloak. To learn more about JWT auth, see [About JWT authenticaiton]({{< link-hextra path="/security/jwt/about/" >}}). 
 
-## Before you begin
-
-1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
-2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
-
+{{< reuse "docs/snippets/agentgateway/prereq.md" >}}
 
 {{< reuse "docs/snippets/keycloak.md" >}}
 

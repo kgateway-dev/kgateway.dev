@@ -5,10 +5,7 @@ weight: 90
 
 Integrate your agentgateway proxy with an OpenTelemetry (OTel) collector and configure custom metadata for your traces with an {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
-## Before you begin
-
-1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
-2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
+{{< reuse "docs/snippets/agentgateway/prereq.md" >}}
 
 ## Set up an OpenTelemetry collector
 
