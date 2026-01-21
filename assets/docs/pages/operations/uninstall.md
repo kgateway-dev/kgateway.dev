@@ -121,7 +121,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    
 2. Log in to the Argo CD UI. 
    ```sh
-   argocd login localhost:9999 --username admin --password solo.io --insecure
+   argocd login localhost:9999 --username admin --password gateway --insecure
    ```
    
 3. Delete the {{< reuse "/docs/snippets/helm-kgateway.md" >}} application.

@@ -2,10 +2,6 @@
 
 In this topic, you learn about the basics of API gateways for microservices, the extensions that {{< reuse "/docs/snippets/kgateway.md" >}} provides beyond typical API gateway functionality, and the default API gateway proxy setup.
 
-{{< callout icon="agentgateway" >}}
-Looking for an AI gateway to connect agents, MCP tools, and LLMs? Check out the [agentgateway data plane docs](../../agentgateway/). {{< reuse "docs/snippets/control-plane-note.md" >}}
-{{< /callout >}}
-
 ## API gateway {#api-gateway}
 
 The {{< reuse "/docs/snippets/kgateway.md" >}} data plane is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
