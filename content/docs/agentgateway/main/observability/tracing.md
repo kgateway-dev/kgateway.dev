@@ -126,7 +126,7 @@ Install an OpenTelemetry collector that the {{< reuse "docs/snippets/agentgatewa
 3. Get the logs of the collector and search for the trace ID. Verify that you see the additional tracing attributes that you configured initially.
    ```sh
    kubectl logs deploy/opentelemetry-collector-traces -n telemetry \
-   | grep -A 25 "Trace ID\s\+: <trace_id>"
+   | grep -A 30 "Trace ID\s\+: <trace_id>"
    ```
 
    Example output: 

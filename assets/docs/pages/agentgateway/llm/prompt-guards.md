@@ -75,7 +75,7 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
            - response:
                message: "Rejected due to inappropriate content"
              regex:
-               action: REJECT
+               action: Reject
                matches:
                - "credit card"
    EOF
@@ -84,16 +84,16 @@ Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource and the `promptG
    {{< /version >}}
 
    {{< callout type="info" >}}
-   You can also reject requests that contain strings of inappropriate content itself, such as credit card numbers, by using the <code>promptGuard.request.regex.builtins</code> field. Besides <code>CREDIT_CARD</code> in this example, you can also specify <code>EMAIL</code>, <code>PHONE_NUMBER</code>, and <code>SSN</code>.
+   You can also reject requests that contain strings of inappropriate content itself, such as credit card numbers, by using the <code>promptGuard.request.regex.builtins</code> field. Besides <code>CreditCard</code> in this example, you can also specify <code>Email</code>, <code>PhoneNumber</code>, <code>Ssn</code>, and <code>CaSin</code>,
    {{< /callout >}}
    ```yaml
    ...
    promptGuard:
      request:
        regex:
-         action: REJECT
+         action: Reject
          builtins:
-         - CREDIT_CARD
+         - CreditCard
    ```
    
 2. Send a request to the AI API that includes the string `credit card` in the request body. Verify that the request is denied with a 403 HTTP response code and the custom response message is returned.
