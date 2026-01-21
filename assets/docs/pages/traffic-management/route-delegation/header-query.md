@@ -1,6 +1,6 @@
 Use header and query matchers in a route delegation setup. 
 
-{{< version exclude-if="2.0.x" >}}
+{{< version exclude-if="2.0.x,2.2.x" >}}
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
