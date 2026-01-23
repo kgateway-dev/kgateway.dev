@@ -1,9 +1,5 @@
 Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About external auth {#about}
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
@@ -47,7 +43,7 @@ Keep in mind that your external authorization service must conform to the [Envoy
 {{< /callout >}}
 
 {{< callout type="info" >}}
-Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `{{< reuse "docs/snippets/namespace.md" >}}` namespace, and the TrafficPolicy, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [Policy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
+Note that in the following example, resources are created in the same namespace to simplify setup. For example, the external auth service and GatewayExtension are in the same `{{< reuse "docs/snippets/namespace.md" >}}` namespace, and the {{< reuse "docs/snippets/trafficpolicy.md" >}}, HTTPRoute, and backing Service for the sample app are in the same `httpbin` namespace. To create the resources in different namespaces, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. 
 {{< /callout >}}
 
 1. Deploy your external authorization service. The following example uses the [Istio external authorization service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes. This service is configured to allow requests with the `x-ext-authz: allow` header.
@@ -80,7 +76,7 @@ Note that in the following example, resources are created in the same namespace 
    EOF
    ```
 
-2. Create a Service for the Deployment that {{< reuse "/docs/snippets/kgateway.md" >}} can access.
+2. Create a Service for the Deployment that your proxy can access.
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -102,7 +98,7 @@ Note that in the following example, resources are created in the same namespace 
    EOF
    ```
 
-3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. For more information and an example, see the [Policy not applied](/docs/operations/debug/#trafficpolicy) troubleshooting docs.
+3. Create a GatewayExtension resource that points to your external authorization Service. Note that the GatewayExtension is created in the same namespace as the external auth service. To use a different namespace, make sure that you set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service. 
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -149,12 +145,12 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    ...
    ```
 
-2. Create a TrafficPolicy that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Create the TrafficPolicy in the same namespace as the targeted resource.
+2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that applies the GatewayExtension with external authorization at the Gateway level. Note that you can also set the `targetRefs` to select an HTTPRoute, which is demonstrated in later steps. Create the TrafficPolicy in the same namespace as the targeted resource.
 
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
      name: gateway-ext-auth-policy
@@ -265,12 +261,12 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    }
    ```
 
-5. Create another TrafficPolicy to disable external authorization for a particular HTTPRoute. This way, requests that do not require external authorization, such as health checks, are allowed through while the external authorization service is still in place for requests to other routes on the Gateway.
+5. Create another {{< reuse "docs/snippets/trafficpolicy.md" >}} to disable external authorization for a particular HTTPRoute. This way, requests that do not require external authorization, such as health checks, are allowed through while the external authorization service is still in place for requests to other routes on the Gateway.
    {{< version exclude-if="2.0.x" >}}
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      namespace: httpbin
      name: route-ext-auth-policy
@@ -289,8 +285,8 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    {{< version include-if="2.0.x" >}}
    ```yaml
    kubectl apply -f - <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      namespace: httpbin
      name: route-ext-auth-policy
@@ -333,10 +329,10 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-1. Delete the TrafficPolicies for the Gateway and HTTPRoute.    
+1. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}} for the Gateway and HTTPRoute.    
 
    ```sh
-   kubectl delete trafficpolicy -A -l app=ext-authz
+   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -A -l app=ext-authz
    ```
 
 2. Delete the sample external authorization service and GatewayExtension resource.

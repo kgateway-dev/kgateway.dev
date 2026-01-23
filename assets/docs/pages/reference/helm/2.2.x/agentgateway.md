@@ -4,7 +4,7 @@
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
 | affinity | object | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. | `{}` |
-| controller | object | Configure the agentgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"controller","tag":""},"logLevel":"info","replicaCount":1,"service":{"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
+| controller | object | Configure the agentgateway control plane deployment. | `{"extraEnv":{},"image":{"pullPolicy":"","registry":"","repository":"controller","tag":""},"logLevel":"info","podDisruptionBudget":{},"replicaCount":1,"service":{"allocateLoadBalancerNodePorts":null,"annotations":{},"clusterIP":"","clusterIPs":[],"enabled":true,"externalIPs":[],"externalName":"","externalTrafficPolicy":"","extraLabels":{},"healthCheckNodePort":null,"internalTrafficPolicy":"","ipFamilies":[],"ipFamilyPolicy":"","loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"publishNotReadyAddresses":false,"sessionAffinity":"","sessionAffinityConfig":{},"trafficDistribution":"","type":"ClusterIP"},"strategy":{},"xds":{"tls":{"enabled":false}}}` |
 | controller.extraEnv | object | Add extra environment variables to the controller container. | `{}` |
 | controller.image | object | Configure the controller container image. | `{"pullPolicy":"","registry":"","repository":"controller","tag":""}` |
 | controller.image.pullPolicy | string | Set the image pull policy for the controller. | `""` |
@@ -12,10 +12,31 @@
 | controller.image.repository | string | Set the image repository for the controller. | `"controller"` |
 | controller.image.tag | string | Set the image tag for the controller. | `""` |
 | controller.logLevel | string | Set the log level for the controller. | `"info"` |
+| controller.podDisruptionBudget | object | Set pod disruption budget for the controller. Note that this does not    affect the data plane. E.g.:  podDisruptionBudget:   minAvailable: 100% | `{}` |
 | controller.replicaCount | int | Set the number of controller pod replicas. | `1` |
-| controller.service | object | Configure the controller service. | `{"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"type":"ClusterIP"}` |
-| controller.service.ports | object | Set the service ports for gRPC and health endpoints. | `{"agwGrpc":9978,"health":9093,"metrics":9092}` |
-| controller.service.type | string | Set the service type for the controller. | `"ClusterIP"` |
+| controller.service | object | Configure the controller service. | `{"allocateLoadBalancerNodePorts":null,"annotations":{},"clusterIP":"","clusterIPs":[],"enabled":true,"externalIPs":[],"externalName":"","externalTrafficPolicy":"","extraLabels":{},"healthCheckNodePort":null,"internalTrafficPolicy":"","ipFamilies":[],"ipFamilyPolicy":"","loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":{"agwGrpc":9978,"health":9093,"metrics":9092},"publishNotReadyAddresses":false,"sessionAffinity":"","sessionAffinityConfig":{},"trafficDistribution":"","type":"ClusterIP"}` |
+| controller.service.allocateLoadBalancerNodePorts | string | Allocate load balancer node ports. | `nil` |
+| controller.service.annotations | object | Service annotations. | `{}` |
+| controller.service.clusterIP | string | Cluster IP address. | `""` |
+| controller.service.clusterIPs | list | Cluster IPs for dual-stack. | `[]` |
+| controller.service.enabled | bool | Create the controller Service. | `true` |
+| controller.service.externalIPs | list | External IP addresses. | `[]` |
+| controller.service.externalName | string | External name for ExternalName services. | `""` |
+| controller.service.externalTrafficPolicy | string | External traffic policy. | `""` |
+| controller.service.extraLabels | object | Extra labels for the Service. | `{}` |
+| controller.service.healthCheckNodePort | string | Health check node port. | `nil` |
+| controller.service.internalTrafficPolicy | string | Internal traffic policy. | `""` |
+| controller.service.ipFamilies | list | IP families. | `[]` |
+| controller.service.ipFamilyPolicy | string | IP family policy. | `""` |
+| controller.service.loadBalancerClass | string | Load balancer class. | `""` |
+| controller.service.loadBalancerIP | string | Load balancer IP address. | `""` |
+| controller.service.loadBalancerSourceRanges | list | Allowed source ranges for load balancer. | `[]` |
+| controller.service.ports | object | Service ports. | `{"agwGrpc":9978,"health":9093,"metrics":9092}` |
+| controller.service.publishNotReadyAddresses | bool | Publish not ready addresses. | `false` |
+| controller.service.sessionAffinity | string | Session affinity. | `""` |
+| controller.service.sessionAffinityConfig | object | Session affinity configuration. | `{}` |
+| controller.service.trafficDistribution | string | Traffic distribution. | `""` |
+| controller.service.type | string | Service type. | `"ClusterIP"` |
 | controller.strategy | object | Change the rollout strategy from the Kubernetes default of a RollingUpdate with 25% maxUnavailable, 25% maxSurge. E.g., to recreate pods, minimizing resources for the rollout but causing downtime: strategy:   type: Recreate E.g., to roll out as a RollingUpdate but with non-default parameters: strategy:   type: RollingUpdate   rollingUpdate:     maxSurge: 100% | `{}` |
 | controller.xds | object | Configure TLS settings for the xDS gRPC servers. | `{"tls":{"enabled":false}}` |
 | controller.xds.tls.enabled | bool | Enable TLS encryption for xDS communication. When enabled, the agent gateway xDS server (port 9978) will use TLS. When TLS is enabled, you must create a Secret named 'agentgateway-xds-cert' in the agentgateway installation namespace. The Secret must be of type 'kubernetes.io/tls' with 'tls.crt', 'tls.key', and 'ca.crt' data fields present. | `false` |

@@ -6,6 +6,7 @@ weight: 430
 Simulate failures, disruptions, and adverse conditions to test that your gateway and apps continue to function.
 
 {{< cards >}}
+  {{< card link="circuit-breakers" title="Circuit breakers" >}}
   {{< card link="connection" title="HTTP conection settings" >}}
   {{< card link="mirroring" title="Mirroring" >}}
   {{< card link="outlier-detection" title="Outlier detection" >}}

@@ -152,6 +152,16 @@ If you’re adopting AI workloads, it’s worth considering a **consistent** Gat
 
 {{< reuse-image src="blog/nginx-ingress-retirement-4.png" width="600px" caption="Agentic AI Radar from the Tech Radar">}}
 
+## Migrate with the kgateway ingress2gateway tool
+
+To help you migrate from Ingress to kgateway, the kgateway team forked the Kubernetes ingress2gateway tool. You can use the [kgateway ingress2gateway tool](https://github.com/kgateway-dev/ingress2gateway) to convert Ingress manifests to Gateway API and kgateway resources, including enhanced support for migrating Ingress NGINX-specific annotations.
+
+To get started, check out the docs.
+
+{{< cards >}}
+  {{< card link="../../docs/envoy/latest/migrate/" title="kgateway ingress2gateway tool" >}}
+{{< /cards >}}
+
 ## Wrapping Up
 
 With Ingress NGINX retiring soon, you need a Gateway solution that:

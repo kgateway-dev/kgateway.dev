@@ -1,9 +1,5 @@
 Apply a CSRF filter to the gateway to help prevent cross-site request forgery attacks.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About CSRF
 
 According to [OWASP](https://owasp.org/www-community/attacks/csrf), CSRF is defined as follows:

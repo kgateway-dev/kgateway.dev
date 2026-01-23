@@ -2,10 +2,6 @@
 
 In this topic, you learn about the basics of API gateways for microservices, the extensions that {{< reuse "/docs/snippets/kgateway.md" >}} provides beyond typical API gateway functionality, and the default API gateway proxy setup.
 
-{{< callout icon="agentgateway" >}}
-Looking for an AI gateway to connect agents, MCP tools, and LLMs? Check out the [agentgateway data plane docs](../../agentgateway/). {{< reuse "docs/snippets/control-plane-note.md" >}}
-{{< /callout >}}
-
 ## API gateway {#api-gateway}
 
 The {{< reuse "/docs/snippets/kgateway.md" >}} data plane is a feature-rich, fast, and flexible Kubernetes-native [ingress controller](#what-is-an-ingress) and next-generation [API gateway](#what-is-an-api-gateway) that is built on top of [Envoy proxy](https://www.envoyproxy.io/) and the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}](#what-is-the-kubernetes-gateway-api). 
@@ -88,6 +84,7 @@ The Gateway API is an API which can be used to program an ingress or an API gate
   {{< card link="../../traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
   {{< card link="../../traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
   {{< card link="../../traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
+  {{< card link="../../traffic-management/ext/" title="Direct responses" tag="Traffic" >}}
   {{< card link="../../setup/customize/" title="Gateway customization" tag="Setup" >}}
   {{< card link="../../integrations/" title="Integrations" tag="Setup" >}}
   {{< card link="../../resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}
@@ -99,4 +96,4 @@ The Gateway API is an API which can be used to program an ingress or an API gate
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} automatically spins up, bootstraps, and manages gateway proxy deployments when you create a Kubernetes Gateway resource. To do that, a combination of kgateway and Kubernetes resources are used, such as GatewayClass, GatewayParameters, and a gateway proxy template that includes the Envoy configuration that each proxy is bootstrapped with. 
 
-To learn more about the default setup and how these resources interact with each other, see the [Default gateway proxy setup](/docs/setup/default/).
+To learn more about the default setup and how these resources interact with each other, see the [Default gateway proxy setup]({{< link-hextra path="/setup/default/" >}}).

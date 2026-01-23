@@ -233,7 +233,10 @@ def _post_process_api_docs(api_file):
                 validation_col = parts[-2].strip() if len(parts) > 1 else ''
                 
                 # Check if validation column has Go code patterns or if there are continuation lines
-                has_go_code = ('//' in validation_col or '`json:' in validation_col or 
+                # Be careful: // in URLs (https://) or regex patterns is NOT a Go comment
+                # Go comments typically have // followed by +optional, +required, +kubebuilder, or whitespace
+                has_go_comment = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', validation_col))
+                has_go_code = (has_go_comment or '`json:' in validation_col or 
                               '*HTTPVersion' in validation_col or 
                               validation_col.endswith('HTTP2') or
                               '<br />XValidation' in validation_col)
@@ -241,13 +244,46 @@ def _post_process_api_docs(api_file):
                 if has_go_code:
                     # Clean up the validation column - keep only valid parts on a single line
                     # Remove everything after the first Go code pattern
-                    clean_validation = re.split(r'//|`json:|[*][A-Z][a-zA-Z0-9_]*\s+`| <br />XValidation', validation_col)[0].strip()
+                    # Be careful: only split on // when it's clearly a Go comment (followed by +optional, +required, etc.)
+                    # Don't split on // that's part of URLs (https://) or regex patterns
+                    # Pattern matches: // followed by +optional, +required, +kubebuilder, or whitespace+text (Go comment)
+                    # But NOT // that's part of a URL pattern like https://
+                    go_comment_pattern = r'//\s*(?:\+|kubebuilder|optional|required)'
+                    # Also match // at the end of validation (incomplete, likely a comment)
+                    # But preserve // in URLs and regex patterns
+                    if re.search(go_comment_pattern, validation_col):
+                        # Split on Go comment pattern
+                        clean_validation = re.split(go_comment_pattern, validation_col)[0].strip()
+                    elif '`json:' in validation_col:
+                        # Split on struct field definitions
+                        clean_validation = re.split(r'`json:', validation_col)[0].strip()
+                    elif '*HTTPVersion' in validation_col or 'Version *HTTPVersion' in validation_col:
+                        # Split on struct field type definitions
+                        clean_validation = re.split(r'[*][A-Z][a-zA-Z0-9_]*\s+`', validation_col)[0].strip()
+                    elif '<br />XValidation' in validation_col:
+                        # Split on incomplete validation rules
+                        clean_validation = re.split(r' <br />XValidation', validation_col)[0].strip()
+                    else:
+                        # If validation ends with HTTP2 or incomplete enum, clean it up
+                        clean_validation = validation_col.strip()
+                    
                     # Remove trailing incomplete validation rules
                     clean_validation = re.sub(r' <br />XValidation.*$', '', clean_validation)
                     # Remove trailing Enum values that got cut off (e.g., "Enum: [HTTP1;HTTP2" without closing bracket)
-                    if clean_validation.startswith('Enum:') and '[' in clean_validation and not clean_validation.endswith(']'):
-                        # If it's an incomplete enum, remove it entirely to avoid broken syntax
-                        clean_validation = re.sub(r'Enum: \[[^\]]*$', '', clean_validation).strip()
+                    # Check if there's an incomplete enum anywhere in the validation (not just at the start)
+                    if 'Enum:' in clean_validation and '[' in clean_validation:
+                        # Find the enum pattern and check if it's incomplete (no closing bracket)
+                        enum_match = re.search(r'Enum:\s*\[([^\]]*)', clean_validation)
+                        if enum_match:
+                            # Check if the enum is incomplete (doesn't have a closing bracket after the content)
+                            enum_end_pos = enum_match.end()
+                            # Check if there's a closing bracket after this position
+                            remaining = clean_validation[enum_end_pos:]
+                            if ']' not in remaining:
+                                # Incomplete enum - remove it entirely to avoid broken syntax
+                                clean_validation = re.sub(r' <br />Enum:\s*\[[^\]]*$', '', clean_validation).strip()
+                                # Also handle case where Enum is at the end without <br />
+                                clean_validation = re.sub(r'Enum:\s*\[[^\]]*$', '', clean_validation).strip()
                     # Ensure no line breaks are embedded in the validation column
                     clean_validation = clean_validation.replace('\n', ' ').replace('\r', ' ').strip()
                     # Reconstruct the line with cleaned validation column
@@ -269,9 +305,21 @@ def _post_process_api_docs(api_file):
                     
                     # Check if this is a continuation line (starts with tab/space) containing Go code
                     # or closing a table cell (like "] |")
-                    if (next_line.startswith('\t') or (next_line.startswith(' ') and not next_stripped.startswith('|'))):
+                    # Also skip empty lines that appear between continuation lines
+                    if next_stripped == '':
+                        # Empty line - skip it if we're in the middle of continuation lines
+                        if continuation_lines_to_skip > 0:
+                            continuation_lines_to_skip += 1
+                            j += 1
+                            continue
+                        else:
+                            # Empty line but not part of continuation - stop
+                            break
+                    elif (next_line.startswith('\t') or (next_line.startswith(' ') and not next_stripped.startswith('|'))):
                         # Check if it contains Go code patterns or is closing a table cell
-                        if ('//' in next_line or '`json:' in next_line or '*HTTPVersion' in next_line or 
+                        # Be careful: only match // when it's clearly a Go comment, not URLs
+                        has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
+                        if (has_go_comment_in_line or '`json:' in next_line or '*HTTPVersion' in next_line or 
                             'XValidation' in next_line or 'Version *HTTPVersion' in next_line or
                             next_stripped == ']' or next_stripped == '] |' or
                             next_stripped.startswith(']') or 'kubebuilder' in next_line.lower()):
@@ -350,8 +398,10 @@ def _post_process_api_docs(api_file):
             next_line = lines[i + 1]
             next_stripped = next_line.strip()
             # If next line doesn't start a new table row and contains Go code or closes a cell, skip it
+            # Be careful: only match // when it's clearly a Go comment, not URLs
+            has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
             if not next_stripped.startswith('|') and (
-                '//' in next_line or '`json:' in next_line or 
+                has_go_comment_in_line or '`json:' in next_line or 
                 '*HTTPVersion' in next_line or 'XValidation' in next_line or
                 next_stripped == ']' or next_stripped == '] |' or
                 'kubebuilder' in next_line.lower()

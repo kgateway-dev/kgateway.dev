@@ -4,8 +4,6 @@ Learn more about the components that make up the {{< reuse "/docs/snippets/kgate
 
 The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} and {{< gloss "Data Plane" >}}data plane{{< /gloss >}}. These components work together to translate gateway custom resources into gateway {{< gloss "Proxy" >}}proxy{{< /gloss >}} configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps. 
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the Envoy-based {{< reuse "docs/snippets/kgateway.md" >}} proxy and the {{< reuse "docs/snippets/agentgateway.md" >}} proxy. {{< reuse "docs/snippets/control-plane-note.md" >}}
-
 {{% conditional-text include-if="envoy" %}}
 
 {{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
@@ -22,7 +20,7 @@ The following image shows the different components that make up the {{< reuse "/
 
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
-1. The config and secret watcher components in the `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources, such as Gateways, HTTPRoutes, or TrafficPolicies.
+1. The config and secret watcher components in the `{{< reuse "/docs/snippets/helm-kgateway.md" >}}` pod watch the cluster for new Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources, such as Gateways, HTTPRoutes, or {{< reuse "/docs/snippets/trafficpolicies.md" >}}.
 2. When the config or secret watcher detect new or updated resources, it sends the resource configuration to the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Translation" >}}translation{{< /gloss >}} engine. 
 3. The translation engine translates Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} resources into gateway proxy configuration. All gateway proxy configuration is consolidated into an xDS snapshot.
 4. The reporter receives a status report for every resource that is processed by the translator. 
@@ -60,7 +58,6 @@ The following image shows the different stages of a translation cycle for the ga
 
 1. The translation cycle starts by defining [Envoy clusters](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto) from all configured Backend and Kubernetes service resources. Clusters in this context are groups of similar hosts. Each Backend has a type that determines how the Backend is processed. Correctly configured Backends and Kubernetes services are converted into Envoy clusters that match their type, including information like cluster metadata.
 
-
 2. The next step in the translation cycle is to process all the functions on each Backend. Function-specific cluster metadata is added and is later processed by function-specific Envoy filters.
 
 3. In the next step, all [Envoy routes](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route.proto) are generated. Routes are generated for each route rule that is defined on the HTTPRoute and TrafficPolicy resources. When all of the routes are created, the translator processes and aggregates HTTPListenerPolicy resources into [Envoy virtual hosts](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#config-route-v3-virtualhost), and adds them to a new [Envoy HTTP Connection Manager](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/http_connection_management) configuration. 
@@ -77,13 +74,13 @@ The following image shows the different stages of a translation cycle for the ga
 {{< reuse-image src="img/agw-translation-loop.svg" caption="Agentgateway translation cycle" >}}
 {{< reuse-image-dark srcDark="img/agw-translation-loop-dark.svg" caption="Agentgateway translation cycle" >}}
 
-1. When the agentgateway feature is enabled for {{< reuse "/docs/snippets/kgateway.md" >}}, the agentgateway syncer component is created as part of the control plane.
+1. The agentgateway syncer component is created as part of the control plane.
 
-2. The agentgateway syncer sets up the initial configuration, including the `agentgateway` GatewayClass name that Gateways can use to automatically create agentgateway proxies. The agentgateway syncer also builds the initial krt collections based on the Gateway API and kgateway resources in the cluster.
+2. The agentgateway syncer sets up the initial configuration, including the `agentgateway` GatewayClass name that Gateways can use to automatically create agentgateway proxies. The agentgateway syncer also builds the initial krt collections based on the Gateway API and agentgateway resources in the cluster.
 
 3. The translation cycle starts by collecting all of the resources that are needed to create agentgateway proxy config. These various collections include:
-   * Core collections of the Kubernetes, Gateway API, and kgateway resources that are defined in the cluster, such as namespaces, services, gateways, routes, policies, backends, and plugins for AI, MCP, and A2A-specific backends.
-   * Agentgateway data plane resource building that consist of information translated from the core collection into the format that agentgateway expects, such as bind, port, listener, route, backend, target, and policy configuration for agentgateway. For more information, see the [agentgateway about topic](../../agentgateway/about/#resources).
+   * Core collections of the Kubernetes, Gateway API, and agentgateway resources that are defined in the cluster, such as namespaces, services, gateways, routes, policies, backends, and plugins for AI, MCP, and A2A-specific backends.
+   * Agentgateway data plane resource building that consist of information translated from the core collection into the format that agentgateway expects, such as bind, port, listener, route, backend, target, and policy configuration for agentgateway. For more information, see the [agentgateway about topic]({{< link-hextra path="/about/overview/">}}).
    * Address collections of the service and workloads that are included in service discovery and endpoint resolution.
    * The translation order ensures that dependencies are resolved correctly: `binds → listeners → routes → policies`, with backends and addresses processed separately and added to the final configuration.
 

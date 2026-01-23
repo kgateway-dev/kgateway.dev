@@ -50,7 +50,6 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    ```
 
 2. Create a Gateway resource that references your custom {{< reuse "docs/snippets/gatewayparameters.md" >}}. 
-
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -81,9 +80,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/namespace.md" >}}   -o yaml
    ```
 
-   {{< callout type="info" >}}
    If the pod does not come up, try running `kubectl get events -n kgateway-system` to see if the Kubernetes API server logged any failures. If no events are logged, ensure that the `kgateway` GatewayClass is present in your cluster and that the Gateway resource shows an `Accepted` status. 
-   {{< /callout >}}
 
    Example output:
 

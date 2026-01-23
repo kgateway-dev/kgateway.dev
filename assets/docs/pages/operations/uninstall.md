@@ -89,7 +89,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
 
 2. Open the [Argo CD UI](https://localhost:9999/applications).
 
-3. Log in with the `admin` username and `solo.io` password.
+3. Log in with the `admin` username and `gateway` password.
 4. Find the application that you want to delete and click **x**. 
 5. Select **Foreground** and click **Ok**. 
 6. Verify that the pods were removed from the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
@@ -102,6 +102,16 @@ For ArgoCD installations, use the following steps to clean up your environment.
    No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
 
+6. Remove the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
+   ```sh
+   kubectl delete namespace {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+7. Remove the `argocd` namespace. 
+   ```sh
+   kubectl delete namespace argocd
+   ```
+
 {{% /tab %}}
 {{% tab tabName="Argo CD CLI" %}}
 1. Port-forward the Argo CD server on port 9999.
@@ -111,7 +121,7 @@ For ArgoCD installations, use the following steps to clean up your environment.
    
 2. Log in to the Argo CD UI. 
    ```sh
-   argocd login localhost:9999 --username admin --password solo.io --insecure
+   argocd login localhost:9999 --username admin --password gateway --insecure
    ```
    
 3. Delete the {{< reuse "/docs/snippets/helm-kgateway.md" >}} application.
@@ -147,10 +157,21 @@ For ArgoCD installations, use the following steps to clean up your environment.
    ```txt  
    No resources found in {{< reuse "docs/snippets/namespace.md" >}} namespace.
    ```
+
+6. Remove the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. 
+   ```sh
+   kubectl delete namespace {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+7. Remove the `argocd` namespace. 
+   ```sh
+   kubectl delete namespace argocd
+   ```
+
 {{% /tab %}}
 {{< /tabs >}}
 
-{{< conditional-text include-if="envoy" >}}
+{{% conditional-text include-if="envoy" %}}
 
 ## Uninstall optional components {#optional}
 
@@ -173,4 +194,4 @@ Remove any optional components that you no longer need, such as sample apps.
    ```sh
    kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
    ```
-{{< /conditional-text >}}
+{{% /conditional-text %}}

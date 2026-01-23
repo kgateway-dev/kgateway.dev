@@ -1,6 +1,6 @@
 Set up route delegation for a child HTTPRoute resource that can receive traffic from one or more parent HTTPRoute resources.
 
-{{< version exclude-if="2.0.x" >}}
+{{< version exclude-if="2.0.x,2.2.x" >}}
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}
 {{< /callout >}}
@@ -229,7 +229,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
    
-9. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the request fails and you get back a 404 HTTP response code. 
+9. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the route is considered invalid and replaced with a 500 HTTP direct response. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -245,10 +245,12 @@ In this guide you walk through a route delegation example that demonstrates rout
 
    Example output: 
    ```
-   HTTP/1.1 404 Not Found
-   date: Mon, 06 May 2024 16:01:48 GMT
+   HTTP/1.1 500 Internal Server Error
+   content-length: 73
+   content-type: text/plain
    server: envoy
-   transfer-encoding: chunked
+
+   invalid route configuration detected and replaced with a direct response
    ```
  
 ## Cleanup

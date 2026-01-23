@@ -8,12 +8,12 @@ Set up an [agentgateway proxy]({{< link-hextra path="/agentgateway/setup" >}}).
 
 ## Connect to the MCP server
 
-1. Create a personal acess token in GitHub and save it in an environment variable. For more information, see the [GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
+1. Create a personal access token in GitHub and save it in an environment variable. For more information, see the [GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens).
    ```sh
    export GH_PAT=<personal-access-token>
    ```
 
-{{< version include-if="2.2.x" >}}2. Create a {{< reuse "docs/snippets/namespace.md" >}} for the remote GitHub MCP server. The server requires you to connect to it by using the HTTPS protocol. Because of that, you set the `mcp.targets.static.port` field to 443.
+{{< version include-if="2.2.x" >}}2. Create the {{< reuse "docs/snippets/namespace.md" >}} for the remote GitHub MCP server. The server requires you to connect to it by using the HTTPS protocol. Because of that, you set the `mcp.targets.static.port` field to 443.
    
    ```yaml
    kubectl apply -f- <<EOF

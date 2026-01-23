@@ -16,6 +16,7 @@ weight: 400
   {{< card link="header-control" title="Header control" >}}
   {{< card link="http2" title="HTTP/2" >}}
   {{< card link="health-checks" title="Health checks" >}}
+  {{< card link="proxy-protocol" title="Proxy protocol" >}}
   {{< card link="session-affinity" title="Session affinity" >}}
   {{< card link="transformations" title="Transformations" >}}
   {{< card link="traffic-split" title="Traffic splitting" >}}
