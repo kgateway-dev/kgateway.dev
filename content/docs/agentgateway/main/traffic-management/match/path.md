@@ -196,8 +196,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions to match incoming requests.
 
 1. Create an HTTPRoute resource for the `match.example` domain that uses a regular expression (regex) to match incoming requests. The following regex patterns are defined in the example: 
-   * **`\/.*my-path.*`**: 
-     * The request path must start with `/`
+   * **`/.*my-path.*`**: 
+     * The request path must start with `/`.
      * The expression `.*` means that any character before and after the `my-path` string is allowed. 
      * Allowed pattern: `/anything/this-is-my-path-1`, not allowed: `/anything`. 
    * **`/anything/stores/[^/]+?/entities`**: 
