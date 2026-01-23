@@ -62,7 +62,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
      name: http
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}
+     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -83,7 +83,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    
    ```txt
    NAME   CLASS      ADDRESS                                  PROGRAMMED   AGE
-   http   {{% conditional-text include-if="envoy" %}}{{< reuse "/docs/snippets/gatewayclass.md" >}}{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< reuse "/docs/snippets/agw-gatewayclass.md" >}}{{% /conditional-text %}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
+   http   {{< reuse "/docs/snippets/gatewayclass.md" >}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
 3. Verify that the gateway proxy pod is running.

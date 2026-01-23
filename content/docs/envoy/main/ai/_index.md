@@ -7,7 +7,7 @@ icon: cognition
 
 Interested in using kgateway as an AI Gateway? Check out using [kgateway with an agentgateway data plane](https://agentgateway.dev/docs).
 
-[Agentgateway](https://agentgateway.dev/) is an open source, AI-first data plane that provides connectivity for agents, MCP tools, LLMs, and inferences in any environment. In Kubernetes environments, you can use {{< reuse "/docs/snippets/kgateway.md" >}} as the control plane to quickly spin up and manage the lifecycle of agentgateway proxies. The control plane translates Kubernetes Gateway API and {{< reuse "docs/snippets/agentgateway.md" >}}'s Kubernetes custom resources such as AgentgatewayPolicy and AgentgatewayBackend into proxy configuration for the data plane.
+Agentgateway is an open source, AI-first data plane that provides connectivity for agents, MCP tools, LLMs, and inferences in any environment. In Kubernetes environments, you can use {{< reuse "/docs/snippets/kgateway.md" >}} as the control plane to quickly spin up and manage the lifecycle of agentgateway proxies. The control plane translates Kubernetes Gateway API and {{< reuse "docs/snippets/agentgateway.md" >}}'s Kubernetes custom resources such as AgentgatewayPolicy and AgentgatewayBackend into proxy configuration for the data plane.
 
 {{< reuse-image src="img/agw-architecture.svg" caption="Figure: agentgateway works across compute environments to provide connectivity to various agentic tools, including MCP servers, agents, and OpenAPI endpoints." >}}
 

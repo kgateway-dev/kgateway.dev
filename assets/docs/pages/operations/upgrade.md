@@ -60,8 +60,6 @@ During the upgrade, pods that run the new version of the control plane and proxi
 -->
 
 
-{{% conditional-text include-if="envoy" %}}
-
 ## Prepare to upgrade {#prepare}
 
 Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the following information.
@@ -69,7 +67,6 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
 1. Review the [kgateway release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
 2. Check the [supported version compatibility matrix](../../reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
-{{% /conditional-text %}}
 
 {{< conditional-text include-if="envoy" >}}
 
@@ -190,8 +187,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    * Make sure to include your Helm values when you upgrade either as a configuration file or with `--set` flags. Otherwise, any previous custom values that you set might be overwritten.
    * When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.{{< version include-if="2.2.x,2.1.x" >}}
    * To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.
-   {{< /version >}}{{< conditional-text include-if="agentgateway" >}}
-   * Make sure to keep the agentgateway feature flag, `--set agentgateway.enabled=true`.{{< /conditional-text >}}
+   {{< /version >}}
    
    ```sh
    helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \

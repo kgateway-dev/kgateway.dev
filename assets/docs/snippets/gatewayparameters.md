@@ -1,1 +1,1 @@
-{{% conditional-text include-if="envoy" %}}GatewayParameters{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< version include-if="2.1.x" >}}GatewayParameters{{< /version >}}{{< version include-if="2.2.x" >}}AgentgatewayParameters{{< /version >}}{{% /conditional-text %}}
+GatewayParameters
