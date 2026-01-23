@@ -121,11 +121,10 @@ spec:
   - name: agentgateway-proxy
     namespace: {{< reuse "docs/snippets/namespace.md" >}}  
   rules:
-  - 
-    backendRefs:
-    - name: mcp-backend
-      group: agentgateway.dev
-      kind: {{< reuse "docs/snippets/backend.md" >}}  
+    - backendRefs:
+      - name: mcp-backend
+        group: agentgateway.dev
+        kind: {{< reuse "docs/snippets/backend.md" >}}  
 EOF
 ```
 {{< /version >}}
