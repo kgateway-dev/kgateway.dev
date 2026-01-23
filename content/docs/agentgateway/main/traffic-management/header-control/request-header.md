@@ -65,8 +65,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    {{< /tabs >}}
 
    Example output: 
-   ```yaml {linenos=table,hl_lines=[13,14],linenostart=1}
-   * Mark bundle as not supporting multiuse
+   ```yaml {linenos=table,hl_lines=[12,13,14],linenostart=1}
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -76,7 +75,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
          "*/*"
       ],
        "Host": [
-         "headers.example:8080"
+         "headers.example"
        ],
        "My-Header": [
          "hello"
@@ -107,8 +106,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    {{< /tabs >}}
    
    Example output: 
-   ```yaml {linenos=table,hl_lines=[13,14,15],linenostart=1}
-   * Mark bundle as not supporting multiuse
+   ```yaml {linenos=table,hl_lines=[12,13,14,15],linenostart=1}
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -118,7 +116,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
          "*/*"
        ],
        "Host": [
-         "headers.example:8080"
+         "headers.example"
        ],
        "My-Header": [
          "foo",
@@ -188,8 +186,7 @@ Setting headers is similar to adding headers. If the request does not include th
    {{< /tabs >}}
 
    Example output: 
-   ```yaml {linenos=table,hl_lines=[13,14],linenostart=1}
-   * Mark bundle as not supporting multiuse
+   ```yaml {linenos=table,hl_lines=[12,13,14],linenostart=1}
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -199,7 +196,7 @@ Setting headers is similar to adding headers. If the request does not include th
          "*/*"
       ],
        "Host": [
-         "headers.example:8080"
+         "headers.example"
        ],
        "My-Header": [
          "hello"
@@ -227,8 +224,7 @@ Setting headers is similar to adding headers. If the request does not include th
    {{< /tabs >}}
    
    Example output: 
-   ```yaml {linenos=table,hl_lines=[13,14],linenostart=1}
-   * Mark bundle as not supporting multiuse
+   ```yaml {linenos=table,hl_lines=[12,13,14],linenostart=1}
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    ...
@@ -238,7 +234,7 @@ Setting headers is similar to adding headers. If the request does not include th
          "*/*"
        ],
        "Host": [
-         "headers.example:8080"
+         "headers.example"
        ],
        "My-Header": [
          "hello"
@@ -271,7 +267,7 @@ You can remove HTTP headers from a request before the request is forwarded to th
    {{< /tabs >}}
 
    Example output: 
-   ```yaml {linenos=table,hl_lines=[10,11],linenostart=1}
+   ```yaml {linenos=table,hl_lines=[10,11,12],linenostart=1}
    ...
    {
      "headers": {
@@ -279,19 +275,10 @@ You can remove HTTP headers from a request before the request is forwarded to th
          "*/*"
        ],
        "Host": [
-         "www.example.com:8080"
+         "www.example.com"
        ],
        "User-Agent": [
-         "curl/7.77.0"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "5b14c790-3870-4f73-a12e-4cba9a7eccd7"
+         "curl/8.7.1"
        ]
      }
    }
@@ -351,16 +338,7 @@ You can remove HTTP headers from a request before the request is forwarded to th
          "*/*"
        ],
        "Host": [
-         "headers.example:8080"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "f83bb750-67f7-47dc-8c79-4a582892034c"
+         "headers.example"
        ]
      }
    }
@@ -383,7 +361,7 @@ You can return dynamic information about the request in the request header. For 
 {{< /callout >}} 
 
 1. Set up a header modifier that sets the `X-Client-Ip` header with the value of the downstream remote address. 
-   ```yaml
+   ```yaml {linenos=table,hl_lines=[18,19],linenostart=1}
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
@@ -432,7 +410,7 @@ You can return dynamic information about the request in the request header. For 
    {{< /tabs >}}
 
    Example output: 
-   ```sh
+   ```sh {linenos=table,hl_lines=[9,10,11],linenostart=1}
    {
      "headers": {
        "Accept": [
