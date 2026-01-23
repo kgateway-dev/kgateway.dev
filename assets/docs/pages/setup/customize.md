@@ -14,8 +14,8 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    
    * The Envoy log level is set to `debug` (default value: `info`).
    * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`). 
-   * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`).{{< version include-if="2.2.x,2.1.x" >}}
-   * The `externalTrafficPolicy` is set to `Local` to preserve the original client IP address.{{< /version >}}
+   * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`).
+   * The `externalTrafficPolicy` is set to `Local` to preserve the original client IP address.
    * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
    * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
 
@@ -37,9 +37,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
          type: NodePort
          extraLabels: 
            gateway: custom
-         {{< version include-if="2.2.x,2.1.x" >}}
          externalTrafficPolicy: Local
-         {{< /version >}}
        podTemplate: 
          extraLabels:
            gateway: custom

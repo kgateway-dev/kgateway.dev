@@ -217,7 +217,7 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
        - matches:  
          - path:
              type: RegularExpression
-             value: \/.*my-path.*
+             value: /.*my-path.*
          - path:
              type: RegularExpression
              value: /anything/stores/[^/]+?/entities
