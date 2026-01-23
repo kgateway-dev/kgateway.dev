@@ -38,7 +38,7 @@ JWT parts are structured as follows:
 JWT authentication uses asymmetric cryptography with public and private key pairs to sign and verify JWTs. Review the following phases during the JWT validation: 
 
 1. **Token issuance**: The identity provider, such as Keycloak signs JWTs with its private key.
-2. **Key distribution**: The identity provider publishes its public keys through a JWKS (JSON Web Key Set) endpoint. Each key has a uniqu key ID (`kid`).
+2. **Key distribution**: The identity provider publishes its public keys through a JWKS (JSON Web Key Set) endpoint. Each key has a unique key ID (`kid`).
 3. **Token validation**: Agentgateway reads the `kid` from the JWT header and fetches the matching public key from the configured JWKS endpoint. The JWKS endpoint can added as an inline JWKS or a remote JWKS address in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. After the agentgateway proxy fetched the public key, it uses the public key to verify the JWT signature. 
 
 ### Remote vs. inline JWKS

@@ -9,7 +9,7 @@ Unlike other implementations of Gateway API, agentgateway is the only data plane
 Kubernetes.
 As a result, agentgateway offers some of the most comprehensive support for the Gateway API.
 
-You can review the confornace test results by version in the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#conformance-levels). For example, as of the time of this writing, agentgateway is the only implementation of Gateway API that passes all conformance tests for Gateway API v1.3. 
+You can review the conformance test results by version in the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#conformance-levels). For example, as of the time of this writing, agentgateway is the only implementation of Gateway API that passes all conformance tests for Gateway API v1.3. 
 
 In addition to supporting all Core and Extended Gateway API features, Gateway API has a number of "experimental"
 features that are in development.
@@ -63,7 +63,7 @@ If you are in the process of evaluating a Gateway API implementation, consider t
 
 **Feature coverage**: Is the implementation correctly implementing the Gateway API specification for features that you use?
 - Evaluate each implementation's conformance report for the version that you want to use. Unlike other conformance programs, Gateway API conformance **does not require passing all (or any) tests**, and instead lets implementations skip features.
-- Confirm that basic functionality like HTTP Method matching, request timeouts, and so forth are supported by thge implementation. Remember that because implementations can skip features, even a "passing" conformance report does not indicate basic functionality.
+- Confirm that basic functionality like HTTP Method matching, request timeouts, and so forth are supported by the implementation. Remember that because implementations can skip features, even a "passing" conformance report does not indicate basic functionality.
 
 **Real-world performance**: Does the implementation behave well in real world scenarios?
 - Consider that the conformance reports evaluate the correctness of an implementation in a simple environment. They do not test whether the implementation can scale up to thousands of routes, handle rapidly changing configuration, or gracefully handle changes without downtime.
