@@ -369,6 +369,63 @@ You can overlay the following resource types in the {{< reuse "docs/snippets/gat
 **HPA and PDB are opt-in.** Unlike Deployment, Service, and ServiceAccount, the control plane does not create HPA or PDB resources by default. These resources are created only when you provide an overlay for them. This gives you full control over autoscaling and disruption policies.
 {{< /callout >}}
 
+### Precedence: GatewayClass vs Gateway parameters {#precedence}
+
+You can attach {{< reuse "docs/snippets/gatewayparameters.md" >}} to either a GatewayClass (shared by all Gateways using that class) or to an individual Gateway. When both are specified, they are processed in the following order:
+
+1. **GatewayClass configs are applied first** - Settings like `image`, `logging`, `resources`, `env`
+2. **Gateway configs merge on top** - Gateway configs override conflicting GatewayClass configs
+3. **GatewayClass overlays are applied** - After all configs are processed, overlays modify the rendered resources
+4. **Gateway overlays merge on top** - Gateway overlays override conflicting GatewayClass overlays
+
+This means all configs from both sources are fully processed before any overlay is applied. The overlays then modify the already-rendered Kubernetes resources.
+
+The overlay merge uses strategic merge patch semantics, which means:
+- For scalar values (like `replicas`), Gateway wins
+- For maps (like `labels`), keys are merged, with Gateway winning on conflicts
+- For lists (like `containers`), items are merged by their merge key (e.g., `name` for containers)
+
+**Example: Potential conflict**
+
+Consider a GatewayClass with:
+```yaml
+spec:
+  deployment:
+    spec:
+      replicas: 3
+      template:
+        spec:
+          containers:
+            - name: agentgateway
+              resources:
+                limits:
+                  memory: 512Mi
+```
+
+And a Gateway with:
+```yaml
+spec:
+  deployment:
+    spec:
+      replicas: 5
+      template:
+        spec:
+          containers:
+            - name: agentgateway
+              resources:
+                limits:
+                  cpu: 500m
+```
+
+The result merges both:
+- `replicas: 5` (Gateway wins)
+- `memory: 512Mi` from GatewayClass is preserved
+- `cpu: 500m` from Gateway is added
+
+{{< callout type="warning" >}}
+**Debugging tip:** When overlays don't behave as expected, check if you have parameters on both the GatewayClass and Gateway. Each overlay might look correct individually but produce unexpected results when merged in serial. Use `kubectl get deployment <gateway-name> -o yaml` to see the final merged result.
+{{< /callout >}}
+
 ## Overlays cookbook {#overlays-cookbook}
 
 The following recipes demonstrate common overlay patterns. Each recipe shows a complete {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you can adapt to your needs.
