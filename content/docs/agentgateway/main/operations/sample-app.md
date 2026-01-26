@@ -46,14 +46,14 @@ You can set up the httpbin sample app. This app can be used to try out traffic m
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgatway-proxy -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} agentgateway-proxy -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS
    ```
 
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. Note that it might take a few seconds for the load balancer service to become fully ready and accept traffic.
    
    ```sh
-   curl -i http://$INGRESS_GW_ADDRESS:80/headers -H "host: www.example.com:8080"
+   curl -i http://$INGRESS_GW_ADDRESS:80/headers -H "host: www.example.com"
    ```
    
    Example output: 
@@ -71,25 +71,16 @@ You can set up the httpbin sample app. This app can be used to try out traffic m
    ```json
    {
      "headers": {
-       "Accept": [
-         "*/*"
-       ],
-       "Host": [
-         "www.example.com"
-       ],
-       "User-Agent": [
-         "curl/8.7.1"
-       ],
-       "X-Envoy-Expected-Rq-Timeout-Ms": [
-         "15000"
-       ],
-       "X-Forwarded-Proto": [
-         "http"
-       ],
-       "X-Request-Id": [
-         "26be0bcd-d941-48f4-ac3b-d5ac288ac46f"
-       ]
-     }
+      "Accept": [
+        "*/*"
+      ],
+      "Host": [
+        "www.example.com"
+      ],
+      "User-Agent": [
+        "curl/8.7.1"
+      ]
+    }
    }
    ```
 {{% /tab %}}
