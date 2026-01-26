@@ -13,6 +13,9 @@ description: Use kgateway with agentgateway.
   {{< card link="inference" title="Inference routing" >}}
   {{< card link="mcp" title="MCP connectivity" >}}
   {{< card link="agent" title="Agent connectivity" >}}
+  {{< card link="rbac" title="CEL-based RBAC" >}}
+  {{< card link="llm/guardrail-api" title="Guardrail Webhook API" >}}
+  {{< card link="llm/observability" title="View metrics and logs" >}}
   {{< card link="routes" title="Routes" >}}
   {{< card link="nacks" title="Monitoring agentgateways for NACKs" >}}
 {{< /cards >}}
