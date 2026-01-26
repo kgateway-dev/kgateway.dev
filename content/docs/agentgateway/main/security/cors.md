@@ -30,59 +30,55 @@ CORS policies are typically implemented to limit access to server resources for 
 You can configure the CORS policy at two levels:
 
 * **HTTPRoute**: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any {{< reuse "docs/snippets/trafficpolicy.md" >}} CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
-* **{{< reuse "docs/snippets/trafficpolicy.md" >}}**: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes, and Gateways, configure a CORS policy in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. You can attach a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. 
+* **{{< reuse "docs/snippets/trafficpolicy.md" >}}**: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes, and Gateways, configure a CORS policy in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. You can attach an {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway or the routes in an HTTPRoute resource. 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-x-channel.md" >}}
+1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
+2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
 
 ## Set up CORS policies
 
-Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+1. Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}. The following example sets up custom HTTP methods and max age for requests for the `https://example.com/` origin.
 
-### CORS in HTTPRoute
+   {{< tabs tabTotal="2" items="HTTPRoute,AgentgatewayPolicy"  >}}
+   {{% tab tabName="HTTPRoute" %}}
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+   spec:
+     parentRefs:
+       - name: agentgateway-proxy
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     rules:
+       - filters:
+           - type: CORS
+             cors:
+               allowCredentials: true
+               allowHeaders:
+                 - Origin               
+               allowMethods:
+                 - GET
+                 - POST
+                 - OPTIONS               
+               allowOrigins:
+                 - "https://example.com"
+               exposeHeaders:
+               - Origin
+               - X-HTTPRoute-Header
+               maxAge: 86400
+         backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
 
-Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httpbin-cors
-  namespace: httpbin
-spec:
-  parentRefs:
-    - name: agentgateway-proxy
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  hostnames:
-    - cors.example
-  rules:
-    - filters:
-        - type: CORS
-          cors:
-            allowCredentials: true
-            allowHeaders:
-              - Origin               
-            allowMethods:
-              - GET
-              - POST
-              - OPTIONS               
-            allowOrigins:
-              - "https://example.com"
-            exposeHeaders:
-            - Origin
-            - X-HTTPRoute-Header
-            maxAge: 86400
-      backendRefs:
-        - name: httpbin
-          port: 8000
-EOF
-```
-
-### CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}
-
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
+   {{% /tab %}}
+   {{% tab tabName="EnterpriseAgentgatewayPolicy" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -90,13 +86,12 @@ EOF
    kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: httpbin-cors
-     namespace: httpbin
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec: 
      targetRefs:
        - group: gateway.networking.k8s.io
          kind: Gateway
          name: agentgateway-proxy   
-         namespace: agentgateway-system
      traffic:
        cors:
          allowCredentials: true
@@ -116,23 +111,21 @@ EOF
          maxAge: 86400
    EOF
    ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
-## Test CORS policies
-
-Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can test the policies.
-
-1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
+2. Send a request to the httpbin app and use `https://example.com` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:80/get -H "host: cors.example" \
+   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:80/get -H "host: www.example.com" \
     -H "Origin: https://example.com" 
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/headers -H "host: www.example.com" \
     -H "Origin: https://example.com" 
    ```
    {{% /tab %}}
@@ -142,93 +135,80 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
-   **CORS in HTTPRoute**
+   Example output:
 
-   ```console {hl_lines=[7,8,9]}
+   ```console {hl_lines=[2,3,4,5]}
    HTTP/1.1 200 OK
-   x-correlation-id: aaaaaaaa
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   content-length: 0
-   
-   HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
-   access-control-allow-credentials: true
-   access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-allow-origin: https://example.com
+   access-control-allow-methods: GET,POST,OPTIONS
+   access-control-allow-headers: origin
    access-control-max-age: 86400
-   access-control-expose-headers: Origin, X-HTTPRoute-Header
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   server: envoy
-   content-length: 0
-   ...
-   ```
-   
-   **CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}**
-   ```console {hl_lines=[7,8,9]}
-   HTTP/1.1 200 OK
-   x-correlation-id: aaaaaaaa
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   content-length: 0
-   
-   HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
-   access-control-allow-credentials: true
-   access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
-   access-control-max-age: 86400
-   access-control-expose-headers: Origin, X-TrafficPolicy-Header
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   server: envoy
    content-length: 0
    ```
 
-2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed orgin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
+3. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed orgin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:80/get -H "host: cors.example" \
+   curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:80/get -H "host: www.example.com" \
     -H "Origin: https://notallowed.com" 
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/headers -H "host: www.example.com" \
     -H "Origin: https://notallowed.com" 
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
    Example output: 
-   ```console
-   HTTP/1.1 200 OK
-   x-correlation-id: aaaaaaaa
-   date: Tue, 24 Jun 2025 13:21:20 GMT
-   content-length: 0
-   
+   ```console {hl_lines=[2,3,4,5]}
    HTTP/1.1 200 OK
    access-control-allow-credentials: true
-   access-control-allow-headers: Origin
    access-control-allow-methods: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
-   access-control-allow-origin: https://notallowed.com/
+   access-control-allow-origin: https://notallowed.com
    access-control-max-age: 3600
-   date: Tue, 24 Jun 2025 13:21:20 GMT
    content-length: 0
-   x-envoy-upstream-service-time: 1
-   server: envoy
    ```
 
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-**CORS in HTTPRoute**
-```sh
-kubectl delete httproute httpbin-cors -n httpbin
+{{< tabs tabTotal="2" items="HTTPRoute,AgentgatewayPolicy" >}}
+{{% tab tabName="HTTPRoute" %}}
+
+Restore the HTTPRoute for the httpbin app. 
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httpbin
+  namespace: httpbin
+spec:
+  parentRefs:
+    - name: agentgateway-proxy
+      namespace: agentgateway-system
+  hostnames:
+    - "www.example.com"
+  rules:
+    - backendRefs:
+        - name: httpbin
+          port: 8000
+EOF
 ```
 
-**CORS in {{< reuse "docs/snippets/trafficpolicy.md" >}}**
+{{% /tab %}}
+{{% tab tabName="EnterpriseAgentgatewayPolicy" %}}
+
 ```sh
-kubectl delete httproute httpbin-cors -n httpbin
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cors -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-cors -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+

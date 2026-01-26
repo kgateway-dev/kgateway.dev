@@ -9,7 +9,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
+2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
 
 ## Set up query parameter matching
 
