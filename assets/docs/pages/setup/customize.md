@@ -507,6 +507,36 @@ spec:
 EOF
 ```
 
+### Custom Istio sidecar proxy {#recipe-istio-sidecar}
+
+When running in an Istio service mesh, you can replace the default Istio sidecar proxy with a custom image. Use `$patch: replace` on the container to completely replace its configuration rather than merging.
+
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: envoy-custom-istio
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: istio-proxy
+                $patch: replace
+                image: customproxy:custom-tag
+                args:
+                  - "proxy"
+EOF
+```
+
+{{< callout type="info" >}}
+**Note:** The `$patch: replace` directive completely replaces the `istio-proxy` container definition rather than merging with the existing one. This is useful when you need full control over the container spec, but means you must provide all required fields.
+{{< /callout >}}
+
 ## Beyond the cookbook: discover-then-customize {#discover-workflow}
 
 If the cookbook doesn't cover your use case, you can write custom overlays by inspecting the resources that the control plane generates. This workflow involves deploying a Gateway first, examining the generated resources, and then writing overlays to modify them.
