@@ -155,6 +155,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
      type: NodePort
    ```
 
+{{< version exclude-if="2.0.x,2.1.x" >}}
 ## Configs vs overlays {#configs-vs-overlays}
 
 The {{< reuse "docs/snippets/gatewayparameters.md" >}} API provides two ways to customize your proxy:
@@ -663,6 +664,7 @@ kubectl get {{< reuse "docs/snippets/gatewayparameters.md" >}} my-params -n {{< 
 ```
 
 If you used null values without server-side apply, they will be missing from the stored resource.
+{{< /version >}}
 
 ## Cleanup
 
