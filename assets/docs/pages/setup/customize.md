@@ -176,13 +176,11 @@ Overlays let you customize the Kubernetes resources that the control plane gener
 
 Overlays are useful when you need to customize resources in ways that are not directly exposed through the {{< reuse "docs/snippets/gatewayparameters.md" >}} configs. Common use cases include:
 
-- Adding image pull secrets to pull from private registries
-- Removing default security contexts for platforms like OpenShift
-- Adding custom labels, annotations, or environment variables
-- Configuring pod scheduling (node selectors, affinities, tolerations)
+- Removing default security contexts for platforms like OpenShift (when `omitDefaultSecurityContext` is not sufficient)
 - Setting up Horizontal Pod Autoscalers (HPA), Vertical Pod Autoscalers (VPA), or Pod Disruption Budgets (PDB)
-- Mounting custom ConfigMaps or Secrets as volumes
-- Configuring cloud provider-specific service annotations
+- Adding init containers or sidecar containers
+- Customizing deployment strategy beyond what configs expose
+- Replacing default service ports entirely (configs can only add NodePorts)
 
 {{< callout type="warning" >}}
 **Upgrade risk:** Overlays modify the internal Kubernetes resources that the control plane generates. These resources are implementation details, not a stable API. Future upgrades may change the structure of these resources, which could cause your overlays to fail or behave unexpectedly. Test your overlays thoroughly after each upgrade.
@@ -280,47 +278,6 @@ The overlay merge uses strategic merge patch semantics, which means:
 
 The following recipes demonstrate common overlay patterns. Each recipe shows a complete {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you can adapt to your needs.
 
-### Change deployment replicas {#recipe-replicas}
-
-Set a specific number of replicas for the Envoy deployment.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-replicas
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        replicas: 3
-EOF
-```
-
-### Add image pull secrets {#recipe-image-pull-secrets}
-
-Add image pull secrets to pull container images from private registries.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-pull-secrets
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            imagePullSecrets:
-              - name: my-registry-secret
-EOF
-```
-
 ### Remove security context for OpenShift {#recipe-openshift}
 
 OpenShift manages security contexts through Security Context Constraints (SCCs). Remove the default security context to allow OpenShift to assign appropriate values.
@@ -361,75 +318,6 @@ spec:
               - name: envoy
                 # Delete container-level securityContext using null (requires server-side apply)
                 securityContext: null
-EOF
-```
-
-### Add environment variables {#recipe-env-vars}
-
-Add custom environment variables to the Envoy container using configs.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-env
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    envoyContainer:
-      env:
-        - name: MY_CUSTOM_VAR
-          value: "my-value"
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-EOF
-```
-
-### Configure pod scheduling {#recipe-pod-scheduling}
-
-Configure node selectors, affinities, tolerations, and topology spread constraints to control where Envoy pods are scheduled.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-scheduling
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            nodeSelector:
-              node-type: gateway
-              zone: us-west-1a
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: kubernetes.io/arch
-                          operator: In
-                          values:
-                            - amd64
-                            - arm64
-            tolerations:
-              - key: dedicated
-                operator: Equal
-                value: gateway
-                effect: NoSchedule
-            topologySpreadConstraints:
-              - maxSkew: 1
-                topologyKey: kubernetes.io/hostname
-                whenUnsatisfiable: DoNotSchedule
-                labelSelector:
-                  matchLabels:
-                    app: envoy
 EOF
 ```
 
@@ -517,71 +405,6 @@ spec:
 EOF
 ```
 
-### Mount custom ConfigMap as volume {#recipe-configmap-volume}
-
-Mount a custom ConfigMap into the Envoy container.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-custom-volume
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            volumes:
-              - name: custom-config
-                configMap:
-                  name: my-custom-config
-            containers:
-              - name: envoy
-                volumeMounts:
-                  - name: custom-config
-                    mountPath: /etc/custom-config
-                    readOnly: true
-EOF
-```
-
-### Add labels and annotations {#recipe-labels-annotations}
-
-Add custom labels and annotations to deployments, pods, and services.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-labels
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      metadata:
-        labels:
-          environment: production
-          team: platform
-        annotations:
-          description: "Production Envoy proxy"
-      spec:
-        template:
-          metadata:
-            labels:
-              environment: production
-            annotations:
-              prometheus.io/scrape: "true"
-              prometheus.io/port: "9091"
-    serviceOverlay:
-      metadata:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-EOF
-```
-
 ### Customize service ports {#recipe-service-ports}
 
 Replace the default service ports with custom port configurations.
@@ -610,64 +433,6 @@ spec:
 EOF
 ```
 
-### Set resource requests and limits {#recipe-resources}
-
-Configure CPU and memory requests and limits for the Envoy container using configs.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-resources
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    envoyContainer:
-      resources:
-        requests:
-          cpu: 100m
-          memory: 128Mi
-        limits:
-          cpu: 500m
-          memory: 512Mi
-EOF
-```
-
-### Custom image {#recipe-image}
-
-Use the `image` config to specify a custom container image. This is a config, not an overlay, so it is validated at apply time.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-image
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    envoyContainer:
-      image:
-        registry: my-registry.io
-        repository: my-org/envoy
-        tag: v1.30.0
-        pullPolicy: Always
-EOF
-```
-
-You can also pin to a specific digest for immutable deployments:
-
-```yaml
-spec:
-  kube:
-    envoyContainer:
-      image:
-        registry: my-registry.io
-        repository: my-org/envoy
-        digest: sha256:abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
-```
-
 ### Static IP for LoadBalancer {#recipe-static-ip}
 
 Assign a static IP address to the LoadBalancer service.
@@ -684,81 +449,6 @@ spec:
     serviceOverlay:
       spec:
         loadBalancerIP: 203.0.113.10
-EOF
-```
-
-### GKE-specific service annotations {#recipe-gke}
-
-Configure GKE-specific features like Regional Backend Services (RBS) and static IPs using service annotations.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-gke
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Enable Regional Backend Services for better load balancing
-          cloud.google.com/l4-rbs: "enabled"
-          # Use pre-reserved static IPs
-          networking.gke.io/load-balancer-ip-addresses: "my-v4-ip,my-v6-ip"
-          # Specify the subnet for internal load balancers
-          networking.gke.io/load-balancer-subnet: "my-subnet"
-EOF
-```
-
-### AWS EKS load balancer annotations {#recipe-aws-eks}
-
-Configure AWS-specific load balancer features using service annotations.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-aws
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Use Network Load Balancer instead of Classic
-          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-          # Make it internal (no public IP)
-          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-          # Enable cross-zone load balancing
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-          # Specify subnets
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-abc123,subnet-def456"
-EOF
-```
-
-### Azure AKS load balancer annotations {#recipe-azure-aks}
-
-Configure Azure-specific load balancer features using service annotations.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-azure
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Make it internal
-          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-          # Specify resource group for the load balancer
-          service.beta.kubernetes.io/azure-load-balancer-resource-group: "my-resource-group"
 EOF
 ```
 
@@ -814,29 +504,6 @@ spec:
                 volumeMounts:
                   - name: logs
                     mountPath: /var/log/envoy
-EOF
-```
-
-### ServiceAccount annotations for IAM {#recipe-sa-iam}
-
-Add annotations to the ServiceAccount for cloud provider IAM integration (e.g., AWS IRSA, GKE Workload Identity).
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: envoy-iam
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    serviceAccountOverlay:
-      metadata:
-        annotations:
-          # AWS IRSA
-          eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/envoy-role"
-          # Or GKE Workload Identity
-          # iam.gke.io/gcp-service-account: "envoy@my-project.iam.gserviceaccount.com"
 EOF
 ```
 
