@@ -1,5 +1,10 @@
 # Cloudflare Pages redirects
 
+# Redirect /docs/agentgateway/ to agentgateway.dev
+/docs/agentgateway https://agentgateway.dev/docs/kubernetes/ 301
+/docs/agentgateway/ https://agentgateway.dev/docs/kubernetes/ 301
+/docs/agentgateway/* https://agentgateway.dev/docs/kubernetes/:splat 301
+
 # Redirect old MCP documentation to new Agent Gateway documentation
 /docs/mcp /docs/main/agentgateway 301
 /docs/integrations/agentgateway /docs/main/agentgateway 301
