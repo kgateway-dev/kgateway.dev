@@ -1,37 +1,6 @@
 The data plane proxy of your Gateway determines the templating language that you use to express transformations.
 
-{{% conditional-text include-if="envoy" %}}
 {{< icon "kgateway" >}} Inja for Envoy-based kgateway proxies
-{{% /conditional-text %}}
-{{% conditional-text include-if="agentgateway" %}}
-{{< icon "agentgateway" >}} Common Expression Language (CEL) for {{< reuse "docs/snippets/agentgateway.md" >}}
-
-## CEL for Agentgateway {#cel}
-
-{{< reuse "docs/snippets/agentgateway-capital.md" >}} transformation templates are written in Common Expression Language (CEL). CEL is a fast, portable, and safely executable language that goes beyond declarative configurations. CEL lets you develop more complex expressions in a readable, developer-friendly syntax.
-
-To learn more about how to use CEL, refer to the following resources:
-
-* [cel.dev tutorial](https://cel.dev/tutorials/cel-get-started-tutorial)
-* [Agentgateway reference docs](https://agentgateway.dev/docs/reference/cel/)
-
-### Log CEL variables in agentgateway {#cel-log}
-
-You can log the full context of the CEL variables by [upgrading your Helm installation settings]({{< link-hextra path="/operations/upgrade/">}}), such as the following example:
-
-```yaml
-agentgateway:
-  config:
-    logging:
-      fields:
-        add:
-          cel: variables()
-  enabled: true
-```
-
-{{% /conditional-text %}}
-
-{{% conditional-text include-if="envoy" %}}
 
 ## Inja for Envoy-based kgateway proxies {#inja}
 
@@ -249,5 +218,3 @@ The following body is returned after transformation:
 ```
 {"author": "Yours Truly", "title": "Sample Slide Show", "slides": "[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}]}% 
 ```
-
-{{% /conditional-text %}}

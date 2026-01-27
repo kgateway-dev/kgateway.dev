@@ -22,6 +22,10 @@
 
 {{- range $versions -}}
   <li>
-    <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+    {{- if or (eq $subSection "agentgateway") (hasPrefix $path "/docs/agentgateway/") -}}
+      <a class="dropdow-item" href="https://agentgateway.dev/docs/kubernetes/latest/">{{ .dropdown }}</a>
+    {{- else -}}
+      <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+    {{- end -}}
   </li>
 {{- end -}}

@@ -1,1 +1,1 @@
-{{% conditional-text include-if="envoy" %}}kgateway{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}agentgateway{{% /conditional-text %}}
+kgateway

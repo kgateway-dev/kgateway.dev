@@ -1,1 +1,1 @@
-{{% conditional-text include-if="envoy" %}}gateway.kgateway.dev{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}{{< version include-if="2.1.x" >}}gateway.kgateway.dev{{< /version >}}{{< version include-if="2.2.x" >}}agentgateway.dev{{< /version >}}{{% /conditional-text %}}
+gateway.kgateway.dev
