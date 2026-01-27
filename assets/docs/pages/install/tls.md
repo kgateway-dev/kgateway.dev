@@ -4,8 +4,7 @@ TLS encryption is disabled by default. When enabled, the control plane mounts a 
 
 ## Before you begin
 
-{{< conditional-text include-if="envoy" >}}{{< reuse "docs/snippets/prereq.md" >}}{{< /conditional-text >}}
-{{< conditional-text include-if="agentgateway" >}}{{< reuse "docs/snippets/agentgateway-prereq.md" >}}{{< /conditional-text >}}
+{{< reuse "docs/snippets/prereq.md" >}}
 
 ## Step 1: Set up cert-manager {#cert-manager}
 
@@ -140,13 +139,13 @@ Now that the control plane is up and running, verify the TLS connection.
 1. Port-forward the control plane service on port 9977.
 
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} {{% conditional-text include-if="envoy" %}}9977{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}9978{{% /conditional-text %}}
+   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} svc/{{< reuse "/docs/snippets/helm-kgateway.md" >}} 9977
    ```
 
 2. Send a request to the control plane in plaintext without TLS authentication. You get back an `authentication failed` error.
 
    ```sh
-   grpcurl -plaintext localhost:{{% conditional-text include-if="envoy" %}}9977{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}9978{{% /conditional-text %}} list
+   grpcurl -plaintext localhost:9977 list
    ```
 
    Example output:

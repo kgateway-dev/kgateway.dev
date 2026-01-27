@@ -1,3 +1,3 @@
 Review the API reference documentation for {{< reuse "docs/snippets/kgateway-and-data-plane.md" >}}. 
 
-Looking for the {{% conditional-text include-if="envoy" %}}agentgateway{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}Envoy{{% /conditional-text %}} data plane APIs instead? See the {{% conditional-text include-if="envoy" %}}[kgateway with agentgateway](https://kgateway.dev/docs/agentgateway/main/reference/api/){{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}[kgateway with Envoy](https://kgateway.dev/docs/envoy/main/reference/api/){{% /conditional-text %}} API docs.
+Looking for the agentgateway data plane APIs instead? See the [kgateway with agentgateway](https://agentgateway.dev/docs) API docs.

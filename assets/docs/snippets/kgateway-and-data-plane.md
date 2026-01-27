@@ -1,1 +1,1 @@
-kgateway with the {{% conditional-text include-if="envoy" %}}Envoy{{% /conditional-text %}}{{% conditional-text include-if="agentgateway" %}}agentgateway{{% /conditional-text %}} data plane
+kgateway with the Envoy data plane
