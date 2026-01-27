@@ -12,3 +12,14 @@ Each example walks through:
 4. Applying them to your cluster
 
 Pick the example that matches your use case, or work through them all to get familiar with the migration workflow.
+
+{{< cards >}}
+  {{< card link="basic" title="Basic Ingress" >}}
+  {{< card link="session-affinity" title="Session Affinity" >}}
+  {{< card link="rate-limiting" title="Rate Limiting" >}}
+  {{< card link="cors" title="CORS" >}}
+  {{< card link="ssl-redirect" title="SSL Redirect" >}}
+  {{< card link="external-auth" title="External Auth" >}}
+  {{< card link="canary" title="Canary Release" >}}
+  {{< card link="backend-tls" title="Backend TLS" >}}
+{{< /cards >}}
