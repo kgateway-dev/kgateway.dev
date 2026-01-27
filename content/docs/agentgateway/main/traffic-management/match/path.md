@@ -1,10 +1,16 @@
+---
+title: Path 
+weight: 10
+---
+
 Match the targeted path of an incoming request against specific path criteria. 
 
 For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/api-types/httproute/#matches).
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+1. [Set up an agentgateway proxy]({{< link-hextra path="/setup/" >}}). 
+2. [Install the httpbin sample app]({{< link-hextra path="/operations/sample-app/" >}}).
 
 ## Set up exact matching
 
@@ -18,7 +24,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      namespace: httpbin
    spec:
      parentRefs:
-       - name: http
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
@@ -37,7 +43,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/status/200 -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing"  %}}
@@ -49,28 +55,22 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
+   * Request completely sent off
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
-   < access-control-allow-credentials: true
+    access-control-allow-credentials: true
    access-control-allow-credentials: true
    < access-control-allow-origin: *
    access-control-allow-origin: *
-   < date: Sat, 04 Nov 2023 03:19:26 GMT
-   date: Sat, 04 Nov 2023 03:19:26 GMT
    < content-length: 0
    content-length: 0
-   < x-envoy-upstream-service-time: 1
-   x-envoy-upstream-service-time: 1
-   < server: envoy
-   server: envoy
    ```
 
 3. Send another request to the httpbin app. This time, use the `/headers` path. Because this path is not specified in the HTTPRoute, the request fails and a 404 HTTP response code is returned. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/headers -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
@@ -82,15 +82,12 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
    < HTTP/1.1 404 Not Found
    HTTP/1.1 404 Not Found
-   < date: Tue, 23 Apr 2024 18:52:01 GMT
-   date: Tue, 23 Apr 2024 18:52:01 GMT
-   < server: envoy
-   server: envoy
-   < content-length: 0
-   content-length: 0
+   < content-length: 9
+   content-length: 9
+   < content-type: text/plain; charset=utf-8
+   content-type: text/plain; charset=utf-8
    ```
    
 ## Set up prefix path matching
@@ -105,7 +102,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
      namespace: httpbin
    spec:
      parentRefs:
-       - name: http
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - match.example
@@ -124,7 +121,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/team1 -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/team1 -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
@@ -136,28 +133,45 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    < access-control-allow-credentials: true
    access-control-allow-credentials: true
    < access-control-allow-origin: *
    access-control-allow-origin: *
-   < date: Sat, 04 Nov 2023 03:19:26 GMT
-   date: Sat, 04 Nov 2023 03:19:26 GMT
-   < content-length: 0
-   content-length: 0
-   < x-envoy-upstream-service-time: 1
-   x-envoy-upstream-service-time: 1
-   < server: envoy
-   server: envoy
+   < content-type: application/json; encoding=utf-8
+   content-type: application/json; encoding=utf-8
+   < content-length: 304
+   content-length: 304
+   < 
+
+   {
+     "args": {},
+     "headers": {
+       "Accept": [
+         "*/*"
+       ],
+       "Host": [
+         "match.example"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ]
+     },
+     "origin": "10.xxx.x.xx:35204",
+     "url": "http://match.example/anything/team1",
+     "data": "",
+     "files": null,
+     "form": null,
+     "json": null
+   }
    ```
 
 3. Send another request to the httpbin app. This time, use the `/headers` path. Because this path is not specified in the HTTPRoute, the request fails and a 404 HTTP response code is returned. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/headers -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
@@ -169,15 +183,12 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
    < HTTP/1.1 404 Not Found
    HTTP/1.1 404 Not Found
-   < date: Tue, 23 Apr 2024 18:52:01 GMT
-   date: Tue, 23 Apr 2024 18:52:01 GMT
-   < server: envoy
-   server: envoy
-   < content-length: 0
-   content-length: 0
+   < content-length: 9
+   content-length: 9
+   < content-type: text/plain; charset=utf-8
+   content-type: text/plain; charset=utf-8
    ```
    
 ## Set up regex matching
@@ -185,8 +196,8 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions to match incoming requests.
 
 1. Create an HTTPRoute resource for the `match.example` domain that uses a regular expression (regex) to match incoming requests. The following regex patterns are defined in the example: 
-   * **`\/.*my-path.*`**: 
-     * The request path must start with `/`
+   * **`/.*my-path.*`**: 
+     * The request path must start with `/`.
      * The expression `.*` means that any character before and after the `my-path` string is allowed. 
      * Allowed pattern: `/anything/this-is-my-path-1`, not allowed: `/anything`. 
    * **`/anything/stores/[^/]+?/entities`**: 
@@ -209,7 +220,7 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
      namespace: httpbin
    spec:
      parentRefs:
-       - name: http
+       - name: agentgateway-proxy
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
      hostnames:
        - "match.example"
@@ -240,9 +251,9 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/this-is-my-path-1 -H "host: match.example:8080"
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/entities -H "host: match.example:8080"
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/dogs/3.0-game -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/this-is-my-path-1 -H "host: match.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/stores/us/entities -H "host: match.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/dogs/3.0-game -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
@@ -256,21 +267,38 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
 
    Example output: 
    ```
-   * Mark bundle as not supporting multiuse
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK
    < access-control-allow-credentials: true
    access-control-allow-credentials: true
    < access-control-allow-origin: *
    access-control-allow-origin: *
-   < date: Sat, 04 Nov 2023 03:19:26 GMT
-   date: Sat, 04 Nov 2023 03:19:26 GMT
-   < content-length: 0
-   content-length: 0
-   < x-envoy-upstream-service-time: 1
-   x-envoy-upstream-service-time: 1
-   < server: envoy
-   server: envoy
+   < content-type: application/json; encoding=utf-8
+   content-type: application/json; encoding=utf-8
+   < content-length: 317
+   content-length: 317
+   < 
+
+   {
+     "args": {},
+     "headers": {
+      "Accept": [
+            "*/*"
+       ],
+       "Host": [
+        "match.example"
+       ],
+       "User-Agent": [
+         "curl/8.7.1"
+       ]
+     },
+     "origin": "10.xxx.x.xx:43182",
+     "url": "http://match.example/anything/stores/us/entities",
+     "data": "",
+     "files": null,
+     "form": null,
+     "json": null
+   }
    ```
 
 3. Send requests to the httpbin app that do not meet the defined regex patterns.
@@ -282,9 +310,9 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: match.example:8080"
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/south/entities -H "host: match.example:8080"
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/birds/1.1-game -H "host: match.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything -H "host: match.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/stores/us/south/entities -H "host: match.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:80/anything/birds/1.1-game -H "host: match.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
@@ -298,13 +326,12 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
 
    Example output: 
    ```
-   * Request completely sent off
    < HTTP/1.1 404 Not Found
    HTTP/1.1 404 Not Found
-   < server: envoy
-   server: envoy
-   < content-length: 0
-   content-length: 0
+   < content-length: 9
+   content-length: 9
+   < content-type: text/plain; charset=utf-8
+   content-type: text/plain; charset=utf-8
    ```
 
 
