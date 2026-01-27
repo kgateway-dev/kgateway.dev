@@ -110,7 +110,7 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 - `nginx.ingress.kubernetes.io/load-balance`: Sets the algorithm to use for load balancing. The only supported value is `round_robin`.
   For kgateway, this maps to `BackendConfigPolicy.spec.loadBalancer`.
 
-**Note:** For kgateway, if multiple Ingress resources reference the same Service with different `proxy-connect-timeout` values, ingress2gateway will emit warnings because Kgateway cannot safely apply multiple conflicting `BackendConfigPolicy` resources to the same Service.
+**Note:** For kgateway, if multiple Ingress resources reference the same Service with different `proxy-connect-timeout` values, ingress2gateway emits warnings because Kgateway cannot safely apply multiple conflicting `BackendConfigPolicy` resources to the same Service.
 
 ---
 
@@ -124,7 +124,7 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-server-name`: **Note:** This annotation is not handled separately. In Kgateway, SNI is automatically enabled when `proxy-ssl-name` is set.
 
-**Note:** For kgateway, backend TLS configuration is applied via `BackendConfigPolicy` resources. If multiple Ingress resources reference the same Service with different backend TLS settings, ingress2gateway will create a single `BackendConfigPolicy` per Service, and conflicting settings may result in warnings.
+**Note:** For kgateway, backend TLS configuration is applied via `BackendConfigPolicy` resources. If multiple Ingress resources reference the same Service with different backend TLS settings, ingress2gateway creates a single `BackendConfigPolicy` per Service, and conflicting settings may result in warnings.
 
 ---
 
@@ -134,7 +134,7 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 - `nginx.ingress.kubernetes.io/session-cookie-name`: Defines the name of the cookie used for session affinity. For kgateway, this maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.name`.
 
-- `nginx.ingress.kubernetes.io/session-cookie-path`: Defines the path that will be set on the cookie. For kgateway, this maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.path`.
+- `nginx.ingress.kubernetes.io/session-cookie-path`: Defines the path that is set on the cookie. For kgateway, this maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.path`.
 
 - `nginx.ingress.kubernetes.io/session-cookie-domain`: Sets the Domain attribute of the sticky cookie. **Note:** This annotation is parsed but not currently mapped to kgateway as the Cookie type doesn't support domain.
 
@@ -154,7 +154,7 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 - `nginx.ingress.kubernetes.io/force-ssl-redirect`: When set to `"true"`, enables SSL redirect for HTTP requests. This annotation is treated exactly the same as `ssl-redirect`. For kgateway, this maps to a `RequestRedirect` filter on HTTPRoute rules that redirects HTTP to HTTPS with a 301 status code. Note that ingress-nginx redirects with code 308, but that isn't supported by gateway API. 
 
-**Note:** Both annotations are supported and treated identically. If either annotation is set to `"true"` (case-insensitive), SSL redirect will be enabled. The redirect filter is added at the rule level in the HTTPRoute, redirecting all HTTP traffic to HTTPS.
+**Note:** Both annotations are supported and treated identically. If either annotation is set to `"true"` (case-insensitive), SSL redirect is enabled. The redirect filter is added at the rule level in the HTTPRoute, redirecting all HTTP traffic to HTTPS.
 
 ---
 

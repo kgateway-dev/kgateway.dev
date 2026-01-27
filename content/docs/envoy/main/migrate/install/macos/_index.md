@@ -5,7 +5,7 @@ weight: 10
 
 ## Install ingress2gateway on macOS
 
-1. Set the environment variables:
+1. Set the environment variables.
 
     ```bash
     VERSION=v0.3.0
@@ -16,21 +16,21 @@ weight: 10
 
     Refer to the [releases page](https://github.com/kgateway-dev/ingress2gateway/releases) for a list of published ingress2gateway versions.
 
-2. Download the release:
+2. Download the release.
 
     ```bash
     curl -LO "https://github.com/kgateway-dev/ingress2gateway/releases/download/${VERSION}/ingress2gateway_${OS}_${ARCH}.tar.gz"
     ```
 
-3. Validate the release tarball (optional)
+3. Validate the release tarball (optional).
 
-    Download the ingress2gateway checksum file:
+    Download the ingress2gateway checksum file.
 
     ```bash
     curl -LO https://github.com/kgateway-dev/ingress2gateway/releases/download/${VERSION}/checksums.txt
     ```
 
-    Validate the binary against the checksum file:
+    Validate the binary against the checksum file.
 
     ```bash
     echo "$(cat checksums.txt)  ingress2gateway" | shasum -a 256 --check
@@ -42,7 +42,7 @@ weight: 10
     ingress2gateway_$OS_$ARCH.tar.gz: OK
     ```
 
-4. Extract the tarball:
+4. Extract the tarball.
 
     ```bash
     tar -xvf ingress2gateway_${OS}_${ARCH}.tar.gz
@@ -57,7 +57,7 @@ weight: 10
 
     **Note:** Make sure /usr/local/bin is in your PATH environment variable.
 
-6. Test the installation by checking the version of the binary:
+6. Test the installation by checking the version of the binary.
 
     ```bash
     ingress2gateway version

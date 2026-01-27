@@ -41,6 +41,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: TrafficPolicy with token bucket
 
+```bash
+cat ratelimit-kgateway.yaml
+```
+
 The generated `TrafficPolicy` uses a token bucket algorithm. With 10 RPS and a 2x burst multiplier, you get `maxTokens: 20`:
 
 ```yaml

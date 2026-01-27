@@ -41,6 +41,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: GatewayExtension
 
+```bash
+cat external-auth-kgateway.yaml
+```
+
 The tool creates a `GatewayExtension` that configures the external auth service:
 
 ```yaml

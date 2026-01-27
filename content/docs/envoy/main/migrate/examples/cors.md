@@ -44,6 +44,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: TrafficPolicy with CORS
 
+```bash
+cat cors-kgateway.yaml
+```
+
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy

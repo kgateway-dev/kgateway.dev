@@ -45,6 +45,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: Gateway API + BackendConfigPolicy
 
+```bash
+cat session-affinity-kgateway.yaml
+```
+
 The tool generates the usual Gateway and HTTPRoute, plus a `BackendConfigPolicy` that configures ring-hash load balancing with cookie-based hashing:
 
 ```yaml
