@@ -7,6 +7,7 @@ Review your options for customizing the gateway proxy for different underlying l
 
 {{< cards >}}
   {{< card link="general-steps" title="General steps to customize gateways" >}}
+  {{< card link="configuration" title="Proxy configuration and overlays cookbook" >}}
   {{< card link="selfmanaged" title="Bring your own (BYO) self-managed gateways" >}}
 {{< /cards >}}
 
