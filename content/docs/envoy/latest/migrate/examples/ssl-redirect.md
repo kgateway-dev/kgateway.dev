@@ -40,6 +40,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: HTTPRoute with redirect filter
 
+```bash
+cat ssl-redirect-kgateway.yaml
+```
+
 The HTTPRoute includes a `RequestRedirect` filter that sends a 301 to HTTPS:
 
 ```yaml

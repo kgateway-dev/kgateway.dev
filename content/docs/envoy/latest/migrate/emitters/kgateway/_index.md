@@ -8,24 +8,23 @@ The Kgateway Emitter supports generating **Gateway API** and **kgateway** resour
 
 - **Provider**: `ingress-nginx`
 
-**Note:** All other providers will be ignored by the emitter.
+**Note:** All other providers are ignored by the emitter.
 
 ## Usage
 
-Ingress2gateway reads Ingress resources from a Kubernetes cluster or a file. It will output the equivalent
-Gateway API and kgateway-specific resources in a YAML/JSON format to stdout.  The simplest case is to convert
+Ingress2gateway reads Ingress resources from a Kubernetes cluster or a file. It outputs the equivalent
+Gateway API and kgateway-specific resources in YAML or JSON format to stdout. The simplest case is to convert
 all ingresses from the ingress-nginx provider:
 
 ```shell
 ingress2gateway print --providers=ingress-nginx --emitter=kgateway
 ```
 
-The above command will:
+This command:
 
-1. Read your Kube config file to extract the cluster credentials and the current
-   active namespace.
-2. Search for ingress-nginx resources in that namespace.
-3. Convert them to Gateway-API resources (Currently only Gateways and HTTPRoutes).
+1. Reads the kubeconfig file to extract cluster credentials and the current active namespace.
+2. Searches for ingress-nginx resources in that namespace. If no ingress-nginx resources exist, the command exits with the message `No resources found`.
+3. Converts them to Gateway API resources (currently only Gateways and HTTPRoutes).
 
 ## Options
 
@@ -34,7 +33,7 @@ The above command will:
 | Flag           | Default Value           | Required | Description                                                  |
 | -------------- | ----------------------- | -------- | ------------------------------------------------------------ |
 | all-namespaces | False                   | No       | If present, list the requested object(s) across all namespaces. Namespace in the current context is ignored even if specified with --namespace. |
-| input-file     |                         | No       | Path to the manifest file. When set, the tool will read ingresses from the file instead of reading from the cluster. Supported files are yaml and json. |
+| input-file     |                         | No       | Path to the manifest file. When set, the tool reads ingresses from the file instead of from the cluster. Supported files are yaml and json. |
 | namespace      |                         | No       | If present, the namespace scope for the invocation.           |
 | output         | yaml                    | No       | The output format, either yaml or json.                       |
 | providers      |  | Yes       | Comma-separated list of providers (only ingress-nginx is supported in this downstream). |
@@ -45,37 +44,37 @@ The above command will:
 
 ### Processing Order and Conflicts
 
-Ingress resources will be processed with a defined order to ensure deterministic
-generated Gateway API configuration.
-This should also determine precedence order of Ingress resources and routes in case
+Ingress resources are processed in a defined order to ensure deterministic
+Gateway API configuration.
+This order also determines precedence of Ingress resources and routes in case
 of conflicts.
 
-Ingress resources with the oldest creation timestamp will be sorted first and therefore
-given precedence. If creation timestamps are equal, then sorting will be done based
+Ingress resources with the oldest creation timestamp are sorted first and therefore
+given precedence. If creation timestamps are equal, sorting is done based
 on the namespace/name of the resources. If an Ingress rule conflicts with another
-(e.g. same path match but different backends) an error will be reported for the
-one that sorted later.
+(e.g. same path match but different backends), an error is reported for the
+one that sorts later.
 
-Since the Ingress v1 spec does not itself have a conflict resolution guide, we have
-adopted this one. These rules are similar to the [Gateway API conflict resolution
+Since the Ingress v1 spec does not define conflict resolution, this tool
+adopts the following rules, which are similar to the [Gateway API conflict resolution
 guidelines](https://gateway-api.sigs.k8s.io/concepts/guidelines/#conflicts).
 
 ### Ingress resource fields to Gateway API fields
 
-Given a set of Ingress resources, `ingress2gateway` will generate a Gateway with
-various HTTP and HTTPS Listeners as well as HTTPRoutes that should represent equivalent
+Given a set of Ingress resources, `ingress2gateway` generates a Gateway with
+various HTTP and HTTPS listeners as well as HTTPRoutes that represent equivalent
 routing rules.
 
 | Ingress Field                   | Gateway API configuration                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ingressClassName`              | If configured on an Ingress resource, this value will be translated to `kgateway`.                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `defaultBackend`                | If present, this configuration will generate a Gateway Listener with no `hostname` specified as well as a catchall HTTPRoute that references this listener. The backend specified here will be translated to a HTTPRoute `rules[].backendRefs[]` element.                                                                                                                                                                                                                                                                                                                                                         |
-| `tls[].hosts`                   | Each host in an IngressTLS will result in a HTTPS Listener on the generated Gateway with the following: `listeners[].hostname` = host as described, `listeners[].port` = `443`, `listeners[].protocol` = `HTTPS`, `listeners[].tls.mode` = `Terminate`                                                                                                                                                                                                                                                                                                                                                            |
-| `tls[].secretName`              | The secret specified here will be referenced in the Gateway HTTPS Listeners mentioned above with the field `listeners[].tls.certificateRefs`. Each Listener for each host in an IngressTLS will get this secret.                                                                                                                                                                                                                                                                                                                                                                                                  |
-| `rules[].host`                  | If non-empty, each distinct value for this field in the provided Ingress resources will result in a separate Gateway HTTP Listener with matching `listeners[].hostname`. `listeners[].port` will be set to `80` and `listeners[].protocol` set to `HTTPS`. In addition, Ingress rules with the same hostname will generate HTTPRoute rules in a HTTPRoute with `hostnames` containing it as the single element. If empty, similar to the `defaultBackend`, a Gateway Listener with no hostname configuration will be generated (if it doesn't exist) and routing rules will be generated in a catchall HTTPRoute. |
+| `ingressClassName`              | If configured on an Ingress resource, this value is translated to `kgateway`.                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `defaultBackend`                | If present, this configuration generates a Gateway Listener with no `hostname` specified as well as a catchall HTTPRoute that references this listener. The backend specified here is translated to a HTTPRoute `rules[].backendRefs[]` element.                                                                                                                                                                                                                                                                                                                                                         |
+| `tls[].hosts`                   | Each host in an IngressTLS results in a HTTPS Listener on the generated Gateway with the following: `listeners[].hostname` = host as described, `listeners[].port` = `443`, `listeners[].protocol` = `HTTPS`, `listeners[].tls.mode` = `Terminate`                                                                                                                                                                                                                                                                                                                                                            |
+| `tls[].secretName`              | The secret specified here is referenced in the Gateway HTTPS Listeners mentioned above with the field `listeners[].tls.certificateRefs`. Each Listener for each host in an IngressTLS gets this secret.                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `rules[].host`                  | If non-empty, each distinct value for this field in the provided Ingress resources results in a separate Gateway HTTP Listener with matching `listeners[].hostname`. `listeners[].port` is set to `80` and `listeners[].protocol` to `HTTPS`. In addition, Ingress rules with the same hostname generate HTTPRoute rules in a HTTPRoute with `hostnames` containing it as the single element. If empty, similar to the `defaultBackend`, a Gateway Listener with no hostname configuration is generated (if it doesn't exist) and routing rules are generated in a catchall HTTPRoute. |
 | `rules[].http.paths[].path`     | This field translates to a HTTPRoute `rules[].matches[].path.value` configuration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `rules[].http.paths[].pathType` | This field translates to a HTTPRoute `rules[].matches[].path.type` configuration. Ingress `Exact` = HTTPRoute `Exact` match. Ingress `Prefix` = HTTPRoute `PathPrefix` match.                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `rules[].http.paths[].backend`  | The backend specified here will be translated to a HTTPRoute `rules[].backendRefs[]` element.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `rules[].http.paths[].backend`  | The backend specified here is translated to a HTTPRoute `rules[].backendRefs[]` element.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ## Supported Annotations
 
@@ -112,7 +111,7 @@ routing rules.
 - `nginx.ingress.kubernetes.io/load-balance`: Sets the algorithm to use for load balancing to a proxied server. The only supported value is `round_robin`.
 - `nginx.ingress.kubernetes.io/affinity`: Enables session affinity (only "cookie" type is supported). Maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies`.
 - `nginx.ingress.kubernetes.io/session-cookie-name`: Specifies the name of the cookie used for session affinity. Maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.name`.
-- `nginx.ingress.kubernetes.io/session-cookie-path`: Defines the path that will be set on the cookie. Maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.path`.
+- `nginx.ingress.kubernetes.io/session-cookie-path`: Defines the path that is set on the cookie. Maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.path`.
 - **Note (regex-mode constraint):** Ingress NGINX session cookie paths do not support regex. If regex-mode is enabled for a host (via `use-regex: "true"` or
   `rewrite-target`) and cookie affinity is used, `session-cookie-path` must be set; the provider validates this and emits an error if it is missing.
 - `nginx.ingress.kubernetes.io/session-cookie-domain`: Sets the Domain attribute of the sticky cookie. **Note:** This annotation is parsed but not currently mapped to kgateway as the Cookie type doesn't support domain.
@@ -150,7 +149,7 @@ routing rules.
 
 ### Access Logging
 
-- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, will create an HTTPListenerPolicy that will configure a basic policy for envoy access logging. Maps to `HTTPListenerPolicy.spec.accessLog[].fileSink`. This can be further customized as needed, see [docs](https://kgateway.dev/docs/envoy/2.0.x/security/access-logging/).
+- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, creates an HTTPListenerPolicy that configures a basic policy for Envoy access logging. Maps to `HTTPListenerPolicy.spec.accessLog[].fileSink`. This can be further customized as needed, see [docs](https://kgateway.dev/docs/envoy/2.0.x/security/access-logging/).
 
 ### Regex Path Matching and Rewrites
 
