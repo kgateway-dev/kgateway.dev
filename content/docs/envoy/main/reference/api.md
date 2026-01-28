@@ -383,10 +383,11 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used.<br />Deprecated: The Type field is deprecated and will be removed in a future release.<br />The backend type is inferred from the configuration. |  | Enum: [AWS Static DynamicForwardProxy] <br /> |
-| `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration.<br />The Aws backend type is only supported with envoy-based gateways, it is not supported in agentgateway. |  |  |
+| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used.<br />Deprecated: The Type field is deprecated and will be removed in a future release.<br />The backend type is inferred from the configuration. |  | Enum: [AWS Static DynamicForwardProxy GCP] <br /> |
+| `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration. |  |  |
 | `static` _[StaticBackend](#staticbackend)_ | Static is the static backend configuration. |  |  |
 | `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | DynamicForwardProxy is the dynamic forward proxy backend configuration. |  |  |
+| `gcp` _[GcpBackend](#gcpbackend)_ | Gcp is the GCP backend configuration. |  |  |
 
 
 #### BackendStatus
@@ -421,6 +422,7 @@ _Appears in:_
 | `AWS` | BackendTypeAWS is the type for AWS backends.<br /> |
 | `Static` | BackendTypeStatic is the type for static backends.<br /> |
 | `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
+| `GCP` | BackendTypeGCP is the type for GCP backends.<br /> |
 
 
 
@@ -826,6 +828,22 @@ _Appears in:_
 
 
 
+#### DnsResolver
+
+
+
+DnsResolver configures the CARES DNS resolver for Envoy.
+
+
+
+_Appears in:_
+- [EnvoyBootstrap](#envoybootstrap)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `udpMaxQueries` _integer_ | Maximum number of UDP queries to be issued on a single UDP channel.<br />This helps prevent DNS query pinning to a single resolver, addressing<br />the issue described in https://github.com/istio/istio/issues/53577.<br />Defaults to 100 if not specified. Set to 0 to disable this limit.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto#extensions-network-dns-resolver-cares-v3-caresdnsresolverconfig |  | Minimum: 0 <br /> |
+
+
 #### DurationFilter
 
 _Underlying type:_ _[ComparisonFilter](#comparisonfilter)_
@@ -874,6 +892,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
 | `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
+| `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
 
 
 #### EnvoyContainer
@@ -1273,6 +1292,23 @@ The current conditions of the GatewayParameters. This is not currently implement
 _Appears in:_
 - [GatewayParameters](#gatewayparameters)
 
+
+
+#### GcpBackend
+
+
+
+GcpBackend is the GCP backend configuration.
+
+
+
+_Appears in:_
+- [BackendSpec](#backendspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `host` _string_ | Host is the hostname of the GCP service to connect to.<br />This will be used for SNI and as the target address. |  | MinLength: 1 <br /> |
+| `audience` _string_ | Audience is the GCP service account audience URL.<br />When omitted, defaults to "https://\{host\}".<br />This is used by the GCP authn filter to request the appropriate token. |  | MinLength: 1 <br /> |
 
 
 #### GracefulShutdownSpec
@@ -2214,6 +2250,9 @@ _Appears in:_
 | `domain` _string_ | CookieDomain specifies the domain to set on the access and ID token cookies.<br />If set, the cookies will be set for the specified domain and all its subdomains. This is useful when requests<br />to subdomains are not required to be re-authenticated after the user has logged into the parent domain.<br />If not set, the cookies will default to the host of the request, not including the subdomains. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` <br /> |
 | `names` _[OAuth2CookieNames](#oauth2cookienames)_ | Names specifies the names of the cookies used to store the tokens.<br />If not set, the default names will be used. |  |  |
 | `sameSite` _[OAuth2CookieSameSite](#oauth2cookiesamesite)_ | SameSite specifies the SameSite attribute for the OAuth2 cookies.<br />If not set, the default is Lax. |  | Enum: [Lax Strict None] <br /> |
+| `disableAccessTokenSetCookie` _boolean_ | DisableAccessTokenSetCookie specifies whether to disable setting the access token cookie.<br />This can be used when the access token is too large to fit in a cookie. When true, the<br />set-cookie response header for the access token will be omitted. |  |  |
+| `disableIDTokenSetCookie` _boolean_ | DisableIDTokenSetCookie specifies whether to disable setting the ID token cookie.<br />This can be used when the ID token is too large to fit in a cookie. When true, the<br />set-cookie response header for the ID token will be omitted. |  |  |
+| `disableRefreshTokenSetCookie` _boolean_ | DisableRefreshTokenSetCookie specifies whether to disable setting the refresh token cookie.<br />This can be used when the refresh token is too large to fit in a cookie. When true, the<br />set-cookie response header for the refresh token will be omitted. |  |  |
 
 
 #### OAuth2CookieNames
@@ -2905,6 +2944,7 @@ _Appears in:_
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
 | `externalTrafficPolicy` _string_ | ExternalTrafficPolicy defines the external traffic policy for the service.<br />Valid values are Cluster and Local. Default value is Cluster. |  |  |
+| `loadBalancerClass` _string_ | LoadBalancerClass is the class of the load balancer implementation this Service belongs to.<br />If specified, the value of this field must be a label-style identifier, with an optional prefix.<br />This field can only be set when the Service type is 'LoadBalancer'. If not set, the default<br />load balancer implementation is used. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class |  |  |
 
 
 #### ServiceAccount
@@ -3262,7 +3302,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `set` _[HeaderTransformation](#headertransformation) array_ | Set is a list of headers and the value they should be set to. |  | MaxItems: 16 <br /> |
-| `add` _[HeaderTransformation](#headertransformation) array_ | Add is a list of headers to add to the request and what that value should be set to.<br />If there is already a header with these values then append the value as an extra entry. |  | MaxItems: 16 <br /> |
+| `add` _[HeaderTransformation](#headertransformation) array_ | Add is a list of headers to add to the request and what that value should be set to.<br />If there is already a header with these values then append the value as an extra entry.<br />Add is not supported on arm64 build, see docs/guides/transformation.md for details |  | MaxItems: 16 <br /> |
 | `remove` _string array_ | Remove is a list of header names to remove from the request/response. |  | MaxItems: 16 <br /> |
 | `body` _[BodyTransformation](#bodytransformation)_ | Body controls both how to parse the body and if needed how to set.<br />If empty, body will not be buffered. |  |  |
 
