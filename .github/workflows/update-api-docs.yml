@@ -8,7 +8,7 @@ on:
         required: true
         default: 'all'
         type: string
-  release:  # Automatically trigger on new releases
+  release:  # Automatically trigger on new releases (in this repo)
     types: [published]
 
 jobs:
@@ -25,6 +25,12 @@ jobs:
         with:
           repository: ${{ github.repository_owner }}/kgateway.dev
           path: kgateway.dev
+
+      - name: Checkout agentgateway website
+        uses: actions/checkout@v4
+        with:
+          repository: agentgateway/website
+          path: agentgateway.website
 
       - name: Setup Go
         uses: actions/setup-go@v4
@@ -78,6 +84,7 @@ jobs:
           GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
           INPUT_VERSION: ${{ inputs.version }}
           KUBE_VERSION: ${{ env.KUBE_VERSION }}
+          AGENTGATEWAY_WEBSITE_DIR: ${{ github.workspace }}/agentgateway.website
         run: |
           cd kgateway.dev
           python3 scripts/generate-ref-docs.py
@@ -99,21 +106,48 @@ jobs:
           body: |
             ${{ github.event_name == 'release' && format('🎉 **Automated documentation update for release {0}**', github.event.release.tag_name) || format('📝 **Manual documentation update for {0}**', inputs.version == 'all' && 'all supported versions' || format('version {0}', inputs.version)) }}
             
-            This PR updates API, Helm, and Metrics reference documentation based on the latest tags from the **kgateway** repository.
+            This PR updates API, Helm, and Metrics reference documentation for **kgateway (envoy)** docs based on the latest tags from the **kgateway** repository. Agentgateway reference docs are updated in a separate PR in the agentgateway/website repo.
             
             **Trigger:** ${{ github.event_name == 'release' && '🚀 Release published' || '👤 Manual workflow dispatch' }}
             ${{ github.event_name == 'release' && format('**Release:** `{0}`', github.event.release.tag_name) || format('**Target version:** `{0}`', inputs.version) }}
             
             **Updates included:**
-            - API reference documentation 
-            - Helm chart reference documentation
+            - API reference (envoy / gateway.kgateway.dev)
+            - Helm chart reference (kgateway, kgateway-crds)
             - Control plane metrics documentation
-            - Each version uses the latest corresponding tag from the kgateway repository
             
             **File locations:**
-            - API docs: `content/docs/{envoy,agentgateway}/{VERSION}/reference/api.md`
-            - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
+            - API docs: `content/docs/envoy/{VERSION}/reference/api.md`
+            - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/`
             - Metrics docs: `assets/docs/snippets/{VERSION}/metrics-control-plane.md`
+          branch: api-gen-update
+          branch-suffix: timestamp
+          delete-branch: true
+          base: main
+          labels: |
+            documentation
+            automated pr
+
+      - name: Create Pull Request (agentgateway website)
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: agentgateway.website
+          commit-message: "docs: Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || format(' for {0}', inputs.version == 'all' && 'all versions' || inputs.version) }}"
+          signoff: true
+          title: "Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || format(' for {0}', inputs.version == 'all' && 'all versions' || inputs.version) }}"
+          body: |
+            ${{ github.event_name == 'release' && format('🎉 **Automated documentation update for release {0}**', github.event.release.tag_name) || format('📝 **Manual documentation update for {0}**', inputs.version == 'all' && 'all supported versions' || format('version {0}', inputs.version)) }}
+            
+            This PR updates API, Helm, and Metrics reference documentation for the **agentgateway** docs site, generated from the latest tags in the **kgateway** repository.
+            
+            **Trigger:** ${{ github.event_name == 'release' && '🚀 Release published' || '👤 Manual workflow dispatch' }}
+            ${{ github.event_name == 'release' && format('**Release:** `{0}`', github.event.release.tag_name) || format('**Target version:** `{0}`', inputs.version) }}
+            
+            **Updates included:**
+            - API reference: `content/docs/kubernetes/{VERSION}/reference/api.md`
+            - Helm reference: `assets/agw-docs/pages/reference/helm/{VERSION}/`
+            - Metrics: `assets/agw-docs/snippets/{VERSION}/metrics-control-plane.md`
           branch: api-gen-update
           branch-suffix: timestamp
           delete-branch: true

@@ -417,8 +417,14 @@ def _post_process_api_docs(api_file):
         f.write(content)
 
 
-def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
-    '''Generate API reference documentation'''
+def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway', agw_website_dir=None):
+    '''Generate API reference documentation.
+
+    Envoy (kgateway) API is always written to kgateway.dev: content/docs/envoy/{url_path}/reference/.
+    Agentgateway API is written to agw_website_dir when set: content/docs/kubernetes/{link_version}/reference/
+    (agentgateway/website repo). When agw_website_dir is not set, agentgateway is written to kgateway.dev
+    content/docs/agentgateway/ (legacy).
+    '''
     print(f'  → Generating API docs for version {version}')
     
     # Check if the API directory exists
@@ -466,16 +472,23 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         # Extract agentgateway.dev/v1alpha1 package
         agentgateway_content = extract_package_section(generated_content, 'agentgateway.dev/v1alpha1')
         if agentgateway_content:
-            target_path = f'content/docs/agentgateway/{url_path}/reference/'
+            if agw_website_dir:
+                # Agentgateway docs live in agentgateway/website: content/docs/kubernetes/{link_version}/reference/
+                target_path = os.path.join(agw_website_dir, f'content/docs/kubernetes/{link_version}/reference')
+                api_intro_reuse = '{{< reuse "/agw-docs/snippets/api-ref-docs-intro.md" >}}'
+            else:
+                # Legacy: write to kgateway.dev content/docs/agentgateway/
+                target_path = f'content/docs/agentgateway/{url_path}/reference/'
+                api_intro_reuse = '{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}'
             os.makedirs(target_path, exist_ok=True)
-            api_file = f'{target_path}api.md'
+            api_file = os.path.join(target_path, 'api.md')
             
             with open(api_file, 'w') as f:
                 f.write('---\n')
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write(f'{api_intro_reuse}\n\n')
                 f.write(agentgateway_content)
             
             # Apply post-processing
@@ -484,9 +497,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             # Inject missing type definitions
             agentgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/agentgateway'
             if os.path.exists(agentgateway_api_dir):
-                # Pass KUBE_VERSION to the subprocess (use the same value used for crd-ref-docs)
                 env = os.environ.copy()
-                # Use the kube_version variable set earlier in this function (line 237)
                 env['KUBE_VERSION'] = kube_version
                 result = subprocess.run([
                     sys.executable, 'scripts/inject-missing-types.py',
@@ -541,16 +552,14 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         
         return True
     else:
-        # For earlier versions, write same content to both directories (legacy behavior)
+        # For earlier versions, write same content to both sections (legacy behavior)
         print(f'    Version {version} uses unified API - generating same docs for both sections')
         
-        for doc_dir in ['envoy', 'agentgateway']:
+        # Envoy (kgateway) always in kgateway.dev
+        for doc_dir in ['envoy']:
             target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
             os.makedirs(target_path, exist_ok=True)
-            
-            api_file = f'{target_path}api.md'
-            
-            # Create API reference file with frontmatter
+            api_file = os.path.join(target_path, 'api.md')
             with open(api_file, 'w') as f:
                 f.write('---\n')
                 f.write('title: API reference\n')
@@ -558,29 +567,58 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('---\n\n')
                 f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(generated_content)
-            
-            # Apply post-processing
             _post_process_api_docs(api_file)
             print(f'    ✓ Generated API docs in {api_file}')
+        
+        # Agentgateway: agentgateway/website or kgateway.dev (legacy)
+        if agw_website_dir:
+            target_path = os.path.join(agw_website_dir, f'content/docs/kubernetes/{link_version}/reference')
+            api_intro_reuse = '{{< reuse "/agw-docs/snippets/api-ref-docs-intro.md" >}}'
+        else:
+            target_path = f'content/docs/agentgateway/{url_path}/reference/'
+            api_intro_reuse = '{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}'
+        os.makedirs(target_path, exist_ok=True)
+        api_file = os.path.join(target_path, 'api.md')
+        with open(api_file, 'w') as f:
+            f.write('---\n')
+            f.write('title: API reference\n')
+            f.write('weight: 10\n')
+            f.write('---\n\n')
+            f.write(f'{api_intro_reuse}\n\n')
+            f.write(generated_content)
+        _post_process_api_docs(api_file)
+        print(f'    ✓ Generated API docs in {api_file}')
         
         return True
 
 
-def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway'):
-    '''Generate Helm chart reference documentation'''
+def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway', agw_website_dir=None):
+    '''Generate Helm chart reference documentation.
+
+    kgateway + kgateway-crds are written to kgateway.dev: assets/docs/pages/reference/helm/{version}/.
+    agentgateway + agentgateway-crds are written to agw_website_dir when set:
+    assets/agw-docs/pages/reference/helm/{version}/ (agentgateway/website repo).
+    '''
     print(f'  → Generating Helm docs for version {version}')
     
-    # Generate Helm docs for each chart
-    # Format: 'directory:filename' where directory is under install/helm/
-    charts = [
-        'kgateway:kgateway',
-        'kgateway-crds:kgateway-crds',
-        'agentgateway:agentgateway',
-        'agentgateway-crds:agentgateway-crds'
+    # Charts for kgateway.dev (envoy docs)
+    kgateway_charts = [
+        ('kgateway:kgateway', None),  # (chart, output_base) None = kgateway.dev cwd
+        ('kgateway-crds:kgateway-crds', None),
     ]
+    # Charts for agentgateway/website when agw_website_dir is set
+    agw_charts = [
+        ('agentgateway:agentgateway', 'agw'),
+        ('agentgateway-crds:agentgateway-crds', 'agw'),
+    ]
+    if agw_website_dir:
+        charts_with_base = [(c, None) for c, _ in kgateway_charts] + agw_charts
+    else:
+        # Legacy: all four charts go to kgateway.dev
+        charts_with_base = [(c, None) for c, _ in kgateway_charts] + [(c, None) for c, _ in agw_charts]
     generated_any = False
     
-    for chart in charts:
+    for chart, output_base in charts_with_base:
         dir_name, file_name = chart.split(':')
         helm_path = f'{kgateway_dir}/install/helm/{dir_name}'
         
@@ -595,13 +633,14 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
             '--dry-run'
         ], capture_output=True, text=True, check=True)
         
-        # Write the raw helm-docs output to assets directory
-        # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
-        # This prevents overwriting when promoting versions
-        assets_path = f'assets/docs/pages/reference/helm/{version}/'
+        # Output path: agentgateway website or kgateway.dev
+        if output_base == 'agw' and agw_website_dir:
+            assets_path = os.path.join(agw_website_dir, f'assets/agw-docs/pages/reference/helm/{version}/')
+        else:
+            assets_path = f'assets/docs/pages/reference/helm/{version}/'
         os.makedirs(assets_path, exist_ok=True)
         
-        helm_file = f'{assets_path}{file_name}.md'
+        helm_file = os.path.join(assets_path, f'{file_name}.md')
         
         with open(helm_file, 'w') as f:
             f.write(result.stdout)
@@ -669,11 +708,13 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
     return generated_any
 
 
-def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgateway'):
-    '''Generate control plane metrics documentation'''
+def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgateway', agw_website_dir=None):
+    '''Generate control plane metrics documentation.
+
+    Always written to kgateway.dev: assets/docs/snippets/{link_version}/metrics-control-plane.md.
+    When agw_website_dir is set, also written to assets/agw-docs/snippets/{link_version}/metrics-control-plane.md.
+    '''
     print(f'  → Generating metrics docs for version {version}')
-    
-    os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
     
     # Check if metrics tool exists
     metrics_tool_path = f'{kgateway_dir}/pkg/metrics/cmd/findmetrics/main.go'
@@ -687,10 +728,20 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
         '--markdown', f'./{kgateway_dir}'
     ], capture_output=True, text=True, check=True)
     
-    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+    # kgateway.dev
+    kgateway_snippets = f'assets/docs/snippets/{link_version}'
+    os.makedirs(kgateway_snippets, exist_ok=True)
+    with open(f'{kgateway_snippets}/metrics-control-plane.md', 'w') as f:
         f.write(result.stdout)
+    print(f'    ✓ Generated metrics docs in {kgateway_snippets}/metrics-control-plane.md')
     
-    print(f'    ✓ Generated metrics docs in assets/docs/snippets/{link_version}/metrics-control-plane.md')
+    # agentgateway/website when set
+    if agw_website_dir:
+        agw_snippets = os.path.join(agw_website_dir, f'assets/agw-docs/snippets/{link_version}')
+        os.makedirs(agw_snippets, exist_ok=True)
+        with open(os.path.join(agw_snippets, 'metrics-control-plane.md'), 'w') as f:
+            f.write(result.stdout)
+        print(f'    ✓ Generated metrics docs in {agw_snippets}/metrics-control-plane.md')
     return True
 
 
@@ -735,6 +786,14 @@ def main():
             print(f'📋 Available versions: {[v["version"] for v in all_versions]}')
             sys.exit(1)
     
+    # Optional: agentgateway/website repo root (absolute or relative to cwd). When set,
+    # agentgateway API/Helm/metrics are written there instead of kgateway.dev.
+    agw_website_dir = os.environ.get('AGENTGATEWAY_WEBSITE_DIR', '').strip()
+    if agw_website_dir and not os.path.isabs(agw_website_dir):
+        agw_website_dir = os.path.abspath(agw_website_dir)
+    if agw_website_dir:
+        print(f'Agentgateway website output: {agw_website_dir}')
+    
     print(f'Processing {len(versions)} version(s): {[v["version"] for v in versions]}')
     
     for version_info in versions:
@@ -773,19 +832,19 @@ def main():
         success_count = 0
         
         try:
-            if generate_api_docs(version, link_version, url_path):
+            if generate_api_docs(version, link_version, url_path, agw_website_dir=agw_website_dir or None):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ API docs failed: {e}')
         
         try:
-            if generate_helm_docs(version, link_version, url_path):
+            if generate_helm_docs(version, link_version, url_path, agw_website_dir=agw_website_dir or None):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ Helm docs failed: {e}')
         
         try:
-            if generate_metrics_docs(version, link_version, url_path):
+            if generate_metrics_docs(version, link_version, url_path, agw_website_dir=agw_website_dir or None):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ Metrics docs failed: {e}')
