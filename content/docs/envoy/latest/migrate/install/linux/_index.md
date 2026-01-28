@@ -8,7 +8,7 @@ weight: 20
 1. Set your environment variables.
 
     ```bash
-    VERSION=v0.3.0
+    VERSION=v0.4.0
     OS=Linux
     # One of arm64|x86_64|i386
     ARCH=arm64
