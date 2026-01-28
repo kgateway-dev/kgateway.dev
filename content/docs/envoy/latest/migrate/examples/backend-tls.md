@@ -42,6 +42,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: BackendConfigPolicy with TLS
 
+```bash
+cat backend-tls-kgateway.yaml
+```
+
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: BackendConfigPolicy

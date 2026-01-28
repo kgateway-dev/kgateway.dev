@@ -10,10 +10,10 @@ Welcome to the documentation for migrating from Ingress to **Gateway API** and *
 [Kubernetes ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway) with the following additional features:
 
 - **Expanded Ingress NGINX Support:** Converts a wide range of Ingress NGINX-specific annotations, e.g. session affinity, authentication,
-  rate limiting, CORS, etc..
-- **Kgateway Emitter Support:** Generates Gateway API and kgateway-specific resources, e.g. TrafficPolicy, BackendConfigPolicy, etc..
+  rate limiting, CORS, etc.
+- **Kgateway Emitter Support:** Generates Gateway API and kgateway-specific resources, e.g. TrafficPolicy, BackendConfigPolicy, etc.
 
-We [plan](https://github.com/kgateway-dev/ingress2gateway/issues/54) to merge these features upstream to the Kubernetes ingress2gateway project.
+[This upstream issue](https://github.com/kgateway-dev/ingress2gateway/issues/54) tracks merging these features into the Kubernetes ingress2gateway project.
 
 ## Prerequisites
 
@@ -49,19 +49,19 @@ of the Ingress before converting.
 
 ## Common workflows
 
-1. Convert a file and write output to a directory
+1. Convert a file and write output to a directory.
 
     ```bash
     ingress2gateway print   --providers=ingress-nginx   --emitter=kgateway   --input-file ./ingress.yaml   --output-dir ./out
     ```
 
-2. Convert a folder of YAMLs
+2. Convert a folder of YAML files.
 
     ```bash
     ingress2gateway print   --providers=ingress-nginx   --emitter=kgateway   --input-dir ./manifests   --output-dir ./out
     ```
 
-3. Check tool version
+3. Check the tool version.
 
     ```bash
     ingress2gateway version
@@ -70,5 +70,5 @@ of the Ingress before converting.
 ## Next steps
 
 - Review the [ingress-nginx provider](./providers/ingressnginx/) to understand the supported Ingress NGINX annotations.
-- Review the [kgateway emitter](./emitters/kgateway/) to understand how providers such as ingress-nginx are mapped to kgateway-specific resources.
-- Read the [emitter design](./emitters/) to understand more about emitters and providers.
+- Review the [kgateway emitter](./emitters/kgateway/) to understand how providers such as ingress-nginx map to kgateway-specific resources.
+- Read the [emitter design](./emitters/) to learn more about emitters and providers.
