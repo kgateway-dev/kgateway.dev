@@ -2,6 +2,12 @@
 
 This directory contains scripts or other tools that are used to help improve the kgateway website and documentation.
 
+## generate-ref-docs.py
+
+Generates API, Helm, and metrics reference documentation from the upstream **kgateway** repository. The script clones kgateway at a given tag or branch, runs [crd-ref-docs](https://github.com/elastic/crd-ref-docs) and [helm-docs](https://github.com/norwoodj/helm-docs) plus a metrics tool, and writes reference docs into this site (kgateway.dev) and, when `AGENTGATEWAY_WEBSITE_DIR` is set, into the agentgateway docs repo.
+
+**Workflow location:** The workflow that runs this script lives in the **upstream [kgateway](https://github.com/kgateway-dev/kgateway) repository**, not in this repo. It is tied to kgateway releases and runs automatically when a release is published, and can also be triggered manually. See `kgateway/.github/workflows/update-api-docs.yml` in the kgateway repo.
+
 ## card-check.py
 
 A script to check the `_index.md` docs files to make sure that the cards include the right links to subpages in that directory.
