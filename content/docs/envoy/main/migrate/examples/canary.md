@@ -61,6 +61,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: HTTPRoute with weighted backends
 
+```bash
+cat canary-kgateway.yaml
+```
+
 Both Ingresses merge into one HTTPRoute. Traffic is split 80/20:
 
 ```yaml

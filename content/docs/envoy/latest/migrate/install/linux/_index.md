@@ -8,7 +8,7 @@ weight: 20
 1. Set your environment variables.
 
     ```bash
-    VERSION=v0.3.0
+    VERSION=v0.4.0
     OS=Linux
     # One of arm64|x86_64|i386
     ARCH=arm64
@@ -16,21 +16,21 @@ weight: 20
 
     Refer to the [releases page](https://github.com/kgateway-dev/ingress2gateway/releases) for a list of published ingress2gateway versions.
 
-2. Download the release:
+2. Download the release.
 
     ```bash
     curl -LO "https://github.com/kgateway-dev/ingress2gateway/releases/download/${VERSION}/ingress2gateway_${OS}_${ARCH}.tar.gz"
     ```
 
-3. Validate the release tarball (optional)
+3. Optional: Validate the release tarball.
 
-    Download the ingress2gateway checksum file:
+    Download the ingress2gateway checksum file.
 
     ```bash
     curl -LO https://github.com/kgateway-dev/ingress2gateway/releases/download/${VERSION}/checksums.txt
     ```
 
-    Validate the binary against the checksum file:
+    Validate the binary against the checksum file.
 
     ```bash
     echo "$(cat checksums.txt)  ingress2gateway" | shasum -a 256 --check
@@ -42,13 +42,13 @@ weight: 20
     ingress2gateway_$OS_$ARCH.tar.gz: OK
     ```
 
-4. Extract the tarball:
+4. Extract the tarball.
 
     ```bash
     tar -xvf ingress2gateway_${OS}_${ARCH}.tar.gz
     ```
 
-5. Install ingress2gateway:
+5. Install ingress2gateway.
 
     ```bash
     sudo install -o root -g root -m 0755 ingress2gateway /usr/local/bin/ingress2gateway
@@ -63,7 +63,7 @@ weight: 20
     # and then append (or prepend) ~/.local/bin to $PATH
     ```
 
-6. Test the installation by checking the version of the binary:
+6. Test the installation by checking the version of the binary.
 
     ```bash
     ingress2gateway version

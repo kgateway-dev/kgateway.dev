@@ -3,7 +3,7 @@ title: "Install"
 weight: 20
 ---
 
-Select the operating system to install ingress2gateway:
+Select the operating system for installing ingress2gateway.
 
 - [macOS](./macos/)
 - [Linux](./linux/)

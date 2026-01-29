@@ -37,6 +37,10 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway --input-file 
 
 ## After: Gateway API resources
 
+```bash
+cat basic-kgateway.yaml
+```
+
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway

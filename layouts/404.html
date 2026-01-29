@@ -13,15 +13,22 @@
 
 <script>
     var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
+    var pathname = window.location.pathname;
     var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
     if (match) {
         var matchedPath = match[1];
         // Skip redirect for section names (envoy, agentgateway)
         if (matchedPath === "envoy" || matchedPath === "agentgateway") {
             // Let the section-specific redirects handle these
+        } else if (matchedPath === "latest" && pathname.startsWith("/docs/latest/") && pathname.length > "/docs/latest/".length) {
+            // /docs/latest/... (with more path) should go to /docs/envoy/latest/... (handles case when _redirects didn't fire)
+            window.location.assign(window.location.origin + "/docs/envoy/latest/" + pathname.slice("/docs/latest/".length));
         } else if (docsVersions.includes(matchedPath)) {
-            // match is a valid docs version, redirect to base docs page for that version
-            window.location.assign(window.location.origin + "/docs/" + matchedPath);
+            // /docs/{version} and /docs/{version}/ no longer exist; redirect to /docs/envoy/{version}
+            if (pathname === "/docs/" + matchedPath || pathname === "/docs/" + matchedPath + "/") {
+                var trailingSlash = pathname.endsWith("/") ? "/" : "";
+                window.location.assign(window.location.origin + "/docs/envoy/" + matchedPath + trailingSlash);
+            }
         } else {
             // match is not a valid docs version, insert `latest` after docs and retry
             window.location.assign(window.location.href.replace("/docs/", "/docs/latest/"));
