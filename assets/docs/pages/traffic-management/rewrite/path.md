@@ -10,7 +10,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite path prefixes. 
 
-### In-custer services
+### In-cluster services
 
 1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to the `/anything` prefix path. 
     
