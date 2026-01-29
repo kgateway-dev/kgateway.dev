@@ -65,7 +65,7 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
+      {{< tabs tabTotal="4" items="Basic installation,Custom values file,Development,Agentgateway and AI extensions" >}}
 {{% tab tabName="Basic installation" %}}
 Note: If you need to use an experimental feature such as TCPRoutes, enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).
 ```sh
@@ -87,6 +87,14 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
 --version v{{< reuse "docs/versions/patch-dev.md" >}} \
 --set controller.image.pullPolicy=Always \
 --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
+```
+{{% /tab %}}
+{{% tab tabName="Agentgateway and AI extensions" %}}
+To enable agentgateway integration for AI capabilities, use the following command. For more information, see the [Agentgateway docs](../../agentgateway/).
+```sh
+helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+--version {{< reuse "docs/versions/helm-version-flag.md" >}} \
+--set agentgateway.enabled=true
 ```
 {{% /tab %}}
       {{< /tabs >}}
