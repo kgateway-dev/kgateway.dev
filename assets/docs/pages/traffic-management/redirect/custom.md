@@ -1,0 +1,89 @@
+Create custom HTTP redirect status codes.
+
+To customize HTTP redirect status codes, you can add the `kgateway.dev/http-redirect-status-code` annotation to an HTTPRoute. This annotation overrides any status codes that are defined in the `RequestRedirect` filter on the HTTPRoute. For example, in the Kubernetes Gateway API version 1.4.0, where you can set an HTTP redirect status code only to 301 or 302, this annotation is useful for allowing a status code other than one of those two. 
+
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#httprequestredirectfilter).
+
+## Before you begin
+
+{{< reuse "docs/snippets/prereq.md" >}}
+
+## Set custom HTTP redirect status codes
+
+1. Create an HTTPRoute that redirects the `/get` and `/post` httpbin paths to the `/anything` path with a 302 HTTP status code. To override the path-specific redirect code with a 307 HTTP response code, you add the `kgateway.dev/http-redirect-status-code` annotation. 
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-redirect
+     namespace: httpbin
+     annotations:
+       kgateway.dev/http-redirect-status-code: "307"
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - redirect.example
+     rules:
+       - matches:
+           - path:
+               type: PathPrefix
+               value: /get
+         filters:
+           - type: RequestRedirect
+             requestRedirect:
+               path:
+                 type: ReplacePrefixMatch
+                 replacePrefixMatch: /anything
+               statusCode: 302
+       - matches:
+           - path:
+               type: PathPrefix
+               value: /post
+         filters:
+           - type: RequestRedirect
+             requestRedirect:
+               path:
+                 type: ReplacePrefixMatch
+                 replacePrefixMatch: /anything
+               statusCode: 302
+   EOF
+   ```
+
+2. Send an HTTP request to the httpbin app on the `redirect.example` domain. Verify that you get back a 307 HTTP response code and that your request path is rewritten to the `/anything` path. 
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik http://$INGRESS_GW_ADDRESS:8080/get -H "host: redirect.example"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/get -H "host: redirect.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   
+   Example output: 
+   ```console {hl_lines=[2,3,4,5]}
+   * Request completely sent off
+   < HTTP/1.1 307 Temporary Redirect
+   HTTP/1.1 307 Temporary Redirect
+   < location: http://redirect.example/anything
+   location: http://redirect.example/anything
+   < content-length: 0
+   content-length: 0
+   ```
+
+
+## Cleanup
+
+{{< reuse "docs/snippets/cleanup.md" >}}
+  
+Remove the HTTPRoute.
+```sh
+kubectl delete httproute httpbin-redirect -n httpbin
+```
