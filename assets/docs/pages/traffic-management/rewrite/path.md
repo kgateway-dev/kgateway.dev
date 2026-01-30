@@ -451,7 +451,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} to rewrite full paths with 
    * **Allowed**: `/anything/stores/us/entities` or `/anything/stores/dummy/entities`
    * **Not allowed**: `/anything/stores/us/buildings` or `/get/stores/us/entities` 
    
-   Note that the `pattern` regex must match the entire request path. For example, if you want to replace only a portion of the request path, you must still capture the entire with, such as with a `/([^/]+)/([^/]+)/([^/]+)/([^/]+)` pattern. If a matching path is found, it is rewritten to the `substitution` value. In this example, the path is rewritten to the `/anything/rewrite/path`/ path. 
+   Note that the `pattern` regex must match the entire request path. For example, if you want to replace only a portion of the request path, you must still capture the entire path, such as with a `/([^/]+)/([^/]+)/([^/]+)/([^/]+)` pattern. If a matching path is found, it is rewritten to the `substitution` value. In this example, the path is rewritten to the `/anything/rewrite/path`/ path. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "/docs/snippets/trafficpolicy-apiversion.md" >}}
