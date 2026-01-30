@@ -88,30 +88,7 @@ Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed
 
 {{< reuse "docs/snippets/cleanup.md" >}}
   
-1. Remove the HTTPRoute.
-   ```sh
-   kubectl delete httproute -A -l gateway=https
-   ```
-  
-2. Remove the HTTPS listener from your Gateway. 
-   ```yaml
-   kubectl apply -f- <<EOF                                                          
-   kind: Gateway
-   apiVersion: gateway.networking.k8s.io/v1
-   metadata:
-     name: http
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
-   spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
-     listeners:
-     - protocol: HTTP
-       port: 8080
-       name: http
-       allowedRoutes:
-         namespaces:
-           from: All
-   EOF
-   ```
-
-
-
+Remove the HTTPRoute.
+```sh
+kubectl delete httproute httpbin-redirect -n httpbin
+```
