@@ -1,6 +1,6 @@
 ---
 title: Custom redirect status codes
-weight: 440
+weight: 444
 description: Create custom HTTP redirect status codes.
 ---
 
