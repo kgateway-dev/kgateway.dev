@@ -568,7 +568,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} to rewrite full paths with 
    EOF
    ```
 
-3. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} to define your path rewrite rules by using regular expressions. The following policy finds a path that matches the `^/anything/stores/(.*)/entities` pattern, such as: 
+3. Create a policy to define your path rewrite rules by using regular expressions. The following {{< reuse "docs/snippets/trafficpolicy.md" >}} finds a path that matches the `^/anything/stores/(.*)/entities` pattern, such as: 
    * **Allowed**: `/anything/stores/us/entities` or `/anything/stores/dummy/entities`
    * **Not allowed**: `/anything/stores/us/buildings` or `/get/stores/us/entities` 
    
