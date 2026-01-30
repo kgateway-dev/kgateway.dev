@@ -2,15 +2,15 @@
 
 Create custom HTTP redirect status codes.
 
-Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed HTTP redirect status codes. The annotation overrides any redirect codes that are set in the `RequestRedirect` filter on the HTTPRoute. 
+To customize HTTP redirect status codes, you can add the `kgateway.dev/http-redirect-status-code` annotation to an HTTPRoute. This annotation overrides any status codes that are defined in the `RequestRedirect` filter on the HTTPRoute. For example, in the Kubernetes Gateway API version 1.4.0, where you can set an HTTP redirect status code only to 301 or 302, this annotation is useful for allowing a status code other than one of those two. 
 
+Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed HTTP redirect status codes. The annotation overrides any redirect codes that are set in the `RequestRedirect` filter on the HTTPRoute. 
 
 For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#httprequestredirectfilter).
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
-
 
 ## Set custom HTTP redirect status codes
 
