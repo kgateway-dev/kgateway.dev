@@ -2,6 +2,9 @@
 
 Create custom HTTP redirect status codes.
 
+Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed HTTP redirect status codes. The annotation overrides any redirect codes that are set in the `RequestRedirect` filter on the HTTPRoute. 
+
+
 For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#httprequestredirectfilter).
 
 ## Before you begin
@@ -10,8 +13,6 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 
 ## Set custom HTTP redirect status codes
-
-Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed HTTP redirect status codes. The annotation overrides any redirect codes that are set in the `RequestRedirect` filter on the HTTPRoute. 
 
 1. Create an HTTPRoute that redirects the `/get` and `/post` httpbin paths to the `/anything` path with a 302 HTTP status code. To override the path-specific redirect code with a 307 HTTP response code, you add the `kgateway.dev/http-redirect-status-code` annotation. 
 
