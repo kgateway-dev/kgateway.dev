@@ -56,7 +56,7 @@ Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed
    EOF
    ```
 
-2. Send an HTTP request to the httpbin app on the `redirect.example` domain. Verify that you get back a 307 HTTP response code. 
+2. Send an HTTP request to the httpbin app on the `redirect.example` domain. Verify that you get back a 307 HTTP response code and that your request path is rewritten to the `/anything` path. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
