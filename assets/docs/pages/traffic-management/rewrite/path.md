@@ -417,7 +417,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
 
 ## Regex rewrite
 
-Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} to rewrite full paths with a regular expression (regex). The regex patter and substitution that you define must follow the [RE2 syntax](https://github.com/google/re2/wiki/Syntax).
+Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} to rewrite full paths with a regular expression (regex). The regex pattern and substitution that you define must follow the [RE2 syntax](https://github.com/google/re2/wiki/Syntax).
 
 ### In-cluster services
 
