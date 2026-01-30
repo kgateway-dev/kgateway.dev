@@ -1,101 +1,56 @@
 name: Deploy PR Preview
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  workflow_dispatch:
-
-# Cancel in-progress runs for the same PR
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  workflow_run:
+    workflows: ["Build PR Preview"]
+    types:
+      - completed
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch all history for Hugo's .GitInfo
-
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.21'
-          cache: true
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install npm dependencies
-        run: npm ci
-
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v3
-        with:
-          hugo-version: '0.135.0'
-          extended: true
-
-      - name: Build site
-        run: |
-          hugo --minify --baseURL "/"
-        env:
-          HUGO_ENV: production
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: site-build
-          path: ./public
-          retention-days: 1
-
-  deploy-preview:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - name: Download build artifact
+      - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: site-build
-          path: ./public
-
-      - name: Deploy to Netlify
-        id: netlify
-        uses: nwtgck/actions-netlify@v3.0
-        with:
-          publish-dir: './public'
-          production-deploy: false
+          name: preview-build
+          run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          deploy-message: "PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
-          enable-pull-request-comment: true
-          enable-commit-comment: false
-          overwrites-pull-request-comment: true
-          alias: "pr-${{ github.event.pull_request.number }}"
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        timeout-minutes: 5
-        continue-on-error: true
 
-      - name: Comment preview URL
-        if: steps.netlify.outputs.deploy-url
+      - name: Get PR Metadata
+        id: metadata
+        run: |
+          source metadata.txt
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
+
+      - name: Deploy to Cloudflare Pages
+        id: cloudflare
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          directory: './public'
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: "pr-${{ steps.metadata.outputs.pr_number }}"
+
+      - name: Comment on PR
         uses: mshick/add-pr-comment@v2
         with:
+          issue: ${{ steps.metadata.outputs.pr_number }}
           message: |
             ## 🔍 Deploy Preview Ready!
             
             | Name | Link |
             |------|------|
-            | 🔍 **Preview** | ${{ steps.netlify.outputs.deploy-url }} |
-            | 📋 **Logs** | ${{ steps.netlify.outputs.logs-url }} |
+            | 🔍 **Preview** | ${{ steps.cloudflare.outputs.url }} |
             
-            > Built from commit ${{ github.sha }}
+            Built from commit ${{ steps.metadata.outputs.head_sha }}
           allow-repeats: false
