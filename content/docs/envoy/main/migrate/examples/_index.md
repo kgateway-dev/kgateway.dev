@@ -17,6 +17,16 @@ Pick the example that matches your use case, or work through them all to get fam
   {{< card link="basic" title="Basic Ingress" >}}
   {{< card link="session-affinity" title="Session Affinity" >}}
   {{< card link="rate-limiting" title="Rate Limiting" >}}
+  {{< card link="basic-auth" title="Basic Auth" >}}
+  {{< card link="jwt-auth" title="JWT Authentication" >}}
+  {{< card link="api-key-auth" title="API Key Authentication" >}}
+  {{< card link="oidc-auth" title="OIDC Authentication" >}}
+  {{< card link="header-modifiers" title="Header Modifiers" >}}
+  {{< card link="timeouts" title="Timeouts" >}}
+  {{< card link="url-rewriting" title="URL Rewriting" >}}
+  {{< card link="request-buffering" title="Request Buffering" >}}
+  {{< card link="traffic-mirroring" title="Traffic Mirroring" >}}
+  {{< card link="client-tls" title="Client TLS (mTLS)" >}}
   {{< card link="cors" title="CORS" >}}
   {{< card link="ssl-redirect" title="SSL Redirect" >}}
   {{< card link="external-auth" title="External Auth" >}}
