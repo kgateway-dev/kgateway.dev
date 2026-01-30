@@ -77,8 +77,6 @@ Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed
    HTTP/1.1 307 Temporary Redirect
    < location: http://redirect.example/anything
    location: http://redirect.example/anything
-   < date: Mon, 06 Nov 2024 01:48:12 GMT
-   date: Mon, 06 Nov 2024 01:48:12 GMT
    < content-length: 0
    content-length: 0
    ```
