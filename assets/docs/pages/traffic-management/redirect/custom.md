@@ -71,8 +71,8 @@ Use the `kgateway.dev/http-redirect-status-code` annotation to configure allowed
    {{< /tabs >}}
    
    Example output: 
-   ```
-   * Mark bundle as not supporting multiuse
+   ```console {hl_lines=[2,3,4,5]}
+   * Request completely sent off
    < HTTP/1.1 307 Temporary Redirect
    HTTP/1.1 307 Temporary Redirect
    < location: http://redirect.example/anything
