@@ -1,4 +1,4 @@
-Follow the [Get started guide](/docs/quickstart/) to install kgateway. You do not need to create a Gateway resource, because you create a self-managed Gateway as part of this guide. 
+Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install kgateway. You do not need to create a Gateway resource, because you create a self-managed Gateway as part of this guide. 
 
 ## Create a self-managed gateway proxy
 

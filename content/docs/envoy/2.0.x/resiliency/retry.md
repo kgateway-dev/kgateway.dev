@@ -6,7 +6,7 @@ description: Specify the number of times and duration for the gateway to try a c
 
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 
-The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts](/docs/resiliency/timeouts/) to ensure that your apps are available even if they are temporarily unavailable.
+The Kubernetes Gateway API provides a way to configure retries on your HTTPRoutes. You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/" >}}) to ensure that your apps are available even if they are temporarily unavailable.
 
 {{< callout type="warning" >}} 
 {{< reuse "docs/versions/warn-experimental.md" >}}
@@ -107,7 +107,7 @@ To use retries, you need to install the experimental channel. You can also set u
    EOF
    ```
 
-3. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide](/docs/security/access-logging/) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#response-flags).
+3. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide]({{< link-hextra path="/security/access-logging/" >}}) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#response-flags).
 
    ```yaml
    kubectl apply -f- <<EOF

@@ -49,7 +49,7 @@ sequenceDiagram
 
 ### Behavior with other AI features {#about-behavior}
 
-Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs](/docs/reference/api/#aitrafficpolicy).
+Keep in mind the following behaviors when using function calling with other AI Gateway features. For more details about these features, see the [API docs]({{< link-hextra path="/reference/api/#aitrafficpolicy" >}}).
 
 * Streaming responses: You can stream responses that call functions.
 * Semantic caching: Function calls are not cached.

@@ -160,7 +160,7 @@
    EOF
    ```
 
-2. Create an HTTPRoute resource to expose the `rollouts-demo` pod on the HTTP gateway that you created as part of the [Get started guide](/docs/quickstart). The HTTP resource can serve both the stable and canary versions of your app. 
+2. Create an HTTPRoute resource to expose the `rollouts-demo` pod on the HTTP gateway that you created as part of the [Get started guide]({{< link-hextra path="/quickstart" >}}). The HTTP resource can serve both the stable and canary versions of your app. 
    ```yaml
    kubectl apply -f- <<EOF
    kind: HTTPRoute

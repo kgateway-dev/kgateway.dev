@@ -12,5 +12,5 @@ Kgateway supports the following AI cloud providers:
 
 You can use kgateway with a local LLM provider, such as the following common options:
 
-* [Ollama](/docs/ai/ollama/) for local LLM development.
-* [Gateway API Inference Extension project](/docs/integrations/inference-extension/) to route requests to local LLM workloads that run in your cluster.
+* [Ollama]({{< link-hextra path="/ai/ollama/" >}}) for local LLM development.
+* [Gateway API Inference Extension project]({{< link-hextra path="/integrations/inference-extension/" >}}) to route requests to local LLM workloads that run in your cluster.

@@ -65,7 +65,7 @@ Downstream connections are between the Envoy gateway proxy and the client that s
 * The end user that sends a request.
 * The Layer 4 or Layer 7 load balancer that forwards the request from the end user to the gateway proxy.
 
-To enable TCP keepalive on downstream connections, create a [ListenerPolicy](/docs/about/policies/listeneroption/) resource that selects the Gateway resource with `targetRefs`.
+To enable TCP keepalive on downstream connections, create a [ListenerPolicy]({{< link-hextra path="/about/policies/listeneroption/" >}}) resource that selects the Gateway resource with `targetRefs`.
 
 The following example enables TCP keepalive probes between the client and the gateway proxy. The first probe is sent when the connection has been idle for 60 seconds (`TCP_KEEPIDLE`). After, each probe is sent every 20 seconds (`TCP_KEEPINTVL`). After no response for 2 consecutive probes (`TCP_KEEPCNT`), the connection is dropped.
 
@@ -117,8 +117,8 @@ kubectl delete listeneroption tcpkeepalive -n kgateway-system
 
 Backend connections are between the Envoy gateway proxy and your services, such as kgatewaybackends, Kubernetes services, external services, OTel collectors, TAP servers, cloud functions, or other destinations.
 
-To enable TCP keepalive on backend connections, configure the following [ConnectionConfig](/docs/reference/api/connection/) settings in the
-[Backend](/docs/reference/api/#backend/) resource.
+To enable TCP keepalive on backend connections, configure the following [ConnectionConfig]({{< link-hextra path="/reference/api/connection/" >}}) settings in the
+[Backend]({{< link-hextra path="/reference/api/#backend/" >}}) resource.
 
 The following example enables TCP keepalive probes between the gateway proxy and the backend connection. The first probe is sent when the connection has been idle for 60 seconds (`keepaliveTime`). After, a TCP keepalive probe is sent every 20 seconds (`keepaliveInterval`). After no response for 2 consecutive probes (`keepaliveProbes`), the connection is dropped.
 

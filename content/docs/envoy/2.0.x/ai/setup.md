@@ -8,13 +8,13 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 ## Before you begin
 
-[Get started](/docs/quickstart/) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/docs/snippets/kgateway.md" >}}.
+[Get started]({{< link-hextra path="/quickstart/" >}}) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/docs/snippets/kgateway.md" >}}.
 
 ## Enable the AI extension {#ai-extension}
 
 Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade](/docs/operations/upgrade/) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade]({{< link-hextra path="/operations/upgrade/" >}}) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.

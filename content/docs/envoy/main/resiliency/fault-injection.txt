@@ -18,7 +18,7 @@ Delays and aborts are independent of one another. When both values are set, your
 Faults can be configured for a route by using a TrafficPolicy resource. Gateway-level faults are not supported.
 {{< /callout >}}
 
-For more information, see the [Fault API](/docs/reference/api/fault/).
+For more information, see the [Fault API]({{< link-hextra path="/reference/api/fault/" >}}).
 
 ## Before you begin
 

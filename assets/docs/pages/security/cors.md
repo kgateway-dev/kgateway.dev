@@ -111,7 +111,7 @@ EOF
    EOF
    ```
 
-2. Attach the {{< reuse "docs/snippets/trafficpolicy.md" >}} to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the {{< reuse "docs/snippets/trafficpolicy.md" >}} attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [{{< reuse "docs/snippets/trafficpolicy.md" >}} concept docs](/docs/about/policies/trafficpolicy/).
+2. Attach the {{< reuse "docs/snippets/trafficpolicy.md" >}} to a route or Gateway. The following example creates an HTTPRoute for the httpbin app that has the {{< reuse "docs/snippets/trafficpolicy.md" >}} attached via the `extensionRef` filter. For more information about attachment and merging rules, see the [{{< reuse "docs/snippets/trafficpolicy.md" >}} concept docs]({{< link-hextra path="/about/policies/trafficpolicy/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF

@@ -189,7 +189,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
 
 ## Configure an HTTPS listener on your gateway
 
-1. Add the cert-manager annotation and an HTTPS listener to the `http` gateway that you set up as part of the [Get started guide](/docs/quickstart/).
+1. Add the cert-manager annotation and an HTTPS listener to the `http` gateway that you set up as part of the [Get started guide]({{< link-hextra path="/quickstart/" >}}).
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1

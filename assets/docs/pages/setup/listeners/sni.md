@@ -19,7 +19,7 @@ In this guide, you learn how to set up an HTTPS Gateway that serves two differen
 
 ## Deploy sample apps 
 
-Deploy the Petstore sample app. This app is used alongside the httpbin app from the [Get started](/docs/quickstart) guide to demonstrate the SNI routing capabilities.
+Deploy the Petstore sample app. This app is used alongside the httpbin app from the [Get started]({{< link-hextra path="/quickstart" >}}) guide to demonstrate the SNI routing capabilities.
 
 1. Deploy the Petstore app.
    ```sh

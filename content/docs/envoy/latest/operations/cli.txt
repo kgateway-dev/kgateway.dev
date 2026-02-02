@@ -73,7 +73,7 @@ Use the same version of the `{{< reuse "docs/snippets/cli-name.md" >}}` CLI as t
 
 ## Reference documentation
 
-For more information about each `{{< reuse "docs/snippets/cli-name.md" >}}` command, see the [CLI documentation](/docs/reference/cli/) or run the help flag for a command.
+For more information about each `{{< reuse "docs/snippets/cli-name.md" >}}` command, see the [CLI documentation]({{< link-hextra path="/reference/cli/" >}}) or run the help flag for a command.
 
 ```shell
 {{< reuse "docs/snippets/cli-name.md" >}} --help

@@ -1,4 +1,4 @@
-1. Follow the [Get started guide](/docs/quickstart/) to install kgateway.
+1. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install kgateway.
 
 2. Follow the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
 
