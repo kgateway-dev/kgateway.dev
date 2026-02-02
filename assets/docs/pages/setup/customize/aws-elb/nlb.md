@@ -11,7 +11,7 @@ Keep in mind the following considerations when working with an NLB:
 ## Before you begin
 
 1. Create or use an existing AWS account. 
-2. Follow the [Get started guide](/docs/quickstart/) to install kgateway, set up a gateway resource, and deploy the httpbin sample app.
+2. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install kgateway, set up a gateway resource, and deploy the httpbin sample app.
 
 ## Step 1: Deploy the AWS Load Balancer controller
 

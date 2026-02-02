@@ -25,7 +25,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 ## Fail over to other models {#model-failover}
 
-In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider. Failover priority is determined by the order in which the pools are listed in the Backend. The pool that is listed first is assigned the highest priority. For more information, see the [MultiPool API reference docs](/docs/reference/api/#multipoolconfig).
+In this example, you create a Backend with multiple pools for the same LLM provider. Each pool represents a specific model from the LLM provider. Failover priority is determined by the order in which the pools are listed in the Backend. The pool that is listed first is assigned the highest priority. For more information, see the [MultiPool API reference docs]({{< link-hextra path="/reference/api/#multipoolconfig" >}}).
 
 1. Create or update the Backend for your LLM providers. The priority order of the models is as follows:
    

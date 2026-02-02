@@ -6,7 +6,7 @@ description: Set a maximum time for the gateway to handle a request.
 
 Set a maximum time for the gateway to handle a request.
 
-The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries](/docs/resiliency/retry/) to ensure that your apps are available even if they are temporarily unavailable.
+The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries]({{< link-hextra path="/resiliency/retry/" >}}) to ensure that your apps are available even if they are temporarily unavailable.
 
 {{< callout >}}
 {{< reuse "docs/snippets/proxy-kgateway.md" >}}

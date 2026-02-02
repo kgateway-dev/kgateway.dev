@@ -16,7 +16,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 The [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/) custom resource is a network abstraction that defines a point of access at which traffic can be forwarded to a backend in a {{< gloss "Cluster (Kubernetes)" >}}Kubernetes cluster{{< /gloss >}}. A Gateway defines the listeners that you want to open, including the ports, protocols, and hostnames that you want to listen on for incoming traffic. You can also specify how incoming, encrypted traffic is handled. For example, encrypted traffic can be terminated at the gateway or passed through to a backend in the cluster. 
 
-To spin up a Gateway and manage its lifecycle, a gateway controller is used. The gateway controller is defined in the  [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) resource and manages the underlying infrastructure to ensure that traffic to endpoints is routed accordingly. When you install kgateway, a GatewayClass resource is automatically created that points to the kgateway controller. For more information, see [GatewayClass](/docs/setup/default/#gatewayclass). 
+To spin up a Gateway and manage its lifecycle, a gateway controller is used. The gateway controller is defined in the  [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) resource and manages the underlying infrastructure to ensure that traffic to endpoints is routed accordingly. When you install kgateway, a GatewayClass resource is automatically created that points to the kgateway controller. For more information, see [GatewayClass]({{< link-hextra path="/setup/default/#gatewayclass" >}}). 
 
 ### HTTPRoute and TCPRoute {#httproute}
 

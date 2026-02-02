@@ -12,7 +12,7 @@ The GRPCRoute approach is more readable, less error-prone, and aligns with the G
 
 ## Before you begin
 
-1. [Install {{< reuse "/docs/snippets/kgateway.md" >}}](/docs/quickstart/) in a cluster.
+1. [Install {{< reuse "/docs/snippets/kgateway.md" >}}]({{< link-hextra path="/quickstart/" >}}) in a cluster.
 2. [Install `grpcurl`](https://github.com/fullstorydev/grpcurl) for testing on your computer.
 
 ## Deploy a sample gRPC service {#sample-grpc}

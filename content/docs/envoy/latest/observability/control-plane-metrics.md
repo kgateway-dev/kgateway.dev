@@ -7,7 +7,7 @@ By default, the {{< reuse "/docs/snippets/kgateway.md" >}} control plane exposes
 
 ## View control plane metrics {#control-plane-metrics}
 
-The following steps show you how to quickly view the metrics endpoint of the control plane deployment. To integrate the metrics into your observability stack, see the [OpenTelemetry guide](/docs/observability/otel-stack/).
+The following steps show you how to quickly view the metrics endpoint of the control plane deployment. To integrate the metrics into your observability stack, see the [OpenTelemetry guide]({{< link-hextra path="/observability/otel-stack/" >}}).
 
 1. Port-forward the control plane deployment on port 9092.
 

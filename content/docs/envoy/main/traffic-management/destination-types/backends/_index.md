@@ -3,7 +3,7 @@ title: Backends
 weight: 20
 ---
 
-Use a Backend resource to define a backing destination that you want kgateway to route to. A Backend destination is external to the cluster and, as such, cannot be represented as a Kubernetes Service. For more information, see the [Backend API docs](/docs/reference/api/#backend). 
+Use a Backend resource to define a backing destination that you want kgateway to route to. A Backend destination is external to the cluster and, as such, cannot be represented as a Kubernetes Service. For more information, see the [Backend API docs]({{< link-hextra path="/reference/api/#backend" >}}). 
 
 ## Types
 
@@ -47,4 +47,4 @@ spec:
    EOF
 ```
 
-For an example, see the [Static](/docs/traffic-management/destination-types/backends/static/) Backend guide. 
+For an example, see the [Static]({{< link-hextra path="/traffic-management/destination-types/backends/static/" >}}) Backend guide. 

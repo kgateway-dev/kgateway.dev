@@ -6,7 +6,7 @@ The following guide deploys a sample TCP echo app, sets up a TCP listener on the
 
 ## Before you begin
 
-1. Follow the [Get started guide](/docs/quickstart) to install {{< reuse "docs/snippets/kgateway.md" >}}.
+1. Follow the [Get started guide]({{< link-hextra path="/quickstart" >}}) to install {{< reuse "docs/snippets/kgateway.md" >}}.
 
 2. Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
 

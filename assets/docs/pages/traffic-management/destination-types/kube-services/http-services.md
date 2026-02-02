@@ -3,7 +3,7 @@ Route traffic to an HTTP or HTTPS Kubernetes service.
 You can route to a Kubernetes service by referencing that service in the `backendRefs` section of your HTTPRoute resource as shown in the following example.
 
 {{< callout type="info" >}}
-Most guides in this documentation route traffic to a Kubernetes service directly. If you want to route to external resources, such as a static hostname or AWS resource, create a [Backend](/docs/traffic-management/destination-types/backends/) resource. 
+Most guides in this documentation route traffic to a Kubernetes service directly. If you want to route to external resources, such as a static hostname or AWS resource, create a [Backend]({{< link-hextra path="/traffic-management/destination-types/backends/" >}}) resource. 
 {{< /callout >}}
 
 ```yaml {linenos=table,hl_lines=[13,14,15],linenostart=1,filename="k8s-service-httproute.yaml"}

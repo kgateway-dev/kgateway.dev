@@ -203,7 +203,7 @@ You can customize the default endpoint paths and authentication headers for LLM 
 
 By default, {{< reuse "docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use an API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
 
-For more information, see the overrides in the [LLM provider API docs](/docs/reference/api/#llmprovider).
+For more information, see the overrides in the [LLM provider API docs]({{< link-hextra path="/reference/api/#llmprovider" >}}).
 
 1. Save your OpenAI API key as an environment variable. To retrieve your API key, log in to your [OpenAI account dashboard](https://platform.openai.com/account/api-keys) and create or copy your API key.
 

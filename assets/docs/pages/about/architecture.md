@@ -70,7 +70,7 @@ The xDS server sends the xDS snapshot to the gateway proxies in the data plane.
 
 {{< reuse "docs/snippets/discovery-about.md" >}}
 
-To enable automatic discovery of services, see [Discovery](/docs/traffic-management/destination-types/backends/#discovery). To learn more about Backends, see [Backends](/docs/traffic-management/destination-types/backends/).
+To enable automatic discovery of services, see [Discovery]({{< link-hextra path="/traffic-management/destination-types/backends/#discovery" >}}). To learn more about Backends, see [Backends]({{< link-hextra path="/traffic-management/destination-types/backends/" >}}).
 
 The following image shows how the endpoint discovery component discovers Kubernetes services and Functions and automatically creates Backend resources for them. 
 

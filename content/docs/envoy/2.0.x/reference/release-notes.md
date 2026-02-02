@@ -32,12 +32,12 @@ Besides the versioned API changes, kgateway offers a host of features designed t
 
 Kgateway introduces powerful, standards-aligned extensions via custom resources that follow the Gateway API’s policy attachment pattern. Key new resources include:
 
-* [Backend](/docs/reference/api/#backend): Define routable backends such as AI providers (OpenAI, Azure, Gemini, and more), AWS Lambda functions, or static server for use by Gateways.
-* [DirectResponse](/docs/reference/api/#directresponse): Enable Gateways to directly return immediate HTTP responses, specifying custom status codes and optional response content without contacting backend services.
-* [GatewayExtension](/docs/reference/api/#gatewayextension): Add external authorization (ExtAuth) and external request processing (ExtProc) via gRPC services, extending the Gateway's request handling capabilities.
-* [GatewayParameter](/docs/reference/api/#gatewayparameter): Provide detailed customization of Gateway deployments, including container images, logging, resource allocations, Istio integrations, sidecar configurations, and AI-related extensions.
-* [HTTPListenerPolicy](/docs/reference/api/#httplistenerpolicy): Set policies for HTTP listeners, including advanced access logging.
-* [TrafficPolicy](/docs/reference/api/#trafficpolicy): Implement advanced traffic rules such as AI prompt manipulation, local rate limiting, request/response transformations, and external processing control for managing traffic through gateways.
+* [Backend]({{< link-hextra path="/reference/api/#backend" >}}): Define routable backends such as AI providers (OpenAI, Azure, Gemini, and more), AWS Lambda functions, or static server for use by Gateways.
+* [DirectResponse]({{< link-hextra path="/reference/api/#directresponse" >}}): Enable Gateways to directly return immediate HTTP responses, specifying custom status codes and optional response content without contacting backend services.
+* [GatewayExtension]({{< link-hextra path="/reference/api/#gatewayextension" >}}): Add external authorization (ExtAuth) and external request processing (ExtProc) via gRPC services, extending the Gateway's request handling capabilities.
+* [GatewayParameter]({{< link-hextra path="/reference/api/#gatewayparameter" >}}): Provide detailed customization of Gateway deployments, including container images, logging, resource allocations, Istio integrations, sidecar configurations, and AI-related extensions.
+* [HTTPListenerPolicy]({{< link-hextra path="/reference/api/#httplistenerpolicy" >}}): Set policies for HTTP listeners, including advanced access logging.
+* [TrafficPolicy]({{< link-hextra path="/reference/api/#trafficpolicy" >}}): Implement advanced traffic rules such as AI prompt manipulation, local rate limiting, request/response transformations, and external processing control for managing traffic through gateways.
 
 #### 🚦 Traffic management {#traffic}
 
@@ -47,7 +47,7 @@ Kgateway gives you sophisticated traffic-handling policies, including:
 * **External processing (ExtProc)** to modify HTTP requests and responses with an external gRPC processing server.
 * **Route delegation** to manage route and policy configuration in multi-tenant environments.
 
-For more information, see the [Traffic management docs](/docs/traffic-management/).
+For more information, see the [Traffic management docs]({{< link-hextra path="/traffic-management/" >}}).
 
 #### 🔐 Secure traffic {#security}
 
@@ -57,7 +57,7 @@ Kgateway provides a comprehensive set of security features, as well as the abili
 * **Local rate limiting** as a first line of defense to control the rate of requests to your Gateway.
 * **External authorization** to protect requests that go through your Gateway by using an external service.
 
-For more information, see the [Security docs](/docs/security/).
+For more information, see the [Security docs]({{< link-hextra path="/security/" >}}).
 
 #### 🤖 AI Gateway (open sourced) {#ai-gateway}
 
@@ -70,7 +70,7 @@ Enterprise-grade **AI gateway functionality** has been open sourced for the firs
 * AI-specific metrics
 * [Gateway API Inference Extension project](https://gateway-api-inference-extension.sigs.k8s.io/guides/) support for routing to local LLM workloads
 
-For more information, see the [AI Gateway docs](/docs/ai/).
+For more information, see the [AI Gateway docs]({{< link-hextra path="/ai/" >}}).
 
 #### 🧠 KRT-based control plane {#control-plane}
 
@@ -80,7 +80,7 @@ Kgateway uses a **brand new control plane** architecture built on the [Kubernete
 - Cleaner reconciliation and modular plugin framework
 - Scalability to massive clusters with tens of thousands of routes
 
-For more information, see the [Architecture docs](/docs/about/architecture/).
+For more information, see the [Architecture docs]({{< link-hextra path="/about/architecture/" >}}).
 
 #### 🐬 Ambient waypoint integration {#ambient-waypoint}
 
@@ -90,7 +90,7 @@ Kgateway introduces support for using its Gateway implementation as an **Istio a
 - Just update your `Gateway` CR to reference `gateway.kgateway.dev` class
 - Provides kgateway L7 features inside the mesh
 
-This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs](/docs/integrations/istio/ambient/).
+This way, you get full L7 policy control over **east-west traffic** while using Gateway API semantics. For more information, see the [Ambient docs]({{< link-hextra path="/integrations/istio/ambient/" >}}).
 
 ### 🔥 Breaking changes from Gloo v1 {#changes}
 
@@ -108,6 +108,6 @@ Kgateway v2 has extensive API changes from Gloo v1, which include the following.
 
 We’re excited to collaborate with the community to continue shaping the future of API gateways! 
 
-* [Get started](/docs/quickstart/) with kgateway 2.0.
+* [Get started]({{< link-hextra path="/quickstart/" >}}) with kgateway 2.0.
 * Check out the [Community repo](https://github.com/kgateway-dev/community) for more about contributing to kgateway.
 * Let us know how it goes in the [CNCF `#kgateway` Slack](https://cloud-native.slack.com/archives/C080D3PJMS4)!
