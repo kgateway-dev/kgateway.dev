@@ -21,5 +21,5 @@ Explore what you can do with AI Gateway in the following guides.
   {{< card link="prompt-guards" title="Prompt guards" >}}
   {{< card link="observability" title="AI Gateway metrics" >}}
   {{< card link="cleanup" title="Cleanup" >}}
-  {{< card link="/docs/integrations/inference-extension" title="Inference Extension for local LLMs" icon="bookmark" >}}
+  {{< card link="../integrations/inference-extension" title="Inference Extension for local LLMs" icon="bookmark" >}}
 {{< /cards >}}
