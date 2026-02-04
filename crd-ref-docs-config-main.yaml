@@ -1,0 +1,44 @@
+processor:
+  ignoreTypes:
+    - ".*List$"
+render:
+  kubernetesVersion: 1.31
+  knownTypes:
+    - name: Quantity
+      package: k8s.io/apimachinery/pkg/api/resource
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-core
+    - name: Duration
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#Duration
+    - name: Time
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#time-v1-meta
+    - name: ObjectMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta
+    - name: LabelSelector
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#labelselector-v1-meta
+    - name: ListMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#listmeta-v1-meta
+    - name: TypeMeta
+      package: k8s.io/apimachinery/pkg/apis/meta/v1
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#TypeMeta
+    
+    # Gateway API types
+    - name: BackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendref
+    - name: BackendObjectReference
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference
+    - name: ParentReference
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
+    - name: GRPCBackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#grpcbackendref
+    - name: HTTPBackendRef
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#httpbackendref

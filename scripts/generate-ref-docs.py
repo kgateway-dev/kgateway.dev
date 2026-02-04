@@ -230,16 +230,27 @@ def _post_process_api_docs(api_file):
             # Check if the validation column (last column before final |) contains Go code artifacts
             parts = line.split('|')
             if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
-                validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                # If the line ends with |, parts[-1] is empty and validation is in parts[-2]
+                # If the line doesn't end with | (incomplete row), validation is in parts[-1]
+                if parts[-1].strip() == '':
+                    validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                    validation_col_idx = -2
+                else:
+                    validation_col = parts[-1].strip() if len(parts) > 1 else ''
+                    validation_col_idx = -1
                 
                 # Check if validation column has Go code patterns or if there are continuation lines
                 # Be careful: // in URLs (https://) or regex patterns is NOT a Go comment
                 # Go comments typically have // followed by +optional, +required, +kubebuilder, or whitespace
+                # Also match standalone +optional, +required, +kubebuilder patterns
                 has_go_comment = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', validation_col))
-                has_go_code = (has_go_comment or '`json:' in validation_col or 
+                has_go_annotation = bool(re.search(r'\+(?:optional|required|kubebuilder)', validation_col))
+                has_go_code = (has_go_comment or has_go_annotation or '`json:' in validation_col or 
                               '*HTTPVersion' in validation_col or 
                               validation_col.endswith('HTTP2') or
-                              '<br />XValidation' in validation_col)
+                              '<br />XValidation' in validation_col or
+                              'BackendHTTP' in validation_col or
+                              '// ' in validation_col)
                 
                 if has_go_code:
                     # Clean up the validation column - keep only valid parts on a single line
@@ -249,17 +260,27 @@ def _post_process_api_docs(api_file):
                     # Pattern matches: // followed by +optional, +required, +kubebuilder, or whitespace+text (Go comment)
                     # But NOT // that's part of a URL pattern like https://
                     go_comment_pattern = r'//\s*(?:\+|kubebuilder|optional|required)'
+                    go_annotation_pattern = r'\s*\+(?:optional|required|kubebuilder)[^\s]*'
                     # Also match // at the end of validation (incomplete, likely a comment)
                     # But preserve // in URLs and regex patterns
                     if re.search(go_comment_pattern, validation_col):
                         # Split on Go comment pattern
                         clean_validation = re.split(go_comment_pattern, validation_col)[0].strip()
+                    elif re.search(go_annotation_pattern, validation_col):
+                        # Split on standalone Go annotation pattern
+                        clean_validation = re.split(go_annotation_pattern, validation_col)[0].strip()
+                    elif '// ' in validation_col and 'https://' not in validation_col:
+                        # Generic Go comment (but not URLs)
+                        clean_validation = validation_col.split('// ')[0].strip()
                     elif '`json:' in validation_col:
                         # Split on struct field definitions
                         clean_validation = re.split(r'`json:', validation_col)[0].strip()
                     elif '*HTTPVersion' in validation_col or 'Version *HTTPVersion' in validation_col:
                         # Split on struct field type definitions
                         clean_validation = re.split(r'[*][A-Z][a-zA-Z0-9_]*\s+`', validation_col)[0].strip()
+                    elif 'BackendHTTP' in validation_col:
+                        # Split on BackendHTTP struct definitions that leaked in
+                        clean_validation = re.split(r'BackendHTTP', validation_col)[0].strip()
                     elif '<br />XValidation' in validation_col:
                         # Split on incomplete validation rules
                         clean_validation = re.split(r' <br />XValidation', validation_col)[0].strip()
@@ -287,7 +308,11 @@ def _post_process_api_docs(api_file):
                     # Ensure no line breaks are embedded in the validation column
                     clean_validation = clean_validation.replace('\n', ' ').replace('\r', ' ').strip()
                     # Reconstruct the line with cleaned validation column
-                    parts[-2] = ' ' + clean_validation + ' '
+                    # Use the correct index based on whether line ends with |
+                    parts[validation_col_idx] = ' ' + clean_validation + ' '
+                    # If the original line didn't end with |, add it back for proper table format
+                    if validation_col_idx == -1:
+                        parts.append('')
                     line = '|'.join(parts)
                 
                 # Check for continuation lines (lines that start with tab/space and contain Go code)
@@ -315,17 +340,31 @@ def _post_process_api_docs(api_file):
                         else:
                             # Empty line but not part of continuation - stop
                             break
+                    # Check if this line is a table cell closer (like "] |") - these don't need indentation
+                    elif next_stripped == '] |' or next_stripped == ']' or next_stripped.startswith('] '):
+                        continuation_lines_to_skip += 1
+                        j += 1
+                        continue
                     elif (next_line.startswith('\t') or (next_line.startswith(' ') and not next_stripped.startswith('|'))):
                         # Check if it contains Go code patterns or is closing a table cell
                         # Be careful: only match // when it's clearly a Go comment, not URLs
                         has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
-                        if (has_go_comment_in_line or '`json:' in next_line or '*HTTPVersion' in next_line or 
+                        has_go_annotation_in_line = bool(re.search(r'\+(?:optional|required|kubebuilder)', next_line))
+                        if (has_go_comment_in_line or has_go_annotation_in_line or 
+                            '`json:' in next_line or '*HTTPVersion' in next_line or 
                             'XValidation' in next_line or 'Version *HTTPVersion' in next_line or
                             next_stripped == ']' or next_stripped == '] |' or
-                            next_stripped.startswith(']') or 'kubebuilder' in next_line.lower()):
+                            next_stripped.startswith(']') or 'kubebuilder' in next_line.lower() or
+                            'BackendHTTP' in next_line or
+                            (next_stripped.startswith('//') and 'https://' not in next_line)):
                             continuation_lines_to_skip += 1
                             j += 1
                             continue
+                    # Check for lines that contain only Go code artifacts (without requiring indentation)
+                    elif (next_stripped.startswith('//') and 'https://' not in next_line):
+                        continuation_lines_to_skip += 1
+                        j += 1
+                        continue
                     
                     # If we get here, it's not a continuation line
                     break
@@ -343,6 +382,12 @@ def _post_process_api_docs(api_file):
     content = re.sub(r' <br />XValidation \|', '', content)
     content = re.sub(r'Enum: \[HTTP1;HTTP2$', '', content, flags=re.MULTILINE)
     
+    # Remove any remaining Go annotations that slipped through
+    # Pattern matches: // +optional, // +required, // +kubebuilder:..., etc.
+    content = re.sub(r'\s*//\s*\+(?:optional|required|kubebuilder[^\s|]*)', '', content)
+    # Also remove standalone +optional, +required patterns (without //)
+    content = re.sub(r'\s+\+(?:optional|required)\s*(?=\||\s*$)', ' ', content)
+    
     # Clean up duplicate "Required <br />Optional" patterns
     # A field should be either Required OR Optional, not both
     # If both are present, use heuristics to determine which is correct:
@@ -355,8 +400,15 @@ def _post_process_api_docs(api_file):
             # Check if this is a table row with validation column
             parts = line.split('|')
             if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
-                validation_col = parts[-2].strip() if len(parts) > 1 else ''
-                default_col = parts[-3].strip() if len(parts) > 2 else ''
+                # Determine correct column index based on whether line ends with |
+                if parts[-1].strip() == '':
+                    validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                    default_col = parts[-3].strip() if len(parts) > 2 else ''
+                    validation_col_idx = -2
+                else:
+                    validation_col = parts[-1].strip() if len(parts) > 1 else ''
+                    default_col = parts[-2].strip() if len(parts) > 2 else ''
+                    validation_col_idx = -1
                 
                 # Check if validation column has both Required and Optional
                 if 'Required' in validation_col and 'Optional' in validation_col:
@@ -378,7 +430,9 @@ def _post_process_api_docs(api_file):
                         validation_col = re.sub(r'\s+Optional', '', validation_col)
                     
                     # Reconstruct the line with cleaned validation column
-                    parts[-2] = ' ' + validation_col + ' '
+                    parts[validation_col_idx] = ' ' + validation_col + ' '
+                    if validation_col_idx == -1:
+                        parts.append('')
                     line = '|'.join(parts)
         
         cleaned_validation_lines.append(line)
@@ -400,11 +454,14 @@ def _post_process_api_docs(api_file):
             # If next line doesn't start a new table row and contains Go code or closes a cell, skip it
             # Be careful: only match // when it's clearly a Go comment, not URLs
             has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
+            has_go_annotation_in_line = bool(re.search(r'\+(?:optional|required|kubebuilder)', next_line))
             if not next_stripped.startswith('|') and (
-                has_go_comment_in_line or '`json:' in next_line or 
-                '*HTTPVersion' in next_line or 'XValidation' in next_line or
+                has_go_comment_in_line or has_go_annotation_in_line or
+                '`json:' in next_line or '*HTTPVersion' in next_line or 
+                'XValidation' in next_line or 'BackendHTTP' in next_line or
                 next_stripped == ']' or next_stripped == '] |' or
-                'kubebuilder' in next_line.lower()
+                'kubebuilder' in next_line.lower() or
+                (next_stripped.startswith('//') and 'https://' not in next_line)
             ):
                 i += 1
                 continue
@@ -417,17 +474,59 @@ def _post_process_api_docs(api_file):
         f.write(content)
 
 
+def _run_crd_ref_docs(api_path, config_file):
+    '''Run crd-ref-docs on the specified API path and return the generated content.'''
+    subprocess.run([
+        'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
+        f'--source-path={api_path}',
+        '--renderer=markdown',
+        '--output-path=./',
+        f'--config={config_file}'
+    ], check=True)
+    
+    # Read the generated content
+    with open('./out.md') as f:
+        content = f.read()
+    
+    # Clean up temporary file
+    os.remove('./out.md')
+    
+    return content
+
+
+def _extract_packages_for_product(content, product):
+    '''Extract relevant packages from crd-ref-docs output for a specific product.
+    
+    For agentgateway: extracts agentgateway.dev/v1alpha1 package
+    For kgateway: extracts gateway.kgateway.dev/v1alpha1 package
+    
+    Returns the extracted content or None if not found.
+    '''
+    if product == 'agentgateway':
+        package_name = 'agentgateway.dev/v1alpha1'
+    else:
+        package_name = 'gateway.kgateway.dev/v1alpha1'
+    
+    return extract_package_section(content, package_name)
+
+
 def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     '''Generate API reference documentation'''
     print(f'  → Generating API docs for version {version}')
     
     # Check if the API directory exists
-    api_path = f'{kgateway_dir}/api/v1alpha1/'
-    if not os.path.exists(api_path):
-        print(f'    Warning: API directory {api_path} does not exist, skipping API docs')
+    api_base = f'{kgateway_dir}/api/v1alpha1'
+    if not os.path.exists(api_base):
+        print(f'    Warning: API directory {api_base} does not exist, skipping API docs')
         return False
     
-    # Generate API docs using individual subprocess calls
+    # Check for the new directory structure (agentgateway, kgateway, shared)
+    has_new_structure = (
+        os.path.exists(f'{api_base}/agentgateway') and 
+        os.path.exists(f'{api_base}/kgateway')
+    )
+    
+    # Prepare crd-ref-docs config
     with open('scripts/crd-ref-docs-config.yaml', 'r') as f:
         config_content = f.read()
     
@@ -436,18 +535,109 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     kube_version = os.environ.get('KUBE_VERSION') or '1.31'
     config_content = config_content.replace('${KUBE_VERSION}', kube_version)
     
-    with open(f'crd-ref-docs-config-{link_version}.yaml', 'w') as f:
+    config_file = f'crd-ref-docs-config-{link_version}.yaml'
+    with open(config_file, 'w') as f:
         f.write(config_content)
+    
+    # Check if version is 2.2.x or later
+    split_api = is_version_2_2_or_later(version)
+    
+    if has_new_structure and split_api:
+        # New structure: run crd-ref-docs on the full api/v1alpha1 directory
+        # then extract packages for each product
+        print(f'    Using new API structure with separate agentgateway/kgateway/shared directories')
+        
+        # Run crd-ref-docs once on the full api directory
+        api_path = f'{api_base}/'
+        generated_content = _run_crd_ref_docs(api_path, config_file)
+        
+        # Extract and generate agentgateway docs
+        agentgateway_content = _extract_packages_for_product(generated_content, 'agentgateway')
+        if agentgateway_content:
+            target_path = f'content/docs/agentgateway/{url_path}/reference/'
+            os.makedirs(target_path, exist_ok=True)
+            api_file = f'{target_path}api.md'
+            
+            with open(api_file, 'w') as f:
+                f.write('---\n')
+                f.write('title: API reference\n')
+                f.write('weight: 10\n')
+                f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write(agentgateway_content)
+            
+            # Apply post-processing
+            _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            agentgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/agentgateway'
+            if os.path.exists(agentgateway_api_dir):
+                env = os.environ.copy()
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, agentgateway_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into agentgateway API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
+            print(f'    ✓ Generated agentgateway API docs in {api_file}')
+        else:
+            print(f'    ⚠ Warning: Could not extract agentgateway.dev/v1alpha1 package')
+        
+        # Extract and generate kgateway/envoy docs
+        kgateway_content = _extract_packages_for_product(generated_content, 'kgateway')
+        if kgateway_content:
+            target_path = f'content/docs/envoy/{url_path}/reference/'
+            os.makedirs(target_path, exist_ok=True)
+            api_file = f'{target_path}api.md'
+            
+            with open(api_file, 'w') as f:
+                f.write('---\n')
+                f.write('title: API reference\n')
+                f.write('weight: 10\n')
+                f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write(kgateway_content)
+            
+            # Apply post-processing
+            _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            kgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/kgateway'
+            if os.path.exists(kgateway_api_dir):
+                env = os.environ.copy()
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, kgateway_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into kgateway/envoy API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
+            print(f'    ✓ Generated kgateway/envoy API docs in {api_file}')
+        else:
+            print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
+        
+        os.remove(config_file)
+        return True
+    
+    # Legacy structure: run crd-ref-docs on the full api/v1alpha1 directory
+    api_path = f'{api_base}/'
     
     subprocess.run([
         'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
         f'--source-path={api_path}',
         '--renderer=markdown',
         '--output-path=./',
-        f'--config=crd-ref-docs-config-{link_version}.yaml'
+        f'--config={config_file}'
     ], check=True)
     
-    os.remove(f'crd-ref-docs-config-{link_version}.yaml')
+    os.remove(config_file)
     
     # Read the generated content once
     with open('./out.md') as f:
