@@ -502,17 +502,15 @@ _Appears in:_
 
 #### CELFilter
 
-_Underlying type:_ _struct_
-
 CELFilter filters requests based on Common Expression Language (CEL).
-
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `match` _[string](#string)_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true. see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  | Required |
 #### CSRFPolicy
 
 
@@ -625,6 +623,20 @@ _Appears in:_
 
 
 
+
+#### ComparisonFilter
+
+ComparisonFilter represents a filter based on a comparison.
+Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `op` _[Op](#op)_ |  |  | Required |
+| `value` _[int32](#int32)_ | Value to compare against. |  | Required <br />Minimum: 0 <br />Maximum: 4294967295 |
 
 #### Compression
 
@@ -1353,18 +1365,17 @@ _Appears in:_
 
 #### GrpcStatusFilter
 
-_Underlying type:_ _[struct{Statuses []GrpcStatus "json:\"statuses,omitempty\""; Exclude *bool "json:\"exclude,omitempty\""}](#struct{statuses-[]grpcstatus-"json:\"statuses,omitempty\"";-exclude-*bool-"json:\"exclude,omitempty\""})_
-
 GrpcStatusFilter filters gRPC requests based on their response status.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
-
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `statuses` _[GrpcStatus](#grpcstatus)_ array |  |  | Optional <br />MinItems: 1 |
+| `exclude` _[bool](#bool)_ |  |  | Optional <br />MinItems: 1 |
 #### HTTPListenerPolicy
 
 
@@ -1495,18 +1506,16 @@ _Appears in:_
 
 #### HeaderFilter
 
-_Underlying type:_ _struct_
-
 HeaderFilter filters requests based on headers.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
-
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  | Required |
 #### HeaderName
 
 _Underlying type:_ _string_
@@ -1522,17 +1531,16 @@ _Appears in:_
 
 #### HeaderSource
 
-_Underlying type:_ _struct_
-
 HeaderSource configures how to retrieve a JWT from a header
-
 
 
 _Appears in:_
 - [JWTTokenSource](#jwttokensource)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `header` _[string](#string)_ | Header is the name of the header. for example, "Authorization" |  | Required <br />MinLength: 1 <br />MaxLength: 2048 |
+| `prefix` _[string](#string)_ | Prefix before the token. for example, "Bearer " |  | Required <br />Optional <br />MinLength: 1 <br />MaxLength: 2048 |
 #### HeaderTransformation
 
 
@@ -1552,11 +1560,8 @@ _Appears in:_
 
 #### HeaderValue
 
-_Underlying type:_ _struct_
-
 Header name/value pair.
 Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-headervalue
-
 
 
 _Appears in:_
@@ -1564,8 +1569,10 @@ _Appears in:_
 - [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
 - [CommonGrpcService](#commongrpcservice)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _[string](#string)_ | Header name. |  | Required |
+| `value` _[string](#string)_ | Header value. |  | Required <br />Optional |
 #### HealthCheck
 
 
@@ -1879,6 +1886,19 @@ _Appears in:_
 
 
 
+
+#### KeyAnyValue
+
+KeyValue is a key-value pair that is used to store Span attributes, Link attributes, etc.
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _[string](#string)_ | Attribute keys must be unique |  | Required |
+| `value` _[AnyValue](#anyvalue)_ | Value may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. |  | Required |
 
 #### KubernetesProxyConfig
 
@@ -2245,6 +2265,18 @@ _Appears in:_
 
 
 
+
+#### MetadataPathSegment
+
+Specifies a segment in a path for retrieving values from Metadata.
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _[string](#string)_ | The key used to retrieve the value in the struct |  | Required |
 
 #### NamedJWTProvider
 
@@ -2650,6 +2682,19 @@ _Appears in:_
 
 
 
+#### RateLimitDescriptorEntryGeneric
+
+RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
+
+
+_Appears in:_
+- [Various types](#various-types)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _[string](#string)_ | Key is the name of this descriptor entry. |  | Required <br />MinLength: 1 |
+| `value` _[string](#string)_ | Value is the static value for this descriptor entry. |  | Required <br />MinLength: 1 |
+
 #### RateLimitDescriptorEntryType
 
 _Underlying type:_ _string_
@@ -2777,18 +2822,16 @@ _Appears in:_
 
 #### ResponseFlagFilter
 
-_Underlying type:_ _[struct{Flags []string "json:\"flags\""}](#struct{flags-[]string-"json:\"flags\""})_
-
 ResponseFlagFilter filters based on response flags.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
-
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `flags` _[string](#string)_ array |  |  | Required <br />MinItems: 1 |
 #### Retry
 
 
@@ -2842,11 +2885,8 @@ _Appears in:_
 
 #### RetryPolicy
 
-_Underlying type:_ _struct_
-
 Specifies the retry policy of remote data source when fetching fails.
 Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
-
 
 
 _Appears in:_
@@ -2854,8 +2894,10 @@ _Appears in:_
 - [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
 - [CommonGrpcService](#commongrpcservice)
 
-
-
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `retryBackOff` _[BackoffStrategy](#backoffstrategy)_ | Specifies parameters that control retry backoff strategy. the default base interval is 1000 milliseconds and the default maximum interval is 10 times the base interval. |  | Optional |
+| `numRetries` _[int32](#int32)_ | Specifies the allowed number of retries. Defaults to 1. |  | Optional <br />Minimum: 1 |
 #### Sampler
 
 
