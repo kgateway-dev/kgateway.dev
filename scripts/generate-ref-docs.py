@@ -12,7 +12,6 @@ import subprocess
 import os
 import re
 import platform
-import shutil
 
 
 def resolve_tag_for_version(version, link_version):
@@ -475,45 +474,7 @@ def _post_process_api_docs(api_file):
         f.write(content)
 
 
-def _create_merged_api_dir(kgateway_dir, product, temp_dir):
-    '''Create a temporary directory with merged API sources for a product.
-    
-    For agentgateway: merges agentgateway + shared directories
-    For kgateway: merges kgateway + shared directories
-    '''
-    api_base = f'{kgateway_dir}/api/v1alpha1'
-    
-    # Create temp directory
-    os.makedirs(temp_dir, exist_ok=True)
-    
-    # Directories to include based on product
-    if product == 'agentgateway':
-        dirs_to_copy = ['agentgateway', 'shared']
-    else:  # kgateway/envoy
-        dirs_to_copy = ['kgateway', 'shared']
-    
-    # Copy each directory's contents to the temp dir
-    for dir_name in dirs_to_copy:
-        src_dir = f'{api_base}/{dir_name}'
-        if os.path.exists(src_dir):
-            # Copy all Go files from the source directory
-            for item in os.listdir(src_dir):
-                src_path = f'{src_dir}/{item}'
-                dst_path = f'{temp_dir}/{item}'
-                if os.path.isfile(src_path):
-                    shutil.copy2(src_path, dst_path)
-                elif os.path.isdir(src_path):
-                    if os.path.exists(dst_path):
-                        # Merge directory contents
-                        for subitem in os.listdir(src_path):
-                            shutil.copy2(f'{src_path}/{subitem}', f'{dst_path}/{subitem}')
-                    else:
-                        shutil.copytree(src_path, dst_path)
-    
-    return temp_dir
-
-
-def _run_crd_ref_docs(api_path, config_file, kube_version):
+def _run_crd_ref_docs(api_path, config_file):
     '''Run crd-ref-docs on the specified API path and return the generated content.'''
     subprocess.run([
         'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
@@ -531,6 +492,22 @@ def _run_crd_ref_docs(api_path, config_file, kube_version):
     os.remove('./out.md')
     
     return content
+
+
+def _extract_packages_for_product(content, product):
+    '''Extract relevant packages from crd-ref-docs output for a specific product.
+    
+    For agentgateway: extracts agentgateway.dev/v1alpha1 package
+    For kgateway: extracts gateway.kgateway.dev/v1alpha1 package
+    
+    Returns the extracted content or None if not found.
+    '''
+    if product == 'agentgateway':
+        package_name = 'agentgateway.dev/v1alpha1'
+    else:
+        package_name = 'gateway.kgateway.dev/v1alpha1'
+    
+    return extract_package_section(content, package_name)
 
 
 def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
@@ -566,15 +543,17 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     split_api = is_version_2_2_or_later(version)
     
     if has_new_structure and split_api:
-        # New structure: generate docs separately for each product
+        # New structure: run crd-ref-docs on the full api/v1alpha1 directory
+        # then extract packages for each product
         print(f'    Using new API structure with separate agentgateway/kgateway/shared directories')
         
-        # Generate agentgateway docs (agentgateway + shared)
-        temp_agentgateway_dir = f'.temp-api-agentgateway-{link_version}'
-        try:
-            _create_merged_api_dir(kgateway_dir, 'agentgateway', temp_agentgateway_dir)
-            agentgateway_content = _run_crd_ref_docs(temp_agentgateway_dir, config_file, kube_version)
-            
+        # Run crd-ref-docs once on the full api directory
+        api_path = f'{api_base}/'
+        generated_content = _run_crd_ref_docs(api_path, config_file)
+        
+        # Extract and generate agentgateway docs
+        agentgateway_content = _extract_packages_for_product(generated_content, 'agentgateway')
+        if agentgateway_content:
             target_path = f'content/docs/agentgateway/{url_path}/reference/'
             os.makedirs(target_path, exist_ok=True)
             api_file = f'{target_path}api.md'
@@ -605,16 +584,12 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                     print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
             
             print(f'    ✓ Generated agentgateway API docs in {api_file}')
-        finally:
-            if os.path.exists(temp_agentgateway_dir):
-                shutil.rmtree(temp_agentgateway_dir)
+        else:
+            print(f'    ⚠ Warning: Could not extract agentgateway.dev/v1alpha1 package')
         
-        # Generate kgateway/envoy docs (kgateway + shared)
-        temp_kgateway_dir = f'.temp-api-kgateway-{link_version}'
-        try:
-            _create_merged_api_dir(kgateway_dir, 'kgateway', temp_kgateway_dir)
-            kgateway_content = _run_crd_ref_docs(temp_kgateway_dir, config_file, kube_version)
-            
+        # Extract and generate kgateway/envoy docs
+        kgateway_content = _extract_packages_for_product(generated_content, 'kgateway')
+        if kgateway_content:
             target_path = f'content/docs/envoy/{url_path}/reference/'
             os.makedirs(target_path, exist_ok=True)
             api_file = f'{target_path}api.md'
@@ -645,9 +620,8 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                     print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
             
             print(f'    ✓ Generated kgateway/envoy API docs in {api_file}')
-        finally:
-            if os.path.exists(temp_kgateway_dir):
-                shutil.rmtree(temp_kgateway_dir)
+        else:
+            print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
         
         os.remove(config_file)
         return True
