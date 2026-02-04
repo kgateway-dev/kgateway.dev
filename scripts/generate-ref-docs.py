@@ -235,11 +235,15 @@ def _post_process_api_docs(api_file):
                 # Check if validation column has Go code patterns or if there are continuation lines
                 # Be careful: // in URLs (https://) or regex patterns is NOT a Go comment
                 # Go comments typically have // followed by +optional, +required, +kubebuilder, or whitespace
+                # Also match standalone +optional, +required, +kubebuilder patterns
                 has_go_comment = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', validation_col))
-                has_go_code = (has_go_comment or '`json:' in validation_col or 
+                has_go_annotation = bool(re.search(r'\+(?:optional|required|kubebuilder)', validation_col))
+                has_go_code = (has_go_comment or has_go_annotation or '`json:' in validation_col or 
                               '*HTTPVersion' in validation_col or 
                               validation_col.endswith('HTTP2') or
-                              '<br />XValidation' in validation_col)
+                              '<br />XValidation' in validation_col or
+                              'BackendHTTP' in validation_col or
+                              '// ' in validation_col)
                 
                 if has_go_code:
                     # Clean up the validation column - keep only valid parts on a single line
@@ -249,17 +253,27 @@ def _post_process_api_docs(api_file):
                     # Pattern matches: // followed by +optional, +required, +kubebuilder, or whitespace+text (Go comment)
                     # But NOT // that's part of a URL pattern like https://
                     go_comment_pattern = r'//\s*(?:\+|kubebuilder|optional|required)'
+                    go_annotation_pattern = r'\s*\+(?:optional|required|kubebuilder)[^\s]*'
                     # Also match // at the end of validation (incomplete, likely a comment)
                     # But preserve // in URLs and regex patterns
                     if re.search(go_comment_pattern, validation_col):
                         # Split on Go comment pattern
                         clean_validation = re.split(go_comment_pattern, validation_col)[0].strip()
+                    elif re.search(go_annotation_pattern, validation_col):
+                        # Split on standalone Go annotation pattern
+                        clean_validation = re.split(go_annotation_pattern, validation_col)[0].strip()
+                    elif '// ' in validation_col and 'https://' not in validation_col:
+                        # Generic Go comment (but not URLs)
+                        clean_validation = validation_col.split('// ')[0].strip()
                     elif '`json:' in validation_col:
                         # Split on struct field definitions
                         clean_validation = re.split(r'`json:', validation_col)[0].strip()
                     elif '*HTTPVersion' in validation_col or 'Version *HTTPVersion' in validation_col:
                         # Split on struct field type definitions
                         clean_validation = re.split(r'[*][A-Z][a-zA-Z0-9_]*\s+`', validation_col)[0].strip()
+                    elif 'BackendHTTP' in validation_col:
+                        # Split on BackendHTTP struct definitions that leaked in
+                        clean_validation = re.split(r'BackendHTTP', validation_col)[0].strip()
                     elif '<br />XValidation' in validation_col:
                         # Split on incomplete validation rules
                         clean_validation = re.split(r' <br />XValidation', validation_col)[0].strip()
@@ -319,10 +333,14 @@ def _post_process_api_docs(api_file):
                         # Check if it contains Go code patterns or is closing a table cell
                         # Be careful: only match // when it's clearly a Go comment, not URLs
                         has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
-                        if (has_go_comment_in_line or '`json:' in next_line or '*HTTPVersion' in next_line or 
+                        has_go_annotation_in_line = bool(re.search(r'\+(?:optional|required|kubebuilder)', next_line))
+                        if (has_go_comment_in_line or has_go_annotation_in_line or 
+                            '`json:' in next_line or '*HTTPVersion' in next_line or 
                             'XValidation' in next_line or 'Version *HTTPVersion' in next_line or
                             next_stripped == ']' or next_stripped == '] |' or
-                            next_stripped.startswith(']') or 'kubebuilder' in next_line.lower()):
+                            next_stripped.startswith(']') or 'kubebuilder' in next_line.lower() or
+                            'BackendHTTP' in next_line or
+                            (next_stripped.startswith('//') and 'https://' not in next_line)):
                             continuation_lines_to_skip += 1
                             j += 1
                             continue
@@ -342,6 +360,12 @@ def _post_process_api_docs(api_file):
     # Final cleanup: remove any remaining incomplete validation rules
     content = re.sub(r' <br />XValidation \|', '', content)
     content = re.sub(r'Enum: \[HTTP1;HTTP2$', '', content, flags=re.MULTILINE)
+    
+    # Remove any remaining Go annotations that slipped through
+    # Pattern matches: // +optional, // +required, // +kubebuilder:..., etc.
+    content = re.sub(r'\s*//\s*\+(?:optional|required|kubebuilder[^\s|]*)', '', content)
+    # Also remove standalone +optional, +required patterns (without //)
+    content = re.sub(r'\s+\+(?:optional|required)\s*(?=\||\s*$)', ' ', content)
     
     # Clean up duplicate "Required <br />Optional" patterns
     # A field should be either Required OR Optional, not both
@@ -400,11 +424,14 @@ def _post_process_api_docs(api_file):
             # If next line doesn't start a new table row and contains Go code or closes a cell, skip it
             # Be careful: only match // when it's clearly a Go comment, not URLs
             has_go_comment_in_line = bool(re.search(r'//\s*(?:\+|kubebuilder|optional|required)', next_line))
+            has_go_annotation_in_line = bool(re.search(r'\+(?:optional|required|kubebuilder)', next_line))
             if not next_stripped.startswith('|') and (
-                has_go_comment_in_line or '`json:' in next_line or 
-                '*HTTPVersion' in next_line or 'XValidation' in next_line or
+                has_go_comment_in_line or has_go_annotation_in_line or
+                '`json:' in next_line or '*HTTPVersion' in next_line or 
+                'XValidation' in next_line or 'BackendHTTP' in next_line or
                 next_stripped == ']' or next_stripped == '] |' or
-                'kubebuilder' in next_line.lower()
+                'kubebuilder' in next_line.lower() or
+                (next_stripped.startswith('//') and 'https://' not in next_line)
             ):
                 i += 1
                 continue
