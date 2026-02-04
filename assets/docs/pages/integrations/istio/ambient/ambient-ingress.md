@@ -19,11 +19,15 @@ This guide assumes that you run your ambient mesh in a single cluster and want t
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-## Step 1: Set up an ambient mesh
+## Step 1: Enable the Istio integration
+
+{{< reuse "docs/snippets/istio-integration.md" >}}
+
+## Step 2: Set up an ambient mesh
 
 {{< reuse "docs/snippets/setup-ambient-mesh.md" >}}
 
-## Step 2: Set up the ingress gateway
+## Step 3: Set up the ingress gateway
 
 To set up {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you simply add all the namespaces that you want to secure to your ambient mesh, including the namespace that your gateway proxy is deployed to.
 
