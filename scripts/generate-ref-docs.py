@@ -12,6 +12,7 @@ import subprocess
 import os
 import re
 import platform
+import shutil
 
 
 def resolve_tag_for_version(version, link_version):
@@ -474,17 +475,81 @@ def _post_process_api_docs(api_file):
         f.write(content)
 
 
+def _create_merged_api_dir(kgateway_dir, product, temp_dir):
+    '''Create a temporary directory with merged API sources for a product.
+    
+    For agentgateway: merges agentgateway + shared directories
+    For kgateway: merges kgateway + shared directories
+    '''
+    api_base = f'{kgateway_dir}/api/v1alpha1'
+    
+    # Create temp directory
+    os.makedirs(temp_dir, exist_ok=True)
+    
+    # Directories to include based on product
+    if product == 'agentgateway':
+        dirs_to_copy = ['agentgateway', 'shared']
+    else:  # kgateway/envoy
+        dirs_to_copy = ['kgateway', 'shared']
+    
+    # Copy each directory's contents to the temp dir
+    for dir_name in dirs_to_copy:
+        src_dir = f'{api_base}/{dir_name}'
+        if os.path.exists(src_dir):
+            # Copy all Go files from the source directory
+            for item in os.listdir(src_dir):
+                src_path = f'{src_dir}/{item}'
+                dst_path = f'{temp_dir}/{item}'
+                if os.path.isfile(src_path):
+                    shutil.copy2(src_path, dst_path)
+                elif os.path.isdir(src_path):
+                    if os.path.exists(dst_path):
+                        # Merge directory contents
+                        for subitem in os.listdir(src_path):
+                            shutil.copy2(f'{src_path}/{subitem}', f'{dst_path}/{subitem}')
+                    else:
+                        shutil.copytree(src_path, dst_path)
+    
+    return temp_dir
+
+
+def _run_crd_ref_docs(api_path, config_file, kube_version):
+    '''Run crd-ref-docs on the specified API path and return the generated content.'''
+    subprocess.run([
+        'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
+        f'--source-path={api_path}',
+        '--renderer=markdown',
+        '--output-path=./',
+        f'--config={config_file}'
+    ], check=True)
+    
+    # Read the generated content
+    with open('./out.md') as f:
+        content = f.read()
+    
+    # Clean up temporary file
+    os.remove('./out.md')
+    
+    return content
+
+
 def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     '''Generate API reference documentation'''
     print(f'  → Generating API docs for version {version}')
     
     # Check if the API directory exists
-    api_path = f'{kgateway_dir}/api/v1alpha1/'
-    if not os.path.exists(api_path):
-        print(f'    Warning: API directory {api_path} does not exist, skipping API docs')
+    api_base = f'{kgateway_dir}/api/v1alpha1'
+    if not os.path.exists(api_base):
+        print(f'    Warning: API directory {api_base} does not exist, skipping API docs')
         return False
     
-    # Generate API docs using individual subprocess calls
+    # Check for the new directory structure (agentgateway, kgateway, shared)
+    has_new_structure = (
+        os.path.exists(f'{api_base}/agentgateway') and 
+        os.path.exists(f'{api_base}/kgateway')
+    )
+    
+    # Prepare crd-ref-docs config
     with open('scripts/crd-ref-docs-config.yaml', 'r') as f:
         config_content = f.read()
     
@@ -493,18 +558,112 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     kube_version = os.environ.get('KUBE_VERSION') or '1.31'
     config_content = config_content.replace('${KUBE_VERSION}', kube_version)
     
-    with open(f'crd-ref-docs-config-{link_version}.yaml', 'w') as f:
+    config_file = f'crd-ref-docs-config-{link_version}.yaml'
+    with open(config_file, 'w') as f:
         f.write(config_content)
+    
+    # Check if version is 2.2.x or later
+    split_api = is_version_2_2_or_later(version)
+    
+    if has_new_structure and split_api:
+        # New structure: generate docs separately for each product
+        print(f'    Using new API structure with separate agentgateway/kgateway/shared directories')
+        
+        # Generate agentgateway docs (agentgateway + shared)
+        temp_agentgateway_dir = f'.temp-api-agentgateway-{link_version}'
+        try:
+            _create_merged_api_dir(kgateway_dir, 'agentgateway', temp_agentgateway_dir)
+            agentgateway_content = _run_crd_ref_docs(temp_agentgateway_dir, config_file, kube_version)
+            
+            target_path = f'content/docs/agentgateway/{url_path}/reference/'
+            os.makedirs(target_path, exist_ok=True)
+            api_file = f'{target_path}api.md'
+            
+            with open(api_file, 'w') as f:
+                f.write('---\n')
+                f.write('title: API reference\n')
+                f.write('weight: 10\n')
+                f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write(agentgateway_content)
+            
+            # Apply post-processing
+            _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            agentgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/agentgateway'
+            if os.path.exists(agentgateway_api_dir):
+                env = os.environ.copy()
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, agentgateway_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into agentgateway API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
+            print(f'    ✓ Generated agentgateway API docs in {api_file}')
+        finally:
+            if os.path.exists(temp_agentgateway_dir):
+                shutil.rmtree(temp_agentgateway_dir)
+        
+        # Generate kgateway/envoy docs (kgateway + shared)
+        temp_kgateway_dir = f'.temp-api-kgateway-{link_version}'
+        try:
+            _create_merged_api_dir(kgateway_dir, 'kgateway', temp_kgateway_dir)
+            kgateway_content = _run_crd_ref_docs(temp_kgateway_dir, config_file, kube_version)
+            
+            target_path = f'content/docs/envoy/{url_path}/reference/'
+            os.makedirs(target_path, exist_ok=True)
+            api_file = f'{target_path}api.md'
+            
+            with open(api_file, 'w') as f:
+                f.write('---\n')
+                f.write('title: API reference\n')
+                f.write('weight: 10\n')
+                f.write('---\n\n')
+                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write(kgateway_content)
+            
+            # Apply post-processing
+            _post_process_api_docs(api_file)
+            
+            # Inject missing type definitions
+            kgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/kgateway'
+            if os.path.exists(kgateway_api_dir):
+                env = os.environ.copy()
+                env['KUBE_VERSION'] = kube_version
+                result = subprocess.run([
+                    sys.executable, 'scripts/inject-missing-types.py',
+                    api_file, kgateway_api_dir
+                ], capture_output=True, text=True, check=False, env=env)
+                if result.returncode == 0:
+                    print(f'    ✓ Injected missing types into kgateway/envoy API docs')
+                elif result.stdout or result.stderr:
+                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
+            
+            print(f'    ✓ Generated kgateway/envoy API docs in {api_file}')
+        finally:
+            if os.path.exists(temp_kgateway_dir):
+                shutil.rmtree(temp_kgateway_dir)
+        
+        os.remove(config_file)
+        return True
+    
+    # Legacy structure: run crd-ref-docs on the full api/v1alpha1 directory
+    api_path = f'{api_base}/'
     
     subprocess.run([
         'go', 'run', 'github.com/elastic/crd-ref-docs@v0.1.0',
         f'--source-path={api_path}',
         '--renderer=markdown',
         '--output-path=./',
-        f'--config=crd-ref-docs-config-{link_version}.yaml'
+        f'--config={config_file}'
     ], check=True)
     
-    os.remove(f'crd-ref-docs-config-{link_version}.yaml')
+    os.remove(config_file)
     
     # Read the generated content once
     with open('./out.md') as f:
