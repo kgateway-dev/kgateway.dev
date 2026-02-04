@@ -230,7 +230,14 @@ def _post_process_api_docs(api_file):
             # Check if the validation column (last column before final |) contains Go code artifacts
             parts = line.split('|')
             if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
-                validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                # If the line ends with |, parts[-1] is empty and validation is in parts[-2]
+                # If the line doesn't end with | (incomplete row), validation is in parts[-1]
+                if parts[-1].strip() == '':
+                    validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                    validation_col_idx = -2
+                else:
+                    validation_col = parts[-1].strip() if len(parts) > 1 else ''
+                    validation_col_idx = -1
                 
                 # Check if validation column has Go code patterns or if there are continuation lines
                 # Be careful: // in URLs (https://) or regex patterns is NOT a Go comment
@@ -301,7 +308,11 @@ def _post_process_api_docs(api_file):
                     # Ensure no line breaks are embedded in the validation column
                     clean_validation = clean_validation.replace('\n', ' ').replace('\r', ' ').strip()
                     # Reconstruct the line with cleaned validation column
-                    parts[-2] = ' ' + clean_validation + ' '
+                    # Use the correct index based on whether line ends with |
+                    parts[validation_col_idx] = ' ' + clean_validation + ' '
+                    # If the original line didn't end with |, add it back for proper table format
+                    if validation_col_idx == -1:
+                        parts.append('')
                     line = '|'.join(parts)
                 
                 # Check for continuation lines (lines that start with tab/space and contain Go code)
@@ -329,6 +340,11 @@ def _post_process_api_docs(api_file):
                         else:
                             # Empty line but not part of continuation - stop
                             break
+                    # Check if this line is a table cell closer (like "] |") - these don't need indentation
+                    elif next_stripped == '] |' or next_stripped == ']' or next_stripped.startswith('] '):
+                        continuation_lines_to_skip += 1
+                        j += 1
+                        continue
                     elif (next_line.startswith('\t') or (next_line.startswith(' ') and not next_stripped.startswith('|'))):
                         # Check if it contains Go code patterns or is closing a table cell
                         # Be careful: only match // when it's clearly a Go comment, not URLs
@@ -344,6 +360,11 @@ def _post_process_api_docs(api_file):
                             continuation_lines_to_skip += 1
                             j += 1
                             continue
+                    # Check for lines that contain only Go code artifacts (without requiring indentation)
+                    elif (next_stripped.startswith('//') and 'https://' not in next_line):
+                        continuation_lines_to_skip += 1
+                        j += 1
+                        continue
                     
                     # If we get here, it's not a continuation line
                     break
@@ -379,8 +400,15 @@ def _post_process_api_docs(api_file):
             # Check if this is a table row with validation column
             parts = line.split('|')
             if len(parts) >= 5:  # At least: empty | Field | Description | Default | Validation |
-                validation_col = parts[-2].strip() if len(parts) > 1 else ''
-                default_col = parts[-3].strip() if len(parts) > 2 else ''
+                # Determine correct column index based on whether line ends with |
+                if parts[-1].strip() == '':
+                    validation_col = parts[-2].strip() if len(parts) > 1 else ''
+                    default_col = parts[-3].strip() if len(parts) > 2 else ''
+                    validation_col_idx = -2
+                else:
+                    validation_col = parts[-1].strip() if len(parts) > 1 else ''
+                    default_col = parts[-2].strip() if len(parts) > 2 else ''
+                    validation_col_idx = -1
                 
                 # Check if validation column has both Required and Optional
                 if 'Required' in validation_col and 'Optional' in validation_col:
@@ -402,7 +430,9 @@ def _post_process_api_docs(api_file):
                         validation_col = re.sub(r'\s+Optional', '', validation_col)
                     
                     # Reconstruct the line with cleaned validation column
-                    parts[-2] = ' ' + validation_col + ' '
+                    parts[validation_col_idx] = ' ' + validation_col + ' '
+                    if validation_col_idx == -1:
+                        parts.append('')
                     line = '|'.join(parts)
         
         cleaned_validation_lines.append(line)
