@@ -1,4 +1,4 @@
-Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} installation to enable the Istio integration.
+Upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} installation to enable the Istio integration so that {{< reuse "/docs/snippets/kgateway.md" >}} works with Istio DestinationRules.
 
 1. Get the Helm values for your current Helm installation. 
    ```sh
