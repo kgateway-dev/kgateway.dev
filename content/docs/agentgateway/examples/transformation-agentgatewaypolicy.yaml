@@ -1,0 +1,34 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: transform-demo
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: ai-api-route
+  traffic:
+    transform:
+      request:
+        headers:
+          - name: X-Agent-Proxy
+            value: '"kgateway-agent"'
+          - name: X-User-IP
+            value: 'request.headers["x-forwarded-for"]'
+      response:
+        headers:
+          - name: X-Processed-By
+            value: '"agentgateway-transform"'
+  backend:
+    ai:
+      promptGuard:
+        response:
+          - regex:
+              action: MASK
+              builtins:
+                - CreditCard
+                - PhoneNumber
+          - regex:
+              action: REJECT
+              pattern: '(?i)password|secret'

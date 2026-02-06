@@ -1,0 +1,21 @@
+apiVersion: agentgateway.dev/v1alpha1
+kind: AgentgatewayPolicy
+metadata:
+  name: access-logging
+  namespace: agentgateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: agentgateway-proxy
+  frontend:
+    accessLogs:
+      openTelemetry:
+        backendRef:
+          name: otel-collector
+          namespace: telemetry
+          port: 4317
+      attributes:
+        add:
+          - name: gateway_name
+            expression: '"agentgateway-proxy"'
