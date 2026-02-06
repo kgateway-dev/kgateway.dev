@@ -12,6 +12,9 @@ author: Gaurav Singh
 
 > Why this matters: `AgentgatewayPolicy` centralizes security, observability, and traffic transformation for AI traffic (LLMs, MCP, agent-to-agent) and is the recommended way to configure agentgateway in Kubernetes.
 
+**About this doc**  
+I created these examples while working with agentgateway and Kubernetes; they are intentionally concise so you can copy/paste them into your environment and adapt them quickly. Please review and replace placeholder values (namespace, names, certificates) before applying them in production.
+
 ---
 
 ## Short conceptual summary

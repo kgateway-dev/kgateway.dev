@@ -1,3 +1,4 @@
+# This is an example — replace name/namespace values for your cluster.
 apiVersion: agentgateway.dev/v1alpha1
 kind: AgentgatewayPolicy
 metadata:
@@ -10,18 +11,12 @@ spec:
       name: my-llm-route
   backend:
     tls:
-      root: |-
-        -----BEGIN CERTIFICATE-----
-        MIID...your-root-cert...
-        -----END CERTIFICATE-----
-      cert: |-
-        -----BEGIN CERTIFICATE-----
-        ...
-        -----END CERTIFICATE-----
-      key: |-
-        -----BEGIN PRIVATE KEY-----
-        ...
-        -----END PRIVATE KEY-----
+      # Reference a Kubernetes Secret containing TLS materials (recommended).
+      # Example: secretRef points to a secret with keys "tls.crt" and "tls.key"
+      secretRef:
+        name: my-llm-backend-tls
+        namespace: agentgateway-system
+      # insecure: false prevents skipping verification (set to true only for testing)
       insecure: false
     tcp:
       keepalive:
