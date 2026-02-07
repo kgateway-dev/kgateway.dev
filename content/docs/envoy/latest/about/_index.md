@@ -13,5 +13,6 @@ To learn more about {{< reuse "docs/snippets/kgateway.md" >}}, review the follow
   {{< card link="architecture" title="Architecture" >}}
   {{< card link="deployment-patterns" title="Deployment patterns" >}}
   {{< card link="custom-resources" title="Custom resources" >}}
+  {{< card link="proxies" title="Gateway proxies" >}}
   {{< card link="policies" title="Policies" >}}
 {{< /cards >}}

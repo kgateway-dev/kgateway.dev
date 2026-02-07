@@ -13,6 +13,7 @@ For example, you might use HTTPS listeners for external client connections, enfo
 {{< cards >}}
   {{< card link="access-logging" title="Access logging" >}}
   {{< card link="cors" title="CORS" >}}
+  {{< card link="csrf" title="CSRF" >}}
   {{< card link="external-auth" title="Bring your own external auth" >}}
   {{< card link="ratelimit" title="Rate limiting" >}}
   {{< card link="backend-tls" title="Backend TLS" >}}

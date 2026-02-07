@@ -11,4 +11,5 @@ Learn how to install kgateway.
   {{< card link="argocd" title="Argo CD" >}}
   {{< card link="sample-app" title="Sample app" >}}
   {{< card link="advanced" title="Advanced settings" >}}
+  {{< card link="tls" title="TLS encryption" >}}
 {{< /cards >}}
