@@ -45,3 +45,9 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version include-if="2.2.x,2.1.x" %}} 
 | [TCP keepalive](../../resiliency/tcp-keepalive/) | BackendConfigPolicy | {{% /version %}}
 | [Transformations](../../traffic-management/transformations) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
+## Policy behavior
+
+{{< cards >}}
+  {{< card link="global-attachment" title="Global policy attachment" >}}
+  {{< card link="merging" title="Policy merging" >}}
+{{< /cards >}}
