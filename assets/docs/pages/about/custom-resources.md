@@ -67,7 +67,7 @@ Kgateway uses the following custom resources to attach policies to routes and ga
 
 * [**DirectResponse**]({{< link-hextra path="/traffic-management/direct-response/" >}}): Directly respond to incoming requests with a custom HTTP response code and body.
 * [**HTTPListenerPolicy**]({{< link-hextra path="/about/policies/httplistenerpolicy/" >}}): Apply policies to all HTTP and HTTPS listeners.
-* [**TrafficPolicy**](https://kgateway.dev/docs/envoy/main/about/policies/trafficpolicy/): Attach policies to routes in an HTTPRoute resource.
+* [**TrafficPolicy**]({{< link-hextra path="/about/policies/trafficpolicy/" >}}): Attach policies to routes in an HTTPRoute resource.
 
 ### {{< reuse "docs/snippets/backend.md" >}}s
 
