@@ -5,7 +5,7 @@
 1. Delete the {{< reuse "/docs/snippets/trafficpolicy.md" >}} resources.
    ```sh
    kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin 
-   {{< version include-if="2.2.x,2.1.x" >}}
+   {{< version exclude-if="2.0.x" >}}
    kubectl delete {{< reuse "/docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin {{< /version >}}
    ```
 
