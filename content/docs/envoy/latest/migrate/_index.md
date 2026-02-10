@@ -46,7 +46,6 @@ The following examples demonstrate how to use `ingress2gateway` to convert vario
 **Optional:** Use the Ingress NGINX [quickstart guide](https://kubernetes.github.io/ingress-nginx/deploy/#quick-start) to test connectivity
 of the Ingress before converting.
 
-
 ## Common workflows
 
 1. Convert a file and write output to a directory.

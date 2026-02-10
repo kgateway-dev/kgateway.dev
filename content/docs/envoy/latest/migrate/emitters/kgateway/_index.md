@@ -23,7 +23,7 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway
 This command:
 
 1. Reads the kubeconfig file to extract cluster credentials and the current active namespace.
-2. Searches for ingress-nginx resources in that namespace. If no ingress-nginx resources exist, the command exits with the message `No resources found`.
+2. Searches for ingress-nginx resources in that namespace.
 3. Converts them to Gateway API resources (currently only Gateways and HTTPRoutes).
 
 ## Options

@@ -9,4 +9,5 @@ Redirect requests to another host or path.
   {{< card link="https" title="HTTPS redirect" >}}
   {{< card link="host" title="Host redirect" >}}
   {{< card link="path" title="Path redirect" >}}
+  {{< card link="https" title="Custom redirect status codes" >}}
 {{< /cards >}}
