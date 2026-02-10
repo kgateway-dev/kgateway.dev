@@ -61,20 +61,29 @@ if __name__ == '__main__':
     print("SPECIFIC ISSUES:")
     print("=" * 60)
     
-    # Check specific types
-    for type_name in ['BackendSimple', 'RemoteJWKS', 'RateLimitDescriptorEntry']:
+    # Check specific types that must be documented
+    failures = []
+    for type_name in ['BackendSimple', 'RemoteJWKS', 'RateLimitDescriptorEntry', 'KubernetesResourceOverlay']:
         print(f"\n{type_name}:")
         if type_name in referenced:
             print(f"  ✓ Referenced in docs")
         else:
             print(f"  ✗ Not referenced")
+            failures.append(f"{type_name} is not referenced in docs")
         if type_name in documented:
             print(f"  ✓ Has documentation section")
             if type_name in empty_structs:
                 print(f"  ⚠ But shows as empty struct (no fields)")
+                failures.append(f"{type_name} is documented as empty struct")
         else:
             print(f"  ✗ No documentation section")
+            failures.append(f"{type_name} is not documented")
 
-
-
+    if failures:
+        print(f"\n{'=' * 60}")
+        print("FAILURES:")
+        print('=' * 60)
+        for f in failures:
+            print(f"  ✗ {f}")
+        sys.exit(1)
 
