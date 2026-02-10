@@ -1,22 +1,22 @@
 - title: How to install kgateway - an open implementation of K8s Gateway API
   description: Learn how to install kgateway and apply Kubernetes Gateway API Custom Resource Definitions (CRDs)
-  href: http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  href: https://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Understanding the basics of Kubernetes Gateway API with kgateway
   description: Learn to configure Gateway and HTTPRoute resources and expose a service with kgateway.
-  href: http://www.solo.io/resources/lab/understanding-the-basics-of-kubernetes-gateway-api-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  href: https://www.solo.io/resources/lab/understanding-the-basics-of-kubernetes-gateway-api-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Configuring kgateway to expose a cluster service over HTTPS
   description: Learn to secure your services with Gateway API and retrofit your configuration to enforce HTTPS traffic with kgateway.
-  href: http://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  href: https://www.solo.io/resources/lab/configure-https-with-the-gateway-api-and-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Configuring gateways across multiple teams with kgateway
   description: Learn how to configure a shared gateway for multiple development team using the Kubernetes Gateway API
-  href: http://www.solo.io/resources/lab/configuring-gateways-across-multiple-teams-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  href: https://www.solo.io/resources/lab/configuring-gateways-across-multiple-teams-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Exploring HTTPRoute resource configurations with kgateway
   description: Learn HTTP traffic management features including request matching, url rewriting, traffic splitting and header modification
-  href: http://www.solo.io/resources/lab/exploring-httproute-resource-configurations-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
+  href: https://www.solo.io/resources/lab/exploring-httproute-resource-configurations-with-kgateway?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community
 
 - title: Gateway API support for service mesh with kgateway
   description: See how Kubernetes Gateway API supports service mesh with kgateway to manage and control internal east-west traffic with your system
@@ -60,7 +60,7 @@
 
 - title: Kgateway as a waypoint
   description: Learn how to use kgateway as a waypoint with Istio's ambient mode to manage east-west traffic between workloads
-  href: http://www.solo.io/resources/lab/kgateway-lab-kgateway-as-a-waypoint?&utm_source=website&utm_medium=lab
+  href: https://www.solo.io/resources/lab/kgateway-lab-kgateway-as-a-waypoint?&utm_source=website&utm_medium=lab
 
 - title: Integrating kgateway with Istio at ingress
   description: Explore how to integrate kgateway's ingress gateway with Ambient Mesh to enable automatic mTLS between ingress gateway and backend workloads
