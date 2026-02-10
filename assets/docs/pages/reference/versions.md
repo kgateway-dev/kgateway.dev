@@ -65,7 +65,3 @@ Development releases are unstable, subject to change, and not recommended for pr
 ### Backports to stable branches {#release-backport}
 
 New features are not developed on or backported to stable branches, such as `v2.0.x`. However, critical patches, bug fixes, and documentation fixes are backported as needed.
-
-## Experimental features in Gateway API {#experimental-features}
-
-{{< reuse "docs/snippets/k8sgwapi-exp.md" >}}
