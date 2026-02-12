@@ -30,17 +30,21 @@ Key changes include:
 
 The documentation for agentgateway has also been moved to the [agentgateway.dev](https://agentgateway.dev/docs/kubernetes/latest/) website.
 
+For a detailed comparison of agentgateway vs kgateway resources, including GatewayClass, controller names, Helm chart locations, and CRDs, see the [kgateway v2.2 release blog](https://kgateway.dev/blog/kgateway-v2.2-release-blog/).
+
 #### Feature gate for experimental Gateway API features {#experimental-feature-gate}
 
 Kgateway 2.2 introduces the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable to gate experimental Gateway API features and APIs. This setting defaults to `false` and must be explicitly enabled to use experimental features such as TCPRoute and TLSRoute.
 
-To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
+To enable these features, set the environment variable in your kgateway controller deployment. You can use either a Helm values file or the `--set` flag during installation:
 
 ```yaml
 controller:
   extraEnv:
     KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
 ```
+
+Or use the Helm flag: `--set controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
 
 If you are currently using any experimental Gateway API features, you must enable this setting before upgrading to kgateway 2.2, or those features will stop working.
 
@@ -105,6 +109,8 @@ Agentgateway received significant enhancements in version 2.2:
 * `PodDisruptionBudget` and `HorizontalPodAutoscaler` options via `AgentgatewayParameters`
 
 #### Gateway API and routing enhancements {#v22-gateway-api}
+
+**API Gateway feature gaps**: The v2.2 release addresses several commonly requested API gateway features that were identified as gaps in v2.1. For more details, see [GitHub issue #12910](https://github.com/kgateway-dev/kgateway/issues/12910).
 
 **Multiple certificate references**: Added support for multiple `certificateRefs` in the listener `tls` section, allowing you to serve multiple certificates from a single listener.
 
@@ -195,11 +201,18 @@ Note: Strict validation is currently not supported for transformation policies w
 
 Added multi-arch support for kgateway with Envoy using upstream Envoy for ARM. Note that strict validation is currently not supported for transformation policies with multi-arch builds.
 
+#### Ingress to Gateway API migration {#v22-ingress-migration}
+
+If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for either kgateway (Envoy) or agentgateway data plane proxies. Choose your migration guide to learn more:
+
+* [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
+* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
+
 ### 🗑️ Deprecated or removed features {#v22-removed-features}
 
 **HTTPListenerPolicy deprecated**: `HTTPListenerPolicy` is now deprecated. Use the `httpSettings` under `ListenerPolicy` instead.
 
-**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. Support is available with the `agentgateway` class.
+**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. v2.2.0 only supports the agentgateway data plane for inference. Note: v2.2.0 includes an inference plugin regression due to [GitHub issue #13456](https://github.com/kgateway-dev/kgateway/issues/13456). Users of this plugin should not upgrade to v2.2.0 and should instead wait for the upcoming v2.2.1 patch release.
 
 **Per-connection buffer limit annotation**: The `PerConnectionBufferLimit` annotation on Gateway resources is deprecated in favor of the `ListenerPolicy` field.
 
