@@ -8,7 +8,7 @@ excludeSearch: true
 
 Kgateway v2.2 is packed with exciting new features and improvements. Here are a few select updates the kgateway team would like to highlight!
 
-There have been major breaking changes regarding the agentgateway implementation! We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway please refer to our [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/agentgateway-migration.md). 
+This release introduces major breaking changes to the agentgateway implementation. We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway, please refer to our [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/agentgateway-migration.md). 
 
 ## 🔥Breaking changes
 
