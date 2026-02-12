@@ -481,22 +481,6 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             # Apply post-processing
             _post_process_api_docs(api_file)
             
-            # Inject missing type definitions
-            envoy_api_dir = f'{kgateway_dir}/api/v1alpha1/envoy'
-            if os.path.exists(envoy_api_dir):
-                # Pass KUBE_VERSION to the subprocess (use the same value used for crd-ref-docs)
-                env = os.environ.copy()
-                # Use the kube_version variable set earlier in this function (line 237)
-                env['KUBE_VERSION'] = kube_version
-                result = subprocess.run([
-                    sys.executable, 'scripts/inject-missing-types.py',
-                    api_file, envoy_api_dir
-                ], capture_output=True, text=True, check=False, env=env)
-                if result.returncode == 0:
-                    print(f'    ✓ Injected missing types into envoy API docs')
-                elif result.stdout or result.stderr:
-                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
-            
             print(f'    ✓ Generated envoy API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
