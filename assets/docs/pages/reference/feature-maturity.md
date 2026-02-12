@@ -27,18 +27,16 @@ Review the following table for the maturity of features in the {{< reuse "docs/s
 | GatewayParameters | GA |
 | Self-managed proxies | Alpha |
 | Backend and BackendConfigPolicy | GA |
-| Traffic- and Listener-level policies, including inheritance | GA |
+| Hierarchical policy attachment, including inheritance | GA |
 | Access logging | GA |
 | Rate limiting GatewayExtension | GA |
 | External auth GatewayExtension | GA |
 | External processing (ExtProc) GatewayExtension | GA |
-| JWT GatewayExtension | GA |
+| JWT GatewayExtension | Beta |
 | OAuth2 provider GatewayExtension | GA |
 | OpenTelemetry integration | GA |
-| AWS NLB/ALB integration | GA |
 | AWS Lambda integration | GA |
 | Istio ambient and sidecar integration | GA |
-| Istio waypoint integration | Alpha |
 | AI Gateway integration | N/A (see agentgateway) |
 | Inference Extension integration | N/A (see agentgateway) |
 
