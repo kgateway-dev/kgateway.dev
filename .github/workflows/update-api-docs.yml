@@ -111,7 +111,7 @@ jobs:
             - Each version uses the latest corresponding tag from the kgateway repository
             
             **File locations:**
-            - API docs: `content/docs/{envoy,agentgateway}/{VERSION}/reference/api.md`
+            - API docs: `content/docs/envoy/{VERSION}/reference/api.md`
             - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
             - Metrics docs: `assets/docs/snippets/{VERSION}/metrics-control-plane.md`
           branch: api-gen-update
