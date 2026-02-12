@@ -463,44 +463,6 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         # For 2.2.x+, split by package
         print(f'    Version {version} uses split API - generating separate docs per package')
         
-        # Extract agentgateway.dev/v1alpha1 package
-        agentgateway_content = extract_package_section(generated_content, 'agentgateway.dev/v1alpha1')
-        if agentgateway_content:
-            target_path = f'content/docs/agentgateway/{url_path}/reference/'
-            os.makedirs(target_path, exist_ok=True)
-            api_file = f'{target_path}api.md'
-            
-            with open(api_file, 'w') as f:
-                f.write('---\n')
-                f.write('title: API reference\n')
-                f.write('weight: 10\n')
-                f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
-                f.write(agentgateway_content)
-            
-            # Apply post-processing
-            _post_process_api_docs(api_file)
-            
-            # Inject missing type definitions
-            agentgateway_api_dir = f'{kgateway_dir}/api/v1alpha1/agentgateway'
-            if os.path.exists(agentgateway_api_dir):
-                # Pass KUBE_VERSION to the subprocess (use the same value used for crd-ref-docs)
-                env = os.environ.copy()
-                # Use the kube_version variable set earlier in this function (line 237)
-                env['KUBE_VERSION'] = kube_version
-                result = subprocess.run([
-                    sys.executable, 'scripts/inject-missing-types.py',
-                    api_file, agentgateway_api_dir
-                ], capture_output=True, text=True, check=False, env=env)
-                if result.returncode == 0:
-                    print(f'    ✓ Injected missing types into agentgateway API docs')
-                elif result.stdout or result.stderr:
-                    print(f'    ⚠ Type injection output: {result.stdout}{result.stderr}')
-            
-            print(f'    ✓ Generated agentgateway API docs in {api_file}')
-        else:
-            print(f'    ⚠ Warning: Could not extract agentgateway.dev/v1alpha1 package')
-        
         # Extract gateway.kgateway.dev/v1alpha1 package
         envoy_content = extract_package_section(generated_content, 'gateway.kgateway.dev/v1alpha1')
         if envoy_content:
@@ -541,10 +503,10 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         
         return True
     else:
-        # For earlier versions, write same content to both directories (legacy behavior)
-        print(f'    Version {version} uses unified API - generating same docs for both sections')
+        # For earlier versions, write to envoy directory only
+        print(f'    Version {version} uses unified API - generating docs for envoy')
         
-        for doc_dir in ['envoy', 'agentgateway']:
+        for doc_dir in ['envoy']:
             target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
             os.makedirs(target_path, exist_ok=True)
             
@@ -575,8 +537,6 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
     charts = [
         'kgateway:kgateway',
         'kgateway-crds:kgateway-crds',
-        'agentgateway:agentgateway',
-        'agentgateway-crds:agentgateway-crds'
     ]
     generated_any = False
     
