@@ -5,268 +5,215 @@ weight: 100
 
 Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
-## v2.1.0 {#v210}
+## v2.2.0 {#v220}
 
-For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.1.0).
+For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.2.0).
 
-### 🔥 Breaking changes {#v21-breaking-changes}
+### 🔥 Breaking changes {#v22-breaking-changes}
 
-#### Kubernetes Gateway API version v1.4.0
+#### Dedicated agentgateway APIs and installation {#agentgateway-apis}
 
-Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
-
-{{< tabs items="Standard,Experimental" tabTotal= "2" >}}
-{{% tab tabName="Standard" %}}
-```sh
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
-```
-{{% /tab %}}
-{{% tab tabName="Experimental" %}}
-```sh
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
-```
-{{% /tab %}}
-{{< /tabs >}}
-
-#### AI Backend API changes {#v21-ai-backend-api-changes}
-
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
-
-Update your old configuration to the new API style as follows.
-
-**Simpler LLM provider nesting**
-
-LLM providers are now nested directly under the `llm` spec field, removing the previous `llm.provider` field.
-
-{{< tabs items="New llm,Old llm.provider" >}}
-{{% tab %}}
-```yaml
-llm:
-  openai:
-```
-{{% /tab %}}
-{{% tab %}}
-```yaml
-llm:
-  provider:
-    openai:
-```
-{{% /tab %}}
-{{< /tabs >}}
+Version 2.2 introduces major breaking changes for agentgateway implementation. Agentgateway now has:
+* New dedicated APIs in the `agentgateway.dev` API group
+* New `AgentgatewayPolicy` to replace `TrafficPolicy` for agentgateway configurations
+* New `AgentgatewayParameters` API in `agentgateway.dev/v1alpha1`
+* Split Helm installation with dedicated charts for Envoy-based kgateway and agentgateway
 
 
-**Priority groups instead of multipool**
+Key changes include:
+* Policies are now configured through `AgentgatewayPolicy` instead of `TrafficPolicy.`
+* `DirectResponse` for agentgateway is now only configurable through `AgentgatewayPolicy` instead of the separate `DirectResponse` CRD.
+* Agentgateway can no longer be configured with `GatewayParameters`, only with `AgentgatewayParameters`.
+* The controller name changed from `kgateway.dev/agentgateway` to `agentgateway.dev/agentgateway`.
+* `AgentgatewayParameters` `rawConfig` breaking change to allow configuring `binds` and other settings in `config.yaml` outside of its `config` section.
+* The default namespace for agentgateway is now `agentgateway-system` instead of `kgateway-system`.
 
-The `priorityGroups` field replaces the `multipool` field with simpler nesting for providers.
+The documentation for agentgateway has also been moved to the [agentgateway.dev](https://agentgateway.dev/docs/kubernetes/latest/) website.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
-```yaml
-priorityGroups:
-- providers:
-  - openai:
-```
-{{% /tab %}}
-{{% tab %}}
-```yaml
-multipool:
-  priorities:
-    - pool:
-        - provider:
-            openai:
-```
-{{% /tab %}}
-{{< /tabs >}}
+For a detailed comparison of agentgateway vs kgateway resources, including GatewayClass, controller names, Helm chart locations, and CRDs, see the [kgateway v2.2 release blog](https://kgateway.dev/blog/kgateway-v2.2-release-blog/).
 
-**Overrides are simplified**
+#### Feature gate for experimental Gateway API features {#experimental-feature-gate}
 
-Some LLM settings are renamed to remove redundant `Override` prefixes.
+Kgateway 2.2 introduces the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable to gate experimental Gateway API features and APIs. This setting defaults to `false` and must be explicitly enabled to use experimental features such as TCPRoute and TLSRoute.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
-```yaml
-host: foo
-port: 8080
-path: 
-  full: "/foo"
-authHeader:
-  prefix: foo
-  headerName: bar
-```
-{{% /tab %}}
-{{% tab %}}
-```yaml
-hostOverride:
-  host: foo
-  port: 8080
-pathOverride:
-  full: /foo
-authHeaderOverride:
-  prefix: foo
-  headerName: bar
-```
-{{% /tab %}}
-{{< /tabs >}}
-
-#### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
-
-The route delegation feature for policy merging is expanded to reflect its broader role of applying not only to routes, but also to policies. This update includes the following changes:
-
-* The annotation is renamed from `delegation.kgateway.dev/inherited-policy-priority` to the simpler `kgateway.dev/inherited-policy-priority`.
-* Now, four values are accepted: `ShallowMergePreferParent`, `ShallowMergePreferChild`, `DeepMergePreferParent`, and `DeepMergePreferChild`. Deep merges apply only to the transformation filter in a TrafficPolicy.
-* The default behavior of parent route policies taking precedence over child routes policies is reversed. Now, child routes take precedence, which aligns better with the precedence defaults across other resources in the kgateway and Gateway APIs.
-
-To maintain the previous default behavior of 2.0, update your annotations to `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent`.
-
-To learn more about policy merging, see the [Policy merging](../../about/policies/merging/) docs.
-
-Note that this change does not impact the other delegation annotations:
-* `delegation.kgateway.dev/inherit-parent-matcher`
-* `delegation.kgateway.dev/label`
-
-#### Deprecated support for AI Gateway and Inference Extension with Envoy
-
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/agentgateway/" >}}) instead.
-
-#### Fail open policy for ExtProc providers
-
-The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
-
-#### Helm changes for agentgateway
-
-The Helm value to enable the agentgateway integration changed from `agentGateway` to `agentgateway`. To enable agentgateway, use the following values in your Helm chart: 
+To enable these features, set the environment variable in your kgateway controller deployment. You can use either a Helm values file or the `--set` flag during installation:
 
 ```yaml
-agentgateway: 
-  enabled: true
+controller:
+  extraEnv:
+    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
 ```
 
-#### Helm changes for waypoints
+Or use the Helm flag: `--set controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
 
-The kgateway waypoint integration is disabled by default. To enable the integration, use the following values in your Helm chart: 
+If you are currently using any experimental Gateway API features, you must enable this setting before upgrading to kgateway 2.2, or those features will stop working.
 
-```yaml
-waypoint:
-  enabled: true
-```
+#### GatewayParameters breaking changes {#gatewayparameters-changes}
 
-#### `ai.llm.hostOverride.insecureSkipVerify` removed from Backend
+Several fields have been removed or changed in the `GatewayParameters` CRD:
 
-The `insecureSkipVerify` flag was removed for AI Backends. To configure this option, use a [BackendConfigPolicy]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}) instead. 
+* The deprecated `spec.kube.floatingUserId` field was removed. When migrating, use the `spec.kube.omitDefaultSecurityContext` field instead. When set to true, this field prevents the controller from injecting opinionated default security contexts, allowing your platform (for example, OCP) to dynamically provide the appropriate security contexts.
+* The `spec.kube.aiExtension` field was removed. To use AI capabilities, migrate to the agentgateway data plane.
+* The `agentgateway` fields were deprecated in `GatewayParameters`. Use `AgentgatewayParameters` instead.
 
-#### Disable per route policies
+#### JWT policy renamed {#jwt-policy-rename}
 
-The configuration for disabling policies on a route changed. Previously, you used the `enablement` field, such as in `extAuth.enablement` to enable or disable a policy on a route. Now, you use the `disable` field instead as shown in the following example: 
+In the `TrafficPolicy` API:
+* The `jwt` field is renamed to `jwtAuth`
+* The `apiKeyAuthentication` field is renamed to `apiKeyAuth`
 
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: TrafficPolicy
-metadata:
-  name: disable-all-extauth-for-route-2-1
-  namespace: infra
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: route-2
-    sectionName: rule1
-  extAuth:
-    disable: {} 
-``` 
+Update your TrafficPolicy resources accordingly when upgrading.
 
-Disabling policies can be applied to CORS, extAuth, extProc, and rate limit policies. 
+#### JWT missing token behavior {#jwt-missing-token}
 
+An option was added to allow missing JWT tokens. Review your JWT authentication policies to ensure they have the desired behavior for missing tokens.
 
-### 🌟 New features {#v21-new-features}
+#### ExtAuth fail closed for agentgateway {#extauth-fail-closed}
 
-#### Agentgateway integration {#v21-agentgateway}
+Agentgateway ExtAuth policies now fail closed when the `backendRef` to the auth server is invalid. Previously, invalid backend references might have allowed requests through. Update your ExtAuth policies to ensure backend references are valid before upgrading.
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../agentgateway/).
+#### AI policy removed from TrafficPolicy {#ai-policy-removed}
 
-#### Global policy attachment {#v21-global-policy-attachment}
+AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/setup/) with the `AgentgatewayPolicy` API instead.
 
-By default, you must attach policies to resources that are in the same namespace. Now, you can enable a feature to create a "global" namespace for policies. Then, these global policies can attach to resources in any namespace in your cluster through label selectors. For more information, see the [Global policy attachment](../../about/policies/global-attachment/) docs.
+### 🌟 New features {#v22-new-features}
 
-#### Weighted routing {#v21-weighted-routing}
+#### Agentgateway enhancements {#v22-agentgateway-features}
 
-Now, you can configure weights for more fine-grained control over your routing rules. This feature is disabled by default. To enable it, see the [Weighted routing]({{< link-hextra path="/traffic-management/weighted-routes/" >}}) docs.
+Agentgateway received significant enhancements in version 2.2:
 
-#### Deep merging for extauth and extproc policies {#deep-merge}
+**Performance improvements**: The agentgateway control plane was refactored, improving performance by up to 25x.
 
-You can now apply deep merging for extAuth and extProc policies. In addition, you can use the `kgateway.dev/policy-weight` annotation to determine the priority in which multiple extAuth and extProc policies are merged. For more information, see [Policy priority during merging]({{< link-hextra path="/about/policies/merging/#policy-priority-during-merging" >}}). 
+**Model aliases**: Added `modelAliases` support to `AgentgatewayPolicy` to allow friendly model name aliases for your AI backends.
 
-#### Additional proxy pod template customization {#podtemplate}
+**Provider support**: 
+* Added support for Azure OpenAI backends
+* Added support for multiple AI backend route types including OpenAI Responses API, Anthropic token counting, and prompt caching configuration for Bedrock (enabling up to 90% cost reduction)
 
-Gateway proxies are created with a default proxy template that is stored in the default GatewayParameters resource. To change the default settings, you create a custom GatewayParameters resource and deploy a Gateway with it. {{< reuse "docs/snippets/kgateway-capital.md" >}} now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
+**Authentication and security**:
+* CSRF support
+* MCP authentication for agentgateway
+* Basic auth, API key auth, and inline JWT auth policies
+* ExtAuth with HTTP support and configurable timeout
 
-For more information, see [Customize the gateway]({{< link-hextra path="/setup/customize/general-steps/" >}}). To find all the values that you can change, see the [PodTemplate reference]({{< link-hextra path="/reference/api/#pod" >}}) in the GatewayParameters API.
+**Advanced features**:
+* Multi-network support for cross-network workload discovery and routing in ambient mode
+* Stateful/stateless session routing configuration for MCP backends
+* Canadian Social Insurance Number prompt guards
+* Tracing support
 
-#### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
+**Infrastructure**:
+* Event reporting for agentgateway gateways that indicates when a gateway has NACKed an update
+* Multi-arch controller image support
+* `Gateway.spec.addresses` support for configuring load balancer IP addresses
+* `PodDisruptionBudget` and `HorizontalPodAutoscaler` options via `AgentgatewayParameters`
 
-Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
+#### Gateway API and routing enhancements {#v22-gateway-api}
 
+**API Gateway feature gaps**: The v2.2 release addresses several commonly requested API gateway features that were identified as gaps in v2.1. For more details, see [GitHub issue #12910](https://github.com/kgateway-dev/kgateway/issues/12910).
 
-#### Horizontal Pod Autoscaling {#hpa}
+**Multiple certificate references**: Added support for multiple `certificateRefs` in the listener `tls` section, allowing you to serve multiple certificates from a single listener.
 
-You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale gateway proxy pods up and down based on certain thresholds, like memory and CPU consumption. For more information, see [Horizontal Pod Autoscaling (HPA)]({{< link-hextra path="/setup/hpa/" >}}).
+**Gateway infrastructure metadata**: The kgateway `GatewayClass` now supports labels and annotations in the Gateway API infrastructure field. When a Gateway specifies infrastructure labels or annotations, these values propagate to all managed Kubernetes resources including the Deployment, Service, ConfigMap, and ServiceAccount. Infrastructure values take precedence over `GatewayParameters` values when the same key is defined in both locations.
 
-#### HTTP1.0/0.9 support {#http10}
+**Custom GatewayClasses**: You can now define GatewayClasses using any controller. For example, create a custom GatewayClass with an arbitrary name that uses `controllerName: kgateway.dev/agentgateway` to duplicate the behavior of the built-in GatewayClass. This enables scenarios like two different teams wanting different `GatewayParameters` for the same class, or clean GitOps with entirely new resources without patching.
 
-Configure your gateway proxy to accept the HTTP/1.0 and HTTP/0.9 protocols so that you can support legacy applications. For more information, see [HTTP/1.0 and HTTP/0.9]({{< link-hextra path="/setup/http10/" >}}).
+**Gateway addresses**: Support for `Gateway.spec.addresses` to configure one IP address that is used in the gateway's Service `loadBalancerIP`.
 
-#### Dynamic Forward Proxy {#dfp}
+**Regex path rewrite**: Added regex path rewrite capabilities for more advanced routing scenarios.
 
-Configure the gateway proxy to use a Dynamic Forward Proxy (DFP) filter to allow the proxy to act as a generic HTTP(S) forward proxy without the need to preconfigure all possible upstream hosts. Instead, the DFP dynamically resolves the upstream host at request time by using DNS.
+**Automatic port detection**: Kgateway now detects the port for listeners without a defined port, selecting 80 for HTTP and 443 for HTTPS. Other protocols do not support automatic port detection.
 
-For more information, see [Dynamic Forward Proxy (DFP)]({{< link-hextra path="/traffic-management/dfp/" >}}).
+#### Security and authentication {#v22-security}
 
-#### Session affinity {#session-affinity}
+**JWT authentication**: 
+* Added JWT authentication configuration to `TrafficPolicy` with support for JWT providers via `GatewayExtension`
+* Support for remote JWKS (JSON Web Key Set) with configurable TLS options
+* Global disable option for JWT policies
+* Allow missing JWT token configuration
 
-You can configure different types of session affinity for your Envoy-based gateway proxies:
-* [Change the loadbalancing algorithm]({{< link-hextra path="/traffic-management/session-affinity/loadbalancing/" >}}): By default, incoming requests are forwarded to the instance with the least requests. You can change this behavior and instead use a round robin or random algorithm to forward the request to a backend service.
-* [Consistent hashing]({{< link-hextra path="/traffic-management/session-affinity/consistent-hashing/" >}}): Set up soft session affinity between a client and a backend service by using consistent hashing algorithms. 
-* [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}): Set up “strong” session affinity or sticky sessions to ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
+**API key authentication**: Added support for configuring API key authentication in `TrafficPolicy` with keys defined in secrets. Routes can selectively opt out of gateway-level authentication requirements using the `disable` field.
 
-#### Enhanced retries and timeout capabilities {#retries-timeouts}
+**Basic authentication**: Added basic auth configuration to `TrafficPolicy`.
 
-You can now set the following retries and timeouts for your Envoy-based gateway proxies:
-* [Request retries]({{< link-hextra path="/resiliency/retry/retry/" >}})
-* [Request timeouts]({{< link-hextra path="/resiliency/timeouts/request/" >}})
-* [Per-try timeouts]({{< link-hextra path="/resiliency/retry/per-try-timeout/" >}})
-* [Idle timeouts]({{< link-hextra path="/resiliency/timeouts/idle/" >}})
-* [Idle stream timeouts]({{< link-hextra path="/resiliency/timeouts/idle-stream/" >}})
+**OAuth2**: Added OAuth2 policy to enable OAuth2 and OIDC flows with Envoy as the gateway, with customizable cookie settings and the ability to deny redirects for matching requests.
 
-#### Passive health checks with outlier detection {#outlier-detection}
+**Frontend TLS configuration**: Implemented `FrontendTLSConfig` with implementation-specific details:
+* Allow multiple `caCertificateRefs`
+* Allow `caCertificateRefs` to reference secrets and configmaps
+* Added `kgateway.dev/verify-certificate-hash` to listener TLS options for validating client certificates
+* Added `kgateway.dev/verify-subject-alt-names` TLS option
+* Support for secret reference kind for `caCertificateRefs` in `BackendTLSPolicy`
 
-Configure passive health checks and remove unhealthy hosts from the load balancing pool with an outlier detection policy. An outlier detection policy sets up several conditions, such as retries and ejection percentages, that kgateway uses to determine if a service is unhealthy. When an unhealthy service is detected, the outlier detection policy defines how the service is removed from the pool of healthy destinations to send traffic to. For more information, see [Outlier detection]({{< link-hextra path="/resiliency/outlier-detection/" >}}).
+**Cipher suite and TLS configuration**: Configure cipher suites, ECDH curves, minimum TLS version, and maximum TLS version using TLS options. Configure ALPN protocols using the `kgateway.dev/alpn-protocols` TLS option.
 
-#### New kgateway operations dashboard {#kgateway-dashboard}
+**TLS for TCPRoutes**: Added support for TLS termination for TCPRoutes.
 
-When you install the [OTel stack]({{< link-hextra path="/observability/otel-stack/" >}}), you can now leverage the new kgateway operations dashboard for Grafana. This dashboard shows important metrics at a glance, such as the translation and reconciliation time, total number of operations, the number of resources in your cluster, and latency.
-      
-{{< reuse-image src="img/kgateway-dashboard.png" >}}
-{{< reuse-image-dark srcDark="img/kgateway-dashboard.png" >}}
+#### Resiliency and traffic management {#v22-resiliency}
 
-#### Leader election enabled {#kgateway-dashboard}
+**Circuit breakers**: Added support for circuit breakers in `BackendConfigPolicy` to prevent cascading failures.
 
-Leader election is now enabled by default to ensure that you can run kgateway in a multi-control plane replica setup for high availability. 
+**Compression**: Added support for gzip response compression and request decompression in `TrafficPolicy`.
 
-You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
+**Per-connection buffer limit**: Added `PerConnectionBufferLimit` to `ListenerPolicy`. The annotation on Gateway resources is now deprecated in favor of this field.
 
-```sh
-helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
-```
+**Request header modification**: Added `earlyRequestHeaderModifier` to `HTTPListenerPolicy`, allowing header modifications before a route is selected.
 
+**Retry policy for GatewayExtension**: Added retry policy to configure retries for the gRPC streams associated with `GatewayExtension` services.
 
+**Stats matcher configuration**: Added stats matcher config to `GatewayParameters` for controlling which Envoy statistics are collected.
 
+**HTTP request settings**: Added `preserveExternalRequestId` and `generateRequestId` to `HttpListenerPolicy` and `ListenerPolicy`. You can now disable the generation of request IDs and preserve external request IDs.
 
-<!-- TODO release 2.1
+**Mirror filters**: Fixed HTTPRoute mirror filters to support multiple mirrors per rule and correct percentage-based mirroring. Previously, percentage values were off by 100x (for example, 50% mirrored only 0.5% of traffic).
 
-### ⚒️ Installation changes {#v2.1-installation-changes}
+**Max request headers**: Added `maxRequestHeadersKb` field in `ListenerPolicy` to control the maximum size of request headers.
 
-### 🔄 Feature changes {#v2.1-feature-changes}
+#### ListenerPolicy and proxy protocol {#v22-listener-policy}
 
-### 🗑️ Deprecated or removed features {#v2.1-removed-features}
+Added a `ListenerPolicy` CRD with ProxyProtocol configuration. The `HTTPListenerPolicy` is now deprecated in favor of using the `httpSettings` under `ListenerPolicy`.
 
-### 🚧 Known issues {#v2.1-known-issues}
--->
+#### Rustformation transformation engine {#v22-rustformation}
+
+Kgateway 2.2 switches to rustformation as the default transformation engine. Rustformation provides:
+* Parsing body as JSON
+* All documented Jinja custom functions
+* Case-insensitive header lookups
+* Improved performance with native Envoy per-route config
+
+Note: Strict validation is currently not supported for transformation policies with multi-arch builds.
+
+#### Gateway customization {#v22-gateway-customization}
+
+**Priority class name**: Added `priorityClassName` to the Pod struct in `GatewayParameters` to set the corresponding `priorityClassName` field in the gateway-proxy pod.
+
+**Custom GatewayParameters**: Added Helm values for setting custom `GatewayParameters` for bundled GatewayClasses.
+
+**Control plane resilience**: `PodDisruptionBudget` is now an option for the agentgateway and Envoy control planes.
+
+#### Observability {#v22-observability}
+
+**Metrics and logs for xDS errors**: Added metrics and logs for Envoy xDS errors to help troubleshoot configuration issues.
+
+**Reference grants enforcement**: Enforced `ReferenceGrants` for cross-namespace Secret references used by XListenerSets, improving security and visibility.
+
+#### Multi-architecture support {#v22-multi-arch}
+
+Added multi-arch support for kgateway with Envoy using upstream Envoy for ARM. Note that strict validation is currently not supported for transformation policies with multi-arch builds.
+
+#### Ingress to Gateway API migration {#v22-ingress-migration}
+
+If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for either kgateway (Envoy) or agentgateway data plane proxies. Choose your migration guide to learn more:
+
+* [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
+* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
+
+### 🗑️ Deprecated or removed features {#v22-removed-features}
+
+**HTTPListenerPolicy deprecated**: `HTTPListenerPolicy` is now deprecated. Use the `httpSettings` under `ListenerPolicy` instead.
+
+**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. v2.2.0 only supports the agentgateway data plane for inference. Note: v2.2.0 includes an inference plugin regression due to [GitHub issue #13456](https://github.com/kgateway-dev/kgateway/issues/13456). Users of this plugin should not upgrade to v2.2.0 and should instead wait for the upcoming v2.2.1 patch release.
+
+**Per-connection buffer limit annotation**: The `PerConnectionBufferLimit` annotation on Gateway resources is deprecated in favor of the `ListenerPolicy` field.
+
+**Waypoint integration removed**: The waypoint integration for Envoy-based gateway proxies was removed.

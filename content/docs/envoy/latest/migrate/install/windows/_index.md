@@ -22,7 +22,7 @@ weight: 30
     curl -LO "https://github.com/kgateway-dev/ingress2gateway/releases/download/${VERSION}/ingress2gateway_${OS}_${ARCH}.zip"
     ```
 
-3. Validate the release tarball (optional).
+3. Optional: Validate the release tarball.
 
     Download the ingress2gateway checksum file.
 

@@ -144,7 +144,7 @@ Unlike a traditional Ingress API setup, no data-plane proxy (Envoy, in this case
 
 We have laid the groundwork for creating and programming a Gateway resource, deploying a sample application, and defining routing and policy configurations for your workloads. In the next blog, we will show you exactly how to accomplish this using kgateway.
 
-In the meantime, we encourage you to explore the [kgateway documentation concepts](https://kgateway.dev/docs/about/), recap the concepts in the [demo](https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g) video below or get hands on and test out the concepts in the free technical lab on [installing kgateway](http://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community).
+In the meantime, we encourage you to explore the [kgateway documentation concepts](https://kgateway.dev/docs/about/), recap the concepts in the [demo](https://youtu.be/eGo8uJDsBEc?si=kIqltssNdFIRIh5g) video below or get hands on and test out the concepts in the free technical lab on [installing kgateway](https://www.solo.io/resources/lab/install-kgateway-open-source-implementation-of-the-gateway-api?web&utm_source=organic&utm_medium=FY26&utm_campaign=WW_GEN_LAB_kgateway.dev&utm_content=community).
 
 Thanks to the standards set forth by the Gateway API specification, you’d be surprised how intuitive it is to get started. 
 Stay tuned for the next part of the series writeup!

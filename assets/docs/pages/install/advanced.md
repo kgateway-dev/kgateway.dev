@@ -20,7 +20,7 @@ For more information, see the [Helm reference docs]({{< link-hextra path="/refer
 
 When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
-{{< version include-if="2.2.x" >}}
+{{< version exclude-if="2.0.x,2.1.x" >}}
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
@@ -40,7 +40,7 @@ controller:
 ```
 {{< /version >}}
 
-{{< version include-if="2.2.x,2.1.x" >}}
+{{< version exclude-if="2.0.x,2.1.x" >}}
 
 ## Leader election
 
@@ -87,7 +87,7 @@ discoveryNamespaceSelectors:
     version: v3
 ```
 
-{{< version include-if="2.2.x,2.1.x" >}}
+{{< version exclude-if="2.0.x,2.1.x" >}}
 
 ## TLS encryption {#tls-encryption}
 

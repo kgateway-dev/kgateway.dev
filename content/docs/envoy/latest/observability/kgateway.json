@@ -37,7 +37,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -106,7 +106,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -171,7 +171,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(gloo_gateway_controller_reconciliations_running{controller=~\"$controller|\",namespace=~\"$namespace|\"}) by (controller)",
@@ -188,7 +188,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -234,7 +234,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(kgateway_resources_managed{parent=~\"$gateway|\",namespace=~\"$namespace|\"}) by (resource)",
@@ -251,7 +251,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -332,7 +332,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(kgateway_translator_translations_total{translator=~\"$translator|\",namespace=~\"$namespace|\"}[5m])) by (translator, result)",
@@ -349,7 +349,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -430,7 +430,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(kgateway_controller_reconciliations_total{controller=~\"$controller|\",namespace=~\"$namespace|\"}[5m])) by (controller, result)",
@@ -446,7 +446,7 @@
     },
     {
       "datasource": {
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -530,7 +530,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(rate(kgateway_status_syncer_status_syncs_total{namespace=~\"$namespace|\"}[5m])) by (syncer, result) ",
@@ -547,7 +547,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -594,7 +594,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(kgateway_translator_translations_total{translator=~\"$translator|\",namespace=~\"$namespace|\"}) by (translator)",
@@ -608,7 +608,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(kgateway_controller_reconciliations_total{controller=~\"$controller|\",namespace=~\"$namespace|\"}) by (controller)",
@@ -621,7 +621,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "sum(kgateway_status_syncer_status_syncs_total{namespace=~\"$namespace|\"}) by (syncer)",
@@ -637,7 +637,7 @@
     },
     {
       "datasource": {
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -705,7 +705,7 @@
     },
     {
       "datasource": {
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -781,7 +781,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -863,7 +863,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_controller_reconcile_duration_seconds{gateway=~\"$gateway|\",controller=~\"$controller|\",namespace=~\"$namespace|\"}[5m])))",
@@ -876,7 +876,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_controller_reconcile_duration_seconds{gateway=~\"$gateway|\",controller=~\"$controller|\",namespace=~\"$namespace|\"}[5m])))",
@@ -889,7 +889,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_controller_reconcile_duration_seconds{gateway=~\"$gateway|\",controller=~\"$controller|\",namespace=~\"$namespace|\"}[5m])))",
@@ -906,7 +906,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -988,7 +988,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1001,7 +1001,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1014,7 +1014,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1031,7 +1031,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1113,7 +1113,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_translator_translation_duration_seconds{name=~\"$gateway|\",translator=~\"$translator|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1126,7 +1126,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_translator_translation_duration_seconds{name=~\"$gateway|\",translator=~\"$translator|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1139,7 +1139,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_translator_translation_duration_seconds{name=~\"$gateway|\",translator=~\"$translator|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1156,7 +1156,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1238,7 +1238,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_xds_snapshot_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1251,7 +1251,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_xds_snapshot_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1264,7 +1264,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_xds_snapshot_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1281,7 +1281,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1363,7 +1363,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1376,7 +1376,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1389,7 +1389,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
           "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
@@ -1405,7 +1405,7 @@
     },
     {
       "datasource": {
-        "uid": "prometheus"
+        "uid": "${DS_PROMETHEUS}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1473,6 +1473,20 @@
     "list": [
       {
         "current": {
+          "text": "Prometheus",
+          "value": "${DS_PROMETHEUS}"
+        },
+        "hide": 2,
+        "label": "datasource",
+        "name": "DS_PROMETHEUS",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "type": "datasource"
+      },
+      {
+        "current": {
           "text": "All",
           "value": [
             "$__all"
@@ -1480,7 +1494,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kgateway_resources_managed,parent)",
         "includeAll": true,
@@ -1504,7 +1518,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kgateway_resources_managed,namespace)",
         "includeAll": true,
@@ -1530,7 +1544,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kgateway_controller_reconciliations_total,controller)",
         "includeAll": true,
@@ -1556,7 +1570,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${DS_PROMETHEUS}"
         },
         "definition": "label_values(kgateway_translator_translations_total,translator)",
         "includeAll": true,

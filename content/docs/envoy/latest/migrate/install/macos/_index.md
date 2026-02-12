@@ -62,10 +62,3 @@ weight: 10
     ```bash
     ingress2gateway version
     ```
-
-    Example output.
-
-    ```console
-    ingress2gateway version: v0.3.0
-    Built with Go version: go1.25.3
-    ```
