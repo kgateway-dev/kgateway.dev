@@ -481,6 +481,9 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             # Apply post-processing
             _post_process_api_docs(api_file)
             
+            # Generate shared types documentation (e.g. CELExpression, PolicyStatus, HeaderModifiers)
+            _generate_shared_types(api_file, kgateway_dir)
+            
             print(f'    ✓ Generated envoy API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
@@ -507,9 +510,30 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             
             # Apply post-processing
             _post_process_api_docs(api_file)
+            
+            # Generate shared types documentation (e.g. CELExpression, PolicyStatus, HeaderModifiers)
+            _generate_shared_types(api_file, kgateway_dir)
+            
             print(f'    ✓ Generated API docs in {api_file}')
         
         return True
+
+
+def _generate_shared_types(api_file, kgateway_dir='kgateway'):
+    '''Append shared types documentation to the API reference file.'''
+    shared_dir = f'{kgateway_dir}/api/v1alpha1/shared'
+    kgateway_source_dir = f'{kgateway_dir}/api/v1alpha1/kgateway'
+    if not os.path.exists(shared_dir):
+        return
+    try:
+        subprocess.run([
+            'python3', 'scripts/generate-shared-types.py',
+            shared_dir,
+            api_file,
+            kgateway_source_dir,
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f'    Warning: generate-shared-types failed: {e}')
 
 
 def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway'):
