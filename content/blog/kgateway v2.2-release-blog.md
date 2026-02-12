@@ -16,7 +16,9 @@ There have been major breaking changes regarding the agentgateway implementation
 
 This release separated kgateway and agentgateway controllers and introduced several agentgateway-specific resources, Helm charts, and controllers. Kgateway-specific resources were not changed. 
 
-Note: If you used agentgateway with kgateway,  you must update and migrate your agentgateway-specific configuration to the new resources. Agentgateway-specific fields in kgateway resources, such as TrafficPolicy or GatewayParameters were deprecated. You cannot upgrade your environment without migrating your resources first!
+{{< callout type="info">}}
+Note: If you used agentgateway with kgateway, you **must update and migrate your agentgateway-specific configuration to the new resources**. Agentgateway-specific fields in kgateway resources, such as TrafficPolicy or GatewayParameters were deprecated. You cannot upgrade your environment without migrating your resources first!
+{{< /callout >}}
 
 The following table includes the new agentgateway-specific resources that were introduced in this release and compares them to kgateway. Make sure to migrate your agentgateway configuration to these new resources. 
 
@@ -61,7 +63,7 @@ See this [PR](https://github.com/kgateway-dev/kgateway/pull/13273) for more info
 
 ### AI prompt guard API alignment
 
-The AI prompt guard API is updated to align with other enums. The values change from `MASK` to `Mask` and `REJECT` to `Reject` as shown in the following example. These changes are enforced by CEL validation in the API.
+The AI prompt guard API is updated to align with other enums. The values changed from `MASK` to `Mask` and `REJECT` to `Reject` as shown in the following example. These changes are enforced by CEL validation in the API.
 
 ```yaml
 kubectl apply -f - <<EOF
@@ -97,7 +99,7 @@ For steps to set up prompt guards, see the [docs](https://agentgateway.dev/docs/
 
 ### HTTPListenerPolicy is deprecated
 
-The HTTPListenerPolicy is now deprecated and is planned to be removed in future releases. If you currently use policies in the HTTPListenerPolicy resource, migrate them to the httpSettings under the ListenerPolicy. 
+The HTTPListenerPolicy is now deprecated and is planned to be removed in future releases. If you currently use policies in the HTTPListenerPolicy resource, migrate them to the `httpSettings` under the ListenerPolicy. 
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/13066) for more information.
 
@@ -165,7 +167,7 @@ See the following PRs for more information:
 
 For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/mcp/auth/). 
 
-##### Inline and remote JWKS support
+#### Inline and remote JWKS support
 
 You can now define both inline and remote JWKS endpoints to automatically fetch and rotate keys from your identity provider on the AgentgatewayPolicy. See this [PR](https://github.com/kgateway-dev/kgateway/pull/12850) for more information. 
 
@@ -362,7 +364,7 @@ See this [PR](https://github.com/kgateway-dev/kgateway/pull/13201) for more info
 
 #### Tracing support
 
-You can now dynamically configure tracing for agentgateway using the AgentgatewayPolicy frontend field:
+You can now dynamically configure tracing for agentgateway using the AgentgatewayPolicy `frontend` field:
 
 ```yaml
 apiVersion: agentgateway.dev/v1alpha1
@@ -403,7 +405,7 @@ For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/
 
 ####  CipherSuite configuration via frontend TLS policy
 
-You can now configure the cipher-suites and min and max TLS version on the agentgateway proxy by using the spec.frontend.tls fields in the AgentgatewayPolicy frontend field:
+You can now configure the cipher-suites and min and max TLS version on the agentgateway proxy by using the `spec.frontend.tls` fields in the AgentgatewayPolicy.
 
 ```yaml
 apiVersion: agentgateway.dev/v1alpha1
@@ -435,7 +437,7 @@ See this [PR](https://github.com/kgateway-dev/kgateway/pull/13219) for more info
 #### Basic auth, api-key auth, and JWT auth
 
 Agentgateway proxies now support basic auth, API key auth and JWT auth. 
-See this [PR]](https://github.com/kgateway-dev/kgateway/pull/12886) for more information.
+See this [PR](https://github.com/kgateway-dev/kgateway/pull/12886) for more information.
 
 For a JWT setup example, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/security/jwt/setup/). 
 
@@ -450,7 +452,7 @@ Issue: https://github.com/kgateway-dev/kgateway/issues/12910
 
 One of the most common themes of feedback we received from the v2.1 release is that there were several missing features which can be considered “tablestakes” for API gateways. This feedback was completely valid and we took it to heart, so we gathered the most requested features and made sure to deliver them for the v2.2 release! Huge thanks goes to all that gave us this important feedback on Slack, GitHub, or anywhere else!
 
-##### API key authentication
+#### API key authentication
 
 API key authentication is a common security mechanism for API gateways, allowing clients to authenticate using API keys provided in HTTP headers. API key authentication support has now been added to TrafficPolicies, allowing API keys to be provided via HTTP headers, query parameters, or cookies.
 
@@ -478,7 +480,7 @@ See the following PRs for more information:
 * [12962](https://github.com/kgateway-dev/kgateway/pull/12962)
 * [13217](https://github.com/kgateway-dev/kgateway/pull/13217)
 
-##### Basic auth 
+#### Basic auth 
 
 TrafficPolicy now provides configuration for HTTP Basic authentication. Basic authentication checks if an incoming request has a valid username and password before routing the request to a backend service.
 
@@ -501,14 +503,14 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12983) for more information.
 
-##### JWT Authentication
+#### JWT Authentication
 
 You can now configure JWT policies in the TrafficPolicy. To setup your JWT providers, use the GatewayExtension resource. 
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12811) for more information.
 
 
-##### OAuth2 and OIDC flows
+#### OAuth2 and OIDC flows
 
 Added capability to protect traffic using OAuth2/OIDC policy when using Envoy as the Gateway proxy.
 
@@ -581,7 +583,7 @@ See the following PRs for more information:
 
 Kgateway now exposes config to accept incoming network traffic with Proxy Protocol via the ListenerPolicy resource.
 
-The new ListenerPolicy also supports `preserveExternalRequestId`, `generateRequestId ', so users can now disable the generation of Request ID and preserve the external request ID.
+The new ListenerPolicy also supports `preserveExternalRequestId`, `generateRequestId`, so users can now disable the generation of Request ID and preserve the external request ID.
 
 Example fields on the new ListenerPolicy:
 ```yaml
@@ -618,10 +620,10 @@ See the following PRs for more information:
 To learn more about the ListenerPolicy, see the [docs](https://kgateway.dev/docs/envoy/latest/about/policies/listenerpolicy/). To set up Proxy Protocol with a ListenerPolicy, check out this [guide](https://kgateway.dev/docs/envoy/latest/traffic-management/proxy-protocol/). 
 
 
-#### earlyRequestHeaderModifier to perform header modifications before route selection 
+#### `earlyRequestHeaderModifier` to perform header modifications before route selection 
 
 Kgateway now supports sanitizing HTTP headers from an incoming request. This is especially useful for gateways that are handling untrusted downstream traffic.
-Before, there were ways to do this with kgateway using a transformation policy or the header modifier feature, but these occur as "standard" filters in an already executing filter chain, they will not guarantee that the headers are removed before any routing or processing decisions are made. Now we support earlyRequestHeaderModifier on the ListenerPolicy:
+Before, there were ways to do this with kgateway using a transformation policy or the header modifier feature, but these occur as "standard" filters in an already executing filter chain, they will not guarantee that the headers are removed before any routing or processing decisions are made. Now we support `earlyRequestHeaderModifier` on the ListenerPolicy:
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -754,7 +756,9 @@ To support FrontendTLSConfig, the following changes were introduced:
 * Allow multiple `caCertificateRefs`. You can use secrets or configmaps to reference your TLS credentials. See this [PR](https://github.com/kgateway-dev/kgateway/pull/12895) for more information.
 * Allow configuring cipher suites, ecdh curves, minimum TLS version, and maximum TLS version using the TLS options map. See this [PR](https://github.com/kgateway-dev/kgateway/pull/12917) for more information.
 * Added the `kgateway.dev/verify-certificate-hash` to listener TLS options to allow configuration of validating client certificates. See this [PR](https://github.com/kgateway-dev/kgateway/pull/13064) for more details.
-* Added `kgateway.dev/verify-certificate-hash` and `kgateway.dev/verify-subject-alt-names` annotations to limit connections to clients that present certificates with a specific Subject Alt Name and certificate hash. See this [PR](https://github.com/kgateway-dev/kgateway/pull/13064 and https://github.com/kgateway-dev/kgateway/pull/13097) for more details.
+* Added `kgateway.dev/verify-certificate-hash` and `kgateway.dev/verify-subject-alt-names` annotations to limit connections to clients that present certificates with a specific Subject Alt Name and certificate hash. See the following PRs for more details: 
+  * [13064](https://github.com/kgateway-dev/kgateway/pull/13064)
+  * [13097](https://github.com/kgateway-dev/kgateway/pull/13097)
 
 For more information, see the following doc guides: 
 * [mTLS (Frontend TLS)](https://kgateway.dev/docs/envoy/latest/setup/listeners/mtls/)
@@ -775,7 +779,7 @@ If you’re currently running [Ingress Nginx](https://kubernetes.github.io/ingre
 * [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
 
 ## Release notes
-Check out the full details of the kgateway v2.2 release in our [release notes](https://kgateway.dev/docs/envoy/main/reference/release-notes/).
+Check out the full details of the kgateway v2.2 release in our [release notes](https://kgateway.dev/docs/envoy/latest/reference/release-notes/).
 
 
 ## Availability
