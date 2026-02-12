@@ -23,23 +23,13 @@ weight: 10
 
 
 
-#### AIBackend
-
-
-
-AIBackend specifies the AI backend configuration
-
-
-
-_Appears in:_
-- [BackendSpec](#backendspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `llm` _[LLMProvider](#llmprovider)_ | The LLM configures the AI gateway to use a single LLM provider backend. |  |  |
-| `priorityGroups` _[PriorityGroup](#prioritygroup) array_ | PriorityGroups specifies a list of groups in priority order where each group defines<br />a set of LLM providers. The priority determines the priority of the backend endpoints chosen.<br />Note: provider names must be unique across all providers in all priority groups. Backend policies<br />may target a specific provider by name using targetRefs[].sectionName.<br /><br />Example configuration with two priority groups:<br />```yaml<br />priorityGroups:<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret<br />	          namespace: kgateway-system<br />	- providers:<br />	  - azureOpenai:<br />	      deploymentName: gpt-4o-mini-2<br />	      apiVersion: 2024-02-15-preview<br />	      endpoint: ai-gateway-2.openai.azure.com<br />	      authToken:<br />	        secretRef:<br />	          name: azure-secret-2<br />	          namespace: kgateway-system<br />```<br />TODO: enable this rule when we don't need to support older k8s versions where this rule breaks names must be unique across groups",rule="self.map(pg, pg.providers.map(pp, pp.name)).map(p, self.map(pg, pg.providers.map(pp, pp.name)).filter(cp, cp != p).exists(cp, p.exists(pn, pn in cp))).exists(p, !p)" |  | MaxItems: 32 <br />MinItems: 1 <br /> |
-
 #### APIKeyAuth
+
+
+
+
+
+
 
 _Appears in:_
 - [TrafficPolicySpec](#trafficpolicyspec)
@@ -160,6 +150,30 @@ _Appears in:_
 | `additionalRequestHeadersToLog` _string array_ | Additional request headers to log in the access log |  |  |
 | `additionalResponseHeadersToLog` _string array_ | Additional response headers to log in the access log |  |  |
 | `additionalResponseTrailersToLog` _string array_ | Additional response trailers to log in the access log |  |  |
+
+
+#### Agentgateway
+
+
+
+Agentgateway is obsolete and retained only for backwards compatibility.  Use
+the agentgateway.dev AgentgatewayParameters API to configure agentgateway
+deployments.
+
+
+
+_Appears in:_
+- [KubernetesProxyConfig](#kubernetesproxyconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `enabled` _boolean_ | Obsolete: This field is no longer used. The agentgateway dataplane is<br />automatically enabled when the Gateway references a GatewayClass with<br />controllerName: agentgateway.dev/agentgateway. Use the AgentgatewayParameters<br />API to configure agentgateway deployments. Any values specified here are ignored. |  |  |
+| `logLevel` _string_ | Log level for the agentgateway. Defaults to info.<br />Levels include "trace", "debug", "info", "error", "warn". See: https://docs.rs/tracing/latest/tracing/struct.Level.html |  |  |
+| `image` _[Image](#image)_ | The agentgateway container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: cr.agentgateway.dev<br />	repository: agentgateway<br />	tag: <agentgateway version><br />	pullPolicy: IfNotPresent |  |  |
+| `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
+| `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
+| `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
 
 
@@ -393,11 +407,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used.<br />Deprecated: The Type field is deprecated and will be removed in a future release.<br />The backend type is inferred from the configuration. |  | Enum: [AWS Static DynamicForwardProxy GCP] <br /> |
-| `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration. |  |  |
+| `type` _[BackendType](#backendtype)_ | Type indicates the type of the backend to be used.<br />Deprecated: The Type field is deprecated and will be removed in a future release.<br />The backend type is inferred from the configuration. |  | Enum: [AWS Static DynamicForwardProxy] <br /> |
+| `aws` _[AwsBackend](#awsbackend)_ | Aws is the AWS backend configuration.<br />The Aws backend type is only supported with envoy-based gateways, it is not supported in agentgateway. |  |  |
 | `static` _[StaticBackend](#staticbackend)_ | Static is the static backend configuration. |  |  |
 | `dynamicForwardProxy` _[DynamicForwardProxyBackend](#dynamicforwardproxybackend)_ | DynamicForwardProxy is the dynamic forward proxy backend configuration. |  |  |
-| `gcp` _[GcpBackend](#gcpbackend)_ | Gcp is the GCP backend configuration. |  |  |
 
 
 #### BackendStatus
@@ -432,7 +445,6 @@ _Appears in:_
 | `AWS` | BackendTypeAWS is the type for AWS backends.<br /> |
 | `Static` | BackendTypeStatic is the type for static backends.<br /> |
 | `DynamicForwardProxy` | BackendTypeDynamicForwardProxy is the type for dynamic forward proxy backends.<br /> |
-| `GCP` | BackendTypeGCP is the type for GCP backends.<br /> |
 
 
 
@@ -838,22 +850,6 @@ _Appears in:_
 
 
 
-#### DnsResolver
-
-
-
-DnsResolver configures the CARES DNS resolver for Envoy.
-
-
-
-_Appears in:_
-- [EnvoyBootstrap](#envoybootstrap)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `udpMaxQueries` _integer_ | Maximum number of UDP queries to be issued on a single UDP channel.<br />This helps prevent DNS query pinning to a single resolver, addressing<br />the issue described in https://github.com/istio/istio/issues/53577.<br />Defaults to 100 if not specified. Set to 0 to disable this limit.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto#extensions-network-dns-resolver-cares-v3-caresdnsresolverconfig |  | Minimum: 0 <br /> |
-
-
 #### DurationFilter
 
 _Underlying type:_ _[ComparisonFilter](#comparisonfilter)_
@@ -902,7 +898,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
 | `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
-| `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
 
 
 #### EnvoyContainer
@@ -1273,27 +1268,6 @@ Kubernetes Gateway.
 | `status` _[GatewayParametersStatus](#gatewayparametersstatus)_ |  |  |  |
 
 
-#### GatewayParametersOverlays
-
-
-
-
-
-
-
-_Appears in:_
-- [KubernetesProxyConfig](#kubernetesproxyconfig)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `deploymentOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deploymentOverlay allows specifying overrides for the generated Deployment resource. |  |  |
-| `serviceOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceOverlay allows specifying overrides for the generated Service resource. |  |  |
-| `serviceAccountOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccountOverlay allows specifying overrides for the generated ServiceAccount resource. |  |  |
-| `podDisruptionBudget` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | podDisruptionBudget allows creating a PodDisruptionBudget for the proxy.<br />If absent, no PDB is created. If present, a PDB is created with its selector<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated PDB. |  |  |
-| `horizontalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | horizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for the proxy.<br />If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated HPA. |  |  |
-| `verticalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | verticalPodAutoscaler allows creating a VerticalPodAutoscaler for the proxy.<br />If absent, no VPA is created. If present, a VPA is created with its targetRef<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated VPA. |  |  |
-
-
 #### GatewayParametersSpec
 
 
@@ -1308,7 +1282,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `kube` _[KubernetesProxyConfig](#kubernetesproxyconfig)_ | The proxy will be deployed on Kubernetes. Overlays (fields named with<br />the suffix 'Overlay') are applied after non-overlay configurations<br />("configs"). Configs on a GatewayClass (inside of GatewayParameters) are<br />applied before configs on a Gateway (inside of GatewayParameters), which<br />merge together. Overlays on a GatewayClass are then applied, and<br />finally, overlays on a Gateway. It is recommended to use an overlay only<br />if necessary (no config exists that can achieve the same goal) for<br />smoother upgrades, readability, and earlier and improved validation. |  |  |
+| `kube` _[KubernetesProxyConfig](#kubernetesproxyconfig)_ | The proxy will be deployed on Kubernetes. |  |  |
 | `selfManaged` _[SelfManagedGateway](#selfmanagedgateway)_ | The proxy will be self-managed and not auto-provisioned. |  |  |
 
 
@@ -1323,23 +1297,6 @@ The current conditions of the GatewayParameters. This is not currently implement
 _Appears in:_
 - [GatewayParameters](#gatewayparameters)
 
-
-
-#### GcpBackend
-
-
-
-GcpBackend is the GCP backend configuration.
-
-
-
-_Appears in:_
-- [BackendSpec](#backendspec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `host` _string_ | Host is the hostname of the GCP service to connect to.<br />This will be used for SNI and as the target address. |  | MinLength: 1 <br /> |
-| `audience` _string_ | Audience is the GCP service account audience URL.<br />When omitted, defaults to "https://\{host\}".<br />This is used by the GCP authn filter to request the appropriate token. |  | MinLength: 1 <br /> |
 
 
 #### GracefulShutdownSpec
@@ -1431,7 +1388,6 @@ _Appears in:_
 | `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
 | `earlyRequestHeaderModifier` _[HTTPHeaderFilter](#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
-| `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
 
 
 #### HTTPSettings
@@ -1464,7 +1420,6 @@ _Appears in:_
 | `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
 | `earlyRequestHeaderModifier` _[HTTPHeaderFilter](#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
-| `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
 
 
 #### HashPolicy
@@ -1710,6 +1665,7 @@ for details.
 
 
 _Appears in:_
+- [Agentgateway](#agentgateway)
 - [EnvoyContainer](#envoycontainer)
 - [IstioContainer](#istiocontainer)
 - [SdsContainer](#sdscontainer)
@@ -1773,7 +1729,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `istioProxyContainer` _[IstioContainer](#istiocontainer)_ | Configuration for the container running istio-proxy.<br />Note that if Istio integration is not enabled, the istio container will not be injected<br />into the gateway proxy deployment. |  |  |
-| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#container-v1-core) array_ | Deprecated: This field was never implemented in v2 and will be deleted.<br />If you need custom TLS certificate handling, use the built-in SDS (Secret Discovery<br />Service) container via the sdsContainer field instead. For other sidecar needs,<br />use a deployment overlay. Example overlay that adds a sidecar:<br /><br />	spec:<br />	  kube:<br />	    deploymentOverlay:<br />	      spec:<br />	        template:<br />	          spec:<br />	            containers:<br />	              - name: my-sidecar<br />	                image: my-sidecar:latest |  |  |
+| `customSidecars` _[Container](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#container-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />Override the default Istio sidecar in gateway-proxy with a custom container. |  |  |
 
 
 #### JWKS
@@ -1894,15 +1850,8 @@ _Appears in:_
 
 
 
-KubernetesProxyConfig configures the set of Kubernetes resources that will
-be provisioned for a given Gateway. Overlays (fields named with the suffix
-'Overlay') are applied after non-overlay configurations ("configs"). Configs
-on a GatewayClass (inside of GatewayParameters) are applied before configs
-on a Gateway (inside of GatewayParameters), which merge together. Overlays
-on a GatewayClass are then applied, and finally, overlays on a Gateway. It
-is recommended to use an overlay only if necessary (no config exists that
-can achieve the same goal) for smoother upgrades, readability, and earlier
-and improved validation.
+KubernetesProxyConfig configures the set of Kubernetes resources that will be provisioned
+for a given Gateway.
 
 
 
@@ -1919,13 +1868,8 @@ _Appears in:_
 | `serviceAccount` _[ServiceAccount](#serviceaccount)_ | Configuration for the Kubernetes ServiceAccount used by the proxy pods. |  |  |
 | `istio` _[IstioIntegration](#istiointegration)_ | Configuration for the Istio integration. |  |  |
 | `stats` _[StatsConfig](#statsconfig)_ | Configuration for the stats server. |  |  |
+| `agentgateway` _[Agentgateway](#agentgateway)_ | Obsolete: This field is no longer used. Agentgateway configuration is now<br />determined automatically based on the GatewayClass controllerName<br />(agentgateway.dev/agentgateway). Use the AgentgatewayParameters API to<br />configure agentgateway deployments. Any values specified here are ignored. |  |  |
 | `omitDefaultSecurityContext` _boolean_ | OmitDefaultSecurityContext is used to control whether or not<br />`securityContext` fields should be rendered for the various generated<br />Deployments/Containers that are dynamically provisioned by the deployer.<br /><br />When set to true, no `securityContexts` will be provided and will left<br />to the user/platform to be provided.<br /><br />This should be enabled on platforms such as Red Hat OpenShift where the<br />`securityContext` will be dynamically added to enforce the appropriate<br />level of security. |  |  |
-| `deploymentOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | deploymentOverlay allows specifying overrides for the generated Deployment resource. |  |  |
-| `serviceOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceOverlay allows specifying overrides for the generated Service resource. |  |  |
-| `serviceAccountOverlay` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | serviceAccountOverlay allows specifying overrides for the generated ServiceAccount resource. |  |  |
-| `podDisruptionBudget` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | podDisruptionBudget allows creating a PodDisruptionBudget for the proxy.<br />If absent, no PDB is created. If present, a PDB is created with its selector<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated PDB. |  |  |
-| `horizontalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | horizontalPodAutoscaler allows creating a HorizontalPodAutoscaler for the proxy.<br />If absent, no HPA is created. If present, an HPA is created with its scaleTargetRef<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated HPA. |  |  |
-| `verticalPodAutoscaler` _[KubernetesResourceOverlay](#kubernetesresourceoverlay)_ | verticalPodAutoscaler allows creating a VerticalPodAutoscaler for the proxy.<br />If absent, no VPA is created. If present, a VPA is created with its targetRef<br />automatically configured to target the proxy Deployment.<br />The metadata and spec fields from this overlay are applied to the generated VPA. |  |  |
 
 
 #### LabelSelector
@@ -2160,8 +2104,6 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
-| `percentEnabled` _integer_ | PercentEnabled specifies the percentage of requests for which the rate limiter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
-| `percentEnforced` _integer_ | PercentEnforced specifies the percentage of requests for which the rate limiter is enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
 
 
 #### LocalityType
@@ -2294,9 +2236,6 @@ _Appears in:_
 | `domain` _string_ | CookieDomain specifies the domain to set on the access and ID token cookies.<br />If set, the cookies will be set for the specified domain and all its subdomains. This is useful when requests<br />to subdomains are not required to be re-authenticated after the user has logged into the parent domain.<br />If not set, the cookies will default to the host of the request, not including the subdomains. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9]))*$` <br /> |
 | `names` _[OAuth2CookieNames](#oauth2cookienames)_ | Names specifies the names of the cookies used to store the tokens.<br />If not set, the default names will be used. |  |  |
 | `sameSite` _[OAuth2CookieSameSite](#oauth2cookiesamesite)_ | SameSite specifies the SameSite attribute for the OAuth2 cookies.<br />If not set, the default is Lax. |  | Enum: [Lax Strict None] <br /> |
-| `disableAccessTokenSetCookie` _boolean_ | DisableAccessTokenSetCookie specifies whether to disable setting the access token cookie.<br />This can be used when the access token is too large to fit in a cookie. When true, the<br />set-cookie response header for the access token will be omitted. |  |  |
-| `disableIDTokenSetCookie` _boolean_ | DisableIDTokenSetCookie specifies whether to disable setting the ID token cookie.<br />This can be used when the ID token is too large to fit in a cookie. When true, the<br />set-cookie response header for the ID token will be omitted. |  |  |
-| `disableRefreshTokenSetCookie` _boolean_ | DisableRefreshTokenSetCookie specifies whether to disable setting the refresh token cookie.<br />This can be used when the refresh token is too large to fit in a cookie. When true, the<br />set-cookie response header for the refresh token will be omitted. |  |  |
 
 
 #### OAuth2CookieNames
@@ -2988,7 +2927,6 @@ _Appears in:_
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Service object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `ports` _[Port](#port) array_ | Additional configuration for the service ports.<br />The actual port numbers are specified in the Gateway resource. |  |  |
 | `externalTrafficPolicy` _string_ | ExternalTrafficPolicy defines the external traffic policy for the service.<br />Valid values are Cluster and Local. Default value is Cluster. |  |  |
-| `loadBalancerClass` _string_ | LoadBalancerClass is the class of the load balancer implementation this Service belongs to.<br />If specified, the value of this field must be a label-style identifier, with an optional prefix.<br />This field can only be set when the Service type is 'LoadBalancer'. If not set, the default<br />load balancer implementation is used. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class |  |  |
 
 
 #### ServiceAccount
@@ -3346,7 +3284,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `set` _[HeaderTransformation](#headertransformation) array_ | Set is a list of headers and the value they should be set to. |  | MaxItems: 16 <br /> |
-| `add` _[HeaderTransformation](#headertransformation) array_ | Add is a list of headers to add to the request and what that value should be set to.<br />If there is already a header with these values then append the value as an extra entry.<br />Add is not supported on arm64 build, see docs/guides/transformation.md for details |  | MaxItems: 16 <br /> |
+| `add` _[HeaderTransformation](#headertransformation) array_ | Add is a list of headers to add to the request and what that value should be set to.<br />If there is already a header with these values then append the value as an extra entry.<br />Add is not supported on arm64 build, see https://github.com/kgateway-dev/kgateway/blob/v2.2.x/docs/guides/transformation.md for details |  | MaxItems: 16 <br /> |
 | `remove` _string array_ | Remove is a list of header names to remove from the request/response. |  | MaxItems: 16 <br /> |
 | `body` _[BodyTransformation](#bodytransformation)_ | Body controls both how to parse the body and if needed how to set.<br />If empty, body will not be buffered. |  |  |
 
@@ -3403,25 +3341,6 @@ _Appears in:_
 | `enabledUpgrades` _string array_ | List of upgrade types to enable (e.g. "websocket", "CONNECT", etc.) |  | MinItems: 1 <br /> |
 
 
-#### UuidRequestIdConfig
-
-
-
-UuidRequestIdConfig configures the UUID request ID extension.
-Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/request_id/uuid/v3/uuid.proto
-
-
-
-_Appears in:_
-- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
-- [HTTPSettings](#httpsettings)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `packTraceReason` _boolean_ | PackTraceReason determines if the trace sampling decision is embedded into the UUID.<br />Defaults to true. Set to false to prevent Envoy from mutating the Request ID,<br />which is useful when preserving exact UUIDs from external systems. |  |  |
-| `useRequestIdForTraceSampling` _boolean_ | UseRequestIDForTraceSampling determines if the Request ID is used to calculate the<br />trace sampling decision. Defaults to true. This ensures consistent sampling decisions<br />for a given Request ID across the mesh. |  |  |
-
-
 #### ValidationMode
 
 _Underlying type:_ _string_
@@ -3456,3 +3375,148 @@ _Appears in:_
 | `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
+
+## Shared Types
+
+The following types are defined in the shared package and used across multiple APIs.
+
+#### AlwaysOnConfig
+
+AlwaysOnConfig specified the AlwaysOn samplerc
+
+#### AnyValue
+
+AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. This is limited to string and nested values as OTel only supports them
+
+**Validation:**
+- MaxProperties=1
+- MinProperties=1
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `stringValue` | *string |  |
+| `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
+| `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### ComparisonFilter
+
+ComparisonFilter represents a filter based on a comparison. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `op` | [Op](#op) | **Required.** |
+| `value` | int32 | Value to compare against. **Required.** |
+
+#### EnvironmentResourceDetectorConfig
+
+EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
+
+#### HeaderModifiers
+
+HeaderModifiers can be used to define the policy to modify request and response headers.
+
+**Validation:**
+- AtLeastOneOf=request;response
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `request` | *gwv1.HTTPHeaderFilter | Request modifies request headers. |
+| `response` | *gwv1.HTTPHeaderFilter | Response modifies response headers. |
+
+#### KeyAnyValue
+
+KeyValue is a key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Attribute keys must be unique **Required.** |
+| `value` | [AnyValue](#anyvalue) | Value may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. **Required.** |
+
+#### KeyAnyValueList
+
+A list of key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `values` | [][KeyAnyValue](#keyanyvalue) | A collection of key/value pairs of key-value pairs. |
+
+#### LocalPolicyTargetReference
+
+Select the object to attach the policy by Group, Kind, and Name. The object must be in the same namespace as the policy. You can target only one object at a time.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+
+#### LocalPolicyTargetSelector
+
+LocalPolicyTargetSelector selects the object to attach the policy by Group, Kind, and MatchLabels. The object must be in the same namespace as the policy and match the specified labels. Do not use targetSelectors when reconciliation times are critical, especially if you have a large number of policies that target the same resource. Instead, use targetRefs to attach the policy.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `matchLabels` | map[string]string | Label selector to select the target resource. **Required.** |
+
+#### MetadataPathSegment
+
+Specifies a segment in a path for retrieving values from Metadata.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | The key used to retrieve the value in the struct **Required.** |
+
+#### NamespacedObjectReference
+
+Select the object by Name and Namespace. You can target only one object at a time.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+| `namespace` | *gwv1.Namespace | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
+
+#### Op
+
+_Underlying type:_ _string_
+
+Op represents comparison operators.
+
+**Validation:**
+- Enum=EQ;GE;LE
+
+#### PolicyAncestorStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
+| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+
+#### PolicyDisable
+
+PolicyDisable is used to disable a policy.
+
+#### PolicyStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conditions` | []metav1.Condition |  |
+| `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
+
+#### RateLimitDescriptorEntryGeneric
+
+RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Key is the name of this descriptor entry. **Required.** |
+| `value` | string | Value is the static value for this descriptor entry. **Required.** |
+
+#### Timeouts
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `request` | *metav1.Duration | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
+| `streamIdle` | *metav1.Duration | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
