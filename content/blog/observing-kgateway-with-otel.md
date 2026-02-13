@@ -1,7 +1,7 @@
 ---
 title: Observing kgateway with OpenTelemetry
 toc: false
-publishDate: 2026-02-13T00:00:00-00:00
+publishDate: 2026-02-17T00:00:00-00:00
 author: Kasper Borg Nissen
 excludeSearch: true
 ---
