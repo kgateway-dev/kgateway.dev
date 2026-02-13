@@ -117,7 +117,8 @@ Steps to set up the sample gRPC service:
 
 ## Set up the Gateway for gRPC routes {#gateway}
 
-Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute requires HTTPS listeners for TLS termination. For more information, see the [HTTPS listener guide](../../../../setup/listeners/https/).
+{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+Create an HTTPS listener so that the gateway can route gRPC traffic. In version 2.3 and later, GRPCRoute can be attached either to HTTPS listeners for TLS termination, or to HTTP listeners. For more information about the following steps, see the [HTTPS listener guide](../../../../setup/listeners/https/).
 
 1. Create a TLS certificate for testing.
 
@@ -166,11 +167,48 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
    | Setting | Description |
    |---------|-------------|
    | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up {{< reuse "/docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
-   | `spec.listeners` | Configure the listeners for this Gateway. GRPCRoute requires HTTPS listeners with TLS termination. |
+   | `spec.listeners` | Configuration for the HTTPS listener for this Gateway. |
    | `hostname` | The hostname for SNI-based routing. Must match the hostname in your GRPCRoute. |
-   | `tls.mode: Terminate` | Terminates TLS at the gateway, required for GRPCRoute. |
+   | `tls.mode: Terminate` | Terminate TLS at the gateway. |
+   {{< /version >}}
 
-3. Check the status of the Gateway.
+{{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+Create an HTTP listener so that the gateway can route gRPC traffic. For more information, see the [HTTP listener guide](../../../../setup/listeners/http/). Note that GRPCRoutes can be attached to HTTPS listeners for TLS termination only in version 2.3 and later.
+
+1. Create a Gateway resource with an HTTP listener.
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     name: grpc-gateway
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: grpc-echo
+   spec:
+     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
+     listeners:
+     - protocol: HTTP
+       port: 8080
+       name: http
+       hostname: "grpc.example.com"
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+   {{< reuse "docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   |---------|-------------|
+   | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up {{< reuse "/docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
+   | `spec.listeners` | Configuration for the HTTP listener for this Gateway. |
+   | `hostname` | The hostname for routing. This values must match the hostname in your GRPCRoute. |
+   {{< /version >}}
+
+2. Check the status of the Gateway.
 
    ```bash
    kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
@@ -199,8 +237,8 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
 
 ## Create a GRPCRoute {#create-grpcroute}
 
-1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute).
-
+1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute){{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -231,6 +269,39 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
          port: 3000
    EOF
    ```
+   {{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: GRPCRoute
+   metadata:
+     name: grpc-echo-route
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     labels:
+       app: grpc-echo
+   spec:
+     parentRefs:
+     - name: grpc-gateway
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       sectionName: http
+     hostnames:
+     - "grpc.example.com"
+     rules:
+     - matches:
+       - method:
+           service: "grpc.reflection.v1alpha.ServerReflection"
+       backendRefs:
+       - name: grpc-echo-svc
+         namespace: default
+         port: 3000
+     - backendRefs:
+       - name: grpc-echo-svc
+         namespace: default
+         port: 3000
+   EOF
+   ```
+   {{< /version >}}
 
 2. Verify that the GRPCRoute is applied successfully.
 
@@ -261,7 +332,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. GRPCRoute r
          kind: Gateway
          name: grpc-gateway
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         sectionName: https
+         sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
    ```
 
 ## Verify the gRPC route {#verify-grpcroute}
@@ -270,6 +341,7 @@ Verify that the gRPC route to the echo service is working.
 
 1. Get the external address of the gateway and save it in an environment variable.
 
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -283,9 +355,27 @@ Verify that the gRPC route to the echo service is working.
    ```
    {{% /tab %}}
    {{< /tabs >}}
+   {{< /version >}}
+
+   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```bash
+   export GATEWAY_IP=$(kubectl get gateway grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.status.addresses[0].value}')
+   echo $GATEWAY_IP
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```bash
+   kubectl port-forward svc/grpc-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   {{< /version >}}
 
 2. Explore the API dynamically.
 
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -300,6 +390,24 @@ Verify that the gRPC route to the echo service is working.
    ```
    {{% /tab %}}
    {{< /tabs >}}
+   {{< /version >}}
+
+   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```bash
+   grpcurl -plaintext -authority grpc.example.com $GATEWAY_IP:8080 list
+   grpcurl -plaintext -authority grpc.example.com $GATEWAY_IP:8080 describe yages.Echo
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```bash
+   grpcurl -plaintext -authority grpc.example.com localhost:8080 list
+   grpcurl -plaintext -authority grpc.example.com localhost:8080 describe yages.Echo
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   {{< /version >}}
 
    Expected response:
    ```
@@ -315,6 +423,7 @@ Verify that the gRPC route to the echo service is working.
 
 3. Send a gRPC request to test the route.
 
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -333,6 +442,28 @@ Verify that the gRPC route to the echo service is working.
    ```
    {{% /tab %}}
    {{< /tabs >}}
+   {{< /version >}}
+
+   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```bash
+   grpcurl -plaintext \
+     -authority grpc.example.com \
+     $GATEWAY_IP:8080 \
+     yages.Echo/Ping
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```bash
+   grpcurl -plaintext \
+     -authority grpc.example.com \
+     localhost:8080 \
+     yages.Echo/Ping
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+   {{< /version >}}
 
    Expected response:
    ```json
