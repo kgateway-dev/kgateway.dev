@@ -113,7 +113,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
 
 Now that you have an app and a gateway proxy, you can create a route to access the app.
 
-1. Create an HTTPRoute resource to expose the httpbin app on the Gateway. The following example exposes the app on the `wwww.example.com` domain. 
+1. Create an HTTPRoute resource to expose the httpbin app on the Gateway. The following example exposes the app on the `www.example.com` domain. 
    
    ```yaml
    kubectl apply -f- <<EOF
