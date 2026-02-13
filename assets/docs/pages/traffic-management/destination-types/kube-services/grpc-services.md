@@ -117,7 +117,7 @@ Steps to set up the sample gRPC service:
 
 ## Set up the Gateway for gRPC routes {#gateway}
 
-{{< version include-if="2.3.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
 Create an HTTPS listener so that the gateway can route gRPC traffic. In version 2.3 and later, GRPCRoute can be attached either to HTTPS listeners for TLS termination, or to HTTP listeners. For more information about the following steps, see the [HTTPS listener guide](../../../../setup/listeners/https/).
 
 1. Create a TLS certificate for testing.
@@ -237,7 +237,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
 
 ## Create a GRPCRoute {#create-grpcroute}
 
-1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute).{{< version include-if="2.3.x" >}}
+1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute){{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    
    ```yaml
    kubectl apply -f - <<EOF
@@ -332,7 +332,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
          kind: Gateway
          name: grpc-gateway
          namespace: {{< reuse "docs/snippets/namespace.md" >}}
-         sectionName: {{< version include-if="2.3.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
+         sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
    ```
 
 ## Verify the gRPC route {#verify-grpcroute}
@@ -341,7 +341,7 @@ Verify that the gRPC route to the echo service is working.
 
 1. Get the external address of the gateway and save it in an environment variable.
 
-   {{< version include-if="2.3.x" >}}
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -375,7 +375,7 @@ Verify that the gRPC route to the echo service is working.
 
 2. Explore the API dynamically.
 
-   {{< version include-if="2.3.x" >}}
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -423,7 +423,7 @@ Verify that the gRPC route to the echo service is working.
 
 3. Send a gRPC request to test the route.
 
-   {{< version include-if="2.3.x" >}}
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```bash
