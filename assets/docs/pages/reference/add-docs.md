@@ -57,7 +57,7 @@ weight: 20
 ---
 ```
 
-If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multipe sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
+If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multiple sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
 
 ```
 |-- security
