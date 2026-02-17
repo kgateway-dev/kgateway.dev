@@ -74,11 +74,11 @@ Define the load balancing algorithm that you want to use for your backend app in
 
    | Setting | Description |
    | -- | -- |
-   | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Deafults to 2. |
+   | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Defaults to 2. |
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
    | `slowStart.window` | The duration of the slow start window. If set, a newly-created backend endpoint remains in slow start mode from its creation time until the duration of the slow start window has elapsed. |
    | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
-   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
+   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab tabName="Round robin" %}}
    ```yaml
@@ -109,7 +109,7 @@ Define the load balancing algorithm that you want to use for your backend app in
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
    | `slowStart.window` | The duration of the slow start window. If set, any newly-created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
    | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic. For more information about fine-tuning this value, see the [API docs](../../../../reference/api/#slowstart). |
-   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the caluclation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
+   | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab tabName="Random" %}}
    Note that no further settings are required because the load balancing is random.

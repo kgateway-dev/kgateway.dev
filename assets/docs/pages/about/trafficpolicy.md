@@ -271,7 +271,7 @@ spec:
 
 ## Policy priority and merging rules
 
-If you apply multiple {{< reuse "docs/snippets/trafficpolicies.md" >}} by using different attachment options, policies are merged based on specificy and priority. 
+If you apply multiple {{< reuse "docs/snippets/trafficpolicies.md" >}} by using different attachment options, policies are merged based on specificity and priority. 
 
 By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
 

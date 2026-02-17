@@ -116,7 +116,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attirbutes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
 
@@ -240,7 +240,7 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attirbutes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
    {{% /tab %}}

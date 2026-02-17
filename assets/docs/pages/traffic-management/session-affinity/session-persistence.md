@@ -22,7 +22,7 @@ However, note that session persistence and session affinity can functionally wor
 - If the request contains a session persistence identity in a cookie or header, route the request directly to the backend that it previously established a session with.
 - If no session persistence identity is present, load balance the request according to the defined session affinity configuration, along with any [load balancing configuration](../loadbalancing).
 
-For more information about session peristence, see the [Kubernetes Gateway API enhancement doc](https://gateway-api.sigs.k8s.io/geps/gep-1619/).
+For more information about session persistence, see the [Kubernetes Gateway API enhancement doc](https://gateway-api.sigs.k8s.io/geps/gep-1619/).
 
 ## Before you begin 
 

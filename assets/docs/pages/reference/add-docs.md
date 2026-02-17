@@ -41,7 +41,7 @@ When you understand the audience and the intended use for the content that you w
 
 ## File names {#file-names}
 
-All documentation in the kgateway project is written in markdown and built by using the static site generator Hugo. In Hugo, the name of the file or folder becomes part of the link to your page. Becaues, of that, it is important to carefully choose the name for the file or folder that you want to add. If the file name consists of multiple words, separate them by hyphens. For example, to add a topic about external authentication, your file name might be `ext-auth.md`. All file names must be lowercase. Keep file and folder names as short as possible to ensure easy cross-linking between topics. 
+All documentation in the kgateway project is written in markdown and built by using the static site generator Hugo. In Hugo, the name of the file or folder becomes part of the link to your page. Because of that, it is important to carefully choose the name for the file or folder that you want to add. If the file name consists of multiple words, separate them by hyphens. For example, to add a topic about external authentication, your file name might be `ext-auth.md`. All file names must be lowercase. Keep file and folder names as short as possible to ensure easy cross-linking between topics. 
 
 
 ## Front matter {#front-matter}
@@ -57,7 +57,7 @@ weight: 20
 ---
 ```
 
-If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multipe sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
+If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multiple sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
 
 ```
 |-- security
