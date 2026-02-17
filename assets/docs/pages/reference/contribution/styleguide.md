@@ -6,7 +6,7 @@ All documentation content must be written in English. Currently, kgateway does n
 
 ## Sentence case
 
-Use sentence case for any content that you add. Sentence case means to capitalize the first word in a sentence and end with a punctuation mark like a period. Do not capitalize words, unless it is a product name, API, or other word that commonly is capatilized. 
+Use sentence case for any content that you add. Sentence case means to capitalize the first word in a sentence and end with a punctuation mark like a period. Do not capitalize words, unless it is a product name, API, or other word that commonly is capitalized. 
 
 | Do ✅ | Don't ❌ | 
 | -- | -- | 
@@ -24,7 +24,7 @@ Use title case for the value of `title:` in the front matter of your markdown pa
 
 ## Simple, present tense
 
-Use simple, present tense throughout the content that you want to add. Avoid past and future tense, unless it is required to convery the correct information. 
+Use simple, present tense throughout the content that you want to add. Avoid past and future tense, unless it is required to convey the correct information. 
 
 | Do ✅ | Don't ❌ | 
 | -- | -- |
@@ -52,7 +52,7 @@ Avoid "I" and "we" in your content contribution. Instead, phrase sentences in th
 
 ## Future statements
 
-Avoid making promises or giving hints about the future releases and features. If you want want to talk about a feature that is still under development, mark it as experimental or beta and use proper callout shortcodes to draw the user's attention to that information.
+Avoid making promises or giving hints about the future releases and features. If you want to talk about a feature that is still under development, mark it as experimental or beta and use proper callout shortcodes to draw the user's attention to that information.
 
 | Do ✅ | Don't ❌ | 
 | -- | -- |

@@ -463,7 +463,7 @@ Use the Kubernetes Gateway API to define header manipulation rules that you appl
    EOF
    ```
 
-3. Use the client sample app to send a request to the httpbin2 app. Verify that you see the `App: httpbin2` and `User-Agent: custom` headers, and that the `X-Remove` was not added to the respones. 
+3. Use the client sample app to send a request to the httpbin2 app. Verify that you see the `App: httpbin2` and `User-Agent: custom` headers, and that the `X-Remove` was not added to the responses. 
    ```sh
    kubectl -n httpbin exec deploy/client -- curl -s http://httpbin2:8000/get \
     -H "X-Remove: this header"

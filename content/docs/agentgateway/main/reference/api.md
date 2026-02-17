@@ -2124,7 +2124,7 @@ _Appears in:_
 | `hostRewrite` _[HostnameRewrite](#hostnamerewrite)_ | hostRewrite specifies how to rewrite the Host header for requests.<br /><br />If the HTTPRoute `urlRewrite` filter already specifies a host rewrite, this setting is ignored. |  | Enum: [Auto None] <br /> |
 | `timeouts` _[Timeouts](#timeouts)_ | timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | retry defines the policy for retrying requests. |  |  |
-| `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attahcment points),<br />all rules are merged. |  |  |
+| `authorization` _[Authorization](#authorization)_ | authorization specifies the access rules based on roles and permissions.<br />If multiple authorization rules are applied across different policies (at the same, or different, attachment points),<br />all rules are merged. |  |  |
 | `jwtAuthentication` _[JWTAuthentication](#jwtauthentication)_ | jwtAuthentication authenticates users based on JWT tokens. |  |  |
 | `basicAuthentication` _[BasicAuthentication](#basicauthentication)_ | basicAuthentication authenticates users based on the "Basic" authentication scheme (RFC 7617), where a username and password<br />are encoded in the request. |  |  |
 | `apiKeyAuthentication` _[APIKeyAuthentication](#apikeyauthentication)_ | apiKeyAuthentication authenticates users based on a configured API Key. |  |  |
