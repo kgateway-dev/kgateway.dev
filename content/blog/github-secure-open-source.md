@@ -74,7 +74,7 @@ Funding Partners: Alfred P. Sloan Foundation, American Express, Chainguard, Data
 
 Ecosystem Partners: Atlantic Council, Ecosyste.ms, CURIOSS, Digital Data Design Institute Lab for Innovation Science, Digital Infrastructure Insights Fund, Microsoft for Startups, Mozilla, OpenForum Europe, Open Source Collective, OpenUK, Open Technology Fund, OpenSSF, Open Source Initiative, OpenJS Foundation, University of California, OWASP, Santa Cruz OSPO, Sovereign Tech Agency, SustainOSS
 
-And as always, thanks to our kgateway community! If you haven't already, come join us in the `#kgateway` channel on the CNCF Slack.
+And as always, thanks to our kgateway community! If you haven't already, come join us in the `#kgateway` channel on the CNCF Slack and share your security best practices.
 
 {{< cards >}}
 {{< card link="https://github.blog/open-source/maintainers/securing-the-ai-software-supply-chain-security-results-across-67-open-source-projects/" icon="external-link" title="GitHub blog post" description="Learn more about the Secure Open Source Fund projects" >}}
