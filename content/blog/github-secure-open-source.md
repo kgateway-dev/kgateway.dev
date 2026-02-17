@@ -1,7 +1,7 @@
 ---
 title: Securing kgateway with the GitHub Secure Open Source Fund
 toc: false
-publishDate: 2026-02-18T10:00:00-00:00
+publishDate: 2026-02-17T14:35:00-00:00
 author: Nina Polshakova, Mayowa Fajobi, Art Berger
 excludeSearch: true
 ---
@@ -64,10 +64,19 @@ Security is not a one-time milestone, but rather an ongoing commitment. This pro
 
 If you maintain an open source project, start small: add a `SECURITY.md` file, enable dependency scanning, and audit unused secrets. Small steps compound quickly. 
 
+## Acknowledgements
+
 We are immensely grateful to GitHub and everyone involved in the Secure Open Source Fund for their support and expertise.
 
-Thanks, all!
+We want to reiterate our thanks to the following partners who supported the Secure Open Source Fund.
+
+Funding Partners: Alfred P. Sloan Foundation, American Express, Chainguard, Datadog, Herodevs, Kraken, Mayfield, Microsoft, Shopify, Stripe, Superbloom, Vercel, Zerodha, 1Password
+
+Ecosystem Partners: Atlantic Council, Ecosyste.ms, CURIOSS, Digital Data Design Institute Lab for Innovation Science, Digital Infrastructure Insights Fund, Microsoft for Startups, Mozilla, OpenForum Europe, Open Source Collective, OpenUK, Open Technology Fund, OpenSSF, Open Source Initiative, OpenJS Foundation, University of California, OWASP, Santa Cruz OSPO, Sovereign Tech Agency, SustainOSS
+
+And as always, thanks to our kgateway community! If you haven't already, come join us in the `#kgateway` channel on the CNCF Slack.
 
 {{< cards >}}
 {{< card link="https://github.blog/open-source/maintainers/securing-the-ai-software-supply-chain-security-results-across-67-open-source-projects/" icon="external-link" title="GitHub blog post" description="Learn more about the Secure Open Source Fund projects" >}}
+{{< card link="https://slack.cncf.io/" icon="external-link" title="CNCF Slack channel" >}}
 {{< /cards >}}
