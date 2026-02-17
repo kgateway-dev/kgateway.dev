@@ -130,7 +130,7 @@ AI Gateway and Inference Extension support for Envoy-based gateway proxies is de
 
 #### Fail open policy for ExtProc providers
 
-The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailabe. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
+The default fail open policy for ExtProc providers changed from `false` to `true`. Because of that, requests are forwarded to the upstream service, even if the ExtProc server is unavailable. To change this policy, set the `spec.extProc.failOpen` field to `false` in your GatewayExtension resource. 
 
 #### Helm changes for agentgateway
 

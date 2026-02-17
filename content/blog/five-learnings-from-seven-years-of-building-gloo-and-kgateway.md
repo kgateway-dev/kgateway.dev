@@ -16,7 +16,7 @@ However, due to shifting priorities and the complexities of reorganizing a widel
 
 ## Support Every Possible Use Case
 
-Initially, we attempted to cover every conceivable use case, trying to anticipate future needs. Instead of waiting for user feedback, we provided extensive APIs for various scenarios. We quickly learnt that most users did not want to understand or manage excessive configurations as it overwhelms them rather than helping. Plus, too many configuration options ofted created confusion and hindered usability.
+Initially, we attempted to cover every conceivable use case, trying to anticipate future needs. Instead of waiting for user feedback, we provided extensive APIs for various scenarios. We quickly learnt that most users did not want to understand or manage excessive configurations as it overwhelms them rather than helping. Plus, too many configuration options often created confusion and hindered usability.
 
 This is a common learning across open-source projects. As Tim Hockin famously said, “Let us keep Kubernetes unfinished.” When implementing Kubernetes Gateway API support in Gloo and kgateway, we embraced this philosophy. We focused on core use cases defined by the standard Gateway API while providing custom extensions on top of it, striking a balance between standardization and flexibility.
 
