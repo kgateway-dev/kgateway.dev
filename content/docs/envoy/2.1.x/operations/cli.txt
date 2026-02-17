@@ -14,7 +14,7 @@ Install the latest version of `{{< reuse "docs/snippets/cli-name.md" >}}`. Make 
   curl -sL https://run.solo.io/gloo/install | sh
   export PATH=$HOME/.gloo/bin:$PATH
   ```
-* Windows: Notes that this script requires OpenSSL.
+* Windows: Note that this script requires OpenSSL.
   ```shell
   (New-Object System.Net.WebClient).DownloadString("https://run.solo.io/gloo/windows/install") | iex
   $env:Path += ";$env:userprofile/.gloo/bin/"
