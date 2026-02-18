@@ -29,7 +29,7 @@ For more information, see the other docs in this [About](../) section.
 | Gateway proxy | Primary use cases | Description |
 | --- | --- | --- |
 | {{< icon "kgateway" >}} kgateway | API, ingress, egress, service mesh | The kgateway project includes its own proxy that is based on Envoy, an L3/L4/L7 network proxy. Beyond Envoy, kgateway provides a set of extensions for advanced configuration, security, and traffic management features. You can also integrate kgateway with the Istio service mesh in sidecar and ambient modes. For more information, see the [kgateway FAQs](../../faqs/) and [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/what_is_envoy). |
-| {{< icon "agentgateway" >}} agentgateway | AI, A2A, MCP, LLM, Inference Extension | Agentgateway is an enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. <ul><li>For Kubernetes deployments, refer to [kgateway.dev/docs/agentgateway/](https://kgateway.dev/docs/agentgateway/)</li><li>For non-Kubernetes environments such as local or on-prem deployments, refer to the upstream [agentgateway.dev/docs](https://agentgateway.dev/docs/)</li></ul>|
+| {{< icon "agentgateway" >}} agentgateway | AI, A2A, MCP, LLM, Inference Extension | Agentgateway is an enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. <ul><li>For Kubernetes deployments, refer to [https://agentgateway.dev/docs/kubernetes/latest/](https://agentgateway.dev/docs/kubernetes/latest/)</li><li>For non-Kubernetes environments such as local or on-prem deployments, refer to the upstream [https://agentgateway.dev/docs/standalone/latest/](hhttps://agentgateway.dev/docs/standalone/latest/)</li></ul>|
 
 ## Reserved ports
 

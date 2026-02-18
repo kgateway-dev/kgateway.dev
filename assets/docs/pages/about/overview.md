@@ -84,7 +84,7 @@ The Gateway API is an API which can be used to program an ingress or an API gate
   {{< card link="../../traffic-management/destination-types/backends/lambda" title="AWS Lambda" tag="Traffic" >}}
   {{< card link="../../traffic-management/route-delegation/" title="Delegation" tag="Traffic" >}}
   {{< card link="../../traffic-management/direct-response/" title="Direct responses" tag="Traffic" >}}
-  {{< card link="../../traffic-management/ext/" title="Direct responses" tag="Traffic" >}}
+  {{< card link="../../traffic-management/extproc/" title="External processing" tag="Traffic" >}}
   {{< card link="../../setup/customize/" title="Gateway customization" tag="Setup" >}}
   {{< card link="../../integrations/" title="Integrations" tag="Setup" >}}
   {{< card link="../../resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}

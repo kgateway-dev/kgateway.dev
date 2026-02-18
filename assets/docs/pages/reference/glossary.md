@@ -35,7 +35,7 @@ A secure, policy-driven communication method for AI agents running in an ambient
 ### Agentgateway
 An open-source data plane optimized for agentic AI workloads. Kgateway uses agentgateway to route and manage traffic for LLMs, inference services, and AI-native applications.
 
-**Learn more**: [Agentgateway docs]({{< link-hextra path="/agentgateway/" >}})
+**Learn more**: [Agentgateway docs]({{< link-hextra path="https://agentgateway.dev/docs/" >}})
 
 ### Agents
 Autonomous AI components that make decisions, communicate with services, and interact with other agents (with or without sidecars). In Kgateway, agents participate in the mesh and communicate over A2A or Envoy-based traffic.
