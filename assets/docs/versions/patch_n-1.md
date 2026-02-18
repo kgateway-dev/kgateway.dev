@@ -1,1 +1,1 @@
-{{< version include-if="2.3.x" >}}2.2.0{{< /version >}}{{< version include-if="2.2.x" >}}2.1.2{{< /version >}}{{< version include-if="2.1.x" >}}2.0.5{{< /version >}}{{< version include-if="2.0.x" >}}2.0.3{{< /version >}}
+{{< version include-if="2.3.x" >}}2.2.1{{< /version >}}{{< version include-if="2.2.x" >}}2.1.2{{< /version >}}{{< version include-if="2.1.x" >}}2.0.5{{< /version >}}{{< version include-if="2.0.x" >}}2.0.3{{< /version >}}
