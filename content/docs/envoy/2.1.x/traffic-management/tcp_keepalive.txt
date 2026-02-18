@@ -67,7 +67,7 @@ Downstream connections are between the Envoy gateway proxy and the client that s
 
 To enable TCP keepalive on downstream connections, create a [ListenerPolicy]({{< link-hextra path="/about/policies/listeneroption/" >}}) resource that selects the Gateway resource with `targetRefs`.
 
-The following example enables TCP keepalive probes between the client and the gateway proxy. The first probe is sent when the connection has been idle for 60 seconds (`TCP_KEEPIDLE`). After, each probe is sent every 20 seconds (`TCP_KEEPINTVL`). After no response for 2 consecutive probes (`TCP_KEEPCNT`), the connection is dropped.
+The following example enables TCP keepalive probes between the client and the gateway proxy. The first probe is sent when the connection has been idle for 60 seconds (`TCP_KEEPIDLE`). After that, each probe is sent every 20 seconds (`TCP_KEEPINTVL`). After no response for 2 consecutive probes (`TCP_KEEPCNT`), the connection is dropped.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -120,7 +120,7 @@ Backend connections are between the Envoy gateway proxy and your services, such 
 To enable TCP keepalive on backend connections, configure the following [ConnectionConfig]({{< link-hextra path="/reference/api/connection/" >}}) settings in the
 [Backend]({{< link-hextra path="/reference/api/#backend/" >}}) resource.
 
-The following example enables TCP keepalive probes between the gateway proxy and the backend connection. The first probe is sent when the connection has been idle for 60 seconds (`keepaliveTime`). After, a TCP keepalive probe is sent every 20 seconds (`keepaliveInterval`). After no response for 2 consecutive probes (`keepaliveProbes`), the connection is dropped.
+The following example enables TCP keepalive probes between the gateway proxy and the backend connection. The first probe is sent when the connection has been idle for 60 seconds (`keepaliveTime`). After that, a TCP keepalive probe is sent every 20 seconds (`keepaliveInterval`). After no response for 2 consecutive probes (`keepaliveProbes`), the connection is dropped.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
