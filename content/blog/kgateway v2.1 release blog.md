@@ -44,7 +44,7 @@ spec:
 EOF
 ```
 
-You are now ready to try out agentgateway. Check out the [agentgateway guides]({{< link-hextra path="/latest/agentgateway/" >}}) to learn how to route traffic to an LLM provider, MCP tool server, or AI agent. 
+You are now ready to try out agentgateway. Check out the [agentgateway guides](https://agentgateway.dev/docs/kubernetes/latest/) to learn how to route traffic to an LLM provider, MCP tool server, or AI agent. 
 
 ### K8s GW API 1.3.0 and Inference Extension 1.0.0
 
@@ -146,7 +146,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 {{< /tabs >}}
 
 ### AI Backend API changes {#v21-ai-backend-api-changes}
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]({{< link-hextra path="/latest/reference/api/#aibackend" >}}) and [AI guides]({{< link-hextra path="/latest/agentgateway/llm/" >}}) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]({{< link-hextra path="/latest/reference/api/#aibackend" >}}) and [AI guides](https://agentgateway.dev/docs/kubernetes/latest/) docs.
 
 
 ### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
@@ -216,7 +216,7 @@ You can also check out the agentgateway and kgateway integration in action routi
 
 ##  🗑️ Deprecated or removed features
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/latest/agentgateway/" >}}) instead. To learn more about why we think that agentgateway is better suited as a gateway for agentic AI and MCP workloads, check out this [blog](https://www.solo.io/blog/why-do-we-need-a-new-gateway-for-ai-agents). 
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/) instead. To learn more about why we think that agentgateway is better suited as a gateway for agentic AI and MCP workloads, check out this [blog](https://www.solo.io/blog/why-do-we-need-a-new-gateway-for-ai-agents). 
 
 ## Release notes
 Check out the full details of the kgateway v1.2 release in our [release notes](https://kgateway.dev/docs/latest/reference/release-notes/).

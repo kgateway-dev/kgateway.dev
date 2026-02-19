@@ -30,7 +30,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../agentgateway/llm/) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](https://agentgateway.dev/docs/kubernetes/latest/llm/) docs.
 
 Update your old configuration to the new API style as follows.
 
@@ -126,7 +126,7 @@ Note that this change does not impact the other delegation annotations:
 
 #### Deprecated support for AI Gateway and Inference Extension with Envoy
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/agentgateway/" >}}) instead.
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/) instead.
 
 #### Fail open policy for ExtProc providers
 
@@ -181,7 +181,7 @@ Disabling policies can be applied to CORS, extAuth, extProc, and rate limit poli
 
 #### Agentgateway integration {#v21-agentgateway}
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../agentgateway/).
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](https://agentgateway.dev/docs/kubernetes/latest/).
 
 #### Global policy attachment {#v21-global-policy-attachment}
 
