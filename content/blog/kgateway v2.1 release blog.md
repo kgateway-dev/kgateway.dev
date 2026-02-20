@@ -44,7 +44,7 @@ spec:
 EOF
 ```
 
-You are now ready to try out agentgateway. Check out the [agentgateway guides](https://agentgateway.dev/docs/kubernetes/latest/) to learn how to route traffic to an LLM provider, MCP tool server, or AI agent. 
+You are now ready to try out agentgateway. Check out the [agentgateway guides](/ai) to learn how to route traffic to an LLM provider, MCP tool server, or AI agent. 
 
 ### K8s GW API 1.3.0 and Inference Extension 1.0.0
 
