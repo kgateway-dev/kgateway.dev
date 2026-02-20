@@ -146,7 +146,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 {{< /tabs >}}
 
 ### AI Backend API changes {#v21-ai-backend-api-changes}
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]({{< link-hextra path="/latest/reference/api/#aibackend" >}}) and [AI guides](https://agentgateway.dev/docs/kubernetes/latest/) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference]({{< link-hextra path="/latest/reference/api/#aibackend" >}}) and [AI guides]({{< link-hextra path="/ai/" >}}) docs.
 
 
 ### Route delegation annotation for policy merging {#v21-delegation-policy-merging}
