@@ -216,7 +216,7 @@ You can also check out the agentgateway and kgateway integration in action routi
 
 ##  🗑️ Deprecated or removed features
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/ai" >}}) instead. To learn more about why we think that agentgateway is better suited as a gateway for agentic AI and MCP workloads, check out this [blog](https://www.solo.io/blog/why-do-we-need-a-new-gateway-for-ai-agents). 
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/ai/" >}}) instead. To learn more about why we think that agentgateway is better suited as a gateway for agentic AI and MCP workloads, check out this [blog](https://www.solo.io/blog/why-do-we-need-a-new-gateway-for-ai-agents). 
 
 ## Release notes
 Check out the full details of the kgateway v1.2 release in our [release notes](https://kgateway.dev/docs/latest/reference/release-notes/).
