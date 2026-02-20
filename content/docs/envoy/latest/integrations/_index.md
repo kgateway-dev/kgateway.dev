@@ -7,7 +7,7 @@ description: Integrate kgateway with common cloud-native tools.
 Integrate kgateway with common cloud-native tools.
 
 {{< cards >}}
-  {{< card link="https://agentgateway.dev/docs/kubernetes/latest/" title="Agentgateway" >}}
+  {{< card link="../../../ai/" title="Agentgateway" >}}
   {{< card link="argo" title="Argo Rollouts" >}}
   {{< card link="aws-elb" title="AWS ELBs" >}}
   {{< card link="external-dns-cert-manager" title="ExternalDNS & Cert Manager"  >}}
