@@ -18,14 +18,11 @@
    default_md = sha256
    distinguished_name = dn
    req_extensions = req_ext
-
    [ dn ]
    CN = *.example.com
    O = any domain
-
    [ req_ext ]
    subjectAltName = @alt_names
-
    [ alt_names ]
    DNS.1 = *.example.com
    DNS.2 = example.com

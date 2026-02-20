@@ -1,0 +1,1 @@
+If you want to change the [default gateway proxy template]({{< link-hextra path="/setup/default/#gateway-proxy-template" >}}) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)]({{< link-hextra path="/setup/selfmanaged" >}}).

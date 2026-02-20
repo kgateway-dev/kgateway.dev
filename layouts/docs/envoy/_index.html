@@ -1,0 +1,74 @@
+{{ define "main" }}
+  <style>
+    /* Hide sidebar on envoy landing page */
+    .sidebar-container,
+    aside.sidebar-container,
+    aside.hx-order-first,
+    .hx-order-first {
+      display: none !important;
+      visibility: hidden !important;
+    }
+    
+    /* Full width for landing page - override theme's flex layout */
+    .hx-mx-auto.hx-flex {
+      max-width: 100% !important;
+      justify-content: center !important;
+    }
+    
+    /* Hide TOC on landing page */
+    .toc-container {
+      display: none !important;
+    }
+  </style>
+  
+  <div class="w-full z-10">
+    {{ partial "announcement.html" .}}
+  </div>
+  
+  <!-- Explicitly structure without sidebar wrapper -->
+  <div class="hx-mx-auto hx-flex hx-justify-center hx-px-6 md:hx-px-12 hx-py-12">
+    <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center">
+      <main class="hx-w-full hx-min-w-0 hx-max-w-6xl">
+        <div class="hx-text-center hx-mb-12">
+          <h1 class="hx-text-4xl hx-font-bold hx-mb-4 hx-text-gray-900 dark:hx-text-gray-100">{{ if .Title }}{{ .Title }}{{ else }}KGateway Documentation{{ end }}</h1>
+        </div>
+        
+        <div class="content hx-prose hx-prose-lg hx-max-w-none">
+          <div class="hx-text-center hx-mb-8">
+            <style>
+              .content p,
+              .content h1,
+              .content h2,
+              .content h3,
+              .content h4,
+              .content h5,
+              .content h6 {
+                color: rgb(55, 65, 81) !important;
+                margin-bottom: 1.5rem !important;
+              }
+              .content h1 {
+                font-size: 2.25rem !important;
+                font-weight: 700 !important;
+                margin-top: 0 !important;
+              }
+              .content p {
+                font-size: 1.125rem !important;
+              }
+              .dark .content p,
+              .dark .content h1,
+              .dark .content h2,
+              .dark .content h3,
+              .dark .content h4,
+              .dark .content h5,
+              .dark .content h6 {
+                color: rgb(209, 213, 219) !important;
+              }
+            </style>
+            {{ .Content }}
+          </div>
+        </div>
+      </main>
+    </article>
+  </div>
+{{ end }}
+

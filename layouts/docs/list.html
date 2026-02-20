@@ -1,57 +1,73 @@
 {{ define "main" }}
-  <style>
-    /* Hide unselected docs version dropdown */
-    .sidebar-container > div > ul > li:not(li:has(.sidebar-active-item)) {
-      display: none;
-    }
-
-    /* Hide top-level docs version dropdowns */
-    .sidebar-container > div > ul > li > a {
-      display: none;
-    }
-
-    /* Adjust padding and hide left border for top-level docs dropdown */
-    sidebar-container > div > ul > li > div {
-      padding-top: 0;
-    }
-
-    .sidebar-container > div > ul > li > div > ul {
-      padding-left: 0;
-      margin-left: 0;
-    }
-
-    .sidebar-container > div > ul > li > div > ul::before {
-      display: none;
-    }
-
-    /* Hide top-layer docs link from breadcrumbs */
-    main > div:first-child > *:nth-child(-n + 2) {
-      display: none;
-    }
-  </style>
-  <script>
-    if (window.location.pathname === "/docs/") {
-      window.location.assign(window.location.href + "latest");
-    }
-  </script>
+  {{- /* Check if this is the /docs/ index page */ -}}
+  {{- $isDocsIndex := and (eq .Section "docs") (eq .RelPermalink "/docs/") -}}
   
-  <div class="w-full z-10">
-    {{ partial "announcement.html" .}}
-  </div>
-  <div class='hx-mx-auto hx-flex {{ partial "utils/page-width" . }}'>
-    {{ partial "sidebar.html" (dict "context" .) }}
-    {{ partial "toc.html" . }}
-    <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center hx-pb-8 hx-pr-[calc(env(safe-area-inset-right)-1.5rem)]">
-      <main class="hx-w-full hx-min-w-0 hx-max-w-6xl hx-px-6 hx-pt-4 md:hx-px-12">
-        {{ partial "breadcrumb.html" . }}
-        <div class="content">
-          {{ if .Title }}<h1>{{ .Title }}</h1>{{ end }}
-          {{ .Content }}
-        </div>
-        {{ partial "components/last-updated.html" . }}
-        {{ partial "components/pager.html" . }}
-        {{ partial "components/comments.html" . }}
-      </main>
-    </article>
-  </div>
+  {{- if $isDocsIndex -}}
+    {{- /* Use the _index.html layout for docs landing page */ -}}
+    {{- partial "docs-index.html" . -}}
+  {{- else -}}
+    <style>
+      /* Hide unselected docs version dropdown */
+      .sidebar-container > div > ul > li:not(li:has(.sidebar-active-item)) {
+        display: none;
+      }
+
+      /* Hide top-level docs version dropdowns */
+      .sidebar-container > div > ul > li > a {
+        display: none;
+      }
+
+      /* Adjust padding and hide left border for top-level docs dropdown */
+      sidebar-container > div > ul > li > div {
+        padding-top: 0;
+      }
+
+      .sidebar-container > div > ul > li > div > ul {
+        padding-left: 0;
+        margin-left: 0;
+      }
+
+      .sidebar-container > div > ul > li > div > ul::before {
+        display: none;
+      }
+
+      /* Hide top-layer docs link from breadcrumbs */
+      main > div:first-child > *:nth-child(-n + 2) {
+        display: none;
+      }
+
+      /* Dark mode sidebar active and hover states - very dark with light text */
+      .dark .sidebar-container nav a.sidebar-active-item,
+      .dark .sidebar-container a.sidebar-active-item {
+        background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+        color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+      }
+
+      .dark .sidebar-container nav a:hover:not(.sidebar-active-item),
+      .dark .sidebar-container a:hover:not(.sidebar-active-item) {
+        background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+        color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+      }
+    </style>
+    
+    <div class="w-full z-10">
+      {{ partial "announcement.html" .}}
+    </div>
+    <div class='hx-mx-auto hx-flex {{ partial "utils/page-width" . }}'>
+      {{ partial "sidebar.html" (dict "context" .) }}
+      {{ partial "toc.html" . }}
+      <article class="hx-w-full hx-break-words hx-flex hx-min-h-[calc(100vh-var(--navbar-height))] hx-min-w-0 hx-justify-center hx-pb-8 hx-pr-[calc(env(safe-area-inset-right)-1.5rem)]">
+        <main class="hx-w-full hx-min-w-0 hx-max-w-6xl hx-px-6 hx-pt-4 md:hx-px-12">
+          {{ partial "breadcrumb.html" . }}
+          <div class="content">
+            {{ if .Title }}<h1>{{ .Title }}</h1>{{ end }}
+            {{ .Content }}
+          </div>
+          {{ partial "components/last-updated.html" . }}
+          {{ partial "components/pager.html" . }}
+          {{ partial "components/comments.html" . }}
+        </main>
+      </article>
+    </div>
+  {{- end -}}
 {{ end }}

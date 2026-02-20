@@ -10,7 +10,7 @@ Parent-child hierarchies might be:
 Policy merging applies to the following policies:
 
 * Native Kubernetes Gateway API policies, such as rewrites, timeouts, or retries.
-* {{< reuse "/docs/snippets/kgateway-capital.md" >}} {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+* {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 Resources that are higher in the parent-child hierarchy can use a special annotation to define how child resources inherit policies. This way, parent resources such as a Gateway or HTTPRoute can decide whether child resources can override the parent policies or not.
 
@@ -82,5 +82,5 @@ Resulting merged policy's headers: The child and grandchild values merge with th
 
 For more information, check out the following guides:
 
-* {{< reuse "docs/snippets/trafficpolicy.md" >}}'s [Policy priority and merging rules](../policies/trafficpolicy/#policy-priority-and-merging-rules)
-* [Policy inheritance and overrides](../../traffic-management/route-delegation/inheritance/) for both Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} policies.
+* {{< reuse "docs/snippets/trafficpolicy.md" >}}'s [Policy priority and merging rules](../trafficpolicy/#policy-priority-and-merging-rules)
+* [Policy inheritance and overrides](../../../traffic-management/route-delegation/inheritance/) for both Kubernetes Gateway API and {{< reuse "/docs/snippets/kgateway.md" >}} policies.

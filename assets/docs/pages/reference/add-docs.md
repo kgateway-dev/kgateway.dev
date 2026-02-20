@@ -31,7 +31,7 @@ When you understand the audience and the intended use for the content that you w
 
 |Content type |	Goals | Audiences |
 | -- | -- | -- |
-|Concepts | Concepts explain key principles of kgateway, its functionality, features, and underlying technologies. For example, you might want to describe the external authentication flow in kgateway and how the components interact with each other. Concepts do not include sequences of steps. Instead, links might be provided to corresponding guides that explain how to set up and use the feature that you described in your concept. | New useres or users that are unfamiliar with the project and the feature it provides. |
+|Concepts | Concepts explain key principles of kgateway, its functionality, features, and underlying technologies. For example, you might want to describe the external authentication flow in kgateway and how the components interact with each other. Concepts do not include sequences of steps. Instead, links might be provided to corresponding guides that explain how to set up and use the feature that you described in your concept. | New users or users that are unfamiliar with the project and the feature it provides. |
 | Guides | Guides provide the steps or procedure to accomplish a certain task. For example, you might want to write a guide for how to set up external authentication in kgateway. Guides give only minimal information about how the feature works, but can include links to related concepts. | Users that want to try out kgateway. | 
 | Setup pages | Setup pages focus on steps for how to install, configure, and set up kgateway. | New or existing uses who want to install kgateway. 
 | Reference pages| Reference pages provide detailed information about certain kgateway components, its CLI, Helm values, and API. Most reference content is automatically generated from the code. | Users with advanced and deep technical knowledge of the project. | 
@@ -41,7 +41,7 @@ When you understand the audience and the intended use for the content that you w
 
 ## File names {#file-names}
 
-All documentation in the kgateway project is written in markdown and built by using the static site generator Hugo. In Hugo, the name of the file or folder becomes part of the link to your page. Becaues, of that, it is important to carefully choose the name for the file or folder that you want to add. If the file name consists of multiple words, separate them by hyphens. For example, to add a topic about external authentication, your file name might be `ext-auth.md`. All file names must be lowercase. Keep file and folder names as short as possible to ensure easy cross-linking between topics. 
+All documentation in the kgateway project is written in markdown and built by using the static site generator Hugo. In Hugo, the name of the file or folder becomes part of the link to your page. Because of that, it is important to carefully choose the name for the file or folder that you want to add. If the file name consists of multiple words, separate them by hyphens. For example, to add a topic about external authentication, your file name might be `ext-auth.md`. All file names must be lowercase. Keep file and folder names as short as possible to ensure easy cross-linking between topics. 
 
 
 ## Front matter {#front-matter}
@@ -57,7 +57,7 @@ weight: 20
 ---
 ```
 
-If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multipe sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
+If you want to add a folder or "twistie" to the left-hand navigation of the docs that has multiple sub-topics, the folder must have at least one `_index.md` file. This file has the title of your twistie and can be used to provide general overview information about the section that you want to add. Note that you must add additional pages to your folder for the twistie to show up in the left-hand navigation. If your folder contains only an `_index.md` file, it shows up as a regular page. The following example shows a sample folder structure: 
 
 ```
 |-- security
@@ -81,6 +81,30 @@ Use the link-hextra shortcode to link to a topic within the documentation in a w
 ```markdown
 [AI Backend API docs]({{</* link-hextra path="/reference/api/#aibackend" */>}})
 ```
+
+### conditional-text
+
+Use the conditional-text shortcode to conditionally display content based on whether the page is in the `content/docs/envoy` or `content/docs/agentgateway` section. This is particularly useful when creating reusable content in the `assets/docs` directory that needs to differ between Envoy-based kgateway and agentgateway documentation. The shortcode automatically detects the current section from the page URL and shows or hides content accordingly.
+
+The following example shows how to use conditional-text in an assets file that can be reused in both sections:
+
+Content in `assets/docs/snippets/example-install.md`:
+```markdown
+{{</* conditional-text include-if="envoy" */>}}
+Install kgateway using the Envoy-based proxy configuration.
+{{</* /conditional-text */>}}
+{{</* conditional-text include-if="agentgateway" */>}}
+Install kgateway using the agentgateway configuration.
+{{</* /conditional-text */>}}
+```
+
+When this snippet is reused via `{{</* reuse "docs/snippets/example-install.md" */>}}`:
+- In pages under `docs/envoy/`, only the first paragraph is displayed.
+- In pages under `docs/agentgateway/`, only the second paragraph is displayed.
+
+Supported parameters:
+- `include-if`: Shows content only when the current section matches the specified value (e.g., `"envoy"`, `"agentgateway"`, or `"envoy,agentgateway"` for multiple sections)
+- `exclude-if`: Shows content only when the current section does not match the specified value
 
 ### reuse
 You can use the reuse shortcode to reuse content in multiple places while maintaining a single source of truth. A common use case for this shortcode is a reference to the latest version, product names, or short paragraphs. The source of the reused content is stored as a markdown file in the `assets/docs` directory. 
@@ -172,6 +196,22 @@ Supported parameters:
 
 Available versions: Check the `hugo.yaml` file's `versions` section in the [kgateway.dev repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/hugo.yaml#L129) for the current versions.
 
+### gloss
+
+Use the gloss shortcode to add inline glossary tooltips to terms in your documentation. When users hover over or click a glossary term, a tooltip displays the term's definition from the glossary data file.
+
+The shortcode takes a glossary key as the first argument and optionally accepts inner content for the displayed text. If no inner content is provided, the key itself is used as the display text.
+
+Example:
+
+```markdown
+The {{</* gloss "API Gateway" */>}}API Gateway{{</* /gloss */>}} manages traffic routing.
+
+You can also use it without inner content: {{</* gloss "Control Plane" */>}}
+```
+
+The glossary definitions are stored in `data/glossary.yaml`. Each entry should have a `short` field (displayed in the tooltip) and optionally a link field for a "Learn more" link.
+
 ## Redirects {#redirects}
 
 If you want to redirect a page to a new location, you can add a redirect rule to the [`static/_redirects` file in the `kgateway.dev` repository](https://github.com/kgateway-dev/kgateway.dev/blob/main/static/_redirects).
@@ -213,7 +253,7 @@ The documentation maintainers of the kgateway project will review your pull requ
 The kgateway project automatically generates the following documentation from the code.
 
 * [API reference]({{< link-hextra path="/reference/api/" >}})
-* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{% version include-if="2.2.x,2.1.x" %}}
-* [Control plane metrics](../../../observability/control-plane-metrics/){{% /version %}}
+* [Helm reference]({{< link-hextra path="/reference/helm/" >}}){{< version exclude-if="2.0.x" >}}
+* [Control plane metrics](../../../observability/control-plane-metrics/){{< /version >}}
 
 To learn more about how to generate these docs, see the [GitHub Workflows README](https://github.com/kgateway-dev/kgateway.dev/tree/main/.github/workflows/README.md).

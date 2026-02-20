@@ -1,8 +1,12 @@
+<!-- Glossary tooltip styles -->
+<link rel="stylesheet" href="{{ "css/glossary.css" | absURL }}">
+
 <style>
   .hextra-footer {
     display: none
   }
 </style>
+
 <footer class="bg-primary-bg text-white py-[4.375rem] md:py-25 px-12 xl:px-25 bg-[url(/hero-background.svg)] bg-[center_top_-27rem]">
   <div class="flex flex-col md:flex-row justify-between gap-[3.125rem] md:gap-0 max-w-[1440px] mx-auto">
     <div class="flex flex-col gap-4 items-center md:items-start">
@@ -13,7 +17,9 @@
     </div>
     <div class="flex flex-col flex-wrap md:flex-row gap-[2.5625rem] items-center md:max-h-[3.1875rem] justify-end">
       <a class="link flex items-center gap-2 whitespace-nowrap text-secondary-link text-[1.125rem] leading-[1.6875rem] md:text-base" href="https://github.com/kgateway-dev/kgateway">
-        {{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }} GitHub
+        <span class="dark:hidden">{{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
+        <span class="hidden dark:inline">{{ partial "utils/icon.html" (dict "name" "github-white" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
+        GitHub
       </a>
       <a class="link flex items-center whitespace-nowrap text-secondary-link" href="/slack">
         {{ partial "utils/icon.html" (dict "name" "slack" "attributes" "class='fill-secondary-link w-10 h-10'") }}
@@ -39,14 +45,17 @@
         {{ partial "utils/icon.html" (dict "name" "youtube" "attributes" "class='fill-secondary-link w-10 h-6'") }}
         YouTube
       </a>                  
-
-      <!-- <a class="bg-secondary-bg text-white rounded-lg p-5" href="/">Get a demo</a> -->
     </div>
   </div>
+
   <div class="flex flex-col max-w-[1440px] items-center mx-auto pt-24">
     <div class="w-80"><img src="/cncf-sandbox-horizontal-white.svg" /></div>
     <div class="pt-6"><p class="text-center">We are a Cloud Native Computing Foundation sandbox project</p></div>
     <div class="pt-6"><p class="text-center text-xs">Copyright © kgateway, a Series of LF Projects, LLC.<br/><a class="link text-secondary-link" href="https://lfprojects.org/policies/">Website terms of use, trademark policy and other project policies</a></p></div>
   </div>
+
   <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=f8e98c47-18c1-416e-9f48-c448193f6d93" />
+
+  <!-- Glossary tooltip JS -->
+  <script src="{{ "js/glossary.js" | absURL }}" defer></script>
 </footer>

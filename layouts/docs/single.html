@@ -28,6 +28,19 @@
     main > div:first-child > *:nth-child(-n + 2) {
       display: none;
     }
+
+    /* Dark mode sidebar active and hover states - very dark with light text */
+    .dark .sidebar-container nav a.sidebar-active-item,
+    .dark .sidebar-container a.sidebar-active-item {
+      background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+      color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+    }
+
+    .dark .sidebar-container nav a:hover:not(.sidebar-active-item),
+    .dark .sidebar-container a:hover:not(.sidebar-active-item) {
+      background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+      color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+    }
   </style>
 
   <div class="w-full z-10">

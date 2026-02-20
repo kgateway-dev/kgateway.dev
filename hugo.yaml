@@ -54,16 +54,15 @@ menu:
     - name: Blog
       url: /blog
       weight: 2
-    - name: Get Started
-      weight: 3
-      url: /docs/latest/quickstart/
-    - name: Why kgateway
-      weight: 4
-      url: /docs/latest/about/overview/
     - name: Search
       weight: 5
       params:
         type: search
+    - name: GitHub
+      weight: 10
+      url: "https://github.com/kgateway-dev/kgateway"
+      params:
+        icon: github
 
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
@@ -126,16 +125,57 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
+  # Global versions (for backward compatibility)
   versions:
-    - version: "2.2.x"
-      dropdown: "2.2 (main)"
+    - version: "2.3.x"
+      dropdown: "2.3 (main)"
       linkVersion: "main"
       url: "/main"
-    - version: "2.1.x"
-      dropdown: "2.1 (latest)"
+    - version: "2.2.x"
+      dropdown: "2.2 (latest)"
       linkVersion: "latest"
       url: "/latest"
+    - version: "2.1.x"
+      dropdown: "2.1"
+      linkVersion: "2.1.x"
+      url: "/2.1.x"
     - version: "2.0.x"
       dropdown: "2.0"
       linkVersion: "2.0.x"
       url: "/2.0.x"
+  
+  # Section-specific configurations
+  sections:
+    envoy:
+      versions:
+        - version: "2.3.x"
+          dropdown: "2.3 (main)"
+          linkVersion: "main"
+          url: "/main"
+        - version: "2.2.x"
+          dropdown: "2.2 (latest)"
+          linkVersion: "latest"
+          url: "/latest"
+        - version: "2.1.x"
+          dropdown: "2.1"
+          linkVersion: "2.1.x"
+          url: "/2.1.x"
+        - version: "2.0.x"
+          dropdown: "2.0"
+          linkVersion: "2.0.x"
+          url: "/2.0.x"
+    
+    agentgateway:
+      versions:
+        - version: "2.3.x"
+          dropdown: "2.3 (main)"
+          linkVersion: "main"
+          url: "/main"
+        - version: "2.2.x"
+          dropdown: "2.2 (latest)"
+          linkVersion: "latest"
+          url: "/latest"
+        - version: "2.1.x"
+          dropdown: "2.1"
+          linkVersion: "2.1.x"
+          url: "/2.1.x"

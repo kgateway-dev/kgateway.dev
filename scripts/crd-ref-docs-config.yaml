@@ -1,5 +1,13 @@
 processor:
+  ignoreGroupVersions:
+    - gateway.networking.k8s.io/v1
+    - gateway.networking.k8s.io/v1alpha2
+    - gateway.networking.k8s.io/v1beta1
   ignoreTypes:
+    - metav1.ObjectMeta
+    - metav1.TypeMeta
+    - metav1.ListMeta
+    # Exclude Kubernetes List resource types - they duplicate the main resource with just metadata + items
     - ".*List$"
 render:
   kubernetesVersion: ${KUBE_VERSION}
@@ -9,7 +17,7 @@ render:
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#quantity-resource-core
     - name: Duration
       package: k8s.io/apimachinery/pkg/apis/meta/v1
-      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#duration-v1-meta
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#Duration
     - name: Time
       package: k8s.io/apimachinery/pkg/apis/meta/v1
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#time-v1-meta
@@ -24,21 +32,21 @@ render:
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#listmeta-v1-meta
     - name: TypeMeta
       package: k8s.io/apimachinery/pkg/apis/meta/v1
-      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#typemeta-v1-meta
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/apis/meta/v1#TypeMeta
     
     # Gateway API types
     - name: BackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendref
     - name: BackendObjectReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.BackendObjectReference
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference
     - name: ParentReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
     - name: GRPCBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCBackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#grpcbackendref
     - name: HTTPBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPBackendRef
+      link: https://gateway-api.sigs.k8s.io/reference/spec/#httpbackendref

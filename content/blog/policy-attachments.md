@@ -89,7 +89,7 @@ The above is just one example of kgateway's [transformations](https://kgateway.d
 ## Creating new opportunities with policy extensions
 Policy attachments open up an exciting new world of possibilities to extend the Gateway API’s core capabilities with advanced traffic management, resiliency, security, and AI features that you can configure on a gateway or route, all while ensuring a common experience and easy adoption amongst users.
 
-You can get started and try out policies in kgateway in this free [hands-on lab](https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions). Alternatively check out this [demo video below](https://www.youtube.com/watch?v=NQSADVpcO8M) by Eitan Suez and follow along as he demostrates how kgateway extends the patterns within the Gateway API.
+You can get started and try out policies in kgateway in this free [hands-on lab](https://www.solo.io/resources/lab/understanding-kgateway-patterns-of-extensions). Alternatively check out this [demo video below](https://www.youtube.com/watch?v=NQSADVpcO8M) by Eitan Suez and follow along as he demonstrates how kgateway extends the patterns within the Gateway API.
 
 <br>
 {{< youtube NQSADVpcO8M >}}

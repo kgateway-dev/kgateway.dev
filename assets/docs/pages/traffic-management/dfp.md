@@ -1,9 +1,5 @@
 Dynamically resolve upstream hosts at request time.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About Dynamic Forward Proxy
 
 Dynamic Forward Proxy (DFP) is a filter in Envoy that allows a gateway proxy to act as a generic HTTP(S) forward proxy without the need to preconfigure all possible upstream hosts. Instead, the DFP dynamically resolves the upstream host at request time by using DNS. 

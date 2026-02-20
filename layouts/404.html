@@ -4,14 +4,31 @@
 {{ end }}
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found | kgateway</title>
+  {{- partial "custom/head-end.html" . -}}
+</head>
 
 <script>
     var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
+    var pathname = window.location.pathname;
     var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
     if (match) {
-        if (docsVersions.includes(match[1])) {
-            // match is a valid docs version, redirect to base docs page for that version
-            window.location.assign(window.location.origin + "/docs/" + match[1]);
+        var matchedPath = match[1];
+        // Skip redirect for section names (envoy, agentgateway)
+        if (matchedPath === "envoy" || matchedPath === "agentgateway") {
+            // Let the section-specific redirects handle these
+        } else if (matchedPath === "latest" && pathname.startsWith("/docs/latest/") && pathname.length > "/docs/latest/".length) {
+            // /docs/latest/... (with more path) should go to /docs/envoy/latest/... (handles case when _redirects didn't fire)
+            window.location.assign(window.location.origin + "/docs/envoy/latest/" + pathname.slice("/docs/latest/".length));
+        } else if (docsVersions.includes(matchedPath)) {
+            // /docs/{version} and /docs/{version}/ no longer exist; redirect to /docs/envoy/{version}
+            if (pathname === "/docs/" + matchedPath || pathname === "/docs/" + matchedPath + "/") {
+                var trailingSlash = pathname.endsWith("/") ? "/" : "";
+                window.location.assign(window.location.origin + "/docs/envoy/" + matchedPath + trailingSlash);
+            }
         } else {
             // match is not a valid docs version, insert `latest` after docs and retry
             window.location.assign(window.location.href.replace("/docs/", "/docs/latest/"));
@@ -20,7 +37,9 @@
 </script>
 
 <body
-    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; height:100vh; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center'>
+    style='font-family:system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"; margin: 0; padding-top: 100px;'>
+    {{- partial "nav.html" . -}}
+    <div style="height: calc(100vh - 100px); text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center;">
     <div>
         <style>
             body {
@@ -53,5 +72,4 @@
         </div>
     </div>
 </body>
-
 </html>

@@ -4,6 +4,7 @@ Review the following information about supported release versions for kgateway.
 
 | Kgateway | Release date | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
 |----------|--------------|------------|----------------|-------|------|----------|
+| 2.2.x | 09 Feb 2026 | 1.31 - 1.35 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.0.x | 01 Apr 2025 | 1.27 - 1.31 | 1.2.x | Proxy 1.33, API v3 | >= 3.12 | 1.18 - 1.23 |
 
@@ -65,7 +66,3 @@ Development releases are unstable, subject to change, and not recommended for pr
 ### Backports to stable branches {#release-backport}
 
 New features are not developed on or backported to stable branches, such as `v2.0.x`. However, critical patches, bug fixes, and documentation fixes are backported as needed.
-
-## Experimental features in Gateway API {#experimental-features}
-
-{{< reuse "docs/snippets/k8sgwapi-exp.md" >}}

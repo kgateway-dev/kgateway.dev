@@ -1,4 +1,4 @@
-1. Follow the [Get started guide](/docs/quickstart/) to install kgateway.
+1. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install kgateway.
 
 2. Follow the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
 
@@ -22,3 +22,11 @@
    ```shell
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
    ```
+
+{{< version include-if="2.2.x,2.3.x" >}}5. **Important**: To use experimental Gateway API features in kgateway, you must enable the `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES` environment variable in your kgateway controller deployment. This setting defaults to `false` and must be explicitly enabled. For example, if you installed kgateway via Helm, add the following to your Helm values and upgrade your installation.
+   
+   ```yaml
+   controller:
+     extraEnv:
+       KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
+   ```{{< /version >}}
