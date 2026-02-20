@@ -126,7 +126,7 @@ Note that this change does not impact the other delegation annotations:
 
 #### Deprecated support for AI Gateway and Inference Extension with Envoy
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/) instead.
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy]({{< link-hextra path="/ai/" >}}) instead.
 
 #### Fail open policy for ExtProc providers
 
