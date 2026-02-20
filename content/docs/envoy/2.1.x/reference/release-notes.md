@@ -30,7 +30,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 
 #### AI Backend API changes {#v21-ai-backend-api-changes}
 
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](https://agentgateway.dev/docs/kubernetes/latest/llm/) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](../api/#aibackend) and [AI guides](../../ai/) docs.
 
 Update your old configuration to the new API style as follows.
 
