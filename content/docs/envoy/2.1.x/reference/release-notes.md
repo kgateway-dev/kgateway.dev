@@ -181,7 +181,7 @@ Disabling policies can be applied to CORS, extAuth, extProc, and rate limit poli
 
 #### Agentgateway integration {#v21-agentgateway}
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](https://agentgateway.dev/docs/kubernetes/latest/).
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../ai/).
 
 #### Global policy attachment {#v21-global-policy-attachment}
 
