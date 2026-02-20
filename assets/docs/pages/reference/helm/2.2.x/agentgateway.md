@@ -53,7 +53,7 @@
 | image.registry | string | Set the default image registry. | `"cr.agentgateway.dev"` |
 | image.tag | string | Set the default image tag. | `""` |
 | imagePullSecrets | list | Set a list of image pull secrets for Kubernetes to use when pulling container images from your own private registry instead of the default agentgateway registry. | `[]` |
-| inferenceExtension | object | Configure the integration with the Gateway API Inference Extension project, which lets you use agentgateway to route to AI inference workloads like LLMs that run locally in your Kubernetes cluster. Documentation for Inference Extension can be found here: https://kgateway.dev/docs/latest/agentgateway/inference/ | `{"enabled":false}` |
+| inferenceExtension | object | Configure the integration with the Gateway API Inference Extension project, which lets you use agentgateway to route to AI inference workloads like LLMs that run locally in your Kubernetes cluster. Documentation for Inference Extension can be found here: https://agentgateway.dev/docs/kubernetes/latest/inference/ | `{"enabled":false}` |
 | inferenceExtension.enabled | bool | Enable Inference Extension support in the agentgateway controller. | `false` |
 | nameOverride | string | Add a name to the default Helm base release, which is 'agentgateway'. If you set 'nameOverride: "foo", the name of the resources that the Helm release creates become 'agentgateway-foo', such as the deployment, service, and service account for the agentgateway control plane in the agentgateway-system namespace. | `""` |
 | nodeSelector | object | Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'. | `{}` |

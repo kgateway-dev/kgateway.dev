@@ -2,7 +2,7 @@ Learn more about the components that make up the {{< reuse "/docs/snippets/kgate
 
 ## Component architecture
 
-The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}}control plane{{< /gloss >}} and {{< gloss "Data Plane" >}}data plane{{< /gloss >}}. These components work together to translate gateway custom resources into gateway {{< gloss "Proxy" >}}proxy{{< /gloss >}} configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps. 
+The following image shows the different components that make up the {{< reuse "/docs/snippets/kgateway.md" >}} {{< gloss "Control Plane" >}} control plane{{< /gloss >}} and {{< gloss "Data Plane" >}}data plane{{< /gloss >}}. These components work together to translate gateway custom resources into gateway {{< gloss "Proxy" >}}proxy{{< /gloss >}} configuration. The gateway proxy configuration controls the behavior of the gateway proxies that serve your apps. 
 
 {{< reuse-image src="img/gw-control-plane-components.svg" caption="Component architecture" >}}
 {{< reuse-image-dark srcDark="img/gw-control-plane-components-dark.svg" caption="Component architecture" >}}
