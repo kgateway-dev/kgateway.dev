@@ -212,7 +212,7 @@ Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that applies ra
 
 The {{< reuse "docs/snippets/trafficpolicy.md" >}} configures the descriptors that define the dimensions for rate limiting. Each descriptor consists of one or more entries that help categorize and count requests. The descriptor entries match on the descriptor keys that you defined previously in the Rate Limit Service.
 
-Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`, or `Generic`. You can combine different entry types so that they are applied together as a rate limit, such as `RemoteAddress` and `Generic` or `Header` and `Path`. The following table describes the different descriptor entry types. For more information, see the [API docs](../../reference/api/#ratelimitpolicy).
+Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`, or `Generic`. You can combine different entry types so that they are applied together as a rate limit, such as `RemoteAddress` and `Generic` or `Header` and `Path`. The following table describes the different descriptor entry types. For more information, see the [API docs](../../../reference/api/#ratelimit).
 
 | Type | Description | Additional Fields |
 |------|-------------|-------------------|
