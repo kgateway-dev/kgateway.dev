@@ -150,7 +150,7 @@ EOF
 ```
 
 #### 3. Deploy OTel Stack
-We only need the traces components. If you need other features (logs, metrics), please refer to: [OTel Stack](https://kgateway.dev/docs/observability/otel-stack/)
+We only need the traces components. If you need other features (logs, metrics), please refer to: [OTel Stack](https://kgateway.dev/docs/envoy/latest/observability/otel-stack/)
 
 Install Tempo:
 ```bash
