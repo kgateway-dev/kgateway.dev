@@ -502,15 +502,17 @@ _Appears in:_
 
 #### CELFilter
 
+_Underlying type:_ _struct_
+
 CELFilter filters requests based on Common Expression Language (CEL).
+
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `match` _[string](#string)_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true. see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  | Required |
+
+
 #### CSRFPolicy
 
 
@@ -623,20 +625,6 @@ _Appears in:_
 
 
 
-
-#### ComparisonFilter
-
-ComparisonFilter represents a filter based on a comparison.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
-
-
-_Appears in:_
-- [Various types](#various-types)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `op` _[Op](#op)_ |  |  | Required |
-| `value` _[int32](#int32)_ | Value to compare against. |  | Required <br />Minimum: 0 <br />Maximum: 4294967295 |
 
 #### Compression
 
@@ -1257,7 +1245,7 @@ _Appears in:_
 
 
 A GatewayParameters contains configuration that is used to dynamically
-provision kgateway's data plane (Envoy or agentgateway proxy instance), based on a
+provision kgateway's data plane (Envoy proxy instance), based on a
 Kubernetes Gateway.
 
 
@@ -1365,17 +1353,18 @@ _Appears in:_
 
 #### GrpcStatusFilter
 
+_Underlying type:_ _[struct{Statuses []GrpcStatus "json:\"statuses,omitempty\""; Exclude *bool "json:\"exclude,omitempty\""}](#struct{statuses-[]grpcstatus-"json:\"statuses,omitempty\"";-exclude-*bool-"json:\"exclude,omitempty\""})_
+
 GrpcStatusFilter filters gRPC requests based on their response status.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
+
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `statuses` _[GrpcStatus](#grpcstatus)_ array |  |  | Optional <br />MinItems: 1 |
-| `exclude` _[bool](#bool)_ |  |  | Optional <br />MinItems: 1 |
+
+
 #### HTTPListenerPolicy
 
 
@@ -1506,16 +1495,18 @@ _Appears in:_
 
 #### HeaderFilter
 
+_Underlying type:_ _struct_
+
 HeaderFilter filters requests based on headers.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
+
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  | Required |
+
+
 #### HeaderName
 
 _Underlying type:_ _string_
@@ -1531,16 +1522,17 @@ _Appears in:_
 
 #### HeaderSource
 
+_Underlying type:_ _struct_
+
 HeaderSource configures how to retrieve a JWT from a header
+
 
 
 _Appears in:_
 - [JWTTokenSource](#jwttokensource)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `header` _[string](#string)_ | Header is the name of the header. for example, "Authorization" |  | Required <br />MinLength: 1 <br />MaxLength: 2048 |
-| `prefix` _[string](#string)_ | Prefix before the token. for example, "Bearer " |  | Required <br />Optional <br />MinLength: 1 <br />MaxLength: 2048 |
+
+
 #### HeaderTransformation
 
 
@@ -1560,8 +1552,11 @@ _Appears in:_
 
 #### HeaderValue
 
+_Underlying type:_ _struct_
+
 Header name/value pair.
 Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-headervalue
+
 
 
 _Appears in:_
@@ -1569,10 +1564,8 @@ _Appears in:_
 - [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
 - [CommonGrpcService](#commongrpcservice)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `key` _[string](#string)_ | Header name. |  | Required |
-| `value` _[string](#string)_ | Header value. |  | Required <br />Optional |
+
+
 #### HealthCheck
 
 
@@ -1886,19 +1879,6 @@ _Appears in:_
 
 
 
-
-#### KeyAnyValue
-
-KeyValue is a key-value pair that is used to store Span attributes, Link attributes, etc.
-
-
-_Appears in:_
-- [Various types](#various-types)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `key` _[string](#string)_ | Attribute keys must be unique |  | Required |
-| `value` _[AnyValue](#anyvalue)_ | Value may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. |  | Required |
 
 #### KubernetesProxyConfig
 
@@ -2265,18 +2245,6 @@ _Appears in:_
 
 
 
-
-#### MetadataPathSegment
-
-Specifies a segment in a path for retrieving values from Metadata.
-
-
-_Appears in:_
-- [Various types](#various-types)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `key` _[string](#string)_ | The key used to retrieve the value in the struct |  | Required |
 
 #### NamedJWTProvider
 
@@ -2682,19 +2650,6 @@ _Appears in:_
 
 
 
-#### RateLimitDescriptorEntryGeneric
-
-RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
-
-
-_Appears in:_
-- [Various types](#various-types)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `key` _[string](#string)_ | Key is the name of this descriptor entry. |  | Required <br />MinLength: 1 |
-| `value` _[string](#string)_ | Value is the static value for this descriptor entry. |  | Required <br />MinLength: 1 |
-
 #### RateLimitDescriptorEntryType
 
 _Underlying type:_ _string_
@@ -2822,16 +2777,18 @@ _Appears in:_
 
 #### ResponseFlagFilter
 
+_Underlying type:_ _[struct{Flags []string "json:\"flags\""}](#struct{flags-[]string-"json:\"flags\""})_
+
 ResponseFlagFilter filters based on response flags.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
+
 
 
 _Appears in:_
 - [FilterType](#filtertype)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `flags` _[string](#string)_ array |  |  | Required <br />MinItems: 1 |
+
+
 #### Retry
 
 
@@ -2848,7 +2805,7 @@ _Appears in:_
 | `retryOn` _[RetryOnCondition](#retryoncondition) array_ | RetryOn specifies the conditions under which a retry should be attempted. |  | Enum: [5xx gateway-error reset reset-before-request connect-failure envoy-ratelimited retriable-4xx refused-stream retriable-status-codes http3-post-connect-failure cancelled deadline-exceeded internal resource-exhausted unavailable] <br />MinItems: 1 <br /> |
 | `attempts` _integer_ | Attempts specifies the number of retry attempts for a request.<br />Defaults to 1 attempt if not set.<br />A value of 0 effectively disables retries. | 1 | Minimum: 0 <br /> |
 | `perTryTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | PerTryTimeout specifies the timeout per retry attempt (incliding the initial attempt).<br />If a global timeout is configured on a route, this timeout must be less than the global<br />route timeout.<br />It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms". |  |  |
-| `statusCodes` _[HTTPRouteRetryStatusCode](#httprouteretrystatuscode) array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | Maximum: 599 <br />MinItems: 1 <br />Minimum: 400 <br /> |
+| `statusCodes` _HTTPRouteRetryStatusCode array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | MinItems: 1 <br /> |
 | `backoffBaseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BackoffBaseInterval specifies the base interval used with a fully jittered exponential back-off between retries.<br />Defaults to 25ms if not set.<br />Given a backoff base interval B and retry number N, the back-off for the retry is in the range [0, (2^N-1)*B].<br />The backoff interval is capped at a max of 10 times the base interval.<br />E.g., given a value of 25ms, the first retry will be delayed randomly by 0-24ms, the 2nd by 0-74ms,<br />the 3rd by 0-174ms, and so on, and capped to a max of 10 times the base interval (250ms). | 25ms |  |
 
 
@@ -2885,8 +2842,11 @@ _Appears in:_
 
 #### RetryPolicy
 
+_Underlying type:_ _struct_
+
 Specifies the retry policy of remote data source when fetching fails.
 Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
+
 
 
 _Appears in:_
@@ -2894,10 +2854,8 @@ _Appears in:_
 - [CommonAccessLogGrpcService](#commonaccessloggrpcservice)
 - [CommonGrpcService](#commongrpcservice)
 
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `retryBackOff` _[BackoffStrategy](#backoffstrategy)_ | Specifies parameters that control retry backoff strategy. the default base interval is 1000 milliseconds and the default maximum interval is 10 times the base interval. |  | Optional |
-| `numRetries` _[int32](#int32)_ | Specifies the allowed number of retries. Defaults to 1. |  | Optional <br />Minimum: 1 |
+
+
 #### Sampler
 
 
@@ -3488,3 +3446,166 @@ _Appears in:_
 | `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
+
+## Shared Types
+
+The following types are defined in the shared package and used across multiple APIs.
+
+#### AlwaysOnConfig
+
+AlwaysOnConfig specified the AlwaysOn samplerc
+
+#### AnyValue
+
+AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. This is limited to string and nested values as OTel only supports them
+
+**Validation:**
+- MaxProperties=1
+- MinProperties=1
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `stringValue` | *string |  |
+| `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
+| `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### ComparisonFilter
+
+ComparisonFilter represents a filter based on a comparison. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `op` | [Op](#op) | **Required.** |
+| `value` | int32 | Value to compare against. **Required.** |
+
+#### EnvironmentResourceDetectorConfig
+
+EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
+
+#### HeaderModifiers
+
+HeaderModifiers can be used to define the policy to modify request and response headers.
+
+**Validation:**
+- AtLeastOneOf=request;response
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `request` | *gwv1.HTTPHeaderFilter | Request modifies request headers. |
+| `response` | *gwv1.HTTPHeaderFilter | Response modifies response headers. |
+
+#### KeyAnyValue
+
+KeyValue is a key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Attribute keys must be unique **Required.** |
+| `value` | [AnyValue](#anyvalue) | Value may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. **Required.** |
+
+#### KeyAnyValueList
+
+A list of key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `values` | [][KeyAnyValue](#keyanyvalue) | A collection of key/value pairs of key-value pairs. |
+
+#### KubernetesResourceOverlay
+
+KubernetesResourceOverlay provides a mechanism to customize generated Kubernetes resources using [Strategic Merge Patch](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md) semantics.  # Overlay Application Order  Overlays are applied **after** all typed configuration fields have been processed. The full merge order is:  1. GatewayClass typed configuration fields (e.g., replicas, image settings from parametersRef) 2. Gateway typed configuration fields (from infrastructure.parametersRef) 3. GatewayClass overlays are applied 4. Gateway overlays are applied  This ordering means Gateway-level configuration overrides GatewayClass-level configuration at each stage. For example, if both levels set the same label, the Gateway value wins.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `metadata` | *[ObjectMetadata](#objectmetadata) | metadata defines a subset of object metadata to be customized. Labels and annotations are merged with existing values. If both GatewayClass and Gateway parameters define the same label or annotation key, the Gateway value takes precedence (applied second). |
+| `spec` | *apiextensionsv1.JSON | Spec provides an opaque mechanism to configure the resource Spec. This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec) and will be merged with the generated configuration using **Strategic Merge Patch** semantics.  # Application Order  Overlays are applied after all typed configuration fields from both levels. The full merge order is:  1. GatewayClass typed configuration fields 2. Gateway typed configuration fields 3. GatewayClass overlays 4. Gateway overlays (can override all previous values)  # Strategic Merge Patch & Deletion Guide  This merge strategy allows you to override individual fields, merge lists, or delete items without needing to provide the entire resource definition.  **1. Replacing Values (Scalars):** Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.  **2. Merging Lists (Append/Merge):** Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`) will append your items to the generated list, or update existing items if keys match.  **3. Deleting Fields or List Items ($patch: delete):** To remove a field or list item from the generated resource, use the `$patch: delete` directive. This works for both map fields and list items, and is the recommended approach because it works with both client-side and server-side apply.  spec: template: spec: # Delete pod-level securityContext securityContext: $patch: delete # Delete nodeSelector nodeSelector: $patch: delete containers: # Be sure to use the correct proxy name here or you will add a container instead of modifying a container: - name: proxy-name # Delete container-level securityContext securityContext: $patch: delete  **4. Null Values (server-side apply only):** Setting a field to `null` can also remove it, but this ONLY works with `kubectl apply --server-side` or equivalent. With regular client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server, so the deletion won't occur. Prefer `$patch: delete` for consistent behavior across both apply modes.  spec: template: spec: nodeSelector: null  # Removes nodeSelector (server-side apply only!)  **5. Replacing Maps Entirely ($patch: replace):** To replace an entire map with your values (instead of merging), use `$patch: replace`. This removes all existing keys and replaces them with only your specified keys.  spec: template: spec: nodeSelector: $patch: replace custom-key: custom-value  **6. Replacing Lists Entirely ($patch: replace):** If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.  service: spec: ports: - $patch: replace - name: http port: 80 targetPort: 8080 protocol: TCP - name: https port: 443 targetPort: 8443 protocol: TCP  |
+
+#### LocalPolicyTargetReference
+
+Select the object to attach the policy by Group, Kind, and Name. The object must be in the same namespace as the policy. You can target only one object at a time.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+
+#### LocalPolicyTargetSelector
+
+LocalPolicyTargetSelector selects the object to attach the policy by Group, Kind, and MatchLabels. The object must be in the same namespace as the policy and match the specified labels. Do not use targetSelectors when reconciliation times are critical, especially if you have a large number of policies that target the same resource. Instead, use targetRefs to attach the policy.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `matchLabels` | map[string]string | Label selector to select the target resource. **Required.** |
+
+#### MetadataPathSegment
+
+Specifies a segment in a path for retrieving values from Metadata.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | The key used to retrieve the value in the struct **Required.** |
+
+#### NamespacedObjectReference
+
+Select the object by Name and Namespace. You can target only one object at a time.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+| `namespace` | *gwv1.Namespace | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
+
+#### ObjectMetadata
+
+ObjectMetadata contains labels and annotations for metadata overlays.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `labels` | map[string]string | Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels |
+| `annotations` | map[string]string | Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations |
+
+#### Op
+
+_Underlying type:_ _string_
+
+Op represents comparison operators.
+
+**Validation:**
+- Enum=EQ;GE;LE
+
+#### PolicyAncestorStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
+| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+
+#### PolicyDisable
+
+PolicyDisable is used to disable a policy.
+
+#### PolicyStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conditions` | []metav1.Condition |  |
+| `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
+
+#### RateLimitDescriptorEntryGeneric
+
+RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Key is the name of this descriptor entry. **Required.** |
+| `value` | string | Value is the static value for this descriptor entry. **Required.** |
+
+#### Timeouts
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `request` | *metav1.Duration | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
+| `streamIdle` | *metav1.Duration | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
