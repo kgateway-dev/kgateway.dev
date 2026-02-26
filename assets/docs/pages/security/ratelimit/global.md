@@ -71,7 +71,7 @@ When rate limiting is enabled, {{< reuse "docs/snippets/kgateway.md" >}} adds th
 
 You can bring your own rate limit service that implements the Envoy Rate Limit gRPC protocol. 
 
-To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/tree/main/test/kubernetes/e2e/features/rate_limit/testdata).
+To get started, you can try out a demo rate limit service from the kgateway project. For more information, see the [GitHub repo](https://github.com/kgateway-dev/kgateway/tree/main/test/e2e/features/rate_limit/global/testdata).
 
 1. Create the `kgateway-test-extensions` namespace.
 

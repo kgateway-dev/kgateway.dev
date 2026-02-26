@@ -64,7 +64,7 @@ Traditionally an ingress primarily handles routing and aggregation, with Kuberne
 
 The {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} is a common, extensible standard for traffic management in Kubernetes. It is quickly becoming the standard interface for defining routing and policy for cloud native networking, addressing many shortcomings of its predecessor, the Ingress API, and unifying best practices that have evolved through real-world usage.
 
-[Learn about the history of the Gateway API](/blog/introduction-to-kubernetes-gateway-api/), or [watch our in-depth video series](/resources/videos/).
+[Learn about the history of the Gateway API](https://kgateway.dev/blog/introduction-to-kubernetes-gateway-api/), or [watch our in-depth video series](https://kgateway.dev/resources/videos/).
 
 Kgateway is fully conformant with the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} and extends its functionality with custom extension APIs, such as TrafficPolicies, ListenerPolicies, and Backends. These custom resources help to centrally configure advanced traffic management, security, and resiliency rules for an HTTPRoute or Gateway listener.
 
