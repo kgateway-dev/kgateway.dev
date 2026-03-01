@@ -1,0 +1,66 @@
+name: Deploy PR Preview
+
+on:
+  workflow_run:
+    workflows: ["Build PR Preview"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: preview-build
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get PR Metadata
+        id: metadata
+        run: |
+          if [ ! -f metadata.txt ]; then
+            echo "Error: metadata.txt not found in artifact"
+            exit 1
+          fi
+          source metadata.txt
+          if [ -z "$PR_NUMBER" ] || [ -z "$HEAD_SHA" ]; then
+            echo "Error: PR_NUMBER or HEAD_SHA not set in metadata.txt"
+            exit 1
+          fi
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "head_sha=$HEAD_SHA" >> $GITHUB_OUTPUT
+          echo "Deploying PR #$PR_NUMBER from commit $HEAD_SHA"
+
+      - name: Deploy to Cloudflare Pages
+        id: cloudflare
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ secrets.CLOUDFLARE_PROJECT_NAME }}
+          directory: './public'
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: "pr-${{ steps.metadata.outputs.pr_number }}"
+
+      - name: Comment on PR
+        uses: mshick/add-pr-comment@v2
+        with:
+          issue: ${{ steps.metadata.outputs.pr_number }}
+          message: |
+            ## 🔍 Deploy Preview Ready!
+            
+            | Name | Link |
+            |------|------|
+            | 🔍 **Preview** | ${{ steps.cloudflare.outputs.url }} |
+            | 📝 **Commit** | ${{ steps.metadata.outputs.head_sha }} |
+            
+            > **Note:** This preview will be automatically updated when you push new commits.
+          allow-repeats: false
