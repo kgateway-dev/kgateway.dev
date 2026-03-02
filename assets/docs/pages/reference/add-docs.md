@@ -70,7 +70,7 @@ If you want to add a folder or "twistie" to the left-hand navigation of the docs
 
 ## Hugo shortcodes {#shortcodes}
 
-As mentioned earlier, the documentation in the kgateway project is built by using the static site generator Hugo. Hugo uses reusable templates, commonly referred to as shortcodes, to display, style, and render site elements, such as tables, videos, or cards and to manage the content for these elements more easily. Supported shortcodes can be found in the [kgateway project repo](https://github.com/kgateway-dev/kgateway.dev/tree/main/layouts/shortcodes) as well as the [Hextra Hugo theme](https://github.com/imfing/hextra/tree/main/exampleSite/content/docs/guide/shortcodes). 
+As mentioned earlier, the documentation in the kgateway project is built by using the static site generator Hugo. Hugo uses reusable templates, commonly referred to as shortcodes, to display, style, and render site elements, such as tables, videos, or cards and to manage the content for these elements more easily. Supported shortcodes can be found in the [kgateway project repo](https://github.com/kgateway-dev/kgateway.dev/tree/main/layouts/shortcodes) as well as the [Hextra Hugo theme](https://github.com/imfing/hextra/tree/main/layouts/_shortcodes). 
 
 Review common shortcodes that you find throughout the documentation: 
 

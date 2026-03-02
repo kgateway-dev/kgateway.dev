@@ -183,7 +183,7 @@ spec:
 ```
 
 ## Extend core capabilities with the ExtensionRef filter
-The `ExtensionRef` filter allows implementers of the Kubernetes Gateway API to plug in their custom filters which opens up an exciting world of new opportunities. One example of such a custom filter is kgateway’s [DirectResponse API](https://kgateway.dev/docs/traffic-management/direct-response/). This API allows you to directly respond to incoming requests with a pre-defined body and HTTP status code. Requests are therefore not forwarded to the backend service. Direct responses can be useful in cases where you want to simulate responses from a backend service for testing purposes or in cases where sending back a static response is sufficient. 
+The `ExtensionRef` filter allows implementers of the Kubernetes Gateway API to plug in their custom filters which opens up an exciting world of new opportunities. One example of such a custom filter is kgateway’s [DirectResponse API](https://kgateway.dev/docs/envoy/latest/traffic-management/direct-response/). This API allows you to directly respond to incoming requests with a pre-defined body and HTTP status code. Requests are therefore not forwarded to the backend service. Direct responses can be useful in cases where you want to simulate responses from a backend service for testing purposes or in cases where sending back a static response is sufficient. 
 
 Below is a DirectResponse resource that sends back a 404 HTTP response code with a custom message indicating that using the `/direct-response` path is not allowed. 
 
@@ -311,7 +311,7 @@ spec:
       weight: 80
 ```
 ## Explore kgateway’s Backend API
-As we saw earlier, a backend is typically represented by a Kubernetes service in your cluster. However, you can also leverage [kgateway’s Backend API](https://kgateway.dev/docs/traffic-management/destination-types/backends/) to route traffic to an external endpoint, such as an AWS Lambda function or a static hostname.
+As we saw earlier, a backend is typically represented by a Kubernetes service in your cluster. However, you can also leverage [kgateway’s Backend API](https://kgateway.dev/docs/envoy/latest/traffic-management/destination-types/backends/) to route traffic to an external endpoint, such as an AWS Lambda function or a static hostname.
 
 Each Backend must define a type, which describes the endpoint you want to send traffic to. Below you find an example for an `aws` Backend that configures an AWS Lambda function. As you can see, you simply specify the region, name of the function, and credentials to access it. 
 
