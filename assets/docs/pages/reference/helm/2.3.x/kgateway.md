@@ -65,6 +65,7 @@
 | serviceAccount.create | bool | Specify whether a service account should be created. | `true` |
 | serviceAccount.name | string | Set the name of the service account to use. If not set and create is true, a name is generated using the fullname template. | `""` |
 | tolerations | list | Set tolerations for pod scheduling, such as 'key: "nvidia.com/gpu"'. | `[]` |
+| topologySpreadConstraints | list | Set topology spread constraints for pod scheduling. E.g.: topologySpreadConstraints:   - maxSkew: 1     topologyKey: topology.kubernetes.io/zone     whenUnsatisfiable: DoNotSchedule     labelSelector:       matchLabels:         app.kubernetes.io/name: kgateway | `[]` |
 | validation | object | Configure validation behavior for route and policy safety checks in the control plane.    This setting determines how invalid configuration is handled to prevent security bypasses    and to maintain multi-tenant isolation. | `{"level":"standard"}` |
 | validation.level | string | Validation level. Accepted values: "standard" or "strict" (case-insensitive).    Standard replaces invalid routes with a direct 500 response and continues applying valid configuration.    Strict adds xDS preflight validation and blocks snapshots that would NACK in Envoy.    Default is "standard". | `"standard"` |
 | waypoint | object | Enable the waypoint integration. This enables kgateway to translate istio waypoints and use kgateway as a waypoint in an Istio Ambient service mesh setup. | `{"enabled":false}` |
