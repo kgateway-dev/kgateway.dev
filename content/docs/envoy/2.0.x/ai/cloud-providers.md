@@ -24,7 +24,7 @@ The following sections in this guide provide examples that are tailored to the s
 
 ## OpenAI {#openai}
 
-OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com/) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
+OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
 
 To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
