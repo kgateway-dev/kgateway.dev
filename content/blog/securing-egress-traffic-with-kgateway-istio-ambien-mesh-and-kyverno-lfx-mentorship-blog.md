@@ -1,5 +1,5 @@
 ---
-title: "Securing Egress Traffic with kgateway, Istio Ambient Mesh, and Kyverno: LFX Mentorship Blog"
+title: "Securing Egress Traffic with kgateway, Istio Ambient Mesh, and Kyverno: LFX Mentorship Blog" 
 toc: 
 author: Aryan Parashar
 excludeSearch: 
