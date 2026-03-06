@@ -29,6 +29,9 @@
          location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.8.0/gatewayapi-plugin-amd64"
    EOF
    ```
+  {{< callout type="info" >}}
+  This configuration is only an example. Ensure you use the correct plugin binary for your platform (arm64 or amd64). Replace the tab before the # see https://... comment line with spaces. Otherwise, the YAML may fail when applying it with kubectl.
+  {{< /callout >}}
 
 3. Restart the Argo Rollouts pod to pick up the latest configuration changes. 
    ```sh
@@ -208,6 +211,7 @@
       <div class='pod' style='background:#44B3C2'> ver: 1.0
       </div>%
       ```
+      {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    3. Port-forward the `http` pod on port 8080. 
@@ -225,7 +229,7 @@
       <div class='pod' style='background:#44B3C2'> ver: 1.0
       </div>%
       ```
-
+      {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
@@ -260,6 +264,8 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
+   {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    ```sh
@@ -283,6 +289,8 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
+   {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
