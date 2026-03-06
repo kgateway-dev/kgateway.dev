@@ -208,6 +208,7 @@
       <div class='pod' style='background:#44B3C2'> ver: 1.0
       </div>%
       ```
+      {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    3. Port-forward the `http` pod on port 8080. 
@@ -225,7 +226,7 @@
       <div class='pod' style='background:#44B3C2'> ver: 1.0
       </div>%
       ```
-
+      {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
@@ -260,6 +261,8 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
+   {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    ```sh
@@ -283,6 +286,8 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
+   {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image src="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
