@@ -29,7 +29,7 @@
          location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.8.0/gatewayapi-plugin-amd64"
    EOF
    ```
-     {{< callout type="info" >}}
+  {{< callout type="info" >}}
   This configuration is only an example. Ensure you use the correct plugin binary for your platform (arm64 or amd64). Replace the tab before the # see https://... comment line with spaces. Otherwise, the YAML may fail when applying it with kubectl.
   {{< /callout >}}
 
