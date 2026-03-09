@@ -28,10 +28,10 @@ In larger environments or environments where you have both high traffic and low 
 
 All gateway proxies are managed by the {{< reuse "/docs/snippets/kgateway.md" >}} control plane. However, one gateway proxy manages traffic for the workloads in the `foo` and `bar` namespaces. The second gateway proxy is a dedicated API gateway for the workloads in the `extra` namespace. Both gateway proxies are exposed directly on the edge. 
 
-While this setup is great to split up and load balance traffic across apps, you might not want the gateway proxies to be exposed directly on the edge. Instead, you might want a central ingress gateway proxy that applies common traffic management, resiliency, and security rules, and that forwards traffic to other gateway proxies that are dedicated to certain apps, teams, or namespaces. To learn more about this deployment pattern, see [Sharded gateway with central ingress](#sharded-gatway-with-central-ingress). 
+While this setup is great to split up and load balance traffic across apps, you might not want the gateway proxies to be exposed directly on the edge. Instead, you might want a central ingress gateway proxy that applies common traffic management, resiliency, and security rules, and that forwards traffic to other gateway proxies that are dedicated to certain apps, teams, or namespaces. To learn more about this deployment pattern, see [Sharded gateway with central ingress](#sharded-gateway-with-central-ingress). 
 
 
-### Sharded gateway with central ingress {#sharded-gatway-with-central-ingress}
+### Sharded gateway with central ingress {#sharded-gateway-with-central-ingress}
 
 The following image shows a gateway proxy that serves as the main ingress endpoint for all traffic. The gateway proxy can be configured to apply common traffic management, resiliency, and security rules to all traffic that enters the cluster. For example, you can set header manipulation policies on that gateway before you forward traffic to a second layer of gateway proxies. This is useful if you need a central IP address and DNS name for the gateway that serves all your traffic. 
 
