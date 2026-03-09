@@ -21,7 +21,7 @@
   {{- if and (ge (len $segments) 4) (eq (index $segments 1) "docs") -}}
     {{- $section = index $segments 2 -}}
     {{- $versionCandidate := index $segments 3 -}}
-    {{- if or (eq $versionCandidate "2.0.x") (eq $versionCandidate "latest") (eq $versionCandidate "main") -}}
+    {{- if or (eq $versionCandidate "2.0.x") (eq $versionCandidate "2.1.x") (eq $versionCandidate "latest") (eq $versionCandidate "main") -}}
       {{- $currentVersion = $versionCandidate -}}
       {{- $isVersionedDocs = true -}}
     {{- end -}}
