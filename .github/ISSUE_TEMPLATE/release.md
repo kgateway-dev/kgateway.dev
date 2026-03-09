@@ -16,6 +16,7 @@ assignees: ''
 - [ ] In `content/docs`, create the new `main` by making a copy of the current main directory. Rename the directories appropriately. For example, the old main is copied to a new `main`, the old main becomes `latest`, and the old latest becomes a `2.x.x` version.
 - [ ] In the `hugo.yaml` file, update the `versions` to include the new minor version as main, the previous main as latest, and the previous latest as its version.
 - [ ] In the `versions.json` file, update the `versions` to include the new minor version as main, the previous main as latest, and the previous latest as its version.
+- [ ] Update the `layouts/partials/sidebar.html` partial so that the versions render in the sidebar, as well as check for any other layouts that might have hardcoded versions.
 - [ ] Retire any version older than `n-3` (remove the directory and version from the `hugo.yaml` file)
 - [ ] Update the version conrefs in the `assets/docs/versions` directory. Often, there is not a release for the next version, so you might have to use the same for latest and main.
 - [ ] Add the release date to the version table in `assets/docs/pages/reference/versions.md`, and remove any retired versions.
