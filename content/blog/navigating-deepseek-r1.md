@@ -6,7 +6,7 @@ author: Christian Posta
 excludeSearch: true
 ---
 
-DeepSeek R1 is a new model from Chinese startup DeepSeek released on January 20th with impressive reasoning ability which rivals (or beats) the existing leading reasoning models (ie, o1 from OpenAI). It is available from a few different providers but from my perspective, the most interesting thing is that it's open source and is available in distilled form with similar performance (ie, distilled to Qwen or Llama models, which can be self-hosted).
+DeepSeek R1 is a new model from Chinese startup DeepSeek released on January 20 with impressive reasoning ability which rivals (or beats) the existing leading reasoning models (ie, o1 from OpenAI). It is available from a few different providers but from my perspective, the most interesting thing is that it's open source and is available in distilled form with similar performance (ie, distilled to Qwen or Llama models, which can be self-hosted).
 
 One question we see (from our users as well as the broader public) is "is DeepSeek safe?". Sure, DeepSeek is hosted by a Chinese company, so most organizations (and the country) may have some questions about that, but the real concern is about your data, what happens to it, what should be sent or not sent. And in that case, it doesn't matter if it's DeepSeek or any other public LLM provider. As an enterprise organization, you have to be careful what you do with your sensitive data. You need tight control and audit trails for your data or risk significant harm to your company with slip ups.
 

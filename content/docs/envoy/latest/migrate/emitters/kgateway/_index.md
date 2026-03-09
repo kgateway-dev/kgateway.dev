@@ -32,7 +32,7 @@ This command:
 
 | Flag           | Default Value           | Required | Description                                                  |
 | -------------- | ----------------------- | -------- | ------------------------------------------------------------ |
-| all-namespaces | False                   | No       | If present, list the requested object(s) across all namespaces. Namespace in the current context is ignored even if specified with --namespace. |
+| all-namespaces | False                   | No       | If present, list the requested objects across all namespaces. Namespace in the current context is ignored even if specified with --namespace. |
 | input-file     |                         | No       | Path to the manifest file. When set, the tool reads ingresses from the file instead of from the cluster. Supported files are yaml and json. |
 | namespace      |                         | No       | If present, the namespace scope for the invocation.           |
 | output         | yaml                    | No       | The output format, either yaml or json.                       |

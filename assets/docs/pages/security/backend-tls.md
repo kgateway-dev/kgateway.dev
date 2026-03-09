@@ -32,7 +32,7 @@ Deploy an NGINX server in your cluster that is configured for TLS traffic. Then,
 
 ### Deploy the sample app
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/e2e/features/backendtls/testdata/nginx.yaml).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
