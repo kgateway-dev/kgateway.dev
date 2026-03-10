@@ -2835,7 +2835,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `environmentResourceDetector` _[EnvironmentResourceDetectorConfig](#environmentresourcedetectorconfig)_ |  |  |  |
+| `environmentResourceDetector` _[EnvironmentResourceDetectorConfig](#environmentresourcedetectorconfig)_ | EnvironmentResourceDetector sets OpenTelemetry resource attributes from the OTEL_RESOURCE_ATTRIBUTES<br />environment variable in the Envoy container.<br />Default enabled if not set. If multiple are set, the last will take precedence. |  |  |
 
 
 #### ResponseCompression
@@ -3560,7 +3560,11 @@ ComparisonFilter represents a filter based on a comparison. Based on: https://ww
 
 #### EnvironmentResourceDetectorConfig
 
-EnvironmentResourceDetectorConfig specified the EnvironmentResourceDetector
+EnvironmentResourceDetectorConfig specifies the EnvironmentResourceDetector configuration.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `enable` | *bool | Enable controls whether the EnvironmentResourceDetector is used. |
 
 #### HeaderModifiers
 
