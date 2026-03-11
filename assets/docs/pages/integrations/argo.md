@@ -231,6 +231,7 @@
       </div>%
       ```
       {{< reuse-image src="img/test-application-ver1.png" >}}
+      {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
@@ -266,7 +267,9 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
    {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image-dark srcDark="img/test-application-ver2.png" >}}
    {{< reuse-image src="img/test-application-ver1.png" >}}
+   {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    ```sh
@@ -291,7 +294,9 @@
    </div><div class='pod' style='background:#F1A94E'> ver: 2.0
    ```
    {{< reuse-image src="img/test-application-ver2.png" >}}
+   {{< reuse-image-dark srcDark="img/test-application-ver2.png" >}}
    {{< reuse-image src="img/test-application-ver1.png" >}}
+   {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{< /tabs >}}
 
