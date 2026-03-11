@@ -212,6 +212,7 @@
       </div>%
       ```
       {{< reuse-image src="img/test-application-ver1.png" >}}
+      {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
    {{% tab  %}}
    3. Port-forward the `http` pod on port 8080. 
