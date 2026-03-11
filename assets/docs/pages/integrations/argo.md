@@ -30,7 +30,7 @@
    EOF
    ```
   {{< callout type="info" >}}
-  This configuration is only an example. Ensure you use the correct plugin binary for your platform (arm64 or amd64). Replace the tab before the # see https://... comment line with spaces. Otherwise, the YAML may fail when applying it with kubectl.
+  This configuration is only an example. Ensure you use the correct plugin binary for your platform, such as arm64 or amd64. Replace the tab before the `# see https://...` comment line with spaces. Otherwise, the YAML might fail when applying it with kubectl.
   {{< /callout >}}
 
 3. Restart the Argo Rollouts pod to pick up the latest configuration changes. 
