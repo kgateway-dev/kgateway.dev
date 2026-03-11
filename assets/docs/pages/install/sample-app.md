@@ -96,7 +96,7 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    
    ```txt
    NAME                  READY   STATUS    RESTARTS   AGE
-   http-7dd94b74-k26j6   3/3     Running   0          18s
+   http-7dd94b74-k26j6   1/1     Running   0          18s
    ```
 
    {{< callout type="info" >}}
