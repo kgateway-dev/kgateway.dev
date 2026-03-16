@@ -120,6 +120,13 @@ helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/s
    kubectl get gatewayclass {{< reuse "/docs/snippets/gatewayclass.md" >}}
    ```
 
+   Example output: 
+   
+   ```txt
+   NAME         CONTROLLER               ACCEPTED   AGE   
+   {{< reuse "/docs/snippets/gatewayclass.md" >}}     kgateway.dev/{{< reuse "/docs/snippets/gatewayclass.md" >}}    True       6m36s
+   ```
+
 ## Next steps
 
 
