@@ -32,7 +32,7 @@
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="arm64" %}}
+   {{% tab tabName="Linux arm64" %}}
    ```yaml
    cat <<EOF | kubectl apply -f -
    apiVersion: v1
