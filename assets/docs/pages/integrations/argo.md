@@ -52,7 +52,7 @@
    {{% /tab %}}
    {{< /tabs >}}
   {{< callout type="info" >}}
-  This configuration is only an example. Ensure you use the correct plugin binary for your platform, such as amd64 or arm64.
+  This configuration is only an example. Ensure you use the correct plugin binary for your platform, such as amd64 or arm64. For more platform and version options, refer to the [releases of the Argo rollouts traffic router plugin for the Gateway API](https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases).
   {{< /callout >}}
 
 3. Restart the Argo Rollouts pod to pick up the latest configuration changes. 
