@@ -43,7 +43,7 @@
    data:
      trafficRouterPlugins: |-
        - name: "argoproj-labs/gatewayAPI"
-	     # example uses arm64 and v0.8.0
+	     # example uses arm64 and v0.11.0
 	     # for other builds and versions,
 	     # see https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases
          location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-arm64"
