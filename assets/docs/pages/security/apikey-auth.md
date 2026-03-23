@@ -78,10 +78,10 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
 3. Verify that the secret is created. Note that the `data.api-key` value is base64 encoded. 
    
    ```sh
-   kubectl get secret apikey -n {{< reuse "docs/snippets/namespace.md" >}} -oyaml
+   kubectl get secret apikey -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
-4. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The following example uses the `Strict` validation mode, which requires request to include a valid `Authorization` header to be authenticated successfully. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
+4. Create an {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The following example uses the `Strict` validation mode, which requires requests to include a valid `Authorization` header to be authenticated successfully. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -255,7 +255,7 @@ EOF
 
 Configure multiple key sources. The gateway proxy checks them in order. If you define different types of key sources, the precedence is determined as follows: 
 * Header key sources take precedence over query parameter
-* Quey parameter key sources take precedence over cookie key sources
+* Query parameter key sources take precedence over cookie key sources
 
 ```yaml
 kubectl apply -f- <<EOF

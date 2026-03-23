@@ -65,9 +65,10 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 Kgateway uses the following custom resources to attach policies to routes and gateway listeners: 
 
-* [**DirectResponse**]({{< link-hextra path="/traffic-management/direct-response/" >}}): Directly respond to incoming requests with a custom HTTP response code and body.
-* [**HTTPListenerPolicy**]({{< link-hextra path="/about/policies/httplistenerpolicy/" >}}): Apply policies to all HTTP and HTTPS listeners.
+* [**DirectResponse**]({{< link-hextra path="/traffic-management/direct-response/" >}}): Directly respond to incoming requests with a custom HTTP response code and body. 
 * [**TrafficPolicy**]({{< link-hextra path="/about/policies/trafficpolicy/" >}}): Attach policies to routes in an HTTPRoute resource.
+
+* {{< version include-if="2.1.x,2.0.x" >}}[**HTTPListenerPolicy**]({{< link-hextra path="/about/policies/httplistenerpolicy/" >}}){{< /version >}}{{< version include-if="2.2.x,2.3.x" >}}[**ListenerPolicy**]({{< link-hextra path="/about/policies/listenerpolicy/" >}}){{< /version >}}: Apply policies to all HTTP and HTTPS listeners. 
 
 ### {{< reuse "docs/snippets/backend.md" >}}s
 
