@@ -10,7 +10,7 @@ Use sentence case for any content that you add. Sentence case means to capitaliz
 
 | Do ✅ | Don't ❌ | 
 | -- | -- | 
-| Use the HTTPS protocol to send traffic. | Use the https protcol to send traffic. 
+| Use the HTTPS protocol to send traffic. | Use the https protocol to send traffic. 
 | Configure external authentication. | Configure External Authentication. | 
 
 ## Title case for titles
