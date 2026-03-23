@@ -99,7 +99,7 @@ To use retries, you need to install the experimental channel. You can also set u
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: access-logs
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -108,17 +108,19 @@ To use retries, you need to install the experimental channel. You can also set u
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     accessLog:
-     - fileSink:
-         path: /dev/stdout
-         jsonFormat:
-           start_time: "%START_TIME%"
-           method: "%REQ(:METHOD)%"
-           path: "%REQ(:PATH)%"
-           response_code: "%RESPONSE_CODE%"
-           response_flags: "%RESPONSE_FLAGS%"
-           upstream_host: "%UPSTREAM_HOST%"
-           upstream_cluster: "%UPSTREAM_CLUSTER%"
+     default:
+       httpSettings:
+         accessLog:
+         - fileSink:
+             path: /dev/stdout
+             jsonFormat:
+               start_time: "%START_TIME%"
+               method: "%REQ(:METHOD)%"
+               path: "%REQ(:PATH)%"
+               response_code: "%RESPONSE_CODE%"
+               response_flags: "%RESPONSE_FLAGS%"
+               upstream_host: "%UPSTREAM_HOST%"
+               upstream_cluster: "%UPSTREAM_CLUSTER%"
    EOF
    ```
 
@@ -481,7 +483,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Delete the access log policy.
 
    ```sh
-   kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete listenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
    
 4. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}}.

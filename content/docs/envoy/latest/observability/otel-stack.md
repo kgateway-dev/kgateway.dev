@@ -9,14 +9,14 @@ weight: 10
 
 ## Step 4: Configure telemetry policies {#policies}
 
-Now that you have the telemetry stack set up, you can configure the telemetry policies to collect logging and tracing data for your gateway environment. The HTTPListenerPolicy lets you configure how to collect, process, and route logs and traces for your Gateway or ListenerSet resources. Note that metrics are collected automatically.
+Now that you have the telemetry stack set up, you can configure the telemetry policies to collect logging and tracing data for your gateway environment. The ListenerPolicy lets you configure how to collect, process, and route logs and traces for your Gateway or ListenerSet resources. Note that metrics are collected automatically.
 
-1. Create an HTTPListenerPolicy to collect and store logs in Loki. The policy applies to the `http` Gateway that serves traffic to the `httpbin` app that you set up before you began.
+1. Create a ListenerPolicy to collect and store logs in Loki. The policy applies to the `http` Gateway that serves traffic to the `httpbin` app that you set up before you began.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: logging-policy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -25,20 +25,22 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     accessLog:
-     - openTelemetry:
-         grpcService:
-           backendRef:
-             name: opentelemetry-collector-logs
-             namespace: telemetry
-             port: 4317
-           logName: "http-gateway-access-logs"
-         body: >-
-           "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %RESPONSE_CODE% "%REQ(:AUTHORITY)%" "%UPSTREAM_CLUSTER%"'
+     default:
+       httpSettings:
+         accessLog:
+         - openTelemetry:
+             grpcService:
+               backendRef:
+                 name: opentelemetry-collector-logs
+                 namespace: telemetry
+                 port: 4317
+               logName: "http-gateway-access-logs"
+             body: >-
+               "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %RESPONSE_CODE% "%REQ(:AUTHORITY)%" "%UPSTREAM_CLUSTER%"'
    EOF
    ```
 
-2. Create a Kubernetes ReferenceGrant so that the HTTPListenerPolicy can apply to the OTel logs collector service.
+2. Create a Kubernetes ReferenceGrant so that the ListenerPolicy can apply to the OTel logs collector service.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -50,7 +52,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    spec:
      from:
      - group: gateway.kgateway.dev
-       kind: HTTPListenerPolicy
+       kind: ListenerPolicy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      to:
      - group: ""
@@ -59,12 +61,12 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    EOF
    ```
 
-3. Create another HTTPListenerPolicy to collect and store traces in Tempo.
+3. Create another ListenerPolicy to collect and store traces in Tempo.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: tracing-policy
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
@@ -73,20 +75,22 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     tracing:
-       provider:
-         openTelemetry:
-           serviceName: http
-           grpcService:
-             backendRef:
-               name: opentelemetry-collector-traces
-               namespace: telemetry
-               port: 4317
-       spawnUpstreamSpan: true
+     default:
+       httpSettings:
+         tracing:
+           provider:
+             openTelemetry:
+               serviceName: http
+               grpcService:
+                 backendRef:
+                   name: opentelemetry-collector-traces
+                   namespace: telemetry
+                   port: 4317
+           spawnUpstreamSpan: true
    EOF
    ```
 
-4. Create a Kubernetes ReferenceGrant so that the HTTPListenerPolicy can apply to the OTel traces collector service.
+4. Create a Kubernetes ReferenceGrant so that the ListenerPolicy can apply to the OTel traces collector service.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -98,7 +102,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    spec:
      from:
      - group: gateway.kgateway.dev
-       kind: HTTPListenerPolicy
+       kind: ListenerPolicy
        namespace: {{< reuse "docs/snippets/namespace.md" >}}
      to:
      - group: ""
@@ -177,11 +181,11 @@ To verify that your setup is working, generate sample traffic and review the log
    rm {{< reuse "docs/snippets/pod-name.md" >}}.json
    ```
 
-2. Delete the HTTPListenerPolicy policies that collect logs and traces.
+2. Delete the ListenerPolicy policies that collect logs and traces.
 
    ```sh
-   kubectl delete httplistenerpolicy logging-policy -n {{< reuse "docs/snippets/namespace.md" >}}
-   kubectl delete httplistenerpolicy tracing-policy -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete listenerpolicy logging-policy -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete listenerpolicy tracing-policy -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 3. Uninstall the Grafana Loki and Tempo components. 

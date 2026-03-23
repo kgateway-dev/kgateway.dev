@@ -378,7 +378,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete HTTPListenerPolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete ListenerPolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
 

@@ -6,8 +6,48 @@ You might have services in your Kubernetes cluster that use HTTP/2 for communica
 
 ## Enable access logging
 
-Enable access logging on the Gateway. You can use the access logs later to verify that the request used the HTTP/2 protocol. 
+Enable access logging on the Gateway. You can use the access logs later to verify that the request used the HTTP/2 protocol.
 
+{{< version include-if="2.2.x,2.3.x" >}}
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: access-logs
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      accessLog:
+      - fileSink:
+          path: /dev/stdout
+          jsonFormat:
+              start_time: "%START_TIME%"
+              method: "%REQ(X-ENVOY-ORIGINAL-METHOD?:METHOD)%"
+              path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+              protocol: "%PROTOCOL%"
+              response_code: "%RESPONSE_CODE%"
+              response_flags: "%RESPONSE_FLAGS%"
+              bytes_received: "%BYTES_RECEIVED%"
+              bytes_sent: "%BYTES_SENT%"
+              total_duration: "%DURATION%"
+              resp_backend_service_time: "%RESP(X-ENVOY-UPSTREAM-SERVICE-TIME)%"
+              req_x_forwarded_for: "%REQ(X-FORWARDED-FOR)%"
+              user_agent: "%REQ(USER-AGENT)%"
+              request_id: "%REQ(X-REQUEST-ID)%"
+              authority: "%REQ(:AUTHORITY)%"
+              backendHost: "%UPSTREAM_HOST%"
+              backendCluster: "%UPSTREAM_CLUSTER%"
+EOF
+```
+{{< /version >}}
+
+{{< version include-if="2.0.x,2.1.x" >}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -42,6 +82,7 @@ spec:
           backendCluster: "%UPSTREAM_CLUSTER%"
 EOF
 ```
+{{< /version >}}
 
 ## HTTP/2 for in-cluster services
 
@@ -228,7 +269,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    
 ## HTTP/2 for external services
 
-1. Create a Backend resource that represents your external service. In this example, you configure a Backend for the `https://nghttp2.org/httpbin/` domain. This domain requires requests to be sent with the HTTP/2 protocol. 
+1. Create a Backend resource that represents your external service. In this example, you configure a Backend for the `https://nghttp2.org/` domain. This domain requires requests to be sent with the HTTP/2 protocol. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -268,13 +309,10 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
          - type: URLRewrite
            urlRewrite:
              hostname: nghttp2.org
-             path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /httpbin/
    EOF
    ```
 
-3. Send a request to the `static.example` domain. The request is forwarded to the `nghttp2.org/httpbin/` path, which only accepts HTTP/2 requests. Verify that the request succeeds and that you get back a 200 HTTP response code. 
+3. Send a request to the `static.example` domain. The request is forwarded to the `nghttp2.org` path, which only accepts HTTP/2 requests. Verify that the request succeeds and that you get back a 200 HTTP response code. 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -363,7 +401,9 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
+{{< version include-if="2.2.x,2.3.x" >}}
 ```sh
+kubectl delete listenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete httproute nginx
 kubectl delete pod nginx
 kubectl delete service nginx
@@ -371,6 +411,19 @@ kubectl delete configmap nginx-conf
 kubectl delete backend http2
 kubectl delete httproute http2
 ```
+{{< /version >}}
+
+{{< version include-if="2.0.x,2.1.x" >}}
+```sh
+kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httproute nginx
+kubectl delete pod nginx
+kubectl delete service nginx
+kubectl delete configmap nginx-conf
+kubectl delete backend http2
+kubectl delete httproute http2
+```
+{{< /version >}}
 
 
 

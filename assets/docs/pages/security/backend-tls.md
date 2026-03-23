@@ -32,13 +32,13 @@ Deploy an NGINX server in your cluster that is configured for TLS traffic. Then,
 
 ### Deploy the sample app
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/test/e2e/features/backendtls/testdata/nginx.yaml).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl apply -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
    ```
 
 2. Verify that the NGINX server is running.
@@ -395,7 +395,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
@@ -408,7 +408,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
+   kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
