@@ -4,6 +4,7 @@ weight: 400
 ---
 
 {{< cards >}}
+  {{< card link="compression" title="Compression" >}} 
   {{< card link="destination-types" title="Destination types" >}}
   {{< card link="direct-response" title="Direct response" >}}
   {{< card link="dfp" title="Dynamic Forward Proxy (DFP)" >}}
