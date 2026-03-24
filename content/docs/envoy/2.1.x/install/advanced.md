@@ -4,12 +4,6 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
----
-title: Advanced settings
-weight: 70
-description: Install kgateway and related components.
----
-
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
 
 * **Show all values**: 
@@ -62,5 +56,3 @@ discoveryNamespaceSelectors:
 - matchLabels:
     version: v3
 ```
-
-
