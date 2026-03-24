@@ -2935,6 +2935,31 @@ _Appears in:_
 
 
 
+#### RouteTracing
+
+
+
+RouteTracing configures per-route tracing overrides.
+These settings override the listener-level tracing configuration for matched routes.
+The tracing provider (e.g., OpenTelemetry collector endpoint) must still be
+configured at the listener level via ListenerPolicy. Without a listener-level tracing
+provider, route-level settings have no effect.
+
+_Validation:_
+- RouteTracing: disable is mutually exclusive with other tracing fields
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `clientSampling` _integer_ | Target percentage of requests that will be force traced if the x-client-trace-id header is set. Overrides the listener-level setting. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `randomSampling` _integer_ | Target percentage of requests that will be randomly selected for trace generation. Overrides the listener-level setting. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `overallSampling` _integer_ | Target percentage of requests that will be traced after all other sampling checks have been applied. This acts as an upper limit on the total configured sampling rate. Overrides the listener-level setting. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `attributes` _[CustomAttribute](#customattribute) array_ | Additional attributes to add to active spans for this route. These are merged with listener-level attributes configured via ListenerPolicy. On name collision, route-level attributes take priority. |  | MaxItems: 16 <br /> |
+| `disable` _[PolicyDisable](#policydisable)_ | Disable tracing for this route.<br />Can be used to disable tracing for specific routes when listener-level tracing is configured via ListenerPolicy. |  |  |
+
+
 #### Sampler
 
 
@@ -3398,6 +3423,7 @@ _Appears in:_
 | `basicAuth` _[BasicAuthPolicy](#basicauthpolicy)_ | BasicAuth specifies the HTTP basic authentication configuration for the policy.<br />This controls authentication using username/password credentials in the Authorization header. |  |  |
 | `apiKeyAuth` _[APIKeyAuth](#apikeyauth)_ | APIKeyAuth authenticates users based on a configured API Key. |  |  |
 | `oauth2` _[OAuth2Policy](#oauth2policy)_ | OAuth2 specifies the configuration to use for OAuth2/OIDC.<br />Note: the OAuth2 filter does not protect against Cross-Site-Request-Forgery attacks on domains with cached<br />authentication (in the form of cookies). It is recommended to pair this with the CSRF policy to prevent<br />malicious social engineering. |  |  |
+| `tracing` _[RouteTracing](#routetracing)_ | Tracing configures per-route tracing overrides.<br />These settings override the listener-level tracing configuration (configured via ListenerPolicy) for matched routes.<br />The tracing provider (e.g., OpenTelemetry collector endpoint) must be configured at the listener-level via ListenerPolicy. Without a listener-level tracing provider, route-level settings have no effect.<br />NOTE: This field is only honored for HTTPRoute and GRPCRoute targets. |  |  |
 
 
 #### Transform
