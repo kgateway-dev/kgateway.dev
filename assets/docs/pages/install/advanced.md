@@ -20,8 +20,6 @@ For more information, see the [Helm reference docs]({{< link-hextra path="/refer
 
 When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
-{{< version exclude-if="2.0.x,2.1.x" >}}
-
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
 To use experimental Gateway API features, you must enable the experimental feature gate, `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`. This setting defaults to `false` and must be explicitly enabled to use experimental features such as the following:
@@ -34,13 +32,11 @@ To use experimental Gateway API features, you must enable the experimental featu
 To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 
 ```yaml
+
 controller:
   extraEnv:
     KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
 ```
-{{< /version >}}
-
-{{< version exclude-if="2.0.x,2.1.x" >}}
 
 ## Leader election
 
@@ -54,7 +50,6 @@ controller:
   disableLeaderElection: true
 ```
 
-{{< /version >}}
 
 ## Namespace discovery {#namespace-discovery}
 
@@ -75,6 +70,7 @@ The following example selects namespaces for discovery that meet either of the f
 * The namespace has the label `version=v3`
 
 ```yaml
+
 discoveryNamespaceSelectors:
 - matchExpressions:
   - key: environment
@@ -87,10 +83,7 @@ discoveryNamespaceSelectors:
     version: v3
 ```
 
-{{< version exclude-if="2.0.x,2.1.x" >}}
-
 ## TLS encryption {#tls-encryption}
 
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.
 
-{{< /version >}}
