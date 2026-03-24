@@ -1,1 +1,0 @@
-enterprisekgateway.solo.io
