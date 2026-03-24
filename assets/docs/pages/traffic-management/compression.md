@@ -226,7 +226,7 @@ Enable gzip decompression on a route so that {{< reuse "docs/snippets/kgateway.m
 {{< reuse "docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete trafficpolicy response-compression -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} response-compression -n httpbin
 kubectl delete httproute httpbin-compression -n httpbin
 kubectl delete trafficpolicy request-decompression -n httpbin
 kubectl delete httproute httpbin-decompression -n httpbin
