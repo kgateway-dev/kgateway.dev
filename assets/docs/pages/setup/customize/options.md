@@ -46,6 +46,72 @@ Review the following table for the resource types that you can overlay in the `s
 Overlays are **not validated** by the {{< reuse "docs/snippets/kgateway.md" >}} control plane at apply time. Configuration errors surface only when Kubernetes processes the resulting resource. The overlay schema reflects the underlying Kubernetes resource schema and is **not stable** between Kubernetes versions. Test overlay configurations after each cluster upgrade.
 {{< /callout >}}
 
+### How overlays work
+
+Overlays are applied **after** the control plane renders the base Kubernetes resources. The control plane runs through the following steps:
+
+1. The control plane reads built-in configuration from the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource, such as `kube.deployment`, `kube.service`, and `kube.podTemplate`.
+2. The control plane generates the base resources for the gateway proxy, including the Deployment, Service, and ServiceAccount.
+3. The control plane applies any overlays that you specified in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource.
+4. The control plane creates or updates the resources in the cluster.
+
+### Remove or replace config
+
+You can use overlays to remove configuration from the generated resources, such as the pod security context when working in OpenShift environments. The strategic merge patch supports the following methods:
+
+**Set field value to null**
+
+Set a field to a `null` value to remove it. You must use `kubectl apply --server-side` to apply the change. Without `--server-side`, the `null` value is silently dropped.
+
+The following example removes the container-level `securityContext`:
+
+```yaml
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: kgateway
+                # Removes the container-level securityContext
+                securityContext: null
+```
+
+**Remove an entire field**
+
+To remove an entire field, use `$patch: delete` instead.
+
+The following example removes the pod-level `securityContext`:
+
+```yaml
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            # Removes the pod-level securityContext
+            securityContext:
+              $patch: delete
+```
+
+To replace a list rather than merging with it, add `$patch: replace` as a separate list item before your actual items:
+
+```yaml
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            volumes:
+              - $patch: replace
+              - name: custom-config
+                configMap:
+                  name: my-custom-config
+```
+
 For a step-by-step guide, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
 ## Configuration priority and precedence
