@@ -66,6 +66,7 @@ Set a field to a `null` value to remove it. You must use `kubectl apply --server
 The following example removes the container-level `securityContext`:
 
 ```yaml
+
 spec:
   kube:
     deploymentOverlay:
@@ -85,6 +86,7 @@ To remove an entire field, use `$patch: delete` instead.
 The following example removes the pod-level `securityContext`:
 
 ```yaml
+
 spec:
   kube:
     deploymentOverlay:
@@ -99,6 +101,7 @@ spec:
 To replace a list rather than merging with it, add `$patch: replace` as a separate list item before your actual items:
 
 ```yaml
+
 spec:
   kube:
     deploymentOverlay:
@@ -130,6 +133,7 @@ You can attach a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to 
 Consider the following GatewayClass configuration:
 
 ```yaml
+
 spec:
   kube:
     deploymentOverlay:
@@ -142,6 +146,7 @@ spec:
 Consider the following Gateway configuration:
 
 ```yaml
+
 spec:
   kube:
     deploymentOverlay:
@@ -154,6 +159,7 @@ spec:
 The resulting configuration merges both configurations as follows:
 
 ```yaml
+
 metadata:
   labels:
     level: gw          # Gateway wins on conflicting key
