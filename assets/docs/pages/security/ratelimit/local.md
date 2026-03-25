@@ -391,6 +391,8 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    HTTP/1.1 200 OK   
    ...
 
+{{< version exclude-if="2.3.x" >}}
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
@@ -402,6 +404,8 @@ kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} disable-ratelimit 
 kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
 ```
+
+{{< /version >}}
 
 
 
