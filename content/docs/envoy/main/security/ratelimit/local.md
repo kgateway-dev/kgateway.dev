@@ -15,7 +15,7 @@ The `percentEnabled` and `percentEnforced` fields let you control how aggressive
 
 The following steps walk through a shadow mode setup where rate limiting is observed but not enforced. You switch to full rate limit enforcement in subsequent steps. 
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with your rate limit config. In this example, the rate limit filter is enabled for all requests (`percentEnabled: 100`), but no requests are blocked (`percentEnforced: 0`).
+1. Create a rate limit config in your {{< reuse "docs/snippets/trafficpolicy.md" >}}. In this example, the rate limit filter is enabled for all requests (`percentEnabled: 100`), but no requests are blocked (`percentEnforced: 0`).
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -40,8 +40,8 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    | `maxTokens` | The maximum number of tokens that are available to use. |
    | `tokensPerFill` | The number of tokens that are added during a refill. |
    | `fillInterval` | The number of seconds after which the token bucket is refilled. |
-   | `percentEnabled` | The percentage of requests for which the rate limit filter is enabled. Set to `100` so the filter runs on all requests and collects statistics. |
-   | `percentEnforced` | The percentage of requests for which the rate limit is enforced. Set to `0` so no requests are blocked, even when the token bucket is exhausted. |
+   | `percentEnabled` | The percentage of requests for which the rate limit filter is enabled. Set to `100` so that the filter runs on all requests and collects statistics. |
+   | `percentEnforced` | The percentage of requests for which the rate limit is enforced. Set to `0` so that no requests are blocked, even when the token bucket is exhausted. |
 
 2. Create an HTTPRoute that applies the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin app along the `ratelimit.example` domain.
    ```yaml

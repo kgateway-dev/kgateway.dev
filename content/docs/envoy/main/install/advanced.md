@@ -21,7 +21,7 @@ commonLabels:
 
 ## Topology spread constraints
 
-Use topology spread constraints to control how kgateway controller pods are distributed across failure domains such as zones or nodes. This helps improve availability and resilience by preventing all replicas from landing in the same zone or node.
+Use topology spread constraints to control how kgateway controller pods are distributed across failure domains such as zones or nodes. This setup helps improve availability and resilience by preventing all replicas from landing in the same zone or node.
 
 For more information, see the [Kubernetes topology spread constraints documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/).
 
@@ -42,7 +42,7 @@ topologySpreadConstraints:
 
 You can assign a PriorityClassName to the control plane pods by using the Helm chart. [Priority](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) indicates the importance of a pod relative to other pods. If a pod cannot be scheduled, the scheduler tries to preempt (evict) lower priority pods to make scheduling of the pending pod possible. 
 
-To assign a PriorityClassName to the control plane, you must first create a PriorityClass resource. The following example creates a PriorityClass with the name `system-cluster-critical` that assigns a priority of 1 Million. 
+To assign a PriorityClassName to the control plane, you must first create a PriorityClass resource. The following example creates a PriorityClass with the name `system-cluster-critical` that assigns a priority of 1 million. 
 
 ```yaml
 kubectl apply -f- <<EOF
