@@ -1,26 +1,26 @@
-The configuration that is used to spin up a gateway proxy is stored in several custom resources, including {{< reuse "docs/snippets/gatewayparameters.md" >}}, and a gateway proxy template. By default, {{< reuse "docs/snippets/kgateway.md" >}} creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration]({{< link-hextra path="/setup/default/" >}}). You have the following options to change the default configuration for your gateway proxies: 
+The configuration that is used to spin up a gateway proxy is stored in several custom resources, including {{< reuse "docs/snippets/gatewayparameters.md" >}}, and a gateway proxy template. By default, {{< reuse "docs/snippets/kgateway.md" >}} creates these resources for you during the installation so that you can spin up gateway proxies with the [default proxy configuration]({{< link-hextra path="/setup/default/" >}}). You have the following options to change the default configuration for your gateway proxies:
 
-| Option | Description | 
-| -- | -- | 
-| Create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource (recommended) | To adjust the settings on the gateway proxy, you can create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This approach allows you to spin up gateway proxies with different configurations. Keep in mind that you must maintain the {{< reuse "docs/snippets/gatewayparameters.md" >}} resources that you created manually. The values in these resources are not automatically updated during upgrades.  | 
+| Option | Description |
+| -- | -- |
+| Create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource (recommended) | To adjust the settings on the gateway proxy, you can create your own {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This approach allows you to spin up gateway proxies with different configurations. Keep in mind that you must maintain the {{< reuse "docs/snippets/gatewayparameters.md" >}} resources that you created manually. The values in these resources are not automatically updated during upgrades.  |
 | Change default proxy settings | You can change some of the values for the default gateway proxy updating the values in the {{< reuse "docs/snippets/kgateway.md" >}} Helm chart. The values that you set in your Helm chart are automatically rolled out to the gateway proxies.  |
-| Create self-managed gateways with custom proxy templates | {{< reuse "docs/snippets/byo-gateway.md" >}} | 
+| Create self-managed gateways with custom proxy templates | {{< reuse "docs/snippets/byo-gateway.md" >}} |
 
-## Customize the gateway proxy 
+## Customize the gateway proxy
 
 The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to change settings on the gateway proxy. To find other customization examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
 
-1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to add any custom settings to the gateway. The following example makes the following changes: 
-   
+1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to add any custom settings to the gateway. The following example makes the following changes:
+
    * The Envoy log level is set to `debug` (default value: `info`).
-   * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`). 
+   * The Kubernetes service type is changed to NodePort (default value: `LoadBalancer`).
    * The `gateway: custom` label is added to the gateway proxy service that exposes the proxy (default value: `gloo=kube-gateway`).
    * The `externalTrafficPolicy` is set to `Local` to preserve the original client IP address.
-   * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ). 
-   * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ). 
+   * The `gateway: custom` label is added to the gateway proxy pod (default value: `gloo=kube-gateway` ).
+   * The security context of the gateway proxy is changed to use the 50000 as the supplemental group ID and user ID (default values: `10101` ).
 
    For other settings, see the [API docs]({{< link-hextra path="/reference/api/#gatewayparametersspec" >}}) or check out the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
-   
+
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -29,25 +29,25 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
      name: custom-gw-params
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
-     kube: 
+     kube:
        envoyContainer:
          bootstrap:
-           logLevel: debug       
+           logLevel: debug
        service:
          type: NodePort
-         extraLabels: 
-           gateway: custom
-         externalTrafficPolicy: Local
-       podTemplate: 
          extraLabels:
            gateway: custom
-         securityContext: 
+         externalTrafficPolicy: Local
+       podTemplate:
+         extraLabels:
+           gateway: custom
+         securityContext:
            fsGroup: 50000
            runAsUser: 50000
    EOF
    ```
 
-2. Create a Gateway resource that references your custom {{< reuse "docs/snippets/gatewayparameters.md" >}}. 
+2. Create a Gateway resource that references your custom {{< reuse "docs/snippets/gatewayparameters.md" >}}.
    ```yaml
    kubectl apply -f- <<EOF
    kind: Gateway
@@ -61,7 +61,7 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
        parametersRef:
          name: custom-gw-params
          group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}       
+         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
      listeners:
      - protocol: HTTP
        port: 80
@@ -72,13 +72,13 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    EOF
    ```
 
-3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. 
+3. Verify that a pod is created for your gateway proxy and that it has the pod settings that you defined in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource.
 
    ```sh
-   kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/namespace.md" >}}   -o yaml
+   kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
-   If the pod does not come up, try running `kubectl get events -n kgateway-system` to see if the Kubernetes API server logged any failures. If no events are logged, ensure that the `kgateway` GatewayClass is present in your cluster and that the Gateway resource shows an `Accepted` status. 
+   If the pod does not come up, try running `kubectl get events -n kgateway-system` to see if the Kubernetes API server logged any failures. If no events are logged, ensure that the `kgateway` GatewayClass is present in your cluster and that the Gateway resource shows an `Accepted` status.
 
    Example output:
 
@@ -108,13 +108,13 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
    ...
    ```
 
-4. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service. 
+4. Get the details of the service that exposes the gateway proxy. Verify that the service is of type NodePort and that the extra label was added to the service.
 
    ```sh
    kubectl get service custom -n kgateway-system -o yaml
    ```
 
-   Example output: 
+   Example output:
 
    ```yaml {linenos=table,hl_lines=[10,36],linenostart=1,filename="gateway-service.yaml"}
    apiVersion: v1
@@ -162,4 +162,4 @@ The example in this guide uses the {{< reuse "docs/snippets/gatewayparameters.md
 ```sh
 kubectl delete gateway custom -n kgateway-system
 kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} custom-gw-params -n kgateway-system
-``` 
+```

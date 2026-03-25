@@ -16,10 +16,26 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🌟 New features {#v22-new-features}
 
-Several additional capabilities are now available for the control plane and Gateway resources:
+#### Control plane changes
 
-* **Common labels**: Add custom labels to all resources created by the Helm charts using the `commonLabels` field, including the Deployment, Service, and ServiceAccount of gateway proxies. This allows you to better organize your resources or integrate with external tools.
-* **Static IP addresses for Gateways**: Assign a static IP address to the Kubernetes service that exposes your Gateway using the `spec.addresses` field with `type: IPAddress`.
+- **Common labels**: Add custom labels to all resources that are created by the Helm charts by using the `commonLabels` field, including the Deployment, Service, and ServiceAccount of the control plane. This allows you to better organize your resources or integrate with external tools. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}). 
+
+####  Static IPs for Gateways
+
+Assign a static IP address to the Kubernetes service that exposes your Gateway using the `spec.addresses` field with `type: IPAddress`.
+
+For more information, see [Static IP address]({{< link-hextra path="/setup/gateway/#static-ip-address" >}}). 
+
+#### Gateway proxy customization {#v23-gateway-customization}
+
+The GatewayParameters resource now supports gateway proxy customization via overlay fields. Overlays use strategic merge patch (SMP) semantics to apply advanced customizations to the Kubernetes resources that are generated for gateway proxies, including the Service, ServiceAccount, and Deployment. 
+
+The following overlays are supported: 
+
+* Use `deploymentOverlay`, `serviceOverlay`, and `serviceAccountOverlay` to patch the generated Deployment, Service, and ServiceAccount.
+* Use `horizontalPodAutoscaler`, `verticalPodAutoscaler`, and `podDisruptionBudget` to automatically create and configure these resources targeting the proxy Deployment.
+
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
 <!-- TODO release 2.2
 
