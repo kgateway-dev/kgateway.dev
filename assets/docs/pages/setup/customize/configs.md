@@ -513,6 +513,28 @@ spec:
 EOF
 ```
 
+### LoadBalancer source IP ranges
+
+Set up an allowlist to restrict which source client IPs are allowed to connect to the LoadBalancer service that exposes the gateway proxy.
+
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    serviceOverlay:
+      spec: 
+        type: LoadBalancer
+        loadBalancerSourceRanges:
+          - 10.0.0.0/8
+          - 192.168.0.0/16
+EOF
+```
+
 ### AWS EKS load balancer annotations {#aws-eks-annotations}
 
 Configure AWS-specific load balancer features using Service annotations.
