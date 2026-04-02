@@ -32,19 +32,25 @@ Deploy an NGINX server in your cluster that is configured for TLS traffic. Then,
 
 ### Deploy the sample app
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml).
 
 
-1. Deploy the NGINX server with a self-signed TLS certificate.
+1. Create the namespace.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
+   kubectl create namespace kgateway-base
    ```
 
-2. Verify that the NGINX server is running.
+2. Deploy the NGINX server with a self-signed TLS certificate.
 
    ```shell
-   kubectl get pods -l app.kubernetes.io/name=nginx
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
+   ```
+
+3. Verify that the NGINX server is running.
+
+   ```shell
+   kubectl -n kgateway-base get pods -l app.kubernetes.io/name=nginx
    ```
 
    Example output:
@@ -68,6 +74,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    apiVersion: v1
    kind: Secret
    metadata:
+     namespace: kgateway-base
      name: ca
      labels:
        app: nginx
@@ -103,6 +110,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: BackendConfigPolicy
    metadata:
+     namespace: kgateway-base
      name: nginx-tls-policy
      labels:
        app: nginx
@@ -133,9 +141,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
    ```shell
-   kubectl apply -f- <<EOF
-   {{< github url="https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml" >}}
-   EOF
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml
    ```
 
 2. Create the TLS policy. Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
@@ -144,6 +150,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    apiVersion: gateway.networking.k8s.io/v1
    kind: BackendTLSPolicy
    metadata:
+     namespace: kgateway-base
      name: nginx-tls-policy
      labels:
        app: nginx
@@ -181,6 +188,7 @@ kubectl apply -f - <<EOF
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
+  namespace: kgateway-base
   name: nginx-route
   labels:
     app: nginx
@@ -395,26 +403,26 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl delete backendconfigpolicy,secret,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -A -l app=nginx
    ```
 {{% /tab %}}
 {{% tab tabName="BackendTLSPolicy" %}}
 1. Delete the NGINX server.
 
    ```yaml
-   kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo-mesh-use-cases/refs/heads/main/agentgateway/nginx-tls.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml
    ```
    
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl delete backendtlspolicy,configmap,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -A -l app=nginx
    ```
 
 3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.
