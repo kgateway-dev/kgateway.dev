@@ -1,16 +1,17 @@
-Review the following information about supported release versions for kgateway.
+Review the following information about released versions for kgateway.
 
-## Supported versions
+## Released versions
 
 | Kgateway | Release date | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
 |----------|--------------|------------|----------------|-------|------|----------|
-| 2.2.x | 09 Feb 2026 | 1.31 - 1.35 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
-| 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.4.x | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
-| 2.0.x | 01 Apr 2025 | 1.27 - 1.31 | 1.2.x | Proxy 1.33, API v3 | >= 3.12 | 1.18 - 1.23 |
+| 2.3.x | TBD | 1.31 - 1.35 | 1.3 - 1.5 | Proxy 1.37, API v3 | >= 3.12 | 1.23 - 1.27 |
+| 2.2.x | 09 Feb 2026 | 1.31 - 1.35 | 1.2 - 1.4 | Proxy 1.36, API v3 | >= 3.12 | 1.23 - 1.27 |
+| 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.2 - 1.4 | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
+| 2.0.x | 01 Apr 2025 | 1.27 - 1.31 | 1.2 | Proxy 1.34, API v3 | >= 3.12 | 1.18 - 1.23 |
 
 <!--See tested min/max versions in https://github.com/kgateway-dev/kgateway/tree/main/.github/workflows/.env/nightly-tests-->
 
-`*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.3.0](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.3.0/kgateway).
+`*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification for the **standard** channel. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.4.0](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.4.0/kgateway).
 
 `†` Istio versions: Istio must run on a compatible version of Kubernetes. For example, Istio 1.27 is tested, but not supported, on Kubernetes 1.28. For more information, see the [Istio docs](https://istio.io/latest/docs/releases/supported-releases/). 
 
