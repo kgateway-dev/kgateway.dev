@@ -11,7 +11,7 @@ Review the following information about released versions for kgateway.
 
 <!--See tested min/max versions in https://github.com/kgateway-dev/kgateway/tree/main/.github/workflows/.env/nightly-tests-->
 
-`*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification for the **standard** channel. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.4.0](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.4.0/kgateway).
+`*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification for the **standard** channel. The latest kgateway and Gateway API versions support the **experimental** channel, but might not for older versions. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.4.0](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.4.0/kgateway).
 
 `†` Istio versions: Istio must run on a compatible version of Kubernetes. For example, Istio 1.27 is tested, but not supported, on Kubernetes 1.28. For more information, see the [Istio docs](https://istio.io/latest/docs/releases/supported-releases/). 
 
