@@ -74,7 +74,7 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
 {{% tab tabName="Kubernetes Gateway API" %}}
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
 
-   * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/#v12-upgrade-notes).
+   * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/getting-started/#v12-upgrade-notes).
    * Check if you need to install the [experimental channel for the features that you want to use](../../reference/versions/#experimental-features).
 
 2. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "docs/versions/k8s-gw-version.md" >}} version.

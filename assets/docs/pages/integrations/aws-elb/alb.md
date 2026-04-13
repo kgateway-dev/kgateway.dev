@@ -8,7 +8,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 1. Create or use an existing AWS account. 
 2. Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to install {{< reuse "docs/snippets/kgateway.md" >}}.
-3. Deploy the httpbin sample app. For more information, see the [sample app guide]({{< link-hextra path="/install/sample-app#deploy-app/" >}}).
+3. Deploy the httpbin sample app. For more information, see the [sample app guide]({{< link-hextra path="/install/sample-app/#deploy-app" >}}).
    1. Create the httpbin app.
       ```shell
       kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
