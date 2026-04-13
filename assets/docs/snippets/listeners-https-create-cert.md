@@ -3,7 +3,7 @@
    mkdir example_certs
    ```
 
-2. Create a self-signed root certificate. The following command creates a root certificate that is valid for a year and can serve any hostname. You use this certificate to sign the server certificate for the gateway later. For other command options, see the [OpenSSL docs](https://www.openssl.org/docs/manmaster/man1/openssl-req.html).
+2. Create a self-signed root certificate. The following command creates a root certificate that is valid for a year and can serve any hostname. You use this certificate to sign the server certificate for the gateway later. For other command options, see the [OpenSSL docs](https://docs.openssl.org/master/man1/openssl-req/).
    ```sh
    # root cert
    openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=any domain/CN=*' -keyout example_certs/root.key -out example_certs/root.crt

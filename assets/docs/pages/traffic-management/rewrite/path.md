@@ -1,6 +1,6 @@
 Rewrite path prefixes in requests by using the `URLRewrite` filter. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPURLRewriteFilter).
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#httpurlrewritefilter).
 
 ## Before you begin
 
@@ -8,7 +8,7 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
 
 ## Rewrite prefix path
 
-Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite path prefixes. 
+Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#httppathmodifiertype) to rewrite path prefixes. 
 
 ### In-cluster services
 
@@ -215,7 +215,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gatew
 
 ## Rewrite full path
 
-Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathModifierType) to rewrite full paths. 
+Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/spec/#httppathmodifiertype) to rewrite full paths. 
 
 ### In-cluster services
 

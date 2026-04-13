@@ -57,7 +57,7 @@ one that sorts later.
 
 Since the Ingress v1 spec does not define conflict resolution, this tool
 adopts the following rules, which are similar to the [Gateway API conflict resolution
-guidelines](https://gateway-api.sigs.k8s.io/concepts/guidelines/#conflicts).
+guidelines](https://gateway-api.sigs.k8s.io/guides/api-design/#conflicts).
 
 ### Ingress resource fields to Gateway API fields
 

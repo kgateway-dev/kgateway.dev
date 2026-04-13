@@ -1,6 +1,6 @@
 Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies to one, multiple, or all routes in an HTTPRoute resource, or all the routes that a Gateway serves. 
 
-## Policy attachment {#policy-attachment-TrafficPolicy}
+## Policy attachment {#policy-attachment-trafficpolicy}
 
 You can apply {{< reuse "docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 

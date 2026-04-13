@@ -28,7 +28,7 @@ In {{< reuse "docs/snippets/kgateway.md" >}}, you use a [{{< reuse "docs/snippet
 * **All routes in an HTTPRoute**: Use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to attach the policy to a particular HTTPRoute resource. 
 * **All routes that the Gateway serves**: Use the `targetRefs` section in the {{< reuse "docs/snippets/trafficpolicy.md" >}} to attach the policy to a Gateway. For an example, see [Gateway configuration](#gateway). 
 
-Note that if you apply a policy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [{{< reuse "docs/snippets/trafficpolicy.md" >}}]({{< link-hextra path="/about/policies/trafficpolicy/#multiple-targetrefs-TrafficPolicies" >}}). 
+Note that if you apply a policy to an HTTPRoute and to a Gateway at the same time, the HTTPRoute policy takes precedence. For more information, see [{{< reuse "docs/snippets/trafficpolicy.md" >}}]({{< link-hextra path="/about/policies/trafficpolicy/#policy-priority-and-merging-rules" >}}). 
 
 ## Before you begin
 

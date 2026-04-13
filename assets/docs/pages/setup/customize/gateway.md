@@ -11,9 +11,11 @@ Choose between the following options to customize your gateway proxy:
 * [Built-in customization](#built-in)
 * [Overlays](#overlays)
 
+{{< conditional-text include-if="envoy" >}}
 {{< callout type="info" >}}
-To change the default proxy template and inject your own Envoy configuration, use a [self-managed gateway]({{< link-hextra path="/setup/customize/selfmanaged/" >}}) instead. 
+To change the default proxy template and inject your own Envoy configuration, use a [self-managed gateway]({{< link-hextra path="/setup/customize/selfmanaged/" >}}) instead.
 {{< /callout >}}
+{{< /conditional-text >}}
 
 ### Built-in customization {#built-in}
 

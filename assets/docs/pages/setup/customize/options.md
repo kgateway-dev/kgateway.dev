@@ -4,7 +4,9 @@ Choose between the following options to customize the configuration of gateway p
 | -- | -- |
 | [Built-in configuration (recommended)](#built-in) | Use the built-in fields in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. These fields are validated when you apply the resource.  |
 | [Overlays](#overlays) | Use the strategic merge patch options in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to modify the raw Kubernetes resources that the control plane generates, or to create additional resources such as Horizontal Pod Autoscalers, Vertical Pod Autoscalers, and Pod Disruption Budgets. Use this option for advanced customizations that are not covered by the built-in fields. |
-| [Self-managed gateways]({{< link-hextra path="/setup/customize/selfmanaged/" >}}) | If you want to change the [default gateway proxy template]({{< link-hextra path="/setup/default/#gateway-proxy-template" >}}) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)]({{< link-hextra path="/setup/customize/selfmanaged/" >}}). | 
+{{< conditional-text include-if="envoy" >}}
+| [Self-managed gateways]({{< link-hextra path="/setup/customize/selfmanaged/" >}}) | If you want to change the [default gateway proxy template]({{< link-hextra path="/setup/default/#gateway-proxy-template" >}}) and provide your own Envoy configuration to bootstrap the proxy with, you must create a self-managed gateway. For more information, see [Self-managed gateways (BYO)]({{< link-hextra path="/setup/customize/selfmanaged/" >}}). |
+{{< /conditional-text >}}
 
 ## Built-in customization (recommended) {#built-in}
 

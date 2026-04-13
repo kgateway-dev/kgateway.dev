@@ -237,7 +237,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
 
 ## Create a GRPCRoute {#create-grpcroute}
 
-1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.GRPCRoute){{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#grpcroute){{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
    
    ```yaml
    kubectl apply -f - <<EOF
