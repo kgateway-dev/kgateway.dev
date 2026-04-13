@@ -10,7 +10,7 @@ Welcome to the documentation for migrating from Ingress to **Gateway API** and *
 [Kubernetes ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway) with the following additional features:
 
 - **Expanded Ingress NGINX Support:** Converts a wide range of Ingress NGINX-specific annotations, e.g. session affinity, authentication,
-  rate limiting, CORS, etc.
+  rate limiting, CORS, TLS passthrough, service-upstream, and backend protocol hints.
 - **Kgateway Emitter Support:** Generates Gateway API and kgateway-specific resources, e.g. TrafficPolicy, BackendConfigPolicy, etc.
 
 [This upstream issue](https://github.com/kgateway-dev/ingress2gateway/issues/54) tracks merging these features into the Kubernetes ingress2gateway project.
@@ -48,19 +48,44 @@ of the Ingress before converting.
 
 ## Common workflows
 
-1. Convert a file and write output to a directory.
+1. Convert Ingresses from the namespace in your current kubeconfig context.
 
     ```bash
-    ingress2gateway print   --providers=ingress-nginx   --emitter=kgateway   --input-file ./ingress.yaml   --output-dir ./out
+    ingress2gateway print \
+      --providers=ingress-nginx \
+      --emitter=kgateway
     ```
 
-2. Convert a folder of YAML files.
+2. Convert one or more manifest files.
 
     ```bash
-    ingress2gateway print   --providers=ingress-nginx   --emitter=kgateway   --input-dir ./manifests   --output-dir ./out
+    ingress2gateway print \
+      --providers=ingress-nginx \
+      --emitter=kgateway \
+      --input-file ./ingress.yaml \
+      --input-file ./more-ingresses.yaml
     ```
 
-3. Check the tool version.
+3. Select a custom Ingress NGINX class.
+
+    ```bash
+    ingress2gateway print \
+      --providers=ingress-nginx \
+      --emitter=kgateway \
+      --ingress-nginx-ingress-class=internal-nginx
+    ```
+
+4. Include experimental Gateway API fields when your migration needs them.
+
+    ```bash
+    ingress2gateway print \
+      --providers=ingress-nginx \
+      --emitter=kgateway \
+      --allow-experimental-gw-api \
+      --input-file ./ingress.yaml
+    ```
+
+5. Check the tool version.
 
     ```bash
     ingress2gateway version
