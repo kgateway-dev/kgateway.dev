@@ -16,7 +16,7 @@ Review the built-in configurations that are provided via the [{{< reuse "docs/sn
 | Field | Description |
 | -- | -- |
 | `deployment` | Set the number of replicas and the update strategy for the proxy Deployment. If you use an HPA, do not set `replicas` here. |
-| `envoyContainer` | Configure the Envoy container, including the image, bootstrap log level, component log levels, environment variables, resource requests and limits, and security context. |
+| `envoyContainer` | Configure the Envoy container, including the image, application log format, bootstrap log level, component log levels, environment variables, resource requests and limits, and security context. |
 | `sdsContainer` | Configure the Secret Discovery Service (SDS) sidecar container. |
 | `podTemplate` | Configure pod-level settings, including image pull secrets, labels, annotations, node selector, affinity, tolerations, topology spread constraints, and the pod security context. |
 | `service` | Configure the Kubernetes Service that exposes the proxy, including the type, ports, labels, annotations, and external traffic policy. |
