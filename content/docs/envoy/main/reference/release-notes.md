@@ -39,7 +39,7 @@ For more information, see [Gradual rollout and shadow mode]({{< link-hextra path
 
 #### Envoy application log format {#v23-envoy-log-format}
 
-Configure how Envoy formats its application logs by using the `logFormat` field in the GatewayParameters resource. You can choose between structured JSON output or a custom text format string. This setting controls the Envoy application log format only and does not affect access logs.
+Configure how Envoy formats its application logs by using the `logFormat` field in the GatewayParameters resource. You can choose between structured JSON or text output. This setting controls the Envoy application log format only and does not affect access logs.
 
 For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/#built-in" >}}).
 
