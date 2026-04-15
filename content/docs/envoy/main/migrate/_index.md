@@ -75,7 +75,7 @@ of the Ingress before converting.
       --ingress-nginx-ingress-class=internal-nginx
     ```
 
-4. Include experimental Gateway API fields when your migration needs them.
+4. The CLI also exposes `--allow-experimental-gw-api` for builds and features that use experimental Gateway API fields.
 
     ```bash
     ingress2gateway print \
