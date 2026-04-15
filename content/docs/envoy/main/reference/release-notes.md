@@ -36,6 +36,13 @@ Use these fields for gradual rollouts or to run the filter in shadow mode (`perc
 
 For more information, see [Gradual rollout and shadow mode]({{< link-hextra path="/security/ratelimit/local/#gradual-rollout" >}}).
 
+
+#### Envoy application log format {#v23-envoy-log-format}
+
+Configure how Envoy formats its application logs by using the `logFormat` field in the GatewayParameters resource. You can choose between structured JSON or text output. This setting controls the Envoy application log format only and does not affect access logs.
+
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/#built-in" >}}).
+
 #### Gateway proxy customization {#v23-gateway-customization}
 
 The GatewayParameters resource now supports gateway proxy customization via overlay fields. Overlays use strategic merge patch (SMP) semantics to apply advanced customizations to the Kubernetes resources that are generated for gateway proxies, including the Service, ServiceAccount, and Deployment. 

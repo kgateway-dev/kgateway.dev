@@ -21,7 +21,7 @@ To change the default proxy template and inject your own Envoy configuration, us
 
 You can use the built-in customization fields in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to change settings on the proxy. This way, your configuration is validated when you apply the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource in your cluster.
 
-1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example changes the proxy Service type from `LoadBalancer` to `NodePort`. For other examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
+1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example changes the proxy Service type from `LoadBalancer` to `NodePort` and configures the Envoy application logs to use JSON format. For other examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -34,8 +34,20 @@ You can use the built-in customization fields in the {{< reuse "docs/snippets/ga
      kube:
        service:
          type: NodePort
+       envoyContainer:
+         bootstrap:
+           logFormat:
+             json:
+               message: "%j"
+               level: "%l"
+               scope: "%n"
+               timestamp: "%Y-%m-%dT%T.%eZ"
    EOF
    ```
+
+   The `logFormat` field configures how Envoy formats its application logs (not access logs). Define the variable fields you want by using the [Envoy format flags](https://www.envoyproxy.io/docs/envoy/latest/operations/cli#cmdoption-log-format). You can choose between the following options:
+   - `json`: Emit logs in structured JSON format. For more information, see the [Envoy application logs documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/application_logging#printing-logs-in-json-format).
+   - `text`: Emit logs in a custom text format. If you omit `logFormat`, Envoy uses `text` as the default format.
 
 2. Create a Gateway resource that references your custom {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
@@ -74,6 +86,18 @@ You can use the built-in customization fields in the {{< reuse "docs/snippets/ga
    ```
    NAME     TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
    custom   NodePort   10.96.123.456   <none>        80:30xxx/TCP   30s
+   ```
+
+4. Verify that the Envoy application logs are emitted in JSON format.
+
+   ```sh
+   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l app.kubernetes.io/name=custom --tail=1
+   ```
+
+   Example output:
+
+   ```json
+   {"message":"all clusters initialized. initializing init manager","timestamp":"yyyy-mm-ddThh:mm:ssZ","scope":"main","level":"info"}
    ```
 
 ### Overlays {#overlays}
