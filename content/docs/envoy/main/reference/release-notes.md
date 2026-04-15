@@ -54,6 +54,13 @@ The following overlays are supported:
 
 For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
+
+#### GRPCRoute support {#v23-grpcroute}
+
+Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.
+
+For more information, see [gRPC routing]({{< link-hextra path="/traffic-management/grpc/" >}}).
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
