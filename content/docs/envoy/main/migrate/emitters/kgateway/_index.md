@@ -24,21 +24,23 @@ This command:
 
 1. Reads the kubeconfig file to extract cluster credentials and the current active namespace.
 2. Searches for ingress-nginx resources in that namespace.
-3. Converts them to Gateway API resources (currently only Gateways and HTTPRoutes).
+3. Converts them to Gateway API resources plus any required kgateway-specific resources.
 
 ## Options
 
 ### `print` command
 
-| Flag           | Default Value           | Required | Description                                                  |
-| -------------- | ----------------------- | -------- | ------------------------------------------------------------ |
-| all-namespaces | False                   | No       | If present, list the requested objects across all namespaces. Namespace in the current context is ignored even if specified with --namespace. |
-| input-file     |                         | No       | Path to the manifest file. When set, the tool reads ingresses from the file instead of from the cluster. Supported files are yaml and json. |
-| namespace      |                         | No       | If present, the namespace scope for the invocation.           |
-| output         | yaml                    | No       | The output format, either yaml or json.                       |
-| providers      |  | Yes       | Comma-separated list of providers (only ingress-nginx is supported in this downstream). |
-| emitter      | standard | No       | The emitter to use for generating Gateway API resources (supported values: standard, kgateway). |
-| kubeconfig     |                         | No       | The kubeconfig file to use when talking to the cluster. If the flag is not set, a set of standard locations can be searched for an existing kubeconfig file. |
+| Flag | Short | Default | Required | Description |
+| --- | --- | --- | --- | --- |
+| `all-namespaces` | `-A` | `false` | No | List matching resources across all namespaces. Ignored when `--input-file` is used. |
+| `allow-experimental-gw-api` |  | `false` | No | Include experimental Gateway API fields in the generated output. |
+| `emitter` |  | `standard` | No | The emitter to use for generating Gateway API resources. |
+| `input-file` |  |  | No | Path to one or more manifest files. Repeat the flag to read multiple files instead of reading from the cluster. |
+| `kubeconfig` |  |  | No | The kubeconfig file to use when reading from the cluster. |
+| `namespace` | `-n` |  | No | Restrict cluster reads to a namespace. |
+| `no-color` |  | `false` | No | Disable ANSI color codes in CLI output. |
+| `output` | `-o` | `yaml` | No | Output format. One of `yaml`, `json`, or `kyaml`. |
+| `providers` |  |  | Yes | Comma-separated list of providers. Use `ingress-nginx` for this emitter. |
 
 ## Conversion of Ingress resources to Gateway API
 
@@ -121,10 +123,12 @@ routing rules.
 - `nginx.ingress.kubernetes.io/session-cookie-secure`: Sets the Secure flag on the cookie. Maps to `BackendConfigPolicy.spec.loadBalancer.ringHash.hashPolicies[].cookie.secure`.
 - `nginx.ingress.kubernetes.io/service-upstream`: When set to `"true"`, configures Kgateway to route to the Service’s cluster IP (or equivalent static host) instead of individual Pod IPs. For each covered Service, the emitter creates a `Backend` resource with `spec.type: Static` and rewrites the corresponding `HTTPRoute.spec.rules[].backendRefs[]` to reference that `Backend` (group `gateway.kgateway.dev`, kind `Backend`).
 - `nginx.ingress.kubernetes.io/backend-protocol`: Indicates the L7 protocol that is used to communicate with the proxied backend.
+  - This annotation affects upstream protocol selection only. It does **not** cause ingress2gateway to emit a `GRPCRoute`.
   - **Supported values (mapped):** `GRPC`, `GRPCS`
     - If `service-upstream: "true"` is also set for the same Service backend, the emitter sets `spec.static.appProtocol: grpc` on the generated `Backend`.
     - Otherwise, the emitter does **not** create or modify Kubernetes `Service` resources. Instead, it emits an **INFO** notification with a `kubectl patch`
       command to update the existing Service port with `appProtocol: grpc`.
+    - Generated routes remain `HTTPRoute` resources. This annotation only influences backend-facing configuration.
   - **Values treated as default HTTP/1.x (no-op):** `HTTP`, `HTTPS`, `AUTO_HTTP`
   - **Unsupported values (rejected by provider):** `FCGI` (and others)
   - **Safety note:** Because emitting Service manifests could overwrite user-managed Service configuration, ingress2gateway intentionally avoids generating
@@ -149,7 +153,7 @@ routing rules.
 
 ### Access Logging
 
-- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, creates an HTTPListenerPolicy that configures a basic policy for Envoy access logging. Maps to `HTTPListenerPolicy.spec.accessLog[].fileSink`. This can be further customized as needed, see [docs](https://kgateway.dev/docs/envoy/2.0.x/security/access-logging/).
+- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, creates an `HTTPListenerPolicy` that configures a basic Envoy access log policy via `HTTPListenerPolicy.spec.accessLog[].fileSink`. This can be further customized as needed; see the [access logging docs]({{< relref "../../../security/access-logging.md" >}}).
 
 ### Regex Path Matching and Rewrites
 
@@ -231,9 +235,11 @@ Currently supported:
     - `spec.static.hosts` containing a single `{host, port}` entry derived from the Service (e.g. `myservice.default.svc.cluster.local:80`).
   - Matching `HTTPRoute.spec.rules[].backendRefs[]` are rewritten to reference this `Backend` instead of the core Service.
 - `nginx.ingress.kubernetes.io/backend-protocol`:
+  - This annotation does **not** switch route generation from `HTTPRoute` to `GRPCRoute`; it only influences backend connection behavior.
   - When set to `GRPC` or `GRPCS` **and** `service-upstream: "true"` is set for the same backend, the emitter stamps `spec.static.appProtocol: grpc` on the generated `Backend`.
   - When set to `GRPC` or `GRPCS` **without** `service-upstream: "true"`, the emitter emits an **INFO** notification that includes a `kubectl patch service ...`
     command to set `spec.ports[].appProtocol` on the existing Service.
+  - Generated routes remain `HTTPRoute` resources.
   - `HTTP`, `HTTPS`, and `AUTO_HTTP` are treated as default HTTP/1.x behavior and do not emit additional config.
 
 ### Summary of Policy Types
