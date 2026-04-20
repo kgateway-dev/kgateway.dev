@@ -70,7 +70,7 @@ Enterprise-grade **AI gateway functionality** has been open sourced for the firs
 * AI-specific metrics
 * [Gateway API Inference Extension project](https://gateway-api-inference-extension.sigs.k8s.io/guides/) support for routing to local LLM workloads
 
-For more information, see the [AI Gateway docs]({{< link-hextra path="/ai/" >}}).
+For more AI capabilities, see the [agentgateway docs](https://agentgateway.dev/docs/kubernetes/latest/).
 
 #### 🧠 KRT-based control plane {#control-plane}
 
