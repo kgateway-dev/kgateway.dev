@@ -222,46 +222,63 @@ def parse_go_file(filepath: Path, source: str = "", is_enterprise: bool = False)
     return types
 
 
-def format_go_type_as_link(go_type: str) -> str:
-    """Convert a Go type to markdown with links to other types."""
+def format_go_type_as_link(go_type: str, documented_types: set[str] | None = None) -> str:
+    """Convert a Go type to markdown with links to other types.
+
+    Only creates anchor links for types that are known to have headings
+    in the document. Types not in documented_types are rendered as plain text.
+    """
     # Handle slices
     if go_type.startswith("[]"):
         inner = go_type[2:]
-        return f"[]{format_go_type_as_link(inner)}"
-    
+        return f"[]{format_go_type_as_link(inner, documented_types)}"
+
     # Handle pointers
     if go_type.startswith("*"):
         inner = go_type[1:]
-        return f"*{format_go_type_as_link(inner)}"
-    
+        return f"*{format_go_type_as_link(inner, documented_types)}"
+
     # Handle maps
     if go_type.startswith("map["):
         return go_type  # Keep maps as-is for simplicity
-    
+
     # Check if it's a custom type (starts with uppercase, not a builtin)
     builtins = {"string", "int", "int32", "int64", "bool", "float32", "float64", "byte", "error"}
     if go_type and go_type[0].isupper() and go_type.lower() not in builtins:
-        # Check for package prefix
+        # Determine the type name (strip package prefix if present)
         if "." in go_type:
-            parts = go_type.split(".")
-            type_name = parts[-1]
-            return f"[{go_type}](#{type_name.lower()})"
-        return f"[{go_type}](#{go_type.lower()})"
-    
+            type_name = go_type.split(".")[-1]
+        else:
+            type_name = go_type
+
+        # Only create an anchor link if the type is documented
+        if documented_types is not None and type_name not in documented_types:
+            return f"_{go_type}_"
+
+        return f"[{go_type}](#{type_name.lower()})"
+
     return go_type
 
 
-def generate_markdown(types: list[TypeInfo], referenced_types: set[str]) -> str:
-    """Generate markdown documentation for the types."""
+def generate_markdown(types: list[TypeInfo], referenced_types: set[str], existing_doc_types: set[str] | None = None) -> str:
+    """Generate markdown documentation for the types.
+
+    existing_doc_types: type names that already have headings in the document.
+    Used to avoid generating dead anchor links for undocumented types.
+    """
     output = []
     output.append("")
     output.append("## Shared Types")
     output.append("")
     output.append("The following types are defined in the shared package and used across multiple APIs.")
     output.append("")
-    
+
     # Filter to only types that are referenced
     types_to_doc = [t for t in types if t.name in referenced_types]
+
+    # Build the full set of documented types: existing headings + types we're about to add
+    documented_types = set(existing_doc_types or set())
+    documented_types.update(t.name for t in types_to_doc)
     
     # Group types by name and whether they're enterprise
     oss_by_name = {}  # name -> list of OSS TypeInfo
@@ -331,7 +348,7 @@ def generate_markdown(types: list[TypeInfo], referenced_types: set[str]) -> str:
             output.append("| Field | Type | Description |")
             output.append("|-------|------|-------------|")
             for field in type_info.fields:
-                type_str = format_go_type_as_link(field.go_type)
+                type_str = format_go_type_as_link(field.go_type, documented_types)
                 req_str = " **Required.**" if field.required else ""
                 desc = field.description + req_str if field.description else req_str.strip()
                 # Escape pipes in description
@@ -342,26 +359,36 @@ def generate_markdown(types: list[TypeInfo], referenced_types: set[str]) -> str:
     return "\n".join(output)
 
 
+def find_documented_types(doc_file: Path) -> set[str]:
+    """Find all type names that have #### headings in the document."""
+    if not doc_file.exists():
+        return set()
+
+    content = doc_file.read_text()
+    heading_pattern = re.compile(r'^#### (\w+)', re.MULTILINE)
+    return {m.group(1) for m in heading_pattern.finditer(content)}
+
+
 def find_all_broken_links(doc_file: Path) -> set[str]:
     """Find all broken anchor links in a markdown file."""
     if not doc_file.exists():
         return set()
-    
+
     content = doc_file.read_text()
-    
+
     # Find all links like [TypeName](#typename)
     link_pattern = re.compile(r'\[([A-Z][A-Za-z0-9_]*)\]\(#([a-z][a-z0-9_]*)\)')
-    
+
     broken = set()
     for match in link_pattern.finditer(content):
         type_name = match.group(1)
         anchor = match.group(2)
-        
+
         # Check if the anchor exists in the document
         anchor_pattern = f"#### {type_name}"
         if anchor_pattern not in content:
             broken.add(type_name)
-    
+
     return broken
 
 
@@ -447,8 +474,12 @@ def main():
             print(f"Warning: These broken links could not be resolved: {remaining}")
         sys.exit(0)
     
+    # Build set of types already documented in the file (from crd-ref-docs output)
+    existing_doc_types = find_documented_types(doc_file)
+    print(f"Existing documented types: {len(existing_doc_types)}")
+
     # Generate markdown for referenced types
-    markdown = generate_markdown(all_types, referenced)
+    markdown = generate_markdown(all_types, referenced, existing_doc_types)
     
     # Append to doc file
     with open(doc_file, "a") as f:

@@ -38,8 +38,8 @@ Let's take a look at how we can set up model priority with kgateway. As shown in
 Make sure that you have a basic kgateway environment set up with AI Gateway and your LLM provider. If you don't, check out these docs:
 
 - [Get started with kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/)
-- [Set up AI Gateway](https://kgateway.dev/docs/envoy/latest/ai/setup/)
-- [Authenticate to the LLM provider](https://kgateway.dev/docs/envoy/latest/ai/auth/)
+- [Set up AI Gateway](https://kgateway.dev/docs/envoy/2.1.x/ai/setup/)
+- [Authenticate to the LLM provider](https://kgateway.dev/docs/envoy/2.1.x/ai/auth/)
 
 ## Step 1: Create a Backend for your models
 
