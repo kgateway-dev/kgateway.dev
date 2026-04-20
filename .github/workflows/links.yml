@@ -23,19 +23,19 @@ jobs:
       PRODUCT_NAME: kgateway OSS
       ISSUE_TITLE: Link Checker Report - kgateway OSS
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           fetch-depth: 100
 
       - name: Checkout shared link-checking scripts
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           repository: solo-io/docs-link-checking
           path: docs-link-checking
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Hugo
-        uses: peaceiris/actions-hugo@v3
+        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # v3
         with:
           hugo-version: '0.147.0'
           extended: true
@@ -100,7 +100,7 @@ jobs:
         id: create-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: peter-evans/create-issue-from-file@v6
+        uses: peter-evans/create-issue-from-file@fca9117c27cdc29c6c4db3b86c48e4115a786710 # v6
         with:
           title: ${{ env.ISSUE_TITLE }}
           content-filepath: ./artifacts/kgateway-oss-links.md
@@ -148,7 +148,7 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: link-checker-assets
           path: artifacts/*
