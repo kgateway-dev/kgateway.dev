@@ -67,6 +67,17 @@ jobs:
             --root-dir "${{ github.workspace }}/public"
             --index-files index.html
             --remap "^https://kgateway\.dev/docs/ file:///${{ github.workspace }}/public/docs/"
+            --remap "public/docs/about public/docs/envoy/latest/about"
+            --remap "public/docs/ai public/docs/envoy/latest/ai"
+            --remap "public/docs/integrations public/docs/envoy/latest/integrations"
+            --remap "public/docs/install public/docs/envoy/latest/install"
+            --remap "public/docs/observability public/docs/envoy/latest/observability"
+            --remap "public/docs/operations public/docs/envoy/latest/operations"
+            --remap "public/docs/quickstart public/docs/envoy/latest/quickstart"
+            --remap "public/docs/reference public/docs/envoy/latest/reference"
+            --remap "public/docs/security public/docs/envoy/latest/security"
+            --remap "public/docs/setup public/docs/envoy/latest/setup"
+            --remap "public/docs/traffic-management public/docs/envoy/latest/traffic-management"
             --format json
             --user-agent curl/8.4.0
             --output "${{ github.workspace }}/artifacts/kgateway-oss-links.json"
