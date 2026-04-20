@@ -69,7 +69,7 @@ You can now apply deep merging for extAuth and extProc policies. In addition, yo
 
 Kgateway now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
 
-For more information, see [Customize the gateway](/docs/envoy/latest/setup/customize/general-steps/). To find all the values that you can change, see the [PodTemplate reference](/docs/envoy/latest/reference/api/#pod) in the GatewayParameters API.
+For more information, see [Customize the gateway](/docs/envoy/latest/setup/customize/gateway/). To find all the values that you can change, see the [PodTemplate reference](/docs/envoy/latest/reference/api/#pod) in the GatewayParameters API.
 
 ### Header modifier filter for TrafficPolicy {#header-modifier}
 
