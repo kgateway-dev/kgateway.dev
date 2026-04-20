@@ -244,8 +244,8 @@ This video demonstrates the rate-limiting example in action:
 
 ## Wrapping Up
 
-I am super excited that the release of [kgateway 2.0](https://kgateway.dev/docs/reference/release-notes/) brings a new level of extensibility to Istio's ambient architecture. With the ability to seamlessly integrate kgateway as a waypoint proxy, you gain access to powerful Layer 7 functions while maintaining a unified traffic control experience across both north-south and east-west traffic.
+I am super excited that the release of [kgateway 2.0](https://kgateway.dev/docs/envoy/latest/reference/release-notes/) brings a new level of extensibility to Istio's ambient architecture. With the ability to seamlessly integrate kgateway as a waypoint proxy, you gain access to powerful Layer 7 functions while maintaining a unified traffic control experience across both north-south and east-west traffic.
 
-By leveraging Kubernetes Gateway APIs, you can easily configure advanced traffic management features like rate limiting, [request transformation](https://kgateway.dev/docs/traffic-management/transformations/), [external processing (ExtProc)](https://kgateway.dev/docs/traffic-management/extproc/), [external Auth](https://kgateway.dev/docs/security/external-auth/), and more — all without wrestling with complex Envoy filters.
+By leveraging Kubernetes Gateway APIs, you can easily configure advanced traffic management features like rate limiting, [request transformation](https://kgateway.dev/docs/envoy/latest/traffic-management/transformations/), [external processing (ExtProc)](https://kgateway.dev/docs/envoy/latest/traffic-management/extproc/), [external Auth](https://kgateway.dev/docs/envoy/latest/security/external-auth/), and more — all without wrestling with complex Envoy filters.
 
 Explore kgateway today, and [reach out on the community Slack](https://kgateway.dev/slack/) if you have any questions or need assistance!

@@ -22,7 +22,7 @@ I know everyone gets excited when they see a project they're interested in and c
 
 ### Deep Product Experience
 
-Instead of rushing to submit my application, I first went to actually experience the product involved in the project: [AI Gateway](https://kgateway.dev/docs/ai/about/). During usage, I discovered a practical problem - I couldn't directly access the LLM service providers mentioned in the official guide.
+Instead of rushing to submit my application, I first went to actually experience the product involved in the project: [AI Gateway](https://kgateway.dev/docs/envoy/latest/ai/about/). During usage, I discovered a practical problem - I couldn't directly access the LLM service providers mentioned in the official guide.
 
 ### Proactive Problem Solving
 
@@ -110,10 +110,10 @@ Through this project, we added complete distributed tracing support to kgateway'
 Want to experience this distributed tracing feature yourself? Follow these steps to quickly set up a complete test environment:
 
 #### 1. Install Gateway
-Follow the [Get started](https://kgateway.dev/docs/quickstart/) guide. For the installation, choose the development version, v{{< reuse "docs/versions/patch-dev.md" >}}.
+Follow the [Get started](https://kgateway.dev/docs/envoy/latest/quickstart/) guide. For the installation, choose the development version, v{{< reuse "docs/versions/patch-dev.md" >}}.
 
 #### 2. Enable AI Extension
-As you follow the [Set up AI Gateway](https://kgateway.dev/docs/ai/setup/), note the following configurations:
+As you follow the [Set up AI Gateway](https://kgateway.dev/docs/envoy/latest/ai/setup/), note the following configurations:
 
 Upgrade kgateway and enable AI Gateway extension:
 ```bash
@@ -240,7 +240,7 @@ EOF
 ```
 
 #### 5. Send Test Request
-Send a test request using [Ollama for local LLMs](https://kgateway.dev/docs/ai/ollama/):
+Send a test request using [Ollama for local LLMs](https://kgateway.dev/docs/envoy/latest/ai/ollama/):
 
 ```bash
 curl -v "localhost:8080/ollama" \
