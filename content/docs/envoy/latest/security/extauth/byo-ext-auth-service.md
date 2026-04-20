@@ -1,5 +1,7 @@
 ---
 title: BYO ext auth service
+aliases:
+  - /docs/envoy/latest/security/external-auth/
 weight: 100
 description: 
 ---

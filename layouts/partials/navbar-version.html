@@ -21,11 +21,26 @@
 {{- $baseurl := site.BaseURL -}}
 
 {{- range $versions -}}
-  <li>
-    {{- if or (eq $subSection "agentgateway") (hasPrefix $path "/docs/agentgateway/") -}}
+  {{- if or (eq $subSection "agentgateway") (hasPrefix $path "/docs/agentgateway/") -}}
+    <li>
       <a class="dropdow-item" href="https://agentgateway.dev/docs/kubernetes/latest/">{{ .dropdown }}</a>
-    {{- else -}}
-      <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+    </li>
+  {{- else -}}
+    {{- /* Only show this version if the equivalent page exists */ -}}
+    {{- $targetPath := printf "/docs/%s/%s%s" $subSection .linkVersion $newPath -}}
+    {{- $targetPage := site.GetPage $targetPath -}}
+    {{- if not $targetPage -}}
+      {{- /* Try without trailing path (link to version root instead) */ -}}
+      {{- $targetPage = site.GetPage (printf "/docs/%s/%s/" $subSection .linkVersion) -}}
     {{- end -}}
-  </li>
+    {{- if $targetPage -}}
+      <li>
+        {{- if site.GetPage $targetPath -}}
+          <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath}}">{{ .dropdown }}</a>
+        {{- else -}}
+          <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}/">{{ .dropdown }}</a>
+        {{- end -}}
+      </li>
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
