@@ -1,4 +1,6 @@
 ---
+aliases:
+  - /docs/envoy/main/traffic-management/transformations/simple/inject-response-headers/
 title: Inject response headers
 weight: 20
 description: Extract values from a request header and inject it as a header to your response. 
