@@ -1,0 +1,50 @@
+{{- $link := .Get "link" -}}
+{{- $path := .Get "path" -}}
+{{- if $path }}
+  {{- $pathTrimmed := strings.TrimPrefix "/" $path -}}
+  {{- $section := "" -}}
+  {{- with findRE `^/docs/(?:envoy|agentgateway)/(?:latest|main|\d+\.\d+\.[x\d]+)` .Page.RelPermalink }}{{ $section = index . 0 }}{{ end -}}
+  {{- if not $section }}{{ $section = strings.TrimSuffix "/" .Page.FirstSection.RelPermalink }}{{ end -}}
+  {{- $section = replaceRE `^https?://[^/]+` "" $section -}}
+  {{- $section = replaceRE `^/localhost:[^/]+` "" $section -}}
+  {{- if not (hasPrefix $section "/") }}{{ $section = printf "/%s" $section }}{{ end -}}
+  {{- $link = printf "%s/%s" $section $pathTrimmed -}}
+  {{- if and (not (strings.HasSuffix $link "/")) (not (in $link "#")) }}{{ $link = printf "%s/" $link }}{{ end -}}
+  {{- range (seq 10) }}{{ $link = replace $link "//" "/" }}{{ end -}}
+{{- end -}}
+
+{{- if templates.Exists "partials/shortcodes/card.html" -}}
+  {{- partial "shortcodes/card" (dict
+    "page" .Page
+    "link" $link
+    "title" (.Get "title" | default (.Get "header"))
+    "icon" (.Get "icon")
+    "subtitle" (.Get "subtitle" | default (.Get "description"))
+    "image" (.Get "image")
+    "alt" (.Get "alt" | default (.Get "title") | default (.Get "header"))
+    "width" 0
+    "height" 0
+    "imageStyle" (.Get "imageStyle")
+    "tag" (.Get "tag")
+    "tagColor" (.Get "tagColor")
+    "tagType" (.Get "tagColor")
+    "tagBorder" (not (eq (.Get "tagBorder") false))
+    "tagIcon" (.Get "tagIcon")
+  ) -}}
+{{- else -}}
+  {{- $title := .Get "title" | default (.Get "header") -}}
+  {{- $subtitle := .Get "subtitle" | default (.Get "description") -}}
+  {{- $icon := .Get "icon" -}}
+  {{- $image := .Get "image" -}}
+  {{- $alt := .Get "alt" | default $title -}}
+  <a class="hextra-card flex flex-col hx:rounded-xl hx:border hx:border-gray-200 hx:bg-white hx:p-4 hx:shadow-sm hx:transition-colors hx:dark:border-neutral-800 hx:dark:bg-neutral-900" href="{{ $link }}">
+    {{- if $image }}
+    <div class="hextra-card-image hx:mb-4 hx:flex hx:justify-center">
+      <img src="{{ $image }}" alt="{{ $alt }}" class="hx:max-h-16 hx:w-auto hx:object-contain" />
+    </div>
+    {{- end -}}
+    {{- if $icon }}{{ partial "utils/icon.html" (dict "name" $icon "attributes" "class='hx:mb-2 hx:size-6'") }}{{ end -}}
+    {{- if $title }}<p class="hx:font-semibold hx:text-primary">{{ $title }}</p>{{ end -}}
+    {{- if $subtitle }}<p class="hextra-card-subtitle hx:mt-1 hx:text-sm hx:text-gray-500 hx:dark:text-gray-400">{{ $subtitle | markdownify }}</p>{{ end -}}
+  </a>
+{{- end -}}
