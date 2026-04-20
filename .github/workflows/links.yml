@@ -1,0 +1,170 @@
+name: Links
+
+# Scheduled: full check on all files, creates issues, posts to Slack.
+# Pull request: local links only on changed files, no issue or Slack.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "00 04 * * MON"
+  pull_request:
+    paths:
+      - 'content/**'
+      - 'assets/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linkChecker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PRODUCT_NAME: kgateway OSS
+      ISSUE_TITLE: Link Checker Report - kgateway OSS
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 100
+
+      - name: Checkout shared link-checking scripts
+        uses: actions/checkout@v4
+        with:
+          repository: solo-io/docs-link-checking
+          path: docs-link-checking
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.147.0'
+          extended: true
+
+      - name: Install Lychee
+        run: |
+          chmod +x docs-link-checking/install-lychee.sh
+          docs-link-checking/install-lychee.sh
+
+      - name: Hugo build
+        run: |
+          npm i -D postcss postcss-cli autoprefixer
+          hugo --config hugo.yaml
+
+      - name: Prepare workspace
+        run: mkdir -p artifacts
+
+      - name: Check Links with Lychee
+        id: lychee
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          shopt -s globstar
+          set +e
+
+          LYCHEE_COMMON=(lychee
+            --verbose
+            --config docs-link-checking/lychee.toml
+            --root-dir "${{ github.workspace }}/public"
+            --index-files index.html
+            --remap "^https://kgateway\.dev/docs/ file:///${{ github.workspace }}/public/docs/"
+            --format json
+            --user-agent curl/8.4.0
+            --output "${{ github.workspace }}/artifacts/kgateway-oss-links.json"
+            public/**/*.html
+          )
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # Skip external URLs on PRs; lychee applies remaps before exclusions so
+            # kgateway.dev links are still resolved to local files and checked.
+            "${LYCHEE_COMMON[@]}" --exclude "^https?://"
+          else
+            "${LYCHEE_COMMON[@]}" --github-token ${{ secrets.GITHUB_TOKEN }}
+          fi > "${{ github.workspace }}/artifacts/kgateway-oss-links-json.log" 2>&1
+
+          EXIT=$?
+          set -e
+          echo "has_failures=$([ "$EXIT" != "0" ] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
+
+      - name: Generate markdown report from JSON
+        if: hashFiles('artifacts/kgateway-oss-links.json') != ''
+        run: |
+          chmod +x docs-link-checking/generate-link-report.sh
+          docs-link-checking/generate-link-report.sh \
+            "${{ github.workspace }}/artifacts/kgateway-oss-links.json" \
+            "${{ github.workspace }}/artifacts/kgateway-oss-links.md" \
+            "${{ github.workspace }}/public" \
+            "${{ github.event_name == 'pull_request' && 'pr' || '' }}"
+
+      - name: Create issue from report
+        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        id: create-issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: peter-evans/create-issue-from-file@v6
+        with:
+          title: ${{ env.ISSUE_TITLE }}
+          content-filepath: ./artifacts/kgateway-oss-links.md
+
+      - name: Set issue URL for Slack
+        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        id: issue-url
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ steps.create-issue.outputs.issue-number }}
+          ISSUE_TITLE: ${{ env.ISSUE_TITLE }}
+          LABELS: links,bug
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          chmod +x docs-link-checking/set-issue-url.sh
+          docs-link-checking/set-issue-url.sh
+
+      - name: Remove public directory
+        run: rm -rf public
+
+      - name: Read link checker results
+        id: link-stats
+        env:
+          MD_FILE: artifacts/kgateway-oss-links.md
+          JSON_FILE: artifacts/kgateway-oss-links.json
+        run: |
+          chmod +x docs-link-checking/read-link-stats.sh
+          docs-link-checking/read-link-stats.sh
+
+      - name: Post results to Slack
+        if: github.event_name != 'pull_request'
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: "#doctopus-tests"
+          ERRORS: ${{ steps.link-stats.outputs.errors }}
+          WARNINGS: ${{ steps.link-stats.outputs.warnings }}
+          REDIRECTS: ${{ steps.link-stats.outputs.redirects }}
+          ICON: ${{ steps.link-stats.outputs.icon }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+          ISSUE_LINE: ${{ steps.issue-url.outputs.issue_line }}
+        run: |
+          chmod +x docs-link-checking/post-slack-results.sh
+          docs-link-checking/post-slack-results.sh
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-checker-assets
+          path: artifacts/*
+
+      - name: Write report to job summary
+        if: hashFiles('artifacts/kgateway-oss-links.md') != ''
+        run: cat artifacts/kgateway-oss-links.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail check if errors exist
+        if: github.event_name == 'pull_request'
+        env:
+          ERRORS: ${{ steps.link-stats.outputs.errors }}
+        run: |
+          if [ "${ERRORS:-0}" -gt 0 ]; then
+            echo "Link checker found ${ERRORS} error(s). See artifacts for details."
+            exit 1
+          else
+            echo "Link checker found ${ERRORS} errors."
+          fi
