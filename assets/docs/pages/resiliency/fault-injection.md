@@ -221,7 +221,7 @@ Delay, or inject latency into, incoming requests for a certain amount of time.
 
 Limit the rate at which response data is sent back to the client. This way, you can simulate slow or degraded upstream connections.
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that limits the response rate to 1 kbit/s for 100% of requests.
+1. Configure the {{< reuse "docs/snippets/trafficpolicy.md" >}} to limit the response rate to 1 kilobit per second for all requests.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
