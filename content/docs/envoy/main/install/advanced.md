@@ -118,7 +118,7 @@ controller:
 ```
 
 
-**Note**: To monitor the memory and CPU threshold, you need to deploy the Kubernetes `metrics-server` in your cluster. The `metrics-server` retrieves metrics, such as CPU and memory consumption for your workloads. 
+**Note**: To monitor the memory and CPU threshold, you must deploy the Kubernetes `metrics-server` to your cluster. The `metrics-server` retrieves metrics, such as CPU and memory consumption, for your workloads. 
 
 You can install the server with the following command: 
 ```sh
