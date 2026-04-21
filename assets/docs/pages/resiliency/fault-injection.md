@@ -18,7 +18,7 @@ You can also use a route-level `disable` override to opt specific routes out of 
 
 ## Abort {#abort}
 
-Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to abort incoming requests with a specific HTTP status code.
+Abort incoming requests with a specific HTTP status code.
 
 1. Configure the {{< reuse "docs/snippets/trafficpolicy.md" >}} to abort requests with a 503 HTTP status code. You can attach the policy to an HTTPRoute to affect a specific route, or to a Gateway to affect all routes.
    {{< tabs items="HTTPRoute,Gateway" tabTotal="2" >}}
