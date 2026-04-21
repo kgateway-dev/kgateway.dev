@@ -52,9 +52,11 @@ Review how policies are inherited along the route delegation chain.
 
 If a destination that is defined in the HTTPRoute's `backendRefs` section cannot be found, such as when a parent HTTPRoute routes traffic to a child HTTPRoute that does not exist, the route is automatically replaced with a 500 HTTP direct response. However, valid routes are not replaced and continue to work.
 
+{{< version exclude-if="2.0.x" >}}
 ## Weighted routing
 
 You can use delegated routes together with [weighted routes](../../weighted-routes/). Make sure to enable the weighted routing feature. Then, add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
+{{< /version >}}
 
 ## Limitations
 
