@@ -66,10 +66,10 @@ controller:
 
 ## Autoscaling
 
-You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "agw-docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
+You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
 
 {{< callout type="info" >}}
-Note that {{< reuse "agw-docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
+Note that {{< reuse "docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
 {{< /callout >}}
 
 {{< callout type="warning" >}}
