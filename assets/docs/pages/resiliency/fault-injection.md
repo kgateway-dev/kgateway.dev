@@ -2,7 +2,7 @@ Test the resilience of your apps by injecting delays and connection failures int
 
 ## About fault injection
 
-Fault injection lets you deliberately introduce failures into your request path for chaos engineering and resiliency testing. kgateway maps fault injection configuration directly to the Envoy [HTTP fault filter](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/fault_filter), and supports the following fault types:
+Fault injection lets you deliberately introduce failures into your request path for chaos engineering and resiliency testing. {{< reuse "/docs/snippets/kgateway-capital.md" >}} maps fault injection configuration directly to the Envoy [HTTP fault filter](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/fault_filter), and supports the following fault types:
 
 * **Abort**: Terminates requests early with a specified HTTP or gRPC status code, simulating crash failures such as backend errors.
 * **Delay**: Injects artificial latency before forwarding a request upstream, simulating timing failures such as network latency or overloaded backends.
