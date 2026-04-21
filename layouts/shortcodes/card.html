@@ -13,6 +13,18 @@
   {{- range (seq 10) }}{{ $link = replace $link "//" "/" }}{{ end -}}
 {{- end -}}
 
+{{- /* Process image through Hugo's asset pipeline so the resolved URL
+       points to the fingerprinted/converted file that Hugo actually emits. */ -}}
+{{- $resolvedImage := .Get "image" -}}
+{{- with .Get "image" -}}
+  {{- if not (strings.HasPrefix . "http") -}}
+    {{- $imgPath := strings.TrimPrefix "/" . -}}
+    {{- with resources.Get $imgPath -}}
+      {{- $resolvedImage = .RelPermalink -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
 {{- if templates.Exists "partials/shortcodes/card.html" -}}
   {{- partial "shortcodes/card" (dict
     "page" .Page
@@ -20,7 +32,7 @@
     "title" (.Get "title" | default (.Get "header"))
     "icon" (.Get "icon")
     "subtitle" (.Get "subtitle" | default (.Get "description"))
-    "image" (.Get "image")
+    "image" $resolvedImage
     "alt" (.Get "alt" | default (.Get "title") | default (.Get "header"))
     "width" 0
     "height" 0
@@ -36,11 +48,20 @@
   {{- $subtitle := .Get "subtitle" | default (.Get "description") -}}
   {{- $icon := .Get "icon" -}}
   {{- $image := .Get "image" -}}
+  {{- $imageStyle := .Get "imageStyle" -}}
   {{- $alt := .Get "alt" | default $title -}}
+  {{- $imgSrc := $image -}}
+  {{- /* Process image through Hugo's asset pipeline if it's a local asset */ -}}
+  {{- if and $image (not (strings.HasPrefix $image "http")) -}}
+    {{- $imgPath := strings.TrimPrefix "/" $image -}}
+    {{- with resources.Get $imgPath -}}
+      {{- $imgSrc = .RelPermalink -}}
+    {{- end -}}
+  {{- end -}}
   <a class="hextra-card flex flex-col hx:rounded-xl hx:border hx:border-gray-200 hx:bg-white hx:p-4 hx:shadow-sm hx:transition-colors hx:dark:border-neutral-800 hx:dark:bg-neutral-900" href="{{ $link }}">
     {{- if $image }}
     <div class="hextra-card-image hx:mb-4 hx:flex hx:justify-center">
-      <img src="{{ $image }}" alt="{{ $alt }}" class="hx:max-h-16 hx:w-auto hx:object-contain" />
+      <img src="{{ $imgSrc }}" alt="{{ $alt }}"{{ with $imageStyle }} style="{{ . }}"{{ end }} class="hx:max-h-16 hx:w-auto hx:object-contain" />
     </div>
     {{- end -}}
     {{- if $icon }}{{ partial "utils/icon.html" (dict "name" $icon "attributes" "class='hx:mb-2 hx:size-6'") }}{{ end -}}
