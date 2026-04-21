@@ -425,14 +425,3 @@ If you have a gateway-level fault injection policy, you can opt specific routes 
    kubectl delete trafficpolicy fault-abort-gateway -n {{< reuse "docs/snippets/namespace.md" >}}
    kubectl delete trafficpolicy fault-disable -n httpbin
    ```
-
-## Cleanup
-
-{{< reuse "docs/snippets/cleanup.md" >}}
-
-Remove the {{< reuse "docs/snippets/trafficpolicy.md" >}} resources if you haven't already.
-
-```sh
-kubectl delete trafficpolicy -n httpbin --all
-kubectl delete trafficpolicy -n {{< reuse "docs/snippets/namespace.md" >}} --all
-```
