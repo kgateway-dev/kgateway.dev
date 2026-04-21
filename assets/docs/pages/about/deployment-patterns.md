@@ -64,7 +64,7 @@ The following image shows a gateway proxy that is exposed on the edge and serves
 
 <!--Source https://app.excalidraw.com/s/AKnnsusvczX/1HkLXOmi9BF-->
 
-For more information, see the guides for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](../../integrations/istio/ambient/ambient-ingress/) or [waypoint proxy](../../integrations/istio/ambient/waypoint/) for your ambient mesh. 
+For more information, see the guide for using {{< reuse "/docs/snippets/kgateway.md" >}} as an [ingress gateway](../../integrations/istio/ambient/ambient-ingress/) for your ambient mesh. 
 
 ### Sidecar mesh
 
