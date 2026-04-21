@@ -13,7 +13,7 @@ Choose between the following options to customize your gateway proxy:
 
 {{< conditional-text include-if="envoy" >}}
 {{< callout type="info" >}}
-To change the default proxy template and inject your own Envoy configuration, use a {{< version include-if="2.1.x,latest" >}}[self-managed gateway]({{< link-hextra path="/setup/selfmanaged/" >}}){{< /version >}}{{< version exclude-if="2.1.x,latest" >}}[self-managed gateway]({{< link-hextra path="/setup/customize/selfmanaged/" >}}){{< /version >}} instead.
+To change the default proxy template and inject your own Envoy configuration, use a {{< version include-if="2.1.x,2.2.x" >}}[self-managed gateway]({{< link-hextra path="/setup/selfmanaged/" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x" >}}[self-managed gateway]({{< link-hextra path="/setup/customize/selfmanaged/" >}}){{< /version >}} instead.
 {{< /callout >}}
 {{< /conditional-text >}}
 
