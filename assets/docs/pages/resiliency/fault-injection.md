@@ -72,7 +72,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to abort incoming 
    | `faultInjection.abort.httpStatus` | The HTTP status code to return for aborted requests. Must be between 200-599. |
    | `faultInjection.abort.percentage` | The percentage of requests to abort (0-100). Defaults to 100 if not set. |
 
-2. Send a few requests to the httpbin app. Verify that some requests are rejected with a 503 HTTP response code.
+2. Send a few requests to the httpbin app. Verify that requests are rejected with a 503 HTTP response code at the percentage that matches what you set in the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
