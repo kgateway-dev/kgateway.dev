@@ -122,7 +122,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to abort incoming 
 
 ## Delay {#delay}
 
-Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to inject latency into incoming requests.
+Delay, or inject latency into, incoming requests for a certain amount of time. 
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that delays requests. You can attach the policy to an HTTPRoute to affect a specific route, or to a Gateway to affect all routes.
    {{< tabs items="HTTPRoute,Gateway" tabTotal="2" >}}
