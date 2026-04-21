@@ -219,7 +219,7 @@ Delay, or inject latency into, incoming requests for a certain amount of time.
 
 ## Response rate limit {#response-rate-limit}
 
-Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to limit the rate at which response data is sent back to the client. This is useful for simulating slow or degraded upstream connections.
+Limit the rate at which response data is sent back to the client. This way, you can simulate slow or degraded upstream connections.
 
 1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that limits the response rate to 1 kbit/s for 100% of requests.
    ```yaml
