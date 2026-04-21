@@ -71,9 +71,15 @@
   {{- end -}}
   
   <nav class="hx-mb-4 hx-flex hx-items-center hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+    {{- if eq $subSection "agentgateway" -}}
+    <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+      {{ $productName }}
+    </a>
+    {{- else -}}
     <a href="/docs/{{ $subSection }}/{{ $currentVersion }}/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
       {{ $productName }}
     </a>
+    {{- end -}}
     {{- /* Add intermediate breadcrumb items */ -}}
     {{- range $breadcrumbItems -}}
       <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
