@@ -158,7 +158,7 @@ As part of debugging, you might have noticed that your HTTPRoute or Gateway had 
 
 3. Determine if you need a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). For example, the {{< reuse "docs/snippets/trafficpolicy.md" >}} might rely on a GatewayExtension to enable a feature such as external auth. However, the GatewayExtension might be in a different namespace than the backing external auth service.
 
-   Example ReferenceGrant for [external auth]({{< link-hextra path="/security/extauth/byo-ext-auth-service/" >}}) GatewayExtension:
+   Example ReferenceGrant for {{< version include-if="2.0.x,2.1.x" >}}[external auth]({{< link-hextra path="/security/external-auth/" >}}){{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}[external auth]({{< link-hextra path="/security/extauth/byo-ext-auth-service/" >}}){{< /version >}} GatewayExtension:
 
    * The GrantExtension for external auth, HTTPRoute, and backing Service are in the app namespace, such as `httpbin`.
    * The external auth service is in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace.

@@ -38,7 +38,7 @@ Review some of the benefits that you can achieve with route delegation:
 
 Review how policies are inherited along the route delegation chain. 
 
-For more information, see the [Policy inheritance]({{< link-hextra path="/traffic-management/route-delegation/inheritance/" >}}) guides. 
+{{< version exclude-if="2.0.x" >}}For more information, see the [Policy inheritance]({{< link-hextra path="/traffic-management/route-delegation/inheritance/" >}}) guides.{{< /version >}} 
 
 ### Native Gateway API policies
 
