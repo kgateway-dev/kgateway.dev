@@ -3,9 +3,10 @@
 
 | Key | Type | Description | Default |
 |-----|------|-------------|---------|
-| affinity | object | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. | `{}` |
+| affinity | object | Set affinity rules for pod scheduling, such as 'nodeAffinity:'. This field is deprecated in favor of controller.affinity and will be removed in v3.0. | `{}` |
 | commonLabels | object | Additional labels to add to all resources created by the Helm chart. | `{}` |
-| controller | object | Configure the kgateway control plane deployment. | `{"extraEnv":{},"horizontalPodAutoscaler":{},"image":{"pullPolicy":"","registry":"","repository":"kgateway","tag":""},"logLevel":"info","podDisruptionBudget":{},"priorityClassName":"","replicaCount":1,"service":{"allocateLoadBalancerNodePorts":null,"annotations":{},"clusterIP":"","clusterIPs":[],"enabled":true,"externalIPs":[],"externalName":"","externalTrafficPolicy":"","extraLabels":{},"healthCheckNodePort":null,"internalTrafficPolicy":"","ipFamilies":[],"ipFamilyPolicy":"","loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":{"grpc":9977,"health":9093,"metrics":9092},"publishNotReadyAddresses":false,"sessionAffinity":"","sessionAffinityConfig":{},"trafficDistribution":"","type":"ClusterIP"},"strategy":{},"verticalPodAutoscaler":{},"xds":{"tls":{"enabled":false}}}` |
+| controller | object | Configure the kgateway control plane deployment. | `{"affinity":null,"extraEnv":{},"horizontalPodAutoscaler":{},"image":{"pullPolicy":"","registry":"","repository":"kgateway","tag":""},"logLevel":"info","nodeSelector":null,"podAnnotations":null,"podDisruptionBudget":{},"podSecurityContext":null,"priorityClassName":"","replicaCount":1,"resources":null,"securityContext":null,"service":{"allocateLoadBalancerNodePorts":null,"annotations":{},"clusterIP":"","clusterIPs":[],"enabled":true,"externalIPs":[],"externalName":"","externalTrafficPolicy":"","extraLabels":{},"healthCheckNodePort":null,"internalTrafficPolicy":"","ipFamilies":[],"ipFamilyPolicy":"","loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":{"grpc":9977,"health":9093,"metrics":9092},"publishNotReadyAddresses":false,"sessionAffinity":"","sessionAffinityConfig":{},"trafficDistribution":"","type":"ClusterIP"},"strategy":{},"tolerations":null,"topologySpreadConstraints":null,"verticalPodAutoscaler":{},"xds":{"tls":{"enabled":false}}}` |
+| controller.affinity | string | Set affinity rules for controller pod scheduling. | `nil` |
 | controller.extraEnv | object | Add extra environment variables to the controller container. | `{}` |
 | controller.horizontalPodAutoscaler | object | Set horizontal pod autoscaler for the controller. Note that this does not    affect the data plane. The scaleTargetRef is automatically configured to    target the controller deployment. E.g.:  horizontalPodAutoscaler:   minReplicas: 1   maxReplicas: 5   metrics:     - type: Resource       resource:         name: cpu         target:           type: Utilization           averageUtilization: 80 | `{}` |
 | controller.image | object | Configure the controller container image. | `{"pullPolicy":"","registry":"","repository":"kgateway","tag":""}` |
@@ -14,9 +15,14 @@
 | controller.image.repository | string | Set the image repository for the controller. | `"kgateway"` |
 | controller.image.tag | string | Set the image tag for the controller. | `""` |
 | controller.logLevel | string | Set the log level for the controller. | `"info"` |
+| controller.nodeSelector | string | Set node selector labels for controller pod scheduling. | `nil` |
+| controller.podAnnotations | string | Add annotations to the controller pods. | `nil` |
 | controller.podDisruptionBudget | object | Set pod disruption budget for the controller. Note that this does not    affect the data plane. E.g.:  podDisruptionBudget:   minAvailable: 100% | `{}` |
+| controller.podSecurityContext | string | Set the pod-level security context for the controller pod. | `nil` |
 | controller.priorityClassName | string | Set the priority class name for the controller pod. | `""` |
 | controller.replicaCount | int | Set the number of controller pod replicas. | `1` |
+| controller.resources | string | Configure resource requests and limits for the controller container. | `nil` |
+| controller.securityContext | string | Set the container-level security context for the controller container. | `nil` |
 | controller.service | object | Controller service configuration. | `{"allocateLoadBalancerNodePorts":null,"annotations":{},"clusterIP":"","clusterIPs":[],"enabled":true,"externalIPs":[],"externalName":"","externalTrafficPolicy":"","extraLabels":{},"healthCheckNodePort":null,"internalTrafficPolicy":"","ipFamilies":[],"ipFamilyPolicy":"","loadBalancerClass":"","loadBalancerIP":"","loadBalancerSourceRanges":[],"ports":{"grpc":9977,"health":9093,"metrics":9092},"publishNotReadyAddresses":false,"sessionAffinity":"","sessionAffinityConfig":{},"trafficDistribution":"","type":"ClusterIP"}` |
 | controller.service.allocateLoadBalancerNodePorts | string | Allocate load balancer node ports. | `nil` |
 | controller.service.annotations | object | Service annotations. | `{}` |
@@ -41,6 +47,8 @@
 | controller.service.trafficDistribution | string | Traffic distribution. | `""` |
 | controller.service.type | string | Service type. | `"ClusterIP"` |
 | controller.strategy | object | Change the rollout strategy from the Kubernetes default of a RollingUpdate with 25% maxUnavailable, 25% maxSurge. E.g., to recreate pods, minimizing resources for the rollout but causing downtime: strategy:   type: Recreate E.g., to roll out as a RollingUpdate but with non-default parameters: strategy:   type: RollingUpdate   rollingUpdate:     maxSurge: 100% | `{}` |
+| controller.tolerations | string | Set tolerations for controller pod scheduling. | `nil` |
+| controller.topologySpreadConstraints | string | Set topology spread constraints for controller pod scheduling. | `nil` |
 | controller.verticalPodAutoscaler | object | Set vertical pod autoscaler for the controller. Note that this does not    affect the data plane. The targetRef is automatically configured to    target the controller deployment. E.g.:  verticalPodAutoscaler:   updatePolicy:     updateMode: Auto   resourcePolicy:     containerPolicies:       - containerName: "*"         minAllowed:           cpu: 100m           memory: 128Mi | `{}` |
 | controller.xds | object | Configure TLS settings for the xDS gRPC servers. | `{"tls":{"enabled":false}}` |
 | controller.xds.tls.enabled | bool | Enable TLS encryption for xDS communication. When enabled, the xDS server (port 9977) uses TLS. You must create a Secret named 'kgateway-xds-cert' in the kgateway installation namespace. The Secret must be of type 'kubernetes.io/tls' with 'tls.crt', 'tls.key', and 'ca.crt' data fields present. | `false` |
@@ -54,18 +62,18 @@
 | image.tag | string | Set the default image tag. | `""` |
 | imagePullSecrets | list | Set a list of image pull secrets for Kubernetes to use when pulling container images from your own private registry instead of the default kgateway registry. | `[]` |
 | nameOverride | string | Add a name to the default Helm base release, which is 'kgateway'. If you set 'nameOverride: "foo", the name of the resources that the Helm release creates become 'kgateway-foo', such as the deployment, service, and service account for the kgateway control plane in the kgateway-system namespace. | `""` |
-| nodeSelector | object | Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'. | `{}` |
-| podAnnotations | object | Add annotations to the kgateway pods. | `{"prometheus.io/scrape":"true"}` |
-| podSecurityContext | object | Set the pod-level security context. For example, 'fsGroup: 2000' sets the filesystem group to 2000. | `{}` |
+| nodeSelector | object | Set node selector labels for pod scheduling, such as 'kubernetes.io/arch: amd64'. This field is deprecated in favor of controller.nodeSelector and will be removed in v3.0. | `{}` |
+| podAnnotations | object | Add annotations to the kgateway pods. This field is deprecated in favor of controller.podAnnotations and will be removed in v3.0. | `{"prometheus.io/scrape":"true"}` |
+| podSecurityContext | object | Set the pod-level security context. For example, 'fsGroup: 2000' sets the filesystem group to 2000. This field is deprecated in favor of controller.podSecurityContext and will be removed in v3.0. | `{}` |
 | policyMerge | object | Policy merging settings. Currently, TrafficPolicy's extAuth, extProc, and transformation policies support deep merging. E.g., to enable deep merging of extProc policy in TrafficPolicy: policyMerge:   trafficPolicy:     extProc: DeepMerge | `{}` |
-| resources | object | Configure resource requests and limits for the container, such as 'limits.cpu: 100m' or 'requests.memory: 128Mi'. | `{}` |
-| securityContext | object | Set the container-level security context, such as 'runAsNonRoot: true'. | `{}` |
+| resources | object | Configure resource requests and limits for the container, such as 'limits.cpu: 100m' or 'requests.memory: 128Mi'. This field is deprecated in favor of controller.resources and will be removed in v3.0. | `{}` |
+| securityContext | object | Set the container-level security context, such as 'runAsNonRoot: true'. This field is deprecated in favor of controller.securityContext and will be removed in v3.0. | `{}` |
 | serviceAccount | object | Configure the service account for the deployment. | `{"annotations":{},"create":true,"name":""}` |
 | serviceAccount.annotations | object | Add annotations to the service account. | `{}` |
 | serviceAccount.create | bool | Specify whether a service account should be created. | `true` |
 | serviceAccount.name | string | Set the name of the service account to use. If not set and create is true, a name is generated using the fullname template. | `""` |
-| tolerations | list | Set tolerations for pod scheduling, such as 'key: "nvidia.com/gpu"'. | `[]` |
-| topologySpreadConstraints | list | Set topology spread constraints for pod scheduling. E.g.: topologySpreadConstraints:   - maxSkew: 1     topologyKey: topology.kubernetes.io/zone     whenUnsatisfiable: DoNotSchedule     labelSelector:       matchLabels:         app.kubernetes.io/name: kgateway | `[]` |
+| tolerations | list | Set tolerations for pod scheduling, such as 'key: "nvidia.com/gpu"'. This field is deprecated in favor of controller.tolerations and will be removed in v3.0. | `[]` |
+| topologySpreadConstraints | list | Set topology spread constraints for pod scheduling. This field is deprecated in favor of controller.topologySpreadConstraints and will be removed in v3.0. E.g.: topologySpreadConstraints:   - maxSkew: 1     topologyKey: topology.kubernetes.io/zone     whenUnsatisfiable: DoNotSchedule     labelSelector:       matchLabels:         app.kubernetes.io/name: kgateway | `[]` |
 | validation | object | Configure validation behavior for route and policy safety checks in the control plane.    This setting determines how invalid configuration is handled to prevent security bypasses    and to maintain multi-tenant isolation. | `{"level":"standard"}` |
 | validation.level | string | Validation level. Accepted values: "standard" or "strict" (case-insensitive).    Standard replaces invalid routes with a direct 500 response and continues applying valid configuration.    Strict adds xDS preflight validation and blocks snapshots that would NACK in Envoy.    Default is "standard". | `"standard"` |
 | waypoint | object | Enable the waypoint integration. This enables kgateway to translate istio waypoints and use kgateway as a waypoint in an Istio Ambient service mesh setup. | `{"enabled":false}` |
