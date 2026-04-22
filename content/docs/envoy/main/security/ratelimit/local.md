@@ -102,7 +102,7 @@ The following steps walk through a shadow mode setup where rate limiting is obse
 
    Port-forward to the Envoy admin endpoint on the gateway proxy pod and query the local rate limit stats:
    ```sh
-   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000:19000 & curl -s localhost:19000/stats | grep local_rate_limit
+   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000:19000 & sleep 1 && curl -s localhost:19000/stats | grep local_rate_limit; kill %1
    ```
 
    Example output:

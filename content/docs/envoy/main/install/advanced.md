@@ -64,5 +64,83 @@ controller:
   priorityClassName: 
 ```
 
+## Autoscaling
+
+You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
+
+{{< callout type="info" >}}
+Note that {{< reuse "docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
+{{< /callout >}}
+
+{{< callout type="warning" >}}
+If you plan to set up both VPA and HPA policies, make sure to closely monitor performance and cost during scale up events. Using both policies can lead to conflict or even destructive loops that impact the performance of your control plane. 
+{{< /callout >}}
+
+
+### Vertical Pod Autoscaler (VPA)
+
+Vertical Pod Autoscaler (VPA) is a Kubernetes component that automatically adjusts the CPU and memory reservations of your pods to match their actual usage. 
+
+The following Helm configuration ensures that the control plane pod is always assigned a minimum of 0.1 CPU cores (100millicores) and 128Mi of memory. 
+
+```yaml
+
+controller:
+  verticalPodAutoscaler:
+    updatePolicy:
+      updateMode: Auto
+    resourcePolicy:
+      containerPolicies:
+      - containerName: "*"
+        minAllowed:
+          cpu: 100m
+          memory: 128Mi
+```
+
+### Horizontal Pod Autoscaler (HPA)
+
+Horizontal Pod Autoscaler (HPA) adds more instances of the pod to your environment when certain memory or CPU thresholds are reached. 
+
+In the following example, you want to have 1 control plane replica running at any given time. If the CPU utilization averages 80%, you want to gradually scale up your replicas. You can have a maximum of 5 replicas at any given time. 
+```yaml
+
+controller: 
+  horizontalPodAutoscaler:
+    minReplicas: 1
+    maxReplicas: 5
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+```
+
+
+**Note**: To monitor the memory and CPU threshold, you must deploy the Kubernetes `metrics-server` to your cluster. The `metrics-server` retrieves metrics, such as CPU and memory consumption, for your workloads. 
+
+You can install the server with the following command: 
+```sh
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl -n kube-system patch deployment metrics-server \
+ --type=json \
+ -p='[{"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"}]'
+```
+
+Then, start monitoring CPU and memory consumption with the `kubectl top pod` command. 
+
+## PodDisruptionBudget
+
+Configure a Pod Disruption Budget to ensure that a minimum number of control plane instances are up and running at any given time during voluntary disruptions, such as upgrades. In this example, 50% of your control plane instances must be running.
+
+```yaml
+
+controller: 
+  podDisruptionBudget:
+    minAvailable: 50%
+```
+
+
 
 
