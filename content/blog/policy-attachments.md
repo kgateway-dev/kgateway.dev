@@ -34,7 +34,7 @@ For a BackendTLSPolicy it's a reference to a service.  But we can imagine other 
 
 The kgateway project comes with different policy types that aim to extend the core capabilities of the Kubernetes Gateway API with advanced traffic management, resiliency, security, and even AI capabilities. You can apply these policies to an HTTPRoute or Gateway. 
 
-Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/reference/api/#httplistenerpolicy). You use the `targetRefs` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
+Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/envoy/latest/reference/api/#httplistenerpolicy). You use the `targetRefs` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
 
 In the below example resource, the policy attaches to the gateway named `infra-gateway` and specifies "standard output" as the access logging "file sink". It then proceeds to specify the fields that will constitute each log line:
 
@@ -61,7 +61,7 @@ spec:
         response_flags: "%RESPONSE_FLAGS%"
         bytes_received: "%BYTES_RECEIVED%"
 ```
-Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[TrafficPolicy](https://kgateway.dev/docs/reference/api/#trafficpolicy) API is designed to solve this use case for you.
+Applying policies to a gateway is handy as it lets you configure all traffic and all the routes that the Gateway serves. What if in addition to configuring a gateway, you also want to extend a route configuration? Kgateway’s[TrafficPolicy](https://kgateway.dev/docs/envoy/latest/reference/api/#trafficpolicy) API is designed to solve this use case for you.
 
 The structure of a TrafficPolicy is very similar to the one of an HTTPListenerPolicy, but you use the `targetRefs` section to apply the policy to the routes in an HTTPRoute instead of a Gateway. 
 
@@ -84,7 +84,7 @@ spec:
       - name: x-kgateway-response
         value: '{{ request_header("x-kgateway-request") }}'
 ```
-The above is just one example of kgateway's [transformations](https://kgateway.dev/docs/traffic-management/transformations/) feature, which provides more powerful request and response transformation capabilities than the Gateway API's *RequestHeaderModifier* and *ResponseHeaderModifier* filters.
+The above is just one example of kgateway's [transformations](https://kgateway.dev/docs/envoy/latest/traffic-management/transformations/) feature, which provides more powerful request and response transformation capabilities than the Gateway API's *RequestHeaderModifier* and *ResponseHeaderModifier* filters.
 
 ## Creating new opportunities with policy extensions
 Policy attachments open up an exciting new world of possibilities to extend the Gateway API’s core capabilities with advanced traffic management, resiliency, security, and AI features that you can configure on a gateway or route, all while ensuring a common experience and easy adoption amongst users.

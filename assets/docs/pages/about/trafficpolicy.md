@@ -4,9 +4,9 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to attach policies
 
 You can apply {{< reuse "docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
-{{< callout type="info" >}}
+{{< version exclude-if="2.0.x" >}}{{< callout type="info" >}}
 By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /callout >}}
+{{< /callout >}}{{< /version >}}
 
 ### All HTTPRoute routes {#attach-to-all-routes}
 
@@ -312,11 +312,11 @@ The way policies are inherited along the route delegation chain depends on the t
 
 {{< reuse "docs/snippets/policy-inheritance-native.md" >}}
 
-For an example, see the policy inheritance guide for [Native Gateway API policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/native-policies/" >}}). 
+{{< version exclude-if="2.0.x" >}}For an example, see the policy inheritance guide for [Native Gateway API policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/native-policies/" >}}).{{< /version >}}
 
 #### Kgateway policies
 
 {{< reuse "docs/snippets/policy-inheritance.md" >}}
 
-For an example, see the policy inheritance guide for [kgateway policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/kgateway-policies/" >}}). 
+{{< version exclude-if="2.0.x" >}}For an example, see the policy inheritance guide for [kgateway policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/kgateway-policies/" >}}).{{< /version >}} 
 

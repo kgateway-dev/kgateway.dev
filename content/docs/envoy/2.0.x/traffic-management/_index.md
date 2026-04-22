@@ -18,5 +18,4 @@ weight: 400
   {{< card link="session-affinity" title="Session affinity" >}}
   {{< card link="transformations" title="Transformations" >}}
   {{< card link="traffic-split" title="Traffic splitting" >}}
-  {{< card link="weighted-routes" title="Route weighting" >}}
 {{< /cards >}}

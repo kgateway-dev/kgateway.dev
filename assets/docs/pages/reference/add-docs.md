@@ -23,7 +23,7 @@ The best documentation starts by knowing the intended users, their knowledge, an
 
 - The user needs to understand complex feature relationships: Provide a diagram showing the relationships, rather than writing multiple pages of content that is tedious to read and understand.
 
-After you identified your audience and the information that they need, select a suitable [content type](#content-type). 
+After you identified your audience and the information that they need, select a suitable [content type](#content-types). 
 
 
 ## Content types {#content-types}

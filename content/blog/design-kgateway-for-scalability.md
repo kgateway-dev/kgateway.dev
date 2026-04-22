@@ -52,7 +52,7 @@ The system should remain fully operational when the control plane restarts or sc
 
 ## Test These Scenarios Yourself
 
-1. [Install kgateway](https://kgateway.dev/docs/quickstart/).
+1. [Install kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/).
 
 2. Create the `http` gateway proxy using a Gateway resource:
 
@@ -75,7 +75,7 @@ spec:
 EOF
 ```
 
-3. **(Optional)** Install the [OpenTelemetry Collector](https://kgateway.dev/docs/observability/#otel) and [kube-prometheus-stack](https://kgateway.dev/docs/observability/#grafana) to observe CPU, memory and Envoy metrics. (Make sure your cluster has adequate resources if doing this.)
+3. **(Optional)** Install the [OpenTelemetry Collector](https://kgateway.dev/docs/envoy/latest/observability/otel-stack/) and [kube-prometheus-stack](https://kgateway.dev/docs/envoy/latest/observability/gateway-metrics/) to observe CPU, memory and Envoy metrics. (Make sure your cluster has adequate resources if doing this.)
 
 4. Clone the [kgateway repo](https://github.com/kgateway-dev/kgateway). From the cloned directory, use the `applier` utilitiy to load 10,000 routes and backends (from 0 to 9999). Send a few random requests to confirm routes are effective immediately.
 

@@ -16,7 +16,7 @@ Kgateway includes full Kubernetes ingress functionality, providing its own contr
 
 ### What are the components of an ingress?
 
-There are three major components that make up any ingress solution:
+An ingress solution consists of three major components:
 
 * control plane  
 * data plane  
@@ -89,7 +89,7 @@ The Gateway API is an API which can be used to program an ingress or an API gate
   {{< card link="../../integrations/" title="Integrations" tag="Setup" >}}
   {{< card link="../../resiliency/mirroring/" title="Mirroring" tag="Resiliency" >}}
   {{< card link="../../traffic-management/transformations/" title="Transformations" tag="Traffic" >}}
-  {{< card link="../../traffic-management/weighted-routes/" title="Weighted routing" tag="Traffic" >}}
+{{< version exclude-if="2.0.x" >}}  {{< card link="../../traffic-management/weighted-routes/" title="Weighted routing" tag="Traffic" >}}{{< /version >}}
 {{< /cards >}}
 
 ## Default gateway proxy setup

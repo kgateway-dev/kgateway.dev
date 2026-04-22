@@ -7,7 +7,7 @@ description: Set up a TLS listener on the Gateway that serves one or more hosts 
 Refer to the guide in the Gateway listener setup section.
 
 {{< cards >}}
-  {{< card link="/docs/setup/listeners/tls-passthrough/" title="TLS passthrough" icon="bookmark">}}
+  {{< card path="/setup/listeners/tls-passthrough/" title="TLS passthrough" icon="bookmark">}}
 {{< /cards >}}
 
 

@@ -1,8 +1,8 @@
 You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPS listeners on the gateway.
 
-{{< callout type="info" >}}
+{{< version exclude-if="2.0.x" >}}{{< callout type="info" >}}
 By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /callout >}}
+{{< /callout >}}{{< /version >}}
 
 ## Policy attachment {#policy-attachment-listeneroption}
 

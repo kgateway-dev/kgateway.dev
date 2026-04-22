@@ -14,7 +14,7 @@
    customresourcedefinition.apiextensions.k8s.io/referencegrants.gateway.networking.k8s.io created
    ```
    
-   {{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).{{< /callout >}}
+   {{< version exclude-if="2.0.x,2.1.x" >}}{{< callout type="info" >}}If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/feature-maturity/#experimental-features).{{< /callout >}}{{< /version >}}
    
 2. Port-forward the Argo CD server on port 9999.
    

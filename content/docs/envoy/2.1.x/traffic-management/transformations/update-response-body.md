@@ -1,4 +1,6 @@
 ---
+aliases:
+  - /docs/envoy/2.1.x/traffic-management/transformations/simple/update-response-body/
 title: Update response body
 weight: 80
 description: Learn how to return a customized response body and how replace specific values in the body.

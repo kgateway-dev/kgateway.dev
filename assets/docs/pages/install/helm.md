@@ -67,7 +67,7 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
       
       {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
 {{% tab tabName="Basic installation" %}}
-Note: If you need to use an experimental feature such as TCPRoutes, enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation. For more information, see [Experimental features in Gateway API](../../reference/versions/#experimental-features).
+Note: If you need to use an experimental feature such as TCPRoutes, enable the experimental feature gate setting (`KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`) in your kgateway installation.{{< version exclude-if="2.0.x,2.1.x" >}} For more information, see [Experimental features in Gateway API](../../reference/feature-maturity/#experimental-features).{{< /version >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}}

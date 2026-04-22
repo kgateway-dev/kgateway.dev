@@ -1,4 +1,6 @@
 ---
+aliases:
+  - /docs/envoy/latest/traffic-management/transformations/simple/templating-language/
 title: Templating language
 weight: 10
 ---

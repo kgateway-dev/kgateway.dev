@@ -16,7 +16,7 @@ Through transformations, kgateway gives us access to an expression language, whi
 
 ## How it works
 
-Transformations are configured with the [TrafficPolicy](https://kgateway.dev/docs/reference/api/#trafficpolicy) resource and can be applied to either the request or the response, or both.
+Transformations are configured with the [TrafficPolicy](https://kgateway.dev/docs/envoy/latest/reference/api/#trafficpolicy) resource and can be applied to either the request or the response, or both.
 
 The TrafficPolicy resource in turn is associated to select HTTP requests through the `targetRefs` field, which can point to an [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#httproute). The HTTPRoute routing rule's [matches field](https://gateway-api.sigs.k8s.io/reference/spec/#httproutematch) can target specific requests based on various request attributes including path, headers, query parameters, and the HTTP method.
 

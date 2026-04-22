@@ -12,5 +12,4 @@ Manage routing rules more effectively by using multiple connected HTTPRoute reso
   {{< card link="multi-parent" title="Multiple parents" >}}
   {{< card link="multi-level-delegation" title="Multi-level delegation" >}}
   {{< card link="header-query" title="Header and query match" >}}
-  {{< card link="inheritance" title="Policy inheritance and overrides" >}}
 {{< /cards >}}
