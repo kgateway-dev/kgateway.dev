@@ -16,7 +16,7 @@ Kgateway includes full Kubernetes ingress functionality, providing its own contr
 
 ### What are the components of an ingress?
 
-There are three major components that make up any ingress solution:
+An ingress solution consists of three major components:
 
 * control plane  
 * data plane  
