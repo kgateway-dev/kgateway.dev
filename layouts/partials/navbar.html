@@ -198,7 +198,7 @@
       {{- end -}}
     {{- end -}}
     
-    {{ if $versions }}
+    {{ if and $versions $version }}
     <div class="dropdown px-2 cursor-pointer">
         <button class="btn" type="button">
           {{- $foundVersion := false -}}
