@@ -123,7 +123,7 @@ Note that in the following example, resources are created in the same namespace 
 
 You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply the policy at both levels, the request must pass both policies to be authorized.
 
-1. Send a test request to the httpbin sample app.  Verify that you get back a 200 HTTP response code and that no authorization is required.
+1. Send a test request to the httpbin sample app. Verify that you get back a 200 HTTP response code and that no authorization is required.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}

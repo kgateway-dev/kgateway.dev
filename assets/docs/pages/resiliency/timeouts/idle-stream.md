@@ -4,7 +4,7 @@ Customize the default idle stream timeout of 5 minutes (300s).
 
 By default, Envoy closes all idle request and response streams after 5 minutes if no data is sent or received and returns a 408 Request Timeout HTTP response code. Idle stream timeouts are different from request timeouts. Request timeouts configure the time Envoy allows for the entire request stream to be received from the client. An idle stream timeout on the other hand is the time Envoy allows a stream to exist without activity before it is terminated. Idle stream timeouts are recommended to protect against clients that stall or that open the stream and never send any data.
 
-You can change the default idle stream timeout setting with a {{< reuse "docs/snippets/trafficpolicy.md" >}}.  While idle streams are a concept in the HTTP/2 and HTTP/3 protocols, Envoy also maps an HTTP/1 request to a stream. Because of that, you can apply idle stream timeouts to HTTP/1 traffic too. 
+You can change the default idle stream timeout setting with a {{< reuse "docs/snippets/trafficpolicy.md" >}}. While idle streams are a concept in the HTTP/2 and HTTP/3 protocols, Envoy also maps an HTTP/1 request to a stream. Because of that, you can apply idle stream timeouts to HTTP/1 traffic too.
 
 ## Before you begin
 
