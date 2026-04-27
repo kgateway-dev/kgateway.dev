@@ -85,7 +85,7 @@ Set up local rate limiting for a particular route.
        - type: ExtensionRef
          extensionRef:
            name: local-ratelimit
-           group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}{
+           group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
            kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
        backendRefs:
        - name: httpbin
@@ -390,6 +390,7 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    < HTTP/1.1 200 OK
    HTTP/1.1 200 OK   
    ...
+   ```
 
 {{< version exclude-if="2.3.x" >}}
 
