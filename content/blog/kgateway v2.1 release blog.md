@@ -63,7 +63,7 @@ Now, you can configure weights for more fine-grained control over your routing r
 
 ### Deep merging for extauth and extproc policies {#deep-merge}
 
-You can now apply deep merging for extAuth and extProc policies. In addition, you can use the `kgateway.dev/policy-weight` annotation to determine the priority in which multiple extAuth and extProc policies are merged. For more information, see [Policy priority during merging](/docs/envoy/latest/about/policies/merging/#policy-priority-during-merging). 
+You can now apply deep merging for extAuth and extProc policies. In addition, you can use the `kgateway.dev/policy-weight` annotation to determine the priority in which multiple extAuth and extProc policies are merged. For more information, see [Policy priority during merging](/docs/envoy/latest/about/policies/merging/#merging-annotation). 
 
 ### Additional proxy pod template customization {#podtemplate}
 

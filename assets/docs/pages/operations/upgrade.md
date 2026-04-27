@@ -66,7 +66,7 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
 
 1. Review the [kgateway release notes](https://github.com/kgateway-dev/kgateway/releases) for any breaking changes or new features that you need to be aware of.
 
-2. Check the [supported version compatibility matrix](../../reference/versions/#supported-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
+2. Check the [supported version compatibility matrix](../../reference/versions/#released-versions). If the version of {{< reuse "/docs/snippets/kgateway.md" >}} that you are upgrading to requires a different version of Kubernetes, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}, or Istio, upgrade those technologies accordingly.
 
 {{< conditional-text include-if="envoy" >}}
 
