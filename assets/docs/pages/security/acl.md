@@ -176,7 +176,7 @@ Allow all traffic by default, but block traffic from specific CIDR ranges. When 
    HTTP/1.1 200 OK
    ```
 
-3. Log into the httpbin pod to run a curl request from within the cluster.  By default, Kubernetes assigns pod IP addresses from the `10.0.0.0/8` range. Because this range matches the deny rule, you get back a 403 HTTP response with the `x-blocked-by: block-rfc1918` header.
+3. Log into the httpbin pod to run a curl request from within the cluster. By default, Kubernetes assigns pod IP addresses from the `10.0.0.0/8` range. Because this range matches the deny rule, you get back a 403 HTTP response with the `x-blocked-by: block-rfc1918` header.
 
    ```sh
    kubectl exec -n httpbin deploy/httpbin -c curl -- curl -vi \

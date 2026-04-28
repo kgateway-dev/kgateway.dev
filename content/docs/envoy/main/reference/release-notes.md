@@ -55,6 +55,12 @@ The following overlays are supported:
 For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
 
+#### IP-based access control (ACL) {#v23-acl}
+
+The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports an `acl` field for IP-based access control. You can define allow and deny rules by using CIDR blocks or bare IP addresses, set a `defaultAction` for unmatched requests, and customize denial responses with a custom HTTP status code and headers. 
+
+For more information, see [IP-based access control (ACL)]({{< link-hextra path="/security/acl/" >}}).
+
 #### GRPCRoute support {#v23-grpcroute}
 
 Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.
