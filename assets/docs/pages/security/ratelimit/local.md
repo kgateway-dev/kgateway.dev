@@ -2,7 +2,7 @@ Limit the number of requests that are allowed to enter the cluster before global
 
 ## About {#about}
 
-Local {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}}rate limiting is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
+Local {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}} is a coarse-grained rate limiting capability that is primarily used as a first line of defense mechanism to limit the number of requests that are forwarded to your rate limit servers. 
 
 Without local rate limiting, all requests are directly forwarded to a rate limit server that you set up where the request is either denied or allowed based on the global rate limiting settings that you configured. However, during an attack, too many requests might be forwarded to your rate limit servers and can cause overload or even failure.
 
