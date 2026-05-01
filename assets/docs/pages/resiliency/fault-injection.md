@@ -4,7 +4,7 @@ Test the resilience of your apps by injecting delays and connection failures int
 
 Fault injection is a chaos engineering technique that lets you deliberately introduce failures and delays into the request path so you can test how your services behave under adverse conditions before those conditions occur in production.
 
-You can configure the following fault injection types with a {{< reuse "docs/snippets/trafficpolicy.md" >}}:
+You can configure the following fault injection types:
 
 * **Delays**: Simulate timing failures such as network latency or overloaded backends by injecting a fixed delay before forwarding the request upstream.
 * **Aborts**: Simulate crash failures by returning an HTTP or gRPC error code to the caller without forwarding the request.
@@ -24,7 +24,7 @@ For more information, see the [Fault injection API reference]({{< link-hextra pa
 
 Inject a fixed latency into requests before they are forwarded upstream.
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that injects a 5-second delay on 50% of all requests to the httpbin route.
+1. Create a policy that injects a 5-second delay on 50% of all requests to the httpbin route.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -145,7 +145,7 @@ Review other common fault injection configurations.
 
 Throttle the response body data rate to simulate slow or degraded upstream connections.
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that limits the response rate to 8 kbits/s on all requests.
+1. Create a policy that limits the response rate to 8 kbits/s on all requests.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
