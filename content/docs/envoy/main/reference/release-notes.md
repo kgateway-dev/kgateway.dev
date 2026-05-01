@@ -61,6 +61,18 @@ The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports an `acl
 
 For more information, see [IP-based access control (ACL)]({{< link-hextra path="/security/acl/" >}}).
 
+#### Fault injection {#v23-fault-injection}
+
+The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports a `faultInjection` field for chaos engineering and resiliency testing. You can inject the following fault types into a percentage of requests:
+
+- **Delays**: Inject a fixed latency before forwarding the request upstream to simulate slow networks or overloaded backends.
+- **Aborts**: Return an HTTP or gRPC error code without forwarding the request to simulate upstream failures.
+- **Response rate limiting**: Throttle the response body data rate to simulate degraded upstream connections.
+
+Fault injection can be applied at the route level by targeting an HTTPRoute, or at the gateway level by targeting a Gateway. A route-level policy can use `disable: {}` to opt out of a gateway-level fault injection policy.
+
+For more information, see [Fault injection]({{< link-hextra path="/resiliency/fault-injection/" >}}).
+
 #### GRPCRoute support {#v23-grpcroute}
 
 Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.
