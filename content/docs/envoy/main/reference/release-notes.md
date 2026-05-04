@@ -150,6 +150,15 @@ Route traffic to gRPC services by using the GRPCRoute resource for protocol-awar
 
 For more information, see [gRPC routing]({{< link-hextra path="/traffic-management/grpc/" >}}).
 
+#### TLS termination for TLSRoutes and TCPRoutes {#v23-tls-terminate}
+
+Terminate TLS traffic at the gateway by using a TLS listener in `Terminate` mode with either a TLSRoute or a TCPRoute. The gateway decrypts incoming TLS traffic using a server-side certificate and forwards the plain traffic to the backend service via TCP proxy.
+
+- **TLSRoute**: Supports SNI-based hostname matching. Use this when you need to route traffic to different backends based on the requested hostname.
+- **TCPRoute**: Routes traffic based on listener port only, without SNI hostname matching. Use this listener for simpler port-based routing.
+
+For more information, see [TLS termination for TLSRoutes]({{< link-hextra path="/setup/listeners/tls-termination/" >}}) and [TLS termination for TCPRoutes]({{< link-hextra path="/setup/listeners/tls-termination-tcproute/" >}}).
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

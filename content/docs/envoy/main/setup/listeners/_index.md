@@ -11,6 +11,8 @@ weight: 20
   {{< card link="sni" title="SNI listener" >}}
   {{< card link="tcp" title="TCP listener" >}}
   {{< card link="tls-passthrough" title="TLS passthrough" >}}
+  {{< card link="tls-termination" title="TLS termination for TLSRoutes" >}}
+  {{< card link="tls-termination-tcproute" title="TLS termination for TCPRoutes" >}}
   {{< card link="tls-settings" title="Additional TLS settings" >}}
 {{< /cards >}}
 
