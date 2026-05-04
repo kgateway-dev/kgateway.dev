@@ -2,6 +2,16 @@
 
 This directory contains scripts or other tools that are used to help improve the kgateway website and documentation.
 
+## Unit tests
+
+Unit tests for scripts in this directory live in `scripts/tests/`.
+
+Run them from the repository root:
+
+```shell
+python3 -m pytest scripts/tests -q
+```
+
 ## card-check.py
 
 A script to check the `_index.md` docs files to make sure that the cards include the right links to subpages in that directory.
