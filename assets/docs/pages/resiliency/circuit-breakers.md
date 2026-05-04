@@ -70,6 +70,69 @@ For more information, see the [Envoy documentation](https://www.envoyproxy.io/do
    }
    ```
 
+{{< version include-if="2.3.x">}}
+
+## Track remaining capacity {#track-remaining}
+
+By default, Envoy does not emit metrics for how much capacity remains in each circuit breaker threshold. You can enable additional metrics to track the remaining capacity with the `trackRemaining` field. When enabled, the following metrics are emitted: 
+
+| Metric | Description |
+|---|---|
+| `remaining_cx` | Remaining connections before the limit is reached. |
+| `remaining_pending` | Remaining pending requests before the limit is reached. |
+| `remaining_rq` | Remaining requests before the limit is reached. |
+| `remaining_retries` | Remaining retries before the limit is reached. |
+
+{{< callout type="warning" >}}
+Keep in mind that enabling these additional metrics leads to a small performance overhead. Only enable this capability if you need visibility into the remaining circuit breaker capacity.
+{{< /callout >}}
+
+1. Update your BackendConfigPolicy to enable `trackRemaining`.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: BackendConfigPolicy
+   metadata:
+     name: httpbin-circuit-breakers
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: ""
+       kind: Service
+       name: httpbin
+     circuitBreakers:
+       maxConnections: 1000
+       maxPendingRequests: 500
+       maxRequests: 2000
+       maxRetries: 10
+       trackRemaining: true
+   EOF
+   ```
+
+2. Send a request to the gateway proxy stats endpoint to see the remaining capacity metrics.
+
+   ```sh
+   kubectl port-forward deploy/http -n kgateway-system 19000 &
+   PF_PID=$!
+
+   sleep 2
+
+   curl -s http://localhost:19000/stats | grep "kube_httpbin_httpbin_8000.*remaining"
+
+   kill $PF_PID
+   ```
+
+   Example output:
+
+   ```
+   cluster.kube_httpbin_httpbin_8000.circuit_breakers.default.remaining_cx: 1000
+   cluster.kube_httpbin_httpbin_8000.circuit_breakers.default.remaining_pending: 500
+   cluster.kube_httpbin_httpbin_8000.circuit_breakers.default.remaining_rq: 2000
+   cluster.kube_httpbin_httpbin_8000.circuit_breakers.default.remaining_retries: 10
+   ```
+
+{{< /version >}}
 
 ## Cleanup
 

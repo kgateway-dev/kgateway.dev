@@ -21,7 +21,12 @@ To change the default proxy template and inject your own Envoy configuration, us
 
 You can use the built-in customization fields in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to change settings on the proxy. This way, your configuration is validated when you apply the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource in your cluster.
 
-1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example changes the proxy Service type from `LoadBalancer` to `NodePort` and configures the Envoy application logs to use JSON format. For other examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
+1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example changes the following proxy settings:
+   * `service.type`: Changes the service type from `LoadBalancer` to `NodePort`
+   * `envoyContainer.bootstrap.logformat`: Configures the Envoy application logs to use JSON format. 
+   * `envoyContainer.extraArgs`: Adds a custom base ID and enables CPU set threading for the gateway proxy. 
+   
+   For other examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -42,6 +47,10 @@ You can use the built-in customization fields in the {{< reuse "docs/snippets/ga
                level: "%l"
                scope: "%n"
                timestamp: "%Y-%m-%dT%T.%eZ"
+         extraArgs:
+           - --base-id
+           - "7"
+           - --cpuset-threads
    EOF
    ```
 
@@ -98,6 +107,27 @@ You can use the built-in customization fields in the {{< reuse "docs/snippets/ga
 
    ```json
    {"message":"all clusters initialized. initializing init manager","timestamp":"yyyy-mm-ddThh:mm:ssZ","scope":"main","level":"info"}
+   ```
+
+5. Check the container arguments that are passed to the gateway proxy and verify that you see the custom base ID and CPU set threading. 
+   ```sh
+   kubectl get deploy/custom -n kgateway-system -o yaml 
+   ```
+
+   Example output: 
+   ```console {hl_lines=[10,11,12]}
+   ...
+    spec:
+      containers:
+      - args:
+        - --disable-hot-restart
+        - --service-node
+        - $(POD_NAME).$(POD_NAMESPACE)
+        - --log-level
+        - info
+        - --base-id
+        - "7"
+        - --cpuset-threads
    ```
 
 ### Overlays {#overlays}

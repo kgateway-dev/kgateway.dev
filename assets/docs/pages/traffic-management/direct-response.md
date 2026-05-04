@@ -20,8 +20,11 @@ Consider the following limitations before creating DirectResponse resources in y
 
 ### Schema validation
 The following rules are applied during schema validation: 
-* The `spec.body` field can have a size of up to 4KB. 
-* The `spec.status` field can define a valid HTTP status code in the 200-599 range. 
+* The `spec.body` field can have a size of up to 4KB.
+* The `spec.bodyFormat.text` field can have a size of up to 4KB.
+* The `spec.status` field can define a valid HTTP status code in the 200-599 range.
+* The `spec.body` and `spec.bodyFormat` fields are mutually exclusive.
+* The `spec.bodyFormat.text` and `spec.bodyFormat.json` fields are mutually exclusive.
 
 ## Before you begin
 
@@ -147,7 +150,8 @@ The following rules are applied during schema validation:
    User-agent: *
    Disallow: /direct-response
    ```
-   
+
+
 ## Cleanup
 
 {{< reuse "docs/snippets/cleanup.md" >}}
@@ -156,4 +160,4 @@ The following rules are applied during schema validation:
 kubectl delete directresponse direct-response -n httpbin
 kubectl delete httproute httpbin-direct-response -n httpbin
 ```
-
+   

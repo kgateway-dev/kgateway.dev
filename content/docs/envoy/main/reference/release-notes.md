@@ -12,7 +12,20 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v22-breaking-changes}
 
+#### Component labels added to selector labels {#v23-component-labels-breaking}
 
+The `app.kubernetes.io/component` label is now added to the selector labels of both the kgateway controller Deployment (`component: controller`) and the gateway proxy Deployment (`component: proxy`). Because selector labels are immutable in Kubernetes, you must handle this before or during the upgrade. Choose one of the following options:
+
+- **Option 1 — Delete before upgrading**: Delete the existing controller Deployment and then run your upgrade. The controller re-creates the Deployment automatically.
+  ```sh
+  kubectl delete deployment kgateway -n kgateway-system
+  ```
+- **Option 2 — Force Helm upgrade**: Pass `--force` to `helm upgrade`. Helm deletes and re-creates resources that cannot be patched in place.
+  ```sh
+  helm upgrade kgateway kgateway/kgateway --force ...
+  ```
+
+Both options result in a brief restart of the controller pod.
 
 ### 🌟 New features {#v22-new-features}
 
@@ -43,7 +56,7 @@ Configure how Envoy formats its application logs by using the `logFormat` field 
 
 For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/#built-in" >}}).
 
-#### Gateway proxy customization {#v23-gateway-customization}
+#### Gateway proxy customization with overlays {#v23-gateway-customization}
 
 The GatewayParameters resource now supports gateway proxy customization via overlay fields. Overlays use strategic merge patch (SMP) semantics to apply advanced customizations to the Kubernetes resources that are generated for gateway proxies, including the Service, ServiceAccount, and Deployment. 
 
@@ -54,6 +67,46 @@ The following overlays are supported:
 
 For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
+#### Additional Envoy container arguments {#envoy-extra-args}
+
+Use `spec.kube.envoyContainer.extraArgs` to pass additional Envoy CLI arguments to the managed proxy container. User-supplied arguments are appended after the default built-in Envoy arguments.
+
+The following example sets a custom base ID and enables CPU set threading:
+
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    envoyContainer:
+      extraArgs:
+        - --base-id
+        - "7"
+        - --cpuset-threads
+EOF
+```
+
+#### Upstream proxy protocol {#v23-upstream-proxy-protocol}
+
+The `BackendConfigPolicy` resource now supports an `upstreamProxyProtocol` field. When configured, the gateway proxy prepends a PROXY protocol header to outbound TCP connections to the upstream backend, allowing the backend to see the original client IP address and port. Both PROXY protocol `V1` (human-readable) and `V2` (binary) are supported.
+
+For more information, see [Outbound proxy protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#outbound" >}}).
+
+#### Allow requests without proxy protocol {#v23-proxy-protocol-allow-without-header}
+
+The ListenerPolicy proxy protocol configuration now supports an `allowRequestsWithoutProxyProtocol` field. When set to `true`, a single listener accepts connections with or without a PROXY protocol header. By default, the field is set to `false` and the listener strictly requires a PROXY protocol header on all incoming connections.
+
+For more information, see [Allow connections without proxy protocol headers]({{< link-hextra path="/traffic-management/proxy-protocol/#allow-without-proxy-protocol" >}}).
+
+#### Circuit breaker remaining capacity metrics {#v23-circuit-breaker-track-remaining}
+
+The `BackendConfigPolicy` circuit breakers configuration now supports a `trackRemaining` field. When set to `true`, Envoy emits gauge metrics for the remaining capacity of each circuit breaker threshold group: `remaining_cx`, `remaining_pending`, `remaining_rq`, and `remaining_retries`. Note that enabling this field has a small performance overhead.
+
+For more information, see [Track remaining capacity]({{< link-hextra path="/resiliency/circuit-breakers/#track-remaining" >}}).
 
 #### IP-based access control (ACL) {#v23-acl}
 
@@ -72,6 +125,24 @@ The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports a `faul
 Fault injection can be applied at the route level by targeting an HTTPRoute, or at the gateway level by targeting a Gateway. A route-level policy can use `disable: {}` to opt out of a gateway-level fault injection policy.
 
 For more information, see [Fault injection]({{< link-hextra path="/resiliency/fault-injection/" >}}).
+
+#### OpenTelemetry tracing {#v23-otel-tracing}
+
+Configure distributed tracing for your gateway by using the ListenerPolicy resource, and override tracing settings per route with a `TrafficPolicy` resource.
+
+The following tracing improvements are included in this release:
+
+- **Listener-level tracing**: Configure the OTel provider, sampling rates (`clientSampling`, `randomSampling`, `overallSampling`), and custom span attributes in a ListenerPolicy that targets your Gateway.
+- **Per-route tracing overrides**: Use a TrafficPolicy that targets an HTTPRoute or GRPCRoute to override sampling rates, add route-specific span attributes, or disable tracing for specific routes.
+- **Auto-populated resource attributes**: [OTel semantic convention](https://opentelemetry.io/docs/specs/semconv/resource/) resource attributes are automatically added to all spans, including `service.name`, `service.namespace`, `service.instance.id`, `service.version`, and Kubernetes identity attributes such as `k8s.pod.name`, `k8s.node.name`, and `k8s.deployment.name`.
+
+For more information, see [Tracing]({{< link-hextra path="/observability/tracing/" >}}).
+
+#### Dynamic direct response bodies {#v23-direct-response-body-format}
+
+The DirectResponse resource now supports a `bodyFormat` field for returning dynamic response bodies by using [Envoy format strings](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto). Format strings use `%VARIABLE%` placeholders that Envoy substitutes at request time, such as request headers or dynamic metadata. You can choose between returning a text or JSON body. Both formats are mutually exclusive. 
+
+For more information, see [Dynamic text body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-text-body" >}}) and [Dynamic JSON body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-json-body" >}}).
 
 #### GRPCRoute support {#v23-grpcroute}
 
