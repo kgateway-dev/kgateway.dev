@@ -12,20 +12,6 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v22-breaking-changes}
 
-#### Component labels added to selector labels {#v23-component-labels-breaking}
-
-The `app.kubernetes.io/component` label is now added to the selector labels of both the kgateway controller Deployment (`component: controller`) and the gateway proxy Deployment (`component: proxy`). Because selector labels are immutable in Kubernetes, you must handle this before or during the upgrade. Choose one of the following options:
-
-- **Option 1 — Delete before upgrading**: Delete the existing controller Deployment and then run your upgrade. The controller re-creates the Deployment automatically.
-  ```sh
-  kubectl delete deployment kgateway -n kgateway-system
-  ```
-- **Option 2 — Force Helm upgrade**: Pass `--force` to `helm upgrade`. Helm deletes and re-creates resources that cannot be patched in place.
-  ```sh
-  helm upgrade kgateway kgateway/kgateway --force ...
-  ```
-
-Both options result in a brief restart of the controller pod.
 
 ### 🌟 New features {#v22-new-features}
 
@@ -34,6 +20,7 @@ Both options result in a brief restart of the controller pod.
 - **Common labels**: Add custom labels to all resources that are created by the Helm charts by using the `commonLabels` field, including the Deployment, Service, and ServiceAccount of the control plane. This allows you to better organize your resources or integrate with external tools. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}).
 - **PriorityClass support**: Assign a PriorityClassName to control plane pods using the `controller.priorityClassName` Helm field. [Priority](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) indicates the importance of a pod relative to other pods and allows higher priority pods to preempt lower priority ones when scheduling.
 - **Topology spread constraints**: Distribute kgateway controller pods across failure domains such as zones or nodes by using the `topologySpreadConstraints` Helm field. For more information, see [Topology spread constraints]({{< link-hextra path="/install/advanced/#topology-spread-constraints" >}}).
+- The default `app.kubernetes.io/component: controller` label is added to the controller deployment. Similarly, the `app.kubernetes.io/component: proxy` is added to all gateway proxies. 
 
 #### Static IPs for Gateways
 
