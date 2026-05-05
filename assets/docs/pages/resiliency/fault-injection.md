@@ -145,7 +145,7 @@ Review other common fault injection configurations.
 
 Throttle the response body data rate to simulate slow or degraded upstream connections.
 
-1. Create a policy that limits the response rate to 8 kbits/s on all requests.
+1. Create a policy that limits the response rate to 64 kbits/s on all requests.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -160,7 +160,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
        name: httpbin
      faultInjection:
        responseRateLimit:
-         kbitsPerSecond: 8
+         kbitsPerSecond: 64
          percentage: 100
    EOF
    ```
@@ -170,18 +170,16 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
    | `faultInjection.responseRateLimit.kbitsPerSecond` | The maximum response data rate in kilobits per second. Must be at least `1`. |
    | `faultInjection.responseRateLimit.percentage` | The percentage of responses to rate limit. Defaults to `100`. |
 
-2. Request a 500 KB response from httpbin without the rate limit and record the time as a baseline.
+2. Request a 500 KB response from httpbin with the rate limit and record the time as a baseline.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   kubectl delete trafficpolicy httpbin-fault -n httpbin
    time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/500000 \
      -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   kubectl delete trafficpolicy httpbin-fault -n httpbin
    time curl -s -o /dev/null localhost:8080/bytes/500000 \
      -H "host: www.example.com"
    ```
@@ -190,10 +188,10 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
 
    Example output:
    ```
-   real    0m0.227s
+   0.00s user 0.01s system 63% cpu 0.017 total
    ```
 
-3. Re-apply the rate limit and repeat the request. Verify that the download is significantly slower than the baseline.
+3. Re-apply the rate limit with a smaller response data rate and repeat the request. Verify that the download is significantly slower than the baseline.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -243,7 +241,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
 
    Example output:
    ```
-   real    0m12.487s
+   0.01s user 0.02s system 0% cpu 12.476 total
    ```
 
 ### Gateway-level fault injection {#gateway-level}
