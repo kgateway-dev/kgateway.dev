@@ -10,7 +10,7 @@ excludeSearch: true
   <div class="py-8 lg:py-16 flex items-center px-6">
     <div class="text-center mx-auto inline-block">
       <h1 class="text-3xl/tight lg:text-6xl/tight max-w-4xl font-bold mt-6 mx-auto font-heading">The most widely deployed gateway in Kubernetes for microservices</h1>
-      <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">Kgateway is:</h2>
+      <p class="text-2xl lg:text-4xl max-w-4xl font-semibold mt-6 lg:mt-16 mx-auto font-heading">Kgateway is:</p>
     </div>
   </div>
 
