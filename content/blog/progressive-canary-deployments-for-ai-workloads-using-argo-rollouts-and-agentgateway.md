@@ -1,11 +1,12 @@
 ---
 title: "Progressive Canary Deployments for AI Workloads using Argo Rollouts and agentgateway"
-toc: 
+toc: false
 author: Aryan Parashar
-excludeSearch: 
+publishDate: 2026-05-08T00:00:00Z
+excludeSearch: true
 ---
 
-Modern applications rarely fail because of bad code alone instead they also fail becasue changes are released too abruptly. Even well tested features can behave unexpectedly once they interact with real users, real traffic patterns, and real production data. A traditional **Kubernetes Deployment** does provide rolling updates, but it treats all updates the same way and offers very limited control over how traffic is shifted and when users are exposed to new behavior.
+Production systems rarely fail because of bad code alone. In many cases, failures occur because changes are introduced too quickly without enough real-world validation. Even well-tested features can behave unexpectedly once they encounter live traffic patterns, real users, and production-scale data. Although Kubernetes Deployments support rolling updates, they provide limited control over how traffic is gradually shifted between versions and how new behavior is validated before broader exposure.
 
 Argo Rollouts fills this gap by enabling progressive delivery. Instead of pushing a new version to everyone at once, it allows teams to gradually introduce changes, observe real-time behavior, and make informed decisions before proceeding further.
 
