@@ -1,6 +1,5 @@
 You can use this guide to upgrade the {{< reuse "/docs/snippets/kgateway.md" >}} control plane and data plane components, or to apply changes to the components' configuration settings.
 
-<!-- TODO upgrade guide when we have a minor version
 ## Considerations
 Consider the following rules before you plan your kgateway upgrade.
 
@@ -56,8 +55,6 @@ During the upgrade, pods that run the new version of the control plane and proxi
    ```
 
 ## Step 3: Upgrade kgateway
-
--->
 
 
 ## Prepare to upgrade {#prepare}
