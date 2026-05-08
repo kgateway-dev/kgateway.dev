@@ -356,7 +356,7 @@ EOF
 
 Kubernetes blue-green deployment is a software release strategy that minimizes downtime and risk by running two identical production environments, "blue" (current version) and "green" (new version), and switching traffic between them seamlessly.
 
-Till now we have deployed and configured various kubernetes resources in order to rollout our stable and canary deployments. Now, let's try rolling out our first revision as `revision-1` which will be represented by a **green** color, then later we'll rollout our `canary` deployment as our `revision-2` which will be represented by a **orange** color, while checking the heatlh and state of our rollouts.
+Till now we have deployed and configured various kubernetes resources in order to rollout our stable and canary deployments. Now, let's try rolling out our first revision as `revision-1` which will be represented by a **green** color, then later we'll rollout our `canary` deployment as our `revision-2` which will be represented by a **orange** color, while checking the health and state of our rollouts.
 
 1. To have a look at our stable Kubernetes service of our Rollout has been updated: 
 
@@ -418,7 +418,7 @@ While for **local testing with port-forwarding**:
 ```bash
 kubectl port-forward -n kgateway-system svc/agentgateway-proxy 8080:80
 ```
-**Then in a seperate terminal:** 
+**Then in a separate terminal:** 
 ```bash
 export GW_ADDRESS=localhost
 export GW_PORT=8080
@@ -516,7 +516,7 @@ for i in {1..100}; do
   echo
 done
 ```
-Expected Ouput might vary but will now include random orange rollouts to get released as well:
+Expected output might vary but will now include random orange rollouts to get released as well:
 ```
 "green"
 "green"
