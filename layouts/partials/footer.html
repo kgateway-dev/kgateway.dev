@@ -15,7 +15,7 @@
         Kgateway was originally created by <a class="text-secondary-link" href="https://www.solo.io/">Solo.io</a> and was known as Gloo.
       </span>
     </div>
-    <div class="flex flex-col flex-wrap md:flex-row gap-[2.5625rem] items-center md:max-h-[3.1875rem] justify-end">
+    <nav class="flex flex-col flex-wrap md:flex-row gap-[2.5625rem] items-center md:max-h-[3.1875rem] justify-end" aria-label="Social media links">
       <a class="link flex items-center gap-2 whitespace-nowrap text-secondary-link text-[1.125rem] leading-[1.6875rem] md:text-base" href="https://github.com/kgateway-dev/kgateway">
         <span class="dark:hidden">{{ partial "utils/icon.html" (dict "name" "github" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
         <span class="hidden dark:inline">{{ partial "utils/icon.html" (dict "name" "github-white" "attributes" "class='fill-secondary-link h-6 w-6'") }}</span>
@@ -45,16 +45,16 @@
         {{ partial "utils/icon.html" (dict "name" "youtube" "attributes" "class='fill-secondary-link w-10 h-6'") }}
         YouTube
       </a>                  
-    </div>
+    </nav>
   </div>
 
   <div class="flex flex-col max-w-[1440px] items-center mx-auto pt-24">
-    <div class="w-80"><img src="/cncf-sandbox-horizontal-white.svg" /></div>
+    <div class="w-80"><img src="/cncf-sandbox-horizontal-white.svg" alt="Cloud Native Computing Foundation Sandbox Project" /></div>
     <div class="pt-6"><p class="text-center">We are a Cloud Native Computing Foundation sandbox project</p></div>
     <div class="pt-6"><p class="text-center text-xs">Copyright © kgateway, a Series of LF Projects, LLC.<br/><a class="link text-secondary-link" href="https://lfprojects.org/policies/">Website terms of use, trademark policy and other project policies</a></p></div>
   </div>
 
-  <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=f8e98c47-18c1-416e-9f48-c448193f6d93" />
+  <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=f8e98c47-18c1-416e-9f48-c448193f6d93" alt="" role="presentation" />
 
   <!-- Glossary tooltip JS -->
   <script src="{{ "js/glossary.js" | absURL }}" defer></script>

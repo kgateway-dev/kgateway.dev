@@ -18,7 +18,7 @@
 {{ $swaggerPreset = $swaggerPreset | resources.Fingerprint }}
 <script src="{{ $swaggerPreset.RelPermalink }}" integrity="{{ $swaggerPreset.Data.Integrity }}"></script>
 
-<div class="openapi-container">
+<div class="openapi-container" role="region" aria-label="Interactive API Documentation">
   <div id="swagger-ui"></div>
 </div>
 

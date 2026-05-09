@@ -70,29 +70,39 @@
     {{- end -}}
   {{- end -}}
   
-  <nav class="hx-mb-4 hx-flex hx-items-center hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
-    {{- if eq $subSection "agentgateway" -}}
-    <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
-      {{ $productName }}
-    </a>
-    {{- else -}}
-    <a href="/docs/{{ $subSection }}/{{ $currentVersion }}/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
-      {{ $productName }}
-    </a>
-    {{- end -}}
-    {{- /* Add intermediate breadcrumb items */ -}}
-    {{- range $breadcrumbItems -}}
-      <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
-      {{- if .isLast -}}
-        <span class="hx-text-gray-900 dark:hx-text-gray-100">
-          {{ .title }}
-        </span>
-      {{- else -}}
-        <a href="{{ .url }}" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
-          {{ .title }}
+  <nav class="hx-mb-4 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400" aria-label="Breadcrumb">
+    <ol class="hx-flex hx-items-center hx-gap-2 hx-list-none hx-p-0 hx-m-0">
+      <li class="hx-inline-flex hx-items-center">
+        {{- if eq $subSection "agentgateway" -}}
+        <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+          {{ $productName }}
         </a>
+        {{- else -}}
+        <a href="/docs/{{ $subSection }}/{{ $currentVersion }}/" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+          {{ $productName }}
+        </a>
+        {{- end -}}
+      </li>
+      {{- /* Add intermediate breadcrumb items */ -}}
+      {{- range $breadcrumbItems -}}
+        <li class="hx-inline-flex hx-items-center" aria-hidden="true">
+          <span class="hx-text-gray-400 dark:hx-text-gray-500">/</span>
+        </li>
+        {{- if .isLast -}}
+          <li class="hx-inline-flex hx-items-center" aria-current="page">
+            <span class="hx-text-gray-900 dark:hx-text-gray-100">
+              {{ .title }}
+            </span>
+          </li>
+        {{- else -}}
+          <li class="hx-inline-flex hx-items-center">
+            <a href="{{ .url }}" class="hover:hx-text-gray-900 dark:hover:hx-text-gray-100">
+              {{ .title }}
+            </a>
+          </li>
+        {{- end -}}
       {{- end -}}
-    {{- end -}}
+    </ol>
   </nav>
 {{- end -}}
 
