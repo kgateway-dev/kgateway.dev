@@ -5,6 +5,7 @@ import sys
 sys.stdout.reconfigure(encoding="utf-8")
 
 def resolve_relative_path(base_dir, link):
+    """Resolve relative/absolute links and check if they exist."""
     if link.startswith("/"):
         abs_path = os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "content", link.lstrip("/"))
@@ -15,6 +16,7 @@ def resolve_relative_path(base_dir, link):
     return os.path.exists(abs_path) or os.path.exists(abs_path + ".md")
 
 def find_cards_in_index(index_file, base_dir):
+    """Extract card links from _index.md file and resolve relative paths."""
     with open(index_file, "r", encoding="utf-8") as file:
         content = file.read()
 
@@ -37,18 +39,22 @@ def find_cards_in_index(index_file, base_dir):
     return resolved_links
 
 def find_valid_links(directory):
+    """Find all valid links in directory."""
     valid_links = set()
     for item in os.listdir(directory):
         item_path = os.path.join(directory, item)
+        # If it's a markdown file (excluding _index.md), add it as a valid link
         if item.endswith(".md") and item != "_index.md":
             valid_links.add(os.path.splitext(item)[0])
+         # If it's a directory, check if it contains at least one .md file
         elif os.path.isdir(item_path):
             md_files = [f for f in os.listdir(item_path) if f.endswith(".md")]
-            if md_files:
+            if md_files:   # Only include subdirectories with .md files
                 valid_links.add(item)
     return valid_links
 
 def check_directory(directory):
+    """Check for missing or extra cards in _index.md."""
     index_file = os.path.join(directory, "_index.md")
     if not os.path.exists(index_file):
         return
