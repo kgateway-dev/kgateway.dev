@@ -7,7 +7,7 @@ In 2.2.x, rustformation is the default. Classic transformation is still availabl
 
 ## Switch back to classic transformation {#switch-back-to-classic-transformation}
 
-Rustformation is enabled by default in 2.2.x. To fall back to classic transformation, set the `USE_RUST_FORMATIONS` environment variable on the kgateway controller to `false`, or set `useRustFormations: false` in the kgateway Helm values. After kgateway restarts, any TrafficPolicy with a `transformation` field is processed by the classic filter instead of the rustformation filter.
+To fall back to classic transformation, set the `USE_RUST_FORMATIONS` environment variable on the kgateway controller to `false`, or set `useRustFormations: false` in the kgateway Helm values. After kgateway restarts, any TrafficPolicy with a `transformation` field is processed by the classic filter instead of the rustformation filter.
 
 ```yaml
 controller:
@@ -40,13 +40,12 @@ Starting in v2.2.0, kgateway supports both `x86_64` (amd64) and `arm64` builds. 
 * `x86_64` uses a custom envoy-wrapper image that includes both the classic transformation filter and the rustformation dynamic module. You can run either engine.
 * `arm64` uses the upstream Envoy image with the rustformation dynamic module loaded at runtime. The classic transformation filter is not available on `arm64`.
 
-In addition, the transformation `add` operation is currently not supported on `arm64` builds. Use `set` instead, or run kgateway on `x86_64` if you need to append header values without replacing existing ones.
 
-## Strict validation {#strict-validation}
+## Strict validation compatibility {#strict-validation-compatibility}
 
 Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with both transformation engines. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can run strict validation with rustformation (the default) or with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
 
 ## Limitations {#limitations}
 
-* On `arm64`, the rustformation `add` header operation is not supported. Use `set`.
-* Classic transformation is deprecated and is removed in 2.3.x. If you fall back to classic in 2.2.x, plan to file issues for any rustformation gaps so that you can move back to the default before upgrading to 2.3.
+* The transformation `add` operation is currently not supported on `arm64` builds. Use `set` instead, or run kgateway on `x86_64` if you need to append header values without replacing existing ones.
+* Classic transformation is deprecated. If you fall back to classic in 2.2.x, plan to file issues for any rustformation gaps so that you can move back to the default before upgrading.

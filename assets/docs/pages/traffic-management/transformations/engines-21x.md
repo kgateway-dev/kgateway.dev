@@ -2,6 +2,6 @@ In 2.1.x, {{< reuse "docs/snippets/kgateway.md" >}} uses the **classic transform
 
 For the template syntax and the list of supported functions, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
 
-## Strict validation {#strict-validation}
+## Strict validation compatibility {#strict-validation-compatibility}
 
 Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.1.x, strict validation works with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).

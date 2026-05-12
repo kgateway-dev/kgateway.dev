@@ -13,7 +13,7 @@ The engine is the classic transformation filter, which is powered by version 3.4
 The default engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). On `x86_64`, classic transformation (powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0)) is available as an opt-out fallback. For a comparison of the two engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 {{< /version >}}
 {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
-The only supported engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). The classic Inja-based transformation filter was removed in 2.3.x. For details, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+The only supported engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). For details, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 {{< /version >}}
 
 The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
@@ -198,7 +198,7 @@ This template results in a body similar to `This is the value of the POD_NAME en
 #### Header to body
 To extract header information and add this information to the body, you can take multiple different approaches. The approach that is right for you depends on how you want to transform the body. 
 
-* **Template functions**:
+**Template functions**:
 
 The following example uses a transformation function to access the value of a request header. This value is added to a custom body string.
 ```yaml

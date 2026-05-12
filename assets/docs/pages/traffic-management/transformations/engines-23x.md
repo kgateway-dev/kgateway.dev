@@ -48,6 +48,6 @@ transformation:
 
 The `value.stringValue` field accepts a MiniJinja template. The rendered output is stored as a string in the named dynamic metadata namespace and key. For details about the available filter chain placement, see the [Envoy dynamic metadata documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/well_known_dynamic_metadata).
 
-## Strict validation {#strict-validation}
+## Strict validation compatibility {#strict-validation-compatibility}
 
 Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.3.x, strict validation works with rustformation. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can safely run TrafficPolicies with `transformation` on Gateways that have strict validation enabled. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
