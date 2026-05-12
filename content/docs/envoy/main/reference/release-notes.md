@@ -16,7 +16,13 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 The C++ classic transformation filter is removed in 2.3.x. Rustformation, which became the default in 2.2.x, is now the only transformation engine. The `useRustFormations` Helm value and the `USE_RUST_FORMATIONS` environment variable on the controller have no effect.
 
-If you upgraded from 2.2.x with `useRustFormations: false`, migrate your TrafficPolicy templates to rustformation syntax before you upgrade. The two engines differ in whitespace handling, default body parsing, header field access syntax, and a few other areas. For a complete comparison and migration guidance, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+If your 2.2.x install has `useRustFormations: false` set, migrate your TrafficPolicy `transformation` templates to rustformation (MiniJinja) syntax before you upgrade. Any policy that relies on classic-only behavior silently misbehaves or fails to render after the upgrade. Common patterns to watch for include:
+
+* The `.0` accessor on JSON header fields (for example, `{{ headers.X-Incoming-Stuff.0 }}`). Rustformation requires bracket notation: `{{ headers["X-Incoming-Stuff"][0] }}`.
+* Templates that rely on the body being auto-parsed as JSON. The classic engine auto-parses whenever a transformation is configured; rustformation defaults to `AsString`. Set `body.parseAs: AsJson` explicitly to keep dot-notation access working.
+* Templates that use a JSON field name that collides with a built-in template function (such as `context`). With `parseAs: AsJson`, MiniJinja shadows the function with the field value and fails to render.
+
+For the full comparison and migration table, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/#migrating-classic" >}}).
 
 ### 🌟 New features {#v23-new-features}
 
