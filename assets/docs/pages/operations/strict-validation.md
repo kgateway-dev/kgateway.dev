@@ -39,9 +39,4 @@ kubectl -n {{< reuse "docs/snippets/namespace.md" >}} get deployment kgateway \
 
 Strict validation runs the preflight against an Envoy binary that is bundled in the kgateway control plane image. The control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator sets `ENVOY_DYNAMIC_MODULES_SEARCH_PATH=/usr/local/lib` before invoking the preflight. As a result, the preflight understands rustformation per-route config and can validate TrafficPolicies that use `transformation`.
 
-Behavior by version:
-
-* **2.1.x:** Strict validation works with classic transformation (the 2.1.x default). It does not work with rustformation, because the 2.1.x validator was not yet wired to load dynamic modules during the preflight. If you opted in to rustformation by setting `useRustFormations: true`, switch the setting back to `false` before you enable strict mode.
-* **2.2.x and 2.3.x:** Strict validation works with both transformation engines (2.2.x) and with rustformation (2.3.x, where rustformation is the only engine). No additional configuration is required.
-
-For more information about the engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
