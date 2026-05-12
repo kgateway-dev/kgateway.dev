@@ -5,7 +5,7 @@
 
 In 2.2.x, rustformation is the default. Classic transformation is still available as a fallback so that you can switch back if you hit a missing feature or a regression. Classic transformation is removed in 2.3.x, so plan to migrate any classic-only templates before you upgrade.
 
-## Switch back to classic transformation
+## Switch back to classic transformation {#switch-back-to-classic-transformation}
 
 Rustformation is enabled by default in 2.2.x. To fall back to classic transformation, set the `USE_RUST_FORMATIONS` environment variable on the kgateway controller to `false`, or set `useRustFormations: false` in the kgateway Helm values. After kgateway restarts, any TrafficPolicy with a `transformation` field is processed by the classic filter instead of the rustformation filter.
 
@@ -17,7 +17,7 @@ controller:
 
 Classic transformation requires the custom envoy-wrapper image, which is only published for `x86_64` (amd64). If you run kgateway on `arm64`, you cannot switch back to classic transformation. For more information, see [Architecture support](#architecture-support).
 
-## Behavior differences
+## Behavior differences {#behavior-differences}
 
 Inja and MiniJinja are syntactically similar but not identical. If you have classic transformation templates that worked in 2.1.x or earlier, review the following differences before you upgrade to 2.2.x.
 
@@ -33,7 +33,7 @@ Inja and MiniJinja are syntactically similar but not identical. If you have clas
 
 For more details about syntax, see the upstream [MiniJinja documentation](https://docs.rs/minijinja/latest/minijinja/).
 
-## Architecture support
+## Architecture support {#architecture-support}
 
 Starting in v2.2.0, kgateway supports both `x86_64` (amd64) and `arm64` builds. The two builds use different Envoy images:
 
@@ -42,11 +42,11 @@ Starting in v2.2.0, kgateway supports both `x86_64` (amd64) and `arm64` builds. 
 
 In addition, the transformation `add` operation is currently not supported on `arm64` builds. Use `set` instead, or run kgateway on `x86_64` if you need to append header values without replacing existing ones.
 
-## Strict validation
+## Strict validation {#strict-validation}
 
 Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with both transformation engines. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can run strict validation with rustformation (the default) or with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
 
-## Limitations
+## Limitations {#limitations}
 
 * On `arm64`, the rustformation `add` header operation is not supported. Use `set`.
 * Classic transformation is deprecated and is removed in 2.3.x. If you fall back to classic in 2.2.x, plan to file issues for any rustformation gaps so that you can move back to the default before upgrading to 2.3.
