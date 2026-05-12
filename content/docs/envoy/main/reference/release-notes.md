@@ -10,10 +10,15 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 <!-- TODO release 2.2 
 For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.2.0).-->
 
-### 🔥 Breaking changes {#v22-breaking-changes}
+### 🔥 Breaking changes {#v23-breaking-changes}
 
+#### Classic transformation removed {#v23-classic-transformation-removed}
 
-### 🌟 New features {#v22-new-features}
+The C++ classic transformation filter is removed in 2.3.x. Rustformation, which became the default in 2.2.x, is now the only transformation engine. The `useRustFormations` Helm value and the `USE_RUST_FORMATIONS` environment variable on the controller have no effect.
+
+If you upgraded from 2.2.x with `useRustFormations: false`, migrate your TrafficPolicy templates to rustformation syntax before you upgrade. The two engines differ in whitespace handling, default body parsing, header field access syntax, and a few other areas. For a complete comparison and migration guidance, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+
+### 🌟 New features {#v23-new-features}
 
 #### Control plane changes
 
@@ -145,6 +150,16 @@ Terminate TLS traffic at the gateway by using a TLS listener in `Terminate` mode
 - **TCPRoute**: Routes traffic based on listener port only, without SNI hostname matching. Use this listener for simpler port-based routing.
 
 For more information, see [TLS termination for TLSRoutes]({{< link-hextra path="/setup/listeners/tls-termination/" >}}) and [TLS termination for TCPRoutes]({{< link-hextra path="/setup/listeners/tls-termination-tcproute/" >}}).
+
+#### Transformation enhancements {#v23-transformation-enhancements}
+
+The rustformation engine, which is the only transformation engine in 2.3.x, gains several new capabilities:
+
+- **`parseAs: None`**: A new value for `transformation.<request|response>.body.parseAs` that skips body buffering and body processing entirely. Use this for routes that should not buffer request or response bodies. When `parseAs: None` is set, the `body()` and `context()` template functions return an empty string, and any attempt to read JSON variables from a header template returns a 400 response.
+- **WebSocket and tunnel auto-detect**: The rustformation filter now automatically bypasses body buffering for `CONNECT` requests and WebSocket upgrade requests. This prevents long-lived tunnels from stalling on body buffering, regardless of the configured `parseAs` value.
+- **Dynamic metadata transformation**: A new `transformation.<request|response>.dynamicMetadata` field lets you populate Envoy dynamic metadata from a MiniJinja template. The rendered string value is stored under the configured namespace and key, and is available to downstream filters and to access log formatters.
+
+For details about each capability and a comparison with the classic transformation behavior, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
 <!-- TODO release 2.2
 

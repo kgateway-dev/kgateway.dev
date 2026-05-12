@@ -1,10 +1,16 @@
 The data plane proxy of your Gateway determines the templating language that you use to express transformations.
 
-{{< icon "kgateway" >}} Inja for Envoy-based kgateway proxies
+{{< icon "kgateway" >}} Jinja-style templates for Envoy-based kgateway proxies
 
-## Inja for Envoy-based kgateway proxies {#inja}
+## Jinja-style templates for Envoy-based kgateway proxies {#inja}
 
-{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates are powered by v3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0), which is inspired by the popular Jinja templating language in Python. The template lets you transform headers and body information of a request or response based on the header and body properties themselves. 
+{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a Jinja-inspired syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves. The template engine that processes the syntax depends on the kgateway version and the transformation engine that is enabled:
+
+* In 2.1.x, the default engine is the classic transformation filter, which is powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0).
+* In 2.2.x, the default engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). Classic transformation is still available as an opt-out fallback on `x86_64`.
+* In 2.3.x, the only supported engine is rustformation (MiniJinja). The classic transformation filter is removed.
+
+The two engines support the same core feature set, but the syntax for certain expressions differs. For a full comparison of behavior, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}). The examples in this guide use syntax that works on both engines unless otherwise noted.
 
 The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
 
@@ -48,18 +54,25 @@ When writing your templates, you can take advantage of all the core Inja feature
 
 When specifying your transformation template, you can leverage custom functions that can help to transform headers and bodies more easily. 
 
-| Function | Description | 
+| Function | Description |
 | -- | -- |
-| `base64_encode(string)` | Encodes the input string to base64. |
-| `base64_decode(string)` | Decodes the input string from base64. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
-| `body()` | Returns the request/response body. For an example, see [Update response body]({{< link-hextra path="/traffic-management/transformations/simple/update-response-body" >}}).  | 
+| `base64_encode(string)` | Encodes the input string to standard base64. |
+| `base64_decode(string)` | Decodes the input string from standard base64. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
+| `base64url_encode(string)` | Encodes the input string to URL-safe base64. URL-safe base64 replaces the standard `+` and `/` characters with `-` and `_` so the result can be used in URLs and HTTP headers without further escaping. |
+| `base64url_decode(string)` | Decodes the input string from URL-safe base64. |
+| `body()` | Returns the request or response body. For an example, see [Update response body]({{< link-hextra path="/traffic-management/transformations/simple/update-response-body" >}}). |
 | `context()` | Returns the base JSON context. You can use this context to parse a JSON body that is an array. |
-| `env(env_var_name)` | Returns the value of the environment variable with the given name. Note that because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). | 
-| `header(header_name)` | Returns the value of the header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}). |
+| `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
+| `header(header_name)` | Returns the value of the response header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}). |
 | `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers" >}}). |
-| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random string. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
-| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}).|
-| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If no `substring_len` is provided or `substring_len is <= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
+| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. See the known-issue note below this table about caching behavior in rustformation. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
+| `replace_with_string(input, pattern, replacement)` | Finds the pattern in the input string and replaces every occurrence with `replacement`. Available in rustformation (kgateway 2.2.x and later). Useful for redacting tokens or normalizing values before they are forwarded. |
+| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
+| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
+
+{{< callout type="warning" >}}
+**Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, `replace_with_random` caches the generated replacement for each unique input string and reuses it for every subsequent request, so the function does not produce a fresh random value per request as the name suggests. If you need a value that varies per request, source it from a request attribute (for example, `request_header("x-request-id")`) instead. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
+{{< /callout >}}
 
 **Other common functions**
 
@@ -121,9 +134,13 @@ Apply transformation templates to request or response bodies. The `body` attribu
 
 #### `parseAs`
 
-By default, {{< reuse "docs/snippets/kgateway.md" >}} parses the body as JSON. If the body cannot be parsed as a JSON, a 400 Bad Request HTTP error is returned. 
+The `parseAs` field controls how the body is buffered and interpreted. The default and the available modes depend on the [transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}) that is enabled.
 
-If your body is not a JSON object, you can instead parse it as plain text, by setting the `parseAs` option to `AsString`. 
+* `AsString`: The body is buffered and exposed to the template as a raw string. This is the rustformation default. With the classic engine, you must set `parseAs: AsString` explicitly if your body is not valid JSON.
+* `AsJson`: The body is buffered and parsed as JSON. Top-level fields are available to the template by name. This is the classic default. With the rustformation engine, you must set `parseAs: AsJson` explicitly to access JSON fields directly. If the body is not valid JSON, the classic engine returns a 400 Bad Request response, and the rustformation engine skips the transformation.
+* `None` (rustformation only, 2.3.x and later): The body is not buffered and all body processing is skipped. The `body()` and `context()` functions return empty strings. Attempts to read JSON variables from a header template return a 400 response.
+
+The following example explicitly parses the body as a string. This works on both engines and is recommended when you do not need JSON field access.
 
 ```yaml
 
