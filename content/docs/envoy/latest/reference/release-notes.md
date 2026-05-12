@@ -180,8 +180,7 @@ Kgateway 2.2 switches to rustformation as the default transformation engine. Rus
 * All documented Jinja custom functions
 * Case-insensitive header lookups
 * Improved performance with native Envoy per-route config
-
-Note: Strict validation is currently not supported for transformation policies with multi-arch builds.
+* Compatibility with [strict validation]({{< link-hextra path="/operations/strict-validation/" >}}) on both `x86_64` and `arm64` builds. The control plane image bundles the rustformation dynamic module and the validator loads it before running the Envoy preflight.
 
 #### Gateway customization {#v22-gateway-customization}
 
@@ -199,7 +198,7 @@ Note: Strict validation is currently not supported for transformation policies w
 
 #### Multi-architecture support {#v22-multi-arch}
 
-Added multi-arch support for kgateway with Envoy using upstream Envoy for ARM. Note that strict validation is currently not supported for transformation policies with multi-arch builds.
+Added multi-arch support for kgateway. `x86_64` builds continue to use the `envoy-gloo` image so that the classic transformation filter remains available as a fallback. `arm64` builds use upstream Envoy with the rustformation dynamic module loaded at runtime (the classic transformation filter is not available on `arm64`). Strict validation works with rustformation on both architectures.
 
 #### Ingress to Gateway API migration {#v22-ingress-migration}
 

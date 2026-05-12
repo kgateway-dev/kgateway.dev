@@ -158,6 +158,7 @@ The rustformation engine, which is the only transformation engine in 2.3.x, gain
 - **`parseAs: None`**: A new value for `transformation.<request|response>.body.parseAs` that skips body buffering and body processing entirely. Use this for routes that should not buffer request or response bodies. When `parseAs: None` is set, the `body()` and `context()` template functions return an empty string, and any attempt to read JSON variables from a header template returns a 400 response.
 - **WebSocket and tunnel auto-detect**: The rustformation filter now automatically bypasses body buffering for `CONNECT` requests and WebSocket upgrade requests. This prevents long-lived tunnels from stalling on body buffering, regardless of the configured `parseAs` value.
 - **Dynamic metadata transformation**: A new `transformation.<request|response>.dynamicMetadata` field lets you populate Envoy dynamic metadata from a MiniJinja template. The rendered string value is stored under the configured namespace and key, and is available to downstream filters and to access log formatters.
+- **`add` header now works on `arm64`**: The 2.2.x workaround that disabled the `add` header operation on `arm64` builds is removed. Envoy v1.37 adds the corresponding function to the upstream dynamic-module SDK, so `transformation.<request|response>.add` works on both `x86_64` and `arm64` in 2.3.x.
 
 For details about each capability and a comparison with the classic transformation behavior, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
