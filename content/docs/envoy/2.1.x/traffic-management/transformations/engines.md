@@ -1,7 +1,7 @@
 ---
-title: Transformation engines
+title: Transformation engine
 weight: 5
-description: Choose between the classic transformation filter and rustformation, and understand the differences in template syntax and behavior.
+description: Learn about the classic transformation filter that processes TrafficPolicy transformations.
 ---
 
 {{< reuse "docs/pages/traffic-management/transformations/engines-21x.md" >}}
