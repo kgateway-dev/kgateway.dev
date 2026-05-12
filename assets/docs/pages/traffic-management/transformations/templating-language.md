@@ -1,10 +1,10 @@
 The data plane proxy of your Gateway determines the templating language that you use to express transformations.
 
-{{< icon "kgateway" >}} Jinja-style templates for Envoy-based kgateway proxies
+{{< icon "kgateway" >}} Transformation templates for Envoy-based kgateway proxies
 
-## Jinja-style templates for Envoy-based kgateway proxies {#inja}
+## Transformation templates for Envoy-based kgateway proxies {#inja}
 
-{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a Jinja-inspired syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves.
+{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a template syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves.
 
 {{< version include-if="2.1.x" >}}
 The engine is the classic transformation filter, which is powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0).
