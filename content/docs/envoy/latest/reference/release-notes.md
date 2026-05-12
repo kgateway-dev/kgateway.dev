@@ -214,7 +214,7 @@ Kgateway 2.2 switches to rustformation as the default transformation engine. Rus
 
 #### Multi-architecture support {#v22-multi-arch}
 
-Added multi-arch support for kgateway. `x86_64` builds continue to use the `envoy-gloo` image so that the classic transformation filter remains available as a fallback. `arm64` builds use upstream Envoy with the rustformation dynamic module loaded at runtime (the classic transformation filter is not available on `arm64`). Strict validation works with rustformation on both architectures.
+Added multi-arch support for kgateway. `x86_64` builds continue to use the `envoy-wrapper` image so that the classic transformation filter remains available as a fallback. `arm64` builds use upstream Envoy with the rustformation dynamic module loaded at runtime (the classic transformation filter is not available on `arm64`). Strict validation works with rustformation on both architectures.
 
 #### Ingress to Gateway API migration {#v22-ingress-migration}
 

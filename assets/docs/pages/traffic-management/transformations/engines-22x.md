@@ -7,7 +7,15 @@ In 2.2.x, rustformation is the default. Classic transformation is still availabl
 
 ## Switch back to classic transformation {#switch-back-to-classic-transformation}
 
-To fall back to classic transformation, set the `USE_RUST_FORMATIONS` environment variable on the kgateway controller to `false`, or set `useRustFormations: false` in the kgateway Helm values. After kgateway restarts, any TrafficPolicy with a `transformation` field is processed by the classic filter instead of the rustformation filter.
+To fall back to classic transformation, set `useRustFormations: false` in the kgateway Helm values, or set the `USE_RUST_FORMATIONS` environment variable on the kgateway controller to `false`. After kgateway restarts, any TrafficPolicy with a `transformation` field is processed by the classic filter instead of the rustformation filter.
+
+Helm values:
+
+```yaml
+useRustFormations: false
+```
+
+Controller environment variable:
 
 ```yaml
 controller:

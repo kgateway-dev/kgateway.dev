@@ -54,7 +54,7 @@ spec:
 
 When writing your templates, you can take advantage of all the core template features, such as loops, conditional logic, and functions. In addition, you can use [custom transformation functions](#custom-inja-functions) to transform request and response metadata more easily.
 
-### Custom transformation functions {#custom-functions}
+### Custom transformation functions {#custom-inja-functions}
 
 When specifying your transformation template, you can leverage custom functions that can help to transform headers and bodies more easily.
 
@@ -153,9 +153,9 @@ The default and the available modes depend on the [transformation engine]({{< li
 * `AsJson`: The body is buffered and parsed as JSON. Top-level fields are available to the template by name. This is the classic default. With the rustformation engine, you must set `parseAs: AsJson` explicitly to access JSON fields directly. If the body is not valid JSON, the classic engine returns a 400 Bad Request response, and the rustformation engine skips the transformation.
 {{< /version >}}
 {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
-* `AsString` (default): The body is buffered and exposed to the template as a raw string. Use this mode when you want to read or rewrite the body with [`body()`](#custom-functions) but do not need field-level access.
+* `AsString` (default): The body is buffered and exposed to the template as a raw string. Use this mode when you want to read or rewrite the body with [`body()`](#custom-inja-functions) but do not need field-level access.
 * `AsJson`: The body is buffered and parsed as JSON. Top-level fields are exposed to the template context, so you can read them with dot or bracket notation. If the body is not valid JSON, the filter falls back to skipping the transformation.
-* `None`: The body is not buffered and all body processing is skipped. The [`body()`](#custom-functions) and [`context()`](#custom-inja-functions) functions return an empty string. Attempts to read JSON variables from a header template return a 400 response.
+* `None`: The body is not buffered and all body processing is skipped. The [`body()`](#custom-inja-functions) and [`context()`](#custom-inja-functions) functions return an empty string. Attempts to read JSON variables from a header template return a 400 response.
 {{< /version >}}
 
 The following example explicitly parses the body as a string.
@@ -217,8 +217,11 @@ This template results in a body similar to `This is the value of the :path pseud
 {{< version include-if="2.1.x" >}}
 {{< reuse "docs/snippets/kgateway.md" >}} automatically parses the body as JSON whenever a transformation is configured, so you can directly access top-level body fields to inject into your custom body.
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x" >}}
-With rustformation, set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body.
+{{< version include-if="2.2.x" >}}
+With rustformation (the 2.2.x default), set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body. If you opted out of rustformation by setting `useRustFormations: false`, the classic engine continues to auto-parse the body as JSON whenever a transformation is configured, so `parseAs: AsJson` is implied.
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+Set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body.
 {{< /version >}}
 
 Assuming a body with the following format:
