@@ -44,12 +44,9 @@ In addition, the transformation `add` operation is currently not supported on `a
 
 ## Strict validation
 
-Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with classic transformation only. The control plane image does not bundle the rustformation dynamic module, so the preflight does not understand rustformation per-route config.
-
-If you need strict validation in 2.2.x, switch back to classic transformation on `x86_64`. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
+Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with both transformation engines. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can run strict validation with rustformation (the default) or with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
 
 ## Limitations
 
 * On `arm64`, the rustformation `add` header operation is not supported. Use `set`.
-* Strict validation is supported with classic transformation only. Switching to classic requires `x86_64`.
 * Classic transformation is deprecated and is removed in 2.3.x. If you fall back to classic in 2.2.x, plan to file issues for any rustformation gaps so that you can move back to the default before upgrading to 2.3.

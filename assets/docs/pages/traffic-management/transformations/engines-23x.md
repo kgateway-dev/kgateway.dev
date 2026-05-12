@@ -1,8 +1,10 @@
-In 2.3.x, {{< reuse "docs/snippets/kgateway.md" >}} uses a single transformation engine: **rustformation**. Rustformation is a Rust filter that is loaded into Envoy at runtime as a [dynamic module](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/dynamic_modules_filter). Templates are powered by the [MiniJinja](https://github.com/mitsuhiko/minijinja) template engine.
+{{< reuse "docs/snippets/kgateway.md" >}} uses a single transformation engine: **rustformation**. Rustformation is a Rust filter that is loaded into Envoy at runtime as a [dynamic module](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/dynamic_modules_filter). Templates are powered by the [MiniJinja](https://github.com/mitsuhiko/minijinja) template engine.
 
-The classic C++ transformation filter that was the default in 2.1.x and the fallback in 2.2.x is removed in 2.3.x. The `USE_RUST_FORMATIONS` setting and the `useRustFormations` Helm value have no effect.
+{{< callout type="warning" >}}
+The classic C++ transformation filter that was the default in 2.1.x and the fallback in 2.2.x is removed in 2.3.x and later. The `USE_RUST_FORMATIONS` setting and the `useRustFormations` Helm value have no effect.
 
-If you upgrade from 2.2.x with `USE_RUST_FORMATIONS=false`, plan to migrate your templates to rustformation syntax before you upgrade to 2.3.x. For migration help, see [Migrating from classic transformation](#migrating-from-classic-transformation) and the v2.2.x [Behavior differences]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+If you upgrade from 2.2.x with `USE_RUST_FORMATIONS=false`, plan to migrate your templates to rustformation syntax before you upgrade to 2.3.x. For migration help, see [Migrating from classic transformation](#migrating-from-classic-transformation).
+{{< /callout >}}
 
 ## Migrating from classic transformation
 
@@ -32,7 +34,7 @@ Rustformation also auto-detects `CONNECT` requests and WebSocket upgrade request
 
 ## Dynamic metadata
 
-In 2.3.x, you can populate Envoy dynamic metadata from a transformation by using the `dynamicMetadata` field. Values you set are available to downstream filters and to access log formatters.
+You can populate Envoy dynamic metadata from a transformation by using the `dynamicMetadata` field. Values you set are available to downstream filters and to access log formatters.
 
 ```yaml
 transformation:
@@ -48,11 +50,8 @@ The `value.stringValue` field accepts a MiniJinja template. The rendered output 
 
 ## Strict validation
 
-Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.3.x, the control plane image does not yet bundle the rustformation dynamic module, so strict validation does not understand rustformation per-route config and fails the preflight for any TrafficPolicy that uses `transformation`.
-
-If you need strict validation today, do not enable it on Gateways that have transformation policies attached. For configuration steps and current limits, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
+Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.3.x, strict validation works with rustformation. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can safely run TrafficPolicies with `transformation` on Gateways that have strict validation enabled. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
 
 ## Limitations
 
-* The `add` header operation is currently not supported on `arm64` builds. Use `set` instead, or run kgateway on `x86_64` if you need to append header values without replacing existing ones.
-* Strict validation does not yet work with rustformation. This is expected to change in a future release once the dynamic module is bundled into the control plane image.
+* `replace_with_random` caches its random output per input string within a policy and reuses the cached value across requests. For details and a workaround, see the known-issue callout in [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/#custom-inja-functions" >}}). Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).

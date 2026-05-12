@@ -47,7 +47,7 @@ For details about each behavior change, see the [v2.2 rustformation release note
 
 ## Strict validation
 
-Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. Strict validation works with classic transformation in 2.1.x. It does not work with rustformation because the control plane image does not bundle the rustformation dynamic module. If you need strict validation, leave `USE_RUST_FORMATIONS` set to `false`. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
+Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.1.x, strict validation works with classic transformation. It does not work with rustformation because the 2.1.x validator was not yet wired to load dynamic modules during the preflight. (Both the validator wiring and a bundled rustformation module land in 2.2.x.) If you need strict validation in 2.1.x, leave `USE_RUST_FORMATIONS` set to `false`. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
 
 ## Limitations
 
