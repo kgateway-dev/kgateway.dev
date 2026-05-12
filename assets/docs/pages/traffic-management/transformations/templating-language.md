@@ -4,13 +4,17 @@ The data plane proxy of your Gateway determines the templating language that you
 
 ## Jinja-style templates for Envoy-based kgateway proxies {#inja}
 
-{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a Jinja-inspired syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves. The template engine that processes the syntax depends on the kgateway version and the transformation engine that is enabled:
+{{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a Jinja-inspired syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves.
 
-* In 2.1.x, the default engine is the classic transformation filter, which is powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0).
-* In 2.2.x, the default engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). Classic transformation is still available as an opt-out fallback on `x86_64`.
-* In 2.3.x, the only supported engine is rustformation (MiniJinja). The classic transformation filter is removed.
-
-The two engines support the same core feature set, but the syntax for certain expressions differs. For a full comparison of behavior, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}). The examples in this guide use syntax that works on both engines unless otherwise noted.
+{{< version include-if="2.1.x" >}}
+The default engine is the classic transformation filter, which is powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0). Rustformation, powered by [MiniJinja](https://github.com/mitsuhiko/minijinja), is available as a preview by setting `useRustFormations: true`. For a comparison of the two engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+{{< /version >}}
+{{< version include-if="2.2.x" >}}
+The default engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). On `x86_64`, classic transformation (powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0)) is available as an opt-out fallback. For a comparison of the two engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+The only supported engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). The classic Inja-based transformation filter was removed in 2.3.x. For details, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+{{< /version >}}
 
 The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
 
@@ -48,11 +52,11 @@ spec:
         parseAs:
 ```
 
-When writing your templates, you can take advantage of all the core Inja features, such as loops, conditional logic, and functions. In addition, you can use [custom Inja functions](#custom-inja-functions) to transform request and response metadata more easily.
+When writing your templates, you can take advantage of all the core template features, such as loops, conditional logic, and functions. In addition, you can use [custom transformation functions](#custom-inja-functions) to transform request and response metadata more easily.
 
-### Custom Inja functions
+### Custom transformation functions {#custom-functions}
 
-When specifying your transformation template, you can leverage custom functions that can help to transform headers and bodies more easily. 
+When specifying your transformation template, you can leverage custom functions that can help to transform headers and bodies more easily.
 
 | Function | Description |
 | -- | -- |
@@ -65,18 +69,20 @@ When specifying your transformation template, you can leverage custom functions 
 | `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
 | `header(header_name)` | Returns the value of the response header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}). |
 | `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers" >}}). |
-| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. See the known-issue note below this table about caching behavior in rustformation. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
+| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. {{< version exclude-if="2.0.x,2.1.x" >}}See the known-issue note below this table about constant-folding behavior in rustformation.{{< /version >}} For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
 | `replace_with_string(input, pattern, replacement)` | Finds the pattern in the input string and replaces every occurrence with `replacement`. Available in rustformation (kgateway 2.2.x and later). Useful for redacting tokens or normalizing values before they are forwarded. |
 | `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
 | `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
 
+{{< version exclude-if="2.0.x,2.1.x" >}}
 {{< callout type="warning" >}}
-**Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, `replace_with_random` caches the generated replacement for each unique input string and reuses it for every subsequent request, so the function does not produce a fresh random value per request as the name suggests. If you need a value that varies per request, source it from a request attribute (for example, `request_header("x-request-id")`) instead. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
+**Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, MiniJinja evaluates `replace_with_random` at template compile time when its arguments are constants and stores the result in the compiled template, so every request returns the same generated value. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")` — a non-constant argument can't be folded at compile time, so MiniJinja re-evaluates the function on every render. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
 {{< /callout >}}
+{{< /version >}}
 
 **Other common functions**
 
-You might use default Inja functions, such as `if else` or `if exists`. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}). 
+You might use built-in template functions such as `if else` or `if exists`. Both the Inja and MiniJinja engines support these constructs. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}).
 
 ### Template attributes
 
@@ -103,9 +109,9 @@ transformation:
       value: bar
 ```
 
-#### Inja functions
+#### Template functions in headers  {#functions-headers}
 
-You can use Inja functions in combination with Inja templates to modify request and response headers. 
+You can use transformation functions in your templates to modify request and response headers.
 
 In the following example, you set response headers in the following ways: 
 * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
@@ -164,8 +170,8 @@ transformation:
 
 This template results in a `This is my static body` body. 
 
-#### Inja template
-The following example uses an Inja function to get the `POD_NAME` environment variable from the gateway proxy and returns that value in a custom body string. 
+#### Template function in the body
+The following example uses a transformation function to get the `POD_NAME` environment variable from the gateway proxy and returns that value in a custom body string.
 
 ```yaml 
 
@@ -180,9 +186,9 @@ This template results in a body similar to `This is the value of the POD_NAME en
 #### Header to body
 To extract header information and add this information to the body, you can take multiple different approaches. The approach that is right for you depends on how you want to transform the body. 
 
-* **Inja functions**: 
+* **Template functions**:
 
-The following example uses an Inja function to access the value of a request header. This value is added to a custom body string. 
+The following example uses a transformation function to access the value of a request header. This value is added to a custom body string.
 ```yaml
 
 transformation: 
@@ -195,9 +201,15 @@ This template results in a body similar to `This is the value of the :path pseud
 
 
 #### Body to body
-Because {{< reuse "docs/snippets/kgateway.md" >}} automatically parses a body as a JSON, you can directly access values from the body to inject into your custom body that you want to return. 
 
-Assuming a body with the following format: 
+{{< version include-if="2.1.x" >}}
+With the classic engine (the 2.1.x default), {{< reuse "docs/snippets/kgateway.md" >}} automatically parses the body as JSON whenever a transformation is configured, so you can directly access top-level body fields to inject into your custom body. If you opt in to rustformation, set `body.parseAs: AsJson` to enable the same direct access.
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x" >}}
+With rustformation, set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body.
+{{< /version >}}
+
+Assuming a body with the following format:
 ```yaml
 {
   "slideshow": {
@@ -222,13 +234,14 @@ Assuming a body with the following format:
 }
 ```
 
-You can use a transformation template similar to the following to extract the `author`, `title`, and `slides` attributes and add them to the response body.  
+You can use a transformation template similar to the following to extract the `author`, `title`, and `slides` attributes and add them to the response body.
 ```yaml
 
-transformation: 
-  response: 
-    body: 
-      text: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
+transformation:
+  response:
+    body:
+      parseAs: AsJson
+      value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
 ```
 
 The following body is returned after transformation: 
