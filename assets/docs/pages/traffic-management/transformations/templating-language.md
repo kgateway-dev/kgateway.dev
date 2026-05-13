@@ -221,7 +221,7 @@ This template results in a body similar to `This is the value of the :path pseud
 With rustformation (the 2.2.x default), set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body. If you opted out of rustformation by setting `useRustFormations: false`, the classic engine continues to auto-parse the body as JSON whenever a transformation is configured, so `parseAs: AsJson` is implied.
 {{< /version >}}
 {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
-Set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body.
+Set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject them into your custom body.
 {{< /version >}}
 
 Assuming a body with the following format:
