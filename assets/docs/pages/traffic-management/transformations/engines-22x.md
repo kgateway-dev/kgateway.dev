@@ -29,17 +29,7 @@ Classic transformation requires the custom envoy-wrapper image, which is only pu
 
 Inja and MiniJinja are syntactically similar but not identical. If you have classic transformation templates that worked in 2.1.x or earlier, review the following differences before you upgrade to 2.2.x.
 
-| Area | Classic (Inja) | Rustformation (MiniJinja) |
-| --- | --- | --- |
-| Whitespace | Whitespace is preserved as-is. | Trailing whitespace is right-trimmed by default. |
-| `replace_with_random` | The same input string produces the same random replacement within a single request. For example, `replace_with_random("abc", "a")` and `replace_with_random("cba", "a")` replace `"a"` with the same generated value. | A new random value is generated on every call, so the two example calls produce different replacements. |
-| Default body parsing | The body is automatically parsed as JSON whenever any transformation is configured, even if the template never reads from the body. | The body is treated as a string by default. To access JSON fields directly, set `transformation.<request\|response>.body.parseAs: AsJson`. |
-| JSON body field access for headers with non-identifier characters | Classic requires the `.0` accessor and dot notation: `{{ headers.X-Incoming-Stuff.0 }}`. Bracket notation is rejected. | MiniJinja requires bracket notation: `{{ headers["X-Incoming-Stuff"][0] }}`. The `.0` accessor is not supported. |
-| JSON field name collisions with custom Inja functions | No conflict. | If a JSON body field shares a name with a built-in template function (for example, `context`), the field value shadows the function and rendering fails because the value is not callable. Rename the field or avoid `parseAs: AsJson` for that template. |
-| Body buffering | The classic filter buffers the body in its own internal structure and tracks buffer limits independently. | Rustformation relies on Envoy to buffer the body before the filter processes it. |
-| Adding multiple headers with the same name | Not supported. | Not supported. The kgateway transformation API models headers as a map keyed by name, so each header can appear only once in `add`, `set`, or `remove`. |
-
-For more details about syntax, see the upstream [MiniJinja documentation](https://docs.rs/minijinja/latest/minijinja/).
+{{< reuse "docs/pages/traffic-management/transformations/migrating-classic.md" >}}
 
 ## Architecture support {#architecture-support}
 
