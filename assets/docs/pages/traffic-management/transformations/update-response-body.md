@@ -3,7 +3,7 @@ Learn how to return a customized response body and how replace specific values i
 In this guide, you use the following methods to transform a JSON body:
 
 * Directly access fields in the JSON body and inject them into a custom JSON body.
-* Use the `replace_with_random` function to replace specific patterns in the JSON body.{{< version exclude-if="2.0.x,2.1.x" >}} Note that with rustformation, when this function's arguments are constants, it is evaluated at template compile time. Because of this, every request returns the same generated value. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")`. See [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).{{< /version >}}
+* Use the `replace_with_random` function to replace specific patterns in the JSON body.
 
 ## Before you begin
 
