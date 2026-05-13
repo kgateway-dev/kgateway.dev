@@ -85,7 +85,7 @@ The two engines are syntactically similar but not identical. Existing classic-en
 * The `.0` accessor on JSON header fields (for example, `{{ headers.X-Incoming-Stuff.0 }}`). Rustformation requires bracket notation: `{{ headers["X-Incoming-Stuff"][0] }}`.
 * Templates that rely on the body being auto-parsed as JSON. The classic engine auto-parses whenever a transformation is configured; rustformation defaults to `AsString`. Set `body.parseAs: AsJson` explicitly to keep dot-notation access working.
 * Templates that use a JSON field name that collides with a built-in template function (such as `context`). With `parseAs: AsJson`, MiniJinja shadows the function with the field value and fails to render.
-* Whitespace handling: rustformation right-trims trailing whitespace by default; classic preserves whitespace as-is.
+* Whitespace handling. Rustformation right-trims trailing whitespace by default; classic preserves whitespace as-is.
 * The `replace_with_random` function is evaluated at template compile time when its arguments are constants and returns the same generated value on every request. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")`. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
 
 If you hit a regression you can't easily migrate around, you can opt out of rustformation on `x86_64` by setting `useRustFormations: false` in your Helm values (or `USE_RUST_FORMATIONS=false` as a controller environment variable). The classic engine is not available on `arm64` and is removed entirely in 2.3.x, so plan to migrate templates before you upgrade further.
