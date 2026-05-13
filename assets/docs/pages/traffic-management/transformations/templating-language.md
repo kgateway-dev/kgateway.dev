@@ -2,6 +2,11 @@ The data plane proxy of your Gateway determines the templating language that you
 
 {{< icon "kgateway" >}} Transformation templates for Envoy-based kgateway proxies
 
+{{< callout type="warning" >}}{{< version include-if="2.1.x,2.2.x" >}}
+**Plan to migrate to rustformation before you upgrade past 2.2.x.** In 2.2.x, rustformation (MiniJinja) is the default engine, and classic transformation (Inja) remains as an opt-out fallback. In a future release, classic transformation is removed and rustformation is the only supported engine. The two engines are syntactically similar but not identical, so existing templates might need updates.{{< /version >}} {{< version include-if="2.2.x" >}}For the differences and a migration table, see the 2.2.x [Transformation engines](/docs/envoy/latest/traffic-management/transformations/engines/) topic.{{< /version >}}
+{{< /callout >}}
+
+
 ## Transformation templates for Envoy-based kgateway proxies {#inja}
 
 {{< reuse "docs/snippets/kgateway-capital.md" >}} transformation templates use a template syntax that lets you transform headers and body information of a request or response based on the header and body properties themselves.
