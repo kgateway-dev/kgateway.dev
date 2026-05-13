@@ -533,7 +533,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    {{% /tab %}}
    {{< /tabs >}}
 
-{{% version include-if="2.3.x" %}}
+{{< version include-if="2.3.x" >}}
 ## Use a value from a Secret {#header-from-secret}
 
 If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` on a `set` or `add` entry in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. kgateway resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, kgateway re-translates the affected policies automatically.
@@ -697,7 +697,7 @@ spec:
 
 Without a matching `ReferenceGrant`, the policy reports `Accepted=False` and the affected route returns a 500 response. The same status is reported if the referenced Secret does not exist.
 
-{{% /version %}}
+{{< /version >}}
 
 ## Dynamic request headers {#dynamic-request-header}
 
