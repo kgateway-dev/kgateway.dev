@@ -533,6 +533,172 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    {{% /tab %}}
    {{< /tabs >}}
 
+{{% version include-if="2.3.x" %}}
+## Use a value from a Secret {#header-from-secret}
+
+If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` on a `set` or `add` entry in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. kgateway resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, kgateway re-translates the affected policies automatically.
+
+{{< callout type="info" >}}
+This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" >}}. The Gateway API `HTTPRoute` `RequestHeaderModifier` filter does not support `secretRef`.
+{{< /callout >}}
+
+1. Create a Secret that holds the values you want to inject. The data keys do not need to match the eventual header names.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: backend-creds
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   type: Opaque
+   stringData:
+     api-key: my-secret-api-key
+     tenant-id: tenant-abc
+   EOF
+   ```
+
+2. Create an HTTPRoute for the httpbin app. The example selects the http Gateway that you created before you began.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-headers
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - headers.example
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+3. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets two request headers from the `backend-creds` Secret. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: httpbin-secret-headers
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     headerModifiers:
+       request:
+         set:
+         - name: X-Api-Key
+           secretRef:
+             name: backend-creds
+             key: api-key
+         - name: X-Tenant-Id
+           secretRef:
+             name: backend-creds
+             key: tenant-id
+   EOF
+   ```
+
+   The {{< reuse "docs/snippets/trafficpolicy.md" >}} `targetRefs` field does not accept a `namespace`. The policy must live in the same namespace as the resource it targets. To scope this example to a single HTTPRoute instead of the whole Gateway, change `kind` to `HTTPRoute` and `name` to the route's name, and create the {{< reuse "docs/snippets/trafficpolicy.md" >}} (and the Secret) in the route's namespace.
+
+   |Setting|Description|
+   |--|--|
+   |`headerModifiers.request.set.name`|The HTTP header name that the upstream service receives. |
+   |`headerModifiers.request.set.secretRef.name`|The name of the Kubernetes Secret to read the value from. If the Secret does not exist when the policy is applied, the policy reports `Accepted=False` and the affected route returns a 500 response. |
+   |`headerModifiers.request.set.secretRef.key`|The key in the Secret's `data` to use as the header value. Optional. If `key` is omitted, it defaults to the value of `headerModifiers.request.set.name`. |
+   |`headerModifiers.request.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. To reference a Secret in a different namespace, see [Cross-namespace Secrets](#cross-namespace-secrets). |
+
+4. Send a request to the httpbin app on the `headers.example` domain and confirm that the upstream sees the `X-Api-Key` and `X-Tenant-Id` headers with the values from the Secret. Note that the values do not appear in the {{< reuse "docs/snippets/trafficpolicy.md" >}} or in the request you sent.
+   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```json
+   {
+     "headers": {
+       "Host": [
+         "headers.example:8080"
+       ],
+       "X-Api-Key": [
+         "my-secret-api-key"
+       ],
+       "X-Tenant-Id": [
+         "tenant-abc"
+       ],
+       ...
+     }
+   }
+   ```
+
+5. Optional: When you are finished, you can clean up the resources that you created.
+
+```sh
+kubectl delete httproute httpbin-headers -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-secret-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete secret backend-creds -n {{% reuse "docs/snippets/namespace.md" %}}
+```
+
+### Field defaulting
+
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. The following table shows how kgateway resolves each combination.
+
+|`name` (header)|`secretRef.key`|Behavior|
+|--|--|--|
+|`X-Api-Key`|`api-key`|The `X-Api-Key` header is set to the value of the `api-key` data key in the Secret.|
+|`X-Api-Key`|*(omitted)*|The `X-Api-Key` header is set to the value of the `X-Api-Key` data key in the Secret.|
+|*(omitted)*|`X-Api-Key`|The `X-Api-Key` header is set to the value of the `X-Api-Key` data key in the Secret.|
+|*(omitted)*|*(omitted)*|Every entry in the Secret is injected as a request header. Each data key is reused as the header name.|
+
+For example, to mirror every entry in the Secret as a request header without listing them individually:
+
+```yaml
+headerModifiers:
+  request:
+    set:
+    - secretRef:
+        name: backend-creds
+```
+
+### Cross-namespace Secrets {#cross-namespace-secrets}
+
+To reference a Secret in a different namespace from the {{< reuse "docs/snippets/trafficpolicy.md" >}}, set `secretRef.namespace` to the Secret's namespace and create a `ReferenceGrant` in that namespace. This grant allows the {{< reuse "docs/snippets/trafficpolicy.md" >}} namespace to read Secrets in the target namespace.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-secret-access
+  namespace: backend-secrets
+spec:
+  from:
+  - group: gateway.kgateway.dev
+    kind: TrafficPolicy
+    namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  to:
+  - group: ""
+    kind: Secret
+```
+
+Without a matching `ReferenceGrant`, the policy reports `Accepted=False` and the affected route returns a 500 response. The same status is reported if the referenced Secret does not exist.
+
+{{% /version %}}
+
 ## Dynamic request headers {#dynamic-request-header}
 
 You can return dynamic information about the request in the request header. For more information, see the Envoy docs for [Custom request/response headers](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers.html#custom-request-response-headers).

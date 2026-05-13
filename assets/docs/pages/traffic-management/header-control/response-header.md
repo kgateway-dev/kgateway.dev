@@ -439,6 +439,119 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    {{% /tab %}}
    {{< /tabs >}}
 
+{{< version include-if="2.3.x" >}}
+## Use a value from a Secret {#header-from-secret}
+
+If a response header value is sensitive, such as an audit signing key or a service-to-service token destined for a trusted client, you might not want to commit it to a manifest in plain text. You can source a response header value from a Kubernetes Secret by replacing `value` with `secretRef` on a `set` or `add` entry in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. kgateway resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, kgateway re-translates the affected policies automatically.
+
+{{< callout type="info" >}}
+This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" >}}. The Gateway API `HTTPRoute` `ResponseHeaderModifier` filter does not support `secretRef`.
+{{< /callout >}}
+
+The same defaulting rules and cross-namespace `ReferenceGrant` requirement that apply to [request headers from a Secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}) also apply here. The following example shows the basic flow for responses.
+
+1. Create a Secret that holds the value you want to inject.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: response-signing
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   type: Opaque
+   stringData:
+     signing-key: my-response-signing-key
+   EOF
+   ```
+
+2. Create an HTTPRoute for the httpbin app. The example selects the http Gateway that you created before you began.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-headers
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     hostnames:
+       - headers.example
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+
+3. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets a response header from the `response-signing` Secret. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: httpbin-secret-response-headers
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     headerModifiers:
+       response:
+         set:
+         - name: X-Response-Signature
+           secretRef:
+             name: response-signing
+             key: signing-key
+   EOF
+   ```
+
+   The {{< reuse "docs/snippets/trafficpolicy.md" >}} `targetRefs` field does not accept a `namespace`. The policy must live in the same namespace as the resource it targets. To scope this example to a single HTTPRoute instead of the whole Gateway, change `kind` to `HTTPRoute` and `name` to the route's name, and create the {{< reuse "docs/snippets/trafficpolicy.md" >}} (and the Secret) in the route's namespace.
+
+   |Setting|Description|
+   |--|--|
+   |`headerModifiers.response.set.name`|The HTTP header name that the client receives. |
+   |`headerModifiers.response.set.secretRef.name`|The name of the Kubernetes Secret to read the value from. If the Secret does not exist when the policy is applied, the policy reports `Accepted=False` and the affected route returns a 500 response. |
+   |`headerModifiers.response.set.secretRef.key`|The key in the Secret's `data` to use as the header value. Optional. If `key` is omitted, it defaults to the value of `headerModifiers.response.set.name`. |
+   |`headerModifiers.response.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. Cross-namespace references require a `ReferenceGrant`. For details, see the request-header [Cross-namespace Secrets]({{< link-hextra path="/traffic-management/header-control/request-header/#cross-namespace-secrets" >}}) section. |
+
+4. Send a request to the httpbin app on the `headers.example` domain and confirm that the response includes the `X-Response-Signature` header with the value from the Secret.
+   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```sh
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; encoding=utf-8
+   x-envoy-upstream-service-time: 0
+   x-response-signature: my-response-signing-key
+   server: envoy
+   ```
+
+When you are finished, optionally clean up the resources that you created.
+
+```sh
+kubectl delete httproute httpbin-headers -n httpbin
+kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-secret-response-headers -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete secret response-signing -n {{< reuse "docs/snippets/namespace.md" >}}
+```
+
+{{< /version >}}
+
 ## Dynamic response headers {#dynamic-response-header}
 
 You can return dynamic information about the response in the response header. For more information, see the Envoy docs for [Custom request/response headers](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers.html#custom-request-response-headers).
