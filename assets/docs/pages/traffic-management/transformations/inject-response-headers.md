@@ -1,4 +1,4 @@
-Use an Inja template to extract a value from a request header and add it as a header to your responses. 
+Use a transformation template to extract a value from a request header and add it as a header to your responses.
 
 ## Before you begin
 
