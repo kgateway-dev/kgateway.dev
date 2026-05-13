@@ -26,7 +26,7 @@ The accepted values for `validation.level` are `standard` and `strict` (case-ins
 
 ## Verify the validation mode
 
-To check which mode is active, inspect the `KGW_VALIDATION_MODE` env var on the kgateway controller deployment. The expected output is `standard` or `strict`.
+To check which mode is active, inspect the `KGW_VALIDATION_MODE` environment variable on the kgateway controller deployment. The expected output is `standard` or `strict`.
 
 ```sh
 kubectl -n {{< reuse "docs/snippets/namespace.md" >}} get deployment kgateway \
