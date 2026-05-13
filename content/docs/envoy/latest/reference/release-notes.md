@@ -78,7 +78,7 @@ AI policy configuration was removed from the `TrafficPolicy` API. To use AI capa
 
 #### Default transformation engine changed to rustformation {#v22-default-transformation-engine}
 
-The default transformation engine flipped from the C++ classic filter (Inja) to rustformation (MiniJinja). See the [Rustformation transformation engine](#v22-rustformation) section under New features for the full set of capabilities. Any `TrafficPolicy` that has a `transformation` field is now processed by rustformation unless you explicitly opt out.
+The default transformation engine changed from the C++ classic filter (Inja) to rustformation (MiniJinja). For the full set of capabilities, see the [Rustformation transformation engine](#v22-rustformation) section under New features. Any `TrafficPolicy` that has a `transformation` field is now processed by rustformation unless you explicitly opt out.
 
 The two engines are syntactically similar but not identical. Existing classic-engine templates from 2.1.x or earlier might render differently or fail to render under rustformation. Common patterns to watch for include:
 
