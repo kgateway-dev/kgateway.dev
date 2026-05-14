@@ -615,43 +615,44 @@ This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" 
    |`headerModifiers.request.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. To reference a Secret in a different namespace, see [Cross-namespace Secrets](#cross-namespace-secrets). |
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the upstream sees the `X-Api-Key` and `X-Tenant-Id` headers with the values from the Secret. Note that the values do not appear in the {{< reuse "docs/snippets/trafficpolicy.md" >}} or in the request you sent.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi localhost:8080/headers -H "host: headers.example"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
-   Example output:
-   ```json
-   {
-     "headers": {
-       "Host": [
-         "headers.example:8080"
-       ],
-       "X-Api-Key": [
-         "my-secret-api-key"
-       ],
-       "X-Tenant-Id": [
-         "tenant-abc"
-       ],
-       ...
-     }
-   }
-   ```
+{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vi localhost:8080/headers -H "host: headers.example"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+```json
+{
+  "headers": {
+    "Host": [
+      "headers.example:8080"
+    ],
+    "X-Api-Key": [
+      "my-secret-api-key"
+    ],
+    "X-Tenant-Id": [
+      "tenant-abc"
+    ],
+    ...
+  }
+}
+```
 
 5. Optional: When you are finished, you can clean up the resources that you created.
 
 ```sh
 kubectl delete httproute httpbin-headers -n httpbin
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-secret-headers -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete secret backend-creds -n {{% reuse "docs/snippets/namespace.md" %}}
+kubectl delete secret backend-creds -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
 ### Field defaulting

@@ -94,16 +94,16 @@ Add headers to incoming requests before they are sent back to the client. If the
    
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
    {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -280,16 +280,16 @@ You can remove HTTP headers from a response before the response is sent back to 
 
 1. Send a request to the httpbin app and find the `content-length` header. 
    {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: www.example.com"
-```
-{{% /tab %}}
+   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: www.example.com"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -393,16 +393,16 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
    {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -518,29 +518,30 @@ The same defaulting rules and cross-namespace `ReferenceGrant` requirement that 
    |`headerModifiers.response.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. Cross-namespace references require a `ReferenceGrant`. For details, see the request-header [Cross-namespace Secrets]({{< link-hextra path="/traffic-management/header-control/request-header/#cross-namespace-secrets" >}}) section. |
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the response includes the `X-Response-Signature` header with the value from the Secret.
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider Loadbalancer" %}}
-   ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi localhost:8080/response-headers -H "host: headers.example"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
-   Example output:
-   ```sh
-   HTTP/1.1 200 OK
-   access-control-allow-credentials: true
-   access-control-allow-origin: *
-   content-type: application/json; encoding=utf-8
-   x-envoy-upstream-service-time: 0
-   x-response-signature: my-response-signing-key
-   server: envoy
-   ```
+{{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
+{{% tab tabName="Cloud Provider Loadbalancer" %}}
+```sh
+curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vi localhost:8080/response-headers -H "host: headers.example"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+```sh
+HTTP/1.1 200 OK
+access-control-allow-credentials: true
+access-control-allow-origin: *
+content-type: application/json; encoding=utf-8
+x-envoy-upstream-service-time: 0
+x-response-signature: my-response-signing-key
+server: envoy
+```
 
 When you are finished, optionally clean up the resources that you created.
 
@@ -645,16 +646,16 @@ You can return dynamic information about the response in the response header. Fo
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that the `x-response-code` response header is set to the HTTP response code. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
