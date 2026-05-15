@@ -700,7 +700,7 @@ headerModifiers:
 
 #### Both `name` and `secretRef.key` omitted
 
-kgateway injects every entry in the Secret as a request header. Each data key becomes a header name.
+kgateway injects every entry in the Secret as a request header. Each data key becomes a header name. Use this combination to mirror an entire Secret into headers without listing each entry individually.
 
 ```yaml
 headerModifiers:
