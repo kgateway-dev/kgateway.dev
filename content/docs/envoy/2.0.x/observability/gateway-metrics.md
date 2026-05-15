@@ -26,4 +26,4 @@ The following steps show you how to quickly view the metrics endpoint of the gat
 
 ## Gateway proxy metrics reference {#reference}
 
-For more details about the collected metrics, see the [Envoy statistics reference docs](https://www.envoyproxy.io/docs/envoy/latest/operations/stats_overview).
+For more details about the collected metrics, see the [Envoy statistics reference docs](https://www.envoyproxy.io/docs/envoy/2.0.x/operations/stats_overview).

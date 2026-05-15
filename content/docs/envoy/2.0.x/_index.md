@@ -18,4 +18,5 @@ Welcome to the documentation for the kgateway open source project!
   {{< card link="operations" title="Operations" >}}
   {{< card link="reference" title="Reference" >}}
   {{< card link="faqs" title="FAQs" >}}
+  {{< card link="migrate" title="Migrate to Gateway API" >}}
 {{< /cards >}}
