@@ -605,7 +605,6 @@ This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" 
    EOF
    ```
 
-   The {{< reuse "docs/snippets/trafficpolicy.md" >}} `targetRefs` field does not accept a `namespace`. The policy must live in the same namespace as the resource it targets. To scope this example to a single HTTPRoute instead of the whole Gateway, change `kind` to `HTTPRoute` and `name` to the route's name, and create the {{< reuse "docs/snippets/trafficpolicy.md" >}} (and the Secret) in the route's namespace.
 
    |Setting|Description|
    |--|--|
