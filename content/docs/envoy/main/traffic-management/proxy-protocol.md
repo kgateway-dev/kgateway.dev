@@ -136,8 +136,10 @@ This setting can be useful in environments where some clients send PROXY headers
 2. Send an HTTP request to the gateway's LoadBalancer address without a PROXY protocol header and verify that it now succeeds. 
 
    ```sh
-   INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} http --output jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} http --output jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-   curl -v http://$INGRESS_GW_ADDRESS/status/200 -H "host: www.example.com"
+   curl -vik \
+    http://$INGRESS_GW_ADDRESS:8080/headers \
+    -H "host: www.example.com:8080"
+
    ```
 
    Example output:
