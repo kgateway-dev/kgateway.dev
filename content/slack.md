@@ -19,4 +19,5 @@ excludeSearch: true
   <ul class="list-disc">
     <li>Visit <a class="text-primary-bg" href="https://slack.cncf.io/">https://slack.cncf.io/</a> and create your Slack account.</li>
     <li>Join us in the <a class="text-primary-bg" href="https://cloud-native.slack.com/archives/C080D3PJMS4">#kgateway channel</a>.</li>
+  </ul>
 </section>

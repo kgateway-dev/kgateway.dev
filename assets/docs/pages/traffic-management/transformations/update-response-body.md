@@ -3,7 +3,7 @@ Learn how to return a customized response body and how replace specific values i
 In this guide, you use the following methods to transform a JSON body:
 
 * Directly access fields in the JSON body and inject them into a custom JSON body.
-* Use the `replace_with_random` Inja function to replace specific patterns in the JSON body.
+* Use the `replace_with_random` function to replace specific patterns in the JSON body.
 
 ## Before you begin
 
@@ -54,7 +54,7 @@ In this guide, you use the following methods to transform a JSON body:
 
 2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules: 
    * A new body is created in the response with the values of the `author`, `title`, and `slides` fields.
-   * To extract the values, you use dot notation. Because the response is parsed as a JSON file, no extractors need to be defined. Instead, you can access the fields directly.   
+   * To extract the values, you use dot notation. Because the transformation sets `body.parseAs: AsJson`, the response body is parsed into the template context, so you can access the fields directly without defining extractors. Without `parseAs: AsJson`, the rustformation engine treats the body as a string and the dot-notation access does not resolve.
 
    ```yaml
    kubectl apply -f- <<EOF
