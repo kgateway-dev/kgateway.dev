@@ -10,10 +10,86 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 <!-- TODO release 2.2 
 For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.2.0).-->
 
-### 🔥 Breaking changes {#v22-breaking-changes}
+### 🔥 Breaking changes {#v23-breaking-changes}
 
+#### XListenerSet API promoted to ListenerSet
 
-### 🌟 New features {#v22-new-features}
+The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update the CRD kind from `XListenerSet` to `ListenerSet` and API version from `gateway.networking.x-k8s.io/v1alpha1` to `gateway.networking.k8s.io/v1`, as shown in the following examples. 
+
+**Old XListenerSet example**:
+```
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+```
+
+**Updated ListenerSet example**: 
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+```
+
+#### ServiceEntry resource watching gate
+
+The Istio ServiceEntry resource watching capability is now gated by the `KGW_ENABLE_ISTIO_INTEGRATION` controller environment variable, which defaults to false. Previously, this environment variable defaulted to true. 
+
+Without the Istio integration enabled, ServiceEntries are now ignored, which can impact annotations, such as `networking.istio.io/traffic-distribution` for multi-cluster peering. 
+
+To restore the old behavior, set `controller.extraEnv.KGW_ENABLE_ISTIO_INTEGRATION=true` in your Helm values.
+
+#### Classic transformation removed {#v23-classic-transformation-removed}
+
+The C++ classic transformation filter is removed in 2.3.x. Rustformation, which became the default in 2.2.x, is now the only transformation engine. The `useRustFormations` Helm value and the `USE_RUST_FORMATIONS` environment variable on the controller have no effect.
+
+If your 2.2.x install has `useRustFormations: false` set, migrate your TrafficPolicy `transformation` templates to rustformation (MiniJinja) syntax before you upgrade. Any policy that relies on classic-only behavior silently misbehaves or fails to render after the upgrade. Common patterns to watch for include:
+
+* The `.0` accessor on JSON header fields (for example, `{{ headers.X-Incoming-Stuff.0 }}`). Rustformation requires bracket notation: `{{ headers["X-Incoming-Stuff"][0] }}`.
+* Templates that rely on the body being auto-parsed as JSON. The classic engine auto-parses whenever a transformation is configured; rustformation defaults to `AsString`. Set `body.parseAs: AsJson` explicitly to keep dot-notation access working.
+* Templates that use a JSON field name that collides with a built-in template function (such as `context`). With `parseAs: AsJson`, MiniJinja shadows the function with the field value and fails to render.
+
+For the full comparison and migration table, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/#migrating-classic" >}}).
+
+### 🌟 New features {#v23-new-features}
+
+#### Kubernetes Gateway API version 1.5.1
+
+The Kubernetes Gateway API dependency is updated to support version 1.5.1. This version introduces several changes, including:
+
+* **XListenerSets promoted to ListenerSets**: The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update these resources to use the ListenerSet API instead.
+* **AllowInsecureFallback mode for mTLS listeners**: If you set up mTLS listeners on your proxy, you can now configure the proxy to establish a TLS connection, even if the client TLS certificate could not be validated successfully. For more information, see the [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}) docs.
+* **CORS wildcard support**: The allowOrigins field now supports wildcard `*` origins to allow any origin. 
+* **BackendTLS**: The BackendTLSPolicy resource implementation is now conformant to the Kubernetes Gateway API, including Gateway ancestor status reporting, ResolvedRefs conditions, and deterministic conflict handling.
 
 #### Control plane changes
 
@@ -131,6 +207,22 @@ The DirectResponse resource now supports a `bodyFormat` field for returning dyna
 
 For more information, see [Dynamic text body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-text-body" >}}) and [Dynamic JSON body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-json-body" >}}).
 
+#### Proxy protocol updates
+
+The following updates were added to the proxy protocol capability. 
+
+**Upstream proxy protocol**:
+
+The `BackendConfigPolicy` resource now supports an `upstreamProxyProtocol` field. When configured, the gateway proxy prepends a PROXY protocol header to outbound TCP connections to the upstream backend, allowing the backend to see the original client IP address and port. Both PROXY protocol `V1` (human-readable) and `V2` (binary) are supported.
+
+For more information, see [Outbound proxy protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#outbound" >}}).
+
+**Allow requests without proxy protocol**: 
+
+The ListenerPolicy proxy protocol configuration now supports an `allowRequestsWithoutProxyProtocol` field. When set to `true`, a single listener accepts connections with or without a PROXY protocol header. By default, the field is set to `false` and the listener strictly requires a PROXY protocol header on all incoming connections.
+
+For more information, see [Allow connections without proxy protocol headers]({{< link-hextra path="/traffic-management/proxy-protocol/#allow-without-proxy-protocol" >}}).
+
 #### GRPCRoute support {#v23-grpcroute}
 
 Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.
@@ -145,6 +237,17 @@ Terminate TLS traffic at the gateway by using a TLS listener in `Terminate` mode
 - **TCPRoute**: Routes traffic based on listener port only, without SNI hostname matching. Use this listener for simpler port-based routing.
 
 For more information, see [TLS termination for TLSRoutes]({{< link-hextra path="/setup/listeners/tls-termination/" >}}) and [TLS termination for TCPRoutes]({{< link-hextra path="/setup/listeners/tls-termination-tcproute/" >}}).
+
+#### Transformation enhancements {#v23-transformation-enhancements}
+
+The rustformation engine, which is the only transformation engine in 2.3.x, gains several new capabilities:
+
+- **`parseAs: None`**: A new value for `transformation.<request|response>.body.parseAs` that skips body buffering and body processing entirely. Use this for routes that should not buffer request or response bodies. When `parseAs: None` is set, the `body()` and `context()` template functions return an empty string, and any attempt to read JSON variables from a header template returns a 400 response.
+- **WebSocket and tunnel auto-detect**: The rustformation filter now automatically bypasses body buffering for `CONNECT` requests and WebSocket upgrade requests. This prevents long-lived tunnels from stalling on body buffering, regardless of the configured `parseAs` value.
+- **Dynamic metadata transformation**: A new `transformation.<request|response>.dynamicMetadata` field lets you populate Envoy dynamic metadata from a MiniJinja template. The rendered string value is stored under the configured namespace and key, and is available to downstream filters and to access log formatters.
+- **`add` header now works on `arm64`**: The 2.2.x workaround that disabled the `add` header operation on `arm64` builds is removed. Envoy v1.37 adds the corresponding function to the upstream dynamic-module SDK, so `transformation.<request|response>.add` works on both `x86_64` and `arm64` in 2.3.x.
+
+For details about each capability and a comparison with the classic transformation behavior, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
 <!-- TODO release 2.2
 

@@ -1,4 +1,4 @@
-Combine multiple Inja functions to accomplish the following tasks: 
+Combine multiple transformation functions to accomplish the following tasks:
 
 - Extract a base64-encoded value from a specific request header. 
 - Decode the base64-encoded value. 
