@@ -56,3 +56,16 @@ discoveryNamespaceSelectors:
 - matchLabels:
     version: v3
 ```
+
+## Strict validation
+
+Set the `validation.level` Helm value to `strict` when you install or upgrade kgateway. Restart the control plane to apply the change.
+
+```yaml
+validation:
+  level: strict
+```
+
+Internally, the Helm chart passes the value to the control plane through the `KGW_VALIDATION_MODE` environment variable. If you manage the control plane deployment manually, set `KGW_VALIDATION_MODE=STRICT` on the kgateway container.
+
+The accepted values for `validation.level` are `standard` and `strict` (case-insensitive). Any other value causes the Helm install to fail.
