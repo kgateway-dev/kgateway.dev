@@ -450,7 +450,7 @@ This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" 
 
 The same defaulting rules and cross-namespace `ReferenceGrant` requirement that apply to [request headers from a Secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}) also apply here. The following example shows the basic flow for responses.
 
-1. Create a Secret that holds the value you want to inject.
+1. Create a Secret that holds the value you want to inject. The data keys do not need to match the eventual header names.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: v1
@@ -549,6 +549,62 @@ server: envoy
 kubectl delete httproute httpbin-headers -n httpbin
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-secret-response-headers -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete secret response-signing -n {{< reuse "docs/snippets/namespace.md" >}}
+```
+
+### Field defaulting
+
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How kgateway resolves a header value depends on which combination of fields you provide.
+
+#### `name` and `secretRef.key` both set
+
+kgateway sets the `name` header to the value of the `secretRef.key` data key in the Secret.
+
+```yaml
+headerModifiers:
+  response:
+    set:
+    - name: X-Response-Signature
+      secretRef:
+        name: response-signing
+        key: signing-key
+```
+
+#### `secretRef.key` omitted
+
+kgateway sets the `name` header to the value of the Secret data key that matches `name`.
+
+```yaml
+headerModifiers:
+  response:
+    set:
+    - name: X-Response-Signature
+      secretRef:
+        name: response-signing
+```
+
+#### `name` omitted
+
+kgateway sets a header named after `secretRef.key` to the value of that data key in the Secret.
+
+```yaml
+headerModifiers:
+  response:
+    set:
+    - secretRef:
+        name: response-signing
+        key: signing-key
+```
+
+#### Both `name` and `secretRef.key` omitted
+
+kgateway injects every entry in the Secret as a response header. Each data key becomes a header name.
+
+```yaml
+headerModifiers:
+  response:
+    set:
+    - secretRef:
+        name: response-signing
 ```
 
 {{< /version >}}

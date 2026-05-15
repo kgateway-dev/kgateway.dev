@@ -656,16 +656,51 @@ kubectl delete secret backend-creds -n {{< reuse "docs/snippets/namespace.md" >}
 
 ### Field defaulting
 
-The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. The following table shows how kgateway resolves each combination.
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How kgateway resolves a header value depends on which combination of fields you provide.
 
-|`name` (header)|`secretRef.key`|Behavior|
-|--|--|--|
-|`X-Api-Key`|`api-key`|The `X-Api-Key` header is set to the value of the `api-key` data key in the Secret.|
-|`X-Api-Key`|*(omitted)*|The `X-Api-Key` header is set to the value of the `X-Api-Key` data key in the Secret.|
-|*(omitted)*|`X-Api-Key`|The `X-Api-Key` header is set to the value of the `X-Api-Key` data key in the Secret.|
-|*(omitted)*|*(omitted)*|Every entry in the Secret is injected as a request header. Each data key is reused as the header name.|
+#### `name` and `secretRef.key` both set
 
-For example, to mirror every entry in the Secret as a request header without listing them individually:
+kgateway sets the `name` header to the value of the `secretRef.key` data key in the Secret.
+
+```yaml
+headerModifiers:
+  request:
+    set:
+    - name: X-Api-Key
+      secretRef:
+        name: backend-creds
+        key: api-key
+```
+
+#### `secretRef.key` omitted
+
+kgateway sets the `name` header to the value of the Secret data key that matches `name`.
+
+```yaml
+headerModifiers:
+  request:
+    set:
+    - name: X-Api-Key
+      secretRef:
+        name: backend-creds
+```
+
+#### `name` omitted
+
+kgateway sets a header named after `secretRef.key` to the value of that data key in the Secret.
+
+```yaml
+headerModifiers:
+  request:
+    set:
+    - secretRef:
+        name: backend-creds
+        key: api-key
+```
+
+#### Both `name` and `secretRef.key` omitted
+
+kgateway injects every entry in the Secret as a request header. Each data key becomes a header name.
 
 ```yaml
 headerModifiers:
