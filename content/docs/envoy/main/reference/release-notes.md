@@ -14,7 +14,7 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 #### XListenerSet API promoted to ListenerSet
 
-The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update the CRD kind from `XListenerSet` to `ListenerSet` and api version from `gateway.networking.x-k8s.io/v1alpha1` to `gateway.networking.k8s.io/v1` as shown in the following examples. 
+The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update the CRD kind from `XListenerSet` to `ListenerSet` and API version from `gateway.networking.x-k8s.io/v1alpha1` to `gateway.networking.k8s.io/v1`, as shown in the following examples. 
 
 **Old XListenerSet example**:
 ```
@@ -76,7 +76,7 @@ To restore the old behavior, set `controller.extraEnv.KGW_ENABLE_ISTIO_INTEGRATI
 The Kubernetes Gateway API dependency is updated to support version 1.5.1. This version introduces several changes, including:
 
 * **XListenerSets promoted to ListenerSets**: The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update these resources to use the ListenerSet API instead.
-* **AllowInsecureFallback mode for mTLS listeners**: If you set up mTLS listeners on yourproxy, you can now configure the proxy to establish a TLS connection, even if the client TLS certificate could not be validated successfully. For more information, see the [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}) docs.
+* **AllowInsecureFallback mode for mTLS listeners**: If you set up mTLS listeners on your proxy, you can now configure the proxy to establish a TLS connection, even if the client TLS certificate could not be validated successfully. For more information, see the [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}) docs.
 * **CORS wildcard support**: The allowOrigins field now supports wildcard `*` origins to allow any origin. 
 * **BackendTLS**: The BackendTLSPolicy resource implementation is now conformant to the Kubernetes Gateway API, including Gateway ancestor status reporting, ResolvedRefs conditions, and deterministic conflict handling.
 
