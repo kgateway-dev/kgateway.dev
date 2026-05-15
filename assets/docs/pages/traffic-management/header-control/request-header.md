@@ -536,7 +536,7 @@ curl -vi localhost:8080/headers -H "host: headers.example"
 {{< version include-if="2.3.x" >}}
 ## Source a header value from a Secret {#header-from-secret}
 
-If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` on a `set` or `add` entry in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. kgateway resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, kgateway re-translates the affected policies automatically.
+If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text or send it as part of the request. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. The gateway proxy resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, the proxy applies the changes automatically.
 
 {{< callout type="info" >}}
 This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" >}}. The Gateway API `HTTPRoute` `RequestHeaderModifier` filter does not support `secretRef`.
