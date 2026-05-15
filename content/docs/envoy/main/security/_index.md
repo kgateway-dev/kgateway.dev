@@ -16,6 +16,7 @@ For example, you might use HTTPS listeners for external client connections, enfo
   {{< card link="cors" title="CORS" >}}
   {{< card link="csrf" title="CSRF" >}}
   {{< card link="extauth" title="Bring your own external auth" >}}
+  {{< card link="oauth2" title="OAuth2/OIDC" >}}
   {{< card link="ratelimit" title="Rate limiting" >}}
   {{< card link="backend-tls" title="Backend TLS" >}}
   {{< card path="/setup/listeners/https/" title="HTTPS listener" icon="bookmark">}}
