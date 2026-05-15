@@ -515,7 +515,7 @@ The same defaulting rules and cross-namespace `ReferenceGrant` requirement that 
    |`headerModifiers.response.set.name`|The HTTP header name that the client receives. |
    |`headerModifiers.response.set.secretRef.name`|The name of the Kubernetes Secret to read the value from. If the Secret does not exist when the policy is applied, the policy reports `Accepted=False` and the affected route returns a 500 response. |
    |`headerModifiers.response.set.secretRef.key`|The key in the Secret's `data` to use as the header value. Optional. If `key` is omitted, it defaults to the value of `headerModifiers.response.set.name`. |
-   |`headerModifiers.response.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. Cross-namespace references require a `ReferenceGrant`. For details, see the request-header [Cross-namespace Secrets]({{< link-hextra path="/traffic-management/header-control/request-header/#cross-namespace-secrets" >}}) section. |
+   |`headerModifiers.response.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. Cross-namespace references require a `ReferenceGrant`.  |
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the response includes the `X-Response-Signature` header with the value from the Secret.
 

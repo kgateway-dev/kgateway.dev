@@ -611,7 +611,7 @@ This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" 
    |`headerModifiers.request.set.name`|The HTTP header name that the upstream service receives. |
    |`headerModifiers.request.set.secretRef.name`|The name of the Kubernetes Secret to read the value from. If the Secret does not exist when the policy is applied, the policy reports `Accepted=False` and the affected route returns a 500 response. |
    |`headerModifiers.request.set.secretRef.key`|The key in the Secret's `data` to use as the header value. Optional. If `key` is omitted, it defaults to the value of `headerModifiers.request.set.name`. |
-   |`headerModifiers.request.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}. To reference a Secret in a different namespace, see [Cross-namespace Secrets](#cross-namespace-secrets). |
+   |`headerModifiers.request.set.secretRef.namespace`|The namespace of the Secret. Optional. If `namespace` is omitted, it defaults to the namespace of the {{< reuse "docs/snippets/trafficpolicy.md" >}}.|
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the upstream sees the `X-Api-Key` and `X-Tenant-Id` headers with the values from the Secret. Note that the values do not appear in the {{< reuse "docs/snippets/trafficpolicy.md" >}} or in the request you sent.
 
@@ -674,28 +674,6 @@ headerModifiers:
     - secretRef:
         name: backend-creds
 ```
-
-### Cross-namespace Secrets {#cross-namespace-secrets}
-
-To reference a Secret in a different namespace from the {{< reuse "docs/snippets/trafficpolicy.md" >}}, set `secretRef.namespace` to the Secret's namespace and create a `ReferenceGrant` in that namespace. This grant allows the {{< reuse "docs/snippets/trafficpolicy.md" >}} namespace to read Secrets in the target namespace.
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: ReferenceGrant
-metadata:
-  name: allow-secret-access
-  namespace: backend-secrets
-spec:
-  from:
-  - group: gateway.kgateway.dev
-    kind: TrafficPolicy
-    namespace: {{< reuse "docs/snippets/namespace.md" >}}
-  to:
-  - group: ""
-    kind: Secret
-```
-
-Without a matching `ReferenceGrant`, the policy reports `Accepted=False` and the affected route returns a 500 response. The same status is reported if the referenced Secret does not exist.
 
 {{< /version >}}
 
