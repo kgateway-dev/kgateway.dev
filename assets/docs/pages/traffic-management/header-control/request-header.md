@@ -578,7 +578,7 @@ This option is available only on the {{< reuse "docs/snippets/trafficpolicy.md" 
    EOF
    ```
 
-3. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that sets two request headers from the `backend-creds` Secret. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway.
+3. Create the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that sets two request headers values from keys that you stored in the `backend-creds` Secret. The following example attaches the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the http Gateway.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
