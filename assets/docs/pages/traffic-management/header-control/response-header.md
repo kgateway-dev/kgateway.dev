@@ -543,7 +543,7 @@ x-response-signature: my-response-signing-key
 server: envoy
 ```
 
-When you are finished, optionally clean up the resources that you created.
+5. Optional: When you are finished, clean up the resources that you created.
 
 ```sh
 kubectl delete httproute httpbin-headers -n httpbin
