@@ -12,3 +12,47 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
 {{/* /CSS */}}
+
+{{/* SEO Meta Tags */}}
+{{- $title := .Title | default site.Title -}}
+{{- $description := .Description | default site.Params.description -}}
+{{- $url := .Permalink -}}
+{{- $image := "/img/logo-kgateway-envoy.png" | absURL -}}
+
+<meta name="description" content="{{ $description }}">
+<link rel="canonical" href="{{ $url }}">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ $url }}">
+<meta property="og:title" content="{{ $title }}">
+<meta property="og:description" content="{{ $description }}">
+<meta property="og:image" content="{{ $image }}">
+
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ $url }}">
+<meta property="twitter:title" content="{{ $title }}">
+<meta property="twitter:description" content="{{ $description }}">
+<meta property="twitter:image" content="{{ $image }}">
+
+{{/* JSON-LD Structured Data */}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "{{ $title }}",
+  "description": "{{ $description }}",
+  "image": "{{ $image }}",
+  "url": "{{ $url }}",
+  "publisher": {
+    "@type": "Organization",
+    "name": "kgateway",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ "/logo.svg" | absURL }}"
+    }
+  }
+}
+</script>
+{{/* /SEO Meta Tags */}}

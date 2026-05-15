@@ -67,7 +67,8 @@
     min-width: 160px;
   }
 
-  .dropdown:hover .dropdown-content {display: block;}
+  .dropdown:hover .dropdown-content,
+  .dropdown:focus-within .dropdown-content {display: block;}
   
   .navbar-dropdown-content {
     position: absolute;
@@ -97,10 +98,46 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
   
-  /* Dark mode hover styles for dropdown items */
-  .dark .navbar-dropdown-content a:hover {
-    background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
+  /* Dark mode hover and focus styles for dropdown items */
+  .dark .navbar-dropdown-content a:hover,
+  .dark .navbar-dropdown-content a:focus {
+    background-color: rgb(31, 41, 55) !important; /* gray-800 - visible contrast against gray-900 */
     color: rgb(255, 255, 255) !important; /* white - maximum contrast */
+    outline: 2px solid rgb(99, 102, 241); /* indigo-500 focus ring */
+    outline-offset: -2px;
+  }
+
+  /* Visible focus ring for all interactive elements */
+  .nav-container a:focus-visible,
+  .nav-container button:focus-visible {
+    outline: 2px solid rgb(99, 102, 241);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+  }
+
+  /* Skip to content link - visually hidden until focused */
+  .skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 100;
+  }
+  .skip-to-content:focus {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    background: rgb(99, 102, 241);
+    color: white;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    z-index: 100;
   }
 
   {{- /* Build the search path pattern based on subSection and version */ -}}
@@ -165,10 +202,11 @@
   }
 </style>
 
-<div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden">
+<a href="#main-content" class="skip-to-content">Skip to main content</a>
+<div class="nav-container hx-sticky hx-top-0 hx-z-20 hx-w-full hx-bg-transparent print:hx-hidden" role="banner">
   <div class="nav-container-blur hx-pointer-events-none hx-absolute hx-z-[-1] hx-h-full hx-w-full hx-bg-white dark:hx-bg-dark hx-shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] contrast-more:hx-shadow-[0_0_0_1px_#000] dark:hx-shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] contrast-more:dark:hx-shadow-[0_0_0_1px_#fff]"></div>
 
-  <nav class="hx-mx-auto hx-flex hx-items-center hx-justify-end hx-gap-2 hx-h-16 hx-px-6 {{ $navWidth }}">
+  <nav class="hx-mx-auto hx-flex hx-items-center hx-justify-end hx-gap-2 hx-h-16 hx-px-6 {{ $navWidth }}" aria-label="Main navigation">
     <a class="hx-flex hx-items-center hover:hx-opacity-75 ltr:hx-mr-auto rtl:hx-ml-auto" href="{{ $logoLink }}">
       {{- if (.Site.Params.navbar.displayLogo | default true) }}
         {{- if $useResource -}}
@@ -200,7 +238,7 @@
     
     {{ if and $versions $version }}
     <div class="dropdown px-2 cursor-pointer">
-        <button class="btn" type="button">
+        <button class="btn" type="button" aria-haspopup="listbox" aria-expanded="false" aria-label="Select documentation version">
           {{- $foundVersion := false -}}
           {{- range $versions -}}
             {{- if eq $version .linkVersion -}}
@@ -215,7 +253,7 @@
           {{- end -}}
           {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
         </button>
-        <ul class="dropdown-content absolute border-[1px] rounded-lg px-6 right-[50%] translate-x-1/2 hx-bg-white dark:hx-bg-dark text-nowrap">
+        <ul class="dropdown-content absolute border-[1px] rounded-lg px-6 right-[50%] translate-x-1/2 hx-bg-white dark:hx-bg-dark text-nowrap" role="listbox">
           {{ partial "navbar-version.html" }} 
         </ul>
     </div>
@@ -243,13 +281,15 @@
               title="{{ or (T .Identifier) .Name | safeHTML }}"
               href="{{ $link }}"
               class="hx-text-sm contrast-more:hx-text-gray-700 contrast-more:dark:hx-text-gray-100 hx-whitespace-nowrap hx-p-2 {{ $activeClass }}"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
               <span class="hx-text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
-              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx-ml-1 hx-mb-0.5 hx-inline hx-w-4 hx-h-4'") }}
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx-ml-1 hx-mb-0.5 hx-inline hx-w-4 hx-h-4' aria-hidden='true'") }}
             </a>
-            <div class="dropdown-content navbar-dropdown-content">
-              <a href="/docs/envoy/latest" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Kgateway (Envoy)</a>
-              <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Agentgateway</a>
+            <div class="dropdown-content navbar-dropdown-content" role="menu" aria-label="Documentation sections">
+              <a href="/docs/envoy/latest" role="menuitem" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Kgateway (Envoy)</a>
+              <a href="https://agentgateway.dev/docs/kubernetes/latest/" role="menuitem" class="hx-block hx-px-4 hx-py-3 hx-text-sm hx-text-gray-700 dark:hx-text-gray-300 hover:hx-bg-gray-100">Agentgateway</a>
             </div>
           </div>
         {{/* Display icon menu item */}}
@@ -280,8 +320,8 @@
     {{- end -}}
 
 
-    <button type="button" aria-label="Menu" class="hamburger-menu -hx-mr-2 hx-rounded hx-p-2 active:hx-bg-gray-400/20 md:hx-hidden">
-      {{- partial "utils/icon.html" (dict "name" "hamburger-menu" "attributes" "height=24") -}}
+    <button type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-nav" class="hamburger-menu -hx-mr-2 hx-rounded hx-p-2 active:hx-bg-gray-400/20 md:hx-hidden">
+      {{- partial "utils/icon.html" (dict "name" "hamburger-menu" "attributes" "height=24 aria-hidden='true'") -}}
     </button>
   </nav>
 </div>

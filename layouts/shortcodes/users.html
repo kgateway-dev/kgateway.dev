@@ -6,7 +6,7 @@
       <h2 class="font-heading text-[2.5rem] font-semibold leading-[2.75rem] tracking-tight">Users</h2>
       <div class="flex flex-wrap gap-8 justify-center items-center">
         {{ range $data }}
-          <img class="w-2/6 md:w-1/6 h-full px-[1.98963rem] py-[2.37419rem]" src="{{ .logoPath }}" />
+          <img class="w-2/6 md:w-1/6 h-full px-[1.98963rem] py-[2.37419rem]" src="{{ .logoPath }}" alt="{{ .name | default "User logo" }}" />
         {{ end }}
       </div>
     </div>

@@ -1,156 +1,127 @@
 A2A:
   short: "Agent-to-Agent Protocol for secure, policy-driven communication across agents."
-  
-  
+  long: "The Agent-to-Agent (A2A) protocol defines how autonomous AI agents discover each other, negotiate capabilities, and collaborate on complex tasks. Kgateway facilitates A2A communication by providing secure, policy-driven routing and observability for agentic interactions across different environments."
 
 Agentgateway:
   short: "An open-source data plane optimized for agentic AI connectivity."
-  
-  
+  long: "Agentgateway is a high-performance, Rust-based data plane designed specifically for AI-first applications. It handles long-lived, stateful connections required by protocols like MCP and A2A, offering features like tool federation, session fan-out, and protocol-aware routing that traditional API gateways lack."
 
 Agents:
   short: "Autonomous AI components that interact with MCP tools, services, and other agents."
-  
-  
+  long: "AI agents are autonomous software components capable of perceiving their environment and taking actions to achieve specific goals. In the context of Kgateway and Agentgateway, agents utilize the Model Context Protocol (MCP) to interact with tools, access data sources, and collaborate with other agents through a secure gateway."
 
 Ambient mesh:
   short: "A sidecarless service mesh mode using waypoint proxies and ztunnels."
-  
-  
+  long: "Ambient mesh is an innovative mode for Istio that eliminates the need for sidecar proxies. It uses a shared L4 ztunnel for basic security and an optional L7 waypoint proxy for advanced traffic management. Kgateway can function as a waypoint proxy in an ambient mesh to manage east-west traffic."
 
 API Gateway:
   short: "A centralized entry point that manages, secures, and routes API traffic."
-  
-  
+  long: "An API Gateway acts as a single point of entry for all client requests, providing a centralized location to manage security, rate limiting, routing, and monitoring. Kgateway is a modern, Kubernetes-native API Gateway built on Envoy and the Kubernetes Gateway API."
 
 Backends:
-  short: "Destination services or endpoints that kgateway routes traffic to (Kubernetes services, AWS lambdas, external hosts)."
-  
+  short: "Destination services or endpoints that kgateway routes traffic to."
+  long: "Backends are the ultimate destinations for traffic routed through Kgateway. These can include Kubernetes Services, external hostnames, AWS Lambda functions, or other cloud-native endpoints. Kgateway supports various backend types and protocols for flexible integration."
 
 Cluster (Kubernetes):
   short: "A Kubernetes cluster of control plane and worker nodes running workloads."
-  
-  
+  long: "A Kubernetes cluster is a set of node machines for running containerized applications. It consists of a control plane that manages the cluster and worker nodes that run the actual application workloads. Kgateway is designed to be deployed and managed within a Kubernetes cluster."
 
 Cluster (Envoy):
   short: "In Envoy, a logical grouping of upstream endpoints used for load balancing."
-  
-  
+  long: "In the context of Envoy proxy, a cluster is a logical group of similar upstream hosts that Envoy connects to. Envoy performs load balancing across the hosts in a cluster and provides health checking, circuit breaking, and other resiliency features."
 
 Control Plane:
   short: "Components that manage and distribute configuration and policies to the data plane."
-  
-  
+  long: "The control plane is the brain of the gateway system. It interprets user-defined configurations and policies (such as Kubernetes Gateway API resources) and translates them into a format that the data plane proxies can understand and execute."
 
 Data Plane:
-  short: "Proxies (Envoy or agentgateway) that process live network traffic per configuration from the control plane."
-  
-  
+  short: "Proxies (Envoy or agentgateway) that process live network traffic."
+  long: "The data plane consists of the actual proxy instances (like Envoy or Agentgateway) that sit in the path of network traffic. They intercept, process, and forward requests based on the configuration received from the control plane."
 
 Delegation:
   short: "A pattern to delegate route and policy ownership from a parent route to child routes."
-  
-  
+  long: "Route delegation allows a parent route to hand over the management of a specific sub-path or set of policies to a child route, often in a different namespace. This enables multi-tenancy and self-service configuration while maintaining centralized control."
 
 DirectResponse:
   short: "A policy to return a custom response from the gateway without forwarding to a backend."
-  
-  
+  long: "A DirectResponse policy allows Kgateway to respond directly to a client request with a predefined status code, headers, and body. This is useful for returning static content, maintenance pages, or simple redirects without burdening upstream services."
 
 Egress:
   short: "Outbound traffic leaving the mesh or cluster, often routed through egress gateways."
-  
-  
+  long: "Egress refers to network traffic that originates within a cluster or service mesh and is destined for an external service. Managing egress traffic through a gateway allows for centralized security, auditing, and protocol translation for outbound connections."
 
 Envoy:
   short: "High-performance Layer 7 proxy used by kgateway as the core data plane."
-  
+  long: "Envoy is an open-source, high-performance edge and service proxy designed for cloud-native applications. Kgateway leverages Envoy as its primary data plane, benefiting from its robust feature set, extensibility, and proven performance in large-scale production environments."
 
 External Authorization:
   short: "Delegate authorization decisions to an external service via an Envoy extension."
-  
-  
+  long: "External Authorization allows Kgateway to offload authentication and authorization decisions to a dedicated external service. This enables complex, custom security logic that can be shared across multiple applications and services."
 
 Gateway Extension:
-  short: "CR to integrate external services with a Gateway, such as external auth, rate limiting, and ext proc."
-  
-  
+  short: "CR to integrate external services with a Gateway, such as external auth or rate limiting."
+  long: "The GatewayExtension Custom Resource (CR) is a Kgateway-specific extension to the Kubernetes Gateway API. It provides a way to link a Gateway resource with external services like external authorization providers or rate limit servers."
 
 GatewayParameters:
   short: "Resource that configures proxy template and runtime settings for a Gateway."
-  
-  
+  long: "GatewayParameters is a Kgateway Custom Resource used to define infrastructure-level settings for a Gateway. This includes the proxy image to use, resource limits, horizontal pod autoscaling (HPA) settings, and other deployment-specific parameters."
 
 HTTPListenerPolicy:
   short: "A policy resource applied to HTTP/HTTPS listeners on a Gateway."
-  
-  
+  long: "HTTPListenerPolicy is used to configure settings specific to the HTTP/HTTPS listeners of a Gateway. This includes things like TLS settings, HTTP/2 support, proxy protocol configuration, and other listener-level parameters."
 
 Inference Extension Project:
   short: "Mechanisms to integrate inference/AI processing into gateway traffic flows."
-  
-  
+  long: "The Inference Extension Project is a community-driven initiative to extend the Kubernetes Gateway API with native support for AI and LLM workloads. Kgateway implements these extensions to provide intelligent, model-aware routing and management for AI traffic."
 
 Lambda:
   short: "Serverless compute in Amazon Web Services (AWS) used as backend targets."
-  
-  
+  long: "AWS Lambda is a serverless, event-driven compute service that lets you run code without provisioning or managing servers. Kgateway can route traffic directly to Lambda functions, allowing you to expose serverless workloads through your API gateway."
 
 Large Language Model (LLM):
-  short: "Pre-trained language models used for natural language tasks. LLM traffic can be managed via agentgateway."
-  
-  
+  short: "Pre-trained language models used for natural language tasks."
+  long: "Large Language Models (LLMs) are AI models trained on vast amounts of text data to understand and generate human-like language. Agentgateway provides a unified interface for consuming LLMs from various providers while ensuring security and observability."
 
 LLM Gateway / AI Gateway:
   short: "A gateway pattern for managing LLM/AI traffic, often served by agentgateway."
-  
-  
+  long: "An AI Gateway is a specialized gateway pattern designed to manage the unique requirements of AI and LLM traffic. This includes prompt management, model failover, rate limiting based on tokens, and providing a unified API for multiple LLM providers."
 
 MCP (Model Context Protocol):
-  short: "Protocol for exchanging model context and metadata between LLM gateways, agents, and tools."
-  
-  
+  short: "Protocol for exchanging model context and metadata between LLM gateways and tools."
+  long: "The Model Context Protocol (MCP) is an open standard that enables seamless integration between AI models and the tools or data sources they need. Agentgateway acts as an MCP gateway, federating multiple MCP servers and providing secure access for agents."
 
 Observability (Logging, Monitoring, Tracing):
   short: "Telemetry systems (logs, metrics, traces) used to monitor kgateway."
-  
-  
+  long: "Observability is crucial for understanding the health and performance of your gateway. Kgateway integrates with industry-standard tools for logging (Fluentd), monitoring (Prometheus), and distributed tracing (OpenTelemetry) to provide deep insights into traffic patterns and issues."
 
 Proxy:
   short: "Envoy- or agentgateway-based data plane process that terminates and forwards traffic."
-  
-  
+  long: "A proxy is a service that acts as an intermediary for requests from clients seeking resources from other servers. In Kgateway, the proxy (Envoy or Agentgateway) is the component that actually handles the network traffic, applying policies and routing requests to the correct backends."
 
 Rate Limiting:
   short: "Policies that control request rates to protect backends and enforce quotas."
-  
-  
+  long: "Rate limiting is a technique to control the amount of traffic sent to or received from a service. Kgateway supports both local and global rate limiting to protect upstream backends from being overwhelmed and to enforce usage quotas for different clients."
 
 Resiliency:
   short: "Features that improve reliability, such as retries, timeouts, and circuit breakers."
-  
-  
+  long: "Resiliency features ensure that your application remains available even when some components fail. Kgateway provides built-in support for retries, timeouts, circuit breaking, and outlier detection to automatically handle and recover from transient failures."
 
 Security:
   short: "Authentication, authorization, encryption and other protections for traffic."
-  
-  
+  long: "Security is a core pillar of Kgateway. It provides a comprehensive set of features to protect your APIs and backends, including TLS termination, mTLS for service-to-service communication, JWT validation, OIDC integration, and fine-grained authorization policies."
 
 Service Mesh:
   short: "Istio ambient layer for service-to-service communication."
-  
-  
+  long: "A service mesh is a dedicated infrastructure layer for managing service-to-service communication. Kgateway integrates with service meshes like Istio, particularly in ambient mode, to provide a unified way to manage both north-south and east-west traffic."
 
 Traffic Management:
   short: "Features to control routing, transformations, load balancing, and traffic shaping."
-  
-  
+  long: "Traffic management encompasses a wide range of features for controlling how requests are handled. Kgateway offers sophisticated routing rules, request/response transformations, advanced load balancing algorithms, and traffic splitting for canary deployments."
 
 TrafficPolicy:
   short: "Policy resource for resilience, security, and other traffic behaviors."
-  
-  
+  long: "TrafficPolicy is a Kgateway Custom Resource used to apply various traffic-related policies to a set of routes. This provides a clean, declarative way to configure resiliency, security, and transformation settings without modifying the core route definitions."
 
 Translation:
   short: "Conversion of Gateway API and CRDs into xDS config for the data plane."
-
+  long: "Translation is the process by which the Kgateway control plane takes high-level, human-readable configurations (like Kubernetes Gateway API resources) and converts them into low-level, machine-readable xDS configuration for the Envoy or Agentgateway data plane."
