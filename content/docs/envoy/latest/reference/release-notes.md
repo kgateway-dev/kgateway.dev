@@ -192,7 +192,7 @@ Kgateway 2.2 switches to rustformation as the default transformation engine. Rus
 * All documented Jinja custom functions
 * Case-insensitive header lookups
 * Improved performance with native Envoy per-route config
-* Compatibility with [strict validation]({{< link-hextra path="/operations/strict-validation/" >}}) on both `x86_64` and `arm64` builds. The control plane image bundles the rustformation dynamic module and the validator loads it before running the Envoy preflight.
+* Compatibility with [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}) on both `x86_64` and `arm64` builds. The control plane image bundles the rustformation dynamic module and the validator loads it before running the Envoy preflight.
 
 #### Gateway customization {#v22-gateway-customization}
 

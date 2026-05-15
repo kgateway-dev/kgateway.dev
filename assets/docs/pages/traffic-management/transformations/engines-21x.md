@@ -4,4 +4,4 @@ For the template syntax and the list of supported functions, see [Templating lan
 
 ## Strict validation compatibility {#strict-validation-compatibility}
 
-Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.1.x, strict validation works with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
+Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.1.x, strict validation works with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}).

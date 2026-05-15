@@ -41,7 +41,7 @@ Starting in v2.2.0, kgateway supports both `x86_64` (amd64) and `arm64` builds. 
 
 ## Strict validation compatibility {#strict-validation-compatibility}
 
-Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with both transformation engines. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can run strict validation with rustformation (the default) or with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/operations/strict-validation/" >}}).
+Strict validation runs an Envoy preflight against the generated xDS snapshot to block configuration that would be rejected at the data plane. In 2.2.x, strict validation works with both transformation engines. The kgateway control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator loads the module from `/usr/local/lib` before running the preflight. You can run strict validation with rustformation (the default) or with classic transformation. For configuration steps, see [Strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}).
 
 ## Limitations {#limitations}
 
