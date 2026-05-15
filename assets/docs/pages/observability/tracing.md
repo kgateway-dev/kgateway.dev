@@ -7,7 +7,7 @@ When tracing is enabled, the gateway proxy generates spans for incoming requests
 Tracing is configured at two levels:
 
 * **Listener level** (required): Configure the OTel provider, sampling rates, and span attributes using a `ListenerPolicy` that targets your Gateway.
-* **Route level** (optional): Override sampling rates, add route-specific span attributes, or disable tracing for individual routes using a `TrafficPolicy` that targets an HTTPRoute or GRPCRoute.
+* **Route level** (optional): Override sampling rates, add route-specific span attributes, or disable tracing for individual routes by using the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that targets an HTTPRoute or GRPCRoute.
 
 ### Auto-populated resource attributes
 
@@ -30,8 +30,8 @@ User-configured resource attributes always take precedence over these defaults.
 
 ### Limitations
 
-* A listener-level `ListenerPolicy` with an OTel provider must be configured for any tracing to occur. Route-level `TrafficPolicy` tracing settings have no effect without it.
-* Route-level tracing via `TrafficPolicy` supports `HTTPRoute` and `GRPCRoute` targets only.
+* A listener-level `ListenerPolicy` with an OTel provider must be configured for any tracing to occur. Route-level `{{< reuse "docs/snippets/trafficpolicy.md" >}}` tracing settings have no effect without it.
+* Route-level tracing via `{{< reuse "docs/snippets/trafficpolicy.md" >}}` supports `HTTPRoute` and `GRPCRoute` targets only.
 * When multiple `TrafficPolicies` with tracing are attached to the same route, the default merge strategy applies.
 
 ## Before you begin
@@ -258,7 +258,7 @@ EOF
 
 ### Per-route sampling and attributes {#per-route-tracing}
 
-Use a `{{< reuse "docs/snippets/trafficpolicy.md" >}}` resource to override sampling rates or add route-specific span attributes for individual HTTPRoutes or GRPCRoutes. Route-level attributes are merged with listener-level attributes; route-level values take priority on name collision.
+Use the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to override sampling rates or add route-specific span attributes for individual HTTPRoutes or GRPCRoutes. Route-level attributes are merged with listener-level attributes; route-level values take priority on name collision.
 
 ```yaml
 kubectl apply -f- <<EOF

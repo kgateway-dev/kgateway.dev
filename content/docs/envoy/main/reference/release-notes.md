@@ -12,6 +12,54 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v22-breaking-changes}
 
+#### XListenerSet API promoted to ListenerSet
+
+The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update the CRD kind from `XListenerSet` to `ListenerSet` and api version from `gateway.networking.x-k8s.io/v1alpha1` to `gateway.networking.k8s.io/v1` as shown in the following examples. 
+
+**Old XListenerSet example**:
+```
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+```
+
+**Updated ListenerSet example**: 
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+```
+
 
 ### 🌟 New features {#v22-new-features}
 
