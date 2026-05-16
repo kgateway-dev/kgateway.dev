@@ -16,11 +16,11 @@ Each rule contains one or more CIDR blocks (for example, `10.0.0.0/8` or `2001:d
 
 **Mixing allow and deny rules with longest-prefix matching**
 
-You can mix `allow` and `deny` actions within the same {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. When a client IP matches more than one rule, the most specific CIDR prefix always wins, regardless of the rule order that you specified in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. A `/32` single-host rule takes precedence over a `/16` subnet rule, which takes precedence over a `/8` range rule. With this capability, you can "punch holes" in to broader CIDR ranges. For example, you can deny an entire `10.0.0.0/8` range, while allowing a specific `10.1.0.0/16` subnet within that CIDR. For an example, see [Hole-punching with named rules](#hole-punching-with-named-rules).
+You can mix `allow` and `deny` actions within the same {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. When a client IP matches more than one rule, the most specific CIDR prefix always wins, regardless of the rule order that you specified in the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource. A `/32` single-host rule takes precedence over a `/16` subnet rule, which takes precedence over a `/8` range rule. With this capability, you can "punch holes" into broader CIDR ranges. For example, you can deny an entire `10.0.0.0/8` range, while allowing a specific `10.1.0.0/16` subnet within that CIDR. For an example, see [Hole-punching](#hole-punching).
 
 **Custom deny responses and surfacing the block reason**
 
-By default, request are denied with a 403 HTTP response. You can customize the HTTP response code and add extra headers to a response. For an example, see [Custom deny response](#custom-deny-response). 
+By default, requests are denied with a 403 HTTP response. You can customize the HTTP response code and add extra headers to a response. For an example, see [Custom deny response and headers](#custom-deny-response-and-headers). 
 
 You can also add the name of the rule that denied the request to your response header. For an example, see [Default allow with a denylist](#default-allow-with-a-denylist).
 
@@ -34,10 +34,10 @@ The following table shows the values that you can expect in your access logs:
 |---|---|
 | Rule's `name` | The name of the rule that matched the source IP address and denied the request.  |
 | `"rule"` | If the rule that matched the IP address does not have a name, the access logs show `"rule"`. |
-| `"default"` | If no rule matched the source IP address and the request was denied by the default action, the access logs show `defaultAction`.  |
+| `"default"` | If no rule matched the source IP address and the request was denied by the default action, the access logs show `"default"`.  |
 | `"unknown-ip"` | If the source IP address could not be parsed, the access logs show `"unknown-ip"`.  |
 
-The filter also increments the gateway proxy's `dev.kgateway.http.acl.blocked` metric on every denial. You can access the Envoy admin interface to monitor this metric. For more information, see [Monitor ACL blocks](#monitor-acl-blocks).
+The filter also increments the gateway proxy's `dev.kgateway.http.acl.blocked` metric on every denial. You can access the Envoy admin interface to monitor this metric. For more information, see [Monitor ACL denials](#monitor-acl-denials).
 
 ## Before you begin
 
@@ -193,7 +193,7 @@ Allow all traffic by default, but block traffic from specific CIDR ranges. When 
 
 ### Hole-punching
 
-Use longest-prefix matching to allow a specific subnet within a broader denied range. When a client IP address matches more than one rule, the most specific CIDR prefix wins, indepedent of the rule order that you defined in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. 
+Use longest-prefix matching to allow a specific subnet within a broader denied range. When a client IP address matches more than one rule, the most specific CIDR prefix wins, independent of the rule order that you defined in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. 
 
 1. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} to deny the entire `10.0.0.0/8` range, but punch a hole to allow requests from the `10.1.0.0/16` range without including the host `10.1.2.3`. 
 
