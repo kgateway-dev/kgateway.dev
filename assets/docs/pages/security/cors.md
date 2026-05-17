@@ -185,7 +185,7 @@ EOF
 
 Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can test the policies.
 
-1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
+1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
