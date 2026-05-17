@@ -191,7 +191,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" \
+    -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -199,7 +199,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" \
+    -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -219,7 +219,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -239,7 +239,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -259,7 +259,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -278,7 +278,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" \
+    -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -286,7 +286,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" \
+    -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -304,7 +304,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    access-control-allow-credentials: true
    access-control-allow-headers: Origin
    access-control-allow-methods: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
-   access-control-allow-origin: https://notallowed.com/
+   access-control-allow-origin: https://notallowed.com
    access-control-max-age: 3600
    date: Tue, 24 Jun 2025 13:21:20 GMT
    content-length: 0
