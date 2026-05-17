@@ -66,18 +66,18 @@ When specifying your transformation template, you can leverage custom functions 
 | Function | Description |
 | -- | -- |
 | `base64_encode(string)` | Encodes the input string to standard base64. |
-| `base64_decode(string)` | Decodes the input string from standard base64. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
+| `base64_decode(string)` | Decodes the input string from standard base64. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/decode-base64-headers/" >}}). |
 | `base64url_encode(string)` | Encodes the input string to URL-safe base64. URL-safe base64 replaces the standard `+` and `/` characters with `-` and `_` so the result can be used in URLs and HTTP headers without further escaping. |
 | `base64url_decode(string)` | Decodes the input string from URL-safe base64. |
-| `body()` | Returns the request or response body. For an example, see [Update response body]({{< link-hextra path="/traffic-management/transformations/simple/update-response-body" >}}). |
+| `body()` | Returns the request or response body. For an example, see [Update response body]({{< link-hextra path="/traffic-management/transformations/update-response-body" >}}). |
 | `context()` | Returns the base JSON context. You can use this context to parse a JSON body that is an array. |
-| `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
-| `header(header_name)` | Returns the value of the response header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}). |
-| `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers" >}}). |
-| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. {{< version exclude-if="2.0.x,2.1.x" >}}See the known-issue note below this table about constant-folding behavior in rustformation.{{< /version >}} For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |{{< version exclude-if="2.0.x,2.1.x" >}}
+| `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |
+| `header(header_name)` | Returns the value of the response header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/change-response-status/" >}}). |
+| `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers" >}}). |
+| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. {{< version exclude-if="2.0.x,2.1.x" >}}See the known-issue note below this table about constant-folding behavior in rustformation.{{< /version >}} For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |{{< version exclude-if="2.0.x,2.1.x" >}}
 | `replace_with_string(input, pattern, replacement)` | Finds the pattern in the input string and replaces every occurrence with `replacement`. Useful for redacting tokens or normalizing values before they are forwarded. |{{< /version >}}
-| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/simple/inject-response-headers/" >}}). |
-| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/simple/decode-base64-headers/" >}}). |
+| `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |
+| `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/decode-base64-headers/" >}}). |
 
 {{< version exclude-if="2.0.x,2.1.x" >}}
 {{< callout type="warning" >}}
@@ -87,7 +87,7 @@ When specifying your transformation template, you can leverage custom functions 
 
 **Other common functions**
 
-You might use built-in template functions such as `if else` or `if exists`. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/simple/change-response-status/" >}}).
+You might use built-in template functions such as `if else` or `if exists`. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/change-response-status/" >}}).
 
 ### Template attributes
 
