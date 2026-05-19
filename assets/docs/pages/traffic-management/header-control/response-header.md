@@ -553,7 +553,7 @@ kubectl delete secret response-signing -n {{< reuse "docs/snippets/namespace.md"
 
 ### Field defaulting
 
-The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How kgateway resolves a header value depends on which combination of fields you provide. If kgateway looks up a key that does not exist in the Secret, the policy reports `Accepted=False` and the affected route returns a 500 response.
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How kgateway resolves a header value depends on which combination of fields you provide. If the Secret does not contain the the `key` or `name` data, the policy reports `Accepted=False` and the affected route returns a 500 response.
 
 #### `name` and `secretRef.key` both set
 
