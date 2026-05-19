@@ -656,11 +656,11 @@ kubectl delete secret backend-creds -n {{< reuse "docs/snippets/namespace.md" >}
 
 ### Field defaulting
 
-The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How the gateway proxy resolves a header value depends on which combination of fields you provide. If the Secret does not contain the `key` or `name` data, the policy reports `Accepted=False` and the affected route returns a 500 response.
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional. How the gateway proxy resolves a header value depends on which combination of fields you provide. If the Secret does not contain the `key` or `name` data, the policy reports `Accepted=False` and the affected route returns a 500 response.
 
 #### Header `name` and `secretRef.key` both set
 
-The following example defines both a name for the header (`request.set.name`) and a data key from your Secret (`secretRef.key`). The gateway proxy uses both to construct the resulting request header. In this example, the resulting request header is `X-Api-Key=api-key`. 
+The following example defines both a name for the header (`request.set.name`) and a data key from your Secret (`secretRef.key`). The gateway proxy uses `name` as the header name and looks up the header value from the Secret using `secretRef.key` as the data key.
 
 ```yaml
 headerModifiers:
@@ -687,7 +687,7 @@ headerModifiers:
 
 #### Header `name` omitted
 
-In this example, the name of the header is omitted, but a data key is referenced in the `secretRef` block. The gateway proxy looks up the data key from the Secret and injects it into a header with the same name as the data key. In the following example, the resulting request header is `api-key: api-key`. 
+In this example, the name of the header is omitted, but a data key is referenced in the `secretRef` block. The gateway proxy looks up the data key from the Secret and injects it into a header with the same name as the data key.
 
 ```yaml
 headerModifiers:
