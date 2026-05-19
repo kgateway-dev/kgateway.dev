@@ -698,7 +698,7 @@ headerModifiers:
         key: api-key
 ```
 
-#### Both `name` and `secretRef.key` omitted
+#### Header `name` and `secretRef.key` omitted
 
 The following example omits both the header name and the data key in the secret. In such cases, the gateway proxy injects every data key entry in the Secret as a request header. Each data key becomes a header name. Use this combination to mirror an entire Secret into headers without listing each entry individually.
 
