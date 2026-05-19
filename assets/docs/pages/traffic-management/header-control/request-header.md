@@ -674,7 +674,7 @@ headerModifiers:
 
 #### `secretRef.key` omitted
 
-kgateway sets the `name` header to the value of the Secret data key that matches `name`.
+In this example, the data key is omitted from the `secretRef` block. The gateway proxy uses the header name (`X-Api-Key`) to look up a data key in the referenced Secret that matches the header name. Then, it uses the header name and matched data value from the Secret to construct the request header. 
 
 ```yaml
 headerModifiers:
