@@ -61,8 +61,38 @@ Several fields have been removed or changed in the `GatewayParameters` CRD:
 In the `TrafficPolicy` API:
 * The `jwt` field is renamed to `jwtAuth`
 * The `apiKeyAuthentication` field is renamed to `apiKeyAuth`
-
 Update your TrafficPolicy resources accordingly when upgrading.
+{{< callout type="warning" >}}
+When upgrading from v2.1 to v2.2, make sure to rename these fields in existing
+`TrafficPolicy` resources. Policies that continue using the old field names may
+not behave as expected after the upgrade.
+{{< /callout >}}
+
+**Before (v2.1):**
+
+```yaml
+spec:
+  jwt:
+    providers:
+      - name: my-provider
+
+  apiKeyAuthentication:
+    providers:
+      - name: my-api-key-provider
+```
+
+**After (v2.2+):**
+
+```yaml
+spec:
+  jwtAuth:
+    providers:
+      - name: my-provider
+
+  apiKeyAuth:
+    providers:
+      - name: my-api-key-provider
+```
 
 #### JWT missing token behavior {#jwt-missing-token}
 
