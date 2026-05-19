@@ -658,7 +658,7 @@ kubectl delete secret backend-creds -n {{< reuse "docs/snippets/namespace.md" >}
 
 The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How kgateway resolves a header value depends on which combination of fields you provide.
 
-#### `name` and `secretRef.key` both set
+#### Header `name` and `secretRef.key` both set
 
 kgateway sets the `name` header to the value of the `secretRef.key` data key in the Secret.
 
