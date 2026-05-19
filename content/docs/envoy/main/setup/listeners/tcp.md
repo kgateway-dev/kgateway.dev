@@ -19,6 +19,13 @@ The following guide deploys a sample TCP echo app, sets up a TCP listener on the
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
+{{< callout type="warning" >}}
+In kgateway 2.2 and later, experimental Gateway API features such as
+`TCPRoute` require the
+`KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
+environment variable to be enabled.
+{{< /callout >}}   
+
 3. {{< reuse "docs/snippets/prereq-listenerset.md" >}}
 
 4. Deploy the sample TCP echo app.
