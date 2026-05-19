@@ -685,7 +685,7 @@ headerModifiers:
         name: backend-creds
 ```
 
-#### `name` omitted
+#### Header `name` omitted
 
 In this example, the name of the header is omitted, but a data key is referenced in the `secretRef` block. The gateway proxy looks up the data key from the Secret and injects it into a header with the same name as the data key. In the following example, the resulting request header is `api-key: api-key`. 
 
