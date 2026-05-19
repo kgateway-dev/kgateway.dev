@@ -22,13 +22,12 @@
    --set controller.image.pullPolicy=Always
    ```
 
-3. Install kgateway by using Helm. To use experimental Gateway API features, include the experimental feature gate, `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true`.
+3. Install kgateway by using Helm.
    ```sh
    helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --namespace kgateway-system \
    --version v{{< reuse "docs/versions/patch-dev.md" >}} \
-   --set controller.image.pullPolicy=Always \
-   --set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true
+   --set controller.image.pullPolicy=Always
    ```
    
 4. Make sure that the `kgateway` control plane is running.

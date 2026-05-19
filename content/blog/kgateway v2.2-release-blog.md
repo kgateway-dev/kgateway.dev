@@ -44,14 +44,16 @@ Kgateway-specific documentation for Envoy gateways did not move and continues to
 
 ### `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` to gate experimental Gateway API features and APIs
 
-Use the `--set controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` setting in your Helm installation to enable experimental Kubernetes Gateway API features and APIs, such as the following: 
+The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` controller environment variable gates experimental Kubernetes Gateway API features and APIs, such as the following:
 
+* TCPRoute
+* TLSRoute
 * XListenerSet
 * Route SessionPersistence
 * HTTPCORSFilter
 * HTTPRouteRetry
 
-By default, the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` is set to `false`. For more information, see the related [kgateway PR](https://github.com/kgateway-dev/kgateway/pull/12695).
+In kgateway 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default. To disable them, set `controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=false` in your Helm installation. For more information, see the related kgateway PRs [#12695](https://github.com/kgateway-dev/kgateway/pull/12695) and [#12881](https://github.com/kgateway-dev/kgateway/pull/12881).
 
 For setup steps, see the get started guide in the [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/) or [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/quickstart/) docs.
 

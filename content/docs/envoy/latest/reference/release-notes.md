@@ -34,19 +34,13 @@ For a detailed comparison of agentgateway vs kgateway resources, including Gatew
 
 #### Feature gate for experimental Gateway API features {#experimental-feature-gate}
 
-Kgateway 2.2 introduces the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable to gate experimental Gateway API features and APIs. This setting defaults to `false` and must be explicitly enabled to use experimental features such as TCPRoute and TLSRoute.
-
-To enable these features, set the environment variable in your kgateway controller deployment. You can use either a Helm values file or the `--set` flag during installation:
+Kgateway 2.2 introduces the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable to gate experimental Gateway API features and APIs such as TCPRoute and TLSRoute. The setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable them, set the environment variable to `false` in your kgateway controller deployment:
 
 ```yaml
 controller:
   extraEnv:
-    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
+    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "false"
 ```
-
-Or use the Helm flag: `--set controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
-
-If you are currently using any experimental Gateway API features, you must enable this setting before upgrading to kgateway 2.2, or those features will stop working.
 
 #### GatewayParameters breaking changes {#gatewayparameters-changes}
 
