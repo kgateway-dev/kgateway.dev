@@ -18,7 +18,7 @@
    ```sh
    helm upgrade -i kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --create-namespace --namespace kgateway-system \
-   --version v{{< reuse "docs/versions/patch-dev.md" >}} \
+   --version v{{< reuse "docs/versions/n-patch.md" >}} \
    --set controller.image.pullPolicy=Always
    ```
 
@@ -26,7 +26,7 @@
    ```sh
    helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
    --namespace kgateway-system \
-   --version v{{< reuse "docs/versions/patch-dev.md" >}} \
+   --version v{{< reuse "docs/versions/n-patch.md" >}} \
    --set controller.image.pullPolicy=Always
    ```
    
