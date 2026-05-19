@@ -660,7 +660,7 @@ The `name` field on a `set` or `add` entry and the `key` field on `secretRef` ar
 
 #### Header `name` and `secretRef.key` both set
 
-kgateway sets the `name` header to the value of the `secretRef.key` data key in the Secret.
+The following example defines both a name for the header (`request.set.name`) and a data key from your Secret (`secretRef.key`). The gateway proxy uses both to construct the resulting request header. In this example, the resulting request header is `X-Api-Key=api-key`. 
 
 ```yaml
 headerModifiers:
