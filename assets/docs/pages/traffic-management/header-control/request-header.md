@@ -656,7 +656,7 @@ kubectl delete secret backend-creds -n {{< reuse "docs/snippets/namespace.md" >}
 
 ### Field defaulting
 
-The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How the gateway proxy resolves a header value depends on which combination of fields you provide.
+The `name` field on a `set` or `add` entry and the `key` field on `secretRef` are both optional, as long as at least one is set. How the gateway proxy resolves a header value depends on which combination of fields you provide. If the gateway proxy looks up a key that does not exist in the Secret, the policy reports `Accepted=False` and the affected route returns a 500 response.
 
 #### Header `name` and `secretRef.key` both set
 
