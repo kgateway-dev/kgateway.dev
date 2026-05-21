@@ -124,7 +124,7 @@ Verify that you get a `200 OK` response.
 
 ## (Optional) Forward JWT claims as request headers {#claims-to-headers}
 
-You can extract claims from the verified JWT and forward them as headers to the upstream service. Update the `GatewayExtension` to add `claimsToHeaders`.
+You can extract claims from the verified JWT and forward them as headers to the upstream service by using the `claimsToHeaders` field in the GatewayExtension resource.
 
 ```yaml
 kubectl apply -f- <<EOF
