@@ -16,7 +16,12 @@ defaultContentLanguage: en
 
 module:
   imports:
-    - path: github.com/imfing/hextra
+    # hextra used to live here as a sibling import; docs-theme-extras
+    # now declares the hextra import itself, so consumers no longer
+    # need to list it separately. The shadowing order stays correct:
+    # docs-theme-extras's own layouts win over the transitively-imported
+    # hextra ones.
+    - path: github.com/solo-io/docs-theme-extras
   mounts:
     - source: "assets"
       target: "assets"
@@ -48,9 +53,6 @@ enableInlineShortcodes: true
 
 menu:
   main:
-    - name: Home
-      url: /
-      weight: 1
     - name: Blog
       url: /blog
       weight: 2
@@ -66,6 +68,12 @@ menu:
 
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
+
+  # Tells docs-theme-extras which brand CSS layer + font stack to load
+  # (see the module's layouts/partials/themeExtras/head-end.html). "oss"
+  # loads brand-oss.css and Open Sans; "enterprise" loads brand-enterprise.css.
+  themeExtras:
+    brand: oss
   navbar:
     displayTitle: false
     displayLogo: true
@@ -125,7 +133,10 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
-  # Global versions (for backward compatibility)
+  # Global versions (consumed by local partials 404.html, navbar.html,
+  # navbar-version.html, breadcrumb.html as a default before the
+  # section-specific list overrides). Keep these in sync with the
+  # latest section list below.
   versions:
     - version: "2.3.x"
       dropdown: "2.3 (latest)"
@@ -139,7 +150,7 @@ params:
       dropdown: "2.1"
       linkVersion: "2.1.x"
       url: "/2.1.x"
-  
+
   # Section-specific configurations
   sections:
     envoy:
