@@ -1,6 +1,6 @@
 ---
 linkTitle: "Get started"
-title: Get started with kgateway
+title: Get started
 weight: 1
 next: /docs/about
 ---

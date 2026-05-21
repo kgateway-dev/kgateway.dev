@@ -7,10 +7,6 @@ h6 {
     font-family: 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.hextra-card-subtitle {
-    text-align: left !important;
-}
-
 /* ──────────────────────────────────────────────────────────────────────
  * Tailwind 4 hx: utility fallbacks.
  *
@@ -26,6 +22,19 @@ h6 {
  * hugo_stats.json against the compiled bundle. Any new misses can land
  * here without touching templates.
  * ────────────────────────────────────────────────────────────────────── */
+
+/* Nav logo light/dark variant visibility. The navbar emits two <img>s — a
+   light-mode logo with `hx:block hx:dark:hidden` and a dark-mode logo with
+   `hx:hidden hx:dark:block`. The hextra-bundled utility classes are present
+   and in the expected source order in the compiled bundle, yet in dark mode
+   both logos render side-by-side on this site (root cause unclear — possibly
+   a Tailwind 4 layer/cascade interaction specific to multi-utility display
+   resolution). Pin visibility with higher-specificity `.dark .nav-container`
+   selectors plus !important so only the correct variant shows in each mode. */
+.nav-container a img.hx\:dark\:hidden { display: block !important; }
+.nav-container a img.hx\:dark\:block  { display: none  !important; }
+.dark .nav-container a img.hx\:dark\:hidden { display: none  !important; }
+.dark .nav-container a img.hx\:dark\:block  { display: block !important; }
 
 .hx\:flex-1 { flex: 1 1 0% }
 .hx\:ml-1 { margin-left: calc(var(--hx-spacing) * 1) }

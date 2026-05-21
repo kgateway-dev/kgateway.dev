@@ -1,6 +1,6 @@
 ---
-linkTitle: "FAQs"
-title: Frequently asked questions
+linkTitle: "FAQ"
+title: FAQ
 weight: 1000
 next: /docs/quickstart
 prev: /docs/reference

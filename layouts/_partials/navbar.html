@@ -57,51 +57,9 @@
 {{- end -}}
 
 <style>
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-
-  .dropdown-content {
-    display: none;
-    min-width: 160px;
-  }
-
-  .dropdown:hover .dropdown-content {display: block;}
-  
-  .navbar-dropdown-content {
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    right: 0;
-    background-color: white;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    z-index: 50;
-    padding-top: 0.25rem;
-  }
-  
-  /* Create a hover bridge between trigger and dropdown */
-  .dropdown::before {
-    content: '';
-    position: absolute;
-    top: 100%;
-    right: 0;
-    left: 0;
-    height: 0.5rem;
-    z-index: 49;
-  }
-  
-  .dark .navbar-dropdown-content {
-    background-color: rgb(17, 24, 39);
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-  
-  /* Dark mode hover styles for dropdown items */
-  .dark .navbar-dropdown-content a:hover {
-    background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
-    color: rgb(255, 255, 255) !important; /* white - maximum contrast */
-  }
+  {{- /* .dropdown / .navbar-dropdown-content rules now live in
+         docs-theme-extras/assets/css/docs-theme-extras.css so both kgateway
+         and agentgateway-oss render dropdowns from a single source. */ -}}
 
   {{- /* Build the search path pattern based on subSection and version */ -}}
   {{- $searchPathPattern := "" -}}
@@ -168,7 +126,7 @@
 <div class="nav-container hx:sticky hx:top-0 hx:z-20 hx:w-full hx:bg-transparent hx:print:hidden">
   <div class="nav-container-blur hx:pointer-events-none hx:absolute hx:z-[-1] hx:h-full hx:w-full hx:bg-white hx:dark:bg-dark hx:shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] hx:contrast-more:shadow-[0_0_0_1px_#000] hx:dark:shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] hx:contrast-more:dark:shadow-[0_0_0_1px_#fff]"></div>
 
-  <nav class="hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-20 hx:px-6 {{ $navWidth }}">
+  <nav class="hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-24 hx:px-6 {{ $navWidth }}">
     <a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="{{ $logoLink }}">
       {{- if (.Site.Params.navbar.displayLogo | default true) }}
         {{- if $useResource -}}
@@ -199,8 +157,8 @@
     {{- end -}}
     
     {{ if and $versions $version }}
-    <div class="dropdown px-2 cursor-pointer">
-        <button class="btn" type="button">
+    <div class="dropdown hx:px-2 hx:relative">
+        <button class="hx:text-sm hx:font-normal hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200 hx:inline-flex hx:items-center hx:whitespace-nowrap hx:cursor-pointer" type="button">
           {{- $foundVersion := false -}}
           {{- range $versions -}}
             {{- if eq $version .linkVersion -}}
@@ -213,10 +171,10 @@
             {{- /* Fallback if version not found */ -}}
             {{- $version -}}
           {{- end -}}
-          {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}
+          {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-1 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
         </button>
-        <ul class="dropdown-content absolute border-[1px] rounded-lg px-6 right-[50%] translate-x-1/2 hx:bg-white hx:dark:bg-dark text-nowrap">
-          {{ partial "navbar-version.html" }} 
+        <ul class="dropdown-content navbar-dropdown-content">
+          {{ partial "navbar-version.html" }}
         </ul>
     </div>
     {{ end }}
@@ -237,7 +195,11 @@
         {{/* Check if this is the Docs menu item and render as dropdown */}}
         {{- if eq .Name "Docs" -}}
           {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
-          {{- $activeClass := cond $active "hx:font-medium" "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
+          {{- /* Use the same color/weight for active and inactive — visual
+                 emphasis on the current page differs from agw's nav, which
+                 styles all top-nav items uniformly. The $active value is
+                 still computed in case future styles want to differentiate. */ -}}
+          {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
           <div class="dropdown hx:relative hx:-ml-2 hx:hidden hx:md:inline-block">
             <a
               title="{{ or (T .Identifier) .Name | safeHTML }}"
@@ -255,7 +217,7 @@
         {{/* Display icon menu item */}}
         {{- else if .Params.icon -}}
           {{- $rel := cond (eq .Params.icon "mastodon") "noreferer me" "noreferer" }}
-          <a class="hx:p-2 hx:text-current" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
+          <a class="hx:p-2 hx:text-current hx:inline-flex hx:items-center" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
             {{- if eq .Params.icon "github" -}}
               <span class="hx:inline-block hx:dark:hidden">{{- partial "utils/icon.html" (dict "name" "github" "attributes" "height=24 width=24") -}}</span>
               <span class="hx:hidden hx:dark:inline-block github-white-icon">{{- partial "utils/icon.html" (dict "name" "github-white" "attributes" "height=24 width=24") -}}</span>
@@ -266,7 +228,11 @@
           </a>
         {{- else -}}
           {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
-          {{- $activeClass := cond $active "hx:font-medium" "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
+          {{- /* Use the same color/weight for active and inactive — visual
+                 emphasis on the current page differs from agw's nav, which
+                 styles all top-nav items uniformly. The $active value is
+                 still computed in case future styles want to differentiate. */ -}}
+          {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
           <a
             title="{{ or (T .Identifier) .Name | safeHTML }}"
             href="{{ $link }}"

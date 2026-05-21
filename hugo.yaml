@@ -8,9 +8,9 @@ services:
     ID: "G-9P21XPDJPX"
 
 outputs:
-  home: [HTML]
-  page: [HTML]
-  section: [HTML, RSS]
+  home: [HTML, RSS, llms]
+  page: [HTML, markdown]
+  section: [HTML, RSS, markdown, llms]
 
 defaultContentLanguage: en
 
@@ -113,6 +113,13 @@ params:
 
   editURL:
     enable: false
+
+  feedback:
+    enable: true
+    issueRepo: kgateway-dev/kgateway.dev
+
+  llms:
+    docsIntro: kgateway is a Kubernetes-native Gateway API implementation built on Envoy with AI gateway capabilities.
 
   blog:
     list:

@@ -146,11 +146,15 @@
         <main class="hx:w-full hx:min-w-0 hx:max-w-6xl hx:px-6 hx:pt-4 hx:md:px-12">
           {{ partial "breadcrumb.html" . }}
           <div class="content">
+            {{ partial "docs-llms-directive.html" . }}
+            {{ partial "copy-markdown.html" . }}
             {{ if .Title }}<h1>{{ .Title }}</h1>{{ end }}
             {{ .Content }}
+            {{ partial "auto-section-cards.html" . }}
           </div>
           {{ partial "components/last-updated.html" . }}
           {{ partial "components/pager.html" . }}
+          {{ partial "components/page-feedback.html" . }}
           {{ partial "components/comments.html" . }}
         </main>
       </article>
