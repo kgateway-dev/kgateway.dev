@@ -67,7 +67,7 @@ Instead of applying the policy to all routes that are defined in an HTTPRoute re
 Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later. Also, the `ExtensionRef` filter is not supported for agentgateway proxies.
 {{< /callout >}}
 
-The following example shows a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRef` field is not set. Because of that, the {{< reuse "docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
+The following example shows a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRefs` field is not set. Because of that, the {{< reuse "docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
 ```yaml
 apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
