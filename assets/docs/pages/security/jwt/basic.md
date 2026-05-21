@@ -57,7 +57,7 @@ EOF
 
 | Field | Description |
 | ----- | ----- |
-| `targetRefs` | The resource to enforce the policy on. When targeting a `Gateway`, the policy must be in the same namespace as the Gateway. To restrict JWT enforcement to a single route instead, change `kind` to `HTTPRoute`, provide the route name, and create the policy in the same namespace as the HTTPRoute. |
+| `targetRefs` | The resource to enforce the policy on. When targeting a Gateway, the policy must be in the same namespace as the Gateway. To restrict JWT enforcement to a single route instead, change the `kind` field to HTTPRoute and provide the name of the HTTPRoute resource that defines the routes that you want to . Make sure to create the policy in the same namespace as the HTTPRoute that you target. |
 | `jwtAuth.extensionRef` | The name of the `GatewayExtension` that holds the JWT provider configuration. The extension must be in the same namespace as the policy. |
 
 ## Step 3: Verify that requests without a JWT are denied {#verify-denied}
