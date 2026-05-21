@@ -8,9 +8,13 @@ The `ingress-nginx` provider defines the source resources to be translated, e.g.
 
 **Note:** Some annotations may be translated into kgateway resources or user-facing notifications.
 
+## Ingress Class Name
+
+To select a custom Ingress class, use `--ingress-nginx-ingress-class=ingress-nginx`. If omitted, the provider defaults to `nginx`.
+
 ## Supported Annotations
 
-The `ingress-nginx` provider currently supports an Ingress with the following annotations.
+The `ingress-nginx` provider currently supports translating the following annotations.
 
 ### Canary / Traffic Shaping
 
@@ -90,6 +94,8 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 ### Backend Protocol
 
 - `nginx.ingress.kubernetes.io/backend-protocol`: Indicates the L7 protocol that is used to communicate with the proxied backend.
+  - This annotation controls upstream protocol intent only. It does **not** change the generated route kind from `HTTPRoute`
+    to `GRPCRoute`.
   - **Supported values (recorded):** `GRPC`, `GRPCS`
     - The provider records protocol intent as policy metadata (used by implementation emitters).
     - For kgateway:
@@ -97,6 +103,7 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
         on the generated `Backend`.
       - Otherwise, the kgateway emitter does **not** generate Kubernetes `Service` resources. Instead, it emits an **INFO** notification with a `kubectl patch`
         command to set `spec.ports[].appProtocol` on the existing Service.
+      - This annotation is treated as upstream protocol metadata and does not imply `GRPCRoute` projection.
   - **Values treated as default HTTP/1.x (no-op):** `HTTP`, `HTTPS`, `AUTO_HTTP`
   - **Unsupported values (rejected):** `FCGI` (and others)
   - **Safety note:** The provider does not attempt to create or mutate Kubernetes Services; implementation emitters decide how to safely project this intent.
@@ -114,6 +121,18 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 ---
 
+### Service Upstream
+
+- `nginx.ingress.kubernetes.io/service-upstream`: When set to `"true"`, treats a Service as a single upstream using Service IP and port semantics
+  rather than per-Endpoint Pod IPs.
+  - The provider records policy metadata describing the derived static backends and which `HTTPRoute` backendRefs the policy applies to.
+  - The kgateway emitter uses that policy to emit `Backend` resources and rewrite the affected `HTTPRoute.spec.rules[].backendRefs[]`.
+  - Backend hosts are derived as in-cluster DNS names such as `<service>.<namespace>.svc.cluster.local`.
+  - Generated backend names are derived as `<service>-service-upstream`.
+  - This applies only to core Service backendRefs with an explicit port. If a port cannot be determined, the backendRef is skipped.
+
+---
+
 ### Backend TLS
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-secret`: Specifies a Secret containing client certificate (`tls.crt`), client key (`tls.key`), and optionally CA certificate (`ca.crt`) in PEM format. The secret name can be specified as `secretName` (same namespace) or `namespace/secretName`. For kgateway, this maps to `BackendConfigPolicy.spec.tls.secretRef`. **Note:** The secret must be in the same namespace as the BackendConfigPolicy.
@@ -125,6 +144,18 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 - `nginx.ingress.kubernetes.io/proxy-ssl-server-name`: **Note:** This annotation is not handled separately. In Kgateway, SNI is automatically enabled when `proxy-ssl-name` is set.
 
 **Note:** For kgateway, backend TLS configuration is applied via `BackendConfigPolicy` resources. If multiple Ingress resources reference the same Service with different backend TLS settings, ingress2gateway creates a single `BackendConfigPolicy` per Service, and conflicting settings may result in warnings.
+
+---
+
+### Access Logging
+
+- `nginx.ingress.kubernetes.io/enable-access-log`: Enables or disables access logging.
+  - In ingress-nginx, access logging is enabled by default when the annotation is not present.
+  - When the annotation is present, the provider records an explicit boolean:
+    - `"true"` enables access logging.
+    - Any other value is treated as `false`.
+  - For kgateway, when access logging is enabled, the emitter creates an `HTTPListenerPolicy` that configures a basic Envoy access log policy via
+    `HTTPListenerPolicy.spec.accessLog[].fileSink`.
 
 ---
 
@@ -158,6 +189,32 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 ---
 
+### SSL Passthrough (TLS Passthrough)
+
+- `nginx.ingress.kubernetes.io/ssl-passthrough`: When set to `"true"` (case-insensitive), enables TLS passthrough.
+  When enabled, TLS termination happens at the backend service rather than at the ingress controller, so the provider converts
+  the affected `HTTPRoute` into a `TLSRoute` and configures a TLS passthrough Gateway listener.
+
+Provider behavior:
+
+- Converts the generated `HTTPRoute` for the affected host or group into a `TLSRoute` in the same namespace.
+- Preserves the original `parentRefs` and `hostnames` when present.
+- Rewrites each HTTPRoute rule into a TLSRoute rule with `backendRefs`.
+- Preserves backendRef `weight` and `namespace` when set and copies `port`, defaulting to `443` when it is missing.
+- Removes the original `HTTPRoute` from the IR and adds the generated `TLSRoute`.
+
+Gateway listener behavior:
+
+- Adds a TLS passthrough listener with `protocol: TLS` and `tls.mode: Passthrough` to the parent `Gateway`.
+- Uses a default listener name of `tls-passthrough` on port `8443`.
+- If a hostname is present, uses a hostname-specific listener name, sets the port to `443`, and sets `hostname` on the listener.
+- Removes any generated HTTP listener on the `Gateway` that matches the TLSRoute hostname so that only the passthrough TLS listener remains.
+- Updates `TLSRoute.spec.parentRefs[].sectionName` to bind the route to the created passthrough listener.
+
+**Note:** With TLS passthrough enabled, backend services must accept and terminate TLS themselves.
+
+---
+
 ### Regex Path Matching and Rewrites
 
 - `nginx.ingress.kubernetes.io/use-regex`: When set to `"true"`, indicates that the paths defined on that Ingress should be treated as regular expressions.
@@ -181,7 +238,7 @@ For kgateway:
 
 ## Provider Limitations
 
-- Currently, kgateway is the only supported emitter.
+- These docs describe the `ingress-nginx` provider behavior as projected by the `kgateway` emitter.
 - Some NGINX behaviors cannot be reproduced exactly due to differences between NGINX and semantics of other proxy implementations.
 - Regex-mode is implemented by converting HTTPRoute path matches to `RegularExpression`. Some ingress-nginx details (such as case-insensitive `~*` behavior)
   may not be reproduced exactly depending on the underlying Gateway API / Envoy behavior and the patterns provided.

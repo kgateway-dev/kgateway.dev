@@ -22,21 +22,28 @@ When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
-To use experimental Gateway API features, you must enable the experimental feature gate, `KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES`. This setting defaults to `false` and must be explicitly enabled to use experimental features such as the following:
+The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features such as the following:
 
+- TCPRoutes
+- TLSRoutes
 - ListenerSets
 - CORS policies
 - Retries
 - Session persistence
 
-To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
+{{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 
 ```yaml
-
 controller:
   extraEnv:
-    KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES: "true"
-```
+    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
+```{{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}In kgateway version 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable these features, set the environment variable to `false` in your kgateway controller deployment in your Helm values file.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "false"
+```{{< /version >}}
 
 ## Leader election
 
