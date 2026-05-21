@@ -90,7 +90,7 @@ Jwt is missing
 kubectl get trafficpolicy jwt-policy -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
 kubectl get gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
 ```
-Both resources should show an `Accepted` condition. If either has no status at all, the resource is in the wrong namespace.
+Both resources must show an `Accepted` condition. If either has no status at all, the resource is in the wrong namespace.
 {{< /callout >}}
 
 ## Step 4: Send a request with a valid JWT {#verify-allowed}
