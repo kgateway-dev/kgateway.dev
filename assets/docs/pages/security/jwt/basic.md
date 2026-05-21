@@ -6,7 +6,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
 ## Step 1: Create a GatewayExtension for the JWT provider {#gateway-extension}
 
-A `GatewayExtension` with a `jwt` configuration holds one or more JWT provider definitions, including the issuer and JWKS source. By keeping provider configuration in a separate resource, the same `GatewayExtension` can be referenced from more than one {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+A `GatewayExtension` resource with a `jwt` configuration holds one or more JWT provider definitions, including the issuer and JWKS source that you want to use to validate incoming tokens. By keeping the provider configuration in a separate resource, the same `GatewayExtension` can be referenced from more than one {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 ```yaml
 kubectl apply -f- <<EOF
