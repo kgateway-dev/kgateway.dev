@@ -25,6 +25,39 @@ When opening a pull request, each of your commits must contain a `Signed-off-by`
 
 Refer to the [Documentation Contributor Guide](https://kgateway.dev/docs/reference/contribution/) for details on adding documentation, previewing locally, and a style guide.
 
+### Framework tests
+
+The `framework-test*` Makefile targets run a Playwright-based structural quality harness against the built HTML. The harness checks for things like leaked shortcode syntax, unrendered markdown, missing image alt text, console errors in JS, broken theme-toggle behavior, contrast violations, and other regressions that look fine in source but break when rendered.
+
+The harness itself lives in [`solo-io/docs-theme-extras`](https://github.com/solo-io/docs-theme-extras). It's not vendored into this repo — `.docs-test.toml` at the repo root configures the harness (where the built HTML lives, which versions to scan, which warnings to allowlist), and the Makefile targets shell out to the extras checkout to run Playwright against it.
+
+#### Setup (one time)
+
+1. Clone `docs-theme-extras` as a sibling directory of this repo:
+   ```sh
+   git clone https://github.com/solo-io/docs-theme-extras.git ../docs-theme-extras
+   ```
+   If you want to put it elsewhere, every `framework-test*` target accepts `FRAMEWORK_EXTRAS_DIR=/abs/path` to override.
+2. Install Playwright and the browser binaries (chromium, firefox, webkit) inside that checkout:
+   ```sh
+   make framework-test-install
+   ```
+   This is a ~120-180 MB download and runs once.
+
+#### Running the harness
+
+| Target                           | What it does                                                                                                  |
+|----------------------------------|---------------------------------------------------------------------------------------------------------------|
+| `make framework-test`            | Build the site, run all specs (static + browser + cross-browser), open the HTML report.                       |
+| `make framework-test-static`     | Build the site, run only the static specs. Fastest loop — no browser is launched. Good for tight iteration.   |
+| `make framework-test-browser`    | Build the site, run the chromium browser specs (tabs, mermaid, theme toggle, copy-md, console errors, etc.).  |
+| `make framework-test-cross-browser` | Run the browser specs across chromium, firefox, and webkit. Slowest — use for release-shaped verification. |
+| `make framework-test-report`     | Re-open the most recent Playwright HTML report (handy after an earlier run was interrupted).                  |
+
+Each `framework-test*` target builds the site fresh via `hugo160 --gc --minify` and writes to `./public` before Playwright runs. The harness reads `.docs-test.toml` to find that build, the version regex, and the allowlists for known-benign noise.
+
+If a spec fails, the HTML report points at the offending page, captures a screenshot for browser-mode failures, and links to the source. Tighten `.docs-test.toml`'s `allowlists` block as content stabilizes.
+
 ### Adding a Lab
 1. Add an entry to `data/labs.yaml` with a title, description, and href
 2. Verify that the new lab appears correctly at http://localhost:1313/resources/labs/

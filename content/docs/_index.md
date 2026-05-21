@@ -5,6 +5,8 @@ menu:
   main:
     weight: 3
     identifier: docs
+cascade:
+  type: docs
 ---
 
 Kgateway provides a control plane that manages the following data plane proxies. Review the docs for each product to learn more.
