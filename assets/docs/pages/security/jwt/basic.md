@@ -95,7 +95,7 @@ Both resources must show an `Accepted` condition. If either has no status at all
 
 ## Step 4: Send a request with a valid JWT {#verify-allowed}
 
-Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key configured in the `GatewayExtension`, so the gateway allows the request through.
+Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the GatewayExtension resource and can be successfully validated by the gateway proxy. 
 
 <!-- Example token from: https://github.com/kgateway-dev/kgateway/pull/12811 -->
 
