@@ -5,7 +5,7 @@ A JSON Web Token (JWT) is an open standard for securely sharing information betw
 For more information, refer to the following sources:
 * [RFC 7519, JWT specification](https://datatracker.ietf.org/doc/html/rfc7519)
 * [Auth0 overview about JWT](https://auth0.com/docs/secure/tokens/json-web-tokens)
-* [JWT policy API docs]({{< link path="/reference/api/kgateway/#jwt" >}})
+* [JWT policy API docs]({{< link-hextra path="/reference/api/kgateway/#jwt" >}})
 * Istio docs for [JWT tokens](https://istio.io/latest/docs/tasks/security/authorization/authz-jwt/) and [JWT claim-based routing](https://istio.io/latest/docs/tasks/security/authentication/jwt-route/)
 
 ### Common use cases {#use-cases}
@@ -16,9 +16,9 @@ For more information, refer to the following sources:
 * **Authorization**: JWTs can have custom claims that can define a user's scope, role, or other permissions. You can use these claims in combination with other policies to enforce fine-grained access control to your apps. By including the claim information within the JWT, the authorization process can happen faster and more scalably.
 * **Secure information exchange**: Because the token is in JSON format, many otherwise incompatible systems and services can use the token to exchange information. The authentication and authorization features built into the token help these systems validate and trust the information. 
 
-{{% alert context="warning" %}}
+{{< callout type="warning" >}}
 Keep in mind that JWT data is encoded but not encrypted. As such, consider using JWT policies with no personally identifiable information (PII) or sensitive data, and only on HTTPS traffic.
-{{% /alert %}}
+{{< /callout >}}
 
 ### JWT structure {#structure}
 
