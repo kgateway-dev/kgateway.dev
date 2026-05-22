@@ -45,23 +45,30 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          version=$(grep "docs-theme-extras" go.mod | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+-[0-9a-f]+)?' | head -1)
+          # Pull the full version field as written in go.mod. Handles every
+          # form: tag (v0.0.2), prerelease tag (v0.0.2-beta.1, v0.0.2-rc.1),
+          # and Go pseudo-version (v0.0.2-0.20260522171640-df9722216725).
+          version=$(awk -v pkg="github.com/solo-io/docs-theme-extras" '
+            { for (i=1; i<=NF; i++) if ($i == pkg) { print $(i+1); exit } }
+          ' go.mod)
           if [ -z "$version" ]; then
             echo "Could not extract docs-theme-extras version from go.mod" >&2
             exit 1
           fi
-          if echo "$version" | grep -qE 'v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[0-9a-f]+'; then
-            # Pseudo-version: extract the 12-char SHA (last segment) and
-            # resolve to a full 40-char SHA, since actions/checkout treats
-            # short SHAs as branch names and fails to fetch them.
-            short=$(echo "$version" | grep -oE '[0-9a-f]+$')
+          # Pseudo-version shape: ends with .<14-digit timestamp>-<12-hex short SHA>
+          # (e.g. v0.0.2-0.20260522171640-df9722216725).
+          if echo "$version" | grep -qE -- '\.[0-9]{14}-[0-9a-f]{12}$'; then
+            # Extract the 12-char short SHA and resolve to a full 40-char SHA,
+            # since actions/checkout treats short SHAs as branch names and
+            # fails to fetch them.
+            short=$(echo "$version" | grep -oE '[0-9a-f]{12}$')
             ref=$(gh api "repos/solo-io/docs-theme-extras/commits/${short}" --jq .sha)
             if [ -z "$ref" ]; then
               echo "Could not resolve full SHA for short=${short}" >&2
               exit 1
             fi
           else
-            # Semver tag: actions/checkout accepts tag names directly.
+            # Semver tag (release or prerelease): actions/checkout accepts it directly.
             ref="$version"
           fi
           echo "ref=$ref" >> "$GITHUB_OUTPUT"
