@@ -15,6 +15,12 @@ on:
     paths:
       - 'layouts/**'
       - 'static/**'
+      - 'assets/css/**'
+      - 'assets/js/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'hugo.yaml'
+      - '.docs-test.toml'
       - '.github/workflows/framework-tests.yml'
   workflow_dispatch:
 
