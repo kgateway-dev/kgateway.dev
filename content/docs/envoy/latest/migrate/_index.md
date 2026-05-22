@@ -1,5 +1,6 @@
 ---
 title: "Migrate from Ingress"
+icon: swap_horiz
 weight: 900
 ---
 
