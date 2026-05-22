@@ -1,0 +1,113 @@
+# Hugo + Hextra docs-framework harness, run against kgateway.dev's built site.
+#
+# The harness lives in solo-io/docs-theme-extras and is checked out at the
+# version pinned in go.mod (semver tag or pseudo-version). Layouts and tests
+# stay in lockstep — bumping the module pin is one PR that updates both.
+#
+# Marked continue-on-error for the first ~week to let allowlists and
+# fixture-aware specs settle. Promote to a required check once the suite
+# stays green for a sustained run.
+
+name: Framework tests
+
+on:
+  pull_request:
+    paths:
+      - 'layouts/**'
+      - 'static/**'
+      - '.github/workflows/framework-tests.yml'
+  workflow_dispatch:
+
+jobs:
+  framework-test-static:
+    name: Static checks
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version: 'stable'
+          cache: false
+      - uses: peaceiris/actions-hugo@v3
+        with:
+          hugo-version: '0.160.1'
+          extended: true
+
+      - name: Resolve docs-theme-extras ref from go.mod
+        id: theme-sha
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version=$(grep "docs-theme-extras" go.mod | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+-[0-9a-f]+)?' | head -1)
+          if [ -z "$version" ]; then
+            echo "Could not extract docs-theme-extras version from go.mod" >&2
+            exit 1
+          fi
+          if echo "$version" | grep -qE 'v[0-9]+\.[0-9]+\.[0-9]+-[0-9]+-[0-9a-f]+'; then
+            # Pseudo-version: extract the 12-char SHA (last segment) and
+            # resolve to a full 40-char SHA, since actions/checkout treats
+            # short SHAs as branch names and fails to fetch them.
+            short=$(echo "$version" | grep -oE '[0-9a-f]+$')
+            ref=$(gh api "repos/solo-io/docs-theme-extras/commits/${short}" --jq .sha)
+            if [ -z "$ref" ]; then
+              echo "Could not resolve full SHA for short=${short}" >&2
+              exit 1
+            fi
+          else
+            # Semver tag: actions/checkout accepts tag names directly.
+            ref="$version"
+          fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+
+      - name: Check out docs-theme-extras at module pin
+        uses: actions/checkout@v6
+        with:
+          repository: solo-io/docs-theme-extras
+          ref: ${{ steps.theme-sha.outputs.ref }}
+          path: docs-theme-extras
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'docs-theme-extras/package-lock.json'
+
+      - name: Build site with Hugo
+        run: |
+          # PostCSS is invoked by Hugo's css.PostCSS for assets/css/styles.css
+          # but isn't installed by default in this runner. Mirror the
+          # install pattern from links.yml so Hugo can find it via npx.
+          npm i -D postcss postcss-cli autoprefixer
+          hugo --gc --minify
+
+      - name: Install harness dependencies
+        working-directory: docs-theme-extras
+        run: npm ci
+
+      - name: Run static specs
+        working-directory: docs-theme-extras
+        env:
+          DOCS_TEST_CONFIG: ${{ github.workspace }}/.docs-test.toml
+        run: |
+          npx playwright test --project=static --reporter=list,html 2>&1 | tee playwright-output.txt
+
+      - name: Append summary to PR check
+        if: always()
+        working-directory: docs-theme-extras
+        run: |
+          {
+            echo "## Framework tests — static (informational)"
+            echo ""
+            echo '```'
+            tail -25 playwright-output.txt 2>/dev/null || echo "No test output captured."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: framework-test-static-report
+          path: docs-theme-extras/playwright-report
+          retention-days: 7
