@@ -47,7 +47,9 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Transformations](../../traffic-management/transformations) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
 ## Policy behavior
 
+{{< version exclude-if="2.0.x" >}}
 {{< cards >}}
-{{< version exclude-if="2.0.x" >}}  {{< card link="global-attachment" title="Global policy attachment" >}}{{< /version >}}
+  {{< card link="global-attachment" title="Global policy attachment" >}}
   {{< card link="merging" title="Policy merging" >}}
 {{< /cards >}}
+{{< /version >}}
