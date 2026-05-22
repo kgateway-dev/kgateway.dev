@@ -1,52 +1,138 @@
 {{ define "main" }}
-  {{- /* Check if this is the /docs/ index page */ -}}
-  {{- $isDocsIndex := and (eq .Section "docs") (eq .RelPermalink "/docs/") -}}
+  {{- /* Check if this is the /docs/envoy/ index page */ -}}
+  {{- $isEnvoyIndex := or (eq .RelPermalink "/docs/envoy/") (eq .RelPermalink "/docs/envoy") -}}
   
-  {{- if $isDocsIndex -}}
-    {{- /* Use the _index.html layout for docs landing page */ -}}
-    {{- partial "docs-index.html" . -}}
+  {{- if $isEnvoyIndex -}}
+    {{- /* Custom layout for envoy landing page */ -}}
+    <style>
+      /* Hide sidebar on envoy landing page */
+      .sidebar-container,
+      aside.sidebar-container,
+      aside.hx:order-first,
+      .hx:order-first {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
+      /* Full width for landing page */
+      .hx:mx-auto.hx:flex {
+        max-width: 100% !important;
+        justify-content: center !important;
+      }
+      
+      /* Hide TOC on landing page */
+      .toc-container {
+        display: none !important;
+      }
+      
+      /* Force visibility for headings and content - target the actual rendered structure */
+      main .content h1,
+      main .content h2,
+      main .content h3,
+      main .content h4,
+      main .content h5,
+      main .content h6,
+      main .content p {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: rgb(17, 24, 39) !important;
+        font-size: 1.5rem !important;
+        font-weight: 700 !important;
+        margin-bottom: 1rem !important;
+      }
+      main .content h1 {
+        font-size: 2.25rem !important;
+        margin-top: 0 !important;
+      }
+      main .content p {
+        font-size: 1.125rem !important;
+        font-weight: 400 !important;
+        color: rgb(55, 65, 81) !important;
+      }
+      .dark main .content h1,
+      .dark main .content h2,
+      .dark main .content h3,
+      .dark main .content h4,
+      .dark main .content h5,
+      .dark main .content h6 {
+        color: rgb(243, 244, 246) !important;
+      }
+      .dark main .content p {
+        color: rgb(209, 213, 219) !important;
+      }
+    </style>
+    
+    <div class="w-full z-10">
+      {{ partial "announcement.html" .}}
+    </div>
+    
+    <div class="hx:mx-auto hx:flex hx:justify-center hx:px-6 hx:md:px-12 hx:py-12">
+      <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center">
+        <main class="hx:w-full hx:min-w-0 hx:max-w-6xl">
+          <div class="hx:text-center hx:mb-12">
+            <h1 class="hx:text-4xl hx:font-bold hx:mb-4 hx:text-gray-900 hx:dark:text-gray-100">{{ if .Title }}{{ .Title }}{{ else }}KGateway Documentation{{ end }}</h1>
+          </div>
+          
+          <div class="content hx:max-w-none">
+            <div class="hx:text-center hx:mb-8">
+              <style>
+                /* Force visibility for all content elements */
+                .content,
+                .content * {
+                  opacity: 1 !important;
+                }
+                .content p,
+                .content h1,
+                .content h2,
+                .content h3,
+                .content h4,
+                .content h5,
+                .content h6 {
+                  color: rgb(55, 65, 81) !important;
+                  margin-bottom: 1.5rem !important;
+                  display: block !important;
+                  visibility: visible !important;
+                  opacity: 1 !important;
+                  height: auto !important;
+                  width: auto !important;
+                  font-size: inherit !important;
+                  line-height: inherit !important;
+                }
+                .content h1 {
+                  font-size: 2.25rem !important;
+                  font-weight: 700 !important;
+                  margin-top: 0 !important;
+                  color: rgb(17, 24, 39) !important;
+                }
+                .content p {
+                  font-size: 1.125rem !important;
+                  color: rgb(55, 65, 81) !important;
+                }
+                .dark .content p,
+                .dark .content h1,
+                .dark .content h2,
+                .dark .content h3,
+                .dark .content h4,
+                .dark .content h5,
+                .dark .content h6 {
+                  color: rgb(209, 213, 219) !important;
+                }
+                .dark .content h1 {
+                  color: rgb(243, 244, 246) !important;
+                }
+              </style>
+              {{ .Content }}
+            </div>
+          </div>
+        </main>
+      </article>
+    </div>
   {{- else -}}
     <style>
-      /* Hide unselected docs version dropdown */
-      .sidebar-container > div > ul > li:not(li:has(.sidebar-active-item)) {
-        display: none;
-      }
-
-      /* Hide top-level docs version dropdowns */
-      .sidebar-container > div > ul > li > a {
-        display: none;
-      }
-
-      /* Adjust padding and hide left border for top-level docs dropdown */
-      sidebar-container > div > ul > li > div {
-        padding-top: 0;
-      }
-
-      .sidebar-container > div > ul > li > div > ul {
-        padding-left: 0;
-        margin-left: 0;
-      }
-
-      .sidebar-container > div > ul > li > div > ul::before {
-        display: none;
-      }
-
       /* Hide top-layer docs link from breadcrumbs */
       main > div:first-child > *:nth-child(-n + 2) {
         display: none;
-      }
-
-      /* Dark mode sidebar active and hover states - very dark with light text */
-      .dark .sidebar-container nav a.sidebar-active-item,
-      .dark .sidebar-container a.sidebar-active-item {
-        background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
-        color: rgb(255, 255, 255) !important; /* white - maximum contrast */
-      }
-
-      .dark .sidebar-container nav a:hover:not(.sidebar-active-item),
-      .dark .sidebar-container a:hover:not(.sidebar-active-item) {
-        background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
-        color: rgb(255, 255, 255) !important; /* white - maximum contrast */
       }
     </style>
     
@@ -75,3 +161,4 @@
     </div>
   {{- end -}}
 {{ end }}
+

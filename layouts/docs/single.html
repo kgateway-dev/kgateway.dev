@@ -1,45 +1,8 @@
 {{ define "main" }}
   <style>
-    /* Hide unselected docs version dropdown */
-    .sidebar-container > div > ul > li:not(li:has(.sidebar-active-item)) {
-      display: none;
-    }
-
-    /* Hide top-level docs version dropdowns */
-    .sidebar-container > div > ul > li > a {
-      display: none;
-    }
-
-    /* Adjust padding and hide left border for top-level docs dropdown */
-    sidebar-container > div > ul > li > div {
-      padding-top: 0;
-    }
-
-    .sidebar-container > div > ul > li > div > ul {
-      padding-left: 0;
-      margin-left: 0;
-    }
-
-    .sidebar-container > div > ul > li > div > ul::before {
-      display: none;
-    }
-
     /* Hide top-layer docs link from breadcrumbs */
     main > div:first-child > *:nth-child(-n + 2) {
       display: none;
-    }
-
-    /* Dark mode sidebar active and hover states - very dark with light text */
-    .dark .sidebar-container nav a.sidebar-active-item,
-    .dark .sidebar-container a.sidebar-active-item {
-      background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
-      color: rgb(255, 255, 255) !important; /* white - maximum contrast */
-    }
-
-    .dark .sidebar-container nav a:hover:not(.sidebar-active-item),
-    .dark .sidebar-container a:hover:not(.sidebar-active-item) {
-      background-color: rgb(17, 24, 39) !important; /* gray-900 - very dark */
-      color: rgb(255, 255, 255) !important; /* white - maximum contrast */
     }
   </style>
 
@@ -66,3 +29,4 @@
     </article>
   </div>
 {{ end }}
+

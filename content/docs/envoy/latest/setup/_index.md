@@ -1,5 +1,6 @@
 ---
 title: Gateway setup
+icon: dns
 weight: 300
 ---
 

@@ -30,6 +30,11 @@ module:
     - source: "hugo_stats.json"
       target: "assets/watching/hugo_stats.json"
 
+caches:
+  getresource:
+    dir: ":cacheDir/:project"
+    maxAge: 1h  # Cache remote resources for 1 hour to balance freshness and build speed
+
 build:
   writeStats: true
   cachebusters:
@@ -74,6 +79,13 @@ params:
   # loads brand-oss.css and Open Sans; "enterprise" loads brand-enterprise.css.
   themeExtras:
     brand: oss
+    # Canonical production host (scheme + hostname, no trailing slash, no path).
+    # Read by the docs-theme-extras module's `utils/prod-host` partial and reused
+    # across layouts (copy-markdown, llms.txt, page-to-markdown) that emit
+    # absolute URLs which need to resolve when pasted outside the build's
+    # preview URL. Set explicitly here because kgw-oss's prod baseURL doesn't
+    # include the host.
+    prodHost: "https://kgateway.dev"
   navbar:
     displayTitle: false
     displayLogo: true
@@ -109,7 +121,10 @@ params:
 
     flexsearch:
       # index page by: content | summary | heading | title
-      index: summary
+      # `content` indexes the full body keyed by heading anchors, so users
+      # can find terms anywhere on a page (not just in the description) and
+      # results link directly to the matching section.
+      index: content
 
   editURL:
     enable: false
@@ -176,16 +191,11 @@ params:
           url: "/2.1.x"
     
     agentgateway:
-      versions:
-        - version: "2.3.x"
-          dropdown: "2.3 (latest)"
-          linkVersion: "latest"
-          url: "/latest"
-        - version: "2.2.x"
-          dropdown: "2.2"
-          linkVersion: "2.2.x"
-          url: "/2.2.x"
-        - version: "2.1.x"
-          dropdown: "2.1"
-          linkVersion: "2.1.x"
-          url: "/2.1.x"
+      # This section has no internal landing page in kgw — the section key
+      # exists only so the version dropdown scopes correctly when users land
+      # on a shared path like /docs/agentgateway/latest/reference/api/. The
+      # centralized sidebar's section-chip row reads `externalURL` and points
+      # the chip off-site rather than to a stub /docs/agentgateway/latest/.
+      # No `versions:` override here — consumers (navbar, navbar-version,
+      # extras sidebar) fall back to the top-level `params.versions` list.
+      externalURL: "https://agentgateway.dev/docs/kubernetes/latest/"

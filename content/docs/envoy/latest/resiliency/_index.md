@@ -1,5 +1,6 @@
 ---
 title: Resiliency
+icon: health_and_safety
 weight: 430
 ---
 
