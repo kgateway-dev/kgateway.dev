@@ -65,7 +65,7 @@
     </div>
     {{- end -}}
     {{- if $icon }}{{ partial "utils/icon.html" (dict "name" $icon "attributes" "class='hx:mb-2 hx:size-6'") }}{{ end -}}
-    {{- if $title }}<p class="hx:font-semibold hx:text-primary">{{ $title }}</p>{{ end -}}
+    {{- if $title }}<h3 class="hx:font-semibold hx:text-primary">{{ $title }}</h3>{{ end -}}
     {{- if $subtitle }}<p class="hextra-card-subtitle hx:mt-1 hx:text-sm hx:text-gray-500 hx:dark:text-gray-400">{{ $subtitle | markdownify }}</p>{{ end -}}
   </a>
 {{- end -}}

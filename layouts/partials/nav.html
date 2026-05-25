@@ -85,7 +85,8 @@
     min-width: 160px;
   }
 
-  .dropdown:hover .dropdown-content {display: block;}
+  .dropdown:hover .dropdown-content,
+  .dropdown:focus-within .dropdown-content {display: block;}
   
   /* Create a hover bridge between trigger and dropdown */
   .dropdown::before {
@@ -105,7 +106,8 @@
   }
 </style>
 
-<nav class="navbar py-[1.875rem] px-12 xl:px-25 fixed top-0 border-b-white border-b w-full hidden lg:block z-20">
+<a href="#main-content" class="skip-to-content hx-sr-only focus:hx-not-sr-only focus:hx-fixed focus:hx-top-4 focus:hx-left-4 focus:hx-z-50 focus:hx-bg-primary-bg focus:hx-text-white focus:hx-p-4 focus:hx-rounded-lg">Skip to main content</a>
+<nav class="navbar py-[1.875rem] px-12 xl:px-25 fixed top-0 border-b-white border-b w-full hidden lg:block z-20" aria-label="Main navigation">
   <div class="flex max-w-[1440px] mx-auto content-center items-center justify-between gap-6">
     <div class="flex items-center gap-8">
       <a href="/">{{ partial "utils/icon.html" (dict "name" "logo" "attributes" "id='logo'" ) }}</a>
@@ -121,20 +123,20 @@
     </div>
     <div class="flex flex-grow lg:flex-grow-0 items-center align-center justify-between lg:gap-8 xl:gap-[3.5625rem]">
       <div class="dropdown">
-        <button class="link whitespace-nowrap text-secondary-link" href="/resources">Resources {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</button>
-        <div class="dropdown-content rounded-l bg-white absolute">
-          <a href="/resources/labs" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Labs</a>
-          <a href="/resources/videos" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Videos</a>
-          <a href="/learn" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Learning paths</a>
-          <a href="https://github.com/kgateway-dev/community" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left">Community</a>
+        <button class="link whitespace-nowrap text-secondary-link" aria-haspopup="true" aria-expanded="false">Resources {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5' aria-hidden='true'") }}</button>
+        <div class="dropdown-content rounded-l bg-white absolute" role="menu">
+          <a href="/resources/labs" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left" role="menuitem">Labs</a>
+          <a href="/resources/videos" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left" role="menuitem">Videos</a>
+          <a href="/learn" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left" role="menuitem">Learning paths</a>
+          <a href="https://github.com/kgateway-dev/community" class="text-primary-text px-4 py-3 block hover:text-primary-bg text-left" role="menuitem">Community</a>
         </div>
       </div>
       <a class="link whitespace-nowrap text-secondary-link" href="/blog">Blog</a>
       <div class="dropdown">
-        <a class="link whitespace-nowrap text-secondary-link" href="/docs/">Docs {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</a>
-        <div class="dropdown-content rounded-l bg-white dark:bg-gray-900 absolute" style="top: calc(100% + 0.25rem); padding-top: 0.25rem;">
-          <a href="/docs/envoy/latest" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Kgateway (Envoy)</a>
-          <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Agentgateway</a>
+        <button class="link whitespace-nowrap text-secondary-link" aria-haspopup="true" aria-expanded="false">Docs {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5' aria-hidden='true'") }}</button>
+        <div class="dropdown-content rounded-l bg-white dark:bg-gray-900 absolute" style="top: calc(100% + 0.25rem); padding-top: 0.25rem;" role="menu">
+          <a href="/docs/envoy/latest" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left" role="menuitem">Kgateway (Envoy)</a>
+          <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left" role="menuitem">Agentgateway</a>
         </div>
       </div>
       <!-- <a class="whitespace-nowrap bg-secondary-bg text-white rounded-lg p-5" href="/">Contact Us</a> -->
@@ -142,10 +144,10 @@
   </div>
 </nav>
 
-<nav class="absolute top-0 w-full block lg:hidden z-50">
+<nav class="absolute top-0 w-full block lg:hidden z-50" aria-label="Mobile navigation">
   <div class="py-6 pr-4 flex justify-between items-center">
-    {{ partial "utils/icon.html" (dict "name" "logo" "attributes" "height=26" ) }}
-    <button class="p-4 bg-primary-text rounded-lg flex items-center" onClick="openMobileNav()">
+    {{ partial "utils/icon.html" (dict "name" "logo" "attributes" "height=26 aria-label='kgateway home'" ) }}
+    <button class="p-4 bg-primary-text rounded-lg flex items-center" onClick="openMobileNav()" aria-label="Toggle mobile menu" aria-expanded="false">
       <div class="visible hamburger hidden">
         {{ partial "utils/icon.html" (dict "name" "hamburger" ) }}
       </div>

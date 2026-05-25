@@ -35,7 +35,7 @@
       {{- /* Render sidebar starting from the versioned docs section */ -}}
       <aside class="sidebar-container hx-order-first hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-flex hx-flex-col">
         <div class="hextra-scrollbar hx-overflow-y-auto hx-overflow-x-hidden hx-p-4 hx-grow md:hx-h-[calc(100vh-var(--navbar-height)-var(--menu-height))]">
-          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400" aria-label="Documentation sidebar">
             {{- template "render-sidebar-tree" (dict "page" $docsSection "current" $context "versionPrefix" $versionPrefix "depth" 0) -}}
           </nav>
         </div>
@@ -75,7 +75,7 @@
     {{- else -}}
       <aside class="sidebar-container hx-order-first hx-hidden hx-w-64 hx-shrink-0 xl:hx-block print:hx-hidden hx-flex hx-flex-col">
         <div class="hextra-scrollbar hx-overflow-y-auto hx-overflow-x-hidden hx-p-4 hx-grow md:hx-h-[calc(100vh-var(--navbar-height)-var(--menu-height))]">
-          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400">
+          <nav class="hx-flex hx-flex-col hx-gap-2 hx-text-sm hx-text-gray-600 dark:hx-text-gray-400" aria-label="Documentation sidebar">
             {{- template "render-sidebar-tree" (dict "page" $context "current" $context "versionPrefix" "" "depth" 0) -}}
           </nav>
         </div>
