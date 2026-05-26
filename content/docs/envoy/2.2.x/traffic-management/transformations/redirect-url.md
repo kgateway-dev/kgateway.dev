@@ -1,6 +1,6 @@
 ---
 aliases:
-  - /docs/envoy/latest/traffic-management/transformations/simple/redirect-url/
+  - /docs/envoy/2.2.x/traffic-management/transformations/simple/redirect-url/
 title: Create redirect URLs
 weight: 70
 description:

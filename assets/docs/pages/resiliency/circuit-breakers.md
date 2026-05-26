@@ -70,7 +70,7 @@ For more information, see the [Envoy documentation](https://www.envoyproxy.io/do
    }
    ```
 
-{{< version include-if="2.3.x,2.4.x">}}
+{{< version exclude-if="2.2.x,2.1.x,2.0.x" >}}
 
 ## Track remaining capacity {#track-remaining}
 
