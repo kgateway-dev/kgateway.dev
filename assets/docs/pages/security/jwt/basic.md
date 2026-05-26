@@ -1,4 +1,4 @@
-Use JWT authentication to verify that incoming requests carry a token issued by a trusted provider before allowing them to reach your upstream services. This configuration lets you protect your APIs from unauthenticated access without adding authentication logic to each service. Enforce JWT authentication by creating a `GatewayExtension` with a JWT provider and referencing it from a {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+Use JWT authentication to verify that incoming requests carry a token issued by a trusted provider before allowing them to reach your upstream services. This configuration lets you protect your APIs from unauthenticated access without adding authentication logic to each service. Enforce JWT authentication by creating a GatewayExtension with a JWT provider and referencing it from a {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
 ## Before you begin
 
@@ -6,7 +6,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
 ## Set up JWT authentication
 
-1. Create a `GatewayExtension` resource with a `jwt` configuration. The `GatewayExtension` holds one or more JWT provider definitions, including the issuer and JWKS source that you want to use to validate incoming tokens. By keeping the provider configuration in a separate resource, the same `GatewayExtension` can be referenced from more than one {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+1. Create a GatewayExtension resource with a `jwt` configuration. The GatewayExtension holds one or more JWT provider definitions, including the issuer and JWKS source that you want to use to validate incoming tokens. By keeping the provider configuration in a separate resource, the same GatewayExtension can be referenced from more than one {{< reuse "docs/snippets/trafficpolicy.md" >}}.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -86,10 +86,10 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    kubectl get {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
    kubectl get gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
    ```
-   Both resources must show an `Accepted` condition. If either has no status at all, the resource is in the wrong namespace.
+   Both resources must show an `Accepted` condition. If either has no status at all, the resource could be in the wrong namespace.
    {{< /callout >}}
 
-4. Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the `GatewayExtension` resource and can be successfully validated by the gateway proxy.
+4. Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the GatewayExtension resource and can be successfully validated by the gateway proxy.
 
    <!-- Example token from: https://github.com/kgateway-dev/kgateway/pull/12811 -->
 
@@ -120,7 +120,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
 You can extract claims from the verified JWT and forward them as headers to the upstream service by using the `claimsToHeaders` field in the GatewayExtension resource.
 
-1. Update the `GatewayExtension` resource to define the claims that you want to add as headers to the request before it is forwarded upstream. The following example extracts the `team` and `org` claims from the verified JWT and forwards them to the upstream service as the `x-team` and `x-org` headers.
+1. Update the GatewayExtension resource to define the claims that you want to add as headers to the request before it is forwarded upstream. The following example extracts the `team` and `org` claims from the verified JWT and forwards them to the upstream service as the `x-team` and `x-org` headers.
 
    ```yaml
    kubectl apply -f- <<EOF
