@@ -1,6 +1,6 @@
 ---
 title: Default proxy setup
-weight: 5
+weight: 10
 next: /docs/setup/customize
 ---
 

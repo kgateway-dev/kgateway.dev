@@ -1,6 +1,6 @@
 ---
 title: Self-managed gateways (BYO)
-weight: 50
+weight: 30
 prev: /docs/setup/customize/aws-elb
 ---
 
