@@ -5,7 +5,7 @@ A JSON Web Token (JWT) is an open standard for securely sharing information betw
 For more information, refer to the following sources:
 * [RFC 7519, JWT specification](https://datatracker.ietf.org/doc/html/rfc7519)
 * [Auth0 overview about JWT](https://auth0.com/docs/secure/tokens/json-web-tokens)
-* [JWT policy API docs]({{< link-hextra path="/reference/api/kgateway/#jwt" >}})
+{{< version exclude-if="2.0.x,2.1.x" >}}* [JWT policy API docs]({{< link-hextra path="/reference/api/#jwt" >}}){{< /version >}}
 * Istio docs for [JWT tokens](https://istio.io/latest/docs/tasks/security/authorization/authz-jwt/) and [JWT claim-based routing](https://istio.io/latest/docs/tasks/security/authentication/jwt-route/)
 
 ### Common use cases {#use-cases}
