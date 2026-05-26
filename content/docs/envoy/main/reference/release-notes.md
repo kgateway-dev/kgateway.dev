@@ -5,6 +5,8 @@ weight: 100
 
 Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
+## 2.4.0
+
 
 
 ### 🔥 Breaking changes {#v23-breaking-changes}
@@ -12,7 +14,6 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 
 ### 🌟 New features {#v23-new-features}
-
 
 
 <!-- TODO release 2.2
