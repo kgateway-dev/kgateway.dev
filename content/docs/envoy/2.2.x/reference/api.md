@@ -1320,7 +1320,7 @@ _Appears in:_
 
 #### GrpcStatusFilter
 
-_Underlying type:_ _[struct{Statuses []GrpcStatus "json:\"statuses,omitempty\""; Exclude *bool "json:\"exclude,omitempty\""}](#struct{statuses-[]grpcstatus-"json:\"statuses,omitempty\"";-exclude-*bool-"json:\"exclude,omitempty\""})_
+_Underlying type:_ _struct_
 
 GrpcStatusFilter filters gRPC requests based on their response status.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
@@ -2726,7 +2726,7 @@ _Appears in:_
 
 #### ResponseFlagFilter
 
-_Underlying type:_ _[struct{Flags []string "json:\"flags\""}](#struct{flags-[]string-"json:\"flags\""})_
+_Underlying type:_ _struct_
 
 ResponseFlagFilter filters based on response flags.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter

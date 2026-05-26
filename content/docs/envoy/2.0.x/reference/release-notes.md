@@ -35,7 +35,7 @@ Kgateway introduces powerful, standards-aligned extensions via custom resources 
 * [Backend]({{< link-hextra path="/reference/api/#backend" >}}): Define routable backends such as AI providers (OpenAI, Azure, Gemini, and more), AWS Lambda functions, or static server for use by Gateways.
 * [DirectResponse]({{< link-hextra path="/reference/api/#directresponse" >}}): Enable Gateways to directly return immediate HTTP responses, specifying custom status codes and optional response content without contacting backend services.
 * [GatewayExtension]({{< link-hextra path="/reference/api/#gatewayextension" >}}): Add external authorization (ExtAuth) and external request processing (ExtProc) via gRPC services, extending the Gateway's request handling capabilities.
-* [GatewayParameter]({{< link-hextra path="/reference/api/#gatewayparameter" >}}): Provide detailed customization of Gateway deployments, including container images, logging, resource allocations, Istio integrations, sidecar configurations, and AI-related extensions.
+* [GatewayParameters]({{< link-hextra path="/reference/api/#gatewayparameters" >}}): Provide detailed customization of Gateway deployments, including container images, logging, resource allocations, Istio integrations, sidecar configurations, and AI-related extensions.
 * [HTTPListenerPolicy]({{< link-hextra path="/reference/api/#httplistenerpolicy" >}}): Set policies for HTTP listeners, including advanced access logging.
 * [TrafficPolicy]({{< link-hextra path="/reference/api/#trafficpolicy" >}}): Implement advanced traffic rules such as AI prompt manipulation, local rate limiting, request/response transformations, and external processing control for managing traffic through gateways.
 
