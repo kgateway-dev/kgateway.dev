@@ -33,7 +33,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    | `issuer` | The expected value of the `iss` claim. Tokens with a different issuer are rejected. If omitted, the `iss` field is not checked. |
    | `jwks.local.inline` | An inline JSON Web Key Set (JWKS) used to verify token signatures. To use a remote JWKS server instead, replace `local` with `remote` and provide a `url` and `backendRef`. |
 
-2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} with `jwtAuth.extensionRef` pointing to the `GatewayExtension`. This example applies JWT enforcement to all routes on the Gateway. Create the policy in the same namespace as the targeted resource.
+2. Create the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that points to the GatewayExtension that you created in the previous step. The following policy applies JWT authentication to all routes on the Gateway. Create the policy in the same namespace as the targeted resource.
 
    ```yaml
    kubectl apply -f- <<EOF
