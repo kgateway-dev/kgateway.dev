@@ -81,7 +81,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    ```
 
    {{< callout type="warning" >}}
-   **Got a `200 OK` instead?** The controller silently ignores a `TrafficPolicy` that targets a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
+   **Got a `200 OK` instead?** The controller silently ignores {{< reuse "docs/snippets/trafficpolicy.md" >}} resources that target a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
    ```sh
    kubectl get {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
    kubectl get gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
