@@ -164,22 +164,3 @@ params:
           dropdown: "2.1"
           linkVersion: "2.1.x"
           url: "/2.1.x"
-    
-    agentgateway:
-      versions:
-        - version: "2.4.x"
-          dropdown: "main"
-          linkVersion: "main"
-          url: "/main"
-        - version: "2.3.x"
-          dropdown: "2.3 (latest)"
-          linkVersion: "latest"
-          url: "/latest"
-        - version: "2.2.x"
-          dropdown: "2.2"
-          linkVersion: "2.2.x"
-          url: "/2.2.x"
-        - version: "2.1.x"
-          dropdown: "2.1"
-          linkVersion: "2.1.x"
-          url: "/2.1.x"
