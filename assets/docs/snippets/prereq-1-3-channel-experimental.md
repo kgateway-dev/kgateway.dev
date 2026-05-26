@@ -20,7 +20,7 @@
 4. **Important**: Install the experimental channel of version 1.3 of the Kubernetes Gateway API to use this feature.
    ```shell
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
-   ```{{< version include-if="2.2.x,2.3.x" >}}
+   ```{{< version include-if="2.2.x,2.3.x,2.4.x" >}}
 
 5. In kgateway version 2.2 and later, experimental Gateway API features are enabled by default. The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable on the kgateway controller deployment defaults to `true`, so no additional configuration is required. To disable these features, set the variable to `false` in your Helm values and upgrade your installation.
 

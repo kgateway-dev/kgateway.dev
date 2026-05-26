@@ -127,6 +127,10 @@ params:
   
   # Global versions (for backward compatibility)
   versions:
+    - version: "2.4.x"
+      dropdown: "main"
+      linkVersion: "main"
+      url: "/main"
     - version: "2.3.x"
       dropdown: "2.3 (latest)"
       linkVersion: "latest"
@@ -144,6 +148,10 @@ params:
   sections:
     envoy:
       versions:
+        - version: "2.4.x"
+          dropdown: "main"
+          linkVersion: "main"
+          url: "/main"
         - version: "2.3.x"
           dropdown: "2.3 (latest)"
           linkVersion: "latest"
@@ -159,6 +167,10 @@ params:
     
     agentgateway:
       versions:
+        - version: "2.4.x"
+          dropdown: "main"
+          linkVersion: "main"
+          url: "/main"
         - version: "2.3.x"
           dropdown: "2.3 (latest)"
           linkVersion: "latest"
