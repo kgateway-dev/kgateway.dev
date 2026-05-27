@@ -160,6 +160,10 @@ params:
   # section-specific list overrides). Keep these in sync with the
   # latest section list below.
   versions:
+    - version: "2.4.x"
+      dropdown: "main"
+      linkVersion: "main"
+      url: "/main"
     - version: "2.3.x"
       dropdown: "2.3 (latest)"
       linkVersion: "latest"
@@ -177,6 +181,10 @@ params:
   sections:
     envoy:
       versions:
+        - version: "2.4.x"
+          dropdown: "main"
+          linkVersion: "main"
+          url: "/main"
         - version: "2.3.x"
           dropdown: "2.3 (latest)"
           linkVersion: "latest"
@@ -189,7 +197,7 @@ params:
           dropdown: "2.1"
           linkVersion: "2.1.x"
           url: "/2.1.x"
-    
+
     agentgateway:
       # This section has no internal landing page in kgw — the section key
       # exists only so the version dropdown scopes correctly when users land

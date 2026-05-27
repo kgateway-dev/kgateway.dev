@@ -10,7 +10,7 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 | 
 | [HTTPRoute rule attachment option]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-rule" >}}) | 1.3 |
 
-{{< version include-if="2.2.x,2.3.x" >}}
+{{< version include-if="2.2.x,2.3.x,2.4.x" >}}
 {{< callout type="info" >}}
 **Experimental feature gate**: In kgateway version 2.2 and later, experimental Gateway API features are enabled by default. The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable on the kgateway controller deployment defaults to `true`. To disable these features, set the variable to `false` in your Helm values:
 

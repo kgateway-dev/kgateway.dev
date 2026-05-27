@@ -193,9 +193,12 @@ def _post_process_api_docs(api_file):
         content = f.read()
     
     # Replace complex struct type definitions with simple "struct"
-    # Pattern matches: _Underlying type:_ _[struct{...}...]_
+    # Pattern matches: _Underlying type:_ _[struct{...}](#struct{...})_
+    # Note: the struct body contains slice notation like `[]GrpcStatus`, so we cannot
+    # use `[^\]]+` to consume it — that stops at the first `]` of the slice. Use a
+    # non-greedy match anchored by `}](` to consume the whole struct body.
     content = re.sub(
-        r'_Underlying type:_ _\[struct\{[^\]]+\}\]\([^\)]+\)_',
+        r'_Underlying type:_ _\[struct\{.+?\}\]\([^\)]+\)_',
         '_Underlying type:_ _struct_',
         content
     )
