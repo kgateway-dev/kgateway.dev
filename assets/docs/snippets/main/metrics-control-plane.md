@@ -11,6 +11,7 @@ kgateway_resources_status_syncs_completed_total|counter|gateway, namespace, reso
 kgateway_resources_status_syncs_started_total|counter|gateway, namespace, resource|Total number of status syncs started
 kgateway_resources_updates_dropped_total|counter||Total number of resources metrics updates dropped. If this metric is ever greater than 0, all resources subsystem metrics should be considered invalid until process restart
 kgateway_routing_domains|gauge|namespace, gateway, port|Number of domains per listener
+kgateway_routing_replacements_total|counter|gateway_namespace, gateway, error_type|Number of routes, virtual hosts, or route configurations replaced with a synthetic 500 direct response due to invalid configuration detected during translation.
 kgateway_status_syncer_status_sync_duration_seconds|histogram|name, namespace, syncer|Status sync duration
 kgateway_status_syncer_status_syncs_total|counter|name, namespace, syncer, result|Total number of status syncs
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
