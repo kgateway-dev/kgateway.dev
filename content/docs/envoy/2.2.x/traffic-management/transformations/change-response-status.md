@@ -1,6 +1,6 @@
 ---
 aliases:
-  - /docs/envoy/latest/traffic-management/transformations/simple/change-response-status/
+  - /docs/envoy/2.2.x/traffic-management/transformations/simple/change-response-status/
 title: Change response status
 weight: 75
 description: Update the response status based on headers being present in a response.
