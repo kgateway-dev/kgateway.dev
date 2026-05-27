@@ -68,7 +68,7 @@ status:
 
 After you have [Istio](https://ambientmesh.io/docs/quickstart/) (v1.25 or newer) and [kgateway](https://github.com/kgateway-dev/kgateway/releases/tag/v2.0.0) (v2.0.0 or newer) installed in your Kubernetes cluster, you can deploy a `kgateway-waypoint` in your namespace using a Kubernetes Gateway resource.
 
-Let's assume you already have a [client](https://raw.githubusercontent.com/linsun/gen-ai-demo/refs/heads/main/kubernetes/client.yaml) app and an [Ollama](https://raw.githubusercontent.com/linsun/gen-ai-demo/2299fee3220225149cf59f4d318e5310348f45c0/kubernetes/ollama-sfset.yaml) StatefulSet running in the same namespace. To integrate kgateway as the waypoint proxy, follow these steps:
+Let's assume you already have a [client](https://raw.githubusercontent.com/linsun/gen-ai-demo/36acd25209f87e296bea7b469ab0836de647e752/kubernetes/client.yaml) app and an [Ollama](https://raw.githubusercontent.com/linsun/gen-ai-demo/36acd25209f87e296bea7b469ab0836de647e752/ollama/ollama-sfset.yaml) StatefulSet running in the same namespace. To integrate kgateway as the waypoint proxy, follow these steps:
 
 First, create the Gateway resource to deploy `kgateway-waypoint` within your namespace:
 
