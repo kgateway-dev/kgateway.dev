@@ -5,226 +5,261 @@ weight: 100
 
 Review the release notes for kgateway. For a detailed list of changes between tags, use the [GitHub Compare changes tool](https://github.com/kgateway-dev/kgateway/compare/).
 
-## v2.2.0 {#v220}
+## v2.3.0
 
-For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.2.0).
+<!-- TODO release 2.2 
+For more details, review the [GitHub release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.2.0).-->
 
-### 🔥 Breaking changes {#v22-breaking-changes}
+### 🔥 Breaking changes {#v23-breaking-changes}
 
-#### Dedicated agentgateway APIs and installation {#agentgateway-apis}
+#### ServiceEntry resource watching gate
 
-Version 2.2 introduces major breaking changes for agentgateway implementation. Agentgateway now has:
-* New dedicated APIs in the `agentgateway.dev` API group
-* New `AgentgatewayPolicy` to replace `TrafficPolicy` for agentgateway configurations
-* New `AgentgatewayParameters` API in `agentgateway.dev/v1alpha1`
-* Split Helm installation with dedicated charts for Envoy-based kgateway and agentgateway
+The Istio ServiceEntry resource watching capability is now gated by the `KGW_ENABLE_ISTIO_INTEGRATION` controller environment variable, which defaults to false. Previously, this environment variable defaulted to true. 
 
+Without the Istio integration enabled, ServiceEntries are now ignored, which can impact annotations, such as `networking.istio.io/traffic-distribution` for multi-cluster peering. 
 
-Key changes include:
-* Policies are now configured through `AgentgatewayPolicy` instead of `TrafficPolicy.`
-* `DirectResponse` for agentgateway is now only configurable through `AgentgatewayPolicy` instead of the separate `DirectResponse` CRD.
-* Agentgateway can no longer be configured with `GatewayParameters`, only with `AgentgatewayParameters`.
-* The controller name changed from `kgateway.dev/agentgateway` to `agentgateway.dev/agentgateway`.
-* `AgentgatewayParameters` `rawConfig` breaking change to allow configuring `binds` and other settings in `config.yaml` outside of its `config` section.
-* The default namespace for agentgateway is now `agentgateway-system` instead of `kgateway-system`.
+To restore the old behavior, set `controller.extraEnv.KGW_ENABLE_ISTIO_INTEGRATION=true` in your Helm values.
 
-The documentation for agentgateway has also been moved to the [agentgateway.dev](https://agentgateway.dev/docs/kubernetes/latest/) website.
+#### Classic transformation removed {#v23-classic-transformation-removed}
 
-For a detailed comparison of agentgateway vs kgateway resources, including GatewayClass, controller names, Helm chart locations, and CRDs, see the [kgateway v2.2 release blog](https://kgateway.dev/blog/kgateway-v2.2-release-blog/).
+The C++ classic transformation filter is removed in 2.3.x. Rustformation, which became the default in 2.2.x, is now the only transformation engine. The `useRustFormations` Helm value and the `USE_RUST_FORMATIONS` environment variable on the controller have no effect.
 
-#### Feature gate for experimental Gateway API features {#experimental-feature-gate}
+If your 2.2.x install has `useRustFormations: false` set, migrate your TrafficPolicy `transformation` templates to rustformation (MiniJinja) syntax before you upgrade. Any policy that relies on classic-only behavior silently misbehaves or fails to render after the upgrade. Common patterns to watch for include:
 
-Kgateway 2.2 introduces the `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable to gate experimental Gateway API features and APIs. This setting defaults to `false` and must be explicitly enabled to use experimental features such as TCPRoute and TLSRoute.
+* The `.0` accessor on JSON header fields (for example, `{{ headers.X-Incoming-Stuff.0 }}`). Rustformation requires bracket notation: `{{ headers["X-Incoming-Stuff"][0] }}`.
+* Templates that rely on the body being auto-parsed as JSON. The classic engine auto-parses whenever a transformation is configured; rustformation defaults to `AsString`. Set `body.parseAs: AsJson` explicitly to keep dot-notation access working.
+* Templates that use a JSON field name that collides with a built-in template function (such as `context`). With `parseAs: AsJson`, MiniJinja shadows the function with the field value and fails to render.
 
-To enable these features, set the environment variable in your kgateway controller deployment. You can use either a Helm values file or the `--set` flag during installation:
+For the full comparison and migration table, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/#migrating-classic" >}}).
 
-```yaml
-controller:
-  extraEnv:
-    KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
+#### CORS wildcard origins
+
+As part of the [Kubernetes Gateway API 1.5.1](#gw-api) update, non-spec CORS `allowOrigins` patterns such as `https://a.b*` are no longer accepted. Use spec-compliant wildcard origins, such as `https://*.a.b` instead. 
+
+#### XListenerSet API promoted to ListenerSet
+
+The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update the CRD kind from `XListenerSet` to `ListenerSet` and API version from `gateway.networking.x-k8s.io/v1alpha1` to `gateway.networking.k8s.io/v1`, as shown in the following examples. 
+
+**Old XListenerSet example**:
+```
+apiVersion: gateway.networking.x-k8s.io/v1alpha1
+kind: XListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
 ```
 
-Or use the Helm flag: `--set controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
+**Updated ListenerSet example**: 
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: http-listenerset
+  namespace: httpbin
+spec:
+  parentRef:
+    name: http
+    namespace: kgateway-system
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+  - protocol: HTTP
+    port: 80
+    name: http
+    allowedRoutes:
+      namespaces:
+        from: All
+```
 
-If you are currently using any experimental Gateway API features, you must enable this setting before upgrading to kgateway 2.2, or those features will stop working.
+### 🌟 New features {#v23-new-features}
 
-#### GatewayParameters breaking changes {#gatewayparameters-changes}
+#### Kubernetes Gateway API version 1.5.1 {#gw-api}
 
-Several fields have been removed or changed in the `GatewayParameters` CRD:
+The Kubernetes Gateway API dependency is updated to support version 1.5.1. This version introduces several changes, including:
 
-* The deprecated `spec.kube.floatingUserId` field was removed. When migrating, use the `spec.kube.omitDefaultSecurityContext` field instead. When set to true, this field prevents the controller from injecting opinionated default security contexts, allowing your platform (for example, OCP) to dynamically provide the appropriate security contexts.
-* The `spec.kube.aiExtension` field was removed. To use AI capabilities, migrate to the agentgateway data plane.
-* The `agentgateway` fields were deprecated in `GatewayParameters`. Use `AgentgatewayParameters` instead.
+* **XListenerSets promoted to ListenerSets**: The experimental XListenerSet API is promoted to the standard ListenerSet API in version 1.5.0. You must install the standard channel of the Kubernetes Gateway API to get the ListenerSet API definition. If you use XListenerSet resources in your setup today, update these resources to use the ListenerSet API instead.
+* **AllowInsecureFallback mode for mTLS listeners**: If you set up mTLS listeners on your proxy, you can now configure the proxy to establish a TLS connection, even if the client TLS certificate could not be validated successfully. For more information, see the [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}) docs.
+* **CORS wildcard support**: The allowOrigins field now supports wildcard `*` origins to allow any origin. 
+* **BackendTLS**: The BackendTLSPolicy resource implementation is now conformant to the Kubernetes Gateway API, including Gateway ancestor status reporting, ResolvedRefs conditions, and deterministic conflict handling.
 
-#### JWT policy renamed {#jwt-policy-rename}
+#### Control plane changes
 
-In the `TrafficPolicy` API:
-* The `jwt` field is renamed to `jwtAuth`
-* The `apiKeyAuthentication` field is renamed to `apiKeyAuth`
+- **Common labels**: Add custom labels to all resources that are created by the Helm charts by using the `commonLabels` field, including the Deployment, Service, and ServiceAccount of the control plane. This allows you to better organize your resources or integrate with external tools. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}).
+- **PriorityClass support**: Assign a PriorityClassName to control plane pods using the `controller.priorityClassName` Helm field. [Priority](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) indicates the importance of a pod relative to other pods and allows higher priority pods to preempt lower priority ones when scheduling.
+- **Topology spread constraints**: Distribute kgateway controller pods across failure domains such as zones or nodes by using the `topologySpreadConstraints` Helm field. For more information, see [Topology spread constraints]({{< link-hextra path="/install/advanced/#topology-spread-constraints" >}}).
+- The default `app.kubernetes.io/component: controller` label is added to the controller deployment. Similarly, the `app.kubernetes.io/component: proxy` is added to all gateway proxies. 
 
-Update your TrafficPolicy resources accordingly when upgrading.
+#### Static IPs for Gateways
 
-#### JWT missing token behavior {#jwt-missing-token}
+Assign a static IP address to the Kubernetes service that exposes your Gateway using the `spec.addresses` field with `type: IPAddress`.
 
-An option was added to allow missing JWT tokens. Review your JWT authentication policies to ensure they have the desired behavior for missing tokens.
+For more information, see [Static IP address]({{< link-hextra path="/setup/gateway/#static-ip-address" >}}). 
 
-#### ExtAuth fail closed for agentgateway {#extauth-fail-closed}
+#### Local rate limit filter options {#v23-local-rate-limit-filter-options}
 
-Agentgateway ExtAuth policies now fail closed when the `backendRef` to the auth server is invalid. Previously, invalid backend references might have allowed requests through. Update your ExtAuth policies to ensure backend references are valid before upgrading.
+The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports the `percentEnabled` and `percentEnforced` optional fields to control the percentage of requests for which the local rate limit filter is enabled or enforced. If not set, both fields default to `100`, which enables and enforces the local rate limiting filter for 100% of all requests.
 
-#### AI policy removed from TrafficPolicy {#ai-policy-removed}
+Use these fields for gradual rollouts or to run the filter in shadow mode (`percentEnabled: 100`, `percentEnforced: 0`), where rate limiting statistics are collected without blocking any requests.
 
-AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/setup/) with the `AgentgatewayPolicy` API instead.
+For more information, see [Gradual rollout and shadow mode]({{< link-hextra path="/security/ratelimit/local/#gradual-rollout" >}}).
 
-#### Default transformation engine changed to rustformation {#v22-default-transformation-engine}
 
-The default transformation engine changed from the C++ classic filter (Inja) to rustformation (MiniJinja). For the full set of capabilities, see the [Rustformation transformation engine](#v22-rustformation) section under New features. Any `TrafficPolicy` that has a `transformation` field is now processed by rustformation unless you explicitly opt out.
+#### Envoy application log format {#v23-envoy-log-format}
 
-The two engines are syntactically similar but not identical. Existing classic-engine templates from 2.1.x or earlier might render differently or fail to render under rustformation. Review the following differences before you upgrade:
+Configure how Envoy formats its application logs by using the `logFormat` field in the GatewayParameters resource. You can choose between structured JSON or text output. This setting controls the Envoy application log format only and does not affect access logs.
 
-{{< reuse "docs/pages/traffic-management/transformations/migrating-classic.md" >}}
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/#built-in" >}}).
 
-If you hit a regression you can't easily migrate around, you can opt out of rustformation on `x86_64` by setting `useRustFormations: false` in your Helm values (or `USE_RUST_FORMATIONS=false` as a controller environment variable). The classic engine is not available on `arm64` and is removed entirely in 2.3.x, so plan to migrate templates before you upgrade further.
+#### Gateway proxy customization with overlays {#v23-gateway-customization}
 
-For more context about the engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+The GatewayParameters resource now supports gateway proxy customization via overlay fields. Overlays use strategic merge patch (SMP) semantics to apply advanced customizations to the Kubernetes resources that are generated for gateway proxies, including the Service, ServiceAccount, and Deployment. 
 
-### 🌟 New features {#v22-new-features}
+The following overlays are supported: 
 
-#### Agentgateway enhancements {#v22-agentgateway-features}
+* Use `deploymentOverlay`, `serviceOverlay`, and `serviceAccountOverlay` to patch the generated Deployment, Service, and ServiceAccount.
+* Use `horizontalPodAutoscaler`, `verticalPodAutoscaler`, and `podDisruptionBudget` to automatically create and configure these resources targeting the proxy Deployment.
 
-Agentgateway received significant enhancements in version 2.2:
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
-**Performance improvements**: The agentgateway control plane was refactored, improving performance by up to 25x.
+#### Additional Envoy container arguments {#envoy-extra-args}
 
-**Model aliases**: Added `modelAliases` support to `AgentgatewayPolicy` to allow friendly model name aliases for your AI backends.
+Use `spec.kube.envoyContainer.extraArgs` to pass additional Envoy CLI arguments to the managed proxy container. User-supplied arguments are appended after the default built-in Envoy arguments.
 
-**Provider support**: 
-* Added support for Azure OpenAI backends
-* Added support for multiple AI backend route types including OpenAI Responses API, Anthropic token counting, and prompt caching configuration for Bedrock (enabling up to 90% cost reduction)
+The following example sets a custom base ID and enables CPU set threading:
 
-**Authentication and security**:
-* CSRF support
-* MCP authentication for agentgateway
-* Basic auth, API key auth, and inline JWT auth policies
-* ExtAuth with HTTP support and configurable timeout
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    envoyContainer:
+      extraArgs:
+        - --base-id
+        - "7"
+        - --cpuset-threads
+EOF
+```
 
-**Advanced features**:
-* Multi-network support for cross-network workload discovery and routing in ambient mode
-* Stateful/stateless session routing configuration for MCP backends
-* Canadian Social Insurance Number prompt guards
-* Tracing support
+#### Upstream proxy protocol {#v23-upstream-proxy-protocol}
 
-**Infrastructure**:
-* Event reporting for agentgateway gateways that indicates when a gateway has NACKed an update
-* Multi-arch controller image support
-* `Gateway.spec.addresses` support for configuring load balancer IP addresses
-* `PodDisruptionBudget` and `HorizontalPodAutoscaler` options via `AgentgatewayParameters`
+The `BackendConfigPolicy` resource now supports an `upstreamProxyProtocol` field. When configured, the gateway proxy prepends a PROXY protocol header to outbound TCP connections to the upstream backend, allowing the backend to see the original client IP address and port. Both PROXY protocol `V1` (human-readable) and `V2` (binary) are supported.
 
-#### Gateway API and routing enhancements {#v22-gateway-api}
+For more information, see [Outbound proxy protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#outbound" >}}).
 
-**API Gateway feature gaps**: The v2.2 release addresses several commonly requested API gateway features that were identified as gaps in v2.1. For more details, see [GitHub issue #12910](https://github.com/kgateway-dev/kgateway/issues/12910).
+#### Allow requests without proxy protocol {#v23-proxy-protocol-allow-without-header}
 
-**Multiple certificate references**: Added support for multiple `certificateRefs` in the listener `tls` section, allowing you to serve multiple certificates from a single listener.
+The ListenerPolicy proxy protocol configuration now supports an `allowRequestsWithoutProxyProtocol` field. When set to `true`, a single listener accepts connections with or without a PROXY protocol header. By default, the field is set to `false` and the listener strictly requires a PROXY protocol header on all incoming connections.
 
-**Gateway infrastructure metadata**: The kgateway `GatewayClass` now supports labels and annotations in the Gateway API infrastructure field. When a Gateway specifies infrastructure labels or annotations, these values propagate to all managed Kubernetes resources including the Deployment, Service, ConfigMap, and ServiceAccount. Infrastructure values take precedence over `GatewayParameters` values when the same key is defined in both locations.
+For more information, see [Allow connections without proxy protocol headers]({{< link-hextra path="/traffic-management/proxy-protocol/#allow-without-proxy-protocol" >}}).
 
-**Custom GatewayClasses**: You can now define GatewayClasses using any controller. For example, create a custom GatewayClass with an arbitrary name that uses `controllerName: kgateway.dev/agentgateway` to duplicate the behavior of the built-in GatewayClass. This enables scenarios like two different teams wanting different `GatewayParameters` for the same class, or clean GitOps with entirely new resources without patching.
+#### Circuit breaker remaining capacity metrics {#v23-circuit-breaker-track-remaining}
 
-**Gateway addresses**: Support for `Gateway.spec.addresses` to configure one IP address that is used in the gateway's Service `loadBalancerIP`.
+The `BackendConfigPolicy` circuit breakers configuration now supports a `trackRemaining` field. When set to `true`, Envoy emits gauge metrics for the remaining capacity of each circuit breaker threshold group: `remaining_cx`, `remaining_pending`, `remaining_rq`, and `remaining_retries`. Note that enabling this field has a small performance overhead.
 
-**Regex path rewrite**: Added regex path rewrite capabilities for more advanced routing scenarios.
+For more information, see [Track remaining capacity]({{< link-hextra path="/resiliency/circuit-breakers/#track-remaining" >}}).
 
-**Automatic port detection**: Kgateway now detects the port for listeners without a defined port, selecting 80 for HTTP and 443 for HTTPS. Other protocols do not support automatic port detection.
+#### IP-based access control (ACL) {#v23-acl}
 
-#### Security and authentication {#v22-security}
+The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports an `acl` field for IP-based access control. You can define allow and deny rules by using CIDR blocks or bare IP addresses, set a `defaultAction` for unmatched requests, and customize denial responses with a custom HTTP status code and headers. 
 
-**JWT authentication**: 
-* Added JWT authentication configuration to `TrafficPolicy` with support for JWT providers via `GatewayExtension`
-* Support for remote JWKS (JSON Web Key Set) with configurable TLS options
-* Global disable option for JWT policies
-* Allow missing JWT token configuration
+For more information, see [IP-based access control (ACL)]({{< link-hextra path="/security/acl/" >}}).
 
-**API key authentication**: Added support for configuring API key authentication in `TrafficPolicy` with keys defined in secrets. Routes can selectively opt out of gateway-level authentication requirements using the `disable` field.
+#### Fault injection {#v23-fault-injection}
 
-**Basic authentication**: Added basic auth configuration to `TrafficPolicy`.
+The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports a `faultInjection` field for chaos engineering and resiliency testing. You can inject the following fault types into a percentage of requests:
 
-**OAuth2**: Added OAuth2 policy to enable OAuth2 and OIDC flows with Envoy as the gateway, with customizable cookie settings and the ability to deny redirects for matching requests.
+- **Delays**: Inject a fixed latency before forwarding the request upstream to simulate slow networks or overloaded backends.
+- **Aborts**: Return an HTTP or gRPC error code without forwarding the request to simulate upstream failures.
+- **Response rate limiting**: Throttle the response body data rate to simulate degraded upstream connections.
 
-**Frontend TLS configuration**: Implemented `FrontendTLSConfig` with implementation-specific details:
-* Allow multiple `caCertificateRefs`
-* Allow `caCertificateRefs` to reference secrets and configmaps
-* Added `kgateway.dev/verify-certificate-hash` to listener TLS options for validating client certificates
-* Added `kgateway.dev/verify-subject-alt-names` TLS option
-* Support for secret reference kind for `caCertificateRefs` in `BackendTLSPolicy`
+Fault injection can be applied at the route level by targeting an HTTPRoute, or at the gateway level by targeting a Gateway. A route-level policy can use `disable: {}` to opt out of a gateway-level fault injection policy.
 
-**Cipher suite and TLS configuration**: Configure cipher suites, ECDH curves, minimum TLS version, and maximum TLS version using TLS options. Configure ALPN protocols using the `kgateway.dev/alpn-protocols` TLS option.
+For more information, see [Fault injection]({{< link-hextra path="/resiliency/fault-injection/" >}}).
 
-**TLS for TCPRoutes**: Added support for TLS termination for TCPRoutes.
+#### OpenTelemetry tracing {#v23-otel-tracing}
 
-#### Resiliency and traffic management {#v22-resiliency}
+Configure distributed tracing for your gateway by using the ListenerPolicy resource, and override tracing settings per route with a `TrafficPolicy` resource.
 
-**Circuit breakers**: Added support for circuit breakers in `BackendConfigPolicy` to prevent cascading failures.
+The following tracing improvements are included in this release:
 
-**Compression**: Added support for gzip response compression and request decompression in `TrafficPolicy`.
+- **Listener-level tracing**: Configure the OTel provider, sampling rates (`clientSampling`, `randomSampling`, `overallSampling`), and custom span attributes in a ListenerPolicy that targets your Gateway.
+- **Per-route tracing overrides**: Use a TrafficPolicy that targets an HTTPRoute or GRPCRoute to override sampling rates, add route-specific span attributes, or disable tracing for specific routes.
+- **Auto-populated resource attributes**: [OTel semantic convention](https://opentelemetry.io/docs/specs/semconv/resource/) resource attributes are automatically added to all spans, including `service.name`, `service.namespace`, `service.instance.id`, `service.version`, and Kubernetes identity attributes such as `k8s.pod.name`, `k8s.node.name`, and `k8s.deployment.name`.
 
-**Per-connection buffer limit**: Added `PerConnectionBufferLimit` to `ListenerPolicy`. The annotation on Gateway resources is now deprecated in favor of this field.
+For more information, see [Tracing]({{< link-hextra path="/observability/tracing/" >}}).
 
-**Request header modification**: Added `earlyRequestHeaderModifier` to `HTTPListenerPolicy`, allowing header modifications before a route is selected.
+#### Dynamic direct response bodies {#v23-direct-response-body-format}
 
-**Retry policy for GatewayExtension**: Added retry policy to configure retries for the gRPC streams associated with `GatewayExtension` services.
+The DirectResponse resource now supports a `bodyFormat` field for returning dynamic response bodies by using [Envoy format strings](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto). Format strings use `%VARIABLE%` placeholders that Envoy substitutes at request time, such as request headers or dynamic metadata. You can choose between returning a text or JSON body. Both formats are mutually exclusive. 
 
-**Stats matcher configuration**: Added stats matcher config to `GatewayParameters` for controlling which Envoy statistics are collected.
+For more information, see [Dynamic text body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-text-body" >}}) and [Dynamic JSON body]({{< link-hextra path="/traffic-management/direct-response/#dynamic-json-body" >}}).
 
-**HTTP request settings**: Added `preserveExternalRequestId` and `generateRequestId` to `HttpListenerPolicy` and `ListenerPolicy`. You can now disable the generation of request IDs and preserve external request IDs.
+#### Proxy protocol updates
 
-**Mirror filters**: Fixed HTTPRoute mirror filters to support multiple mirrors per rule and correct percentage-based mirroring. Previously, percentage values were off by 100x (for example, 50% mirrored only 0.5% of traffic).
+The following updates were added to the proxy protocol capability. 
 
-**Max request headers**: Added `maxRequestHeadersKb` field in `ListenerPolicy` to control the maximum size of request headers.
+**Upstream proxy protocol**:
 
-#### ListenerPolicy and proxy protocol {#v22-listener-policy}
+The `BackendConfigPolicy` resource now supports an `upstreamProxyProtocol` field. When configured, the gateway proxy prepends a PROXY protocol header to outbound TCP connections to the upstream backend, allowing the backend to see the original client IP address and port. Both PROXY protocol `V1` (human-readable) and `V2` (binary) are supported.
 
-Added a `ListenerPolicy` CRD with ProxyProtocol configuration. The `HTTPListenerPolicy` is now deprecated in favor of using the `httpSettings` under `ListenerPolicy`.
+For more information, see [Outbound proxy protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#outbound" >}}).
 
-#### Rustformation transformation engine {#v22-rustformation}
+**Allow requests without proxy protocol**: 
 
-Kgateway 2.2 switches to rustformation as the default transformation engine. Rustformation provides:
-* Parsing body as JSON
-* All documented Jinja custom functions
-* Case-insensitive header lookups
-* Improved performance with native Envoy per-route config
-* Compatibility with [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}) on both `x86_64` and `arm64` builds. The control plane image bundles the rustformation dynamic module and the validator loads it before running the Envoy preflight.
+The ListenerPolicy proxy protocol configuration now supports an `allowRequestsWithoutProxyProtocol` field. When set to `true`, a single listener accepts connections with or without a PROXY protocol header. By default, the field is set to `false` and the listener strictly requires a PROXY protocol header on all incoming connections.
 
-#### Gateway customization {#v22-gateway-customization}
+For more information, see [Allow connections without proxy protocol headers]({{< link-hextra path="/traffic-management/proxy-protocol/#allow-without-proxy-protocol" >}}).
 
-**Priority class name**: Added `priorityClassName` to the Pod struct in `GatewayParameters` to set the corresponding `priorityClassName` field in the gateway-proxy pod.
+#### GRPCRoute support {#v23-grpcroute}
 
-**Custom GatewayParameters**: Added Helm values for setting custom `GatewayParameters` for bundled GatewayClasses.
+Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.
 
-**Control plane resilience**: `PodDisruptionBudget` is now an option for the agentgateway and Envoy control planes.
+For more information, see [gRPC routing]({{< link-hextra path="/traffic-management/grpc/" >}}).
 
-#### Observability {#v22-observability}
+#### TLS termination for TLSRoutes and TCPRoutes {#v23-tls-terminate}
 
-**Metrics and logs for xDS errors**: Added metrics and logs for Envoy xDS errors to help troubleshoot configuration issues.
+Terminate TLS traffic at the gateway by using a TLS listener in `Terminate` mode with either a TLSRoute or a TCPRoute. The gateway decrypts incoming TLS traffic using a server-side certificate and forwards the plain traffic to the backend service via TCP proxy.
 
-**Reference grants enforcement**: Enforced `ReferenceGrants` for cross-namespace Secret references used by XListenerSets, improving security and visibility.
+- **TLSRoute**: Supports SNI-based hostname matching. Use this when you need to route traffic to different backends based on the requested hostname.
+- **TCPRoute**: Routes traffic based on listener port only, without SNI hostname matching. Use this listener for simpler port-based routing.
 
-#### Multi-architecture support {#v22-multi-arch}
+For more information, see [TLS termination for TLSRoutes]({{< link-hextra path="/setup/listeners/tls-termination/" >}}) and [TLS termination for TCPRoutes]({{< link-hextra path="/setup/listeners/tls-termination-tcproute/" >}}).
 
-Added multi-arch support for kgateway. `x86_64` builds continue to use the `envoy-wrapper` image so that the classic transformation filter remains available as a fallback. `arm64` builds use upstream Envoy with the rustformation dynamic module loaded at runtime (the classic transformation filter is not available on `arm64`). Strict validation works with rustformation on both architectures.
+#### Transformation enhancements {#v23-transformation-enhancements}
 
-#### Ingress to Gateway API migration {#v22-ingress-migration}
+The rustformation engine, which is the only transformation engine in 2.3.x, gains several new capabilities:
 
-If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for either kgateway (Envoy) or agentgateway data plane proxies. Choose your migration guide to learn more:
+- **`parseAs: None`**: A new value for `transformation.<request|response>.body.parseAs` that skips body buffering and body processing entirely. Use this for routes that should not buffer request or response bodies. When `parseAs: None` is set, the `body()` and `context()` template functions return an empty string, and any attempt to read JSON variables from a header template returns a 400 response.
+- **WebSocket and tunnel auto-detect**: The rustformation filter now automatically bypasses body buffering for `CONNECT` requests and WebSocket upgrade requests. This prevents long-lived tunnels from stalling on body buffering, regardless of the configured `parseAs` value.
+- **Dynamic metadata transformation**: A new `transformation.<request|response>.dynamicMetadata` field lets you populate Envoy dynamic metadata from a MiniJinja template. The rendered string value is stored under the configured namespace and key, and is available to downstream filters and to access log formatters.
+- **`add` header now works on `arm64`**: The 2.2.x workaround that disabled the `add` header operation on `arm64` builds is removed. Envoy v1.37 adds the corresponding function to the upstream dynamic-module SDK, so `transformation.<request|response>.add` works on both `x86_64` and `arm64` in 2.3.x.
 
-* [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
-* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
+For details about each capability and a comparison with the classic transformation behavior, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
-### 🗑️ Deprecated or removed features {#v22-removed-features}
+<!-- TODO release 2.2
 
-**HTTPListenerPolicy deprecated**: `HTTPListenerPolicy` is now deprecated. Use the `httpSettings` under `ListenerPolicy` instead.
+### ⚒️ Installation changes {#v2.2-installation-changes}
 
-**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. v2.2.0 only supports the agentgateway data plane for inference. Note: v2.2.0 includes an inference plugin regression due to [GitHub issue #13456](https://github.com/kgateway-dev/kgateway/issues/13456). Users of this plugin should not upgrade to v2.2.0 and should instead wait for the upcoming v2.2.1 patch release.
+### 🔄 Feature changes {#v2.2-feature-changes}
 
-**Per-connection buffer limit annotation**: The `PerConnectionBufferLimit` annotation on Gateway resources is deprecated in favor of the `ListenerPolicy` field.
+### 🗑️ Deprecated or removed features {#v2.2-removed-features}
 
-**Waypoint integration removed**: The waypoint integration for Envoy-based gateway proxies was removed.
+### 🚧 Known issues {#v2.2-known-issues}
+-->

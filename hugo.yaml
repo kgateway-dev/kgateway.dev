@@ -8,15 +8,20 @@ services:
     ID: "G-9P21XPDJPX"
 
 outputs:
-  home: [HTML]
-  page: [HTML]
-  section: [HTML, RSS]
+  home: [HTML, RSS, llms]
+  page: [HTML, markdown]
+  section: [HTML, RSS, markdown, llms]
 
 defaultContentLanguage: en
 
 module:
   imports:
-    - path: github.com/imfing/hextra
+    # hextra used to live here as a sibling import; docs-theme-extras
+    # now declares the hextra import itself, so consumers no longer
+    # need to list it separately. The shadowing order stays correct:
+    # docs-theme-extras's own layouts win over the transitively-imported
+    # hextra ones.
+    - path: github.com/solo-io/docs-theme-extras
   mounts:
     - source: "assets"
       target: "assets"
@@ -24,6 +29,11 @@ module:
       target: "static/fonts"
     - source: "hugo_stats.json"
       target: "assets/watching/hugo_stats.json"
+
+caches:
+  getresource:
+    dir: ":cacheDir/:project"
+    maxAge: 1h  # Cache remote resources for 1 hour to balance freshness and build speed
 
 build:
   writeStats: true
@@ -48,9 +58,6 @@ enableInlineShortcodes: true
 
 menu:
   main:
-    - name: Home
-      url: /
-      weight: 1
     - name: Blog
       url: /blog
       weight: 2
@@ -66,6 +73,19 @@ menu:
 
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
+
+  # Tells docs-theme-extras which brand CSS layer + font stack to load
+  # (see the module's layouts/partials/themeExtras/head-end.html). "oss"
+  # loads brand-oss.css and Open Sans; "enterprise" loads brand-enterprise.css.
+  themeExtras:
+    brand: oss
+    # Canonical production host (scheme + hostname, no trailing slash, no path).
+    # Read by the docs-theme-extras module's `utils/prod-host` partial and reused
+    # across layouts (copy-markdown, llms.txt, page-to-markdown) that emit
+    # absolute URLs which need to resolve when pasted outside the build's
+    # preview URL. Set explicitly here because kgw-oss's prod baseURL doesn't
+    # include the host.
+    prodHost: "https://kgateway.dev"
   navbar:
     displayTitle: false
     displayLogo: true
@@ -101,10 +121,20 @@ params:
 
     flexsearch:
       # index page by: content | summary | heading | title
-      index: summary
+      # `content` indexes the full body keyed by heading anchors, so users
+      # can find terms anywhere on a page (not just in the description) and
+      # results link directly to the matching section.
+      index: content
 
   editURL:
     enable: false
+
+  feedback:
+    enable: true
+    issueRepo: kgateway-dev/kgateway.dev
+
+  llms:
+    docsIntro: kgateway is a Kubernetes-native Gateway API implementation built on Envoy with AI gateway capabilities.
 
   blog:
     list:
@@ -125,49 +155,55 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
-  # Global versions (for backward compatibility)
+  # Global versions (consumed by local partials 404.html, navbar.html,
+  # navbar-version.html, breadcrumb.html as a default before the
+  # section-specific list overrides). Keep these in sync with the
+  # latest section list below.
   versions:
-    - version: "2.3.x"
-      dropdown: "2.3 (main)"
+    - version: "2.4.x"
+      dropdown: "main"
       linkVersion: "main"
       url: "/main"
-    - version: "2.2.x"
-      dropdown: "2.2 (latest)"
+    - version: "2.3.x"
+      dropdown: "2.3 (latest)"
       linkVersion: "latest"
       url: "/latest"
+    - version: "2.2.x"
+      dropdown: "2.2"
+      linkVersion: "2.2.x"
+      url: "/2.2.x"
     - version: "2.1.x"
       dropdown: "2.1"
       linkVersion: "2.1.x"
       url: "/2.1.x"
-  
+
   # Section-specific configurations
   sections:
     envoy:
       versions:
-        - version: "2.3.x"
-          dropdown: "2.3 (main)"
+        - version: "2.4.x"
+          dropdown: "main"
           linkVersion: "main"
           url: "/main"
-        - version: "2.2.x"
-          dropdown: "2.2 (latest)"
+        - version: "2.3.x"
+          dropdown: "2.3 (latest)"
           linkVersion: "latest"
           url: "/latest"
+        - version: "2.2.x"
+          dropdown: "2.2"
+          linkVersion: "2.2.x"
+          url: "/2.2.x"
         - version: "2.1.x"
           dropdown: "2.1"
           linkVersion: "2.1.x"
           url: "/2.1.x"
-    
+
     agentgateway:
-      versions:
-        - version: "2.3.x"
-          dropdown: "2.3 (main)"
-          linkVersion: "main"
-          url: "/main"
-        - version: "2.2.x"
-          dropdown: "2.2 (latest)"
-          linkVersion: "latest"
-          url: "/latest"
-        - version: "2.1.x"
-          dropdown: "2.1"
-          linkVersion: "2.1.x"
-          url: "/2.1.x"
+      # This section has no internal landing page in kgw — the section key
+      # exists only so the version dropdown scopes correctly when users land
+      # on a shared path like /docs/agentgateway/latest/reference/api/. The
+      # centralized sidebar's section-chip row reads `externalURL` and points
+      # the chip off-site rather than to a stub /docs/agentgateway/latest/.
+      # No `versions:` override here — consumers (navbar, navbar-version,
+      # extras sidebar) fall back to the top-level `params.versions` list.
+      externalURL: "https://agentgateway.dev/docs/kubernetes/latest/"

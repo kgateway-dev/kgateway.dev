@@ -39,7 +39,7 @@ _Appears in:_
 | `keySources` _[APIKeySource](#apikeysource) array_ | keySources specifies the list of key sources to extract the API key from.<br />Key sources are processed in array order and the first one that successfully<br />extracts a key is used. Within each key source, if multiple types (header, query, cookie) are<br />specified, precedence is: header > query parameter > cookie.<br /><br />If empty, defaults to a single key source with header "api-key".<br /><br />Example:<br />  keySources:<br />  - header: "X-API-KEY"<br />  - query: "api_key"<br />  - header: "Authorization"<br />    query: "token"<br />    cookie: "auth_token"<br /><br />In this example, the system will:<br />1. First try header "X-API-KEY"<br />2. If not found, try query parameter "api_key"<br />3. If not found, try header "Authorization" (then query "token", then cookie "auth_token" within that key source) |  | MaxItems: 16 <br />MinItems: 0 <br /> |
 | `forwardCredential` _boolean_ | forwardCredential controls whether the API key is included in the request sent to the upstream.<br />If false (default), the API key is removed from the request before sending to upstream.<br />If true, the API key is included in the request sent to upstream.<br />This applies to all configured key sources (header, query parameter, or cookie). |  |  |
 | `clientIdHeader` _string_ | clientIdHeader specifies the header name to forward the authenticated client identifier.<br />If not specified, the client identifier will not be forwarded in any header.<br />Example: "x-client-id" |  |  |
-| `secretRef` _[SecretObjectReference](#secretobjectreference)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
+| `secretRef` _[SecretObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#secretobjectreference)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
 | `secretSelector` _[LabelSelector](#labelselector)_ | secretSelector selects multiple secrets containing API Keys. If the same key is defined in multiple secrets, the<br />behavior is undefined.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the API key authentication filter.<br />Can be used to disable API key authentication policies applied at a higher level in the config hierarchy. |  |  |
 
@@ -572,6 +572,7 @@ _Appears in:_
 | `maxPendingRequests` _integer_ | MaxPendingRequests is the maximum number of pending requests that are<br />allowed to the upstream cluster. If not specified, defaults to 1024. |  | Minimum: 1 <br /> |
 | `maxRequests` _integer_ | MaxRequests is the maximum number of parallel requests that are allowed<br />to the upstream cluster. If not specified, defaults to 1024. |  | Minimum: 1 <br /> |
 | `maxRetries` _integer_ | MaxRetries is the maximum number of parallel retries that are allowed<br />to the upstream cluster. If not specified, defaults to 3. |  | Minimum: 0 <br /> |
+| `trackRemaining` _boolean_ | TrackRemaining controls whether Envoy tracks the remaining resource<br />gauges for this circuit breaker threshold group. When enabled, the<br />remaining_cx, remaining_pending, remaining_rq, and remaining_retries<br />statistics are populated. Enabling this has a performance cost.<br />If not specified, defaults to false. |  |  |
 
 
 #### ClientCertificateValidationConfig
@@ -1007,6 +1008,7 @@ _Appears in:_
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
 | `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 | `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
+| `enableReadinessProbeProxyProtocol` _boolean_ | EnableReadinessProbeProxyProtocol enables the PROXY protocol listener filter<br />on the kgateway readiness listener (port 8082).<br />Set this to true if and only if the load balancer in front of the gateway<br />prepends PROXY protocol headers to incoming TCP connections targeting the<br />readiness port. For example, when using an AWS NLB with proxy protocol v2<br />enabled at the target group level<br />(`service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"`).<br />Defaults to false. |  |  |
 
 
 #### EnvoyContainer
@@ -1026,6 +1028,7 @@ _Appears in:_
 | `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: envoy-wrapper<br />	tag: <kgateway version><br />	pullPolicy: IfNotPresent |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
+| `extraArgs` _string array_ | Additional arguments to pass to the Envoy binary.<br /><br />Similar to Kubernetes container args, variable references $(VAR_NAME) are<br />expanded using the container's environment. If a variable cannot be<br />resolved, the reference is left unchanged. Double $$ are reduced to a<br />single $, which allows escaping the $(VAR_NAME) syntax.<br /><br />The following Envoy flags are already managed by kgateway and must not be<br />set here: `--disable-hot-restart`, `--service-node`, `--log-level`, and<br />`--component-log-level`. Consider using a DeploymentOverlay to override these values if desired. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
 | `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
@@ -1353,6 +1356,45 @@ _Appears in:_
 | `runtimeFilter` _[RuntimeFilter](#runtimefilter)_ | Filters for random sampling of access logs.<br />Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter |  |  |
 
 
+#### ForwardClientCertDetails
+
+
+
+ForwardClientCertDetails configures how Envoy handles the x-forwarded-client-cert (XFCC)
+header forwarded to upstream backends.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [HTTPSettings](#httpsettings)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `mode` _[ForwardClientCertMode](#forwardclientcertmode)_ | Mode controls how Envoy handles the XFCC header on the request forwarded upstream.<br />If unset and Details is provided, Mode defaults to SanitizeSet.<br />If both Mode and Details are unset, this field has no effect.<br /><br />- Sanitize: do not send the XFCC header upstream.<br />- ForwardOnly: forward the XFCC header in the request unchanged.<br />- AppendForward: append the current client's details to the XFCC header.<br />- SanitizeSet: reset the XFCC header with the current client's details, ignoring any client-supplied value.<br />- AlwaysForwardOnly: always forward the XFCC header, even for non-mTLS connections. |  | Enum: [Sanitize ForwardOnly AppendForward SanitizeSet AlwaysForwardOnly] <br /> |
+| `details` _[SetCurrentClientCertDetails](#setcurrentclientcertdetails)_ | Details selects which fields from the downstream client certificate are written into<br />the XFCC header that is sent upstream. These fields are only honored by Envoy when<br />Mode is AppendForward or SanitizeSet. |  |  |
+
+
+#### ForwardClientCertMode
+
+_Underlying type:_ _string_
+
+ForwardClientCertMode is the XFCC header forwarding mode for HTTP Connection Manager.
+
+
+
+_Appears in:_
+- [ForwardClientCertDetails](#forwardclientcertdetails)
+
+| Field | Description |
+| --- | --- |
+| `Sanitize` | ForwardClientCertModeSanitize strips the XFCC header from requests forwarded upstream.<br /> |
+| `ForwardOnly` | ForwardClientCertModeForwardOnly forwards the XFCC header from the request unchanged.<br /> |
+| `AppendForward` | ForwardClientCertModeAppendForward appends the current client's details to the XFCC header.<br /> |
+| `SanitizeSet` | ForwardClientCertModeSanitizeSet resets the XFCC header with the current client's details,<br />ignoring any client-supplied value.<br /> |
+| `AlwaysForwardOnly` | ForwardClientCertModeAlwaysForwardOnly always forwards the XFCC header, even for non-mTLS connections.<br /> |
+
+
 
 
 #### GatewayExtension
@@ -1546,7 +1588,7 @@ _Appears in:_
 
 #### GrpcStatusFilter
 
-_Underlying type:_ _[struct{Statuses []GrpcStatus "json:\"statuses,omitempty\""; Exclude *bool "json:\"exclude,omitempty\""}](#struct{statuses-[]grpcstatus-"json:\"statuses,omitempty\"";-exclude-*bool-"json:\"exclude,omitempty\""})_
+_Underlying type:_ _struct_
 
 GrpcStatusFilter filters gRPC requests based on their response status.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
@@ -1609,14 +1651,18 @@ _Appears in:_
 | `skipXFFAppend` _boolean_ | SkipXffAppend specifies whether to skip adding the downstream's remote IP address to the X-Forwarded-For HTTP header.<br />Note: If omitted, this effectively will default to true when UseRemoteAddress is false, such that Envoy acts as a "transparent proxy".<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-skip-xff-append |  |  |
 | `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
-| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connnections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `maxRequestsPerConnection` _integer_ | MaxRequestsPerConnection sets the maximum number of requests served over a single downstream<br />keepalive connection. When the limit is reached, Envoy closes the connection, which forces<br />clients to reconnect. This allows L4 load balancers like AWS NLB to rebalance long-lived<br />HTTP/2 and gRPC connections across gateway pods.<br />If set to 0 or unspecified, defaults to unlimited.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-requests-per-connection |  | Minimum: 0 <br /> |
+| `http2ProtocolOptions` _[ListenerHTTP2ProtocolOptions](#listenerhttp2protocoloptions)_ | Http2ProtocolOptions configures downstream HTTP/2 behavior on the listener's<br />HttpConnectionManager.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http2protocoloptions |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
 | `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
 | `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
-| `earlyRequestHeaderModifier` _[HTTPHeaderFilter](#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
+| `earlyRequestHeaderModifier` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
+| `forwardClientCertDetails` _[ForwardClientCertDetails](#forwardclientcertdetails)_ | ForwardClientCertDetails configures how Envoy handles the x-forwarded-client-cert (XFCC)<br />header and which parts of the downstream client certificate are forwarded to upstream<br />backends. Most modes only have effect on listeners where mTLS is configured. The exceptions<br />are Sanitize, which strips XFCC unconditionally, and AlwaysForwardOnly, which forwards XFCC<br />unconditionally; on a non-mTLS listener under any other mode the setting is a no-op.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-forward-client-cert-details |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
 | `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
+| `stripHostPortMode` _[StripHostPortMode](#striphostportmode)_ | StripHostPortMode determines whether, and under what conditions, Envoy will strip the port<br />from the Host/authority header. StripMatchingHostPort strips the port only if it matches<br />the listener's own port. StripAnyHostPort strips the port unconditionally.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-matching-host-port<br />See also: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-any-host-port |  | Enum: [MatchingPort AnyPort] <br /> |
 
 
 #### HTTPSettings
@@ -1645,14 +1691,18 @@ _Appears in:_
 | `skipXFFAppend` _boolean_ | SkipXffAppend specifies whether to skip adding the downstream's remote IP address to the X-Forwarded-For HTTP header.<br />Note: If omitted, this effectively will default to true when UseRemoteAddress is false, such that Envoy acts as a "transparent proxy".<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-skip-xff-append |  |  |
 | `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
-| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connnections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `maxRequestsPerConnection` _integer_ | MaxRequestsPerConnection sets the maximum number of requests served over a single downstream<br />keepalive connection. When the limit is reached, Envoy closes the connection, which forces<br />clients to reconnect. This allows L4 load balancers like AWS NLB to rebalance long-lived<br />HTTP/2 and gRPC connections across gateway pods.<br />If set to 0 or unspecified, defaults to unlimited.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-requests-per-connection |  | Minimum: 0 <br /> |
+| `http2ProtocolOptions` _[ListenerHTTP2ProtocolOptions](#listenerhttp2protocoloptions)_ | Http2ProtocolOptions configures downstream HTTP/2 behavior on the listener's<br />HttpConnectionManager.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http2protocoloptions |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
 | `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
 | `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
-| `earlyRequestHeaderModifier` _[HTTPHeaderFilter](#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
+| `earlyRequestHeaderModifier` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
+| `forwardClientCertDetails` _[ForwardClientCertDetails](#forwardclientcertdetails)_ | ForwardClientCertDetails configures how Envoy handles the x-forwarded-client-cert (XFCC)<br />header and which parts of the downstream client certificate are forwarded to upstream<br />backends. Most modes only have effect on listeners where mTLS is configured. The exceptions<br />are Sanitize, which strips XFCC unconditionally, and AlwaysForwardOnly, which forwards XFCC<br />unconditionally; on a non-mTLS listener under any other mode the setting is a no-op.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-forward-client-cert-details |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
 | `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
+| `stripHostPortMode` _[StripHostPortMode](#striphostportmode)_ | StripHostPortMode determines whether, and under what conditions, Envoy will strip the port<br />from the Host/authority header. StripMatchingHostPort strips the port only if it matches<br />the listener's own port. StripAnyHostPort strips the port unconditionally.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-matching-host-port<br />See also: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-any-host-port |  | Enum: [MatchingPort AnyPort] <br /> |
 
 
 #### HashPolicy
@@ -1870,7 +1920,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `initialStreamWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | InitialStreamWindowSize is the initial window size for the stream.<br />Valid values range from 65535 (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum).<br />Defaults to 268435456 (256 * 1024 * 1024).<br />Values can be specified with units like "64Ki". |  |  |
 | `initialConnectionWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | InitialConnectionWindowSize is similar to InitialStreamWindowSize, but for the connection level.<br />Same range and default value as InitialStreamWindowSize.<br />Values can be specified with units like "64Ki". |  |  |
-| `maxConcurrentStreams` _integer_ | The maximum number of concurrent streams that the connection can have. |  | Minimum: 0 <br /> |
+| `maxConcurrentStreams` _integer_ | The maximum number of concurrent streams that the connection can have.<br />Envoy defaults to 1024. |  | Maximum: 2.147483647e+09 <br />Minimum: 1 <br /> |
 | `overrideStreamErrorOnInvalidHttpMessage` _boolean_ | Allows invalid HTTP messaging and headers. When disabled (default), then<br />the whole HTTP/2 connection is terminated upon receiving invalid HEADERS frame.<br />When enabled, only the offending stream is terminated. |  |  |
 
 
@@ -1907,8 +1957,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `registry` _string_ | The image registry. |  |  |
 | `repository` _string_ | The image repository (name). |  |  |
-| `tag` _string_ | The image tag. |  |  |
-| `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...` |  |  |
+| `tag` _string_ | The image tag.<br /><br />Tag and Digest are coupled at merge time: specifying a non-empty Tag<br />without also specifying a Digest clears any inherited Digest, so the<br />rendered image reference is `repo:tag`. To keep both an inherited (or<br />overridden) tag and digest, specify non-empty values for both fields.<br />To clear an inherited Tag while keeping an inherited Digest, set Tag to<br />the empty string. |  |  |
+| `digest` _string_ | The hash digest of the image, e.g. `sha256:12345...`<br /><br />Tag and Digest are coupled at merge time: specifying a non-empty Digest<br />without also specifying a Tag clears any inherited Tag, so the rendered<br />image reference is `repo@digest`. To keep both an inherited (or<br />overridden) tag and digest, specify non-empty values for both fields.<br />To clear an inherited Digest while keeping an inherited Tag, set Digest<br />to the empty string. |  |  |
 | `pullPolicy` _[PullPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#pullpolicy-v1-core)_ | The image pull policy for the container. See<br />https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy<br />for details. |  |  |
 
 
@@ -2149,10 +2199,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />When set, Envoy will expect connections to include the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
+| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />By default, when set, Envoy will require connections to include the PROXY<br />protocol header. This behavior can be relaxed by setting<br />allowRequestsWithoutProxyProtocol to true, which allows the listener to<br />also accept connections without the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
+| `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | TCPKeepalive configures OS-level TCP keepalive checks for downstream client connections accepted by this listener. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
-| `rbac` _[Authorization](#authorization)_ | RBAC specifies network-level role-based access control for this listener.<br />Network RBAC is evaluated at the TCP connection level, before any HTTP processing begins.<br />This allows filtering based on connection attributes such as source IP address, destination port,<br />and TLS client certificate information.<br /><br />Available CEL attributes for network RBAC include:<br />  - source.address: Source IP address (e.g., "192.168.1.100")<br />  - source.port: Source port number<br />  - destination.address: Destination IP address<br />  - destination.port: Destination port (e.g., 443, 8080)<br />  - connection.tls.subject: TLS client certificate subject<br />  - connection.tls.uri_san: TLS URI Subject Alternative Name<br /><br />Example: Allow only corporate network IPs<br />  rbac:<br />    policy:<br />      matchExpressions:<br />        - 'source.address.startsWith("10.0.0.")'<br />        - 'source.address.startsWith("192.168.0.")'<br />    action: Allow |  |  |
-| `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPListenerPolicy is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
+| `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPSettings is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
 
 
 #### ListenerDefaultConfig
@@ -2169,10 +2219,31 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `clientCertificateValidation` _[ClientCertificateValidationConfig](#clientcertificatevalidationconfig)_ | ClientCertificateValidation configures mutual TLS (mTLS) client certificate validation for the listener.<br />This enables per-listener configuration of CA certificates for client certificate validation,<br />allowing different listeners on the same port to enforce different mTLS trust boundaries.<br />When configured on a ListenerPolicy targeting a specific listener (via sectionName),<br />it overrides any Gateway-level mTLS configuration for that listener.<br /><br />Security Note: Per-listener CA certificate validation can be bypassed in scenarios where<br />wildcard listeners (e.g., *.example.com) overlap with more specific hostnames on the same port,<br />due to TLS connection coalescing. For deployments with non-overlapping hostnames per listener,<br />this security concern does not apply. See GEP-91 and GEP-3567 for more details.<br />Reference: https://gateway-api.sigs.k8s.io/geps/gep-91/<br />Reference: https://github.com/kubernetes-sigs/gateway-api/issues/3567 |  |  |
-| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />When set, Envoy will expect connections to include the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
+| `proxyProtocol` _[ProxyProtocolConfig](#proxyprotocolconfig)_ | ProxyProtocol configures the PROXY protocol listener filter.<br />By default, when set, Envoy will require connections to include the PROXY<br />protocol header. This behavior can be relaxed by setting<br />allowRequestsWithoutProxyProtocol to true, which allows the listener to<br />also accept connections without the PROXY protocol header.<br />This is commonly used when kgateway is behind a load balancer that preserves client IP information.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/listener/proxy_protocol/v3/proxy_protocol.proto |  |  |
+| `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | TCPKeepalive configures OS-level TCP keepalive checks for downstream client connections accepted by this listener. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
-| `rbac` _[Authorization](#authorization)_ | RBAC specifies network-level role-based access control for this listener.<br />Network RBAC is evaluated at the TCP connection level, before any HTTP processing begins.<br />This allows filtering based on connection attributes such as source IP address, destination port,<br />and TLS client certificate information.<br /><br />Available CEL attributes for network RBAC include:<br />  - source.address: Source IP address (e.g., "192.168.1.100")<br />  - source.port: Source port number<br />  - destination.address: Destination IP address<br />  - destination.port: Destination port (e.g., 443, 8080)<br />  - connection.tls.subject: TLS client certificate subject<br />  - connection.tls.uri_san: TLS URI Subject Alternative Name<br /><br />Example: Allow only corporate network IPs<br />  rbac:<br />    policy:<br />      matchExpressions:<br />        - 'source.address.startsWith("10.0.0.")'<br />        - 'source.address.startsWith("192.168.0.")'<br />    action: Allow |  |  |
-| `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPListenerPolicy is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
+| `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPSettings is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
+
+
+#### ListenerHTTP2ProtocolOptions
+
+
+
+ListenerHTTP2ProtocolOptions mirrors Http2ProtocolOptions for listener-facing
+policies, but avoids the expensive CEL validations that push the listener CRDs
+over Kubernetes' schema cost budget.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [HTTPSettings](#httpsettings)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `initialStreamWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | InitialStreamWindowSize is the initial window size for the stream.<br />Valid values range from 65535 (2^16 - 1, HTTP/2 default) to 2147483647 (2^31 - 1, HTTP/2 maximum).<br />Defaults to 268435456 (256 * 1024 * 1024).<br />Values can be specified with units like "64Ki". |  |  |
+| `initialConnectionWindowSize` _[Quantity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#quantity-resource-api)_ | InitialConnectionWindowSize is similar to InitialStreamWindowSize, but for the connection level.<br />Same range and default value as InitialStreamWindowSize.<br />Values can be specified with units like "64Ki". |  |  |
+| `maxConcurrentStreams` _integer_ | The maximum number of concurrent streams that the connection can have.<br />Envoy defaults to 1024. |  | Maximum: 2.147483647e+09 <br />Minimum: 1 <br /> |
 
 
 #### ListenerPolicy
@@ -2594,7 +2665,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `headers` _HTTPHeaderMatch array_ | Headers specifies the list of HTTP headers to match on requests that should be denied redirects. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `headers` _[HTTPHeaderMatch](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadermatch) array_ | Headers specifies the list of HTTP headers to match on requests that should be denied redirects. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
 
 #### OAuth2JWTConfig
@@ -2787,7 +2858,7 @@ _Appears in:_
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
 | `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
-| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
+| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for<br />details. |  |  |
 | `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
 | `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
 | `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  |  |
@@ -2869,6 +2940,9 @@ _Appears in:_
 - [ListenerConfig](#listenerconfig)
 - [ListenerDefaultConfig](#listenerdefaultconfig)
 
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `allowRequestsWithoutProxyProtocol` _boolean_ | AllowRequestsWithoutProxyProtocol, when true, configures the PROXY protocol<br />listener filter to accept connections that do not include a PROXY protocol<br />header in addition to those that do. This allows a single listener to serve<br />mixed traffic, e.g. PROXY-preserving load balancer traffic plus direct<br />in-cluster traffic on the same port.<br /><br />Security: accepting connections without a PROXY header is non-conformant<br />with the PROXY protocol spec and allows clients to spoof the perceived<br />source address. Only enable this when every source that can reach the<br />listener is trusted. See<br />https://www.haproxy.org/download/2.1/doc/proxy-protocol.txt.<br /><br />Defaults to false. |  |  |
 
 
 #### ProxyProtocolVersion
@@ -3071,7 +3145,7 @@ _Appears in:_
 
 #### ResponseFlagFilter
 
-_Underlying type:_ _[struct{Flags []string "json:\"flags\""}](#struct{flags-[]string-"json:\"flags\""})_
+_Underlying type:_ _struct_
 
 ResponseFlagFilter filters based on response flags.
 Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
@@ -3098,8 +3172,8 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `retryOn` _[RetryOnCondition](#retryoncondition) array_ | RetryOn specifies the conditions under which a retry should be attempted. |  | Enum: [5xx gateway-error reset reset-before-request connect-failure envoy-ratelimited retriable-4xx refused-stream retriable-status-codes http3-post-connect-failure cancelled deadline-exceeded internal resource-exhausted unavailable] <br />MinItems: 1 <br /> |
 | `attempts` _integer_ | Attempts specifies the number of retry attempts for a request.<br />Defaults to 1 attempt if not set.<br />A value of 0 effectively disables retries. | 1 | Minimum: 0 <br /> |
-| `perTryTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | PerTryTimeout specifies the timeout per retry attempt (incliding the initial attempt).<br />If a global timeout is configured on a route, this timeout must be less than the global<br />route timeout.<br />It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms". |  |  |
-| `statusCodes` _HTTPRouteRetryStatusCode array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | MinItems: 1 <br /> |
+| `perTryTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | PerTryTimeout specifies the timeout per retry attempt (including the initial attempt).<br />If a global timeout is configured on a route, this timeout must be less than the global<br />route timeout.<br />It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms". |  |  |
+| `statusCodes` _[HTTPRouteRetryStatusCode](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouteretrystatuscode) array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | MinItems: 1 <br /> |
 | `backoffBaseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BackoffBaseInterval specifies the base interval used with a fully jittered exponential back-off between retries.<br />Defaults to 25ms if not set.<br />Given a backoff base interval B and retry number N, the back-off for the retry is in the range [0, (2^N-1)*B].<br />The backoff interval is capped at a max of 10 times the base interval.<br />E.g., given a value of 25ms, the first retry will be delayed randomly by 0-24ms, the 2nd by 0-74ms,<br />the 3rd by 0-174ms, and so on, and capped to a max of 10 times the base interval (250ms). | 25ms |  |
 
 
@@ -3256,8 +3330,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[ObjectName](#objectname)_ | Name of the secret containing htpasswd data. |  |  |
-| `namespace` _[Namespace](#namespace)_ | Namespace of the secret. If not specified, defaults to the namespace of the TrafficPolicy.<br />Note that a secret in a different namespace requires a ReferenceGrant to be accessible. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` <br /> |
+| `name` _[ObjectName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname)_ | Name of the secret containing htpasswd data. |  |  |
+| `namespace` _[Namespace](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#namespace)_ | Namespace of the secret. If not specified, defaults to the namespace of the TrafficPolicy.<br />Note that a secret in a different namespace requires a ReferenceGrant to be accessible. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` <br /> |
 | `key` _string_ | Key in the secret that contains the htpasswd data.<br />Defaults to ".htpasswd" if not specified. | .htpasswd | MinLength: 1 <br /> |
 
 
@@ -3331,6 +3405,28 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  |  |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
+
+
+#### SetCurrentClientCertDetails
+
+
+
+SetCurrentClientCertDetails selects fields from the downstream client certificate to include
+in the XFCC header when Envoy sets or appends it. Fields default to false when unset.
+See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-msg-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-setcurrentclientcertdetails
+
+
+
+_Appears in:_
+- [ForwardClientCertDetails](#forwardclientcertdetails)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `subject` _boolean_ | Subject forwards the certificate Subject in the XFCC header. |  |  |
+| `cert` _boolean_ | Cert forwards the entire client certificate in URL-encoded PEM format in the XFCC header. |  |  |
+| `chain` _boolean_ | Chain forwards the entire client certificate chain (including the leaf certificate) in<br />URL-encoded PEM format in the XFCC header. |  |  |
+| `dns` _boolean_ | DNS forwards DNS-type Subject Alternative Names from the client certificate in the XFCC header. |  |  |
+| `uri` _boolean_ | URI forwards the URI-type Subject Alternative Name from the client certificate in the XFCC header. |  |  |
 
 
 #### SlowStart
@@ -3436,6 +3532,25 @@ _Appears in:_
 
 
 
+#### StripHostPortMode
+
+_Underlying type:_ _string_
+
+StripHostPortMode determines whether or not Envoy strips the port component from the
+Host/authority header.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [HTTPSettings](#httpsettings)
+
+| Field | Description |
+| --- | --- |
+| `MatchingPort` | StripMatchingHostPortMode strips the port from the header if and only if it matches<br />the listener's own port.<br /> |
+| `AnyPort` | StripAnyHostPortMode strips any port from the header, regardless of its value.<br /> |
+
+
 #### TCPKeepalive
 
 
@@ -3446,6 +3561,8 @@ See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/con
 
 _Appears in:_
 - [BackendConfigPolicySpec](#backendconfigpolicyspec)
+- [ListenerConfig](#listenerconfig)
+- [ListenerDefaultConfig](#listenerdefaultconfig)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -3469,7 +3586,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
 | `files` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
-| `wellKnownCACertificates` _[WellKnownCACertificatesType](#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
+| `wellKnownCACertificates` _[WellKnownCACertificatesType](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
 | `insecureSkipVerify` _boolean_ | InsecureSkipVerify originates TLS but skips verification of the backend's certificate.<br />WARNING: This is an insecure option that should only be used if the risks are understood. |  |  |
 | `sni` _string_ | The SNI domains that should be considered for TLS connection |  | MinLength: 1 <br /> |
 | `verifySubjectAltNames` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
@@ -3655,6 +3772,7 @@ _Appears in:_
 | `oauth2` _[OAuth2Policy](#oauth2policy)_ | OAuth2 specifies the configuration to use for OAuth2/OIDC.<br />Note: the OAuth2 filter does not protect against Cross-Site-Request-Forgery attacks on domains with cached<br />authentication (in the form of cookies). It is recommended to pair this with the CSRF policy to prevent<br />malicious social engineering. |  |  |
 | `tracing` _[RouteTracing](#routetracing)_ | Tracing configures per-route tracing overrides.<br />These settings override the listener-level tracing configuration<br />(configured via ListenerPolicy) for matched routes.<br />The tracing provider (e.g., OpenTelemetry collector endpoint) must be<br />configured at the listener level via ListenerPolicy. Without a listener-level<br />tracing provider, route-level settings have no effect.<br />NOTE: This field is only honored for HTTPRoute and GRPCRoute targets. |  |  |
 | `faultInjection` _[FaultInjectionPolicy](#faultinjectionpolicy)_ | FaultInjection configures fault injection for chaos engineering and<br />resiliency testing. Supports delay injection, abort injection,<br />and response rate limiting. |  |  |
+| `acl` _[ACLPolicy](#aclpolicy)_ | ACL configures IP-based access control for HTTP requests.<br />Rules are evaluated using longest-prefix matching on the effictive client IP<br />from envoy base on settings. See the UseRemoteAddress, XffTrustedCIDRs,<br />XffNumTrustedHops settings under ListenerPolicy -> HttpSettings for details.<br /><br />When multiple TrafficPolicy objects target the same route, their ACL fields are<br />deep-merged by default: rules are unioned (higher-priority policy's rules first),<br />and singleton fields (defaultAction, denyResponse) are taken from the higher-priority<br />policy. If singleton fields conflict between policies, the merge falls back to<br />shallow (higher-priority policy wins entirely). Gateway-level and route-level ACL<br />policies are kept in separate merge groups and are never combined with each other;<br />a route-level ACL completely replaces the gateway-level ACL for that route. |  |  |
 
 
 #### Transform
@@ -3797,13 +3915,64 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
-| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
+| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
 
 ## Shared Types
 
 The following types are defined in the shared package and used across multiple APIs.
+
+#### ACLAction
+
+_Underlying type:_ _string_
+
+ACLAction defines whether to allow or deny traffic.
+
+**Validation:**
+- Enum=allow;deny
+
+#### ACLDenyResponse
+
+ACLDenyResponse customizes the response sent when a request is denied.
+
+**Validation:**
+- AtLeastOneOf=statusCode;headers;blockedByHeaderName
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `statusCode` | *int32 | StatusCode is the HTTP status code returned on deny. Defaults to 403. |
+| `headers` | [][ACLResponseHeader](#aclresponseheader) | Headers are additional response headers to attach on every deny. |
+| `blockedByHeaderName` | *string | BlockedByHeaderName, when set, adds a response header with this name on every deny. The header value mirrors the blocked-by dynamic metadata: the matched rule's name, "rule" for an unnamed rule, or "default" for a default-action deny. |
+
+#### ACLPolicy
+
+ACLPolicy defines IP-based access control rules evaluated on every HTTP request. The filter uses longest-prefix matching so rule order does not matter.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `defaultAction` | [ACLAction](#aclaction) | DefaultAction is the action to take when no rule matches the client IP. **Required.** |
+| `rules` | [][ACLRule](#aclrule) | Rules is a list of IP/CIDR-based rules. Longest-prefix match wins regardless of rule order. |
+| `denyResponse` | *[ACLDenyResponse](#acldenyresponse) | DenyResponse customizes the HTTP response sent when a request is denied. |
+
+#### ACLResponseHeader
+
+ACLResponseHeader defines a response header to include in deny responses.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | string | Name is the header name. **Required.** |
+| `value` | string | Value is the header value. **Required.** |
+
+#### ACLRule
+
+ACLRule defines an IP/CIDR-based ACL rule.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | *string | Name is an optional rule identifier emitted as blocked-by dynamic metadata on deny. |
+| `cidrs` | [][IPOrCIDR](#iporcidr) | CIDRs is a list of IP addresses or CIDR ranges (e.g. "10.0.0.0/8", "2001:db8::/32", "192.168.1.1", "::1"). Bare IPs without a prefix are treated as /32 for IPv4 and /128 for IPv6. All entries share the same name and action. **Required.** |
+| `action` | [ACLAction](#aclaction) | Action determines what to do when a client IP matches this rule. **Required.** |
 
 #### AlwaysOnConfig
 
@@ -3858,6 +4027,33 @@ FractionalPercent represents a fraction as a numerator and denominator. Based on
 | `numerator` | int32 | Specifies the numerator. Defaults to 0. **Required.** |
 | `denominator` | *[DenominatorType](#denominatortype) | Specifies the denominator. If the denominator specified is less than the numerator, the final fractional percentage is capped at 1 (100%). Defaults to HUNDRED. |
 
+#### HTTPHeader
+
+HTTPHeader represents a single header name/value pair. Exactly one of value or secretRef must be set. When using secretRef, name and key interact as follows: - Both present: name is the header name, key is the Secret data key. - name absent, key present: the key is also used as the header name. - name present, key absent: the name is also used as the Secret data key. - Both absent: every entry in the Secret is injected as a header (data key -> header name). 
+
+**Validation:**
+- ExactlyOneOf=value;secretRef
+- XValidation:rule="has(self.value) ? has(self.name) : true",message="name is required when using an inline value"
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | *gwv1.HTTPHeaderName | Name is the HTTP header field name. Name matching is case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2.) Required when value is set. When secretRef is used, if omitted the Secret data key is used as the header name; if both name and key are omitted every Secret entry is injected as a header. |
+| `value` | *string | Value is an inline string value for the header. Mutually exclusive with secretRef. Must consist of printable US-ASCII characters. (See https://tools.ietf.org/html/rfc7230#section-3.2.) |
+| `secretRef` | *[SecretRefWithKey](#secretrefwithkey) | SecretRef sources the header value from a key in a Kubernetes Secret. Mutually exclusive with value. |
+
+#### HTTPHeaderFilter
+
+HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request or response. Only one action for a given header name is permitted. Filters specifying multiple actions of the same or different type for any one header name are invalid and will be rejected by CRD validation. Configuration to set or add multiple values for a header must use RFC 7230 header value formatting, separating each value with a comma. Unlike the Gateway API HTTPHeaderFilter, each entry also supports sourcing the value from a Kubernetes Secret via secretRef.
+
+**Validation:**
+- AtLeastOneOf=set;add;remove
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `set` | [][HTTPHeader](#httpheader) | Set overwrites the request with the given header (name, value) before the action.  Input: GET /foo HTTP/1.1 my-header: foo  Config: set: - name: "my-header" value: "bar"  Output: GET /foo HTTP/1.1 my-header: bar  |
+| `add` | [][HTTPHeader](#httpheader) | Add adds the given header(s) (name, value) to the request before the action. It appends to any existing values associated with the header name.  Input: GET /foo HTTP/1.1 my-header: foo  Config: add: - name: "my-header" value: "bar,baz"  Output: GET /foo HTTP/1.1 my-header: foo,bar,baz  |
+| `remove` | []string | Remove the given header(s) from the HTTP request before the action. The value of Remove is a list of HTTP header names. Note that header names are case-insensitive (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).  Input: GET /foo HTTP/1.1 my-header1: foo my-header2: bar my-header3: baz  Config: remove: ["my-header1", "my-header3"]  Output: GET /foo HTTP/1.1 my-header2: bar  |
+
 #### HeaderModifiers
 
 HeaderModifiers can be used to define the policy to modify request and response headers.
@@ -3867,8 +4063,17 @@ HeaderModifiers can be used to define the policy to modify request and response 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `request` | *gwv1.HTTPHeaderFilter | Request modifies request headers. |
-| `response` | *gwv1.HTTPHeaderFilter | Response modifies response headers. |
+| `request` | *[HTTPHeaderFilter](#httpheaderfilter) | Request modifies request headers. |
+| `response` | *[HTTPHeaderFilter](#httpheaderfilter) | Response modifies response headers. |
+
+#### IPOrCIDR
+
+_Underlying type:_ _string_
+
+IPOrCIDR accepts either a bare IP address or an address range in CIDR notation. A bare IP without a prefix length is treated as /32 for IPv4 and /128 for IPv6. Note: The regex for the IP validation patterns was taken from https://www.ditig.com/validating-ipv4-and-ipv6-addresses-with-regexp
+
+**Validation:**
+- Pattern=`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}(\/([0-9]|[1-2][0-9]|3[0-2]))?$|^((?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|:(?::[0-9A-Fa-f]{1,4}){1,7}|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,6}))(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?$`
 
 #### KeyAnyValue
 
@@ -3978,6 +4183,16 @@ RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
 |-------|------|-------------|
 | `key` | string | Key is the name of this descriptor entry. **Required.** |
 | `value` | string | Value is the static value for this descriptor entry. **Required.** |
+
+#### SecretRefWithKey
+
+SecretRefWithKey identifies a Kubernetes Secret and optionally a specific key within it.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | gwv1.ObjectName | Name is the name of the Kubernetes Secret. **Required.** |
+| `key` | *string | Key is the key within the Secret's data map to use as the header value. When omitted and the parent HTTPHeader.name is set, that name is used as the key. When both key and name are omitted, all entries in the Secret are injected as headers. |
+| `namespace` | *gwv1.Namespace | Namespace is the namespace of the Secret. If omitted, defaults to the namespace of the referencing policy. Cross-namespace references require a ReferenceGrant in the target namespace permitting access from the policy's namespace. |
 
 #### Timeouts
 

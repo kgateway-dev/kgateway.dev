@@ -19,6 +19,9 @@ jobs:
   linkChecker:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      issues: write
     env:
       PRODUCT_NAME: kgateway OSS
       ISSUE_TITLE: Link Checker Report - kgateway OSS
@@ -37,7 +40,7 @@ jobs:
       - name: Set up Hugo
         uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # v3
         with:
-          hugo-version: '0.147.0'
+          hugo-version: '0.160.1'
           extended: true
 
       - name: Install Lychee
@@ -97,6 +100,7 @@ jobs:
           echo "has_failures=$([ "$EXIT" != "0" ] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
 
       - name: Generate markdown report from JSON
+        id: report
         if: hashFiles('artifacts/kgateway-oss-links.json') != ''
         run: |
           chmod +x docs-link-checking/generate-link-report.sh
@@ -107,7 +111,7 @@ jobs:
             "${{ github.event_name == 'pull_request' && 'pr' || '' }}"
 
       - name: Create issue from report
-        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        if: steps.report.outputs.has_issues == 'true' && github.event_name != 'pull_request'
         id: create-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -117,7 +121,7 @@ jobs:
           content-filepath: ./artifacts/kgateway-oss-links.md
 
       - name: Set issue URL for Slack
-        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        if: steps.report.outputs.has_issues == 'true' && github.event_name != 'pull_request'
         id: issue-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -130,10 +134,12 @@ jobs:
           docs-link-checking/set-issue-url.sh
 
       - name: Remove public directory
+        if: always()
         run: rm -rf public
 
       - name: Read link checker results
         id: link-stats
+        if: always() && hashFiles('artifacts/kgateway-oss-links.json') != ''
         env:
           MD_FILE: artifacts/kgateway-oss-links.md
           JSON_FILE: artifacts/kgateway-oss-links.json
@@ -142,7 +148,7 @@ jobs:
           docs-link-checking/read-link-stats.sh
 
       - name: Post results to Slack
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request' && steps.link-stats.conclusion == 'success'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: "#doctopus-tests"
@@ -165,7 +171,7 @@ jobs:
           path: artifacts/*
 
       - name: Write report to job summary
-        if: hashFiles('artifacts/kgateway-oss-links.md') != ''
+        if: always() && hashFiles('artifacts/kgateway-oss-links.md') != ''
         run: cat artifacts/kgateway-oss-links.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail check if errors exist

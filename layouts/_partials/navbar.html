@@ -1,0 +1,564 @@
+{{- $logoLink := .Site.Params.navbar.logo.link | default .Site.Home.RelPermalink -}}
+{{- $logoWidth := .Site.Params.navbar.logo.width | default "20" -}}
+{{- $logoHeight := .Site.Params.navbar.logo.height | default "20" -}}
+
+{{- $navWidth := "hx:max-w-[90rem]" -}}
+{{- with .Site.Params.navbar.width -}}
+  {{ if eq . "normal" -}}
+    {{ $navWidth = "hx:max-w-screen-xl" -}}
+  {{ else if eq . "full" -}}
+    {{ $navWidth = "max-w-full" -}}
+  {{ end -}}
+{{- end -}}
+
+{{- $pagelink := page.RelPermalink -}}
+{{ $parts := split $pagelink "/" }}
+{{- $version := "" -}}
+{{- /* Extract version from path: /docs/envoy/latest/... or /docs/agentgateway/latest/... */ -}}
+{{- if and (ge (len $parts) 4) (eq (index $parts 1) "docs") -}}
+  {{- $version = index $parts 3 -}}
+{{- end -}}
+
+{{- /* Determine logo based on section */ -}}
+{{- $subSection := "" -}}
+{{- if and (ge (len $parts) 3) (eq (index $parts 1) "docs") -}}
+  {{- $subSection = index $parts 2 -}}
+{{- end -}}
+
+{{- /* Increase logo size for kgateway envoy section to accommodate two-line logo */ -}}
+{{- if eq $subSection "envoy" -}}
+  {{- $logoHeight = "50" -}}
+{{- end -}}
+
+{{- /* Increase logo size for agentgateway section to accommodate two-line logo */ -}}
+{{- if eq $subSection "agentgateway" -}}
+  {{- $logoHeight = "50" -}}
+{{- end -}}
+
+{{- $logoPath := .Site.Params.navbar.logo.path | default "images/logo.svg" -}}
+{{- $logoDarkPath := .Site.Params.navbar.logo.dark | default $logoPath -}}
+{{- $useResource := false -}}
+{{- $logoResource := "" -}}
+{{- $logoDarkResource := "" -}}
+
+{{- /* Override logo paths based on section */ -}}
+{{- if eq $subSection "envoy" -}}
+  {{- $logoResource = resources.Get "img/logo-kgateway-envoy.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-kgateway-envoy-light-on-transparent.svg" -}}
+  {{- if $logoResource -}}
+    {{- $useResource = true -}}
+  {{- end -}}
+{{- else if eq $subSection "agentgateway" -}}
+  {{- $logoResource = resources.Get "img/logo-kgateway-agentgateway.svg" -}}
+  {{- $logoDarkResource = resources.Get "img/logo-kgateway-agentgateway-light-on-transparent.svg" -}}
+  {{- if $logoResource -}}
+    {{- $useResource = true -}}
+  {{- end -}}
+{{- end -}}
+
+<style>
+  {{- /* .dropdown / .navbar-dropdown-content rules now live in
+         docs-theme-extras/assets/css/docs-theme-extras.css so both kgateway
+         and agentgateway-oss render dropdowns from a single source. */ -}}
+
+  {{- /* Build the search path pattern based on subSection and version */ -}}
+  {{- $searchPathPattern := "" -}}
+  {{- if and $subSection $version -}}
+    {{- $searchPathPattern = printf "/docs/%s/%s/" $subSection $version -}}
+  {{- else if $version -}}
+    {{- $searchPathPattern = printf "/docs/%s/" $version -}}
+  {{- end -}}
+
+  {{- if $searchPathPattern -}}
+  /* Hide section headers for non-selected versions */
+  .search-results .prefix:has(+ li a:not([href*="{{$searchPathPattern}}"]) ){
+    display: none;
+  }
+
+  /* Hide articles for non-selected versions */
+  .search-results li a:not([href*="{{$searchPathPattern}}"]) {
+    display: none;
+  }
+
+  /* Fix top margin when first item returned is hidden */
+  .search-results .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) {
+    margin-top: 0;
+  }
+  .search-results .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) ~ .prefix:has(+ li a[href*="{{$searchPathPattern}}"]) {
+    margin-top: 1.5rem;
+  }
+  {{- end -}}
+
+  /* GitHub icon dark mode override */
+  .dark a[href*="github"] span.github-white-icon {
+    display: inline-block !important;
+  }
+  
+  /* GitHub icon size constraint */
+  a[href*="github"] svg {
+    max-width: 24px;
+    max-height: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  /* Section logos (envoy / agentgateway). The SVG natural aspect is ~3:1, so
+     the rendered width must follow `height` via `width: auto` — otherwise the
+     `width="494"` HTML attribute (the param default in hugo.yaml) leaves a
+     494px-wide image box that bleeds off the left on narrow viewports. */
+  .nav-container a img.envoy-logo,
+  .nav-container a img.agentgateway-logo {
+    height: 50px !important;
+    max-height: 50px !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  /* Mobile nav threshold. agw production uses lg (1024px) as the cutoff:
+     below it, only the logo + boxed hamburger render; everything else folds
+     into the hamburger drawer. Hextra's bundled Tailwind only emits md:
+     (768px) variants for these utilities, so we add direct rules at 1024px
+     here. */
+  @media (max-width: 1023.99px) {
+    .nav-container .nav-desktop-only {
+      display: none !important;
+    }
+    /* The agentgateway logo SVG has a taller viewBox (1200 vs 1064 on the
+       base kgateway logo) because it carries a stacked "AGENTGATEWAY" tag
+       below the wordmark. At the same 50px height it renders ~12% narrower
+       than the kgateway logo, so the kgateway text inside looks smaller.
+       Bumping the rendered height in mobile compensates. */
+    .nav-container a img.agentgateway-logo {
+      height: 58px !important;
+      max-height: 58px !important;
+    }
+    /* `:not(.hx\:hidden)` so the drawer's open/close mechanism (extras's JS
+       toggles `hx:hidden` on `#mobile-icons-menu`) can still hide it. Without
+       this guard the `!important` here would override `hx:hidden`'s
+       `display: none` and the drawer would always be visible. */
+    .nav-container .nav-mobile-only:not(.hx\:hidden) {
+      display: inline-block !important;
+    }
+    /* The drawer wants block layout, not inline-block. More specific
+       selector wins over the inline-block rule above. */
+    .nav-container .nav-mobile-drawer:not(.hx\:hidden) {
+      display: block !important;
+    }
+  }
+  @media (min-width: 1024px) {
+    .nav-container .nav-mobile-only {
+      display: none !important;
+    }
+  }
+
+  /* Mobile hamburger button — boxed style matching agw production. Swaps
+     between hamburger and X based on aria-expanded (set by extras's JS). */
+  .nav-mobile-toggle {
+    margin-right: -0.5rem;
+    cursor: pointer;
+    border-radius: 0.375rem;
+    border: 1px solid #e5e7eb;
+    padding: 0.625rem;
+    background: white;
+    box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    color: rgb(17, 24, 39);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-mobile-toggle:active {
+    background: #f3f4f6;
+  }
+  .dark .nav-mobile-toggle {
+    background: rgb(17, 24, 39);
+    border-color: rgb(55, 65, 81);
+    color: rgb(229, 231, 235);
+  }
+  .dark .nav-mobile-toggle:active {
+    background: rgb(31, 41, 55);
+  }
+  .nav-mobile-toggle .nav-mobile-icon-x { display: none; }
+  .nav-mobile-toggle[aria-expanded="true"] .nav-mobile-icon-hamburger { display: none; }
+  .nav-mobile-toggle[aria-expanded="true"] .nav-mobile-icon-x { display: block; }
+
+  /* Full-width slide-down drawer, anchored just below the navbar bar.
+     `.nav-container` is the position context (sticky top). The drawer
+     spans the viewport width and scrolls internally if its content is
+     taller than the remaining viewport. */
+  .nav-mobile-drawer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 1rem 1.5rem 1.5rem;
+    max-height: calc(100vh - 96px);
+    overflow-y: auto;
+    z-index: 50;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 8px 16px -4px rgba(0,0,0,.08);
+  }
+  .dark .nav-mobile-drawer {
+    background: rgb(17, 24, 39);
+    border-top-color: rgb(55, 65, 81);
+  }
+
+  /* Search input at top of the drawer. Override Hextra's default 16rem
+     width to full-width inside the drawer. */
+  .nav-mobile-drawer-search {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .dark .nav-mobile-drawer-search {
+    border-bottom-color: rgb(55, 65, 81);
+  }
+  .nav-mobile-drawer-search .hextra-search-wrapper {
+    width: 100% !important;
+    min-height: 2.5rem;
+  }
+  .nav-mobile-drawer-search .hextra-search-input {
+    width: 100%;
+  }
+
+  /* Theme toggle row — full-width, icon + label, simple sun↔moon swap. */
+  .nav-mobile-drawer-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.875rem 0;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #e5e7eb;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1.125rem;
+    color: rgb(17, 24, 39);
+    text-align: left;
+  }
+  .dark .nav-mobile-drawer-row {
+    color: rgb(229, 231, 235);
+    border-bottom-color: rgb(55, 65, 81);
+  }
+  /* Show moon in light mode, sun in dark mode. */
+  .nav-mobile-drawer-row .nav-mobile-theme-icon-sun { display: none; }
+  .dark .nav-mobile-drawer-row .nav-mobile-theme-icon-moon { display: none; }
+  .dark .nav-mobile-drawer-row .nav-mobile-theme-icon-sun { display: block; }
+
+  /* Section blocks with bold header + indented children. */
+  .nav-mobile-drawer-section {
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+  }
+  .nav-mobile-drawer-header {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: rgb(17, 24, 39);
+  }
+  .dark .nav-mobile-drawer-header {
+    color: rgb(243, 244, 246);
+  }
+  /* Variant for when a top-level menu item (e.g. Blog, GitHub) has no
+     children and renders as a standalone header-styled link. */
+  a.nav-mobile-drawer-header-link {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 0;
+  }
+  a.nav-mobile-drawer-header-link:hover {
+    color: rgb(75, 85, 99);
+  }
+  .dark a.nav-mobile-drawer-header-link:hover {
+    color: rgb(156, 163, 175);
+  }
+  .nav-mobile-drawer-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0 0.5rem 1.5rem;
+    font-size: 1.125rem;
+    color: rgb(75, 85, 99);
+    text-decoration: none;
+  }
+  .nav-mobile-drawer-link:hover {
+    color: rgb(17, 24, 39);
+  }
+  .dark .nav-mobile-drawer-link {
+    color: rgb(156, 163, 175);
+  }
+  .dark .nav-mobile-drawer-link:hover {
+    color: rgb(229, 231, 235);
+  }
+
+  /* Version list inside drawer — match link styling (override the desktop
+     dropdown styling that navbar-version.html applies to its items). */
+  .nav-mobile-drawer-version-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav-mobile-drawer-version-list a {
+    display: block;
+    padding: 0.5rem 0 0.5rem 1.5rem !important;
+    font-size: 1.125rem !important;
+    color: rgb(75, 85, 99) !important;
+    background: transparent !important;
+    text-decoration: none;
+  }
+  .nav-mobile-drawer-version-list a:hover {
+    color: rgb(17, 24, 39) !important;
+    background: transparent !important;
+  }
+  .dark .nav-mobile-drawer-version-list a {
+    color: rgb(156, 163, 175) !important;
+  }
+  .dark .nav-mobile-drawer-version-list a:hover {
+    color: rgb(229, 231, 235) !important;
+  }
+</style>
+
+{{- /*
+  Hidden dummy that satisfies Hextra v0.12.3 main.js's
+  `document.querySelector('.hextra-hamburger-menu')`. Without it, Hextra's
+  hamburger handler throws `menu is null` on every page load because we've
+  replaced Hextra's hamburger with our own `#mobile-icons-toggle`. The
+  centralized sidebar already aliases `hextra-sidebar-container`, which
+  gives Hextra's syncAriaHidden() the second element it needs. Hextra's
+  click handler still binds to this dummy, but nobody clicks a
+  display:none button, so the conflicting translate3d transforms never
+  fire on our real sidebar.
+*/ -}}
+<button class="hextra-hamburger-menu" aria-hidden="true" tabindex="-1" style="display:none"><svg></svg></button>
+
+<div class="nav-container hx:sticky hx:top-0 hx:z-20 hx:w-full hx:bg-transparent hx:print:hidden">
+  <div class="nav-container-blur hx:pointer-events-none hx:absolute hx:z-[-1] hx:h-full hx:w-full hx:bg-white hx:dark:bg-dark hx:shadow-[0_2px_4px_rgba(0,0,0,.02),0_1px_0_rgba(0,0,0,.06)] hx:contrast-more:shadow-[0_0_0_1px_#000] hx:dark:shadow-[0_-1px_0_rgba(255,255,255,.1)_inset] hx:contrast-more:dark:shadow-[0_0_0_1px_#fff]"></div>
+
+  <nav class="hx:mx-auto hx:flex hx:items-center hx:justify-end hx:gap-2 hx:h-24 hx:px-6 {{ $navWidth }}">
+    {{- /* Sidebar mobile trigger — only renders on docs pages (where a sidebar
+           exists). Sits at the far left of the navbar, before the logo. The
+           toggleMobileSidebar() function comes from
+           docs-theme-extras/_partials/themeExtras/head-end.html and targets
+           the centralized `.sidebar-mobile-panel` aside. */ -}}
+    {{- if and (ge (len $parts) 3) (eq (index $parts 1) "docs") -}}
+      <button type="button" class="solo-sidebar-mobile-trigger hx:mr-1" aria-label="Open sidebar" onclick="toggleMobileSidebar()">
+        {{- /* agw-style hamburger: middle line shorter than top/bottom
+               (path widths 16, 10, 16). */ -}}
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h16"/></svg>
+      </button>
+    {{- end -}}
+    <a class="hx:flex hx:items-center hx:hover:opacity-75 hx:ltr:mr-auto hx:rtl:ml-auto" href="{{ $logoLink }}">
+      {{- if (.Site.Params.navbar.displayLogo | default true) }}
+        {{- if $useResource -}}
+          <img class="hx:block hx:dark:hidden {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ else if eq $subSection "envoy" }}envoy-logo{{ end }}" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- if $logoDarkResource -}}
+            <img class="hx:hidden hx:dark:block {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ else if eq $subSection "envoy" }}envoy-logo{{ end }}" src="{{ $logoDarkResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- else -}}
+            <img class="hx:hidden hx:dark:block {{ if eq $subSection "agentgateway" }}agentgateway-logo{{ else if eq $subSection "envoy" }}envoy-logo{{ end }}" src="{{ $logoResource.RelPermalink }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          {{- end -}}
+        {{- else -}}
+          <img class="hx:block hx:dark:hidden" src="{{ $logoPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+          <img class="hx:hidden hx:dark:block" src="{{ $logoDarkPath | relURL }}" alt="{{ .Site.Title }}" height="{{ $logoHeight }}" width="{{ $logoWidth }}" />
+        {{- end -}}
+      {{- end }}
+      {{- if (.Site.Params.navbar.displayTitle | default true) }}
+        <span class="hx:mx-2 hx:font-extrabold hx:inline hx:select-none" title="{{ .Site.Title }}">{{- .Site.Title -}}</span>
+      {{- end }}
+    </a>
+
+    {{- /* Get versions for current section */ -}}
+    {{- $versions := site.Params.versions -}}
+    {{- $subSection := "" -}}
+    {{- if and (ge (len $parts) 3) (eq (index $parts 1) "docs") -}}
+      {{- $subSection = index $parts 2 -}}
+      {{- if and $subSection (isset site.Params.sections $subSection) -}}
+        {{- $versions = (index site.Params.sections $subSection).versions -}}
+      {{- end -}}
+    {{- end -}}
+    
+    {{ if and $versions $version }}
+    {{- /* Version dropdown — visible on lg+ only. On mobile the same items
+           are folded into the hamburger drawer further down. */ -}}
+    <div class="dropdown hx:px-2 hx:relative nav-desktop-only">
+        <button class="hx:text-sm hx:font-normal hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200 hx:inline-flex hx:items-center hx:whitespace-nowrap hx:cursor-pointer" type="button">
+          {{- $foundVersion := false -}}
+          {{- range $versions -}}
+            {{- if eq $version .linkVersion -}}
+               {{- printf "%s" .dropdown -}}
+               {{- $foundVersion = true -}}
+               {{ break }}
+            {{- end -}}
+          {{- end -}}
+          {{- if not $foundVersion -}}
+            {{- /* Fallback if version not found */ -}}
+            {{- $version -}}
+          {{- end -}}
+          {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-1 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
+        </button>
+        <ul class="dropdown-content navbar-dropdown-content">
+          {{ partial "navbar-version.html" }}
+        </ul>
+    </div>
+    {{ end }}
+
+    {{- $currentPage := . -}}
+    {{- range .Site.Menus.main -}}
+      {{- if eq .Params.type "search" -}}
+        {{- /* Desktop-only navbar search. On mobile the drawer renders its
+               own search wrapper. Hextra's `getActiveSearchElement()` filters
+               for wrappers with `clientHeight > 0` AND requires exactly one
+               match; two visible wrappers (or zero) returns undefined and the
+               keydown/mousedown handlers throw. Hiding this one on mobile
+               keeps the count at 1. */ -}}
+        <div class="nav-desktop-only">
+          {{- partial "search.html" (dict "params" .Params) -}}
+        </div>
+      {{- else -}}
+        {{- $link := .URL -}}
+        {{- $external := strings.HasPrefix $link "http" -}}
+        {{- with .PageRef -}}
+          {{- if hasPrefix . "/" -}}
+            {{- $link = relLangURL (strings.TrimPrefix "/" .) -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{/* Check if this is the Docs menu item and render as dropdown */}}
+        {{- if eq .Name "Docs" -}}
+          {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
+          {{- /* Use the same color/weight for active and inactive — visual
+                 emphasis on the current page differs from agw's nav, which
+                 styles all top-nav items uniformly. The $active value is
+                 still computed in case future styles want to differentiate. */ -}}
+          {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
+          <div class="dropdown hx:relative hx:-ml-2 nav-desktop-only">
+            <a
+              title="{{ or (T .Identifier) .Name | safeHTML }}"
+              href="{{ $link }}"
+              class="hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:whitespace-nowrap hx:p-2 hx:inline-flex hx:items-center {{ $activeClass }}"
+            >
+              <span class="hx:text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-2 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
+            </a>
+            <div class="dropdown-content navbar-dropdown-content">
+              <a href="/docs/envoy/latest" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Kgateway (Envoy)</a>
+              <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Agentgateway</a>
+            </div>
+          </div>
+        {{/* Display icon menu item — hidden on mobile; surfaced in hamburger drawer instead */}}
+        {{- else if .Params.icon -}}
+          {{- $rel := cond (eq .Params.icon "mastodon") "noreferer me" "noreferer" }}
+          <a class="nav-desktop-only hx:p-2 hx:text-current hx:inline-flex hx:items-center" {{ if $external }}target="_blank" rel="{{ $rel }}"{{ end }} href="{{ $link }}" title="{{ or (T .Identifier) .Name | safeHTML }}">
+            {{- if eq .Params.icon "github" -}}
+              <span class="hx:inline-block hx:dark:hidden">{{- partial "utils/icon.html" (dict "name" "github" "attributes" "height=24 width=24") -}}</span>
+              <span class="hx:hidden hx:dark:inline-block github-white-icon">{{- partial "utils/icon.html" (dict "name" "github-white" "attributes" "height=24 width=24") -}}</span>
+            {{- else -}}
+              {{- partial "utils/icon.html" (dict "name" .Params.icon "attributes" "height=24") -}}
+            {{- end -}}
+            <span class="hx:sr-only">{{ or (T .Identifier) .Name | safeHTML }}</span>
+          </a>
+        {{- else -}}
+          {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
+          {{- /* Use the same color/weight for active and inactive — visual
+                 emphasis on the current page differs from agw's nav, which
+                 styles all top-nav items uniformly. The $active value is
+                 still computed in case future styles want to differentiate. */ -}}
+          {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
+          <a
+            title="{{ or (T .Identifier) .Name | safeHTML }}"
+            href="{{ $link }}"
+            {{ if $external }}target="_blank" rel="noreferer"{{ end }}
+            class="nav-desktop-only hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:relative hx:-ml-2 hx:whitespace-nowrap hx:p-2 {{ $activeClass }}"
+          >
+            <span class="hx:text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
+          </a>
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- /* Theme toggle (light/dark/system) — visible on lg+ only; the
+           mobile drawer below has its own toggle button. */ -}}
+    {{- if .Site.Params.theme.displayToggle -}}
+      <div class="nav-desktop-only">
+        {{- partial "theme-toggle.html" (dict "iconHeight" 24 "hideLabel" true "location" "top" "class" "hx:p-2") -}}
+      </div>
+    {{- end -}}
+
+    {{- /* Mobile hamburger button. The drawer itself lives outside <nav>
+           (just after </nav>) so it can span full width. The button toggles
+           between a hamburger icon (drawer closed) and an X icon (drawer
+           open) based on the aria-expanded attribute that extras's JS
+           keeps in sync. */ -}}
+    <button type="button" id="mobile-icons-toggle" aria-label="Menu" aria-expanded="false"
+            class="nav-mobile-only nav-mobile-toggle">
+      <svg class="nav-mobile-icon-hamburger" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg class="nav-mobile-icon-x" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </nav>
+
+  {{- /* Full-width mobile drawer, anchored just below the navbar. Matches
+         agw's old mobile menu style: search at top, simple light/dark
+         toggle (sun/moon swap, no 3-state dropdown), section headers with
+         indented children. The toggle JS sets/clears `hx:hidden` on this
+         element by id. */ -}}
+  <div id="mobile-icons-menu" class="nav-mobile-only nav-mobile-drawer hx:hidden">
+
+    {{- /* Search bar. Renders Hextra's standard search partial; CSS below
+           overrides its desktop width=16rem to full-width inside the drawer. */ -}}
+    <div class="nav-mobile-drawer-search">
+      {{- range .Site.Menus.main -}}
+        {{- if eq .Params.type "search" -}}
+          {{- partial "search.html" (dict "params" .Params) -}}
+        {{- end -}}
+      {{- end -}}
+    </div>
+
+    {{- /* Theme toggle. Single tap toggles between light and dark; the
+           toggleMobileTheme() helper lives in extras's themeExtras/head-end.html
+           and proxies to the underlying Hextra theme system. CSS shows the
+           moon icon in light mode and the sun in dark mode. */ -}}
+    {{- if .Site.Params.theme.displayToggle -}}
+      <button type="button" onclick="toggleMobileTheme()" class="nav-mobile-drawer-row">
+        <svg class="nav-mobile-theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="nav-mobile-theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path></svg>
+        <span>Toggle theme</span>
+      </button>
+    {{- end -}}
+
+    {{- /* Docs section header + section switcher children. */ -}}
+    <div class="nav-mobile-drawer-section">
+      <div class="nav-mobile-drawer-header">Docs</div>
+      <a class="nav-mobile-drawer-link" href="/docs/envoy/latest">Kgateway (Envoy)</a>
+      <a class="nav-mobile-drawer-link" href="https://agentgateway.dev/docs/kubernetes/latest/">Agentgateway</a>
+    </div>
+
+    {{- /* Version section header — only on a versioned docs page. */ -}}
+    {{ if and $versions $version }}
+      <div class="nav-mobile-drawer-section">
+        <div class="nav-mobile-drawer-header">Version</div>
+        <ul class="nav-mobile-drawer-version-list">
+          {{ partial "navbar-version.html" }}
+        </ul>
+      </div>
+    {{ end }}
+
+    {{- /* Other top-level menu items (Blog, GitHub, etc.). These have no
+           sub-items so they render as standalone "section header"-styled
+           links — matching agw production where top-level items without
+           children get the same prominence as section headers, not smaller
+           child-link styling. Icons are dropped here since the header
+           treatment is text-only. */ -}}
+    {{- range .Site.Menus.main -}}
+      {{- if or (eq .Params.type "search") (eq .Name "Docs") -}}{{- continue -}}{{- end -}}
+      {{- $link := .URL -}}
+      {{- $external := strings.HasPrefix $link "http" -}}
+      {{- with .PageRef -}}
+        {{- if hasPrefix . "/" -}}{{- $link = relLangURL (strings.TrimPrefix "/" .) -}}{{- end -}}
+      {{- end -}}
+      <div class="nav-mobile-drawer-section">
+        <a href="{{ $link }}" {{ if $external }}target="_blank" rel="noreferer"{{ end }} class="nav-mobile-drawer-header nav-mobile-drawer-header-link">
+          {{ or (T .Identifier) .Name | safeHTML }}
+        </a>
+      </div>
+    {{- end -}}
+  </div>
+</div>

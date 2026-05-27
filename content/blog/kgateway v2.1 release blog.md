@@ -78,7 +78,7 @@ Now, you can apply header request and response modifiers in a TrafficPolicy. Thi
 
 ### Horizontal Pod Autoscaling {#hpa}
 
-You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale kgateway control and data plane pods up and down based on certain thresholds, like memory and CPU consumption. See [Horizontal Pod Autoscaling (HPA)](/docs/envoy/latest/setup/hpa/) for more information.
+You can bring your own Horizontal Pod Autoscaler (HPA) plug-in to kgateway. This way, you can automatically scale kgateway control and data plane pods up and down based on certain thresholds, like memory and CPU consumption. See [Horizontal Pod Autoscaling (HPA)](/docs/envoy/latest/setup/customize/configs/#hpa) for more information.
 
 ### HTTP1.0/0.9 support {#http10}
 
@@ -146,7 +146,7 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 {{< /tabs >}}
 
 ### AI Backend API changes {#v21-ai-backend-api-changes}
-The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](/docs/envoy/latest/reference/api/#aibackend) and [AI guides](/docs/envoy/2.1.x/ai/) docs.
+The AI Backend API is updated to simplify the configuration of various LLM features. For more information, see the [API reference](/docs/envoy/2.1.x/reference/api/#aibackend) and [AI guides](/docs/envoy/2.1.x/ai/) docs.
 
 
 ### Route delegation annotation for policy merging {#v21-delegation-policy-merging}

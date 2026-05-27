@@ -1,6 +1,7 @@
 # Build / generated files
 .hugo_build.lock
 hugo_stats.json
+.build.log
 
 # Node dependencies
 node_modules/
@@ -19,3 +20,4 @@ resources/
 
 # macOS system files
 .DS_Store
+

@@ -1,0 +1,44 @@
+{{- $path := page.RelPermalink -}}
+{{- $segments := split $path "/" -}}
+{{- $section := index $segments 1 -}}  {{- /* "docs" */ -}}
+{{- $subSection := index $segments 2 -}}  {{- /* "envoy" or "agentgateway" */ -}}
+{{- $currentVersion := "" -}}
+{{- /* Extract current version from path */ -}}
+{{- if and (ge (len $segments) 4) (eq $section "docs") -}}
+  {{- $currentVersion = index $segments 3 -}}
+{{- end -}}
+
+{{- /* Get versions for current section */ -}}
+{{- $versions := site.Params.versions -}}
+{{- if and $subSection (isset site.Params.sections $subSection) -}}
+  {{- $versions = (index site.Params.sections $subSection).versions -}}
+{{- end -}}
+
+{{- /* Build path without version but with section */ -}}
+{{- /* Skip first 4 segments: "", "docs", "envoy", "latest" - take everything after version */ -}}
+{{- $filtered := after 4 $segments -}}
+{{- $newPath := printf "/%s" (delimit $filtered "/") -}}
+{{- $baseurl := site.BaseURL -}}
+
+{{- $itemClass := "hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100 hx:dark:hover:bg-gray-800 hx:whitespace-nowrap" -}}
+
+{{- range $versions -}}
+  <li>
+    {{- if or (eq $subSection "agentgateway") (hasPrefix $path "/docs/agentgateway/") -}}
+      <a class="{{ $itemClass }}" href="https://agentgateway.dev/docs/kubernetes/latest/">{{ .dropdown }}</a>
+    {{- else -}}
+      {{- /* Default: same path in target version. If that page does not exist
+             and the target version has a `not-in-version` fallback page, route
+             there so the user lands on a helpful page instead of a 404. */ -}}
+      {{- $href := printf "/docs/%s/%s%s" $subSection .linkVersion $newPath -}}
+      {{- $targetPath := printf "/docs/%s/%s%s" $subSection .linkVersion $newPath -}}
+      {{- if not (site.GetPage $targetPath) -}}
+        {{- $fallbackPath := printf "/docs/%s/%s/not-in-version" $subSection .linkVersion -}}
+        {{- if site.GetPage $fallbackPath -}}
+          {{- $href = printf "/docs/%s/%s/not-in-version/" $subSection .linkVersion -}}
+        {{- end -}}
+      {{- end -}}
+      <a class="{{ $itemClass }}" href="{{ $href }}">{{ .dropdown }}</a>
+    {{- end -}}
+  </li>
+{{- end -}}

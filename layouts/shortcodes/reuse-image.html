@@ -1,6 +1,0 @@
-{{ $src := .Get "src" }}
-{{ $width := .Get "width" }}
-{{ $alt := .Get "alt" }}
-{{ $image := resources.Get $src }}
-{{ $caption := .Get "caption" }}
-<div><figure class="hx-block dark:hx-hidden"><img class="hx-block dark:hx-hidden" src="{{ $image.RelPermalink }}" width="{{ $width }}" alt="{{ $alt }}"/> <figcaption style="font-style:italic">{{ $caption }}</figcaption></figure></div>

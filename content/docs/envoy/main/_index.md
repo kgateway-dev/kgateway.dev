@@ -1,6 +1,6 @@
 ---
-linkTitle: "Kgateway 2.3.x"
-title: Kgateway 2.3.x
+linkTitle: "Kgateway 2.4.x"
+title: Kgateway 2.4.x
 ---
 
 Welcome to the documentation for the kgateway open source project!

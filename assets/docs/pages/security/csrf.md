@@ -46,7 +46,7 @@ Use a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to define your CSR
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#csrfpolicy" >}}).
+   {{< reuse "docs/snippets/review-table.md" >}}{{< version exclude-if="2.0.x" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#csrfpolicy" >}}).{{< /version >}}
 
    | Field | Description |
    |-------|-------------|

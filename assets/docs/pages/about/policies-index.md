@@ -7,21 +7,12 @@ While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} allows you to do
 
 Kgateway uses the following custom resources to attach policies to routes and gateway listeners. 
 
-{{< version exclude-if="2.0.x" >}}
-{{< cards >}}
-  {{< card link="../policies/backendconfigpolicy/" title="BackendConfigPolicy" subtitle="Configure connection settings to an upstream service." >}}
-  {{< card link="../../traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
-  {{< card link="../policies/httplistenerpolicy/" title="HTTPListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
-  {{< card link="../policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
-{{< /cards >}}
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
 {{< cards >}}
   {{< card link="../../traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
   {{< card link="../policies/httplistenerpolicy/" title="HTTPListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
   {{< card link="../policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
 {{< /cards >}}
-{{< /version >}}
+
 
 ## Supported policies {#supported-policies}
 
@@ -45,9 +36,6 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version exclude-if="2.0.x" %}} 
 | [TCP keepalive](../../resiliency/tcp-keepalive/) | BackendConfigPolicy | {{% /version %}}
 | [Transformations](../../traffic-management/transformations) | {{< reuse "docs/snippets/trafficpolicy.md" >}} | 
+
 ## Policy behavior
 
-{{< cards >}}
-{{< version exclude-if="2.0.x" >}}  {{< card link="global-attachment" title="Global policy attachment" >}}{{< /version >}}
-  {{< card link="merging" title="Policy merging" >}}
-{{< /cards >}}

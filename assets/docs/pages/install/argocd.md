@@ -9,7 +9,7 @@ In this installation guide, you install {{< reuse "/docs/snippets/kgateway.md" >
 3. If you do not already have Argo CD installed in your cluster, install it.
    ```shell
    kubectl create namespace argocd
-   until kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.12.3/manifests/install.yaml > /dev/null 2>&1; do sleep 2; done
+   until kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml > /dev/null 2>&1; do sleep 2; done
    # wait for deployment to complete
    kubectl -n argocd rollout status deploy/argocd-applicationset-controller
    kubectl -n argocd rollout status deploy/argocd-dex-server

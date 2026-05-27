@@ -356,7 +356,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `endpoint` _[AbsoluteURI](#absoluteuri)_ | EndPoint specifies the URL of the OTLP Exporter for traces.<br />Example: "http://my-otel-collector.svc.cluster.local:4317"<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_endpoint |  |  |
+| `endpoint` _[AbsoluteURI](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#absoluteuri)_ | EndPoint specifies the URL of the OTLP Exporter for traces.<br />Example: "http://my-otel-collector.svc.cluster.local:4317"<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_endpoint |  |  |
 | `sampler` _[OTelTracesSampler](#oteltracessampler)_ | Sampler defines the sampling strategy for OpenTelemetry traces.<br />Sampling helps in reducing the volume of trace data by selectively<br />recording only a subset of traces.<br />https://opentelemetry.io/docs/languages/sdk-configuration/general/#otel_traces_sampler |  |  |
 | `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | OTLPTimeout specifies timeout configurations for OTLP (OpenTelemetry Protocol) exports.<br />It allows setting general and trace-specific timeouts for sending data.<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_timeout |  |  |
 | `protocol` _[OTLPTracesProtocolType](#otlptracesprotocoltype)_ | OTLPProtocol specifies the protocol to be used for OTLP exports.<br />This determines how tracing data is serialized and transported (e.g., gRPC, HTTP/Protobuf).<br />https://opentelemetry.io/docs/languages/sdk-configuration/otlp-exporter/#otel_exporter_otlp_traces_protocol |  | Enum: [grpc http/protobuf http/json] <br /> |
@@ -1756,7 +1756,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `header` _[HTTPHeaderMatch](#httpheadermatch)_ |  |  |  |
+| `header` _[HTTPHeaderMatch](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadermatch)_ |  |  |  |
 
 
 #### HeaderModifiers
@@ -1772,8 +1772,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `request` _[HTTPHeaderFilter](#httpheaderfilter)_ | Request modifies request headers. |  |  |
-| `response` _[HTTPHeaderFilter](#httpheaderfilter)_ | Response modifies response headers. |  |  |
+| `request` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | Request modifies request headers. |  |  |
+| `response` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | Response modifies response headers. |  |  |
 
 
 #### HeaderName
@@ -2182,9 +2182,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
+| `group` _[Group](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname)_ | The name of the target resource. |  |  |
 
 
 #### LocalPolicyTargetReferenceWithSectionName
@@ -2202,10 +2202,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
-| `sectionName` _[SectionName](#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
+| `group` _[Group](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `name` _[ObjectName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname)_ | The name of the target resource. |  |  |
+| `sectionName` _[SectionName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
 
 
 #### LocalPolicyTargetSelector
@@ -2228,8 +2228,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `group` _[Group](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
 | `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
 
 
@@ -2251,10 +2251,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `group` _[Group](#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
-| `kind` _[Kind](#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
+| `group` _[Group](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#group)_ | The API group of the target resource.<br />For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. |  |  |
+| `kind` _[Kind](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#kind)_ | The API kind of the target resource,<br />such as Gateway or HTTPRoute. |  |  |
 | `matchLabels` _object (keys:string, values:string)_ | Label selector to select the target resource. |  |  |
-| `sectionName` _[SectionName](#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
+| `sectionName` _[SectionName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#sectionname)_ | The section name of the target resource. |  | MaxLength: 253 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$` <br /> |
 
 
 #### LocalRateLimitPolicy
@@ -2372,7 +2372,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[SectionName](#sectionname)_ | Name of the MCP target. |  |  |
+| `name` _[SectionName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#sectionname)_ | Name of the MCP target. |  |  |
 | `selector` _[McpSelector](#mcpselector)_ | Selector is the selector to use to select the MCP targets.<br />Note: Policies must target the resource selected by the target and<br />not the name of the selector-based target on the Backend resource. |  |  |
 | `static` _[McpTarget](#mcptarget)_ | Static is the static MCP target to use.<br />Policies can target static backends by targeting the Backend resource<br />and using sectionName to target the specific static target by name. |  |  |
 
@@ -2521,7 +2521,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[SectionName](#sectionname)_ | Name of the provider. Policies can target this provider by name. |  |  |
+| `name` _[SectionName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#sectionname)_ | Name of the provider. Policies can target this provider by name. |  |  |
 | `openai` _[OpenAIConfig](#openaiconfig)_ | OpenAI provider |  |  |
 | `azureopenai` _[AzureOpenAIConfig](#azureopenaiconfig)_ | Azure OpenAI provider |  |  |
 | `anthropic` _[AnthropicConfig](#anthropicconfig)_ | Anthropic provider |  |  |
@@ -2550,8 +2550,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `name` _[ObjectName](#objectname)_ | The name of the target resource. |  |  |
-| `namespace` _[Namespace](#namespace)_ | The namespace of the target resource.<br />If not set, defaults to the namespace of the parent object. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` <br /> |
+| `name` _[ObjectName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname)_ | The name of the target resource. |  |  |
+| `namespace` _[Namespace](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#namespace)_ | The namespace of the target resource.<br />If not set, defaults to the namespace of the parent object. |  | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9]([-a-z0-9]*[a-z0-9])?$` <br /> |
 
 
 #### OTLPTracesProtocolType
@@ -2708,7 +2708,7 @@ _Appears in:_
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata. |  |  |
 | `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
 | `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
-| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for<br />details. |  |  |
+| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
 | `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
 | `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
 | `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  |  |
@@ -3128,7 +3128,7 @@ _Appears in:_
 | `retryOn` _[RetryOnCondition](#retryoncondition) array_ | RetryOn specifies the conditions under which a retry should be attempted. |  | Enum: [5xx gateway-error reset reset-before-request connect-failure envoy-ratelimited retriable-4xx refused-stream retriable-status-codes http3-post-connect-failure cancelled deadline-exceeded internal resource-exhausted unavailable] <br />MinItems: 1 <br /> |
 | `attempts` _integer_ | Attempts specifies the number of retry attempts for a request.<br />Defaults to 1 attempt if not set.<br />A value of 0 effectively disables retries. | 1 | Minimum: 0 <br /> |
 | `perTryTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | PerTryTimeout specifies the timeout per retry attempt (incliding the initial attempt).<br />If a global timeout is configured on a route, this timeout must be less than the global<br />route timeout.<br />It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms". |  |  |
-| `statusCodes` _HTTPRouteRetryStatusCode array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | MinItems: 1 <br /> |
+| `statusCodes` _[HTTPRouteRetryStatusCode](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouteretrystatuscode) array_ | StatusCodes specifies the HTTP status codes in the range 400-599 that should be retried in addition<br />to the conditions specified in RetryOn. |  | MinItems: 1 <br /> |
 | `backoffBaseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BackoffBaseInterval specifies the base interval used with a fully jittered exponential back-off between retries.<br />Defaults to 25ms if not set.<br />Given a backoff base interval B and retry number N, the back-off for the retry is in the range [0, (2^N-1)*B].<br />The backoff interval is capped at a max of 10 times the base interval.<br />E.g., given a value of 25ms, the first retry will be delayed randomly by 0-24ms, the 2nd by 0-74ms,<br />the 3rd by 0-174ms, and so on, and capped to a max of 10 times the base interval (250ms). | 25ms |  |
 
 
@@ -3482,7 +3482,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | Reference to the TLS secret containing the certificate, key, and optionally the root CA. |  |  |
 | `files` _[TLSFiles](#tlsfiles)_ | File paths to certificates local to the proxy. |  |  |
-| `wellKnownCACertificates` _[WellKnownCACertificatesType](#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
+| `wellKnownCACertificates` _[WellKnownCACertificatesType](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#wellknowncacertificatestype)_ | WellKnownCACertificates specifies whether to use a well-known set of CA<br />certificates for validating the backend's certificate chain. Currently,<br />only the system certificate pool is supported via SDS. |  |  |
 | `insecureSkipVerify` _boolean_ | InsecureSkipVerify originates TLS but skips verification of the backend's certificate.<br />WARNING: This is an insecure option that should only be used if the risks are understood. |  |  |
 | `sni` _string_ | The SNI domains that should be considered for TLS connection |  | MinLength: 1 <br /> |
 | `verifySubjectAltNames` _string array_ | Verify that the Subject Alternative Name in the peer certificate is one of the specified values.<br />note that a root_ca must be provided if this option is used. |  |  |
@@ -3789,7 +3789,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _[Host](#host)_ | Host to send the traffic to.<br />Note: TLS is not currently supported for webhook.<br />Example:<br />```yaml<br />host:<br />  host: example.com  #The host name of the webhook endpoint.<br />  port: 443 	        #The port number on which the webhook is listening.<br />``` |  |  |
-| `forwardHeaderMatches` _[HTTPHeaderMatch](#httpheadermatch) array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
+| `forwardHeaderMatches` _[HTTPHeaderMatch](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadermatch) array_ | ForwardHeaderMatches defines a list of HTTP header matches that will be<br />used to select the headers to forward to the webhook.<br />Request headers are used when forwarding requests and response headers<br />are used when forwarding responses.<br />By default, no headers are forwarded. |  |  |
 
 
 #### XRateLimitHeadersStandard
@@ -3806,6 +3806,6 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
-| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-03.html).<br /> |
+| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
