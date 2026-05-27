@@ -8,6 +8,7 @@ Review your options for configuring gateway proxies and the HTTP or HTTPS listen
 {{< cards >}}
   {{< card link="gateway" title="Set up a gateway" >}}
   {{< card link="default" title="Default gateway proxy setup" >}}
+  {{< card link="end-to-end-ingress" title="End-to-End Ingress Guide" >}}
   {{< card link="customize" title="Gateway customization" >}}
   {{< card link="listeners" title="Listeners" >}}
   {{< card link="customize/selfmanaged" title="Self-managed gateways (BYO)" >}}
