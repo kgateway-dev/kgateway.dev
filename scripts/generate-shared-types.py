@@ -161,7 +161,7 @@ def parse_go_file(filepath: Path, source: str = "", is_enterprise: bool = False)
     """Parse a Go file and extract type definitions."""
     types = []
     
-    content = filepath.read_text()
+    content = filepath.read_text(encoding="utf-8")
     lines = content.split('\n')
     
     # Find type definitions
@@ -364,7 +364,7 @@ def find_documented_types(doc_file: Path) -> set[str]:
     if not doc_file.exists():
         return set()
 
-    content = doc_file.read_text()
+    content = doc_file.read_text(encoding="utf-8")
     heading_pattern = re.compile(r'^#### (\w+)', re.MULTILINE)
     return {m.group(1) for m in heading_pattern.finditer(content)}
 
@@ -374,7 +374,7 @@ def find_all_broken_links(doc_file: Path) -> set[str]:
     if not doc_file.exists():
         return set()
 
-    content = doc_file.read_text()
+    content = doc_file.read_text(encoding="utf-8")
 
     # Find all links like [TypeName](#typename)
     link_pattern = re.compile(r'\[([A-Z][A-Za-z0-9_]*)\]\(#([a-z][a-z0-9_]*)\)')
@@ -482,7 +482,7 @@ def main():
     markdown = generate_markdown(all_types, referenced, existing_doc_types)
     
     # Append to doc file
-    with open(doc_file, "a") as f:
+    with open(doc_file, "a", encoding="utf-8") as f:
         f.write(markdown)
     
     print(f"Successfully appended documentation for {len(referenced)} types")
