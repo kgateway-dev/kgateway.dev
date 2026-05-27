@@ -26,8 +26,3 @@ You can download the Helm chart to review the Helm values that are supported.
 ## Helm charts
 
 Review the documentation for the following Helm charts.
-
-{{< cards >}}
-  {{< card link="kgateway-crds" title="kgateway-crds" >}}
-  {{< card link="kgateway" title="kgateway" >}}
-{{< /cards >}}

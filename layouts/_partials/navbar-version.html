@@ -20,18 +20,25 @@
 {{- $newPath := printf "/%s" (delimit $filtered "/") -}}
 {{- $baseurl := site.BaseURL -}}
 
+{{- $itemClass := "hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100 hx:dark:hover:bg-gray-800 hx:whitespace-nowrap" -}}
+
 {{- range $versions -}}
   <li>
     {{- if or (eq $subSection "agentgateway") (hasPrefix $path "/docs/agentgateway/") -}}
-      <a class="dropdow-item" href="https://agentgateway.dev/docs/kubernetes/latest/">{{ .dropdown }}</a>
+      <a class="{{ $itemClass }}" href="https://agentgateway.dev/docs/kubernetes/latest/">{{ .dropdown }}</a>
     {{- else -}}
+      {{- /* Default: same path in target version. If that page does not exist
+             and the target version has a `not-in-version` fallback page, route
+             there so the user lands on a helpful page instead of a 404. */ -}}
+      {{- $href := printf "/docs/%s/%s%s" $subSection .linkVersion $newPath -}}
       {{- $targetPath := printf "/docs/%s/%s%s" $subSection .linkVersion $newPath -}}
-      {{- $pageExists := site.GetPage $targetPath -}}
-      {{- if $pageExists -}}
-        <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}{{ $newPath }}">{{ .dropdown }}</a>
-      {{- else -}}
-        <a class="dropdow-item" href="{{ $baseurl }}docs/{{ $subSection }}/{{ .linkVersion }}/" style="opacity: 0.4;" title="This page is not available in {{ .dropdown }}">{{ .dropdown }}</a>
+      {{- if not (site.GetPage $targetPath) -}}
+        {{- $fallbackPath := printf "/docs/%s/%s/not-in-version" $subSection .linkVersion -}}
+        {{- if site.GetPage $fallbackPath -}}
+          {{- $href = printf "/docs/%s/%s/not-in-version/" $subSection .linkVersion -}}
+        {{- end -}}
       {{- end -}}
+      <a class="{{ $itemClass }}" href="{{ $href }}">{{ .dropdown }}</a>
     {{- end -}}
   </li>
 {{- end -}}
