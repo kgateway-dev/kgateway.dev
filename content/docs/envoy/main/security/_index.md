@@ -17,6 +17,7 @@ For example, you might use HTTPS listeners for external client connections, enfo
   {{< card link="jwt" title="JWT" >}}
   {{< card link="csrf" title="CSRF" >}}
   {{< card link="extauth" title="Bring your own external auth" >}}
+  {{< card link="oidc" title="OIDC Concepts" >}}
   {{< card link="ratelimit" title="Rate limiting" >}}
   {{< card link="backend-tls" title="Backend TLS" >}}
   {{< card path="/setup/listeners/https/" title="HTTPS listener" icon="bookmark">}}
