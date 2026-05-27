@@ -110,3 +110,14 @@ h6 {
   color: #f3f4f6;
 }
 
+/* Align the centralized docs sidebar and TOC with the breadcrumb on
+   kgw docs pages. Kgw's main hx:pt-6 leaves the breadcrumb ~30px below
+   the navbar shadow; the centralized .sidebar-nav-wrapper and
+   .solo-toc-inner default to a much smaller top offset (tuned for
+   agw's tighter pt-2 layout), so pad them down here. */
+aside.sidebar-container > .sidebar-nav-wrapper {
+  padding-top: 1.1875rem;
+}
+nav.hextra-toc > div.hextra-scrollbar {
+  padding-top: 1.875rem;
+}
