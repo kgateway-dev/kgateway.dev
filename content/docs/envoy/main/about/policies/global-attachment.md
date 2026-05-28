@@ -1,5 +1,6 @@
 ---
 title: Global policy attachment
+description: Attach policies across namespaces using label selectors for centralized policy management.
 weight: 20
 ---
 

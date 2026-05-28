@@ -1,5 +1,6 @@
 ---
 title: "Providers"
+description: Pick the Ingress provider that ingress2gateway translates to the Gateway API.
 weight: 20
 ---
 

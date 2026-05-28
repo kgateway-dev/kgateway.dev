@@ -1,9 +1,8 @@
 ---
 title: SNI
 weight: 10
-description: 
+description: Serve multiple hostnames from one HTTPS listener by selecting certificates with SNI.
 ---
-
 Serve multiple hosts on the same HTTPS listener.
 
 ## About SNI 

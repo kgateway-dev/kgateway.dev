@@ -1,5 +1,6 @@
 ---
 title: "Emitters"
+description: How emitters convert source Ingress resources into Gateway API equivalents.
 weight: 20
 ---
 

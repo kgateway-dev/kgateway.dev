@@ -1,5 +1,6 @@
 ---
 title: Deployment patterns
+description: Compare single-gateway, sharded, and service-mesh deployment patterns.
 weight: 20
 ---
 

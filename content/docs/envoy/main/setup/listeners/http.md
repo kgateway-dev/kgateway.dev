@@ -1,5 +1,6 @@
 ---
 title: HTTP
+description: Add an HTTP listener for plaintext traffic on a gateway.
 weight: 10
 ---
 

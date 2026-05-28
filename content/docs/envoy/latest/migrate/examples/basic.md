@@ -1,5 +1,6 @@
 ---
 title: "Basic Ingress"
+description: Convert a simple Ingress resource to a Gateway and HTTPRoute.
 weight: 10
 ---
 

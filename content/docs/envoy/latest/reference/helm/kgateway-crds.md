@@ -1,5 +1,6 @@
 ---
 title: kgateway-crds
+description: Reference for the kgateway-crds Helm chart values that install the kgateway CRDs.
 weight: 30
 ---
 

@@ -1,11 +1,5 @@
 ---
 title: Rate limit
+description: Throttle requests with local rate limiting or a global rate limit service.
 weight: 10
 ---
-
-
-
-{{< cards >}}
-  {{< card link="local" title="Local rate limiting" >}}
-  {{< card link="global" title="Global rate limiting" >}}
-{{< /cards >}}

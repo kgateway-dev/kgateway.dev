@@ -1,5 +1,6 @@
 ---
 title: Backends
+description: Route to backends outside your cluster, including static hosts and AWS Lambda functions.
 weight: 20
 ---
 

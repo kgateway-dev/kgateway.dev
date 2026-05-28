@@ -1,5 +1,6 @@
 ---
 title: AWS ELBs
+description: Front your gateway with AWS Application or Network Load Balancers for traffic distribution.
 weight: 20
 ---
 

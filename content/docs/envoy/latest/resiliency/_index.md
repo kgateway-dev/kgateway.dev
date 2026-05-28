@@ -1,5 +1,6 @@
 ---
 title: Resiliency
+description: Apply retries, timeouts, circuit breakers, and fault injection to keep your gateway resilient.
 icon: health_and_safety
 weight: 430
 ---

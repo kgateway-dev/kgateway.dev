@@ -1,5 +1,6 @@
 ---
 title: "Migrate from Ingress"
+description: Migrate from Ingress NGINX to the Gateway API and kgateway using the ingress2gateway tool.
 icon: swap_horiz
 weight: 900
 ---

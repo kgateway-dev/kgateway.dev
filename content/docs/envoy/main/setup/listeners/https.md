@@ -1,5 +1,6 @@
 ---
 title: HTTPS
+description: Add an HTTPS listener that terminates TLS at the gateway.
 weight: 10
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Request matching
+description: Match requests by path, method, header, query parameter, or regular expression.
 weight: 20
 ---
 

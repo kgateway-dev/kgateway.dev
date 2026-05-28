@@ -1,5 +1,6 @@
 ---
 title: Rewrites
+description: Rewrite the request host or path prefix before forwarding to a backend.
 weight: 20
 ---
 

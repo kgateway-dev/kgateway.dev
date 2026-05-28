@@ -1,5 +1,6 @@
 ---
 title: Istio ambient mesh for mTLS
+description: Enforce mTLS between the gateway and upstream workloads with an Istio mesh.
 weight: 70
 ---
 

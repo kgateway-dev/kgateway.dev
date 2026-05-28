@@ -1,5 +1,6 @@
 ---
 title: API reference
+description: Browse the full kgateway CRD reference for fields, types, and validation rules.
 weight: 10
 ---
 

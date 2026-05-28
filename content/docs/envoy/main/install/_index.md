@@ -1,15 +1,8 @@
 ---
 title: Install
+description: Install the kgateway control plane in your Kubernetes cluster with Helm or Argo CD.
 weight: 250
 icon: settings
 ---
 
 Learn how to install kgateway. 
-
-{{< cards >}}
-  {{< card link="helm" title="Helm" >}}
-  {{< card link="argocd" title="Argo CD" >}}
-  {{< card link="sample-app" title="Sample app" >}}
-  {{< card link="advanced" title="Advanced settings" >}}
-  {{< card link="tls" title="TLS encryption" >}}
-{{< /cards >}}

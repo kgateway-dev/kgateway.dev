@@ -1,5 +1,6 @@
 ---
 title: OTel stack
+description: Deploy an OpenTelemetry collector stack to collect logs, metrics, and traces from your gateway.
 weight: 10
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: Weighted routing
+description: Distribute traffic across multiple HTTPRoutes by weight for traffic shaping.
 weight: 20
 ---
 

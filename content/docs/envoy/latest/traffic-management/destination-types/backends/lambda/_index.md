@@ -1,5 +1,6 @@
 ---
 title: AWS Lambda
+description: Invoke AWS Lambda functions directly from a gateway route.
 weight: 30
 ---
 

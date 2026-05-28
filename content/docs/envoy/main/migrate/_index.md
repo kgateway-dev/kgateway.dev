@@ -1,8 +1,9 @@
 ---
 title: "Migrate from Ingress"
+icon: swap_horiz
+description: Migrate from Ingress NGINX to the Gateway API and kgateway using the ingress2gateway tool.
 weight: 900
 ---
-
 ## Introduction
 
 Welcome to the documentation for migrating from Ingress to **Gateway API** and **kgateway**. Migration is supported using the
