@@ -1,5 +1,6 @@
 ---
 title: "CLI"
+description: Use the ingress2gateway print and version commands to inspect and convert resources.
 weight: 10
 ---
 This page focuses on the commands you’ll use most often.

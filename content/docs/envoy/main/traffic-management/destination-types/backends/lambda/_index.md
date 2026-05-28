@@ -1,5 +1,6 @@
 ---
 title: AWS Lambda
+description: Invoke AWS Lambda functions directly from a gateway route.
 weight: 30
 ---
 
@@ -22,6 +23,6 @@ For more information, see the AWS Lambda documentation on [configuring Lambda fu
 Check out the following guides for examples on how to invoke Lambda functions with kgateway, depending on the type of authentication that you want to use.
 
 {{< cards >}}
-  {{< card link="creds-secret" title="Access AWS Lambda with a credentials secret" >}}
-  {{< card link="service-accounts" title="Access AWS Lambda with a service account" >}}
+  {{< card link="creds-secret" title="Access AWS Lambda with a credentials secret" subtitle="Authenticate to AWS Lambda by using long-lived credentials stored in a Kubernetes secret." >}}
+  {{< card link="service-accounts" title="Access AWS Lambda with a service account" subtitle="Authenticate to AWS Lambda by using IAM Roles for Service Accounts (IRSA)." >}}
 {{< /cards >}}

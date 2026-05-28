@@ -1,5 +1,6 @@
 ---
 title: "Windows Installation"
+description: Install the ingress2gateway CLI on Windows.
 weight: 30
 ---
 

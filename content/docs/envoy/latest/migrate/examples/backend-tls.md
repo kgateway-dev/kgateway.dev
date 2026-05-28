@@ -1,5 +1,6 @@
 ---
 title: "Backend TLS"
+description: Convert Ingress NGINX backend TLS annotations to a kgateway BackendConfigPolicy.
 weight: 80
 ---
 

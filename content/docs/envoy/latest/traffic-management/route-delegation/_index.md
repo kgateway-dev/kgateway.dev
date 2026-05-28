@@ -1,5 +1,6 @@
 ---
 title: Route delegation
+description: Compose routing across teams by delegating subpaths to child HTTPRoute resources.
 weight: 20
 ---
 

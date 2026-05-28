@@ -1,5 +1,6 @@
 ---
 title: "macOS Installation"
+description: Install the ingress2gateway CLI on macOS.
 weight: 10
 ---
 

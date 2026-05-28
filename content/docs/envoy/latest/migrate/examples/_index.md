@@ -1,5 +1,6 @@
 ---
 title: "Examples"
+description: Walk through worked examples that convert common Ingress NGINX configurations to kgateway.
 weight: 50
 ---
 

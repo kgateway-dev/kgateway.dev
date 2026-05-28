@@ -1,5 +1,6 @@
 ---
 title: Proxy protocol
+description: Preserve the original client IP and port by accepting PROXY protocol on a listener.
 weight: 20
 ---
 

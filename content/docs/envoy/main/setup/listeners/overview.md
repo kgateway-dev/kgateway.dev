@@ -1,9 +1,8 @@
 ---
 title: Listener overview
 weight: 5
-description: 
+description: Compare inline Gateway listeners and ListenerSet listeners and learn how to configure each.
 ---
-
 Set up listeners on your API Gateway. A listener configures how your API Gateway accepts and processes incoming requests.
 
 In the Kubernetes Gateway API, you can create listeners in two main ways:

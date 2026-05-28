@@ -1,5 +1,6 @@
 ---
 title: Health checks
+description: Probe backend and gateway health to remove unhealthy endpoints from rotation.
 weight: 20
 ---
 

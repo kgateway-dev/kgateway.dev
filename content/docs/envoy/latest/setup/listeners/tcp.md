@@ -1,5 +1,6 @@
 ---
 title: TCP
+description: Add a TCP listener to route non-HTTP traffic through the gateway.
 weight: 10
 ---
 

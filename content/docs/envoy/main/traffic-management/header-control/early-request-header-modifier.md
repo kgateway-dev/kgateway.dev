@@ -1,5 +1,6 @@
 ---
 title: Early request header modification
+description: Modify request headers before authentication and policy filters run.
 weight: 30
 ---
 

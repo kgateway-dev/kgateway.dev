@@ -1,5 +1,6 @@
 ---
 title: "SSL Redirect"
+description: Convert Ingress NGINX SSL redirect annotations to an HTTPRoute RequestRedirect filter.
 weight: 50
 ---
 

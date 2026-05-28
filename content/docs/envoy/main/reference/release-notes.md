@@ -1,5 +1,6 @@
 ---
 title: Release notes
+description: What's new, breaking changes, and bug fixes for each kgateway release.
 weight: 100
 ---
 

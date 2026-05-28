@@ -1,5 +1,6 @@
 ---
 title: Header control
+description: Add, remove, or rewrite request and response headers on routes and listeners.
 weight: 20
 ---
 

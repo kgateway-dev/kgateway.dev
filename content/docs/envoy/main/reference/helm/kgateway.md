@@ -1,5 +1,6 @@
 ---
 title: kgateway
+description: Reference for the kgateway Helm chart values that configure the control plane and default proxies.
 weight: 30
 ---
 

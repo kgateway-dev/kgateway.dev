@@ -1,5 +1,6 @@
 ---
 title: "Session Affinity"
+description: Convert Ingress NGINX session affinity annotations to a kgateway BackendConfigPolicy.
 weight: 20
 ---
 

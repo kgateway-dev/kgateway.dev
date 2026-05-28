@@ -1,5 +1,6 @@
 ---
 title: HTTP services
+description: Route traffic to a Kubernetes Service backend over HTTP.
 weight: 10
 prev: /docs/traffic-management/destination-types/
 ---

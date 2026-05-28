@@ -1,5 +1,6 @@
 ---
 title: Contributor guide
+description: Contribute to the kgateway documentation, from writing pages to previewing them locally.
 weight: 100
 ---
 

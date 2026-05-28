@@ -1,5 +1,6 @@
 ---
 title: Gateway setup
+description: Configure gateway proxies, listeners, and gateway-level options.
 icon: dns
 weight: 300
 ---

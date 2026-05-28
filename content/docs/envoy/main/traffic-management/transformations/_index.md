@@ -1,19 +1,20 @@
 ---
 title: Transformations
+description: Transform request and response headers and bodies with templated expressions.
 weight: 20
 ---
 
 Mutate and transform requests and responses before forwarding them to the destination.
 
 {{< cards >}}
-  {{< card link="engines" title="Transformation engine" >}}
-  {{< card link="templating-language" title="Templating language" >}}
-  {{< card link="inject-response-headers" title="Inject response headers" >}}
-  {{< card link="decode-base64-headers" title="Decode base64 headers" >}}
-  {{< card link="update-request-path" title="Update request paths and methods" >}}
-  {{< card link="redirect-url" title="Create redirect URLs" >}}
-  {{< card link="change-response-status" title="Change response status" >}}
-  {{< card link="update-response-body" title="Update response body" >}}
+  {{< card link="engines" title="Transformation engine" subtitle="Learn how the rustformation engine processes TrafficPolicy transformations and migrate templates from the classic transformation filter." >}}
+  {{< card link="templating-language" title="Templating language" subtitle="Reference for the MiniJinja-style templating language used in transformations." >}}
+  {{< card link="inject-response-headers" title="Inject response headers" subtitle="Extract values from a request header and inject it as a header to your response." >}}
+  {{< card link="decode-base64-headers" title="Decode base64 headers" subtitle="Automatically decode base64 values in request headers and add the decoded value as a response header." >}}
+  {{< card link="update-request-path" title="Update request paths and methods" subtitle="Change the request path and HTTP method when a request header is present." >}}
+  {{< card link="redirect-url" title="Create redirect URLs" subtitle="Use a transformation to generate dynamic redirect URLs from request data." >}}
+  {{< card link="change-response-status" title="Change response status" subtitle="Update the response status based on headers being present in a response." >}}
+  {{< card link="update-response-body" title="Update response body" subtitle="Learn how to return a customized response body and how replace specific values in the body." >}}
 {{< /cards >}}
 
 ## Known limitations

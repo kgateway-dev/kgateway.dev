@@ -1,5 +1,6 @@
 ---
 title: Additional TLS settings
+description: Tune TLS settings such as minimum version and cipher suites on a listener.
 weight: 20
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Rate Limiting"
+description: Convert Ingress NGINX rate limit annotations to a kgateway TrafficPolicy.
 weight: 30
 ---
 

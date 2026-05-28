@@ -1,5 +1,6 @@
 ---
 title: Transformations
+description: Transform request and response headers and bodies with templated expressions.
 weight: 20
 ---
 

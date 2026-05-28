@@ -1,5 +1,6 @@
 ---
 title: mTLS listener
+description: Require client certificates on a listener to authenticate inbound traffic with mutual TLS.
 weight: 20
 ---
 

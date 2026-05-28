@@ -1,5 +1,6 @@
 ---
 title: About
+description: Get to know kgateway's architecture, custom resources, deployment patterns, and policy system.
 weight: 200
 icon: lightbulb
 ---

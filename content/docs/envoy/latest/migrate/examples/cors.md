@@ -1,5 +1,6 @@
 ---
 title: "CORS"
+description: Convert Ingress NGINX CORS annotations to a kgateway TrafficPolicy.
 weight: 40
 ---
 
