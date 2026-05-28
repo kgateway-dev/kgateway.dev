@@ -11,8 +11,3 @@ Use Kubernetes services as destinations for traffic routing within your cluster.
 ## Types
 
 Check out the following guides for examples on how to route to different types of Kubernetes services with kgateway.
-
-{{< cards >}}
-  {{< card link="grpc-services" title="gRPC services" subtitle="Route traffic to gRPC services using GRPCRoute." >}}
-  {{< card link="http-services" title="HTTP services" subtitle="Route traffic to a Kubernetes Service backend over HTTP." >}}
-{{< /cards >}}
