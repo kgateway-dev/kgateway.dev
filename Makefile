@@ -42,6 +42,7 @@ framework-test-install:  ## Install Playwright + browsers in the extras checkout
 .PHONY: framework-test
 framework-test:  ## Build, then run the full Playwright harness (static + browser + cross-browser)
 	@$(MAKE) _framework_test_preflight
+	rm -rf public
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test; \
@@ -52,6 +53,7 @@ framework-test:  ## Build, then run the full Playwright harness (static + browse
 .PHONY: framework-test-static
 framework-test-static:  ## Build, then run only the static (no-browser) specs â€” fastest loop
 	@$(MAKE) _framework_test_preflight
+	rm -rf public
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=static; \
@@ -62,6 +64,7 @@ framework-test-static:  ## Build, then run only the static (no-browser) specs â€
 .PHONY: framework-test-browser
 framework-test-browser:  ## Build, then run the chromium browser specs
 	@$(MAKE) _framework_test_preflight
+	rm -rf public
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=browser; \
@@ -72,6 +75,7 @@ framework-test-browser:  ## Build, then run the chromium browser specs
 .PHONY: framework-test-cross-browser
 framework-test-cross-browser:  ## Build, then run cross-browser specs (chromium + firefox + webkit)
 	@$(MAKE) _framework_test_preflight
+	rm -rf public
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test \
