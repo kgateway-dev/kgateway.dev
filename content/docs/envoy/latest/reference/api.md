@@ -1620,6 +1620,7 @@ _Appears in:_
 | `earlyRequestHeaderModifier` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
 | `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
+| `stripHostPortMode` _[StripHostPortMode](#striphostportmode)_ | StripHostPortMode determines whether, and under what conditions, Envoy will strip the port<br />from the Host/authority header. StripMatchingHostPort strips the port only if it matches<br />the listener's own port. StripAnyHostPort strips the port unconditionally.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-matching-host-port<br />See also: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-any-host-port |  | Enum: [MatchingPort AnyPort] <br /> |
 
 
 #### HTTPSettings
@@ -1657,6 +1658,7 @@ _Appears in:_
 | `earlyRequestHeaderModifier` _[HTTPHeaderFilter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter)_ | EarlyRequestHeaderModifier defines header modifications to be applied early in the request processing,<br />before route selection.<br />For example, if you use ExternalAuthz to add a header, you may want to remove it here, to make<br />sure it did not come from the client. |  |  |
 | `maxRequestHeadersKb` _integer_ | MaxRequestHeadersKb sets the maximum size of request headers that Envoy will accept.<br />If unset, the Envoy default is 60 KiB.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-max-request-headers-kb |  | Maximum: 8192 <br />Minimum: 1 <br /> |
 | `uuidRequestIdConfig` _[UuidRequestIdConfig](#uuidrequestidconfig)_ | UuidRequestIdConfig configures the behavior of the UUID request ID extension.<br />This extension sets the x-request-id header to a UUID value. |  |  |
+| `stripHostPortMode` _[StripHostPortMode](#striphostportmode)_ | StripHostPortMode determines whether, and under what conditions, Envoy will strip the port<br />from the Host/authority header. StripMatchingHostPort strips the port only if it matches<br />the listener's own port. StripAnyHostPort strips the port unconditionally.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-matching-host-port<br />See also: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-strip-any-host-port |  | Enum: [MatchingPort AnyPort] <br /> |
 
 
 #### HashPolicy
@@ -3462,6 +3464,25 @@ Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v
 _Appears in:_
 - [FilterType](#filtertype)
 
+
+
+#### StripHostPortMode
+
+_Underlying type:_ _string_
+
+StripHostPortMode determines whether or not Envoy strips the port component from the
+Host/authority header.
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [HTTPSettings](#httpsettings)
+
+| Field | Description |
+| --- | --- |
+| `MatchingPort` | StripMatchingHostPortMode strips the port from the header if and only if it matches<br />the listener's own port.<br /> |
+| `AnyPort` | StripAnyHostPortMode strips any port from the header, regardless of its value.<br /> |
 
 
 #### TCPKeepalive
