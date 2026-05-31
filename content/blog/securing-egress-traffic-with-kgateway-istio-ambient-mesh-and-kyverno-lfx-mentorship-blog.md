@@ -1,9 +1,9 @@
 ---
 title: "Securing Egress Traffic with kgateway, Istio Ambient Mesh, and Kyverno: LFX Mentorship Blog" 
-toc: 
+toc: false
 publishDate: 2026-03-12T00:00:00-00:00
 author: Aryan Parashar
-excludeSearch: 
+excludeSearch: true
 ---
 
 Modern Kubernetes platforms already secure in-cluster (east–west) communication through service meshes like Istio. But the same rigor rarely applies to outbound (egress) traffic — calls leaving the cluster to reach APIs, model endpoints, or third-party services. Without standardized policies, teams often struggle to track which workloads are reaching out to the internet, whether those requests are properly authorized, and how to enforce consistent authentication without adding custom code in every service. This blog reflects my LFX Mentorship journey, where I deep-dived into designing a well governed, observable, and secure egress pathway for Kubernetes workloads.
@@ -88,11 +88,11 @@ Before integrating kagteway with Istio Ambient, ensure we have:
 3. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
 4. Deploy the Ollama Container at port number 11434, binding to 0.0.0.0 so the Kubernetes virtual machine can access it via the host's bridge network.
    ```
-   docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
+   docker run -d --name ollama-server -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama
    ```
-5. Get the Container IP of ollama container which will be inserted at all the **`address filds` which is 172.17.0.2 in our case.
+5. Get the Container IP of ollama container which will be inserted at all the **`address fields`** which is 172.17.0.2 in our case.
    ```
-   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTIANER_NAME>
+   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME>
    ```
    Here it will get container's IP as an output:
    ```
