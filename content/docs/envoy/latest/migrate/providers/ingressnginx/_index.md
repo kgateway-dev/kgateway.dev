@@ -69,7 +69,7 @@ The `ingress-nginx` provider currently supports translating the following annota
 - `nginx.ingress.kubernetes.io/limit-burst-multiplier`: Burst multiplier for rate limiting. Used to compute `maxTokens`.
 
 {{< callout type="info" >}}
-**Not an exact 1:1 mapping for `limit-rps`/`limit-rpm`.** Ingress-NGINX applies these limits **per client IP address, per pod** using a shared memory zone keyed by client IP. The kgateway local token bucket applies to **all requests** reaching the Envoy pod, regardless of client IP. For per-client-IP rate limiting, use global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective client IP) or a `Header` descriptor with `X-Forwarded-For`.
+**Not an exact 1:1 mapping for `limit-rps`/`limit-rpm`.** Ingress-NGINX applies these limits **per client IP address, per pod** using a shared memory zone keyed by client IP. The kgateway local token bucket is shared across clients within the scope where the policy is attached (for example, a route or virtual host), rather than per client IP. For per-client-IP rate limiting, prefer global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective downstream address). If you must use a `Header` descriptor with `X-Forwarded-For`, only do so when XFF is validated via trusted-proxy or trusted-hops configuration and normalized to the intended client IP (for example, the leftmost untrusted hop); otherwise clients can spoof or rotate the header and it may include multiple IPs.
 {{< /callout >}}
 
 ---
