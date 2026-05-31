@@ -64,6 +64,10 @@ The `ingress-nginx` provider currently supports an Ingress with the following an
 
 - `nginx.ingress.kubernetes.io/limit-burst-multiplier`: Burst multiplier for rate limiting. Used to compute `maxTokens`.
 
+{{< callout type="info" >}}
+**Not an exact 1:1 mapping for `limit-rps`/`limit-rpm`.** Ingress-NGINX applies these limits **per client IP address, per pod** using a shared memory zone keyed by client IP. The kgateway local token bucket applies to **all requests** reaching the Envoy pod, regardless of client IP. For per-client-IP rate limiting, use global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective client IP) or a `Header` descriptor with `X-Forwarded-For`.
+{{< /callout >}}
+
 ---
 
 ### Timeouts

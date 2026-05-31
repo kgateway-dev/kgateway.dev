@@ -6,6 +6,10 @@ weight: 30
 
 NGINX's `limit-rps` and `limit-rpm` annotations map to a kgateway `TrafficPolicy` with local rate limiting.
 
+{{< callout type="info" >}}
+**Not an exact 1:1 mapping.** Ingress-NGINX's `limit-rps` uses a shared memory zone keyed by client IP, applying the rate limit **per client IP address, per pod**. The kgateway local token bucket applies to **all requests** reaching the Envoy pod, regardless of client IP. If you need per-client-IP rate limiting, use global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective client IP) or a `Header` descriptor with `X-Forwarded-For`.
+{{< /callout >}}
+
 ## Before: Ingress with rate limits
 
 ```bash
