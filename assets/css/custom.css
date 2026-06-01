@@ -126,10 +126,12 @@ nav.hextra-toc > div.hextra-scrollbar {
    nothing to fight. Light mode is plain white; dark mode uses the same
    --hx-color-dark variable the top nav blur div uses, guaranteeing an
    exact colour match without needing to know the hex value. */
-.blog-page {
+.blog-page,
+.resource-page {
   background-color: white;
 }
-.dark .blog-page {
+.dark .blog-page,
+.dark .resource-page {
   background-color: var(--hx-color-dark);
 }
 
