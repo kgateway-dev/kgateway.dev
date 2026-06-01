@@ -10,7 +10,7 @@ Learn about the custom resources that make up {{< reuse "/docs/snippets/kgateway
 
 Review the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources that you use to set up gateway proxies and configure routing for your apps. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/#introduction). 
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/docs/). 
 
 ### Gateway and GatewayClass
 
