@@ -139,7 +139,7 @@
           <a href="/resources/labs" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Labs</a>
           <a href="/resources/videos" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Videos</a>
           <a href="/learn" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Learning paths</a>
-          <a href="https://github.com/kgateway-dev/community" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Community</a>
+          <a href="https://github.com/kgateway-dev/community" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Community<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:4px;opacity:0.6;width:11px;height:11px;max-width:11px;max-height:11px"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         </div>
       </div>
       <a class="link whitespace-nowrap text-secondary-link" href="/blog">Blog</a>
@@ -147,7 +147,7 @@
         <a class="link whitespace-nowrap text-secondary-link" href="/docs/">Docs {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='ml-1 mb-0.5 inline w-5 h-5'") }}</a>
         <div class="dropdown-content rounded-l bg-white dark:bg-gray-900 absolute" style="top: calc(100% + 0.25rem); padding-top: 0.25rem;">
           <a href="/docs/envoy/latest" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Kgateway (Envoy)</a>
-          <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Agentgateway</a>
+          <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="text-primary-text dark:text-gray-300 px-4 py-3 block hover:text-primary-bg dark:hover:bg-gray-800 dark:hover:text-white text-left">Agentgateway<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:4px;opacity:0.6"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
         </div>
       </div>
       <!-- <a class="whitespace-nowrap bg-secondary-bg text-white rounded-lg p-5" href="/">Contact Us</a> -->
@@ -181,12 +181,15 @@
       <span class="text-[1.5625rem]">Toggle theme</span>
     </button>
     {{- end -}}
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/labs">Labs</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/resources/videos">Videos</a>
+    <span class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 font-semibold">Resources</span>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="/resources/labs">Labs</a>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="/resources/videos">Videos</a>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="/learn">Learning paths</a>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="https://github.com/kgateway-dev/community">Community</a>
     <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/blog">Blog</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5" href="/docs/">Docs</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 pl-8" href="/docs/envoy/latest">Kgateway (Envoy)</a>
-    <a class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 pl-8" href="https://agentgateway.dev/docs/kubernetes/latest/">Agentgateway</a>
+    <span class="whitespace-nowrap text-[1.5625rem] text-white border-b border-[#545454] py-5 font-semibold">Docs</span>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="/docs/envoy/latest">Kgateway (Envoy)</a>
+    <a class="whitespace-nowrap text-[1.25rem] text-white border-b border-[#545454] py-4 pl-6" href="https://agentgateway.dev/docs/kubernetes/latest/">Agentgateway</a>
     <!-- <a class="whitespace-nowrap text-center text-white rounded-lg mb-10 mt-[3.125rem] p-6 bg-primary-bg font-semibold" href="/">
       Contact Us
     </a> -->
