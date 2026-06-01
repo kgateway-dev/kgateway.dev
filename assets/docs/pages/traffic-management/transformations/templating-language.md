@@ -4,7 +4,7 @@ The data plane proxy of your Gateway determines the templating language that you
 
 {{< version include-if="2.1.x,2.2.x" >}}
 {{< callout type="warning" >}}
-**Plan to migrate to rustformation before you upgrade past 2.2.x.** In 2.2.x, rustformation (MiniJinja) is the default engine, and classic transformation (Inja) remains as an opt-out fallback. In a future release, classic transformation is removed and rustformation is the only supported engine. The two engines are syntactically similar but not identical, so existing templates might need updates. {{< version include-if="2.2.x" >}}For the differences and a migration table, see the 2.2.x [Transformation engines](/docs/envoy/latest/traffic-management/transformations/engines/) topic.{{< /version >}}
+**Plan to migrate to rustformation before you upgrade past 2.2.x.** In 2.2.x, rustformation (MiniJinja) is the default engine, and classic transformation (Inja) remains as an opt-out fallback. In a future release, classic transformation is removed and rustformation is the only supported engine. The two engines are syntactically similar but not identical, so existing templates might need updates. {{< version include-if="2.2.x" >}}For the differences and a migration table, see the 2.2.x [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}) topic.{{< /version >}}
 {{< /callout >}}
 {{< /version >}}
 
