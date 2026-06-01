@@ -407,10 +407,11 @@ Through this Blog we addressed one of the most overlooked challenges in service 
 
 # Demo
 
-[Demo](https://youtu.be/5PegECeu0v0)
 
 
+<div style="margin: 1.5rem 0;">
 {{< youtube 5PegECeu0v0 >}}
+</div>
 
 # My LFX Mentorship Experience
 It's always great to contribute to a project and gain skills, experience, expertise and knowledge while working on certain different features of that project, but one of the most important part of contributing to an open source or being a part of an amazing project like kgateway is building up a strong confidence towards the future of the project and building up a commitement for the future to keep contributing as much value back to the project, to keep project's growth gain a consistent or exponential growth sustainably over the interval.
