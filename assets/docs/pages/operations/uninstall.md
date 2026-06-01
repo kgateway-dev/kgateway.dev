@@ -190,5 +190,5 @@ Remove any optional components that you no longer need, such as sample apps.
 3. Remove the Petstore sample app.
    
    ```sh
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway.dev/{{< reuse "docs/versions/github-branch.md" >}}/assets/docs/examples/petstore.yaml
+   kubectl delete -f https://raw.githubusercontent.com/solo-io/gloo/v1.16.x/example/petstore/petstore.yaml
    ```
