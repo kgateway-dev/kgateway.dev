@@ -58,6 +58,9 @@ enableInlineShortcodes: true
 
 menu:
   main:
+    - name: Resources
+      url: /resources
+      weight: 1
     - name: Blog
       url: /blog
       weight: 2

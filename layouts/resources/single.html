@@ -1,8 +1,5 @@
 {{ define "main" }}
-<script>
-    document.querySelector('html').classList.remove('dark');
-</script>
-<div class='mx-auto flex bg-white text-primary-text'>
+<div class='resource-page mx-auto flex min-h-screen text-primary-text dark:text-gray-100'>
     {{ partial "sidebar.html" (dict "context" . "disableSidebar" true) }}
     <article class="w-full break-words flex justify-center">
         <main id="content" class="w-full relative overflow-hidden">

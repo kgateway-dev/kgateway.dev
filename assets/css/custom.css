@@ -121,3 +121,28 @@ aside.sidebar-container > .sidebar-nav-wrapper {
 nav.hextra-toc > div.hextra-scrollbar {
   padding-top: 1.875rem;
 }
+
+/* Blog page background: no Tailwind bg class on the element so there is
+   nothing to fight. Light mode is plain white; dark mode uses the same
+   --hx-color-dark variable the top nav blur div uses, guaranteeing an
+   exact colour match without needing to know the hex value. */
+.blog-page,
+.resource-page {
+  background-color: white;
+}
+.dark .blog-page,
+.dark .resource-page {
+  background-color: var(--hx-color-dark);
+}
+
+/* Content link dark mode: docs-theme-extras hardcodes .content a to
+   #158bc2 (42% lightness) with no dark variant. brand-oss.css already
+   defines --theme-primary at hsl(212,100%,60%) for dark mode — wire links
+   up to it so they're readable on the dark background. Applies to both
+   blog pages and docs pages that load brand-oss. */
+.dark .content a {
+  color: var(--theme-primary);
+}
+.dark .content a:hover {
+  color: hsl(212, 100%, 72%);
+}
