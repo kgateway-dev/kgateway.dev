@@ -10,20 +10,20 @@ Learn about the custom resources that make up {{< reuse "/docs/snippets/kgateway
 
 Review the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources that you use to set up gateway proxies and configure routing for your apps. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/#introduction). 
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/docs/). 
 
 ### Gateway and GatewayClass
 
-The [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/) custom resource is a network abstraction that defines a point of access at which traffic can be forwarded to a backend in a {{< gloss "Cluster (Kubernetes)" >}}Kubernetes cluster{{< /gloss >}}. A Gateway defines the listeners that you want to open, including the ports, protocols, and hostnames that you want to listen on for incoming traffic. You can also specify how incoming, encrypted traffic is handled. For example, encrypted traffic can be terminated at the gateway or passed through to a backend in the cluster. 
+The [Gateway](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) custom resource is a network abstraction that defines a point of access at which traffic can be forwarded to a backend in a {{< gloss "Cluster (Kubernetes)" >}}Kubernetes cluster{{< /gloss >}}. A Gateway defines the listeners that you want to open, including the ports, protocols, and hostnames that you want to listen on for incoming traffic. You can also specify how incoming, encrypted traffic is handled. For example, encrypted traffic can be terminated at the gateway or passed through to a backend in the cluster. 
 
-To spin up a Gateway and manage its lifecycle, a gateway controller is used. The gateway controller is defined in the  [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) resource and manages the underlying infrastructure to ensure that traffic to endpoints is routed accordingly. When you install kgateway, a GatewayClass resource is automatically created that points to the kgateway controller. For more information, see [GatewayClass]({{< link-hextra path="/setup/default/#gatewayclass" >}}). 
+To spin up a Gateway and manage its lifecycle, a gateway controller is used. The gateway controller is defined in the  [GatewayClass](https://gateway-api.sigs.k8s.io/reference/api-types/gatewayclass/) resource and manages the underlying infrastructure to ensure that traffic to endpoints is routed accordingly. When you install kgateway, a GatewayClass resource is automatically created that points to the kgateway controller. For more information, see [GatewayClass]({{< link-hextra path="/setup/default/#gatewayclass" >}}). 
 
 ### HTTPRoute and TCPRoute {#httproute}
 
 To configure routing, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides several routing resources, such as an HTTPRoute and TCPRoute. These routes attach to a Gateway resource and define how incoming traffic is matched and forwarded to a backing destination.
 
-* [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/): The most commonly used route resource, that configures traffic routing for HTTP and HTTPS traffic. 
-* [TCPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#tcproute): A resource to route TCP requests.
+* [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/): The most commonly used route resource, that configures traffic routing for HTTP and HTTPS traffic. 
+* [TCPRoute](https://gateway-api.sigs.k8s.io/guides/tcp/): A resource to route TCP requests.
 
 While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides the functionality for basic request matching, redirects, rewrites, and header manipulation, it is missing more complex traffic management, resiliency, and security features, such as transformations, access logging, or route delegation. 
 
@@ -37,7 +37,7 @@ If traffic matches the conditions that are defined in the HTTPRoute, the Gateway
 
 ### ReferenceGrant
 
-A [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Backend that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
+A [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) allows a Kubernetes Gateway API resource, such as an HTTPRoute, to reference resources that exist in other namespaces. For example, if you create an HTTPRoute resource in `namespace1`, but the Kubernetes Service or Backend that you want to route to is in `namespace2`, you must create a ReferenceGrant to allow communication between these resources.
 
 <!--
 

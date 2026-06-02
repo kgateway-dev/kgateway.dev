@@ -33,7 +33,7 @@ Another key consideration is that AI models often maintain in-memory caches, suc
 
 To address these challenges, the [Kubernetes Gateway API Inference Extension](https://gateway-api-inference-extension.sigs.k8s.io) introduces inference-aware routing through two new Custom Resource Definitions (CRDs): [InferenceModel and InferencePool](https://gateway-api-inference-extension.sigs.k8s.io/concepts/api-overview/). 
 
-The [InferenceModel CRD](https://gateway-api-inference-extension.sigs.k8s.io/api-types/inferencemodel/) is designed for AI engineers, allowing them to define logical model endpoints. It maps user-facing model names to backend models and provides flexibility for traffic splitting between fine-tuned adapters. Additionally, it enables workload owners to specify request criticality, ensuring that real-time services receive priority over best-effort batch jobs.
+The [InferenceModel CRD](https://gateway-api-inference-extension.sigs.k8s.io/reference/spec/) is designed for AI engineers, allowing them to define logical model endpoints. It maps user-facing model names to backend models and provides flexibility for traffic splitting between fine-tuned adapters. Additionally, it enables workload owners to specify request criticality, ensuring that real-time services receive priority over best-effort batch jobs.
 
 {{< reuse-image src="blog/smarter-ai-reference-3.png" width="750px" >}}
 

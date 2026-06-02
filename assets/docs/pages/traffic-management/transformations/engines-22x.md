@@ -1,6 +1,6 @@
 {{< reuse "docs/snippets/kgateway-capital.md" >}} can transform requests and responses by using one of two transformation engines:
 
-* **Rustformation** (default in 2.2.x): A Rust filter that is loaded into Envoy at runtime as a [dynamic module](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/dynamic_modules_filter). Templates are powered by the [MiniJinja](https://github.com/mitsuhiko/minijinja) template engine.
+* **Rustformation** (default in 2.2.x): A Rust filter that is loaded into Envoy at runtime as a [dynamic module](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/dynamic_modules). Templates are powered by the [MiniJinja](https://github.com/mitsuhiko/minijinja) template engine.
 * **Classic transformation** (opt-out fallback): A C++ filter that is statically linked into a custom Envoy build. Templates are powered by version 3.4 of the [Inja](https://github.com/pantor/inja/tree/v3.4.0) template engine.
 
 In 2.2.x, rustformation is the default. Classic transformation is still available as a fallback so that you can switch back if you hit a missing feature or a regression. Classic transformation is removed in 2.3.x, so plan to migrate any classic-only templates before you upgrade.

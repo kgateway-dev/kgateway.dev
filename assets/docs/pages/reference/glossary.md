@@ -107,12 +107,12 @@ An Envoy extension that offloads authorization decisions to an external service.
 ### Gateway
 A Gateway API resource that represents the instantiation of a gateway implementation.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.Gateway
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#gateway
 
 ### GatewayClass
 Defines a class of Gateways with a shared configuration or implementation. Depending on how you install kgateway, you may have one or more GatewayClass resources created for you.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GatewayClass
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#gatewayclass
 
 ### Gateway Extension
 A kgateway resource that integrates extended services such as external authorization, rate limits, and processors into the Gateway data plane configuration.
@@ -127,12 +127,12 @@ Configures template, deployment, and runtime settings for a Gateway instance (in
 ### GRPCRoute
 A Gateway API resource for configuring gRPC routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GRPCRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#grpcroute
 
 ### HTTPRoute
 A Gateway API resource for configuring HTTP/HTTPS routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.HTTPRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#httproute
 
 ### Inference Extension Project
 Mechanisms for running inference or AI processing in traffic flows—typically implemented as Envoy filters or external processors.
@@ -169,7 +169,7 @@ Controls how many requests can reach your services over time. Often implemented 
 ### ReferenceGrant
 A Gateway API resource that controls cross-namespace references.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.ReferenceGrant
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#referencegrant
 
 ### Resiliency
 Techniques like retries, timeouts, and circuit breakers that make applications more reliable when failures occur.
@@ -185,7 +185,7 @@ A network layer for service-to-service communication. Kgateway integrates with I
 ### TCPRoute
 A Gateway API resource for configuring TCP routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.TCPRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#tcproute
 
 ### Traffic Management
 Features that shape, route, or modify traffic, such as load balancing, matching, filtering, and transformations.

@@ -22,7 +22,7 @@ This pattern is marked experimental at the time of writing, and is further discu
 
 Some notable aspects of this pattern worth calling out include:
 
-- **Policy naming convention:** A resource will typically configure some kind of policy, so we are encouraged to use the suffix `Policy` when naming the CRD. For example, the Gateway API defines a [BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/), which allows us to quickly infer that this resource is designed to configure aspects of TLS communication for the connection between a gateway and a backend workload.  
+- **Policy naming convention:** A resource will typically configure some kind of policy, so we are encouraged to use the suffix `Policy` when naming the CRD. For example, the Gateway API defines a [BackendTLSPolicy](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/), which allows us to quickly infer that this resource is designed to configure aspects of TLS communication for the connection between a gateway and a backend workload.  
 
 - **Target reference (`targetRefs`) in policy attachments:** The resource that a policy attachment affects should be specified via a `targetRefs` field. The value of that target reference is contextual. 
 

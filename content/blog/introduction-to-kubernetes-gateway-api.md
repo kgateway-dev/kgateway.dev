@@ -73,7 +73,7 @@ Use GatewayClass and Gateway to define the overall gateway capabilities, such as
 Define HTTPRoute (or TLSRoute, etc.) resources that attach to Gateways. They control how traffic is routed to backend services, canary versions, or particular subsets of pods—without needing cluster-admin-level access.
 
 **Security / Ops Teams:**
-Leverage policy attachment points to insert custom capabilities (rate limiting, WAF configuration, etc.) in a consistent way by using [extension points](https://gateway-api.sigs.k8s.io/guides/migrating-from-ingress/?h=extensionref#approach-to-extensibility) within the API.
+Leverage policy attachment points to insert custom capabilities (rate limiting, WAF configuration, etc.) in a consistent way by using [extension points](https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress/#approach-to-extensibility) within the API.
 
 This separation of concerns mirrors successful design patterns in Kubernetes, such as the way storage classes are managed by platform teams while developers issue persistent volume claims. It’s a more secure and maintainable approach that fosters collaboration within organizations.
 

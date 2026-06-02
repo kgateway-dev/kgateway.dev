@@ -54,11 +54,11 @@ kubectl get pods -n kgateway-system
 
 ## Creating a Gateway Object
 
-The concrete implementation that a Gateway leverages is specified by referencing the name of a [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/), which in turn is associated with a specific controller.
+The concrete implementation that a Gateway leverages is specified by referencing the name of a [GatewayClass](https://gateway-api.sigs.k8s.io/reference/api-types/gatewayclass/), which in turn is associated with a specific controller.
 
 Let us then proceed to assume the role of the cluster operator, primarily concerned with creating gateways and governing what ports and protocols to expose.
 
-For that, the Gateway API provides the [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/#gateway) resource:
+For that, the Gateway API provides the [Gateway](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) resource:
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -153,7 +153,7 @@ Let's build out a simple `httpbin` so we can attach a route to it and have it re
 kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
 ```
 
-Once that's in place, we can apply [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/) below to attach to it:
+Once that's in place, we can apply [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/) below to attach to it:
 
 ```yaml
 kubectl apply -f- <<EOF

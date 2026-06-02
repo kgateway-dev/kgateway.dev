@@ -8,7 +8,7 @@ Originate a one-way TLS connection from the Gateway to a backend.
 
 When you configure a TLS listener on your Gateway, the Gateway typically terminates incoming TLS traffic and forwards the unencrypted traffic to the backend service. However, you might have a service that only accepts TLS connections, or you want to forward traffic to a secured Backend service that is external to the cluster.
 
-You can use the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
+You can use the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
 
 However, to additionally set up different hostnames on the Backend that you want to route to via SNI, or to originate TLS connections to an external backend, use the {{< reuse "docs/snippets/kgateway.md" >}} BackendConfigPolicy instead. 
 
@@ -168,7 +168,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/).
 
    | Setting | Description |
    |---------|-------------|

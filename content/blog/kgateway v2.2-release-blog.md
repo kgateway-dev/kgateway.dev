@@ -8,7 +8,7 @@ excludeSearch: true
 
 Kgateway v2.2 is packed with exciting new features and improvements. Here are a few select updates the kgateway team would like to highlight!
 
-This release introduces major breaking changes to the agentgateway implementation. We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway, please refer to our [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/agentgateway-migration.md). 
+This release introduces major breaking changes to the agentgateway implementation. We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway, please refer to our [migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/). 
 
 ## 🔥Breaking changes
 
@@ -94,7 +94,7 @@ spec:
 EOF
 ```
 
-For steps to set up prompt guards, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/prompt-guards/). 
+For steps to set up prompt guards, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/guardrails/overview/). 
 
 
 ##  🗑️ Deprecated or removed features
@@ -236,7 +236,7 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12836) for more information. 
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/providers/azureopenai/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/providers/azure/). 
 
 #### Model aliasing
 
@@ -700,7 +700,7 @@ See the following PRs for more information:
 
 #### FrontendTLSConfig support
 
-Kgateway and agentgateway now implement the [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/1.4/spec/#frontendtlsconfig). This config allows you to set up a mutual TLS listener on the gateway. 
+Kgateway and agentgateway now implement the [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/api-spec/#frontendtlsconfig). This config allows you to set up a mutual TLS listener on the gateway. 
 
 ```yaml
 kubectl apply -f- <<EOF
