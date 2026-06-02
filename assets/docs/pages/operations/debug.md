@@ -156,7 +156,7 @@ As part of debugging, you might have noticed that your HTTPRoute or Gateway had 
 
 2. Confirm that you do not have multiple, conflicting policies. In general, the oldest policy is enforced. For more information, see [Policy priority and merging rules](../../about/policies/trafficpolicy/#policy-priority-and-merging-rules).
 
-3. Determine if you need a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). For example, the {{< reuse "docs/snippets/trafficpolicy.md" >}} might rely on a GatewayExtension to enable a feature such as external auth. However, the GatewayExtension might be in a different namespace than the backing external auth service.
+3. Determine if you need a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/). For example, the {{< reuse "docs/snippets/trafficpolicy.md" >}} might rely on a GatewayExtension to enable a feature such as external auth. However, the GatewayExtension might be in a different namespace than the backing external auth service.
 
    Example ReferenceGrant for {{< version include-if="2.0.x,2.1.x" >}}[external auth]({{< link-hextra path="/security/external-auth/" >}}){{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}[external auth]({{< link-hextra path="/security/extauth/byo-ext-auth-service/" >}}){{< /version >}} GatewayExtension:
 

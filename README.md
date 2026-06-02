@@ -7,7 +7,7 @@
 * `hugo extended v0.160.1`
 
 #### To run `kgateway.dev` locally:
-1. `git@github.com:kgateway-dev/kgateway.dev.git`
+1. `git clone git@github.com:kgateway-dev/kgateway.dev.git`
 2. `cd kgateway.dev`
 3. `npm install`
 4. `hugo server`
@@ -93,5 +93,5 @@ Note that a `publishDate` in the future will allow for an article to be availabl
 Blogs have full support for Markdown including headers, code blocks, quotes, ordered and unordered lists, etc. 
 
 To add an image to a blog:
-1. Add the image to `assets/blog`. Use [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) for the file name. I generally use a short version of the blog title followed by a number for where the image appears in the blog.
+1. Add the image to `assets/blog`. Use [kebab-case](https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case) for the file name. Common convention is to use a short version of the blog title followed by a number for where the image appears in the blog.
 2. Add `{{< reuse-image src="blog/<your-image-name>" width="750px" >}}` to your blog where the image should appear. If you want to change the size of the image, you can modify the `width` property.
