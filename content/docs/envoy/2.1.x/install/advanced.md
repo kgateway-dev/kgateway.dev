@@ -4,7 +4,9 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
-You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI. Set the version you want to configure in an environment variable, such as the patch version (2.1.3):
+You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI. 
+
+Set the version you want to configure in an environment variable, such as the patch version (2.1.3):
  ```sh
  export NEW_VERSION=2.1.3
  ```
