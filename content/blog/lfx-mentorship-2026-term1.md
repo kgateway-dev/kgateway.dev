@@ -16,16 +16,17 @@ The first thing that happened was a kick-off event with all the mentees who were
 All of my activities during the mentorship can be tracked in the following issue: [kgateway-dev/kgateway.dev#606](https://github.com/kgateway-dev/kgateway.dev/issues/606)
 
 ## The projects I worked with
-The main focus during the term was writing practical integration guides to connect the individual projects with each other. Of course other open source tools were used along the way to get all the tasks done, but these five were the core.
+The main focus during the mentorship was creating practical integration guides that connect different cloud-native projects. While various open source tools were used along the way, the five core projects were Kgateway, AgentGateway, Kagent, KServe, and Argo Rollouts.
+
+Kgateway worked well as the foundation for these integrations. As a Kubernetes-native gateway, it provides a flexible way to connect components while applying policies, traffic management, and observability. This makes it a natural fit for integrating with other CNCF and open source projects across the cloud-native ecosystem.
 
 {{< reuse-image src="blog/lfx-mentorship-2026-term1-1.png">}}
 {{< reuse-image-dark srcDark="blog/lfx-mentorship-2026-term1-1.png">}}
 
-## What I worked on
+## Writing and testing integration guides
 The goal of the mentorship was to improve and expand the documentation on both [kgateway.dev](https://kgateway.dev) and [agentgateway.dev](https://agentgateway.dev) by creating clear, practical, and ecosystem focused integration guides. That meant actually running the tools, getting them to work together, and writing up step-by-step guides that others could follow from scratch.
 
 The four main integration guides I wrote and shipped were:
-
 
 1. **Argo Rollouts + kgateway** \
    This guide shows how to use [Argo Rollouts](https://kgateway.dev/docs/envoy/main/integrations/argo/) with kgateway for progressive delivery. Argo Rollouts is a Kubernetes controller that enables advanced deployment strategies like canary and blue-green releases. Since it supports the Kubernetes Gateway API, it can control exactly how traffic shifts between a stable and a canary version of your app, all routed through the kgateway proxy. The guide walks through setting up the Argo Rollouts plugin, defining a canary `Rollout`, creating the matching `HTTPRoute`, and watching traffic weights shift live as the promotion progresses.
@@ -36,22 +37,23 @@ The four main integration guides I wrote and shipped were:
 3. **KServe + agentgateway** \
    This guide demonstrates how to use agentgateway as a gateway for [KServe](https://agentgateway.dev/docs/kubernetes/main/integrations/kserve/) model serving, a Kubernetes-native platform for serving machine learning models. With agentgateway sitting in front of KServe, you can enforce policies like token-based rate limiting on inference requests without touching the inference service itself. The guide covers installing KServe, deploying a mock LLM, creating an `AgentgatewayBackend`, and applying a token budget policy that returns `429` responses once the per-minute token limit is exhausted.
 
-4. **Kagent + agentgateway** \
+4. **kagent + agentgateway** \
    [Kagent](https://agentgateway.dev/docs/kubernetes/main/integrations/web-uis/kagent/) is a Kubernetes-native framework for running AI agents as declarative CRD-based resources. This guide shows how to secure and observe Kagent by routing its LLM traffic through agentgateway, giving you centralized control over authentication, rate limiting, and observability across all agent workloads, without changing a single line of agent code.
 
 Beyond the documentation itself, the work meant constantly switching between repos, spinning up real Kubernetes clusters, and testing every step by hand. It was as much about learning how to write good documentation, following style guides, keeping examples reproducible, and structuring content so a first-time reader could actually follow along, as it was about understanding the underlying systems.
 
-## What made it exciting
-The cool thing about working across all these projects was discovering new things constantly. And naturally you also stumble into obstacles.
-One that really stood out: while working on the KServe integration I found a small bug in agentgateway related to regex recognition in the HTTPRoutes that KServe auto-generates. The two tools simply did not work together because of it.
-What made this moment special was not just finding the bug, it was what came next. Up until this point I had no real hands-on Go experience. But instead of just logging the issue and moving on, my mentors offered me the chance and the support to fix it myself. That was something I genuinely did not expect. And because of that support, I worked through the fix, learned a bit of Go, and in the end both tools worked together correctly.
-That was one of my favourite and most satisfying moments, seeing everything work.
+## Contributing code fixes made the journey more exciting
+The cool thing about working across all these projects was discovering new things constantly. And naturally you also stumble into obstacles. One that really stood out: while working on the KServe integration I found a small bug in agentgateway related to regex recognition in the HTTPRoutes that KServe auto-generates. The two tools simply did not work together because of it. What made this moment special was not just finding the bug, it was what came next. Up until this point I had no real hands-on Go experience. But instead of just logging the issue and moving on, my mentors offered me the chance and the support to fix it myself. That was something I genuinely did not expect. And because of that support, I worked through the fix, learned a bit of Go, and in the end both tools worked together correctly. That was one of my favourite and most satisfying moments, seeing everything work.
 
-## The unexpected
-One thing I truly did not see coming was the chance to create content that might actually make it to KubeCon, as a real talk submission. That possibility alone felt like a whole new chapter opening up. I am keeping my fingers crossed that one talk get accepted.
+## Submitting to Kubecon was an unexpected plus
+One thing I truly did not see coming was the chance to create content that might actually make it to KubeCon, as a real talk submission. That possibility alone felt like a whole new chapter opening up. I am keeping my fingers crossed that one of the talks gets accepted.
 
 ## Conclusion
-The last few months were packed with new knowledge and experiences. What is great about the program is that it provides a structured flow with weekly check-ins on your progress, while still leaving you enough freedom to work on topics that genuinely interest you. A huge thank you to [@Nina](https://github.com/npolshakova) and [@Art](https://github.com/artberger) for being awesome mentors, for the support and the fast feedback throughout the whole term. If you ever get the chance to apply for the Mentorship Program, I would definitely recommend it.
+The last few months were packed with new knowledge and experiences. What is great about the program is that it provides a structured flow with weekly check-ins on your progress, while still leaving you enough freedom to work on topics that genuinely interest you.
+
+If you ever get the chance to apply, I would definitely recommend it. A few things that helped me get the most out of it: plan more time than you think you need, because the work is real and the best moments come from going deep. Communicate openly with your mentors, set weekly goals together, and flag blockers early. The faster you surface problems, the faster they get solved. And attend the community meetings. It is one of the fastest ways to understand how a project actually works, who the people in the project are, and where things are heading.
+
+A huge thank you to [@Nina](https://github.com/npolshakova) and [@Art](https://github.com/artberger) for being awesome mentors, for the support and the fast feedback throughout the whole term.
 
 cheers!
 
