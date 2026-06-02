@@ -1199,6 +1199,7 @@ _Appears in:_
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 | `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
 | `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
+| `filterStage` _[FilterStageSpec](#filterstagespec)_ | FilterStage specifies where in the HTTP filter chain the ExtProc filter<br />should be placed. If not specified, the ExtProc filter defaults to running<br />after the AuthZ stage. |  |  |
 
 
 #### ExtProcRouteCacheAction
@@ -1327,6 +1328,65 @@ _Appears in:_
 | `path` _string_ | the file path to which the file access logging service will sink |  |  |
 | `stringFormat` _string_ | the format string by which envoy will format the log lines<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-strings |  |  |
 | `jsonFormat` _[RawExtension](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#rawextension-runtime-pkg)_ | the format object by which to envoy will emit the logs in a structured way.<br />https://www.envoyproxy.io/docs/envoy/v1.33.0/configuration/observability/access_log/usage#format-dictionaries |  |  |
+
+
+#### FilterStage
+
+_Underlying type:_ _string_
+
+FilterStage represents well-known positions in the HTTP filter chain.
+
+_Validation:_
+- Enum: [Fault AuthN AuthZ RateLimit Route]
+
+_Appears in:_
+- [FilterStageSpec](#filterstagespec)
+
+| Field | Description |
+| --- | --- |
+| `Fault` | FilterStageFault is the earliest stage in the filter chain.<br /> |
+| `AuthN` | FilterStageAuthN is the authentication stage.<br /> |
+| `AuthZ` | FilterStageAuthZ is the authorization stage.<br /> |
+| `RateLimit` | FilterStageRateLimit is the rate limiting stage.<br /> |
+| `Route` | FilterStageRoute is the final processing stage before routing to upstream.<br />The terminal Router filter always runs after this stage.<br /> |
+
+
+#### FilterStagePredicate
+
+_Underlying type:_ _string_
+
+FilterStagePredicate specifies placement relative to a stage.
+
+_Validation:_
+- Enum: [Before During After]
+
+_Appears in:_
+- [FilterStageSpec](#filterstagespec)
+
+| Field | Description |
+| --- | --- |
+| `Before` | FilterStagePredicateBefore places the filter before the specified stage.<br /> |
+| `During` | FilterStagePredicateDuring places the filter during the specified stage.<br /> |
+| `After` | FilterStagePredicateAfter places the filter after the specified stage.<br /> |
+
+
+#### FilterStageSpec
+
+
+
+FilterStageSpec specifies where in the HTTP filter chain a filter should
+be placed.
+
+
+
+_Appears in:_
+- [ExtProcProvider](#extprocprovider)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `stage` _[FilterStage](#filterstage)_ | Stage selects the well-known position in the filter chain. |  | Enum: [Fault AuthN AuthZ RateLimit Route] <br /> |
+| `predicate` _[FilterStagePredicate](#filterstagepredicate)_ | Predicate specifies placement relative to the stage: Before, During,<br />or After. | During | Enum: [Before During After] <br /> |
+| `weight` _integer_ | Weight controls ordering among multiple filters at the same<br />stage and predicate. Higher weight places the filter earlier in the<br />chain. Defaults to 0. Filters with the same stage, predicate, and<br />weight are sorted alphabetically by filter name for consistency. | 0 |  |
 
 
 #### FilterType
