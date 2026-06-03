@@ -68,7 +68,7 @@ Agentgateway ExtAuth policies now fail closed when the `backendRef` to the auth 
 
 #### AI policy removed from TrafficPolicy {#ai-policy-removed}
 
-AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, see the [Agentgateway documentation](https://agentgateway.dev/docs).
+AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs).
 
 #### Default transformation engine changed to rustformation {#v22-default-transformation-engine}
 

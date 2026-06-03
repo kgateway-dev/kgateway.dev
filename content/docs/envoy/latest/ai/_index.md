@@ -5,7 +5,7 @@ description: AI Gateway, MCP, LLM, and agent connectivity documentation is publi
 icon: cognition
 ---
 
-AI Gateway documentation is published on the [Agentgateway](https://agentgateway.dev/docs) site.
+AI Gateway documentation is published on the [agentgateway](https://agentgateway.dev/docs) site.
 
 <div class="hx:block hx:dark:hidden">
 {{< cards >}}

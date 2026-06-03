@@ -126,7 +126,7 @@ Note that this change does not impact the other delegation annotations:
 
 #### Deprecated support for AI Gateway and Inference Extension with Envoy
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [Agentgateway documentation](https://agentgateway.dev/docs) instead.
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs) instead.
 
 #### Fail open policy for ExtProc providers
 
@@ -181,7 +181,7 @@ Disabling policies can be applied to CORS, extAuth, extProc, and rate limit poli
 
 #### Agentgateway integration {#v21-agentgateway}
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../ai/).
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [agentgateway docs](../../ai/).
 
 #### Global policy attachment {#v21-global-policy-attachment}
 
