@@ -228,6 +228,24 @@ _Appears in:_
 | `headersToBackend` _string array_ | HeadersToBackend specifies which headers from the authorization response<br />should be forwarded to the upstream service when the request is authorized.<br />Common examples: ["x-current-user", "x-user-id", "x-auth-request-email"] |  |  |
 
 
+#### AwsAddressType
+
+_Underlying type:_ _string_
+
+AwsAddressType defines which EC2 IP address to route to.
+
+_Validation:_
+- Enum: [PrivateIP PublicIP]
+
+_Appears in:_
+- [AwsEc2](#awsec2)
+
+| Field | Description |
+| --- | --- |
+| `PrivateIP` | AwsAddressTypePrivateIP routes to the instance private IP.<br /> |
+| `PublicIP` | AwsAddressTypePublicIP routes to the instance public IP.<br /> |
+
+
 #### AwsAuth
 
 
@@ -274,17 +292,18 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
-| `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
+| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS Lambda service. |  |  |
+| `ec2` _[AwsEc2](#awsec2)_ | Ec2 configures dynamic discovery of AWS EC2 instances. |  |  |
+| `accountId` _string_ | AccountId is the AWS account ID to use for the backend.<br />Deprecated: Set accountId on spec.aws.lambda instead. This field is kept for backward compatibility.<br />When both fields are set, spec.aws.lambda.accountId takes precedence. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
 | `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the following credential providers are tried in order, stopping when one<br />of them returns an access key ID and a secret access key (the session token is optional):<br />1. Environment variables: when the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN are set.<br />2. AssumeRoleWithWebIdentity API call: when the environment variables AWS_WEB_IDENTITY_TOKEN_FILE and AWS_ROLE_ARN are set.<br />3. EKS Pod Identity: when the environment variable AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE is set.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
 | `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 
 
-#### AwsLambda
+#### AwsEc2
 
 
 
-AwsLambda configures the AWS lambda service.
+AwsEc2 configures dynamic discovery of EC2 instances.
 
 
 
@@ -293,11 +312,65 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
+| `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
+| `roleArn` _string_ | RoleArn is an optional IAM role to assume before listing instances. |  | Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
+| `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
+
+
+#### AwsLambda
+
+
+
+AwsLambda configures the AWS Lambda service.
+
+
+
+_Appears in:_
+- [AwsBackend](#awsbackend)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `accountId` _string_ | AccountId is the AWS account ID to use for the backend.<br />This is the preferred location for Lambda backends. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
 | `endpointURL` _string_ | EndpointURL is the URL or domain for the Lambda service. This is primarily<br />useful for testing and development purposes. When omitted, the default<br />lambda hostname will be used. |  | MaxLength: 2048 <br />Pattern: `^https?://[-a-zA-Z0-9@:%.+~#?&/=]+$` <br /> |
 | `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br /> |
 | `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br /> |
 | `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". | $LATEST | Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
 | `payloadTransformMode` _[AWSLambdaPayloadTransformMode](#awslambdapayloadtransformmode)_ | PayloadTransformation specifies payload transformation mode before it is sent to the Lambda function.<br />Defaults to Envoy. | Envoy | Enum: [None Envoy] <br /> |
+
+
+#### AwsTagFilter
+
+
+
+AwsTagFilter matches EC2 instances by tag.
+
+
+
+_Appears in:_
+- [AwsEc2](#awsec2)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Key matches instances that contain the given tag key, regardless of value. |  | MaxLength: 128 <br />MinLength: 1 <br /> |
+| `keyValue` _[AwsTagKeyValueFilter](#awstagkeyvaluefilter)_ | KeyValue matches instances that contain the given tag key/value pair. |  |  |
+
+
+#### AwsTagKeyValueFilter
+
+
+
+AwsTagKeyValueFilter matches EC2 instances by a tag key/value pair.
+
+
+
+_Appears in:_
+- [AwsTagFilter](#awstagfilter)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Key is the tag key to match. |  | MaxLength: 128 <br />MinLength: 1 <br /> |
+| `value` _string_ | Value is the tag value to match. |  | MaxLength: 256 <br />MinLength: 1 <br /> |
 
 
 #### Backend
@@ -319,6 +392,10 @@ _Appears in:_
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[BackendSpec](#backendspec)_ |  |  |  |
 | `status` _[BackendStatus](#backendstatus)_ |  |  |  |
+
+
+
+
 
 
 #### BackendConfigPolicy
@@ -2742,6 +2819,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `jwksURI` _[HttpsUri](#httpsuri)_ | JWKSURI specifies the URL that public keys for validating JWTs should be retrieved from.<br />This must be set if the retrieved access or ID token need to be parsed and IssuerURI is not set for discovery.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />The URL must point to a valid JWKS definition.<br />Refer to https://datatracker.ietf.org/doc/html/rfc7517#section-5 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
+| `jwksBackendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | JWKSBackendRef specifies the backend to use for fetching the JWKS.<br />If not set, the parent OAuth2Provider's BackendRef is used. |  |  |
 | `accessToken` _[OAuth2JWTProcessingConfig](#oauth2jwtprocessingconfig)_ | AccessToken specifies how to process the retrieved access token.<br />This requires the access token cookie to be enabled. Requests missing the token will be rejected.<br />The token will be verified against the provided JWKS.<br />Successfully processed tokens have their payload made available as the 'accessToken' dynamic metadata in the 'envoy.filters.http.jwt_authn' namespace.<br />If omitted, the token will not be attempted to be parsed and verified at all. |  |  |
 | `idToken` _[OAuth2JWTProcessingConfig](#oauth2jwtprocessingconfig)_ | IDToken specifies how to process the retrieved ID token.<br />This requires the ID token cookie to be enabled. Requests missing the token will be rejected.<br />The token will be verified against the provided JWKS.<br />Successfully processed tokens have their payload made available as the 'idToken' dynamic metadata in the 'envoy.filters.http.jwt_authn' namespace.<br />If omitted, the token will not be attempted to be parsed and verified at all. |  |  |
 
@@ -4051,6 +4129,39 @@ AnyValue is used to represent any type of attribute value. AnyValue may contain 
 | `stringValue` | *string |  |
 | `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
 | `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### Authorization
+
+Authorization defines the configuration for role-based access control.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `policy` | [AuthorizationPolicy](#authorizationpolicy) | Policy specifies the Authorization rule to evaluate. A policy matches when **any** of the conditions evaluates to true. **Required.** |
+| `action` | [AuthorizationPolicyAction](#authorizationpolicyaction) | Action defines whether the rule allows or denies the request if matched. If unspecified, the default is "Allow". |
+
+#### AuthorizationPolicy
+
+AuthorizationPolicy defines a single Authorization rule.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `matchExpressions` | [][CELExpression](#celexpression) | MatchExpressions defines a set of conditions that must be satisfied for the rule to match. These expression should be in the form of a Common Expression Language (CEL) expression.  **Required.** |
+
+#### AuthorizationPolicyAction
+
+_Underlying type:_ _string_
+
+AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
+
+#### CELExpression
+
+_Underlying type:_ _string_
+
+CELExpression represents a Common Expression Language (CEL) expression.
+
+**Validation:**
+- MinLength=1
+- MaxLength=16384
 
 #### ComparisonFilter
 
