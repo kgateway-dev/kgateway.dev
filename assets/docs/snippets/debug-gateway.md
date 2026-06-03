@@ -27,7 +27,7 @@
    Review the following table of common endpoints that can help troubleshoot your setup further.
    | Endpoint | Description| 
    | -- | -- | 
-   | config_dump | Get the configuration that is available in the Envoy proxy. Any kgateway resources that you create are translated in to Envoy configuration. Depending on whether or not you enabled resource validation, you might have applied invalid configuration that was rejected by Envoy. To get the proxy configuration directly, open `http://localhost:19000/config_dump`. | 
+   | config_dump | Get the configuration that is available in the Envoy proxy. Any kgateway resources that you create are translated into an Envoy configuration. Depending on whether or not you enabled resource validation, you might have applied an invalid configuration that was rejected by Envoy. To get the proxy configuration directly, open `http://localhost:19000/config_dump`. | 
    | listeners | See the listeners that are configured on your gateway. | 
    | logging | Review the log level that is set for each component. |  
    | stats/prometheus | View metrics that Envoy emitted and sent to the built-in Prometheus instance. |
