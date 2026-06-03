@@ -376,17 +376,19 @@ def find_all_broken_links(doc_file: Path) -> set[str]:
 
     content = doc_file.read_text()
 
+    # Exact set of type names that have a #### heading. Using an exact match
+    # (rather than a substring `"#### Foo" in content` test) is important: a
+    # link to "#grpcstatus" must not be considered satisfied by a "#### GrpcStatusFilter"
+    # heading, and "#authorization" must not be satisfied by "#### AuthorizationRequest".
+    documented = find_documented_types(doc_file)
+
     # Find all links like [TypeName](#typename)
     link_pattern = re.compile(r'\[([A-Z][A-Za-z0-9_]*)\]\(#([a-z][a-z0-9_]*)\)')
 
     broken = set()
     for match in link_pattern.finditer(content):
         type_name = match.group(1)
-        anchor = match.group(2)
-
-        # Check if the anchor exists in the document
-        anchor_pattern = f"#### {type_name}"
-        if anchor_pattern not in content:
+        if type_name not in documented:
             broken.add(type_name)
 
     return broken
