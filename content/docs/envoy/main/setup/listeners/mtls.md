@@ -3,7 +3,7 @@ title: mTLS (FrontendTLS)
 weight: 10 
 description: Create a FrontendTLSConfig on a Gateway to enforce mutual TLS between clients and listeners.
 ---
-Add a [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/1.4/spec/#frontendtlsconfig) to a Gateway to create a mutual TLS (mTLS) listener. 
+Add a [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#frontendtlsconfig) to a Gateway to create a mutual TLS (mTLS) listener. 
 
 ## About FrontendTLS
 

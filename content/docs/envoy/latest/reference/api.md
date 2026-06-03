@@ -139,7 +139,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -624,7 +624,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -651,7 +651,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -1130,7 +1130,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 | `retry` _[ExtSvcRetryPolicy](#extsvcretrypolicy)_ | Retry specifies the retry policy for gRPC streams associated with the service. |  |  |
@@ -1149,7 +1149,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
 | `pathPrefix` _string_ | PathPrefix specifies a prefix to the value of the authorization request's path header.<br />This allows customizing the path at which the authorization server expects to receive requests.<br />For example, if the authorization server expects requests at "/verify", set this to "/verify".<br />If not specified, the original request path is used. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the HTTP request. Default timeout is 2 seconds. |  |  |
 | `authorizationRequest` _[AuthorizationRequest](#authorizationrequest)_ | AuthorizationRequest configures the authorization request to the external service. |  |  |
@@ -2688,7 +2688,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
 | `authorizationEndpoint` _[HttpsUri](#httpsuri)_ | AuthorizationEndpoint specifies the endpoint to redirect to for authorization in response to unauthorized requests.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `tokenEndpoint` _[HttpsUri](#httpsuri)_ | TokenEndpoint specifies the endpoint on the authorization server to retrieve the access token from.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.2 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `redirectURI` _string_ | RedirectURI specifies the URL passed to the authorization endpoint.<br />Defaults to <request-scheme>://<host>/oauth2/redirect, where the URL scheme and host are derived from the original request.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2 for more details. |  |  |
@@ -3045,7 +3045,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
 | `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
 
 
@@ -3925,6 +3925,39 @@ AnyValue is used to represent any type of attribute value. AnyValue may contain 
 | `stringValue` | *string |  |
 | `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
 | `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### Authorization
+
+Authorization defines the configuration for role-based access control.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `policy` | [AuthorizationPolicy](#authorizationpolicy) | Policy specifies the Authorization rule to evaluate. A policy matches when **any** of the conditions evaluates to true. **Required.** |
+| `action` | [AuthorizationPolicyAction](#authorizationpolicyaction) | Action defines whether the rule allows or denies the request if matched. If unspecified, the default is "Allow". |
+
+#### AuthorizationPolicy
+
+AuthorizationPolicy defines a single Authorization rule.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `matchExpressions` | [][CELExpression](#celexpression) | MatchExpressions defines a set of conditions that must be satisfied for the rule to match. These expression should be in the form of a Common Expression Language (CEL) expression.  **Required.** |
+
+#### AuthorizationPolicyAction
+
+_Underlying type:_ _string_
+
+AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
+
+#### CELExpression
+
+_Underlying type:_ _string_
+
+CELExpression represents a Common Expression Language (CEL) expression.
+
+**Validation:**
+- MinLength=1
+- MaxLength=16384
 
 #### ComparisonFilter
 

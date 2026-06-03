@@ -526,14 +526,22 @@ def _generate_shared_types(api_file, kgateway_dir='kgateway'):
     '''Append shared types documentation to the API reference file.'''
     shared_dir = f'{kgateway_dir}/api/v1alpha1/shared'
     kgateway_source_dir = f'{kgateway_dir}/api/v1alpha1/kgateway'
-    if not os.path.exists(shared_dir):
+    flat_dir = f'{kgateway_dir}/api/v1alpha1'
+    if os.path.exists(shared_dir):
+        # 2.2.x+ split layout: shared/ and kgateway/ subpackages.
+        args = [shared_dir, api_file, kgateway_source_dir]
+    elif os.path.exists(flat_dir):
+        # Older versions (e.g. 2.0.x, 2.1.x) use a flat api/v1alpha1 layout with no
+        # shared/ subpackage. Parse the flat directory so the appender can still
+        # document types that crd-ref-docs referenced but did not render; otherwise
+        # their intra-page anchors (e.g. #grpcstatus, #policystatus) stay dead.
+        args = [flat_dir, api_file]
+    else:
         return
     try:
         subprocess.run([
             'python3', 'scripts/generate-shared-types.py',
-            shared_dir,
-            api_file,
-            kgateway_source_dir,
+            *args,
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f'    Warning: generate-shared-types failed: {e}')

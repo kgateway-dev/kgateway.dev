@@ -16,7 +16,7 @@ To help the community learn about Gateway API, we plan to publish [blogs](https:
 * Moving forward, we’ll discuss the unique capabilities and advanced functionality offered by kgateway, including special extensions and policy attachments.
 * Finally, we’ll wrap up by examining how kgateway integrates with service mesh and AI-based features, offering insights into where the technology is headed.
 
-Although we are using kgateway as a reference example, the same concepts can be applied to any of the [over two dozen implementations](https://gateway-api.sigs.k8s.io/implementations/) of Gateway API, which is one of the major strengths of an open, vendor-neutral standard discussed in part one of this blog series. Whether you’re new to the Gateway API or simply looking for a modern, flexible solution for traffic routing and policy management, kgateway is a great starting point for experimenting with Gateway API.
+Although we are using kgateway as a reference example, the same concepts can be applied to any of the [over two dozen implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/) of Gateway API, which is one of the major strengths of an open, vendor-neutral standard discussed in part one of this blog series. Whether you’re new to the Gateway API or simply looking for a modern, flexible solution for traffic routing and policy management, kgateway is a great starting point for experimenting with Gateway API.
 
 In this first writeup, we simply want to point you in the right direction, by following the [quickstart](https://kgateway.dev/docs/envoy/latest/quickstart/) instructions to install kgateway and diving deeper into the underlying components
 

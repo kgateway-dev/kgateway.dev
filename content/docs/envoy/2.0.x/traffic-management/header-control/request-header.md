@@ -5,7 +5,7 @@ weight: 10
 
 Use the `RequestHeaderModifier` filter to add, append, overwrite, or remove request headers for a specific route. 
 
-For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#httpheaderfilter).
+For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter).
 
 ## Before you begin
 

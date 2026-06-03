@@ -250,7 +250,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -840,7 +840,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -867,7 +867,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -1302,7 +1302,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 
@@ -2733,7 +2733,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `ancestorRef` _[ParentReference](https://gateway-api.sigs.k8s.io/reference/spec/#parentreference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
+| `ancestorRef` _[ParentReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#parentreference)_ | AncestorRef corresponds with a ParentRef in the spec that this<br />PolicyAncestorStatus struct describes the status of. |  |  |
 | `controllerName` _string_ | ControllerName is a domain/path string that indicates the name of the<br />controller that wrote this status. This corresponds with the<br />controllerName field on GatewayClass.<br /><br />Example: "example.net/gateway-controller".<br /><br />The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are<br />valid Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).<br /><br />Controllers MUST populate this field when writing status. Controllers should ensure that<br />entries to status populated with their ControllerName are cleaned up when they are no<br />longer necessary. |  |  |
 | `conditions` _[Condition](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#condition-v1-meta) array_ | Conditions describes the status of the Policy with respect to the given Ancestor. |  | MaxItems: 8 <br />MinItems: 1 <br /> |
 
@@ -3809,3 +3809,86 @@ _Appears in:_
 | `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
+
+## Shared Types
+
+The following types are defined in the shared package and used across multiple APIs.
+
+#### AnyValue
+
+AnyValue is used to represent any type of attribute value. AnyValue may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. This is limited to string and nested values as OTel only supports them
+
+**Validation:**
+- MaxProperties=1
+- MinProperties=1
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `stringValue` | *string |  |
+| `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
+| `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### BackoffStrategy
+
+Configuration defining a jittered exponential back off strategy. Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/backoff.proto#envoy-v3-api-msg-config-core-v3-backoffstrategy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `baseInterval` | metav1.Duration | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
+| `maxInterval` | *metav1.Duration | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
+
+#### GrpcStatus
+
+_Underlying type:_ _string_
+
+GrpcStatus represents possible gRPC statuses.
+
+**Validation:**
+- Enum=OK;CANCELED;UNKNOWN;INVALID_ARGUMENT;DEADLINE_EXCEEDED;NOT_FOUND;ALREADY_EXISTS;PERMISSION_DENIED;RESOURCE_EXHAUSTED;FAILED_PRECONDITION;ABORTED;OUT_OF_RANGE;UNIMPLEMENTED;INTERNAL;UNAVAILABLE;DATA_LOSS;UNAUTHENTICATED
+
+#### KeyAnyValue
+
+KeyValue is a key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Attribute keys must be unique **Required.** |
+| `value` | [AnyValue](#anyvalue) | Value may contain a primitive value such as a string or integer or it may contain an arbitrary nested object containing arrays, key-value lists and primitives. **Required.** |
+
+#### KeyAnyValueList
+
+A list of key-value pair that is used to store Span attributes, Link attributes, etc.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `values` | [][KeyAnyValue](#keyanyvalue) | A collection of key/value pairs of key-value pairs. |
+
+#### OTelTracesSamplerType
+
+_Underlying type:_ _string_
+
+OTelTracesSamplerType defines the available OpenTelemetry trace sampler types. These samplers determine which traces are recorded and exported.
+
+#### PolicyAncestorStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
+| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+
+#### PolicyStatus
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `conditions` | []metav1.Condition |  |
+| `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
+
+#### RateLimitDescriptorEntryGeneric
+
+RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `key` | string | Key is the name of this descriptor entry. **Required.** |
+| `value` | string | Value is the static value for this descriptor entry. **Required.** |
