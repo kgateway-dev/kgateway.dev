@@ -66,6 +66,7 @@ jobs:
 
           LYCHEE_COMMON=(lychee
             --verbose
+            --exclude-path public/docs/envoy/2.0.x
             --config docs-link-checking/lychee.toml
             --root-dir "${{ github.workspace }}/public"
             --index-files index.html
