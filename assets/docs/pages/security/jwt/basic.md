@@ -186,6 +186,51 @@ You can extract claims from the verified JWT and forward them as headers to the 
    }
    ```
 
+## (Optional) Customize how tokens are validated {#customize}
+
+The `jwt` configuration in the GatewayExtension supports several optional fields that change how tokens are located, validated, and forwarded. To use any of them, add the field to the GatewayExtension that you created earlier and reapply it. Add only the fields that you need, and keep the `jwks` and other settings that you already configured.
+
+| Field | Location | Description |
+| ----- | ----- | ----- |
+| `validationMode` | `spec.jwt` | Controls whether a JWT is required. `Strict` (the default) rejects requests that do not include a valid JWT. `AllowMissing` lets requests without a token through, but still rejects requests that present an invalid token. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through. |
+| `audiences` | `spec.jwt.providers[]` | A list of accepted audiences. An incoming token must include an `aud` claim that matches one of these values. If omitted, the `aud` claim is not checked. |
+| `tokenSource` | `spec.jwt.providers[]` | Where to find the JWT. By default, the token is read from the `Authorization` header as a bearer token. Set `header.header` to read it from a different header (and optional `header.prefix` to strip a prefix), or `queryParameter` to read it from a URL query parameter. Exactly one of `header` or `queryParameter` can be set. |
+| `forwardToken` | `spec.jwt.providers[]` | Whether to forward the token to the upstream service. If `false` or unset, the gateway removes the token's header before it forwards the request. Set to `true` to keep the token so that the upstream service can use it. |
+
+The following GatewayExtension is a complete replacement for the one that you created earlier. You can apply it as-is: the request-changing fields (`audiences` and `tokenSource`) are commented out, so the example keeps working with the sample token and requests from the previous steps. Uncomment the fields that you want to use.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    validationMode: Strict            # Strict (default) requires a valid JWT; AllowMissing also lets requests with no token through
+    providers:
+      - name: selfminted
+        issuer: solo.io
+        forwardToken: true            # keep the token so that the upstream service can use it
+        # audiences:                  # require a matching aud claim (the sample token has no aud claim)
+        #   - my-api
+        # tokenSource:                # read the token from a custom location instead of the Authorization header
+        #   header:
+        #     header: x-jwt
+        #     prefix: "Bearer "
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
+EOF
+```
+
+{{< callout type="warning" >}}
+The `audiences` and `tokenSource` fields change how clients must send requests, so they are commented out above. If you uncomment `tokenSource`, send the token in the matching header or query parameter instead of the `Authorization` header. If you uncomment `audiences`, requests must use a token that includes a matching `aud` claim; the sample token in this guide has no `aud` claim.
+{{< /callout >}}
+
+For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
+
 ## Cleanup {#cleanup}
 
 ```sh
