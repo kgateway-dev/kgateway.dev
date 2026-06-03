@@ -5,7 +5,7 @@ weight: 20
 
 Use the `ResponseHeaderModifier` filter to add, append, overwrite, or remove headers from a response before it is sent back to the client. 
 
-For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#httpheaderfilter).
+For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter).
 
 ## Before you begin
 

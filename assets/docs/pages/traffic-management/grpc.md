@@ -133,7 +133,7 @@ Steps to set up the sample gRPC service:
    EOF
    ```
 
-2. Create the GRPCRoute. The GRPCRoute includes a match for `grpc.reflection.v1alpha.ServerReflection` to enable dynamic API exploration and a match for the `Ping` method. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/spec/#grpcroute).
+2. Create the GRPCRoute. The GRPCRoute includes a match for `grpc.reflection.v1alpha.ServerReflection` to enable dynamic API exploration and a match for the `Ping` method. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcroute).
 
    ```yaml
    kubectl apply -f - <<EOF

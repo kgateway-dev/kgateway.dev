@@ -1,4 +1,4 @@
-By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their order and specificity, as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule). When a route matches a request, no further routes are evaluated for matching, which might affect the gateway's routing decision and the policies that are applied to the traffic. With {{< reuse "/docs/snippets/kgateway.md" >}}, you can configure weights for more fine-grained control over your routing rules.
+By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their order and specificity, as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouterule). When a route matches a request, no further routes are evaluated for matching, which might affect the gateway's routing decision and the policies that are applied to the traffic. With {{< reuse "/docs/snippets/kgateway.md" >}}, you can configure weights for more fine-grained control over your routing rules.
 
 ## Before you begin
 
@@ -6,7 +6,7 @@ By default, the Kubernetes Gateway API sorts HTTPRoute rules based on their orde
 
 ## Step 1: Review the default routing behavior {#default-routing}
 
-By default, the Kubernetes Gateway API sorts HTTPRoute rules as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule).
+By default, the Kubernetes Gateway API sorts HTTPRoute rules as defined in the [Gateway API docs](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouterule).
 
 1. Specificity of the route matching rule, such as a header match with largest number of matching headers.
 2. Oldest route based on creation timestamp.
@@ -215,7 +215,7 @@ By default, weighted routes are disabled. Upgrade your {{< reuse "/docs/snippets
 Apply an annotation at the HTTPRoute level that sets a weight for the route, which can be any 32-bit integer, including negative numbers. HTTPRoutes without the annotation are given a weight of `0`. Routes are sorted as follows:
 
 1. In descending order by weight, from highest to lowest.
-2. By [Gateway API route precedence](https://gateway-api.sigs.k8s.io/reference/spec/#httprouterule) for routes with the same weight.
+2. By [Gateway API route precedence](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouterule) for routes with the same weight.
 
 {{< callout type="info" >}}
 Using route delegation? Make sure to add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
