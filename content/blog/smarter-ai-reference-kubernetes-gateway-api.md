@@ -1,5 +1,6 @@
 ---
 title: Smarter AI Inference Routing on Kubernetes with Gateway API Inference Extension
+draft: true
 toc: false
 publishDate: 2025-03-25T00:00:00-00:00
 author: Christian Posta
