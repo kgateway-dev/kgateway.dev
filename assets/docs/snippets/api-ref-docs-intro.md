@@ -1,3 +1,3 @@
-Review the API reference documentation for {{< reuse "docs/snippets/kgateway-and-data-plane.md" >}}. 
+Review the API reference documentation for {{< reuse "docs/snippets/kgateway-and-data-plane.md" >}}.
 
-Looking for the agentgateway data plane APIs instead? See the [kgateway with agentgateway](https://agentgateway.dev/docs) API docs.
+Looking for Agentgateway APIs instead? See the [Agentgateway documentation](https://agentgateway.dev/docs).

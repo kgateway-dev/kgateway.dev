@@ -56,7 +56,7 @@ excludeSearch: true
       About kgateway
     </h2>
     <div class="flex gap-8 flex-wrap justify-center text-l lg:text-xl px-4">
-      <p class="text-primary-text max-w-4xl mx-auto">Kgateway is a control plane for the most mature and widely deployed Envoy-based kgateway data plane gateway proxy in the market today. Kgateway also was the initial control plane for the agentgateway data plane, designed from the ground up for AI workloads. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways that handle billions of API calls. Kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
+      <p class="text-primary-text max-w-4xl mx-auto">Kgateway is a control plane for the most mature and widely deployed Envoy-based kgateway data plane gateway proxy in the market today. Built on open source and open standards, kgateway implements the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways that handle billions of API calls. Kgateway brings omni-directional API connectivity to any cloud and any environment.</p>
       <p class="text-primary-text max-w-4xl mx-auto">Kgateway was launched in 2018 as <b>Gloo</b>. Since then, the project has steadily evolved to become the most trusted and feature-rich API gateway for Kubernetes, processing billions of API requests for many of the world's biggest companies.</p>
     </div>
   </div>

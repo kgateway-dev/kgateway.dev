@@ -47,7 +47,6 @@ Add headers to incoming requests before they are sent back to the client. If the
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
    {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
-   **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -183,7 +182,6 @@ Setting headers is similar to adding headers. If the response does not include t
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
    {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
-   **Note**: {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -614,10 +612,6 @@ headerModifiers:
 You can return dynamic information about the response in the response header. For more information, see the Envoy docs for [Custom request/response headers](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers.html#custom-request-response-headers).
 
 {{< reuse "docs/snippets/dynamic-req-resp-headers.md" >}}
-
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}} 
 
 1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
