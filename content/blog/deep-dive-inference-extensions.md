@@ -1,5 +1,6 @@
 ---
 title: Deep Dive into the Gateway API Inference Extension
+draft: true
 toc: false
 publishDate: 2025-04-01T00:00:00-00:00
 author: Christian Posta
