@@ -44,7 +44,7 @@ So how does the Gateway API enforce these policies if no gateway is involved? Th
 
 The role of a service mesh provider is to recognize the east-west communication pattern and to enforce it accordingly within the service mesh by using a gateway-like component. In Istio, you typically have a sidecar proxy or a waypoint proxy that applies the policy to the east-west traffic before it is forwarded to the target destination. 
 
-Check out the [implementations](https://gateway-api.sigs.k8s.io/implementations/#service-mesh-implementation-status) page of the Kubernetes Gateway API portal to find a list of other service mesh providers that also support this facet of the Gateway API.
+Check out the [implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/#service-mesh-implementation-status) page of the Kubernetes Gateway API portal to find a list of other service mesh providers that also support this facet of the Gateway API.
 
 ## The power of extensibility
 

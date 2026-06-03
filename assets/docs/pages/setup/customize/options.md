@@ -30,7 +30,7 @@ Use the built-in fields where possible. Built-in fields are validated at apply t
 
 ## Overlays {#overlays}
 
-For advanced customization that is not covered by the built-in fields, the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource supports overlays. Overlays use [Kubernetes strategic merge patch (SMP)](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md) semantics to modify the raw Kubernetes resources after the control plane renders them. You can also use overlays to create HorizontalPodAutoscaler (HPA), VerticalPodAutoscaler (VPA), and PodDisruptionBudget (PDB) resources that automatically target the proxy Deployment.
+For advanced customization that is not covered by the built-in fields, the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource supports overlays. Overlays use [Kubernetes strategic merge patch (SMP)](https://github.com/kubernetes/community/blob/main/contributors/devel/sig-api-machinery/strategic-merge-patch.md) semantics to modify the raw Kubernetes resources after the control plane renders them. You can also use overlays to create HorizontalPodAutoscaler (HPA), VerticalPodAutoscaler (VPA), and PodDisruptionBudget (PDB) resources that automatically target the proxy Deployment.
 
 Review the following table for the resource types that you can overlay in the `spec.kube` field of your {{< reuse "docs/snippets/gatewayparameters.md" >}} resource.
 

@@ -10,7 +10,7 @@ Learn about the custom resources that make up {{< reuse "/docs/snippets/kgateway
 
 Review the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} resources that you use to set up gateway proxies and configure routing for your apps. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/docs/). 
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} introduction](https://gateway-api.sigs.k8s.io/docs/introduction/). 
 
 ### Gateway and GatewayClass
 
@@ -23,7 +23,7 @@ To spin up a Gateway and manage its lifecycle, a gateway controller is used. The
 To configure routing, the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides several routing resources, such as an HTTPRoute and TCPRoute. These routes attach to a Gateway resource and define how incoming traffic is matched and forwarded to a backing destination.
 
 * [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/): The most commonly used route resource, that configures traffic routing for HTTP and HTTPS traffic. 
-* [TCPRoute](https://gateway-api.sigs.k8s.io/guides/tcp/): A resource to route TCP requests.
+* [TCPRoute](https://gateway-api.sigs.k8s.io/guides/user-guides/tcp/): A resource to route TCP requests.
 
 While the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} provides the functionality for basic request matching, redirects, rewrites, and header manipulation, it is missing more complex traffic management, resiliency, and security features, such as transformations, access logging, or route delegation. 
 
