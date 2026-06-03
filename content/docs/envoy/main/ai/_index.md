@@ -72,7 +72,7 @@ Running your own models on GPU infrastructure? Agentgateway implements the [Kube
 
 ### MCP Gateway
 
-Connect LLMs to tools and external data sources using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Agentgateway provides:
+Connect LLMs to tools and external data sources using the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro). Agentgateway provides:
 
 - **Tool federation**: Aggregate multiple MCP servers behind a single endpoint
 - **Protocol support**: stdio, HTTP/SSE, and Streamable HTTP transports
@@ -91,7 +91,7 @@ Enable secure communication between AI agents using the [Agent-to-Agent (A2A)](h
 ### Security & Observability
 
 - **Authentication**: JWT, API keys, basic auth, MCP auth spec
-- **Authorization**: Fine-grained RBAC with [Cedar policy engine](https://www.cedarpolicy.com/)
+- **Authorization**: Fine-grained RBAC with [Cedar policy engine](https://cedarpolicy.com/)
 - **Traffic policies**: Rate limiting, CORS, TLS, external authz
 - **Observability**: Built-in [OpenTelemetry](https://opentelemetry.io/) metrics, logs, and distributed tracing
 

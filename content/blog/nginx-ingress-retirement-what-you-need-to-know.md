@@ -126,7 +126,7 @@ status:
 
 ## Envoy Proxy
 
-Many Gateway API [implementations](https://gateway-api.sigs.k8s.io/implementations/) are built on **Envoy**, a high-performance modern proxy. Projects like Istio, kgateway, Contour, Cilium, Envoy Gateway, and Emissary-Ingress use Envoy as the data plane.
+Many Gateway API [implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/) are built on **Envoy**, a high-performance modern proxy. Projects like Istio, kgateway, Contour, Cilium, Envoy Gateway, and Emissary-Ingress use Envoy as the data plane.
 
 While multiple gateways may share the same data plane, the **control plane** is what sets them apart. The control plane translates Gateway API resources into Envoy configuration. For small setups, this is simple, but for large-scale deployments (e.g., 20,000 routes → 500,000+ lines of Envoy config), control plane **efficiency and scalability** are critical.
 
