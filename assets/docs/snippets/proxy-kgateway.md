@@ -1,1 +1,0 @@
-{{< icon "kgateway" >}} The steps in this section use the Envoy-based kgateway data plane. The steps do not work with the agentgateway data plane.
