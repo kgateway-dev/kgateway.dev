@@ -59,6 +59,9 @@ render:
     - name: HTTPRouteRetryStatusCode
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouteretrystatuscode
+    - name: HTTPURLRewriteFilter
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter
     - name: ObjectName
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname
