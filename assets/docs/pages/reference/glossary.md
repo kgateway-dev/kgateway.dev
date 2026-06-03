@@ -48,7 +48,7 @@ A service mesh architecture that removes the need for sidecars. Instead of injec
 ### API Gateway
 The central entry point for controlling, securing, and routing API traffic.
 
-In kgateway, the **Envoy-based kgateway proxy** acts as the API gateway for traditional API and service mesh traffic. For AI and LLM-specific traffic, use [Agentgateway](https://agentgateway.dev/docs).
+In kgateway, the **Envoy-based kgateway proxy** acts as the API gateway for traditional API and service mesh traffic. For AI and LLM-specific traffic, use [agentgateway](https://agentgateway.dev/docs).
 
 ### Backends
 Destination services or endpoints that kgateway routes traffic to, such as Kubernetes Services, Lambdas, external hosts, or custom backends. These backends are connected to routes for forwarding traffic.
@@ -131,10 +131,10 @@ Mechanisms for running inference or AI processing in traffic flows—typically i
 Serverless compute functions in Amazon Web Services (AWS) that kgateway can route traffic to via Backends.
 
 ### Large Language Model (LLM)
-AI models trained on massive datasets to generate human-like text. For LLM and agent traffic, use [Agentgateway](https://agentgateway.dev/docs).
+AI models trained on massive datasets to generate human-like text. For LLM and agent traffic, use [agentgateway](https://agentgateway.dev/docs).
 
 ### LLM Gateway / AI Gateway
-A traffic-management pattern specialized for LLM, agent, MCP, and AI inference traffic. See the [Agentgateway documentation](https://agentgateway.dev/docs).
+A traffic-management pattern specialized for LLM, agent, MCP, and AI inference traffic. See the [agentgateway documentation](https://agentgateway.dev/docs).
 
 ## M–O
 
