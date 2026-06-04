@@ -116,7 +116,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
    Verify that you get a `200 OK` response.
 
-## (Optional) Forward JWT claims as request headers {#claims-to-headers}
+## Forward JWT claims as request headers {#claims-to-headers}
 
 You can extract claims from the verified JWT and forward them as headers to the upstream service by using the `claimsToHeaders` field in the GatewayExtension resource.
 
@@ -186,7 +186,7 @@ You can extract claims from the verified JWT and forward them as headers to the 
    }
    ```
 
-## (Optional) Customize how tokens are validated {#customize}
+## Optional: Customize how tokens are validated {#customize}
 
 The `jwt` configuration in the GatewayExtension supports several optional fields that change how tokens are located, validated, and forwarded. To use any of them, add the field to the GatewayExtension that you created earlier and reapply it. Add only the fields that you need, and keep the `jwks` and other settings that you already configured.
 
