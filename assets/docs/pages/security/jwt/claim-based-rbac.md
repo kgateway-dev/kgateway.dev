@@ -96,6 +96,22 @@ rbac:
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['team'] == 'dev' && metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['org'] == 'solo.io'"
 ```
 
+### Match an OAuth scope {#scope}
+
+You can authorize requests based on an OAuth `scope` claim, such as one issued by an identity provider. Unlike the single-value claims in the previous examples, the `scope` claim is conventionally a single string of space-delimited scopes, such as `read write admin`. To match one scope without accidentally matching a longer scope that contains it (for example, matching `admin` but not `superadmin`), split the string on spaces and test for membership in the resulting list. The following policy allows requests whose `scope` claim includes `admin`.
+
+```yaml
+rbac:
+  action: Allow
+  policy:
+    matchExpressions:
+      - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope'].split(' ')"
+```
+
+{{< callout type="info" >}}
+The sample token in the [Basic JWT policy](../basic/) guide does not include a `scope` claim, so this example does not match that token. To try it out, use a token that carries a space-delimited `scope` claim. If your identity provider issues `scope` as a list instead of a string, drop the `.split(' ')` and match the list directly: `"'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope']"`.
+{{< /callout >}}
+
 ## Cleanup {#cleanup}
 
 ```sh
