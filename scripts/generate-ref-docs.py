@@ -415,7 +415,30 @@ def _post_process_api_docs(api_file):
         i += 1
     
     content = '\n'.join(final_lines)
-    
+
+    # ── Markdown-leak fixes ──────────────────────────────────────────────
+    # crd-ref-docs renders multi-line field comments into single table cells
+    # by replacing newlines with "<br />". Two patterns from that leak into
+    # the rendered HTML as literal text:
+    #
+    # 1. A fenced code block (```...```) inside a comment ends up inside a
+    #    table cell. Markdown can't put a code block in a cell, so it escapes
+    #    the cell contents and the surrounding "<br />" surface as literal
+    #    "&lt;br /&gt;" text. Strip the fence tokens on table-row lines (those
+    #    starting with "|") so the example renders as <br />-separated text.
+    #    Real, standalone fenced blocks have ``` on their own line (never
+    #    starting with "|") and are left untouched.
+    fixed_lines = []
+    for line in content.split('\n'):
+        if line.startswith('|') and '```' in line:
+            line = re.sub(r'```[a-zA-Z0-9]*', '', line)
+        fixed_lines.append(line)
+    content = '\n'.join(fixed_lines)
+
+    # 2. A backslash-escaped "\<br />" renders as the literal text "<br />"
+    #    (Goldmark turns "\<" into a literal "<"). Unescape it to a real break.
+    content = re.sub(r'\\(<br\s*/?>)', r'\1', content)
+
     with open(api_file, 'w') as f:
         f.write(content)
 
