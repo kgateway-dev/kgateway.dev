@@ -31,7 +31,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    | `spec.jwt.providers` | A list of JWT providers. If multiple providers are listed, a token that validates against any one of them is accepted (OR logic). |
    | `name` | An arbitrary name for this provider entry. |
    | `issuer` | The expected value of the `iss` claim. Tokens with a different issuer are rejected. If omitted, the `iss` field is not checked. |
-   | `jwks.local.inline` | An inline JSON Web Key Set (JWKS) used to verify token signatures. To use a remote JWKS server instead, replace `local` with `remote` and provide a `url` and `backendRef`. |
+   | `jwks.local.inline` | An inline JSON Web Key Set (JWKS) used to verify token signatures. To fetch the keys from a remote JWKS server instead, see [Use a remote JWKS as a source](#remote-jwks). |
 
 2. Create the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that points to the GatewayExtension that you created in the previous step. The following policy applies JWT authentication to all routes on the Gateway. Create the policy in the same namespace as the targeted resource.
 
@@ -186,6 +186,65 @@ You can extract claims from the verified JWT and forward them as headers to the 
    }
    ```
 
+## Optional: Use a remote JWKS as a source {#remote-jwks}
+
+Instead of embedding the keys inline, you can point the provider at a remote JWKS server, such as the JWKS endpoint of an external identity provider. The gateway fetches the keys from the server and caches them, which means you do not have to update the GatewayExtension when the provider rotates its keys. To reach the server, the GatewayExtension references a Backend resource that fronts the JWKS host.
+
+1. Create a Backend resource for the remote JWKS server. The following example uses a static Backend that points to an external host. Set the `host` and `port` to match the JWKS server that you want to use.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: jwks-server
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     type: Static
+     static:
+       hosts:
+         - host: example.com
+           port: 443
+   EOF
+   ```
+
+2. Update the GatewayExtension to use a `remote` JWKS source instead of `local`. Replace the entire `jwks` block with the `remote` configuration. The `url` is the full JWKS endpoint, and `backendRef` points to the Backend that you created in the previous step.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: GatewayExtension
+   metadata:
+     name: selfminted-jwt
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   spec:
+     jwt:
+       providers:
+         - name: remote-provider
+           issuer: https://example.com
+           jwks:
+             remote:
+               url: https://example.com/.well-known/jwks.json
+               backendRef:
+                 name: jwks-server
+                 kind: Backend
+                 group: gateway.kgateway.dev
+               cacheDuration: 10m
+   EOF
+   ```
+
+   | Field | Description |
+   | ----- | ----- |
+   | `jwks.remote.url` | The URL of the remote JWKS server. It must be a full FQDN with protocol, host, and path, for example `https://example.com/.well-known/jwks.json`. |
+   | `jwks.remote.backendRef` | A reference to the Backend (or other backend resource) that fronts the JWKS server. When you reference a kgateway Backend, set `kind` to `Backend` and `group` to `gateway.kgateway.dev`. |
+   | `jwks.remote.cacheDuration` | How long the gateway caches the fetched keys before it refreshes them. If omitted, the keys are cached for 5 minutes. |
+
+   {{< callout type="warning" >}}
+   This example uses a placeholder JWKS server (`example.com`), so it does not validate the sample token from the earlier steps. To try it out, replace the host, URL, and `issuer` with the values for a JWKS server that you control, and use a token that is signed by that provider.
+   {{< /callout >}}
+
+   For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
+
 ## Optional: Customize how tokens are validated {#customize}
 
 The `jwt` configuration in the GatewayExtension supports several optional fields that change how tokens are located, validated, and forwarded. To use any of them, add the field to the GatewayExtension that you created earlier and reapply it. Add only the fields that you need, and keep the `jwks` and other settings that you already configured.
@@ -197,7 +256,7 @@ The `jwt` configuration in the GatewayExtension supports several optional fields
 | `tokenSource` | `spec.jwt.providers[]` | Where to find the JWT. By default, the token is read from the `Authorization` header as a bearer token. Set `header.header` to read it from a different header (and optional `header.prefix` to strip a prefix), or `queryParameter` to read it from a URL query parameter. Exactly one of `header` or `queryParameter` can be set. |
 | `forwardToken` | `spec.jwt.providers[]` | Whether to forward the token to the upstream service. If `false` or unset, the gateway removes the token's header before it forwards the request. Set to `true` to keep the token so that the upstream service can use it. |
 
-The following GatewayExtension is a complete replacement for the one that you created earlier. You can apply it as-is: the request-changing fields (`audiences` and `tokenSource`) are commented out, so the example keeps working with the sample token and requests from the previous steps. Uncomment the fields that you want to use.
+The following GatewayExtension is a replacement for the one that you created earlier. You can apply it as-is: the request-changing fields (`audiences` and `tokenSource`) are commented out, so the example keeps working with the sample token and requests from the previous steps. Uncomment the fields that you want to use.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -236,4 +295,10 @@ For claim-based access control with a CEL `rbac` policy, see [Restrict access wi
 ```sh
 kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "docs/snippets/namespace.md" >}}
 kubectl delete gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}}
+```
+
+If you completed the [Use a remote JWKS as a source](#remote-jwks) section, also delete the Backend that you created for the JWKS server.
+
+```sh
+kubectl delete backend jwks-server -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
