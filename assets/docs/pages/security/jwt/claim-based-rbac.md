@@ -66,7 +66,7 @@ The following examples show other ways to write the `rbac` policy. Each one repl
 
 ### Deny access based on a claim {#deny}
 
-Set `action` to `Deny` to deny requests that match the expressions and allow everything else. The following policy denies requests whose `team` claim is `ops`.
+Set `action` to `Deny` to deny requests that match the expressions and allow everything else. The following policy denies requests with a JWT where the `team` claim equals `ops`.
 
 ```yaml
 rbac:
