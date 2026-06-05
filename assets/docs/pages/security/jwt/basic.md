@@ -31,7 +31,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    | `spec.jwt.providers` | A list of JWT providers. If multiple providers are listed, a token that validates against any one of them is accepted (OR logic). |
    | `name` | An arbitrary name for this provider entry. |
    | `issuer` | The expected value of the `iss` claim. Tokens with a different issuer are rejected. If omitted, the `iss` field is not checked. |
-   | `jwks.local.inline` | An inline JSON Web Key Set (JWKS) used to verify token signatures. To fetch the keys from a remote JWKS server instead, see [Use a remote JWKS as a source](#remote-jwks). |
+   | `jwks.local.inline` | An inline JSON Web Key Set (JWKS) used to verify token signatures. To fetch the keys from a remote JWKS server instead, see [Remote JWKS](#remote-jwks). |
 
 2. Create the {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that points to the GatewayExtension that you created in the previous step. The following policy applies JWT authentication to all routes on the Gateway. Create the policy in the same namespace as the targeted resource.
 
@@ -55,7 +55,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
    | Field | Description |
    | ----- | ----- |
-   | `targetRefs` | The resource to enforce the policy on. When targeting a Gateway, the policy must be in the same namespace as the Gateway. To restrict JWT enforcement to a single route instead, change the `kind` field to HTTPRoute and provide the name of the HTTPRoute resource that defines the routes that you want to route to. Make sure to create the policy in the same namespace as the HTTPRoute that you target. |
+   | `targetRefs` | The resource to enforce the policy on. When targeting a Gateway, the policy must be in the same namespace as the Gateway. To restrict JWT enforcement to a single route instead, change the `kind` field to HTTPRoute and provide the name of the HTTPRoute resource that defines the routes you want to protect. Make sure to create the policy in the same namespace as the HTTPRoute that you target. |
    | `jwtAuth.extensionRef` | The name of the GatewayExtension resource that holds the JWT provider configuration. The extension must be in the same namespace as the policy. |
 
 3. Send a request without a JWT and verify that you get a `401 Unauthorized` response.
@@ -186,9 +186,9 @@ You can extract claims from the verified JWT and forward them as headers to the 
    }
    ```
 
-## Other configurations
+## Other configurations {#other-configurations}
 
-Review other common JWT configuration examples. 
+Review other common JWT configuration examples.
 
 ### Remote JWKS {#remote-jwks}
 
@@ -280,7 +280,7 @@ spec:
 EOF
 ```
 
-**AllowMissing**: Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through.
+**AllowMissing**: Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through. For an example, see [Restrict access based on claims](../claim-based-rbac/).
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -391,7 +391,7 @@ kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< 
 kubectl delete gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
-If you completed the [Use a remote JWKS as a source](#remote-jwks) section, also delete the Backend that you created for the Keycloak server.
+If you completed the [Remote JWKS](#remote-jwks) section, also delete the Backend that you created for the Keycloak server.
 
 ```sh
 kubectl delete backend keycloak -n {{< reuse "docs/snippets/namespace.md" >}}

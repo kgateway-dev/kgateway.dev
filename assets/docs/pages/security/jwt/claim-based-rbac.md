@@ -11,7 +11,7 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
 ## Allow access based on a claim {#allow}
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that enforces JWT authentication and allows only requests with a valid JWT that contains the `team=dev` claim is `dev`. If the JWT does not include this claim, the request is denied.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that enforces JWT authentication and allows only requests with a valid JWT that contains the `team=dev` claim. If the JWT does not include this claim, the request is denied.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -41,7 +41,7 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
    | `rbac.action` | The action to take when a request matches the policy, either `Allow` or `Deny`. Defaults to `Allow`, which permits only matching requests and denies all others. |
    | `rbac.policy.matchExpressions` | A list of CEL expressions. The policy matches when any one of the expressions evaluates to `true`. Reference verified JWT claims through the `envoy.filters.http.jwt_authn` filter metadata, in the form `metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['<claim>']`. |
 
-2. Send a request with the sample token from the previous guide. Because JWT has a `team` claim that equals `dev`, the request matches the policy and is allowed with a 200 HTTP response. A request with a token where the `team` claim does not equal `dev`, or that has no `team` claim, is denied with a 403 HTTP response.
+2. Send a request with the sample token from the previous guide. Because the JWT has a `team` claim that equals `dev`, the request matches the policy and is allowed with a 200 HTTP response. A request with a token where the `team` claim does not equal `dev`, or that has no `team` claim, is denied with a 403 HTTP response.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -59,6 +59,8 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
    ```
    {{% /tab %}}
    {{< /tabs >}}
+
+   Verify that you get a `200 OK` response.
 
 ## Other configurations {#other}
 
@@ -78,7 +80,7 @@ rbac:
 
 ### Match more than one claim {#multiple}
 
-List multiple expressions to match on more than one condition. The policy matches when **any** expression evaluates to `true` (OR logic). The following policy allows requests if the JWT has a `team=dev` or `sub=alice` claim. 
+List multiple expressions to match on more than one condition. The policy matches when **any** expression evaluates to `true` (OR logic). The following policy allows requests if the JWT has a `team=dev` or `sub=alice` claim.
 
 ```yaml
 rbac:
@@ -89,7 +91,7 @@ rbac:
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['sub'] == 'alice'"
 ```
 
-To require multiple conditions in a single rule instead (AND logic), combine them in one expression with `&&`. The following policy allows a request only when the JWT contains the `team=dev` and `org=solo.io` claims.  
+To require multiple conditions in a single rule instead (AND logic), combine them in one expression with `&&`. The following policy allows a request only when the JWT contains the `team=dev` and `org=solo.io` claims.
 
 ```yaml
 rbac:
