@@ -43,21 +43,21 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
 2. Send a request with the sample token from the previous guide. Because the JWT has a `team` claim that equals `dev`, the request matches the policy and is allowed with a 200 HTTP response. A request with a token where the `team` claim does not equal `dev`, or that has no `team` claim, is denied with a 403 HTTP response.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{< tab name="Cloud Provider LoadBalancer" >}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      --header "Authorization: Bearer $TOKEN"
    ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{< /tab >}}
+   {{< tab name="Port-forward for local testing" >}}
    ```sh
    curl -vik localhost:8080/headers \
      -H "host: www.example.com:8080" \
      --header "Authorization: Bearer $TOKEN"
    ```
-   {{% /tab %}}
+   {{< /tab >}}
    {{< /tabs >}}
 
    Verify that you get a `200 OK` response.
