@@ -11,7 +11,7 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
 ## Allow access based on a claim {#allow}
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that enforces JWT authentication and allows only requests whose `team` claim is `dev`. All other requests are denied.
+1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that enforces JWT authentication and allows only requests with a valid JWT that contains the `team=dev` claim is `dev`. If the JWT does not include this claim, the request is denied.
 
    ```yaml
    kubectl apply -f- <<EOF
