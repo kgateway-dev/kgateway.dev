@@ -537,7 +537,7 @@ def _generate_shared_types(api_file, kgateway_dir='kgateway'):
         return
     try:
         subprocess.run([
-            'python3', 'scripts/generate-shared-types.py',
+            sys.executable, 'scripts/generate-shared-types.py',
             shared_dir,
             api_file,
             kgateway_source_dir,
