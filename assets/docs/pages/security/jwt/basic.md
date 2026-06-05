@@ -192,7 +192,7 @@ Review other common JWT configuration examples.
 
 ### Remote JWKS {#remote-jwks}
 
-Instead of embedding the JWKS keys inline, you can point the provider at a remote JWKS server, such as the JWKS endpoint of an external identity provider. The gateway fetches the keys from the server and caches them, which means you do not have to update the GatewayExtension when the provider rotates its keys. To reach the server, the GatewayExtension references a Backend resource that exposes the JWKS host.
+Instead of embedding the JWKS keys inline, you can point the provider at a remote JWKS server, such as the JWKS endpoint of an external identity provider. The gateway fetches the keys from the server and caches them, which means you do not have to update the GatewayExtension when the provider rotates its keys.
 
 The following example uses Keycloak as the identity provider.
 
@@ -222,7 +222,7 @@ The following example uses Keycloak as the identity provider.
    EOF
    ```
 
-3. Update the GatewayExtension to use the Keycloak JWKS endpoint. Set the `issuer` to the Keycloak realm URL and the `url` to the realm's JWKS endpoint. The `backendRef` is required and points to the Backend you created in the previous step; kgateway routes the key-fetch request through it.
+3. Update the GatewayExtension to use the Keycloak JWKS endpoint. Set the `issuer` to the Keycloak realm URL and the `url` to the realm's JWKS endpoint. The `backendRef` points to the Backend you created in the previous step; kgateway routes the key-fetch request through it.
 
    ```yaml
    kubectl apply -f- <<EOF
