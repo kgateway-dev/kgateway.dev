@@ -188,21 +188,16 @@ def extract_package_section(content, package_name):
 
 def _post_process_api_docs(api_file):
     '''Apply post-processing to API docs file'''
-    # Format the generated docs with sed commands
-    # macOS sed requires an extension argument, use '' for in-place editing
-    # Use an empty string (not '') to avoid creating backup files
-    if platform.system() == 'Darwin':
-        subprocess.run(['sed', '-i', '', 's/Required: {}/Required/g', api_file], check=True)
-        subprocess.run(['sed', '-i', '', 's/Optional: {}/Optional/g', api_file], check=True)
-        subprocess.run(['sed', '-i', '', '/^# API Reference$/,/^$/d', api_file], check=True)
-    else:
-        subprocess.run(['sed', '-i', 's/Required: {}/Required/g', api_file], check=True)
-        subprocess.run(['sed', '-i', 's/Optional: {}/Optional/g', api_file], check=True)
-        subprocess.run(['sed', '-i', '/^# API Reference$/,/^$/d', api_file], check=True)
-    
-    # Additional post-processing to clean up complex struct types and Go code artifacts
-    with open(api_file, 'r') as f:
+    # Read content with explicit UTF-8 encoding to prevent Windows UnicodeDecodeErrors
+    with open(api_file, 'r', encoding='utf-8') as f:
         content = f.read()
+    
+    # Format the generated docs (replacing external sed dependencies)
+    content = content.replace('Required: {}', 'Required')
+    content = content.replace('Optional: {}', 'Optional')
+    
+    # Equivalent to sed '/^# API Reference$/,/^$/d' (delete # API Reference up to next blank line)
+    content = re.sub(r'^# API Reference\r?\n(?:[^\r\n]+\r?\n)*\r?\n', '', content, flags=re.MULTILINE)
     
     # Replace complex struct type definitions with simple "struct"
     # Pattern matches: _Underlying type:_ _[struct{...}](#struct{...})_
@@ -428,7 +423,7 @@ def _post_process_api_docs(api_file):
     
     content = '\n'.join(final_lines)
     
-    with open(api_file, 'w') as f:
+    with open(api_file, 'w', encoding='utf-8') as f:
         f.write(content)
 
 
@@ -443,7 +438,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         return False
     
     # Generate API docs using individual subprocess calls
-    with open('scripts/crd-ref-docs-config.yaml', 'r') as f:
+    with open('scripts/crd-ref-docs-config.yaml', 'r', encoding='utf-8') as f:
         config_content = f.read()
     
     # Substitute environment variables in config (handle both $VAR and ${VAR} formats)
@@ -451,7 +446,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     kube_version = os.environ.get('KUBE_VERSION') or '1.31'
     config_content = config_content.replace('${KUBE_VERSION}', kube_version)
     
-    with open(f'crd-ref-docs-config-{link_version}.yaml', 'w') as f:
+    with open(f'crd-ref-docs-config-{link_version}.yaml', 'w', encoding='utf-8') as f:
         f.write(config_content)
     
     subprocess.run([
@@ -465,7 +460,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
     os.remove(f'crd-ref-docs-config-{link_version}.yaml')
     
     # Read the generated content once
-    with open('./out.md') as f:
+    with open('./out.md', 'r', encoding='utf-8') as f:
         generated_content = f.read()
     
     # Clean up temporary file
@@ -485,7 +480,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             os.makedirs(target_path, exist_ok=True)
             api_file = f'{target_path}api.md'
             
-            with open(api_file, 'w') as f:
+            with open(api_file, 'w', encoding='utf-8') as f:
                 f.write('---\n')
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
@@ -515,7 +510,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             api_file = f'{target_path}api.md'
             
             # Create API reference file with frontmatter
-            with open(api_file, 'w') as f:
+            with open(api_file, 'w', encoding='utf-8') as f:
                 f.write('---\n')
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
@@ -586,7 +581,7 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
         
         helm_file = f'{assets_path}{file_name}.md'
         
-        with open(helm_file, 'w') as f:
+        with open(helm_file, 'w', encoding='utf-8') as f:
             f.write(result.stdout)
         
         # Remove badge line and following empty line
@@ -670,7 +665,7 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
         '--markdown', f'./{kgateway_dir}'
     ], capture_output=True, text=True, check=True)
     
-    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w', encoding='utf-8') as f:
         f.write(result.stdout)
     
     print(f'    ✓ Generated metrics docs in assets/docs/snippets/{link_version}/metrics-control-plane.md')
@@ -706,7 +701,7 @@ def main():
         target_version = input_version
         print(f'👤 Manual trigger with version: {target_version}')
     
-    with open('versions.json', 'r') as f:
+    with open('versions.json', 'r', encoding='utf-8') as f:
         versions = json.load(f)
     
     # Filter versions based on target
