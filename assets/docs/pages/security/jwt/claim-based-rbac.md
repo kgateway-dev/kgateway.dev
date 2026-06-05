@@ -78,7 +78,7 @@ rbac:
 
 ### Match more than one claim {#multiple}
 
-List multiple expressions to match on more than one condition. The policy matches when **any** expression evaluates to `true` (OR logic). The following policy allows requests from either the `dev` team or the user `alice`.
+List multiple expressions to match on more than one condition. The policy matches when **any** expression evaluates to `true` (OR logic). The following policy allows requests if the JWT has a `team=dev` or `sub=alice` claim. 
 
 ```yaml
 rbac:
