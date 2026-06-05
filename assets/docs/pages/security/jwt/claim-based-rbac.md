@@ -4,7 +4,10 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-4. This guide builds on the [Basic JWT policy](../basic/) guide. Before you continue, create the `selfminted-jwt` GatewayExtension from that guide, and save the sample token. The sample token includes the claims `team: dev`, `org: solo.io`, and `sub: alice`.
+4. Complete the [Basic JWT policy](../basic/) guide to set up JWT auth with an inline JWKS key. Save a sample JWT token in an environment variable so that you can use it in this guide. 
+    ```sh
+    export TOKEN=...
+    ```
 
 ## Allow access based on a claim {#allow}
 
