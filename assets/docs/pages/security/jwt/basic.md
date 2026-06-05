@@ -194,25 +194,35 @@ Review other common JWT configuration examples.
 
 Instead of embedding the JWKS keys inline, you can point the provider at a remote JWKS server, such as the JWKS endpoint of an external identity provider. The gateway fetches the keys from the server and caches them, which means you do not have to update the GatewayExtension when the provider rotates its keys. To reach the server, the GatewayExtension references a Backend resource that exposes the JWKS host.
 
-1. Create a Backend resource for the remote JWKS server. The following example uses a static Backend that points to an external host. Set the `host` and `port` to match the JWKS server that you want to use.
+The following example uses Keycloak as the identity provider.
+
+1. Set the following environment variables to match your Keycloak installation.
+
+   ```sh
+   export HOST_KEYCLOAK=<keycloak-host>    # hostname of your Keycloak server, for example keycloak.example.com
+   export PORT_KEYCLOAK=443               # port that Keycloak listens on
+   export KEYCLOAK_URL=https://$HOST_KEYCLOAK
+   ```
+
+2. Create a Backend resource that points to the Keycloak host.
 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: Backend
    metadata:
-     name: jwks-server
+     name: keycloak
      namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      type: Static
      static:
        hosts:
-         - host: example.com
-           port: 443
+         - host: $HOST_KEYCLOAK
+           port: $PORT_KEYCLOAK
    EOF
    ```
 
-2. Update the GatewayExtension to use a `remote` JWKS source instead of `local`. Replace the entire `jwks` block with the `remote` configuration. The `url` is the full JWKS endpoint, and `backendRef` points to the Backend that you created in the previous step.
+3. Update the GatewayExtension to use the Keycloak JWKS endpoint. Set the `issuer` to the Keycloak realm URL and the `url` to the realm's JWKS endpoint. The `backendRef` is required and points to the Backend you created in the previous step; kgateway routes the key-fetch request through it.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -224,13 +234,13 @@ Instead of embedding the JWKS keys inline, you can point the provider at a remot
    spec:
      jwt:
        providers:
-         - name: remote-provider
-           issuer: https://example.com
+         - name: keycloak
+           issuer: $KEYCLOAK_URL/realms/master
            jwks:
              remote:
-               url: https://example.com/.well-known/jwks.json
+               url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
                backendRef:
-                 name: jwks-server
+                 name: keycloak
                  kind: Backend
                  group: gateway.kgateway.dev
                cacheDuration: 10m
@@ -239,28 +249,17 @@ Instead of embedding the JWKS keys inline, you can point the provider at a remot
 
    | Field | Description |
    | ----- | ----- |
-   | `jwks.remote.url` | The URL of the remote JWKS server. It must be a full FQDN with protocol, host, and path, for example `https://example.com/.well-known/jwks.json`. |
-   | `jwks.remote.backendRef` | A reference to the Backend (or other backend resource) that fronts the JWKS server. When you reference a kgateway Backend, set `kind` to `Backend` and `group` to `gateway.kgateway.dev`. |
+   | `jwks.remote.url` | The full URL of the JWKS endpoint, including protocol, host, and path. |
+   | `jwks.remote.backendRef` | A reference to the Backend that fronts the JWKS server. kgateway routes the key-fetch request through this Backend. Set `kind` to `Backend` and `group` to `gateway.kgateway.dev`. |
    | `jwks.remote.cacheDuration` | How long the gateway caches the fetched keys before it refreshes them. If omitted, the keys are cached for 5 minutes. |
-
-   {{< callout type="warning" >}}
-   This example uses a placeholder JWKS server (`example.com`), so it does not validate the sample token from the earlier steps. To try it out, replace the host, URL, and `issuer` with the values for a JWKS server that you control, and use a token that is signed by that provider.
-   {{< /callout >}}
 
    For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
 
 ### JWT validation modes {#jwt-validation}
 
-The `jwt` configuration in the GatewayExtension supports several optional fields that change how tokens are located, validated, and forwarded. To use any of them, add the field to the GatewayExtension that you created earlier and reapply it. Add only the fields that you need, and keep the `jwks` and other settings that you already configured.
+The `validationMode` field in `spec.jwt` controls whether requests without a JWT are allowed. To change the mode, reapply the GatewayExtension that you created earlier with the updated `validationMode` value.
 
-| Field | Location | Description |
-| ----- | ----- | ----- |
-| `validationMode` | `spec.jwt` | Controls whether a JWT is required. `Strict` (the default) rejects requests that do not include a valid JWT. `AllowMissing` lets requests without a token through, but still rejects requests that present an invalid token. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through. |
-| `audiences` | `spec.jwt.providers[]` | A list of accepted audiences. An incoming token must include an `aud` claim that matches one of these values. If omitted, the `aud` claim is not checked. |
-| `tokenSource` | `spec.jwt.providers[]` | Where to find the JWT. By default, the token is read from the `Authorization` header as a bearer token. Set `header.header` to read it from a different header (and optional `header.prefix` to strip a prefix), or `queryParameter` to read it from a URL query parameter. Exactly one of `header` or `queryParameter` can be set. |
-| `forwardToken` | `spec.jwt.providers[]` | Whether to forward the token to the upstream service. If `false` or unset, the gateway removes the token's header before it forwards the request. Set to `true` to keep the token so that the upstream service can use it. |
-
-The following GatewayExtension is a replacement for the one that you created earlier. You can apply it as-is: the request-changing fields (`audiences` and `tokenSource`) are commented out, so the example keeps working with the sample token and requests from the previous steps. Uncomment the fields that you want to use.
+**Strict** (default): Requests without a valid JWT are rejected with a `401 Unauthorized` response.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -271,26 +270,117 @@ metadata:
   namespace: {{< reuse "docs/snippets/namespace.md" >}}
 spec:
   jwt:
-    validationMode: Strict            # Strict (default) requires a valid JWT; AllowMissing also lets requests with no token through
+    validationMode: Strict
     providers:
       - name: selfminted
         issuer: solo.io
-        forwardToken: true            # keep the token so that the upstream service can use it
-        # audiences:                  # require a matching aud claim (the sample token has no aud claim)
-        #   - my-api
-        # tokenSource:                # read the token from a custom location instead of the Authorization header
-        #   header:
-        #     header: x-jwt
-        #     prefix: "Bearer "
         jwks:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
 ```
 
+**AllowMissing**: Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    validationMode: AllowMissing
+    providers:
+      - name: selfminted
+        issuer: solo.io
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
+EOF
+```
+
+### Configure audiences {#audiences}
+
+Restrict access to tokens that include a specific audience claim. An incoming token must include an `aud` claim that matches at least one of the listed values. The following example restricts access to tokens that include a `my-api` audience.
+
 {{< callout type="warning" >}}
-The `audiences` and `tokenSource` fields change how clients must send requests, so they are commented out above. If you uncomment `tokenSource`, send the token in the matching header or query parameter instead of the `Authorization` header. If you uncomment `audiences`, requests must use a token that includes a matching `aud` claim; the sample token in this guide has no `aud` claim.
+The sample token in this guide has no `aud` claim, so using this configuration requires a different token that carries a matching `aud` claim.
 {{< /callout >}}
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: solo.io
+        audiences:
+          - my-api
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
+EOF
+```
+
+### Customize token source {#token-source}
+
+By default, the gateway reads the JWT from the `Authorization` header as a bearer token. Use `tokenSource` to read the token from a different header or from a URL query parameter. The following example reads the token from a custom `x-jwt` header with a `Bearer ` prefix.
+
+{{< callout type="warning" >}}
+Changing the `tokenSource` affects how clients must send requests. If you apply this example, send the token in the `x-jwt` header instead of the `Authorization` header.
+{{< /callout >}}
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: solo.io
+        tokenSource:
+          header:
+            header: x-jwt
+            prefix: "Bearer "
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
+EOF
+```
+
+### Forward tokens upstream {#forward-token}
+
+By default, the gateway strips the JWT from the request before forwarding it to the upstream service. Set `forwardToken: true` to keep the token so the upstream service can read it.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: solo.io
+        forwardToken: true
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
+EOF
+```
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
 
@@ -301,8 +391,8 @@ kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< 
 kubectl delete gatewayextension selfminted-jwt -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
 
-If you completed the [Use a remote JWKS as a source](#remote-jwks) section, also delete the Backend that you created for the JWKS server.
+If you completed the [Use a remote JWKS as a source](#remote-jwks) section, also delete the Backend that you created for the Keycloak server.
 
 ```sh
-kubectl delete backend jwks-server -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete backend keycloak -n {{< reuse "docs/snippets/namespace.md" >}}
 ```

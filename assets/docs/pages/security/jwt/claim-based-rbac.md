@@ -4,10 +4,10 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-4. Complete the [Basic JWT policy](../basic/) guide to set up JWT auth with an inline JWKS key. Save a sample JWT token in an environment variable so that you can use it in this guide. 
-    ```sh
-    export TOKEN=...
-    ```
+4. Complete the [Basic JWT policy](../basic/) guide to set up JWT auth with an inline JWKS key. Save the sample JWT token in an environment variable.
+   ```sh
+   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InNvbG8tcHVibGljLWtleS0wMDEifQ.eyJpc3MiOiJzb2xvLmlvIiwib3JnIjoic29sby5pbyIsInN1YiI6ImFsaWNlIiwidGVhbSI6ImRldiIsImV4cCI6MjA3NDI3NDg4NCwibGxtcyI6eyJvcGVuYWkiOlsiZ3B0LTMuNS10dXJibyJdfX0.il5Rjsad65jpQR_pyRzBdEKFSj-ERmBf4K2VksvGvswWVv4n79lYERslr4KCECuiz9y_T-xUiQ9IkhW3YHzl5zo1kajhhIg7Nhnl1AvAqODbnF6wYpLRk0Npna_2T6lK3Yj54qQGi6vXG3IMRpo1_o2DrbdlKx2k_WFegCoQyyYazb4z3ZXfWvTiWqQDJA5wWcM3-jKzAWfNM8zgZWa-1BeAHDvpLcfWtuXEGSjkdCW0FQJOTjgIEqACnnXb2Jio0tWgelh9hDPILI-tvanj3iKCjpf3uF6g8QWSBNoVFfu7F1jJgj5Aj1sX8AV-CQVu2aQx3EHRZ1mL_3w3qSRWPw
+   ```
 
 ## Allow access based on a claim {#allow}
 
