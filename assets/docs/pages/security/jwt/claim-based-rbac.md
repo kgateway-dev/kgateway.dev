@@ -101,7 +101,7 @@ rbac:
 
 ### Match an OAuth scope {#scope}
 
-You can authorize requests based on an OAuth `scope` claim, such as one issued by an identity provider. Unlike the single-value claims in the previous examples, the `scope` claim is conventionally a single string of space-delimited scopes, such as `read write admin`. To match one scope without accidentally matching a longer scope that contains it (for example, matching `admin` but not `superadmin`), split the string on spaces and test for membership in the resulting list. The following policy allows requests whose `scope` claim includes `admin`.
+You can authorize requests based on an OAuth scope, such as one that is issued by an identity provider. Unlike the single-value claims in the previous examples, the scope is conventionally a single string of space-delimited scopes, such as `read write admin`. To match one scope without accidentally matching a longer scope that contains it (for example, matching `admin` but not `superadmin`), split the string on spaces and test for membership in the resulting list. The following policy allows requests with a JWT where the `scope` includes `admin`.
 
 ```yaml
 rbac:
