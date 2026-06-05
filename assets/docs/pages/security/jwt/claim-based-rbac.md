@@ -41,7 +41,7 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
    | `rbac.action` | The action to take when a request matches the policy, either `Allow` or `Deny`. Defaults to `Allow`, which permits only matching requests and denies all others. |
    | `rbac.policy.matchExpressions` | A list of CEL expressions. The policy matches when any one of the expressions evaluates to `true`. Reference verified JWT claims through the `envoy.filters.http.jwt_authn` filter metadata, in the form `metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['<claim>']`. |
 
-2. Send a request with the sample token from the previous guide. Because its `team` claim is `dev`, the request matches the policy and is allowed with a `200 OK` response. A request with a token whose `team` claim is not `dev`, or that has no `team` claim, is denied with a `403 Forbidden` response.
+2. Send a request with the sample token from the previous guide. Because JWT has a `team` claim that equals `dev`, the request matches the policy and is allowed with a 200 HTTP response. A request with a token where the `team` claim does not equal `dev`, or that has no `team` claim, is denied with a 403 HTTP response.
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
