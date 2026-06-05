@@ -249,7 +249,7 @@ Instead of embedding the JWKS keys inline, you can point the provider at a remot
 
    For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
 
-## Optional: Customize how tokens are validated {#customize}
+### JWT validation modes {#jwt-validation}
 
 The `jwt` configuration in the GatewayExtension supports several optional fields that change how tokens are located, validated, and forwarded. To use any of them, add the field to the GatewayExtension that you created earlier and reapply it. Add only the fields that you need, and keep the `jwks` and other settings that you already configured.
 
