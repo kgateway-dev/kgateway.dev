@@ -186,7 +186,11 @@ You can extract claims from the verified JWT and forward them as headers to the 
    }
    ```
 
-## Optional: Use a remote JWKS as a source {#remote-jwks}
+## Other configurations
+
+Review other common JWT configuration examples. 
+
+### Remote JWKS {#remote-jwks}
 
 Instead of embedding the keys inline, you can point the provider at a remote JWKS server, such as the JWKS endpoint of an external identity provider. The gateway fetches the keys from the server and caches them, which means you do not have to update the GatewayExtension when the provider rotates its keys. To reach the server, the GatewayExtension references a Backend resource that fronts the JWKS host.
 
