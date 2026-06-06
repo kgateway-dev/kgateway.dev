@@ -89,7 +89,7 @@ routing rules.
 - `nginx.ingress.kubernetes.io/cors-expose-headers`
 - `nginx.ingress.kubernetes.io/cors-allow-methods`
 - `nginx.ingress.kubernetes.io/cors-max-age`
-- `nginx.ingress.kubernetes.io/limit-rps` : Not an exact 1:1 mapping for `limit-rps`. See the [rate limiting migration example](../../examples/rate-limiting/) for details.
+- `nginx.ingress.kubernetes.io/limit-rps`: Not an exact 1:1 mapping for `limit-rps`. See the [rate limiting migration example](../../examples/rate-limiting/) for details.
 - `nginx.ingress.kubernetes.io/limit-rpm` : Not an exact 1:1 mapping for `limit-rpm`. See the [rate limiting migration example](../../examples/rate-limiting/) for details.
 - `nginx.ingress.kubernetes.io/limit-burst-multiplier`
 
