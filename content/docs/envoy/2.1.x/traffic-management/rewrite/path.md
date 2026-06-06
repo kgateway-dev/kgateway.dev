@@ -20,7 +20,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
 
 1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to the `/anything` prefix path. 
     
-   Because the `ReplacePrefixPath` path modifier is used, only the path prefix is replaced during the rewrite. For example, requests to `http://rewrite.example/headers` are rewritten to `https://rewrite.example/anything`. However, for longer paths, such as in `http://rewrite.example/headers/200`, only the prefix is replaced and the path is rewritten to `http://rewrite.example/anything/200`. 
+   Because the `ReplacePrefixMatch` path modifier is used, only the path prefix is replaced during the rewrite. For example, requests to `http://rewrite.example/headers` are rewritten to `http://rewrite.example/anything`. However, for longer paths, such as in `http://rewrite.example/headers/200`, only the prefix is replaced and the path is rewritten to `http://rewrite.example/anything/200`. 
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -121,7 +121,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    kind: Backend
    metadata:
      name: httpbin
-     namespace: default
+     namespace: httpbin
    spec:
      type: Static
      static:
@@ -138,7 +138,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    kind: HTTPRoute
    metadata:
      name: backend-rewrite
-     namespace: default
+     namespace: httpbin
    spec:
      parentRefs:
      - name: http
@@ -164,7 +164,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    EOF
    ```
 
-2. Send a request to the `external-rewrite.example` domain on the `/headers` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
+3. Send a request to the `external-rewrite.example` domain on the `/headers` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
@@ -225,9 +225,9 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
 
 ### In-cluster services
 
-1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite prefix paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to `/anything`. 
+1. Create an HTTPRoute resource for the httpbin app that configures an `URLRewrite` filter to rewrite full paths. In this example, all incoming requests that match the `/headers` prefix path on the `rewrite.example` domain are rewritten to `/anything`. 
     
-   Because the `ReplaceFullPath` path modifier is used, requests to `http://rewrite.example/headers` and `http://rewrite.example/headers/200` both are rewritten to `https://rewrite.example/anything`.
+   Because the `ReplaceFullPath` path modifier is used, requests to `http://rewrite.example/headers` and `http://rewrite.example/headers/200` both are rewritten to `http://rewrite.example/anything`.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -263,11 +263,11 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    |--|--|
    |`spec.parentRefs`| The name and namespace of the Gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
    |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `URLRewrite` filter is used.|
-   |`spec.rules.filters.urlRewrite.path.type`| The type of HTTPPathModifier that you want to use. In this example, `ReplaceFullPath` is used, which replaces the full path prefix.  |
-   | `spec.rules.filters.urlRewrite.path.replaceFullPath` | The path prefix you want to rewrite to. In this example, you replace the full prefix path with the `/anything` prefix path. | 
+   |`spec.rules.filters.urlRewrite.path.type`| The type of HTTPPathModifier that you want to use. In this example, `ReplaceFullPath` is used, which replaces the full path.  |
+   | `spec.rules.filters.urlRewrite.path.replaceFullPath` | The path you want to rewrite to. In this example, you replace the full path with the `/anything` path. | 
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
-3. Send a request to the httpbin app along the `/headers` path on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that your request is rewritten to the `/anything` path. 
+2. Send a request to the httpbin app along the `/headers` path on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that your request is rewritten to the `/anything` path. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -293,7 +293,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    ...
    ```
 
-4. Send another request to the httpbin app. This time, you send it along the `/headers/200` path on the `rewrite.example` domain. Verify that you also get back a 200 HTTP response code and that the full path is rewritten to the `/anything` path. 
+3. Send another request to the httpbin app. This time, you send it along the `/headers/200` path on the `rewrite.example` domain. Verify that you also get back a 200 HTTP response code and that the full path is rewritten to the `/anything` path. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -328,7 +328,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    kind: Backend
    metadata:
      name: httpbin
-     namespace: default
+     namespace: httpbin
    spec:
      type: Static
      static:
@@ -345,7 +345,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    kind: HTTPRoute
    metadata:
      name: backend-rewrite
-     namespace: default
+     namespace: httpbin
    spec:
      parentRefs:
      - name: http
@@ -367,17 +367,17 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    EOF
    ```
 
-2. Send a request to the `external-rewrite.example` domain on the `/header` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
+3. Send a request to the `external-rewrite.example` domain on the `/headers` path. Verify that you get back a 200 HTTP response code and that the request was rewritten to `httpbin.org/anything`. 
    
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/header -H "host: external-rewrite.example:8080"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: external-rewrite.example:8080"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/header -H "host: external-rewrite.example"
+   curl -vi localhost:8080/headers -H "host: external-rewrite.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
