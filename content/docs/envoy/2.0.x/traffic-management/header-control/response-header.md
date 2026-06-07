@@ -244,7 +244,7 @@ curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.exam
 {{% /tab %}}
 {{% tab tabName="Port-forward for local testing" %}}
 ```sh
-curl -vi localhost:8080/reesponse-headers -H "host: headers.example"
+curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}
