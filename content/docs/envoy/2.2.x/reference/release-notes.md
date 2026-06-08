@@ -47,7 +47,7 @@ controller:
 Several fields have been removed or changed in the `GatewayParameters` CRD:
 
 * The deprecated `spec.kube.floatingUserId` field was removed. When migrating, use the `spec.kube.omitDefaultSecurityContext` field instead. When set to true, this field prevents the controller from injecting opinionated default security contexts, allowing your platform (for example, OCP) to dynamically provide the appropriate security contexts.
-* The `spec.kube.aiExtension` field was removed. To use AI capabilities, migrate to the agentgateway data plane.
+* The `spec.kube.aiExtension` field was removed. To use AI capabilities, migrate to [Agentgateway](https://agentgateway.dev/docs).
 * The `agentgateway` fields were deprecated in `GatewayParameters`. Use `AgentgatewayParameters` instead.
 
 #### JWT policy renamed {#jwt-policy-rename}
@@ -68,7 +68,7 @@ Agentgateway ExtAuth policies now fail closed when the `backendRef` to the auth 
 
 #### AI policy removed from TrafficPolicy {#ai-policy-removed}
 
-AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/setup/) with the `AgentgatewayPolicy` API instead.
+AI policy configuration was removed from the `TrafficPolicy` API. To use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs).
 
 #### Default transformation engine changed to rustformation {#v22-default-transformation-engine}
 
@@ -208,7 +208,7 @@ Added multi-arch support for kgateway. `x86_64` builds continue to use the `envo
 
 #### Ingress to Gateway API migration {#v22-ingress-migration}
 
-If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for either kgateway (Envoy) or agentgateway data plane proxies. Choose your migration guide to learn more:
+If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for kgateway (Envoy) or Agentgateway. Choose your migration guide to learn more:
 
 * [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
 * [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
@@ -217,7 +217,7 @@ If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingres
 
 **HTTPListenerPolicy deprecated**: `HTTPListenerPolicy` is now deprecated. Use the `httpSettings` under `ListenerPolicy` instead.
 
-**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. v2.2.0 only supports the agentgateway data plane for inference. Note: v2.2.0 includes an inference plugin regression due to [GitHub issue #13456](https://github.com/kgateway-dev/kgateway/issues/13456). Users of this plugin should not upgrade to v2.2.0 and should instead wait for the upcoming v2.2.1 patch release.
+**AI Gateway and Inference Extension removed**: Support for `InferencePool` and AI backends with the `kgateway` class, which was deprecated in v2.1, was removed. Use [Agentgateway](https://agentgateway.dev/docs) for inference workloads. Note: v2.2.0 includes an inference plugin regression due to [GitHub issue #13456](https://github.com/kgateway-dev/kgateway/issues/13456). Users of this plugin should not upgrade to v2.2.0 and should instead wait for the upcoming v2.2.1 patch release.
 
 **Per-connection buffer limit annotation**: The `PerConnectionBufferLimit` annotation on Gateway resources is deprecated in favor of the `ListenerPolicy` field.
 

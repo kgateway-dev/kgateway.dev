@@ -1,9 +1,5 @@
 Fine-tune connection speeds for read and write operations by setting a connection buffer limit. 
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About read and write buffer limits
 
 By default, {{< reuse "/docs/snippets/kgateway.md" >}} is set up with 1MiB of request read and write buffer for each gateway. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "/docs/snippets/kgateway.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 413 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service. Alternatively, when using {{< reuse "/docs/snippets/kgateway.md" >}} as an edge proxy, configuring the buffer limit can be important when dealing with untrusted downstreams. By setting the limit to a small number, such as 32KiB, you can better guard against potential attacks or misconfigured downstreams that could excessively use the proxy's resources.

@@ -139,7 +139,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -228,6 +228,24 @@ _Appears in:_
 | `headersToBackend` _string array_ | HeadersToBackend specifies which headers from the authorization response<br />should be forwarded to the upstream service when the request is authorized.<br />Common examples: ["x-current-user", "x-user-id", "x-auth-request-email"] |  |  |
 
 
+#### AwsAddressType
+
+_Underlying type:_ _string_
+
+AwsAddressType defines which EC2 IP address to route to.
+
+_Validation:_
+- Enum: [PrivateIP PublicIP]
+
+_Appears in:_
+- [AwsEc2](#awsec2)
+
+| Field | Description |
+| --- | --- |
+| `PrivateIP` | AwsAddressTypePrivateIP routes to the instance private IP.<br /> |
+| `PublicIP` | AwsAddressTypePublicIP routes to the instance public IP.<br /> |
+
+
 #### AwsAuth
 
 
@@ -274,17 +292,18 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS lambda service. |  |  |
-| `accountId` _string_ | AccountId is the AWS account ID to use for the backend. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
+| `lambda` _[AwsLambda](#awslambda)_ | Lambda configures the AWS Lambda service. |  |  |
+| `ec2` _[AwsEc2](#awsec2)_ | Ec2 configures dynamic discovery of AWS EC2 instances. |  |  |
+| `accountId` _string_ | AccountId is the AWS account ID to use for the backend.<br />Deprecated: Set accountId on spec.aws.lambda instead. This field is kept for backward compatibility.<br />When both fields are set, spec.aws.lambda.accountId takes precedence. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
 | `auth` _[AwsAuth](#awsauth)_ | Auth specifies an explicit AWS authentication method for the backend.<br />When omitted, the following credential providers are tried in order, stopping when one<br />of them returns an access key ID and a secret access key (the session token is optional):<br />1. Environment variables: when the environment variables AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and AWS_SESSION_TOKEN are set.<br />2. AssumeRoleWithWebIdentity API call: when the environment variables AWS_WEB_IDENTITY_TOKEN_FILE and AWS_ROLE_ARN are set.<br />3. EKS Pod Identity: when the environment variable AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE is set.<br /><br />See the Envoy docs for more info:<br />https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_request_signing_filter#credentials |  |  |
 | `region` _string_ | Region is the AWS region to use for the backend.<br />Defaults to us-east-1 if not specified. | us-east-1 | MaxLength: 63 <br />MinLength: 1 <br />Pattern: `^[a-z0-9-]+$` <br /> |
 
 
-#### AwsLambda
+#### AwsEc2
 
 
 
-AwsLambda configures the AWS lambda service.
+AwsEc2 configures dynamic discovery of EC2 instances.
 
 
 
@@ -293,11 +312,65 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
+| `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
+| `roleArn` _string_ | RoleArn is an optional IAM role to assume before listing instances. |  | Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
+| `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
+
+
+#### AwsLambda
+
+
+
+AwsLambda configures the AWS Lambda service.
+
+
+
+_Appears in:_
+- [AwsBackend](#awsbackend)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `accountId` _string_ | AccountId is the AWS account ID to use for the backend.<br />This is the preferred location for Lambda backends. |  | MaxLength: 12 <br />MinLength: 1 <br />Pattern: `^[0-9]\{12\}$` <br /> |
 | `endpointURL` _string_ | EndpointURL is the URL or domain for the Lambda service. This is primarily<br />useful for testing and development purposes. When omitted, the default<br />lambda hostname will be used. |  | MaxLength: 2048 <br />Pattern: `^https?://[-a-zA-Z0-9@:%.+~#?&/=]+$` <br /> |
 | `functionName` _string_ | FunctionName is the name of the Lambda function to invoke. |  | Pattern: `^[A-Za-z0-9-_]\{1,140\}$` <br /> |
 | `invocationMode` _string_ | InvocationMode defines how to invoke the Lambda function.<br />Defaults to Sync. | Sync | Enum: [Sync Async] <br /> |
 | `qualifier` _string_ | Qualifier is the alias or version for the Lambda function.<br />Valid values include a numeric version (e.g. "1"), an alias name<br />(alphanumeric plus "-" or "_"), or the special literal "$LATEST". | $LATEST | Pattern: `^(\$LATEST\|[0-9]+\|[A-Za-z0-9-_]\{1,128\})$` <br /> |
 | `payloadTransformMode` _[AWSLambdaPayloadTransformMode](#awslambdapayloadtransformmode)_ | PayloadTransformation specifies payload transformation mode before it is sent to the Lambda function.<br />Defaults to Envoy. | Envoy | Enum: [None Envoy] <br /> |
+
+
+#### AwsTagFilter
+
+
+
+AwsTagFilter matches EC2 instances by tag.
+
+
+
+_Appears in:_
+- [AwsEc2](#awsec2)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Key matches instances that contain the given tag key, regardless of value. |  | MaxLength: 128 <br />MinLength: 1 <br /> |
+| `keyValue` _[AwsTagKeyValueFilter](#awstagkeyvaluefilter)_ | KeyValue matches instances that contain the given tag key/value pair. |  |  |
+
+
+#### AwsTagKeyValueFilter
+
+
+
+AwsTagKeyValueFilter matches EC2 instances by a tag key/value pair.
+
+
+
+_Appears in:_
+- [AwsTagFilter](#awstagfilter)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `key` _string_ | Key is the tag key to match. |  | MaxLength: 128 <br />MinLength: 1 <br /> |
+| `value` _string_ | Value is the tag value to match. |  | MaxLength: 256 <br />MinLength: 1 <br /> |
 
 
 #### Backend
@@ -319,6 +392,10 @@ _Appears in:_
 | `metadata` _[ObjectMeta](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#objectmeta-v1-meta)_ | Refer to Kubernetes API documentation for fields of `metadata`. |  |  |
 | `spec` _[BackendSpec](#backendspec)_ |  |  |  |
 | `status` _[BackendStatus](#backendstatus)_ |  |  |  |
+
+
+
+
 
 
 #### BackendConfigPolicy
@@ -624,7 +701,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -651,7 +728,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -1006,7 +1083,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `logFormat` _[LogFormat](#logformat)_ | Envoy application log format. Does *not* affect access logs. Can be JSON or custom text format.<br />Defaults to text with default format string as defined in Envoy documentation.<br />See https://www.envoyproxy.io/docs/envoy/latest/operations/cli#cmdoption-log-format for format flag options. |  |  |
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
-| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
+| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 | `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
 | `enableReadinessProbeProxyProtocol` _boolean_ | EnableReadinessProbeProxyProtocol enables the PROXY protocol listener filter<br />on the kgateway readiness listener (port 8082).<br />Set this to true if and only if the load balancer in front of the gateway<br />prepends PROXY protocol headers to incoming TCP connections targeting the<br />readiness port. For example, when using an AWS NLB with proxy protocol v2<br />enabled at the target group level<br />(`service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"`).<br />Defaults to false. |  |  |
 
@@ -1131,7 +1208,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 | `retry` _[ExtSvcRetryPolicy](#extsvcretrypolicy)_ | Retry specifies the retry policy for gRPC streams associated with the service. |  |  |
@@ -1150,7 +1227,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
 | `pathPrefix` _string_ | PathPrefix specifies a prefix to the value of the authorization request's path header.<br />This allows customizing the path at which the authorization server expects to receive requests.<br />For example, if the authorization server expects requests at "/verify", set this to "/verify".<br />If not specified, the original request path is used. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the HTTP request. Default timeout is 2 seconds. |  |  |
 | `authorizationRequest` _[AuthorizationRequest](#authorizationrequest)_ | AuthorizationRequest configures the authorization request to the external service. |  |  |
@@ -2742,6 +2819,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `jwksURI` _[HttpsUri](#httpsuri)_ | JWKSURI specifies the URL that public keys for validating JWTs should be retrieved from.<br />This must be set if the retrieved access or ID token need to be parsed and IssuerURI is not set for discovery.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />The URL must point to a valid JWKS definition.<br />Refer to https://datatracker.ietf.org/doc/html/rfc7517#section-5 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
+| `jwksBackendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | JWKSBackendRef specifies the backend to use for fetching the JWKS.<br />If not set, the parent OAuth2Provider's BackendRef is used. |  |  |
 | `accessToken` _[OAuth2JWTProcessingConfig](#oauth2jwtprocessingconfig)_ | AccessToken specifies how to process the retrieved access token.<br />This requires the access token cookie to be enabled. Requests missing the token will be rejected.<br />The token will be verified against the provided JWKS.<br />Successfully processed tokens have their payload made available as the 'accessToken' dynamic metadata in the 'envoy.filters.http.jwt_authn' namespace.<br />If omitted, the token will not be attempted to be parsed and verified at all. |  |  |
 | `idToken` _[OAuth2JWTProcessingConfig](#oauth2jwtprocessingconfig)_ | IDToken specifies how to process the retrieved ID token.<br />This requires the ID token cookie to be enabled. Requests missing the token will be rejected.<br />The token will be verified against the provided JWKS.<br />Successfully processed tokens have their payload made available as the 'idToken' dynamic metadata in the 'envoy.filters.http.jwt_authn' namespace.<br />If omitted, the token will not be attempted to be parsed and verified at all. |  |  |
 
@@ -2792,7 +2870,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
 | `authorizationEndpoint` _[HttpsUri](#httpsuri)_ | AuthorizationEndpoint specifies the endpoint to redirect to for authorization in response to unauthorized requests.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `tokenEndpoint` _[HttpsUri](#httpsuri)_ | TokenEndpoint specifies the endpoint on the authorization server to retrieve the access token from.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.2 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `redirectURI` _string_ | RedirectURI specifies the URL passed to the authorization endpoint.<br />Defaults to <request-scheme>://<host>/oauth2/redirect, where the URL scheme and host are derived from the original request.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2 for more details. |  |  |
@@ -3149,7 +3227,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
 | `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
 
 
@@ -4051,6 +4129,39 @@ AnyValue is used to represent any type of attribute value. AnyValue may contain 
 | `stringValue` | *string |  |
 | `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
 | `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### Authorization
+
+Authorization defines the configuration for role-based access control.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `policy` | [AuthorizationPolicy](#authorizationpolicy) | Policy specifies the Authorization rule to evaluate. A policy matches when **any** of the conditions evaluates to true. **Required.** |
+| `action` | [AuthorizationPolicyAction](#authorizationpolicyaction) | Action defines whether the rule allows or denies the request if matched. If unspecified, the default is "Allow". |
+
+#### AuthorizationPolicy
+
+AuthorizationPolicy defines a single Authorization rule.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `matchExpressions` | [][CELExpression](#celexpression) | MatchExpressions defines a set of conditions that must be satisfied for the rule to match. These expression should be in the form of a Common Expression Language (CEL) expression.  **Required.** |
+
+#### AuthorizationPolicyAction
+
+_Underlying type:_ _string_
+
+AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
+
+#### CELExpression
+
+_Underlying type:_ _string_
+
+CELExpression represents a Common Expression Language (CEL) expression.
+
+**Validation:**
+- MinLength=1
+- MaxLength=16384
 
 #### ComparisonFilter
 

@@ -24,7 +24,7 @@ The following sections in this guide provide examples that are tailored to the s
 
 ## OpenAI {#openai}
 
-OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com) and [Mistral](https://docs.mistral.ai/getting-started/quickstart/).
+OpenAI is the most common LLM provider, and the examples throughout the AI Gateway docs use OpenAI. You can adapt these examples to your own provider, especially ones that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com) and [Mistral](https://docs.mistral.ai/).
 
 To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
@@ -193,10 +193,6 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    ```
 
 ## Overriding LLM Provider Settings {#override-settings}
-
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
 
 You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI supports authentication via an `Authorization` or `api-key` header. 
 

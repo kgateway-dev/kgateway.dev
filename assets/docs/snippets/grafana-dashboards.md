@@ -8,7 +8,7 @@ You can use the pre-built Grafana dashboards to observe the control and data pla
      ```
    * [Kgateway operations dashboard](../kgateway.json) 
      ```sh
-     curl -L "http://kgateway.dev/docs/main/envoy/observability/kgateway.json" >> kgateway.json 
+     curl -L "https://kgateway.dev/docs/main/envoy/observability/kgateway.json" >> kgateway.json 
      ```
 
 2. Import the Grafana dashboards.

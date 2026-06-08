@@ -16,11 +16,6 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
 {{< reuse "docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}

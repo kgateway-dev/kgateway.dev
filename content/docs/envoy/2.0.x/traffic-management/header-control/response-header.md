@@ -5,7 +5,7 @@ weight: 20
 
 Use the `ResponseHeaderModifier` filter to add, append, overwrite, or remove headers from a response before it is sent back to the client. 
 
-For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#httpheaderfilter).
+For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter).
 
 ## Before you begin
 
@@ -244,7 +244,7 @@ curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.exam
 {{% /tab %}}
 {{% tab tabName="Port-forward for local testing" %}}
 ```sh
-curl -vi localhost:8080/reesponse-headers -H "host: headers.example"
+curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
 {{% /tab %}}
    {{< /tabs >}}

@@ -6,11 +6,6 @@ By default, Envoy-based gateway proxies return a 426 Upgrade Required HTTP respo
 
 Both protocol versions are rarely used nowadays. However, some applications might still require support for these versions for backwards compatibility. To allow the gateway proxy to accept these types of requests, you can create a ListenerPolicy and attach it to your Gateway.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
-
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq-listeners.md" >}}

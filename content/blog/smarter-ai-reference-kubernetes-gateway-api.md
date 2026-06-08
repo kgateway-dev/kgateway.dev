@@ -1,5 +1,6 @@
 ---
 title: Smarter AI Inference Routing on Kubernetes with Gateway API Inference Extension
+draft: true
 toc: false
 publishDate: 2025-03-25T00:00:00-00:00
 author: Christian Posta
@@ -43,7 +44,7 @@ The [InferencePool CRD](https://gateway-api-inference-extension.sigs.k8s.io/api-
 
 ## How Inference Routing Works in kgateway
 
-When a request reaches the kgateway, it will follow typical [Gateway API](https://gateway-api.sigs.k8s.io) [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute) policy to determine which backend should handle the request. The backend in this case is an InferencePool:
+When a request reaches the kgateway, it will follow typical [Gateway API](https://gateway-api.sigs.k8s.io) [HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute) policy to determine which backend should handle the request. The backend in this case is an InferencePool:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1

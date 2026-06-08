@@ -40,7 +40,7 @@ Review the following table for the maturity of features in the {{< reuse "docs/s
 | AI Gateway integration | N/A (see agentgateway) |
 | Inference Extension integration | N/A (see agentgateway) |
 
-`*` For more details about Gateway API support, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/implementations/#kgateway).
+`*` For more details about Gateway API support, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/docs/implementations/list/#kgateway).
 
 ## Experimental features in Gateway API {#experimental-features}
 

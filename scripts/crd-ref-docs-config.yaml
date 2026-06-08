@@ -37,19 +37,19 @@ render:
     # Gateway API types
     - name: BackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref
     - name: BackendObjectReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference
     - name: ParentReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#parentreference
     - name: GRPCBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#grpcbackendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcbackendref
     - name: HTTPBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#httpbackendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpbackendref
     - name: HTTPHeaderFilter
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter
@@ -59,6 +59,9 @@ render:
     - name: HTTPRouteRetryStatusCode
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouteretrystatuscode
+    - name: HTTPURLRewriteFilter
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter
     - name: ObjectName
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname

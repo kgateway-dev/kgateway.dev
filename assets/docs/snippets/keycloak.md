@@ -111,7 +111,7 @@ The following instructions assume that you are still logged into the **Administr
    echo $KEYCLOAK_URL
    ```
 
-2. Get the issuer and JWKS path. The agentgateway proxy uses these values to validate the JWTs. 
+2. Get the issuer and JWKS path. The gateway proxy uses these values to validate the JWTs. 
     1. From the sidebar menu options, click **Realm Settings**.
     2. From the **General** tab, scroll down to the **Endpoints** section and open the **OpenID Endpoint Configuration** link. In a new tab, your browser opens to a URL similar to `http://$KEYCLOAK_URL:8080/realms/master/.well-known/openid-configuration`.
     3. In the OpenID configuration, search for the `issuer` field. Save the value as an environment variable, such as the following example. 
