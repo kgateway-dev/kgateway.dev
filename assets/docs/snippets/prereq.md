@@ -10,7 +10,7 @@
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"  %}}
+   {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
    ```
