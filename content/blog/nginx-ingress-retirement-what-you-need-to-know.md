@@ -6,7 +6,7 @@ author: Lin Sun & Michael Levan
 excludeSearch: true
 ---
 
-During KubeConNA last week, the Kubernetes community [announced](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) the **Ingress NGINX retirement** and recommended that users move to the **Gateway API**, which is the modern replacement for Ingress. Best-effort maintenance of Ingress NGINX will continue until **March 2026**, meaning users need a migration plan soon.
+During KubeCon NA last week, the Kubernetes community [announced](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) the **Ingress NGINX retirement** and recommended that users move to the **Gateway API**, which is the modern replacement for Ingress. Best-effort maintenance of Ingress NGINX will continue until **March 2026**, meaning users need a migration plan soon.
 
 This announcement is significant—Ingress NGINX has been one of the most popular ingress controllers for traffic into Kubernetes clusters. It’s part of the core Kubernetes project with over 19,000 stars on [GitHub](https://github.com/kubernetes/ingress-nginx). In this blog, we’ll share key considerations to help you choose a replacement.
 

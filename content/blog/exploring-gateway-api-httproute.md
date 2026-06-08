@@ -205,7 +205,7 @@ However, when traffic comes in on the `/direct-response` path, the gateway will 
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: httpbin-direct-resonse
+  name: httpbin-direct-response
   namespace: httpbin
 spec:
   parentRefs:
