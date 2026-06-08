@@ -222,7 +222,7 @@ The following example uses Keycloak as the identity provider.
    EOF
    ```
 
-3. Update the GatewayExtension to use the Keycloak JWKS endpoint. Set the `issuer` to the Keycloak realm URL and the `url` to the realm's JWKS endpoint. The `backendRef` points to the Backend you created in the previous step; kgateway routes the key-fetch request through it.
+3. Update the GatewayExtension to use the Keycloak JWKS endpoint. Set the `issuer` to the Keycloak realm URL and the `url` to the realm's JWKS endpoint. The `backendRef` points to the Backend that you created in the previous step. The kgateway proxy uses this Backend to fetch the JWKS keys from Keycloak. 
 
    ```yaml
    kubectl apply -f- <<EOF
