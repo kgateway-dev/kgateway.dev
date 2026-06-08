@@ -15,12 +15,6 @@ const disabledCss = {
 
 module.exports = {
     darkMode: 'class',
-    // Hextra's compiled bundle already ships a (layered) base reset. This
-    // local Tailwind build must NOT emit a second, unlayered Preflight: its
-    // `button{margin:0;padding:0}` reset wins over Hextra's @layer utilities
-    // (unlayered beats layered in the cascade) and strips the tab-button
-    // styling, collapsing the tab bar to plain text.
-    corePlugins: { preflight: false },
     content: [
         `${themeDir}/hugo_stats.json`,
     ],
