@@ -1,6 +1,6 @@
 Redirect requests to a different host. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/spec/#httprequestredirectfilter).
+For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprequestredirectfilter).
 
 ## Before you begin
 

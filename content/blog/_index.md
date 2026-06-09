@@ -5,8 +5,8 @@ description: ""
 excludeSearch: true
 ---
 
-<section class="bg-primary-bg text-white pb-[4.375rem] lg:pb-28 px-4 lg:px-12 xl:px-25 bg-[url(/hero-background.svg)] bg-center bg-no-repeat pt-[9.875rem] lg:pt-50 bg-[length:61.85319rem_60.14119rem] lg:bg-auto">
-  <div class="mx-auto max-w-[1440px] flex flex-row justify-center">
+<section class="bg-primary-bg text-white py-16 lg:py-24 min-h-[14rem] lg:min-h-[20rem] px-4 lg:px-12 xl:px-25 bg-[url(/hero-background.svg)] bg-center bg-no-repeat bg-[length:61.85319rem_60.14119rem] lg:bg-auto flex items-center">
+  <div class="mx-auto max-w-[1440px] flex flex-row justify-center w-full">
     <h1 class="text-[2.1875rem] lg:text-[4.0625rem] font-semibold leading-[2.40625rem] lg:leading-[4.46875rem] font-headings tracking-tight">
       The kgateway Blog
     </h1>

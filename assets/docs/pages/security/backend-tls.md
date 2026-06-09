@@ -26,10 +26,6 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ### Deploy the sample app
 
 The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/nginx.yaml).
@@ -275,12 +271,10 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
    
-2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies. For agentgateway proxies, use the BackendTLSPolicy.
+2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies.
    
    {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
    {{% tab tabName="BackendConfigPolicy" %}}
-   
-   {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

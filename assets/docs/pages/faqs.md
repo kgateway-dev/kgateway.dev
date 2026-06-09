@@ -43,7 +43,7 @@ For examples, see the [Istio integration guides]({{< link-hextra path="/integrat
 
 ## What license is kgateway under?
 
-The kgateway project uses [Apache License 2.0](http://www.apache.org/licenses/).
+The kgateway project uses [Apache License 2.0](https://www.apache.org/licenses/).
 
 ## What is the project roadmap?
 

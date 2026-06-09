@@ -1,11 +1,5 @@
 Set up basic route delegation between a parent and two child HTTPRoute resources.
 
-{{< version exclude-if="2.0.x,2.2.x,2.3.x,2.4.x" >}}
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-{{< /version >}}
-
 ## Configuration overview
 
 In this guide you walk through a basic route delegation example that demonstrates route delegation between a parent HTTPRoute resource and two child HTTPRoute resources that forward traffic to an httpbin sample app. The following image illustrates the resulting route delegation hierarchy:

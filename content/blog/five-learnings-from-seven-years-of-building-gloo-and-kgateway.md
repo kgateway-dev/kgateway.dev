@@ -60,7 +60,7 @@ Four years ago, we explored using Istio’s control plane to manage Gloo’s gat
 
 However, Istio lacked features we needed, leading us to implement numerous Envoy filters—a decision that quickly proved problematic. To prevent users from encountering upgrade issues, we had to add complex workarounds in our code base. Additionally, we struggled with eventual consistency and large Envoy filter sizes.
 
-Developing features for Istio required deep understanding of its internal representations, making customization difficult. Instead of forcing Istio to fit our needs, we designed [Istio in Ambient mode](http://ambientmesh.io) to be pluggable for waypoints, allowing users to choose a different waypoint proxy like Gloo/kgateway.
+Developing features for Istio required deep understanding of its internal representations, making customization difficult. Instead of forcing Istio to fit our needs, we designed [Istio in Ambient mode](https://ambientmesh.io) to be pluggable for waypoints, allowing users to choose a different waypoint proxy like Gloo/kgateway.
 
 {{< reuse-image src="blog/five-learnings-3.png" width="750px" >}}
 

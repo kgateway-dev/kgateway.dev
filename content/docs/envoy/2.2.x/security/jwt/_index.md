@@ -6,6 +6,3 @@ description: Control access or route traffic based on verified claims in a JSON 
 
 {{< reuse "docs/snippets/jwt-about.md" >}}
 
-{{< cards >}}
-  {{< card link="basic" title="Basic JWT policy" >}}
-{{< /cards >}}

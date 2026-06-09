@@ -39,7 +39,7 @@ referencegrants                     refgrant             gateway.networking.k8s.
 
 This is a list of all the installed CRDs (think of them as just API specs at this point; we will be building actual resources based on their spec). In this blog, we are just covering the creation of the bare necessities, a gateway, and a route.
 
-While that covers the CRDs needed for the Kubernetes Gateway API spec, you still need something to process the configuration. In our case, it's going to be [kgateway](http://kgateway.dev), which we will install with helm:
+While that covers the CRDs needed for the Kubernetes Gateway API spec, you still need something to process the configuration. In our case, it's going to be [kgateway](https://kgateway.dev), which we will install with helm:
 
 ```yaml
 #install kgateway CRDs
