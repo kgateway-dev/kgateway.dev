@@ -254,6 +254,14 @@ The rustformation engine, which is the only transformation engine in 2.3.x, gain
 
 For details about each capability and a comparison with the classic transformation behavior, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
+
+#### Strip port from Host header {#v24-strip-host-port}
+
+Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy resource that allows you to configure the gateway proxy to strip the port information from the `Host` or `authority` header before forwarding requests to upstream backends. You can choose between two modes: 
+* `AnyPort`: Removes any port from the header.
+* `MatchingPort`: Removes the port only if it matches the listener's own port.  
+
+For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-host-port/" >}}).
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
