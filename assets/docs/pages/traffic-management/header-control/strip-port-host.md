@@ -143,7 +143,7 @@ Use the `AnyPort` setting to strip any port from the `Host` header, regardless o
 
 ## Strip listener ports only {#strip-matching-port}
 
-Use the `MatchingPort` setting to strip the port only when it matches the listener's own port. Ports that do not match the listener port are preserved in the header and forwarded to the upstream client.
+Use the `MatchingPort` setting to strip the port only when it matches the listener's own port. Ports that do not match the listener port are preserved in the header and forwarded to the upstream backend.
 
 1. Review the port settings on your Gateway. The Gateway in this example has a listener on port 8080. 
    ```sh
@@ -230,7 +230,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
    ...
    ```
 
-4. Send another request to the httpbin app. This time, you include a port in the `Hoste` header that does not match the listener port, such as `9999`. Verify that the port is not removed from the `Host` header.
+4. Send another request to the httpbin app. This time, you include a port in the `Host` header that does not match the listener port, such as `9999`. Verify that the port is not removed from the `Host` header.
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -253,7 +253,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
          "*/*"
        ],
        "Host": [
-         "www.example.com:443"
+         "www.example.com:9999"
        ],
        "User-Agent": [
          "curl/8.7.1"

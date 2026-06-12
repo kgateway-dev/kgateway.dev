@@ -261,7 +261,7 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 * `AnyPort`: Removes any port from the header.
 * `MatchingPort`: Removes the port only if it matches the listener's own port.  
 
-For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-host-port/" >}}).
+For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

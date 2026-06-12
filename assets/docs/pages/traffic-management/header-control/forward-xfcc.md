@@ -8,7 +8,7 @@ The following modes are supported to configure the XFCC header. Note that most m
 
 | Mode | Description |
 |---|---|
-| `Sanitize` | Remove the XFCC header unconditionally. This is the default setting in Envoy. |
+| `Sanitize` | Remove the XFCC header unconditionally. This setting is the default in Envoy. |
 | `ForwardOnly` | Forward the XFCC header unchanged. Applies only to mTLS gateway listeners. |
 | `AppendForward` | Append the current client certificate details to the existing XFCC header. Applies only to mTLS gateway listeners. |
 | `SanitizeSet` | Remove the current XFCC header and replace it with the details of the certificate that was used during the TLS handshake. Applies only to mTLS gateway listeners.  |

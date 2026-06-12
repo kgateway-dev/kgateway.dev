@@ -33,7 +33,7 @@ The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes th
 
 You can now configure how the gateway proxy handles the `x-forwarded-client-cert` (XFCC) header before forwarding requests to upstream backends by using the `forwardClientCertDetails` field in the ListenerPolicy. By default, Envoy strips the XFCC header from all requests. 
 
-For more information, see [Forward client certificate header]({{< link-hextra path="/traffic-management/header-control/forward-client-cert/" >}}).
+For more information, see [Forward client certificate header]({{< link-hextra path="/traffic-management/header-control/forward-xfcc/" >}}).
 
 #### Strip port from Host header {#v24-strip-host-port}
 
@@ -41,7 +41,7 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 * `AnyPort`: Removes any port from the header.
 * `MatchingPort`: Removes the port only if it matches the listener's own port.  
 
-For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-host-port/" >}}).
+For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
 
 <!-- TODO release 2.2
 
