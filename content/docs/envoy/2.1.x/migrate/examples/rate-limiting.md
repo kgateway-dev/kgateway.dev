@@ -5,6 +5,14 @@ weight: 30
 
 NGINX's `limit-rps` and `limit-rpm` annotations map to a kgateway `TrafficPolicy` with local rate limiting.
 
+## Mapping considerations
+
+Note that the Ingress-NGINX annotation to kgateway TrafficPolicy mapping is not 1:1. The `limit-rps`/`limit-rpm` use a shared memory zone keyed by client IP, applying the rate limit **per client IP address, per pod**. In contrast, the kgateway local token bucket is shared across clients within the scope where the policy is attached (for example, a route or virtual host), rather than per client IP address.
+
+- Per-client IP address: If you need per-client-IP rate limiting, use global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective downstream address).
+- Forwarded headers: If you need a `Header` descriptor with `X-Forwarded-For`, only do so when XFF is validated via trusted-proxy or trusted-hops configuration and normalized to the intended client IP address (for example, the leftmost untrusted hop). Otherwise, clients can spoof or rotate the header and it might include multiple IP addresses.
+
+
 ## Before: Ingress with rate limits
 
 ```bash
