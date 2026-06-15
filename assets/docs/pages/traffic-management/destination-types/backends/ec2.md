@@ -24,7 +24,7 @@ Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm valu
      --set controller.enableAwsEc2Discovery=true
    ```
 
-3. Verify that the control planes pods are up and running. 
+3. Verify that the control plane pods are up and running. 
    ```sh
    kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
