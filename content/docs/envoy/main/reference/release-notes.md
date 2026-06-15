@@ -43,6 +43,12 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 
 For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
 
+#### AWS EC2 backend {#v24-ec2-backend}
+
+You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values.
+
+For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

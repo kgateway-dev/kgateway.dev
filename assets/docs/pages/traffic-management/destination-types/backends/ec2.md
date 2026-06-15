@@ -4,16 +4,33 @@ Route traffic directly to AWS EC2 instances that the gateway proxy discovers dyn
 
 {{< reuse "docs/snippets/prereq.md" >}}
 
-2. Enable EC2 discovery when you install or upgrade {{< reuse "/docs/snippets/kgateway.md" >}} by setting the `controller.enableAwsEc2Discovery` Helm value to `true`.
+## Step 1: Enable EC2 discovery
+
+Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm value to `true` in your {{< reuse "docs/snippets/kgateway.md" >}} Helm chart. 
+
+1. Optional: Get the values of your current installation. 
+   ```sh
+   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   open values.yaml
+   ```
+
+2. Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm value to `true`. The `--reuse-values` setting re-applies any Helm values that you previously set.
 
    ```sh
-   helm upgrade --install kgateway oci://ghcr.io/kgateway-dev/charts/kgateway \
+   helm upgrade -i {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      --namespace {{< reuse "docs/snippets/namespace.md" >}} \
      --reuse-values \
+     --version v{{< reuse "docs/versions/n-patch.md" >}} \
      --set controller.enableAwsEc2Discovery=true
    ```
 
-## Create an AWS EC2 instance {#ec2-instance}
+3. Verify that the control planes pods are up and running. 
+   ```sh
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+
+## Step 2: Create an AWS EC2 instance {#ec2-instance}
 
 1. Follow the AWS documentation to [launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance) with the following settings:
    - Use an Amazon Linux image.
@@ -21,24 +38,19 @@ Route traffic directly to AWS EC2 instances that the gateway proxy discovers dyn
    - Add at least one tag that you later use to discover the instance, for example `app: payments`.
    - Create a key file so that you can later connect to your instance by using SSH. 
 
-2. Save the AWS region that your EC2 instance is created in as an environment variable.
+2. Save the AWS region that your EC2 instance is created in as an environment variable. Make sure to use the region name (for example, `us-east-1`), not an availability zone (for example, `us-east-1b`).
    ```sh
    export AWS_REGION=<aws-region>
    ```
 
-3. Get the public IP address of your EC2 instance and save it in an environment variable. 
-   ```sh
-   export INSTANCE_IP=<public-ec2-IP>
-   ```
+3. [Connect to your EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-connect-to-instance). 
 
-4. [Connect to your EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-connect-to-instance). 
-
-5. Start an HTTP server on the EC2 instance. You can use the HTTP server that is built into Python by default. 
+4. Start an HTTP server on the EC2 instance. You can use the HTTP server that is built into Python by default. 
    ```sh
    sudo python3 -m http.server 80 &
    ```
 
-6. Verify that you can send requests to the local HTTP server. 
+5. Verify that you can send requests to the local HTTP server. 
    ```sh
    curl http://localhost/
    ```
@@ -65,16 +77,18 @@ Route traffic directly to AWS EC2 instances that the gateway proxy discovers dyn
    </html>
    ```
 
-## Configure AWS credentials {#credentials}
+## Step 3: Configure AWS credentials {#credentials}
 
-For the gateway proxy to discover and route traffic to the EC2 instance, you must configure the proxy with the required AWS credentials. You can choose between the following authentication methods: 
-* **Static AWS credentials**: Store your AWS secret key and access key ID in a Kubernetes secret. Then, 
-* Role assumption: 
+For the gateway proxy to discover and route traffic to the EC2 instance, you must configure the proxy with the required AWS credentials. You can choose between the following authentication methods:
+* **Static AWS credentials**: Store your AWS access key ID and secret access key in a Kubernetes secret.
+* **Role assumption**: Configure an IAM role that the gateway proxy assumes to get temporary credentials.
 
-The credentials must have at least `ec2:DescribeInstances` permissions. 
+For static credentials, the IAM user must have at least `ec2:DescribeInstances` permissions. For role assumption, the IAM user must have `sts:AssumeRole` permissions and the role must have at least `ec2:DescribeInstances` permissions.
 
 {{< tabs items="Static AWS credentials,Role assumption" >}}
 {{% tab tabName="Static AWS credentials" %}}
+
+Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the gateway proxy uses those credentials as-is to discover EC2 instances.
 
 1. Create the policy document and save the ARN in an environment variable. At a minimum, you must assign the `ec2:DescribeInstances` permission. 
    ```sh
@@ -96,7 +110,67 @@ The credentials must have at least `ec2:DescribeInstances` permissions.
    echo $POLICY_ARN
    ```
 
-2. Create a role and configure your IAM user to assume this role. 
+2. Get your IAM username and attach the policy directly to your IAM user.
+   ```sh
+   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+   export IAM_USERNAME=$(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)
+
+   aws iam attach-user-policy \
+     --user-name ${IAM_USERNAME} \
+     --policy-arn $POLICY_ARN
+   ```
+
+3. Create permanent AWS credentials for your user. 
+   ```sh
+   eval $(aws iam create-access-key --user-name ${IAM_USERNAME} \
+     --query 'AccessKey.[AccessKeyId,SecretAccessKey]' \
+     --output text | \
+     awk '{print "export AWS_ACCESS_KEY_ID="$1"\nexport AWS_SECRET_ACCESS_KEY="$2}')
+
+   echo "AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID"
+   echo "AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY"
+   ```
+
+4. Create a Kubernetes secret that holds the credentials.
+   ```yaml
+   kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
+   apiVersion: v1
+   kind: Secret
+   metadata:
+     name: aws-creds
+   type: Opaque
+   stringData:
+     accessKey: "${AWS_ACCESS_KEY_ID}"
+     secretKey: "${AWS_SECRET_ACCESS_KEY}"
+   EOF
+   ```
+
+{{% /tab %}}
+{{% tab tabName="Role assumption" %}}
+
+Use this method when you want to limit what the IAM user can do directly, or when your EC2 instances are in a different AWS account than the IAM user. The gateway proxy uses the IAM user credentials stored in the Kubernetes secret to call `sts:AssumeRole`, gets back temporary credentials for the role, and uses those to discover EC2 instances. The `ec2:DescribeInstances` permission is attached to the role, not the user. When using this method, you must also set the `ec2.roleArn` field in the Backend resource.
+
+1. Create the policy document and save the ARN in an environment variable. At a minimum, you must assign the `ec2:DescribeInstances` permission.
+   ```sh
+   export POLICY_ARN=$(aws iam create-policy \
+     --policy-name kgateway-ec2-discovery \
+     --policy-document '{
+       "Version": "2012-10-17",
+       "Statement": [
+         {
+           "Effect": "Allow",
+           "Action": "ec2:DescribeInstances",
+           "Resource": "*"
+         }
+       ]
+     }' \
+     --query 'Policy.Arn' \
+     --output text)
+
+   echo $POLICY_ARN
+   ```
+
+2. Get your AWS account ID and IAM username, then create an IAM role with a trust policy that allows your IAM user to assume it.
    ```sh
    export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
    export IAM_USERNAME=$(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)
@@ -113,14 +187,17 @@ The credentials must have at least `ec2:DescribeInstances` permissions.
      }"
    ```
 
-3. Attach the policy to the role. 
+3. Attach the policy to the role and save the role ARN in an environment variable.
    ```sh
    aws iam attach-role-policy \
-    --role-name kgateway-ec2-role \
-    olicy-arn $POLICY_ARN     
+     --role-name kgateway-ec2-role \
+     --policy-arn $POLICY_ARN
+
+   export ROLE_ARN=$(aws iam get-role --role-name kgateway-ec2-role --query 'Role.Arn' --output text)
+   echo $ROLE_ARN
    ```
 
-4. Create permanent AWS credentials for your user. 
+4. Create permanent AWS credentials for your IAM user. The gateway proxy uses these credentials to assume the role.
    ```sh
    eval $(aws iam create-access-key --user-name ${IAM_USERNAME} \
      --query 'AccessKey.[AccessKeyId,SecretAccessKey]' \
@@ -131,7 +208,7 @@ The credentials must have at least `ec2:DescribeInstances` permissions.
    echo "AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY"
    ```
 
-5. Create a Kubernetes secret that holds the credentials. Note that if you don't use long-lived AWS credentials, you must also provide an AWS session token in the `sessionToken` field.
+5. Create a Kubernetes secret that holds the IAM user credentials.
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
    apiVersion: v1
@@ -142,20 +219,20 @@ The credentials must have at least `ec2:DescribeInstances` permissions.
    stringData:
      accessKey: "${AWS_ACCESS_KEY_ID}"
      secretKey: "${AWS_SECRET_ACCESS_KEY}"
-     # sessionToken: "${AWS_SESSION_TOKEN}"
    EOF
    ```
 
 {{% /tab %}}
-{{% tab tabName="Role assumption" %}}
-{{% /tab %}}
 {{< /tabs >}}
 
-## Set up EC2 routing {#routing}
+## Step 4: Set up EC2 routing {#routing}
 
-Create `Backend` and `HTTPRoute` resources to route requests to your EC2 instances.
+Create a Backend resource that represents your EC2 instance and an HTTPRoute to route requests to it.
 
-1. Create a Backend resource that represents the EC2 instance. Set the tag that you added to your EC2 instance earlier in the `ec2.filters` field so that the gateway proxy can discover the instance. You can also choose to route traffic to the instance's public or private IP address by using the `addressType` field. Note that if you choose a private address, your cluster must be in the same private network as the EC2 instance, such as in the same VPC.  
+1. Create a Backend resource that represents the EC2 instance. Set the tag that you added to your EC2 instance earlier in the `ec2.filters` field so that the gateway proxy can discover the instance. You can also choose to route traffic to the instance's public or private IP address by using the `addressType` field. Note that if you choose a private address, your cluster must be in the same private network as the EC2 instance, such as in the same VPC.
+
+   {{< tabs items="Static AWS credentials,Role assumption" >}}
+   {{% tab tabName="Static AWS credentials" %}}
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -179,11 +256,40 @@ Create `Backend` and `HTTPRoute` resources to route requests to your EC2 instanc
              value: payments
    EOF
    ```
+   {{% /tab %}}
+   {{% tab tabName="Role assumption" %}}
+   ```yaml
+   kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: ec2-backend
+   spec:
+     type: AWS
+     aws:
+       region: ${AWS_REGION}
+       auth:
+         type: Secret
+         secretRef:
+           name: aws-creds
+       ec2:
+         port: 80
+         addressType: PublicIP
+         roleArn: "${ROLE_ARN}"
+         filters:
+         - keyValue:
+             key: app
+             value: payments
+   EOF
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    | Field | Description |
    |---|---|
    | `ec2.port` | The port on the EC2 instance to route to. |
    | `ec2.addressType` | `PublicIP` to route to the public IP address; `PrivateIP` to route to the private IP address. |
+   | `ec2.roleArn` | The ARN of the IAM role to assume before listing instances. Required only when using role assumption. |
    | `ec2.filters` | Tag-based filters to select EC2 instances. Only running instances that match all filters are included as endpoints. |
 
 2. Create an HTTPRoute resource that references the `ec2-backend` Backend.
@@ -211,30 +317,45 @@ Create `Backend` and `HTTPRoute` resources to route requests to your EC2 instanc
    EOF
    ```
 
-3. Verify that the Backend endpoint is discovered. {{< reuse "/docs/snippets/kgateway.md" >}} periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters.
+3. Verify that the Backend endpoint is discovered. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters.
    ```sh
    kubectl get backend ec2-backend -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
    ```
 
-4. Send a request to the EC2 instance through the gateway.
+4. Send a request to the EC2 instance through the gateway proxy. Verify that the output equals the output that you saw earlier when you sent a request to the EC2 directly. 
    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl http://$INGRESS_GW_ADDRESS:8080/help -H "host: ec2.example"
+   curl http://$INGRESS_GW_ADDRESS:8080/ -H "host: ec2.example"
    ```
    {{% /tab %}}
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
-   curl http://localhost:8080/help -H "host: ec2.example"
+   curl http://localhost:8080/ -H "host: ec2.example"
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
    Example output:
-   ```
-   usage:
-     curl -v http://localhost:8080/?code=<httpCode>
-       where httpCode is a http response code such as 200, 404, or 500
+   ```console
+   <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+   <html>
+   <head>
+   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <title>Directory listing for /</title>
+   </head>
+   <body>
+   <h1>Directory listing for /</h1>
+   <hr>
+   <ul>
+   <li><a href=".bash_logout">.bash_logout</a></li>
+   <li><a href=".bash_profile">.bash_profile</a></li>
+   <li><a href=".bashrc">.bashrc</a></li>
+   <li><a href=".ssh/">.ssh/</a></li>
+   </ul>
+   <hr>
+   </body>
+   </html>
    ```
 
 ## Cleanup
@@ -252,4 +373,22 @@ Create `Backend` and `HTTPRoute` resources to route requests to your EC2 instanc
    kubectl delete secret aws-creds -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
-3. Terminate the EC2 instance from the AWS console.
+3. Clean up the AWS IAM resources.
+
+   {{< tabs items="Static AWS credentials,Role assumption" >}}
+   {{% tab tabName="Static AWS credentials" %}}
+   ```sh
+   aws iam detach-user-policy --user-name ${IAM_USERNAME} --policy-arn ${POLICY_ARN}
+   aws iam delete-policy --policy-arn ${POLICY_ARN}
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Role assumption" %}}
+   ```sh
+   aws iam detach-role-policy --role-name kgateway-ec2-role --policy-arn ${POLICY_ARN}
+   aws iam delete-role --role-name kgateway-ec2-role
+   aws iam delete-policy --policy-arn ${POLICY_ARN}
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+4. Terminate the EC2 instance from the AWS console.
