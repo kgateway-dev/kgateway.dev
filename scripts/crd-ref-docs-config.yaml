@@ -62,6 +62,15 @@ render:
     - name: HTTPURLRewriteFilter
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter
+    - name: HTTPPathMatch
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httppathmatch
+    - name: TCPRoute
+      package: sigs.k8s.io/gateway-api/apis/v1alpha2
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#tcproute
+    - name: GRPCRoute
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcroute
     - name: ObjectName
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname
