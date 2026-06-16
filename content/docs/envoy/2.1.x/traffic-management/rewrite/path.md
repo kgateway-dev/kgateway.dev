@@ -424,7 +424,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
 ## Regex rewrite
 
 {{< callout type="info" >}}
-Regex-based path rewriting via `TrafficPolicy` is not available in v2.1.x. This feature was introduced in v2.2. To upgrade, see the [v2.2 release notes](https://kgateway.dev/docs/envoy/2.2.x/reference/release-notes/).
+Regex-based path rewriting via `TrafficPolicy` is not available in v2.1.x. This feature was introduced in v2.2. To upgrade, see the [v2.2 release notes](/docs/envoy/2.2.x/reference/release-notes/).
 {{< /callout >}}
 
 For regex-based path rewriting in v2.1.x, consider these alternatives:
