@@ -28,6 +28,11 @@ The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes th
 
 ### 🌟 New features {#v23-new-features}
 
+#### Configurable ExtProc filter stages {#v24-extproc-filter-stages}
+
+You can now control where in the Envoy filter chain an ExtProc filter runs by setting the `filterStage` field in the GatewayExtension resource. You can also apply multiple ExtProc filters to the same route at different stages.
+
+For more information, see [Staged ExtProc filters]({{< link-hextra path="/traffic-management/extproc/filter-stages/" >}}).
 
 #### Forward client certificate header {#v24-xfcc}
 
