@@ -254,6 +254,10 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
 
+{{< callout type="info">}}
+If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS can override the TLS settings from your BackendTLSPolicy or BackendConfigPolicy, causing backend TLS connections to fail. To prevent this failure, add the `kgateway.dev/disable-istio-auto-mtls: "true"` annotation to the Backend resource. For more information, see [Istio ingress]({{< link-hextra path="/integrations/istio/sidecar/ingress/" >}}).
+{{< /callout >}}
+
 1. Create a Backend resource that represents your external service. In this example, you use a static Backend that routes traffic to the `httpbin.org` site. Make sure to include the HTTPS port 443 so that traffic is routed to this port. 
    ```yaml
    kubectl apply -f- <<EOF
