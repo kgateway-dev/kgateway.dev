@@ -132,6 +132,58 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
      "user_agent": "curl/7.77.0"
    }
    ```
+## Other configurations
+
+Review other common configurations. 
+
+### String format {#string-format}
+
+Instead of a JSON format, you can write access logs as a plain string by using the `stringFormat` field. For longer format strings, a [YAML block scalar](https://yaml.org/spec/1.2-old/spec.html#id2794534) is easier to read and maintain than escaping special characters in a quoted string.
+
+{{< callout >}}
+Do not use single-quoted strings in the `stringFormat` field. Single-quoted YAML strings do not interpret escape sequences. Because of that, `\n` is stored as the literal characters `\` and `n` instead of a newline. Note that Kubernetes also stores `stringFormat` values with single quotes by default, so adding `\n` via the `kubectl edit` command also does not add a newline. Instead, use a block scalar as shown in the following example, which automatically adds the trailing newline that Envoy requires.
+{{< /callout >}}
+
+The following example uses the folded block scalar (`>`) syntax. The `>` operator converts the line break between the two content lines into a space, so that is produces a single-line string. It also appends a trailing newline, which Envoy requires in the format string.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: access-logs
+  namespace: kgateway-system
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      accessLog:
+        - fileSink:
+            path: /dev/stdout
+            stringFormat: >
+              [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+              "%PROTOCOL%" "%RESPONSE_CODE%" "%RESPONSE_FLAGS%"
+EOF
+```
+
+| Setting | Description |
+| ------- | ----------- |
+| `stringFormat` | The string format to write logs in. For more information about the string format and command operators you can use, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-strings). To format as JSON, use the `jsonFormat` setting instead. If you omit or leave this setting blank, the [Envoy default format string](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#default-format-string) is used. |
+
+After sending a request to your app, check the gateway logs to see an entry similar to the following:
+
+```sh
+kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1
+```
+
+Example output:
+```console
+[2024-08-19T20:57:57.511Z] "GET /headers" "HTTP/1.1" "200" "-"
+```
+
 <!-- TODO
 
 Need to figure out how to mount a volume for file-based

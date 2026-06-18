@@ -236,7 +236,7 @@ Create or update a Gateway that includes the Istio proxy.
 
 {{< version exclude-if="2.0.x" >}}
 {{< callout type="info">}}
-To exclude a service from using Istio mTLS or to configure your own TLS settings, you can create a static Backend resource for the service and add the `kgateway.dev/disable-istio-auto-mtls` annotation to the Backend. Then, you can apply custom TLS settings by using a BackendTLSPolicy or BackendConfigPolicy.   
+To exclude a service from using Istio mTLS or to configure your own TLS settings, you can create a static Backend resource for the service and add the `kgateway.dev/disable-istio-auto-mtls` annotation to the Backend. Then, you can apply custom TLS settings by using a BackendTLSPolicy or BackendConfigPolicy. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
 {{< /callout >}}
 {{< /version >}}
 
