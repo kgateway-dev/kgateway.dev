@@ -62,6 +62,36 @@ Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/
 
    Verify that you get a `200 OK` response.
 
+3. Save a token that does not have the `team=dev` claim, then repeat the request. This example uses a token for a user named Bob, who has the `team=ops` claim. The token is signed by the same key as the inline JWKS, so it passes JWT verification, but it does not match the `rbac` policy.
+
+   ```sh
+   export BOB_TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InNvbG8tcHVibGljLWtleS0wMDEifQ.eyJpc3MiOiJzb2xvLmlvIiwib3JnIjoic29sby5pbyIsInN1YiI6ImJvYiIsInRlYW0iOiJvcHMiLCJleHAiOjIwNzQyNzQ5NTQsImxsbXMiOnsibWlzdHJhbGFpIjpbIm1pc3RyYWwtbGFyZ2UtbGF0ZXN0Il19fQ.GF_uyLpZSTT1DIvJeO_eish1WDjMaS4BQSifGQhqPRLjzu3nXtPkaBRjceAmJi9gKZYAzkT25MIrT42ZIe3bHilrd1yqittTPWrrM4sWDDeldnGsfU07DWJHyboNapYR-KZGImSmOYshJlzm1tT_Bjt3-RK3OBzYi90_wl0dyAl9D7wwDCzOD4MRGFpoMrws_OgVrcZQKcadvIsH8figPwN4mK1U_1mxuL08RWTu92xBcezEO4CdBaFTUbkYN66Y2vKSTyPCxg3fLtg1mvlzU1-Wgm2xZIiPiarQHt6Uq7v9ftgzwdUBQM1AYLvUVhCN6XkkR9OU3p0OXiqEDjAxcg
+   ```
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+     -H "host: www.example.com:8080" \
+     --header "Authorization: Bearer $BOB_TOKEN"
+   ```
+   {{% /tab %}}
+   {{% tab tabName="Port-forward for local testing" %}}
+   ```sh
+   curl -vik localhost:8080/headers \
+     -H "host: www.example.com:8080" \
+     --header "Authorization: Bearer $BOB_TOKEN"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Verify that the request is denied with a `403 Forbidden` response.
+
+   ```
+   HTTP/1.1 403 Forbidden
+   RBAC: access denied
+   ```
+
 ## Other configurations {#other}
 
 The following examples show other ways to write the `rbac` policy. Each one replaces the `rbac` block in the {{< reuse "docs/snippets/trafficpolicy.md" >}} from the previous section.
