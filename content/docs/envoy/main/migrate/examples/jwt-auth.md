@@ -1,5 +1,6 @@
 ---
 title: "JWT Authentication"
+description: Convert NGINX Plus JWT authentication to a kgateway GatewayExtension and TrafficPolicy.
 weight: 32
 ---
 
@@ -9,7 +10,8 @@ Migrating from NGINX's `auth-jwt` (often used in NGINX Plus) or custom external 
 
 If you are using NGINX Plus, your Ingress might look like this:
 
-```yaml
+```bash
+cat <<'EOF' > jwt-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -30,6 +32,7 @@ spec:
               number: 8000
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert
@@ -41,7 +44,7 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: GatewayExtension and TrafficPolicy
 
-kgateway uses a `GatewayExtension` to define your JWT providers once, which can then be referenced by any `TrafficPolicy`.
+The `nginx.com/auth-jwt*` annotations are NGINX Plus extensions that the `ingress-nginx` provider doesn't recognize, so `ingress2gateway` won't emit JWT config for them. You author the following resources by hand. kgateway uses a `GatewayExtension` to define your JWT providers once, which can then be referenced by any `TrafficPolicy`.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1

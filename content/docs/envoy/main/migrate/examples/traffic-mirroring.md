@@ -1,5 +1,6 @@
 ---
 title: "Traffic Mirroring"
+description: Convert the NGINX mirror-target annotation to a Gateway API HTTPRoute RequestMirror filter.
 weight: 39
 ---
 
@@ -9,7 +10,8 @@ Traffic mirroring (shadowing) allows you to copy live traffic to a test service 
 
 This Ingress mirrors all traffic from `production-svc` to `staging-svc`:
 
-```yaml
+```bash
+cat <<'EOF' > shadow-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,6 +31,7 @@ spec:
               number: 80
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert

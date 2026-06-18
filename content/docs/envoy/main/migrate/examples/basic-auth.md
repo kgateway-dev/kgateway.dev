@@ -1,5 +1,6 @@
 ---
 title: "Basic Auth"
+description: Convert NGINX basic authentication annotations to a kgateway TrafficPolicy with basicAuth.
 weight: 31
 ---
 

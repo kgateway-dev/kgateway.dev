@@ -1,5 +1,6 @@
 ---
 title: "URL Rewriting"
+description: Convert the NGINX rewrite-target annotation to a Gateway API HTTPRoute URLRewrite filter.
 weight: 37
 ---
 
@@ -9,7 +10,8 @@ Path rewriting is common when backends expect a different path than what is expo
 
 In this example, requests to `/api/v1/users` are rewritten to `/users` before reaching the backend:
 
-```yaml
+```bash
+cat <<'EOF' > rewrite-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,6 +31,7 @@ spec:
             name: backend-svc
             port:
               number: 80
+EOF
 ```
 
 ## Convert
