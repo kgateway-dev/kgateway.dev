@@ -10,7 +10,7 @@ The following stages are supported. The stages are listed in the order that a re
 |---|---|
 | `Fault` | Earliest stage. ExtProc is executed before fault injection. |
 | `AuthN` | External authentication stage. |
-| `AuthZ` | Authorization stage. This is the default setting when the `filterStage` field is not set. |
+| `AuthZ` | Authorization stage. This setting is the default when the `filterStage` field is not set. |
 | `RateLimit` | Rate limiting stage. |
 | `Route` | Final processing stage before the request leaves the gateway proxy. |
 
@@ -21,7 +21,7 @@ The following predicates are supported:
 | `filterStage.predicate` | Description |
 |---|---|
 | `Before` | Run the ExtProc filter before the specified stage. |
-| `During` | Run the ExtProc filter during the specified stage. This is the default when `predicate` is not set. |
+| `During` | Run the ExtProc filter during the specified stage. This setting is the default when the `predicate` field is not set. |
 | `After` | Run the ExtProc filter after the specified stage. |
 
 {{< callout >}}
@@ -162,7 +162,7 @@ By default, creating multiple {{< reuse "docs/snippets/trafficpolicy.md" >}} res
    EOF
    ```
 
-8. Create an HTTPRoute resource that routes traffic along the `extproc.example` domain to the http app and applies both {{< reuse "docs/snippets/trafficpolicy.md" >}} resources to the same route rule.
+8. Create an HTTPRoute resource that routes traffic along the `extproc.example` domain to the httpbin app and applies both {{< reuse "docs/snippets/trafficpolicy.md" >}} resources to the same route rule.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -218,7 +218,7 @@ By default, creating multiple {{< reuse "docs/snippets/trafficpolicy.md" >}} res
    EOF
    ```
 
-10. Send a request to the `/headers` path. The ExtProc server is invoked twice. Verify that you see the  `x-extproc-processed: true` header in your response.
+10. Send a request to the `/headers` path. The ExtProc server is invoked twice. Verify that you see the `x-extproc-processed: true` header in your response.
 
     {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
 
@@ -257,7 +257,7 @@ By default, creating multiple {{< reuse "docs/snippets/trafficpolicy.md" >}} res
     ...
     ```
 
-10. Check the ExtProc server logs. Verify that you see two `Process` log entries, one for each stage. 
+11. Check the ExtProc server logs. Verify that you see two `Process` log entries, one for each stage. 
     ```sh
     kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l app.kubernetes.io/name=ext-proc-grpc
     ```
