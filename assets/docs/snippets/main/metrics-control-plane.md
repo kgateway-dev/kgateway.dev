@@ -17,6 +17,14 @@ kgateway_status_syncer_status_syncs_total|counter|name, namespace, syncer, resul
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
 kgateway_translator_translations_running|gauge|name, namespace, translator|Current number of translations running
 kgateway_translator_translations_total|counter|name, namespace, translator, result|Total number of translations
+kgateway_validation_cache_hits_total|counter|caller|Total number of Envoy validation cache hits.
+kgateway_validation_cache_misses_total|counter|caller|Total number of Envoy validation cache misses.
+kgateway_validation_calls_total|counter|caller|Total number of Envoy validation requests.
+kgateway_validation_duration_seconds|histogram|caller, result|Duration of Envoy validation requests.
+kgateway_validation_invalid_xds_total|counter|caller|Total number of Envoy invalid-xDS validation results.
+kgateway_validation_invocation_errors_total|counter|caller|Total number of Envoy validation invocation errors.
+kgateway_validation_mode|gauge|mode, validator_mode|Configured validation mode. The active mode series has value 1.
+kgateway_validation_valid_total|counter|caller|Total number of successful Envoy validation results.
 kgateway_xds_auth_rq_failure_total|counter||Total number of failed xDS auth requests
 kgateway_xds_auth_rq_success_total|counter||Total number of successful xDS auth requests
 kgateway_xds_auth_rq_total|counter||Total number of xDS auth requests
