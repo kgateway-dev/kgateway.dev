@@ -1,5 +1,6 @@
 ---
 title: "Client TLS (mTLS)"
+description: Convert NGINX client certificate verification to Gateway API frontendValidation (mTLS).
 weight: 40
 ---
 
@@ -13,7 +14,8 @@ Mutual TLS (mTLS) allows the gateway to verify the identity of the client via a 
 
 An NGINX Ingress requiring a client certificate verified against a specific CA:
 
-```yaml
+```bash
+cat <<'EOF' > mtls-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -34,6 +36,7 @@ spec:
             port:
               number: 8443
         path: /
+EOF
 ```
 
 ## Convert

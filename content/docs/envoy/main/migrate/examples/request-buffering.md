@@ -1,5 +1,6 @@
 ---
 title: "Request Buffering"
+description: Convert the NGINX proxy-body-size annotation to a kgateway TrafficPolicy buffer limit.
 weight: 38
 ---
 
@@ -9,7 +10,8 @@ Managing the maximum allowed request size is a basic security requirement. NGINX
 
 Configuration for an Ingress that allows uploads up to 20MB:
 
-```yaml
+```bash
+cat <<'EOF' > upload-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -29,6 +31,7 @@ spec:
               number: 8080
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert

@@ -1,5 +1,6 @@
 ---
 title: "API Key Authentication"
+description: Convert an NGINX API key check to a kgateway TrafficPolicy with native apiKeyAuth.
 weight: 33
 ---
 
@@ -9,7 +10,8 @@ In open-source NGINX, API key validation is often implemented using a `configura
 
 This is a common way to enforce API keys in NGINX Ingress:
 
-```yaml
+```bash
+cat <<'EOF' > api-key-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -32,6 +34,7 @@ spec:
               number: 8000
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert
@@ -43,7 +46,7 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: TrafficPolicy with API Key Auth
 
-Instead of a raw if-statement, you define the source (e.g., header name) and a secret containing the valid keys.
+The `configuration-snippet` is raw NGINX configuration, so `ingress2gateway` passes it through without translating it. You author the `apiKeyAuth` policy by hand: instead of a raw if-statement, you define the source (for example, a header name) and a secret that holds the valid keys.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1

@@ -1,5 +1,6 @@
 ---
 title: "Header Modifiers"
+description: Convert NGINX header directives to a Gateway API HTTPRoute RequestHeaderModifier filter.
 weight: 35
 ---
 
@@ -9,7 +10,8 @@ Whether you're adding security headers or passing custom metadata to your backen
 
 An NGINX Ingress adding a custom header to requests:
 
-```yaml
+```bash
+cat <<'EOF' > headers-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -30,6 +32,7 @@ spec:
               number: 80
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert
@@ -41,7 +44,7 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: HTTPRoute with Header Filters
 
-The Gateway API `HTTPRoute` includes a `RequestHeaderModifier` filter to handle this natively:
+Because the header is set in a raw `configuration-snippet`, `ingress2gateway` can't translate it. You add the filter to the generated `HTTPRoute` by hand. The Gateway API `HTTPRoute` includes a `RequestHeaderModifier` filter to handle this natively:
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1

@@ -1,5 +1,6 @@
 ---
 title: "Timeouts"
+description: Convert NGINX proxy timeout annotations to kgateway TrafficPolicy and BackendConfigPolicy timeouts.
 weight: 36
 ---
 
@@ -9,7 +10,8 @@ Connection and request timeouts are critical for stability. NGINX uses proxy-lev
 
 An NGINX Ingress configured with custom read and connect timeouts (values in seconds):
 
-```yaml
+```bash
+cat <<'EOF' > timeouts-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -30,6 +32,7 @@ spec:
               number: 80
         path: /
         pathType: Prefix
+EOF
 ```
 
 ## Convert
