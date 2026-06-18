@@ -129,6 +129,41 @@ You can set up access logs to write to a standard (stdout/stderr) stream. The fo
      "user_agent": "curl/7.77.0"
    }
    ```
+
+### Use a string format
+
+To write each access log entry as a text line instead of a JSON object, set `fileSink.stringFormat`. The following example writes a custom text access log to the `stdout` stream of the gateway proxy container.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: HTTPListenerPolicy
+metadata:
+  name: access-logs
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  accessLog:
+  - fileSink:
+      path: /dev/stdout
+      stringFormat: '[%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%" %RESPONSE_CODE% %RESPONSE_FLAGS% %BYTES_RECEIVED% %BYTES_SENT% %DURATION% "%REQ(USER-AGENT)%" "%REQ(X-REQUEST-ID)%" "%UPSTREAM_HOST%"\n'
+EOF
+```
+
+After you send a request, get the logs for the gateway pod and verify that you see a text entry for each request.
+
+```sh
+kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1
+```
+
+Example output:
+
+```txt
+[2024-08-19T20:57:57.511Z] "GET /status/200 HTTP/1.1" 200 - 0 0 1 "curl/7.77.0" "a6758866-0f26-4c95-95d9-4032c365c498" "10.36.0.14:8080"
+```
 <!-- TODO
 
 Need to figure out how to mount a volume for file-based
@@ -377,7 +412,6 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 ```sh
 kubectl delete HTTPListenerPolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
 ```
-
 
 
 
