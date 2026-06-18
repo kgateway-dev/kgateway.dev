@@ -16,7 +16,7 @@ To inject your own bootstrap configuration while the control plane continues to 
 2. Customize the bootstrap configuration to your needs and store it in your own ConfigMap. 
 3. Use a `deploymentOverlay` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to point the `envoy-config` volume at your custom ConfigMap. Volumes merge on the `name` key under [strategic merge patch](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/), so the overlay updates the existing volume rather than adding a new one.
 
-Because you start from a copy of the generated bootstrap, the proxy keeps its control-plane–managed configuration, such as the `node` identity, the `xds_cluster`, the xDS token, and `dynamic_resources`, and continues to connect to the control plane.
+Because you start from a copy of the generated bootstrap, the proxy keeps its control-plane–managed configuration, such as the `node` identity, `xds_cluster`, xDS token, and `dynamic_resources`, and continues to connect to the control plane.
 
 {{< callout type="warning" >}}
 Do not change the control-plane–managed sections of the bootstrap configuration, including the `node`, `dynamic_resources`, `xds_cluster`, and `xds_service_account_token.json` entries. Changing these sections breaks the connection between the gateway proxy and the control plane. Make sure to add or change only the fields that you need, such as `stats_config`.
@@ -32,7 +32,7 @@ Do not change the control-plane–managed sections of the bootstrap configuratio
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: gw-params
@@ -52,7 +52,7 @@ Do not change the control-plane–managed sections of the bootstrap configuratio
      infrastructure:
        parametersRef:
          name: gw-params
-         group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
+         group: {{< reuse "docs/snippets/gatewayparam-group.md" >}}
          kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
      listeners:
      - protocol: HTTP
@@ -64,38 +64,42 @@ Do not change the control-plane–managed sections of the bootstrap configuratio
    EOF
    ```
 
-2. Get the generated bootstrap and save the `envoy.yaml` entry to a file. This is the bootstrap you customize in the next step.
-
-   ```sh
-   kubectl get configmap custom -n {{< reuse "docs/snippets/namespace.md" >}} \
-     -o jsonpath='{.data.envoy\.yaml}' > envoy.yaml
-   ```
-
-3. Edit `envoy.yaml` to add your customization. The following example adds a `stats_config` block with custom histogram bucket boundaries (in milliseconds) for cluster stats. Add the block as a new top-level key; leave all the existing keys unchanged.
-
-   ```yaml
-   stats_config:
-     histogram_bucket_settings:
-     - match:
-         prefix: "cluster."
-       buckets: [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
-   ```
-
-4. Create your own ConfigMap from the edited bootstrap. Copy the other entries from the generated ConfigMap too, such as `xds_service_account_token.json`, so that the proxy still authenticates to the control plane.
-
+2. Get the ConfigMap that contains the Envoy bootstrap configuration and save it in a local file. 
    ```sh
    kubectl get configmap custom -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > custom-bootstrap.yaml
-   # In custom-bootstrap.yaml: rename metadata.name to "custom-bootstrap",
-   # remove the owner references and resourceVersion, and replace the
-   # data.envoy.yaml value with your edited envoy.yaml from step 3.
-   kubectl apply -f custom-bootstrap.yaml
    ```
 
-5. Add a `deploymentOverlay` to the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to repoint the `envoy-config` volume at your custom ConfigMap.
+3. Make the following changes to your ConfigMap. 
+   1. Change the `metadata.name` field to a custom name, such as `custom-bootstrap`. You must create the ConfigMap under a different name to avoid automatic overwrites of the ConfigMap by the managed proxy. 
+   2. Find the Envoy bootstrap configuration in the `envoy.yaml` entry and customize it to your needs. The following example adds a `stats_config` block with custom histogram bucket boundaries (in milliseconds) for cluster stats. Add the block as a new top-level key. Make sure to leave all the existing keys of your Envoy bootstrap configuration unchanged.
+      ```yaml
+      stats_config:
+        histogram_bucket_settings:
+        - match:
+            prefix: "cluster."
+          buckets: [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+      ```
+
+      {{< callout type="tip" >}}
+If you prefer to extract only the Envoy bootstrap configuration for easier updating, run the following command. Make sure to apply your customizations to the `envoy.yaml` section of your ConfigMap.  
+```sh
+kubectl get configmap custom -n {{< reuse "docs/snippets/namespace.md" >}} \
+  -o jsonpath='{.data.envoy\.yaml}' > envoy.yaml
+
+open envoy.yaml
+```
+      {{< /callout >}}
+  
+   3. Apply the new ConfigMap. 
+      ```sh
+      kubectl apply -f custom-bootstrap.yaml
+      ```
+   
+4. Add a `deploymentOverlay` to the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to point the `envoy-config` volume at your custom ConfigMap.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
    kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: gw-params
@@ -116,27 +120,45 @@ Do not change the control-plane–managed sections of the bootstrap configuratio
    EOF
    ```
 
-   The control plane re-renders the Deployment and rolls out a new proxy pod that mounts your custom ConfigMap.
+5. Verify that the gateway proxy is restarted. 
+   ```sh
+   kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} | grep custom
+   ```
 
-6. Verify that the running proxy uses your custom histogram buckets. Open a port-forward to the Envoy admin port and check the bootstrap in the config dump.
+6. Port-forward the gateway proxy on port 19000 to access the admin interface. 
 
    ```sh
    kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} deploy/custom 19000:19000
    ```
 
-   In a separate terminal, query the config dump:
+7. Get the `histogram_bucket_settings` of your proxy config dump to verify that your custom settings are applied. 
 
    ```sh
-   curl -s localhost:19000/config_dump | grep -A6 histogram_bucket_settings
+   curl -s localhost:19000/config_dump | grep -A25 histogram_bucket_settings
    ```
 
    Example output:
 
-   ```json
+   ```console
    "histogram_bucket_settings": [
     {
-     "match": { "prefix": "cluster." },
-     "buckets": [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
+     "match": {
+      "prefix": "cluster."
+     },
+     "buckets": [
+      1,
+      5,
+      10,
+      25,
+      50,
+      100,
+      250,
+      500,
+      1000,
+      2500,
+      5000,
+      10000
+     ]
     }
    ]
    ```
