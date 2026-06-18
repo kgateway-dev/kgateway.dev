@@ -19,7 +19,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
      jwt:
        providers:
          - name: selfminted
-           issuer: solo.io
+           issuer: kgateway.dev
            jwks:
              local:
                inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
@@ -133,7 +133,7 @@ You can extract claims from the verified JWT and forward them as headers to the 
      jwt:
        providers:
          - name: selfminted
-           issuer: solo.io
+           issuer: kgateway.dev
            claimsToHeaders:
              - name: team
                header: x-team
@@ -177,7 +177,7 @@ You can extract claims from the verified JWT and forward them as headers to the 
      "headers": {
        ...
        "X-Org": [
-         "solo.io"
+         "kgateway.dev"
        ],
        "X-Team": [
          "dev"
@@ -273,7 +273,7 @@ spec:
     validationMode: Strict
     providers:
       - name: selfminted
-        issuer: solo.io
+        issuer: kgateway.dev
         jwks:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
@@ -294,7 +294,7 @@ spec:
     validationMode: AllowMissing
     providers:
       - name: selfminted
-        issuer: solo.io
+        issuer: kgateway.dev
         jwks:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
@@ -320,7 +320,7 @@ spec:
   jwt:
     providers:
       - name: selfminted
-        issuer: solo.io
+        issuer: kgateway.dev
         audiences:
           - my-api
         jwks:
@@ -348,7 +348,7 @@ spec:
   jwt:
     providers:
       - name: selfminted
-        issuer: solo.io
+        issuer: kgateway.dev
         tokenSource:
           header:
             header: x-jwt
@@ -374,7 +374,7 @@ spec:
   jwt:
     providers:
       - name: selfminted
-        issuer: solo.io
+        issuer: kgateway.dev
         forwardToken: true
         jwks:
           local:
