@@ -10,7 +10,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayExtension
    metadata:
      name: selfminted-jwt
@@ -124,7 +124,7 @@ You can extract claims from the verified JWT and forward them as headers to the 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayExtension
    metadata:
      name: selfminted-jwt
@@ -226,7 +226,7 @@ The following example uses Keycloak as the identity provider.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: gateway.kgateway.dev/v1alpha1
    kind: GatewayExtension
    metadata:
      name: selfminted-jwt
@@ -263,7 +263,7 @@ The `validationMode` field in `spec.jwt` controls whether requests without a JWT
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
@@ -284,7 +284,7 @@ EOF
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
@@ -311,7 +311,7 @@ The sample token in this guide has no `aud` claim, so using this configuration r
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
@@ -339,7 +339,7 @@ Changing the `tokenSource` affects how clients must send requests. If you apply 
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
@@ -365,7 +365,7 @@ By default, the gateway strips the JWT from the request before forwarding it to 
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
