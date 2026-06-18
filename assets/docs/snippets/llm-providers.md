@@ -2,11 +2,11 @@
 
 Kgateway supports the following AI cloud providers:
 
-* [Anthropic](https://docs.anthropic.com/en/release-notes/api)
+* [Anthropic](https://platform.claude.com/docs/en/release-notes/overview)
 * [Azure OpenAI](https://learn.microsoft.com/en-us/azure/foundry/)
 * [Gemini](https://ai.google.dev/gemini-api/docs)
 * [OpenAI](https://platform.openai.com/). You can also use `openai` support for LLM providers that use the OpenAI API, such as [DeepSeek](https://api-docs.deepseek.com) and [Mistral](https://docs.mistral.ai/).
-* [Vertex AI](https://docs.cloud.google.com/vertex-ai/docs)
+* [Vertex AI](https://docs.cloud.google.com/gemini-enterprise-agent-platform)
 
 ### Local providers {#local-providers}
 

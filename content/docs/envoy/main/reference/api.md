@@ -118,6 +118,7 @@ _Validation:_
 
 _Appears in:_
 - [AccessLog](#accesslog)
+- [LocalReplyMapper](#localreplymapper)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -524,24 +525,6 @@ _Appears in:_
 | `users` _string array_ | Users provides an inline list of username/password pairs in htpasswd format.<br />Each entry should be formatted as "username:hashed_password".<br />The only supported hash format is SHA-1<br /><br />Example entries:<br />  - "user1:\{SHA\}d95o2uzYI7q7tY7bHI4U1xBug7s=" |  | MaxItems: 256 <br />MinItems: 1 <br /> |
 | `secretRef` _[SecretReference](#secretreference)_ | SecretRef references a Kubernetes secret containing htpasswd data.<br />The secret must contain username/password pairs in htpasswd format. |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable basic auth.<br />Can be used to disable basic auth policies applied at a higher level in the config hierarchy. |  |  |
-
-
-#### BodyFormat
-
-
-
-BodyFormat configures an Envoy response body using formatting. Either JSON or Text must be specified.
-
-
-
-_Appears in:_
-- [DirectResponseSpec](#directresponsespec)
-
-| Field | Description | Default | Validation |
-| --- | --- | --- | --- |
-| `contentType` _string_ | ContentType defines the HTTP Content-Type header to be sent with the response.<br />By default, `text/plain` is used for the Text format and `application/json` for the JSON format.<br />Note: This setting does not currently take effect due to a bug in Envoy, a fix for which is pending release.<br />The option is included for completeness and will become effective with a future version of Envoy. |  |  |
-| `text` _string_ | Text is a format string by which Envoy will format the response body.<br />Mutually exclusive with JSON.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-text-format for details. |  | MaxLength: 4096 <br />MinLength: 1 <br /> |
-| `json` _[JSON](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#json-v1-apiextensions-k8s-io)_ | JSON is a format object by which Envoy will produce a JSON response body.<br />Mutually exclusive with Text.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-json-format for details.<br /><br />Setting a field to `null` in the JSON object requires the use of<br />`kubectl apply --server-side` or equivalent. With the default client-side<br />`kubectl apply`, null values are stripped by kubectl before reaching<br />the API server. |  | Type: object <br /> |
 
 
 #### BodyParseBehavior
@@ -1779,6 +1762,7 @@ _Appears in:_
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
 | `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for Envoy's OpenTelemetry tracer.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html |  |  |
+| `localReplies` _[LocalReplyConfig](#localreplyconfig)_ | LocalReplies configures how Envoy's local replies are formatted etc. |  |  |
 | `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
 | `useRemoteAddress` _boolean_ | UseRemoteAddress determines whether to use the remote address for the original client.<br />Note: If this field is omitted, it will fallback to the default value of 'true', which we set for all Envoy HCMs.<br />Thus, setting this explicitly to true is unnecessary (but will not cause any harm).<br />When true, Envoy will use the remote address of the connection as the client address.<br />When false, Envoy will use the X-Forwarded-For header to determine the client address. Furthermore, SkipXffAppend will implicitly be set to true unless explicitly configured.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-use-remote-address |  |  |
 | `preserveExternalRequestId` _boolean_ | PreserveExternalRequestId determines whether the connection manager will keep the x-request-id header if passed for<br />a request that is edge (Edge request is the request from external clients to front Envoy) and not reset it, which is the current Envoy behaviour. This defaults to false.<br />See here for more information https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-preserve-external-request-id |  |  |
@@ -1790,6 +1774,7 @@ _Appears in:_
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
 | `maxRequestsPerConnection` _integer_ | MaxRequestsPerConnection sets the maximum number of requests served over a single downstream<br />keepalive connection. When the limit is reached, Envoy closes the connection, which forces<br />clients to reconnect. This allows L4 load balancers like AWS NLB to rebalance long-lived<br />HTTP/2 and gRPC connections across gateway pods.<br />If set to 0 or unspecified, defaults to unlimited.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-requests-per-connection |  | Minimum: 0 <br /> |
+| `maxHeadersCount` _integer_ | MaxHeadersCount sets the maximum number of headers allowed in a request.<br />Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and a<br />stream reset for HTTP/2. If unset, defaults to Envoy's built-in default of 100.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-headers-count |  | Minimum: 1 <br /> |
 | `http2ProtocolOptions` _[ListenerHTTP2ProtocolOptions](#listenerhttp2protocoloptions)_ | Http2ProtocolOptions configures downstream HTTP/2 behavior on the listener's<br />HttpConnectionManager.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http2protocoloptions |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
@@ -1819,6 +1804,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
 | `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for Envoy's OpenTelemetry tracer.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html |  |  |
+| `localReplies` _[LocalReplyConfig](#localreplyconfig)_ | LocalReplies configures how Envoy's local replies are formatted etc. |  |  |
 | `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html |  |  |
 | `useRemoteAddress` _boolean_ | UseRemoteAddress determines whether to use the remote address for the original client.<br />Note: If this field is omitted, it will fallback to the default value of 'true', which we set for all Envoy HCMs.<br />Thus, setting this explicitly to true is unnecessary (but will not cause any harm).<br />When true, Envoy will use the remote address of the connection as the client address.<br />When false, Envoy will use the X-Forwarded-For header to determine the client address. Furthermore, SkipXffAppend will implicitly be set to true unless explicitly configured.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-use-remote-address |  |  |
 | `preserveExternalRequestId` _boolean_ | PreserveExternalRequestId determines whether the connection manager will keep the x-request-id header if passed for<br />a request that is edge (Edge request is the request from external clients to front Envoy) and not reset it, which is the current Envoy behaviour. This defaults to false.<br />See here for more information https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-preserve-external-request-id |  |  |
@@ -1830,6 +1816,7 @@ _Appears in:_
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
 | `maxRequestsPerConnection` _integer_ | MaxRequestsPerConnection sets the maximum number of requests served over a single downstream<br />keepalive connection. When the limit is reached, Envoy closes the connection, which forces<br />clients to reconnect. This allows L4 load balancers like AWS NLB to rebalance long-lived<br />HTTP/2 and gRPC connections across gateway pods.<br />If set to 0 or unspecified, defaults to unlimited.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-requests-per-connection |  | Minimum: 0 <br /> |
+| `maxHeadersCount` _integer_ | MaxHeadersCount sets the maximum number of headers allowed in a request.<br />Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and a<br />stream reset for HTTP/2. If unset, defaults to Envoy's built-in default of 100.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-headers-count |  | Minimum: 1 <br /> |
 | `http2ProtocolOptions` _[ListenerHTTP2ProtocolOptions](#listenerhttp2protocoloptions)_ | Http2ProtocolOptions configures downstream HTTP/2 behavior on the listener's<br />HttpConnectionManager.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http2protocoloptions |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
@@ -2582,6 +2569,44 @@ _Appears in:_
 | `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket represents the configuration for a token bucket local rate-limiting mechanism.<br />It defines the parameters for controlling the rate at which requests are allowed. |  |  |
 | `percentEnabled` _integer_ | PercentEnabled specifies the percentage of requests for which the rate limiter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
 | `percentEnforced` _integer_ | PercentEnforced specifies the percentage of requests for which the rate limiter is enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+
+
+#### LocalReplyConfig
+
+
+
+LocalReplyConfig represents the listener-wide options for local replies returned by Envoy (e.g. errors, direct responses)
+
+
+
+_Appears in:_
+- [HTTPListenerPolicySpec](#httplistenerpolicyspec)
+- [HTTPSettings](#httpsettings)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `defaultBodyFormat` _[BodyFormat](#bodyformat)_ | DefaultBodyFormat is the format to use for local reply bodies if it's not overridden by any mapper.<br />You can use the `%LOCAL_REPLY_BODY%` substitution to insert the original reply such as an error message. |  |  |
+| `mappers` _[LocalReplyMapper](#localreplymapper) array_ | A list of custom options to apply based on filters. This may override the DefaultBodyFormat. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+
+
+#### LocalReplyMapper
+
+
+
+LocalReplyMapper may customize the local reply based on stream, request, and response properties such as status code.
+
+
+
+_Appears in:_
+- [LocalReplyConfig](#localreplyconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `filter` _[AccessLogFilter](#accesslogfilter)_ | A filter that determines if this mapper should apply. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
+| `statusCode` _integer_ | New response status code for the reply if specified. |  | Maximum: 599 <br />Minimum: 100 <br /> |
+| `body` _string_ | New body text for the reply if specified.<br />Available as `%LOCAL_REPLY_BODY%` in substitution strings. |  |  |
+| `bodyFormatOverride` _[BodyFormat](#bodyformat)_ | Alternative body format for the reply if specified. Takes precedence over default body format. |  |  |
+| `headers` _[HTTPHeaderFilter](#httpheaderfilter)_ | Headers to add or set for the reply if specified. |  |  |
 
 
 #### LocalityType
@@ -3897,7 +3922,7 @@ _Appears in:_
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
 | `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | HeaderModifiers defines the policy to modify request and response headers. |  |  |
-| `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honored for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
+| `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honored for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and ListenerSets, and ignored for other targeted kinds. |  |  |
@@ -4153,6 +4178,19 @@ _Underlying type:_ _string_
 
 AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
 
+#### BodyFormat
+
+BodyFormat configures an Envoy response body using formatting. Either JSON or Text must be specified.
+
+**Validation:**
+- ExactlyOneOf=json;text
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `contentType` | *string | ContentType defines the HTTP Content-Type header to be sent with the response. By default, `text/plain` is used for the Text format and `application/json` for the JSON format. Note: This setting does not currently take effect due to a bug in Envoy, a fix for which is pending release. The option is included for completeness and will become effective with a future version of Envoy. |
+| `text` | *string | Text is a format string by which Envoy will format the response body. Mutually exclusive with JSON. See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-text-format for details. |
+| `json` | *apiextensionsv1.JSON | JSON is a format object by which Envoy will produce a JSON response body. Mutually exclusive with Text. See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-json-format for details.  Setting a field to `null` in the JSON object requires the use of `kubectl apply --server-side` or equivalent. With the default client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server. |
+
 #### CELExpression
 
 _Underlying type:_ _string_
@@ -4170,7 +4208,7 @@ ComparisonFilter represents a filter based on a comparison. Based on: https://ww
 | Field | Type | Description |
 |-------|------|-------------|
 | `op` | [Op](#op) | **Required.** |
-| `value` | int32 | Value to compare against. **Required.** |
+| `value` | uint32 | Value to compare against. **Required.** |
 
 #### DenominatorType
 

@@ -12,6 +12,19 @@ import subprocess
 import os
 import re
 import platform
+import shutil
+import stat
+
+
+def safe_rmtree(path):
+    '''Safely remove a directory tree, handling read-only permissions on Windows'''
+    def _remove_readonly(func, p, excinfo):
+        os.chmod(p, stat.S_IWRITE)
+        func(p)
+
+    if os.path.exists(path):
+        shutil.rmtree(path, onerror=_remove_readonly)
+
 
 
 def resolve_tag_for_version(version, link_version):
@@ -79,8 +92,7 @@ def resolve_branch_for_version(version, link_version):
 def clone_repository(ref, kgateway_dir='kgateway'):
     '''Clone the kgateway repository at the specified branch or tag'''
     # Clean up any existing directory
-    if os.path.exists(kgateway_dir):
-        subprocess.run(['rm', '-rf', kgateway_dir], check=True)
+    safe_rmtree(kgateway_dir)
     
     # Clone repository
     if ref == 'main':
@@ -793,7 +805,7 @@ def main():
             print(f'   ⚠ Metrics docs failed: {e}')
         
         # Clean up repository after processing this version
-        subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+        safe_rmtree('kgateway')
         
         print(f'✅ Completed version {version} - generated {success_count}/3 doc types')
     
