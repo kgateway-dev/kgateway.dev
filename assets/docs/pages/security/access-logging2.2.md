@@ -144,7 +144,7 @@ Instead of a JSON format, you can write access logs as a plain string by using t
 Do not use single-quoted strings in the `stringFormat` field. Single-quoted YAML strings do not interpret escape sequences. Because of that, `\n` is stored as the literal characters `\` and `n` instead of a newline. Note that Kubernetes also stores `stringFormat` values with single quotes by default, so adding `\n` via the `kubectl edit` command also does not add a newline. Instead, use a block scalar as shown in the following example, which automatically adds the trailing newline that Envoy requires.
 {{< /callout >}}
 
-The following example uses the folded block scalar (`>`) syntax. The `>` operator converts the line break between the two content lines into a space, so that is produces a single-line string. It also appends a trailing newline, which Envoy requires in the format string.
+The following example uses the folded block scalar (`>`) syntax. The `>` operator converts the line break between the two content lines into a space, so that it produces a single-line string. A trailing newline is also appended, which Envoy requires in the format string.
 
 ```yaml
 kubectl apply -f- <<EOF
