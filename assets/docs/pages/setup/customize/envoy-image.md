@@ -1,20 +1,20 @@
 
-Use this guide to build a custom envoy-wrapper image on top of any upstream Envoy release (for example, to pick up a CVE patch) and point kgateway at it without waiting for an official kgateway release.
+Build a custom `envoy-wrapper` image on top of any upstream Envoy release and use it in your gateway proxies. For example, this process can be useful to apply CVE fixes that were released upstream, but are not yet released in kgateway.  
 
 ## How it works {#how-it-works}
 
-kgateway's data plane isn't a plain Envoy binary. It bundles two extra components on top of upstream Envoy:
+The kgateway data plane isn't a plain Envoy binary. It bundles two extra components on top of upstream Envoy:
 
-- **`envoyinit`**: a Go binary that runs as PID 1, manages the Envoy process lifecycle, and injects bootstrap configuration from xDS.
-- **`librust_module.so`**: a Rust dynamic module that powers kgateway's transformation engine (`rustformation`) and other data-plane features. Envoy loads this `.so` at startup through its Dynamic Modules API.
+- **`envoyinit`**: A Go binary that runs as PID 1, manages the Envoy process lifecycle, and injects bootstrap configuration from xDS.
+- **`librust_module.so`**: A Rust dynamic module that powers kgateway's transformation engine (`rustformation`) and other data-plane features. Envoy loads this `.so` module at startup through its Dynamic Modules API.
 
-Because the Dynamic Modules ABI is tied to a specific Envoy minor version, you can't just swap in a plain upstream Envoy image. The module and the image need to be built together. The `envoy-wrapper-docker` Makefile target handles this: it compiles the Rust module against the Envoy SDK and layers it on top of whatever base image you pass in.
+Because the Dynamic Modules ABI is tied to a specific Envoy minor version, you can't swap in a plain upstream Envoy image. Instead, you must build the module and image together. The `envoy-wrapper-docker` Makefile target handles this: it compiles the Rust module against the Envoy SDK and layers it on top of whatever base image you pass in.
 
 ## Before you begin {#before-you-begin}
 
 - A clone of the `kgateway` repository at the **same version** as the kgateway control plane running in your cluster. The repository version determines which Rust module is compiled, and that module must match your control plane.
-- Docker with [BuildKit / `buildx`](https://docs.docker.com/buildx/working-with-buildx/) support.
-- A container registry that your cluster can pull from.
+- Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/buildx/working-with-buildx/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/). 
+- Set up a container registry that your cluster can pull from and connect to it. 
 - The Rust toolchain is managed automatically by `rustup` using the `rust-toolchain.toml` file in the repository. You don't need to install it yourself.
 
 ## Compatibility {#compatibility}
@@ -37,14 +37,14 @@ export VERSION=v2.3.0-custom
 make envoy-wrapper-docker
 ```
 
-What this does under the hood:
+The command completes the following tasks:
 
-1. Compiles `librust_module.so` from `internal/envoy_modules/` using `cargo-zigbuild`.
-2. Starts a new image `FROM` the upstream Envoy image you picked.
-3. Copies the compiled `.so`, the `envoyinit` binary, and the entrypoint script into it.
-4. Tags the result as `$IMAGE_REGISTRY/envoy-wrapper:$VERSION`.
+1. Builds the Rust dynamic module (`librust_module.so`) from `internal/envoy_modules/` by using `cargo-zigbuild`.
+2. Creates a Dockerfile that sets the `ENVOY_IMAGE` as the base image (`FROM` entry).
+3. Copies the compiled `.so` library, `envoyinit` binary, and entrypoint script to the output directory. 
+4. Builds the image with `docker buildx build` and tags the image as `$IMAGE_REGISTRY/envoy-wrapper:$VERSION`.
 
-By default, the build targets your host machine's architecture. To build for `amd64` explicitly (for example, when running on an arm64 laptop):
+By default, the build targets your host machine's architecture. To build for `amd64` architectures explicitly, such as when running on an `arm64` laptop, set the `GOARCH` environment variable as shown in the following example: 
 
 ```sh
 GOARCH=amd64 ENVOY_IMAGE=... IMAGE_REGISTRY=... VERSION=... make envoy-wrapper-docker
@@ -58,7 +58,7 @@ docker push registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 
 If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
-## Step 3: Create a GatewayParameters resource {#gateway-parameters}
+## Step 3: Customize the Envoy image {#envoy-image}
 
 Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that points `spec.kube.envoyContainer.image` to your custom wrapper image.
 
@@ -121,7 +121,7 @@ When kgateway reconciles this Gateway, it creates a proxy Deployment with the cu
 
 ## Apply to all gateways by default {#default}
 
-If you want every Gateway that uses the `kgateway` GatewayClass to pick up the custom image (instead of referencing the {{< reuse "docs/snippets/gatewayparameters.md" >}} per Gateway), you can point the GatewayClass at it with the `gatewayClassParametersRefs` Helm value.
+Instead of referencing the same {{< reuse "docs/snippets/gatewayparameters.md" >}} resource in each Gateway, you can configure the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass with your custom Envoy image by using the `gatewayClassParametersRefs.kgateway` Helm value. This way, all gateway proxies that use this GatewayClass are automatically deployed with the custom Envoy image. 
 
 ```yaml
 # values.yaml
@@ -148,9 +148,8 @@ kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networ
   -o jsonpath='{.items[0].spec.containers[0].image}'
 ```
 
-You should see your custom image:
+Example output:
 
-```
 registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 ```
 
