@@ -1,6 +1,6 @@
 ---
 title: Use a custom Envoy image
-weight: 35
+weight: 10
 description: Build a custom envoy-wrapper image on top of any upstream Envoy release and point kgateway at it, without waiting for an official kgateway release.
 ---
 

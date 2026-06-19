@@ -1,5 +1,5 @@
 
-Build a custom `envoy-wrapper` image on top of any upstream Envoy release and use it in your gateway proxies. For example, this process can be useful to apply CVE fixes that were released upstream, but are not yet released in kgateway.  
+Build a custom `envoy-wrapper` image on top of any upstream Envoy release and use it in your gateway proxies. For example, this process can be useful to apply CVE fixes that were released upstream, but aren't yet released in kgateway.
 
 ## How it works {#how-it-works}
 
@@ -10,13 +10,6 @@ The kgateway data plane isn't a plain Envoy binary. It bundles two extra compone
 
 Because the Dynamic Modules ABI is tied to a specific Envoy minor version, you can't swap in a plain upstream Envoy image. Instead, you must build the module and image together. The `envoy-wrapper-docker` Makefile target handles this: it compiles the Rust module against the Envoy SDK and layers it on top of whatever base image you pass in.
 
-## Before you begin {#before-you-begin}
-
-- A clone of the `kgateway` repository at the **same version** as the kgateway control plane running in your cluster. The repository version determines which Rust module is compiled, and that module must match your control plane.
-- Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/buildx/working-with-buildx/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/). 
-- Set up a container registry that your cluster can pull from and connect to it. 
-- The Rust toolchain is managed automatically by `rustup` using the `rust-toolchain.toml` file in the repository. You don't need to install it yourself.
-
 ## Compatibility {#compatibility}
 
 The Rust dynamic module is compiled against the `envoy-proxy-dynamic-modules-rust-sdk`, which is pinned to the same Envoy version that kgateway targets in a given release. This means:
@@ -26,37 +19,79 @@ The Rust dynamic module is compiled against the `envoy-proxy-dynamic-modules-rus
 
 If you are unsure which Envoy minor version your kgateway release targets, check the `ENVOY_IMAGE` variable at the top of the project `Makefile`.
 
+## Before you begin {#before-you-begin}
+
+1. Clone the `kgateway` repository at the **same version** as the kgateway control plane running in your cluster. For example, if your cluster runs kgateway `v2.3.0`, check out the `v2.3.0` tag. The Rust module gets compiled from that checkout, so the versions need to line up.
+
+   ```sh
+   git clone https://github.com/kgateway-dev/kgateway.git
+   cd kgateway
+   git checkout v2.3.0
+   ```
+
+2. Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/buildx/working-with-buildx/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/).
+
+3. Set up a container registry that your cluster can pull from and connect to it. If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "docs/snippets/gatewayparameters.md" >}}.
+
+4. Install `rustup`, the Rust toolchain installer. The correct Rust version is then picked up automatically from the `rust-toolchain.toml` file in the repository.
+
+   ```sh
+   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+   ```
+
 ## Step 1: Build the wrapper image {#build}
 
-From the root of your kgateway clone, run `make envoy-wrapper-docker` with the upstream Envoy image you want and the output registry you control.
+Set the following environment variables, then run the build target.
 
-```sh
-export ENVOY_IMAGE=docker.io/envoyproxy/envoy:v1.37.3
-export IMAGE_REGISTRY=registry.example.com/myorg
-export VERSION=v2.3.0-custom
-make envoy-wrapper-docker
-```
+- `ENVOY_IMAGE`: The upstream Envoy image that you want to use as the base image.
+- `IMAGE_REGISTRY`: Your container registry path. This is where the built `envoy-wrapper` image gets pushed.
+- `VERSION`: The image version tag for your custom image, such as `v2.3.0-custom`. This tag is used to name the output image as `$IMAGE_REGISTRY/envoy-wrapper:$VERSION`.
 
-The command completes the following tasks:
+1. Set the environment variables.
 
-1. Builds the Rust dynamic module (`librust_module.so`) from `internal/envoy_modules/` by using `cargo-zigbuild`.
-2. Creates a Dockerfile that sets the `ENVOY_IMAGE` as the base image (`FROM` entry).
-3. Copies the compiled `.so` library, `envoyinit` binary, and entrypoint script to the output directory. 
-4. Builds the image with `docker buildx build` and tags the image as `$IMAGE_REGISTRY/envoy-wrapper:$VERSION`.
+   ```sh
+   export ENVOY_IMAGE=docker.io/envoyproxy/envoy:v1.37.3
+   export IMAGE_REGISTRY=registry.example.com/myorg
+   export VERSION=v2.3.0-custom
+   ```
 
-By default, the build targets your host machine's architecture. To build for `amd64` architectures explicitly, such as when running on an `arm64` laptop, set the `GOARCH` environment variable as shown in the following example: 
+2. Build the custom image.
 
-```sh
-GOARCH=amd64 ENVOY_IMAGE=... IMAGE_REGISTRY=... VERSION=... make envoy-wrapper-docker
-```
+   ```sh
+   make envoy-wrapper-docker
+   ```
+
+   Under the hood, this:
+
+   1. Builds the Rust dynamic module (`librust_module.so`) from `internal/envoy_modules/` by using `cargo-zigbuild`.
+   2. Creates a Dockerfile that sets the `ENVOY_IMAGE` as the base image (`FROM` entry).
+   3. Copies the compiled `.so` library, `envoyinit` binary, and entrypoint script to the output directory.
+   4. Builds the image with `docker buildx build` and tags the image as `$IMAGE_REGISTRY/envoy-wrapper:$VERSION`.
+
+   By default, the build targets your host architecture. If you're on an `arm64` machine but need an `amd64` image, set `GOARCH` explicitly:
+
+   ```sh
+   GOARCH=amd64 ENVOY_IMAGE=... IMAGE_REGISTRY=... VERSION=... make envoy-wrapper-docker
+   ```
+
+3. Verify the image is available locally.
+
+   ```sh
+   docker images registry.example.com/myorg/envoy-wrapper
+   ```
+
+   Example output:
+
+   ```
+   REPOSITORY                               TAG            IMAGE ID       CREATED         SIZE
+   registry.example.com/myorg/envoy-wrapper v2.3.0-custom  d3f1a2b3c4e5   1 minute ago    200MB
+   ```
 
 ## Step 2: Push the image {#push}
 
 ```sh
 docker push registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 ```
-
-If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
 ## Step 3: Customize the Envoy image {#envoy-image}
 
@@ -121,23 +156,30 @@ When kgateway reconciles this Gateway, it creates a proxy Deployment with the cu
 
 ## Apply to all gateways by default {#default}
 
-Instead of referencing the same {{< reuse "docs/snippets/gatewayparameters.md" >}} resource in each Gateway, you can configure the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass with your custom Envoy image by using the `gatewayClassParametersRefs.kgateway` Helm value. This way, all gateway proxies that use this GatewayClass are automatically deployed with the custom Envoy image. 
+If you want every Gateway using the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass to pick up your custom image automatically, set the `gatewayClassParametersRefs.kgateway` Helm value instead of attaching the {{< reuse "docs/snippets/gatewayparameters.md" >}} to each Gateway individually.
 
-```yaml
-# values.yaml
-gatewayClassParametersRefs:
-  kgateway:
-    name: custom-envoy-image
-    namespace: {{< reuse "docs/snippets/namespace.md" >}}
-```
+1. Get the current Helm values for your kgateway installation.
 
-Then upgrade your kgateway installation with this values file:
+   ```sh
+   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   ```
 
-```sh
-helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-  oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-  -f values.yaml
-```
+2. Configure the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass with the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created earlier. Add the following to your `values.yaml` file.
+
+   ```yaml
+   gatewayClassParametersRefs:
+     kgateway:
+       name: custom-envoy-image
+       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+   ```
+
+3. Upgrade your kgateway installation with the updated values.
+
+   ```sh
+   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+     -f values.yaml
+   ```
 
 ## Verify {#verify}
 
@@ -150,6 +192,7 @@ kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networ
 
 Example output:
 
+```
 registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 ```
 
