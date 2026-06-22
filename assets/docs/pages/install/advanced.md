@@ -144,4 +144,57 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
+{{< version exclude-if="2.2.x,2.1.x,2.0.x">}}
 
+## ReferenceGrant enforcement modes
+
+The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted. {{< reuse "docs/snippets/kgateway.md" >}} supports three enforcement modes that you set with the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane, such as with the following example.
+
+```yaml
+
+controller:
+  extraEnv:
+    KGW_REFERENCE_GRANT_MODE: "PERMISSIVE"
+```
+
+The default mode is `PERMISSIVE` so that GatewayExtensions such as for external auth are permitted out of the box. The following table describes the three modes.
+
+| Mode | Behavior |
+|------|----------|
+| `OFF` | Disables all ReferenceGrant validation and permits unrestricted cross-namespace references. |
+| `PERMISSIVE` (default) | Enforces ReferenceGrant for `BackendRef` and `SecretRef` cross-namespace references. Cross-namespace `ExtensionRef` references (such as a TrafficPolicy that references a GatewayExtension) are not checked and are always permitted. |
+| `STRICT` | Enforces ReferenceGrant for all cross-namespace references, including `ExtensionRef`. References that are missing a grant are rejected, and the referencing policy reports a `RouteRuleReplaced` condition. |
+
+The following table shows which reference types are checked in each mode. Same-namespace references always pass, regardless of the mode.
+
+| Reference | From | To | `OFF` | `PERMISSIVE` | `STRICT` |
+|-----------|------|----|-------|--------------|----------|
+| `BackendRef` | HTTPRoute / GRPCRoute | Service / Backend | allowed | checked | checked |
+| `SecretRef` | TrafficPolicy (BasicAuth, APIKeyAuth) | Secret | allowed | checked | checked |
+| `BackendRef` | GatewayExtension (ExtAuth, ExtProc, RateLimit, OAuth2) | Service | allowed | checked | checked |
+| `ExtensionRef` | TrafficPolicy | GatewayExtension (same namespace) | allowed | allowed | allowed |
+| `ExtensionRef` | TrafficPolicy | GatewayExtension (cross namespace) | allowed | allowed | checked |
+
+{{< callout type="warning" >}}
+Avoid `OFF` mode in multi-tenant or production environments. It breaks Gateway API compliance, bypasses namespace isolation, and can allow any namespace to access backends, secrets, and GatewayExtensions in other namespaces, which introduces secret exfiltration risks.
+{{< /callout >}}
+
+`STRICT` mode closes a transitive exposure gap: a TrafficPolicy that references a GatewayExtension gains indirect access to that extension's secrets. To allow a cross-namespace `ExtensionRef` in `STRICT` mode, create a ReferenceGrant in the target namespace. For example, the following ReferenceGrant permits a TrafficPolicy in the `app` namespace to reference a GatewayExtension in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-trafficpolicy-to-gwext
+  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+spec:
+  from:
+    - group: gateway.kgateway.dev
+      kind: TrafficPolicy
+      namespace: app
+  to:
+    - group: gateway.kgateway.dev
+      kind: GatewayExtension
+```
+
+{{< /version >}}
