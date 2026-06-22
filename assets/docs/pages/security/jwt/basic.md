@@ -93,8 +93,8 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
    <!-- Example token generated from https://jwt.io using RS256 with the following payload:
 {
-  "iss": "solo.io",
-  "org": "solo.io",
+  "iss": "kgateway.dev",
+  "org": "kgateway.dev",
   "sub": "alice",
   "team": "dev",
   "exp": 2074274884,
@@ -109,7 +109,7 @@ To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"solo
 -->
 
    ```sh
-   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InNvbG8tcHVibGljLWtleS0wMDEifQ.eyJpc3MiOiJzb2xvLmlvIiwib3JnIjoic29sby5pbyIsInN1YiI6ImFsaWNlIiwidGVhbSI6ImRldiIsImV4cCI6MjA3NDI3NDg4NCwibGxtcyI6eyJvcGVuYWkiOlsiZ3B0LTMuNS10dXJibyJdfX0.MGcAqMaOw_XSnBBFJ182BpARgeA00dL6FFpCPbHJzy9UqdHh7AhWXOmh4pMLW53tBpaVE1lQu7HvGKMFbs_w2ymOpEBw8mWn5rgLw1vxbumOpBrhoPTF7avgBRwZezBhY9YI4kYB6_pJp7UpS299mLTq5ANw78N-BGgLDf3Ahfg7QlPLU2X7h2vEUR5D7yOgBZ-JcPb_elqir8aRvfWo8BXZijHYtHG2tRO7aWuo5o4SmfpnBCq50NUWcrIyoKCkQdSvvvbJyYevoa84glI_HU_zA5lRLQBlaN1pXAGJET0LogrohpTcbKgTuJttVbn-8nSAeS4p7zrtUBXpC2fSpg
+   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InNvbG8tcHVibGljLWtleS0wMDEifQ.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.n72yyMjx-eH0jwgQlrlzJClQvDhv6Guz_w-J4tKg1ehtpA962jEMSoSWHMqp-Uhcurxr-sCGmDl1VYOFvRBJUilJXNfaTj4MtavBjTyL2Ph8WWyh-557qwKfqs-cf99pRSG0ZJd2Ap9Gnzgq5zEfBfJH07foWHzD_fQyjrUNeQ5A2oUTRsqe18UgOzYTT_1dM2O0W5BO3yJZjB2gnF-lDhy_KTGF8JyggYRen38cUDJjl_x_-1QtFevec3G5pzelEhIB_qkUOcH2ndd-IwlctTTFDi86E3FU0MyYvJaJC1o5eiwWRzo08axkj72OYeRTC3Au8OkfzUcehoFdyYrf9Q
    ```
 
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
