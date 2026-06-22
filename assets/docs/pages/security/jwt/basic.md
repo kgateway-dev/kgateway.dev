@@ -279,6 +279,29 @@ spec:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
 ```
+Send a request without a token to verify the behavior:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
 
 **AllowMissing**: Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through. For an example, see [Restrict access based on claims](../claim-based-rbac/).
 
@@ -299,6 +322,26 @@ spec:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
+```
+Send a request without a token to verify the behavior:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```
+< HTTP/1.1 200 OK
 ```
 
 ### Configure audiences {#audiences}
@@ -327,6 +370,31 @@ spec:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
+```
+Send a request with the sample token to verify audience enforcement:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```
+< HTTP/1.1 401 Unauthorized
+Jwt validation failed: audience mismatch
 ```
 
 ### Customize token source {#token-source}
@@ -358,6 +426,30 @@ spec:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
 ```
+Send a request with the token in the `x-jwt` header:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  -H "x-jwt: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  -H "x-jwt: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```
+< HTTP/1.1 200 OK
+```
 
 ### Forward tokens upstream {#forward-token}
 
@@ -380,6 +472,37 @@ spec:
           local:
             inline: '{"keys":[{"kty":"RSA","kid":"solo-public-key-001","use":"sig","alg":"RS256","n":"AOfIaJMUm7564sWWNHaXt_hS8H0O1Ew59-nRqruMQosfQqa7tWne5lL3m9sMAkfa3Twx0LMN_7QqRDoztvV3Wa_JwbMzb9afWE-IfKIuDqkvog6s-xGIFNhtDGBTuL8YAQYtwCF7l49SMv-GqyLe-nO9yJW-6wIGoOqImZrCxjxXFzF6mTMOBpIODFj0LUZ54QQuDcD1Nue2LMLsUvGa7V1ZHsYuGvUqzvXFBXMmMS2OzGir9ckpUhrUeHDCGFpEM4IQnu-9U8TbAJxKE5Zp8Nikefr2ISIG2Hk1K2rBAc_HwoPeWAcAWUAR5tWHAxx-UXClSZQ9TMFK850gQGenUp8","e":"AQAB"}]}'
 EOF
+```
+Send a request with the token to verify it is forwarded to the upstream:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```json
+{
+  "headers": {
+    ...
+    "Authorization": [
+      "Bearer eyJhbGciOiJSUzI1NiIs..."
+    ]
+  }
+}
 ```
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
