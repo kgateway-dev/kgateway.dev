@@ -1350,7 +1350,7 @@ _Appears in:_
 | `delay` _[FaultDelay](#faultdelay)_ | Delay injects latency into requests before forwarding upstream. |  |  |
 | `abort` _[FaultAbort](#faultabort)_ | Abort injects HTTP or gRPC errors to terminate requests early. |  |  |
 | `responseRateLimit` _[FaultResponseRateLimit](#faultresponseratelimit)_ | ResponseRateLimit limits the response body data rate to simulate<br />slow or degraded upstream connections. |  |  |
-| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
+| `maxActiveFaults` _[uint32](#uint32)_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the fault injection filter.<br />Can be used to disable fault injection policies applied at a higher level<br />in the config hierarchy. |  |  |
 
 
@@ -2449,6 +2449,7 @@ _Appears in:_
 | `maglev` _[LoadBalancerMaglevConfig](#loadbalancermaglevconfig)_ | Maglev configures the maglev load balancer type. |  |  |
 | `random` _[LoadBalancerRandomConfig](#loadbalancerrandomconfig)_ | Random configures the random load balancer type. |  |  |
 | `localityType` _[LocalityType](#localitytype)_ | LocalityType specifies the locality config type to use.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/common/v3/common.proto#envoy-v3-api-msg-extensions-load-balancing-policies-common-v3-localitylbconfig |  | Enum: [WeightedLb] <br /> |
+| `zoneAware` _[ZoneAwareLoadBalancer](#zoneawareloadbalancer)_ | ZoneAware configures zone-aware routing behavior for the load balancer.<br />When enabled, traffic is preferentially routed to endpoints in the same<br />availability zone as the Envoy proxy.<br />This is mutually exclusive with localityType. |  |  |
 | `closeConnectionsOnHostSetChange` _boolean_ | If set to true, the load balancer will drain connections when the host set changes.<br /><br />Ring Hash or Maglev can be used to ensure that clients with the same key<br />are routed to the same upstream host.<br />Distruptions can cause new connections with the same key as existing connections<br />to be routed to different hosts.<br />Enabling this feature will cause the load balancer to drain existing connections<br />when the host set changes, ensuring that new connections with the same key are<br />consistently routed to the same host.<br />Connections are not immediately closed, but are allowed to drain<br />before being closed. |  |  |
 
 
@@ -2603,7 +2604,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `filter` _[AccessLogFilter](#accesslogfilter)_ | A filter that determines if this mapper should apply. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
-| `statusCode` _integer_ | New response status code for the reply if specified. |  | Maximum: 599 <br />Minimum: 100 <br /> |
+| `statusCode` _[uint32](#uint32)_ | New response status code for the reply if specified. |  | Maximum: 599 <br />Minimum: 100 <br /> |
 | `body` _string_ | New body text for the reply if specified.<br />Available as `%LOCAL_REPLY_BODY%` in substitution strings. |  |  |
 | `bodyFormatOverride` _[BodyFormat](#bodyformat)_ | Alternative body format for the reply if specified. Takes precedence over default body format. |  |  |
 | `headers` _[HTTPHeaderFilter](#httpheaderfilter)_ | Headers to add or set for the reply if specified. |  |  |
@@ -4079,6 +4080,59 @@ _Appears in:_
 | --- | --- |
 | `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
 | `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-03.html).<br /> |
+
+
+#### ZoneAwareForce
+
+
+
+ZoneAwareForce configures Envoy forceLocalZone behavior.
+
+
+
+_Appears in:_
+- [ZoneAwarePreferLocal](#zoneawarepreferlocal)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `minEndpointsInZoneThreshold` _[uint32](#uint32)_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Minimum: 1 <br /> |
+
+
+#### ZoneAwareLoadBalancer
+
+
+
+ZoneAwareLoadBalancer configures zone-aware routing behavior.
+Currently, preferLocal must be specified.
+
+
+
+_Appears in:_
+- [LoadBalancer](#loadbalancer)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `preferLocal` _[ZoneAwarePreferLocal](#zoneawarepreferlocal)_ | PreferLocal enables Envoy's zone-aware routing which prefers sending traffic<br />to local zone endpoints while maintaining overall traffic balance across zones.<br />This requires the Envoy proxy to be aware of its own zone, which can be configured<br />via the KGATEWAY_NODE_ZONE environment variable on the proxy pod.<br />See https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/zone_aware |  |  |
+
+
+#### ZoneAwarePreferLocal
+
+
+
+ZoneAwarePreferLocal configures Envoy's native zone-aware routing.
+Envoy will prefer sending traffic to endpoints in the same zone as the proxy,
+while still maintaining rough request balance across all upstream hosts.
+
+
+
+_Appears in:_
+- [ZoneAwareLoadBalancer](#zoneawareloadbalancer)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `force` _[ZoneAwareForce](#zoneawareforce)_ | Force enables Envoy forced zone-local routing. Envoy routes to same-zone<br />endpoints while the local endpoint threshold is met. If there are not enough<br />local endpoints, traffic falls back to standard zone-aware routing behavior. |  |  |
+| `minEndpointsThreshold` _integer_ | MinEndpointsThreshold is the minimum number of total endpoints in the cluster<br />that must exist for zone-aware routing to be enabled. If the total number<br />of endpoints is below this threshold, zone-aware routing is disabled.<br />This maps to Envoy's min_cluster_size setting.<br />Defaults to 6. | 6 | Minimum: 1 <br /> |
+| `routingEnabled` _integer_ | RoutingEnabled is the percentage of requests for which Envoy applies<br />zone-aware routing once the minEndpointsThreshold is met.<br />Defaults to 100. | 100 | Maximum: 100 <br />Minimum: 0 <br /> |
 
 
 
