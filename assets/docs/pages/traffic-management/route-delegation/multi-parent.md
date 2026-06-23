@@ -146,13 +146,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 6. Send a request to the `delegation-parent1.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo -H "host: delegation-parent1.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo -H "host: delegation-parent1.example"
    ```
@@ -172,13 +172,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 7. Send another request to the `delegation-parent1.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar -H "host: delegation-parent1.example"
    ```
@@ -198,13 +198,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
 
 8. Now, send a request to the `delegation-parent2.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo -H "host: delegation-parent2.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo -H "host: delegation-parent2.example"
    ```
@@ -224,13 +224,13 @@ In this guide you walk through a route delegation example that demonstrates rout
    ```
    
 9. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the route is considered invalid and replaced with a 500 HTTP direct response. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar -H "host: delegation-parent2.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar  -H "host: delegation-parent2.example"
    ```

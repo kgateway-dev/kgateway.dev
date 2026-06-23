@@ -50,13 +50,13 @@ Add headers to incoming requests before they are sent back to the client. If the
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -128,13 +128,13 @@ Setting headers is similar to adding headers. If the response does not include t
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-response: custom` header was set. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -168,13 +168,13 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
 You can remove HTTP headers from a response before the response is sent back to the client. 
 
 1. Send a request to the httpbin app and find the `content-length` header. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: www.example.com"
 ```
@@ -236,13 +236,13 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```

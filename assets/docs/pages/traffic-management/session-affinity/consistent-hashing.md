@@ -29,8 +29,8 @@ See the following links to get started:
 Ringhash allows you to tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup. To learn more about Ringhash, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html). 
 
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
-   {{< tabs tabTotal="3" items="Headers,Cookies,Source IP address" >}}
-   {{% tab tabName="Headers" %}}
+   {{< tabs >}}
+   {{% tab name="Headers" %}}
 
    Create a consistent hash by using a specific request header.
 
@@ -75,7 +75,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
 
    {{% /tab %}}
-   {{% tab tabName="Cookies" %}}
+   {{% tab name="Cookies" %}}
 
    Create a consistent hash by using a cookie. 
 
@@ -121,7 +121,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
 
    {{% /tab %}}
-   {{% tab tabName="Source IP" %}}
+   {{% tab name="Source IP address" %}}
 
    Create a consistent hash by using the source IP address. 
 
@@ -166,8 +166,8 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 With Maglev, you use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
 
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
-   {{< tabs items="Headers,Cookies,Source IP address" tabTotal="3" >}}
-   {{% tab tabName="Headers"  %}}
+   {{< tabs >}}
+   {{% tab name="Headers" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -205,7 +205,7 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
 
    {{% /tab %}}
-   {{% tab tabName="Cookies" %}}
+   {{% tab name="Cookies" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -244,7 +244,7 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
    {{% /tab %}}
-   {{% tab tabName="Source IP" %}}
+   {{% tab name="Source IP address" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -299,8 +299,8 @@ Send a few requests to the httpbin app and verify that the request is served by 
    ```
 
 3. Test consistent hashing by sending multiple requests to the httpbin app and verifying that all requests are served by the same backend instance. Note that the verification steps vary depending on the hashing policy that you defined. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    
    * **Headers**: 
      ```sh
@@ -334,7 +334,7 @@ Send a few requests to the httpbin app and verify that the request is served by 
         -H "host: www.example.com"; done
         ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
   
    * **Headers**
      ```sh

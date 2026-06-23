@@ -151,14 +151,14 @@ The following image illustrates the route delegation hierarchy:
    ```
       
 4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path with the `header1=val1` request header and the `query1=val1` query parameter. Verify that you get back a 404 HTTP response code. Although you included the header and query parameters that are defined on the parent HTTPRoute resource, the headers and query parameters that the child HTTPRoute resource matches on are missing in your request.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1" \
    -H "host: delegation.example" -H "header1: val1"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team1/foo?query1=val1" \
    -H "host: delegation.example" -H "header1: val1"
@@ -175,14 +175,14 @@ The following image illustrates the route delegation hierarchy:
    ```
    
 5. Send another request to the `delegation.example` domain along the `/anything/team1/foo` path. This time, you include all of the header and query parameters that the parent and child HTTPRoute resources defined. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo?query1=val1&queryX=valX" \
    -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team1/foo?query1=val1&queryX=valX" \
    -H "host: delegation.example" -H "header1: val1" -H "headerX: valX"
@@ -203,14 +203,14 @@ The following image illustrates the route delegation hierarchy:
    ```
 
 6. Send another request to the `delegation.example` domain along the `/anything/team2/bar` path that is configured on the `child-team2` HTTPRoute resource and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that you get back a 500 HTTP response code. Because the `child-team2` HTTPRoute resource does not specify the same header and query matchers as the parent HTTPRoute resource, the routing configuration is considered invalid. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
@@ -266,14 +266,14 @@ Instead of requiring the child HTTPRoutes to define the same matchers, headers, 
    ```
 
 2. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path and include all of the header and query parameters that are defined on the parent and child HTTPRoute resources. Verify that this time, you get back a 200 HTTP response code, because `child-team2` inherited the matchers, headers, and query parameters from the `parent`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i "http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example" -H "headerX: valX" -H "header2: val2"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i "localhost:8080/anything/team2/bar?queryX=valX&query2=val2" \
    -H "host: delegation.example:8080" -H "headerX: valX" -H "header2: val2"

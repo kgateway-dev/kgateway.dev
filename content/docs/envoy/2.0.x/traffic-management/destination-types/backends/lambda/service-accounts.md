@@ -278,14 +278,14 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    ```
 
 3. Get the external address of the gateway and save it in an environment variable.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "/docs/snippets/namespace.md" >}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "/docs/snippets/namespace.md" >}} 8080:8080
    ```
@@ -294,13 +294,13 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
 
 4. Confirm that {{< reuse "/docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function. Note that the first request might take a few seconds to process, because the AWS Security Token Service (STS) credential request must be performed first. However, after the credentials are cached, subsequent requests are processed more quickly.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl $INGRESS_GW_ADDRESS:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl localhost:8080/echo -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```

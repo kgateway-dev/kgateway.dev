@@ -32,13 +32,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 4. Send a request to the httpbin app on the `host.redirect.example` domain and verify that you get back a 302 HTTP response code and the redirect location `www.example.com/headers`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: host.redirect.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: host.redirect.example"
    ```

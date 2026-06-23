@@ -14,13 +14,13 @@ As part of the default control plane installation, you enable the Envoy-based {{
 Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm.
 
 1. Install the custom resources of the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version {{< reuse "docs/versions/k8s-gw-version.md" >}}.
-   {{< tabs items="Standard, Experimental" tabTotal="2" >}}
-   {{% tab tabName="Standard" %}}
+   {{< tabs >}}
+   {{% tab name="Standard" %}}
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
    {{% /tab %}}
-   {{% tab tabName="Experimental" %}}
+   {{% tab name="Experimental" %}}
    CRDs in the experimental channel are required to use some experimental features in the Gateway API. Guides that require experimental CRDs note this requirement in their prerequisites.
    ```sh
    kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
@@ -65,22 +65,22 @@ Install the {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using He
       
    2. Install {{< reuse "/docs/snippets/kgateway.md" >}} control plane by using Helm. If you modified the `values.yaml` file with custom installation values, add the `-f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` flag.
       
-      {{< tabs tabTotal="3" items="Basic installation,Custom values file,Development" >}}
-{{% tab tabName="Basic installation" %}}
+      {{< tabs >}}
+{{% tab name="Basic installation" %}}
 {{< version exclude-if="2.0.x,2.1.x" >}}Note: Experimental Gateway API features such as TCPRoutes are enabled by default in kgateway 2.2 and later. For more information, see [Experimental Gateway API features](../advanced/#experimental-gateway-api-features).{{< /version >}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}}
 ```
 {{% /tab %}}
-{{% tab tabName="Custom values" %}}
+{{% tab name="Custom values file" %}}
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
 -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
 ```
 {{% /tab %}}
-{{% tab tabName="Development" %}}
+{{% tab name="Development" %}}
 When using the development build v{{< reuse "docs/versions/patch-dev.md" >}}, add the `--set controller.image.pullPolicy=Always` option to ensure you get the latest image. Alternatively, you can specify the exact image digest.
 ```sh
 helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \

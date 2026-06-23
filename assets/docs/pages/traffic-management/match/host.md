@@ -31,13 +31,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
    
 2. Send a request to the `/status/200` path of the httpbin app on the `host1.example` domain. Verify that you get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: host1.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: host1.example"
    ```
@@ -62,13 +62,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send another request to the httpbin app. This time, you send it along the `host2.example` domain. Verify that the request succeeds and that you also get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: host2.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: host2.example"
    ```

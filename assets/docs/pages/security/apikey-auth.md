@@ -102,13 +102,13 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
 
 5. Send a request to the httpbin app without an API key. Verify that the request fails with a 401 HTTP response code. 
    
-   {{< tabs tabTotal= "2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"                                  
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "localhost:8080/headers" -H "host: www.example.com" 
    ```
@@ -126,15 +126,15 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
    ```
 
 6. Repeat the request. This time, you provide a valid API key in the `Authorization` header. Verify that the request now succeeds. 
-   {{< tabs tabTotal= "2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "${INGRESS_GW_ADDRESS}:8080/headers" \
    -H "host: www.example.com" \
    -H "api-key: Bearer N2YwMDIxZTEtNGUzNS1jNzgzLTRkYjAtYjE2YzRkZGVmNjcy"                                 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "localhost:8080/headers" \
    -H "host: www.example.com" \

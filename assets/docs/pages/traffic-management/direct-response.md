@@ -82,14 +82,14 @@ The following rules are applied during schema validation:
    ```
    
 3. Send a request to the httpbin app along the `/status/200` path on the `direct-response.com` domain. Verify that your request succeeds and that you get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 \
    -H "host: direct-response.com:8080"
@@ -117,14 +117,14 @@ The following rules are applied during schema validation:
    ```
    
 4. Send another request along the `/direct-response` path. Verify that you get back the direct response message that you defined in the DirectResponse resource. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/direct-response \
    -H "host: direct-response.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/direct-response \
    -H "host: direct-response.com:8080"

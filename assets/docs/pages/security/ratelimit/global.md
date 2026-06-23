@@ -223,9 +223,9 @@ Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`,
 
 Flip through the tabs for different example rate limit policies. Note that the examples apply to the Gateway that you created before you began, but you can also apply a {{< reuse "docs/snippets/trafficpolicy.md" >}} to an HTTPRoute or specific route.
 
-{{< tabs tabTotal="5" items="Client IP address, Request path, User ID, Nested global rate limits, Local and global rate limits" >}}
+{{< tabs >}}
 
-{{% tab tabName="Client IP address" %}}
+{{% tab name="Client IP address" %}}
 
 Limit requests based on the client's IP address.
 
@@ -253,7 +253,7 @@ EOF
 
 {{% /tab %}}
 
-{{% tab tabName="Request path" %}}
+{{% tab name="Request path" %}}
 
 Limit requests based on the request path, such as a request with `/path1` or `/path2` in the path as defined in the example Rate Limit Service actions.
 
@@ -281,7 +281,7 @@ EOF
 
 {{% /tab %}}
 
-{{% tab tabName="User ID" %}}
+{{% tab name="User ID" %}}
 
 Limit requests based on a user ID from an `X-User-ID` header.
 
@@ -310,7 +310,7 @@ EOF
 
 {{% /tab %}}
 
-{{% tab tabName="Nested global rate limits" %}}
+{{% tab name="Nested global rate limits" %}}
 
 Apply different limits based on both path and user ID. The following example requires nested descriptors to rate limit requests along the path and header.
 
@@ -356,7 +356,7 @@ descriptors:
 
 {{% /tab %}}
 
-{{% tab tabName="Local and global rate limits" %}}
+{{% tab name="Local and global rate limits" %}}
 
 Combine local and global rate limiting in the same {{< reuse "docs/snippets/trafficpolicy.md" >}} such as in the following example. For more information, see [Local rate limiting](../local).
 
@@ -402,13 +402,13 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
 
 1. Send a test request to the httpbin sample app. The request succeeds because you did not exceed the rate limit of 1 request per minute.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -424,13 +424,13 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
 
 2. Repeat the request. The request fails because you exceeded the rate limit of 1 request per minute.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```

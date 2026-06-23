@@ -58,13 +58,13 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 3. Send a request to your Backend and verify that you get back a 200 HTTP response code and a list of posts. 
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/posts -H "host: static.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/posts -H "host: static.example:8080" 
    ```
@@ -171,8 +171,8 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    If you generated a self-signed certificate when setting up the HTTPS listener, make sure the certificate contains Subject Alternative Name (SAN) entries for the hostname you configured (for example, both `example.com` and `*.example.com` for wildcard coverage) and install the root certificate into your local trust store of your system or pass it to your client. For example, for a `curl` client, add the `--cacert example_certs/root.crt` option (update the path to match where you stored the certificate).
    {{< /callout >}}
 
-   {{< tabs tabTotal="2" items="BackendConfigPolicy, BackendTLSPolicy" >}}
-   {{% tab tabName="BackendConfigPolicy" %}}
+   {{< tabs >}}
+   {{% tab name="BackendConfigPolicy" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -190,7 +190,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="BackendTLSPolicy" %}}
+   {{% tab name="BackendTLSPolicy" %}}
    Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f - <<EOF
@@ -213,13 +213,13 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 5. Send a request to your Backend and verify that you get back a 200 HTTP response code and a list of posts. Note that you can remove the `--cacert example_certs/root.crt` if you stored the certificates in the local trust store of your system.
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi --cacert example_certs/root.crt --resolve "static.example.com:443:${INGRESS_GW_ADDRESS}" https://static.example.com:443/posts
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi --cacert example_certs/root.crt --connect-to static.example.com:443:localhost:8443 https://static.example.com:443/posts
    ```
@@ -328,14 +328,14 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs tabTotal="2" items="HTTP,HTTPS">}}
-{{% tab tabName="HTTP" %}}
+{{< tabs >}}
+{{% tab name="HTTP" %}}
 ```sh
 kubectl delete httproute static-backend
 kubectl delete backend json-backend
 ```
 {{% /tab %}}
-{{% tab tabName="HTTPS" %}}
+{{% tab name="HTTPS" %}}
 ```sh
 kubectl delete httproute static-backend
 kubectl delete backendconfigpolicy static-tls-policy

@@ -220,15 +220,15 @@ By default, creating multiple {{< reuse "docs/snippets/trafficpolicy.md" >}} res
 
 10. Send a request to the `/headers` path. The ExtProc server is invoked twice. Verify that you see the `x-extproc-processed: true` header in your response.
 
-    {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
+    {{< tabs >}}
 
-    {{% tab tabName="Cloud Provider LoadBalancer" %}}
+    {{% tab name="Cloud Provider LoadBalancer" %}}
     ```sh
     curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: extproc.example"
     ```
     {{% /tab %}}
 
-    {{% tab tabName="Port-forward for local testing" %}}
+    {{% tab name="Port-forward for local testing" %}}
     ```sh
     curl -vi http://localhost:8080/headers -H "host: extproc.example"
     ```

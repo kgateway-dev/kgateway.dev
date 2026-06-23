@@ -59,13 +59,13 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
    ```
 
 3. Send a request to a hostname of your choice, such as `httpbin.org`. Verify that your gateway proxy successfully resolves the `httpbin.org` host and returns its welcome page.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080 -H "host: httpbin.org" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    curl -vik http://localhost:8080 -H "host: httpbin.org"
    ```

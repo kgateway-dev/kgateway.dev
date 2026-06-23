@@ -28,13 +28,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    ```
 
 3. Send a few requests to the httpbin app. Because both httpbin replicas are exposed under the same service, requests are automatically load balanced between all healthy replicas. 
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    for i in {1..5}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" ; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    for i in {1..5}; do curl -vi localhost:8080/status/200 -H "host: www.example.com:8080"; done
    ```
@@ -100,13 +100,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    | `maxEjectionPercent` | The maximum percent of hosts that can be ejected from the load balancing pool. In this example, 80% of all hosts can be ejected at a given time. If not set, this field defaults to `10` percent.  | 
    
 6. Repeat the requests to the httpbin app. In the log output for both httpbin replicas, verify that all requests are still spread across both httpbin instances. 
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    for i in {1..5}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" ; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    for i in {1..5}; do curl -vi localhost:8080/status/200 -H "host: www.example.com:8080"; done
    ```
@@ -114,13 +114,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    {{< /tabs >}}
 
 7. Force one httpbin replica to return a 503 HTTP response code. This response code triggers the outlier detection policy and automatically removes this httpbin replica from the load balancing pool for 1 hour. 
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/status/503 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/503 -H "host: www.example.com:8080"
    ```
@@ -139,13 +139,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    ```
 
 8. Send a few more requests to the httpbin app. In the logs for both replicas, verify that all requests now only go to the instance that is still considered healthy. 
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    for i in {1..5}; do curl http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" ; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    for i in {1..5}; do curl -vi localhost:8080/status/200 -H "host: www.example.com:8080"; done
    ```
@@ -167,13 +167,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    ```
 
 9. Force the second httpbin replica to return a 503 HTTP response code. Note that the outlier detection only allows 80% of all upstream hosts to be ejected at a given time. Since both replicas would equal 100%, the outlier detection does not remove the host from the load balancing pool. The instance is still considered healthy and can receive requests. In your log output for the healthy instance, verify that you see the log entry for the 503 request. 
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/status/503 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}}
+   {{% tab name="Port forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/503 -H "host: www.example.com:8080"
    ```
@@ -186,13 +186,13 @@ Outlier detection is an important part of building resilient apps. An outlier de
    ```
 
 10. Send a few more requests to the httpbin app. In the logs for both replicas, verify that all requests are still routed to the same instance as the instance was not removed from the load balancing pool.  
-   {{< tabs tabTotal="2" items="Cloud Provider Load Balancer,Port forward for local testing" >}}
-   {{% tab tabName="Cloud Provider Load Balancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
    ```sh
    for i in {1..5}; do curl http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080" ; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port forward for local testing" %}} 
+   {{% tab name="Port forward for local testing" %}} 
    ```sh
    for i in {1..5}; do curl -vi localhost:8080/status/200 -H "host: www.example.com:8080"; done
    ```

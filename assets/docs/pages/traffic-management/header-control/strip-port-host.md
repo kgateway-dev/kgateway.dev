@@ -21,13 +21,13 @@ Use the `AnyPort` setting to strip any port from the `Host` header, regardless o
 
 1. Send a request to the httpbin app and include a port number in the `Host` header. Verify that you see the port included in the `Host` header of your response. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:9999"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers -H "host: www.example.com:9999"
    ```
@@ -95,13 +95,13 @@ Use the `AnyPort` setting to strip any port from the `Host` header, regardless o
    | `spec.default.httpSettings.stripHostPortMode` | How Envoy strips the port from the `Host`/`authority` header. In this example, the `AnyPort` setting is used that removes any port that the client sends as part of the request. |
 
 3. Send another request to the httpbin app. Verify that this time, port 9999 is not returned in the `Host` header. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:9999"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers -H "host: www.example.com:9999"
    ```
@@ -200,13 +200,13 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
 
 3. Send a request to the httpbin app and include the listener port in the `Host` header. Verify that the port is removed from the `Host` header. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers -H "host: www.example.com:8080"
    ```
@@ -231,13 +231,13 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
    ```
 
 4. Send another request to the httpbin app. This time, you include a port in the `Host` header that does not match the listener port, such as `9999`. Verify that the port is not removed from the `Host` header.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:9999"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers -H "host: www.example.com:9999"
    ```

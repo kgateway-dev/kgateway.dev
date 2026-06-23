@@ -18,8 +18,8 @@
    This configuration is only an example. Ensure you use the correct plugin binary for your platform, such as amd64 or arm64. For more platform and version options, refer to the [releases of the Argo rollouts traffic router plugin for the Gateway API](https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases).
    {{< /callout >}}
 
-   {{< tabs items="Linux amd64, Linux arm64" tabTotal="2" >}}
-   {{% tab tabName="Linux amd64" %}}
+   {{< tabs >}}
+   {{% tab name="Linux amd64" %}}
    ```yaml
    cat <<EOF | kubectl apply -f -
    apiVersion: v1
@@ -37,7 +37,7 @@
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Linux arm64" %}}
+   {{% tab name="Linux arm64" %}}
    ```yaml
    cat <<EOF | kubectl apply -f -
    apiVersion: v1
@@ -217,8 +217,8 @@
    ```
 
 3. Send a request to the `rollouts-demo` app and verify your CLI output.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    1. Get the external address of the gateway and save it in an environment variable.
       ```sh
       export INGRESS_GW_ADDRESS=$(kubectl get svc -n kgateway-system http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
@@ -238,7 +238,7 @@
       {{< reuse-image src="img/test-application-ver1.png" >}}
       {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab name="Port-forward for local testing" %}}
    3. Port-forward the `http` pod on port 8080. 
       ```sh
       kubectl port-forward deployment/http -n kgateway-system 8080:8080
@@ -266,8 +266,8 @@
    ```
 
 5. Send another request to your app. Because traffic is split between version 1 and version 2 of the app, you see responses from both app versions until the rollout is completed.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab  %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
    while true; do curl -H "host: demo.example.com" $INGRESS_GW_ADDRESS:8080/callme; done     
    ```
@@ -295,7 +295,7 @@
    {{< reuse-image src="img/test-application-ver1.png" >}}
    {{< reuse-image-dark srcDark="img/test-application-ver1.png" >}}
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    while true; do curl localhost:8080/callme -H "host: demo.example.com"; done
    ```

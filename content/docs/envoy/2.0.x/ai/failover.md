@@ -106,8 +106,8 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 
 3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -118,7 +118,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    ]}' | jq
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
      "messages": [

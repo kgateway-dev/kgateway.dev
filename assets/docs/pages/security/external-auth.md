@@ -125,13 +125,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 1. Send a test request to the httpbin sample app. Verify that you get back a 200 HTTP response code and that no authorization is required.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -169,13 +169,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 3. Repeat your request to the httpbin sample app and verify that the request is denied.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -199,13 +199,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 4. Send another request, this time with the `x-ext-authz: allow` header. The Istio external authorization service is configured to allow requests with this header. Therefore, the request succeeds.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080" -H "x-ext-authz: allow"
    ```  
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com" -H "x-ext-authz: allow"
    ```
@@ -305,13 +305,13 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
 
 6. Send a request without the `x-ext-authz` header and verify that you get back a 200 OK response. This time, the TrafficPolicy with the disabled external authorization service takes precedence so that the request is allowed through.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```

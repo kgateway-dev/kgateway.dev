@@ -194,8 +194,8 @@ Steps to set up the sample gRPC service:
 
 Verify that the gRPC route to the echo service is working. The steps vary depending on whether your Gateway is exposed with a LoadBalancer service or set up for local testing only. 
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 1. Send a request to the gRPC echo service by using the gRPC client app. Verify that you see the `pong` message in your response. 
    ```sh
    kubectl exec -n kgateway-system grpcurl-client -c grpcurl -- \
@@ -231,7 +231,7 @@ Verify that the gRPC route to the echo service is working. The steps vary depend
    ```
    
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 1. Port-forward the gateway proxy pod on port 8080.
    ```sh
    kubectl port-forward svc/grpc -n {{< reuse "docs/snippets/namespace.md" >}} 8080:80

@@ -63,8 +63,8 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 * You must install the experimental channel of the Kubernetes Gateway API at version 1.3 or later.
 
 1. Create a Gateway with a TCP listener. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
-   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -94,7 +94,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TCP Gateway that listens for incoming traffic on port 8000. The Gateway can serve TCPRoutes from any namespace. |
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSets (experimental)" %}}
+   {{% tab name="ListenerSets (experimental)" %}}
 
    1. Create a Gateway that enables the attachment of ListenerSets.
    
@@ -216,8 +216,8 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 ## Create a TCPRoute
 
 1. Create the TCPRoute resource. 
-   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -240,7 +240,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="ListenerSets (experimental)" %}}
+   {{% tab name="ListenerSets (experimental)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -306,14 +306,14 @@ Verify that the TCP route to the TCP echo app is working.
 
 1. Get the external address of the gateway and save it in an environment variable.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} tcp-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deployment/tcp-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8000:8000
    ```
@@ -322,13 +322,13 @@ Verify that the TCP route to the TCP echo app is working.
 
 2. Send a TCP request to the external address of the TCP gateway on port 8000. You might use a tool such as telnet or netcat as in the following example.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    nc $INGRESS_GW_ADDRESS 8000
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    nc localhost 8000
    ```

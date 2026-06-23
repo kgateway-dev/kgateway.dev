@@ -94,13 +94,13 @@ Set up local rate limiting for a particular route.
    ```
 
 3. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
@@ -125,13 +125,13 @@ Set up local rate limiting for a particular route.
    ```
    
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the route is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the route. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: ratelimit.example"
    ```
@@ -189,13 +189,13 @@ Instead of applying local rate limiting to a particular route, you can also appl
    | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
    
 3. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. Verify that the request succeeds.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -220,13 +220,13 @@ Instead of applying local rate limiting to a particular route, you can also appl
    ```
 
 4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the gateway is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the gateway. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -305,13 +305,13 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
 
 3. Send two requests to verify that the route is rate limited due to the Gateway-level {{< reuse "docs/snippets/trafficpolicy.md" >}} that allows only 1 request per 100 seconds.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```
@@ -363,13 +363,13 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
 
 5. Repeat the requests. This time, the requests succeed because the HTTPRoute is excluded from rate limiting.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/anything -H "host: www.example.com"; done
    ```

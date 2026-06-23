@@ -50,8 +50,8 @@ Inject a fixed latency into requests before they are forwarded upstream.
    | `faultInjection.delay.percentage` | The percentage of requests to delay. Defaults to `100`. |
 
 2. Send several requests to the httpbin app. Verify that roughly half of the requests are delayed by 5 seconds, while the other half respond immediately.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..6}; do
      time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/status/200 \
@@ -59,7 +59,7 @@ Inject a fixed latency into requests before they are forwarded upstream.
    done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..6}; do
      time curl -s -o /dev/null localhost:8080/status/200 \
@@ -109,13 +109,13 @@ Terminate requests early by returning an error code to the caller. You can confi
    | `faultInjection.abort.percentage` | The percentage of requests to abort. Defaults to `100`. |
 
 3. Send a request to the httpbin app. Verify that the request is aborted with a 503 response.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -171,14 +171,14 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
    | `faultInjection.responseRateLimit.percentage` | The percentage of responses to rate limit. Defaults to `100`. |
 
 2. Request a 500 KB response from httpbin with the rate limit and record the time as a baseline.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/500000 \
      -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    time curl -s -o /dev/null localhost:8080/bytes/500000 \
      -H "host: www.example.com"
@@ -192,8 +192,8 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
    ```
 
 3. Re-apply the rate limit with a smaller response data rate and repeat the request. Verify that the download is significantly slower than the baseline.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -215,7 +215,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
      -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}

@@ -34,15 +34,15 @@ Use `AlwaysForwardOnly` to forward an existing XFCC header to the upstream backe
 
 1. Send a request to the httpbin app with an XFCC header. Verify that you do not see the XFCC header in your response. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -s http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      -H "x-forwarded-client-cert: By=spiffe://cluster.local/ns/default/sa/backend;Hash=abc123"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -s localhost:8080/headers \
      -H "host: www.example.com" \
@@ -113,15 +113,15 @@ Use `AlwaysForwardOnly` to forward an existing XFCC header to the upstream backe
 
 3. Send the same request again. Verify that the upstream now receives the XFCC header.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -s http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      -H "x-forwarded-client-cert: By=spiffe://cluster.local/ns/default/sa/backend;Hash=abc123"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -s localhost:8080/headers \
      -H "host: www.example.com" \

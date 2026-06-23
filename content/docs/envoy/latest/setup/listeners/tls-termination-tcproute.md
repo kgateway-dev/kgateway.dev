@@ -76,8 +76,8 @@ Set up a TLS listener on the Gateway with `tls.mode: Terminate`. The Gateway dec
 
 1. Create a Gateway with a TLS termination listener. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
 
-   {{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -117,7 +117,7 @@ Set up a TLS listener on the Gateway with `tls.mode: Terminate`. The Gateway dec
    |`spec.listeners.allowedRoutes.kinds`|Restricts the listener to accept only TCPRoute resources.|
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSets" %}}
+   {{% tab name="ListenerSets" %}}
 
    1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -216,8 +216,8 @@ Set up a TLS listener on the Gateway with `tls.mode: Terminate`. The Gateway dec
 
 Create a TCPRoute that routes traffic on port 8443 to the httpbin app.
 
-{{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -239,7 +239,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSets" %}}
+{{% tab name="ListenerSets" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -267,8 +267,8 @@ EOF
 
 ## Verify TLS termination traffic {#verify-tls-terminate-tcp}
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 1. Get the external address of the gateway and save it in an environment variable.
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} tls-terminate-tcp -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
@@ -300,7 +300,7 @@ EOF
    ```
 
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 1. Port-forward the gateway service to your local machine.
    ```sh
    kubectl port-forward svc/tls-terminate-tcp -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443
@@ -328,14 +328,14 @@ EOF
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 ```sh
 kubectl delete -A gateways,tcproutes,secret -l example=tls-terminate-tcp
 rm -rf example_certs
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSet" %}}
+{{% tab name="ListenerSet" %}}
 ```sh
 kubectl delete -A gateways,tcproutes,listenersets,secret -l example=tls-terminate-tcp
 rm -rf example_certs

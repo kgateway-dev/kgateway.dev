@@ -11,8 +11,8 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
 1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy.
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -46,7 +46,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    |`spec.rules.filters.responseHeaderModifier.add`|The name and value of the response header that you want to add. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -92,13 +92,13 @@ Add headers to incoming requests before they are sent back to the client. If the
    {{< /tabs >}}
    
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Loadbalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers -H "host: headers.example"
    ```
@@ -127,13 +127,13 @@ Add headers to incoming requests before they are sent back to the client. If the
    ```
 
 1. Optional: Remove the resources that you created. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -146,8 +146,8 @@ Add headers to incoming requests before they are sent back to the client. If the
 Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
 
 1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -181,7 +181,7 @@ Setting headers is similar to adding headers. If the response does not include t
    |`spec.rules.filters.responseHeaderModifier.set`|The name and value of the response header that you want to set. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -227,13 +227,13 @@ Setting headers is similar to adding headers. If the response does not include t
    {{< /tabs >}}
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-response: custom` header was set. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -258,13 +258,13 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
    ```
 
 1. Optional: Remove the resources that you created. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -277,13 +277,13 @@ curl -vi localhost:8080/response-headers -H "host: headers.example"
 You can remove HTTP headers from a response before the response is sent back to the client. 
 
 1. Send a request to the httpbin app and find the `content-length` header. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Loadbalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers -H "host: www.example.com"
    ```
@@ -311,8 +311,8 @@ You can remove HTTP headers from a response before the response is sent back to 
    ```
    
 2. Set up a header modifier that removes the `content-length` header from the response. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -345,7 +345,7 @@ You can remove HTTP headers from a response before the response is sent back to 
    |`spec.rules.filters.responseHeaderModifier.remove`|The name of the response header that you want to remove. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -390,13 +390,13 @@ You can remove HTTP headers from a response before the response is sent back to 
    {{< /tabs >}}
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
-   {{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider Loadbalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Loadbalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers -H "host: headers.example"
    ```
@@ -423,13 +423,13 @@ You can remove HTTP headers from a response before the response is sent back to 
    ```
 
 1. Optional: Remove the resources that you created. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -517,13 +517,13 @@ The same defaulting rules and cross-namespace `ReferenceGrant` requirement that 
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the response includes the `X-Response-Signature` header with the value from the Secret.
 
-{{< tabs items="Cloud Provider Loadbalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider Loadbalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider Loadbalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/response-headers -H "host: headers.example"
 ```
@@ -614,8 +614,8 @@ You can return dynamic information about the response in the response header. Fo
 {{< reuse "docs/snippets/dynamic-req-resp-headers.md" >}}
 
 1. Set up a header modifier that sets the `X-Response-Code` header with the value of the HTTP response code. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -649,7 +649,7 @@ You can return dynamic information about the response in the response header. Fo
    |`spec.rules.filters.responseHeaderModifier.set`|The response header that you want to set. In this example, the `x-response-code` header is set to the HTTP response code. For more potential values, see [Command operators in the Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage.html#command-operators). |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}  
+   {{% tab name="TrafficPolicy" %}}  
    1. Create an HTTPRoute resource for the route that you want to modify. Note that the example selects the http Gateway that you created before you began.
       ```yaml
       kubectl apply -f- <<EOF
@@ -695,13 +695,13 @@ You can return dynamic information about the response in the response header. Fo
    {{< /tabs >}}
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that the `x-response-code` response header is set to the HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers -H "host: headers.example"
    ```
@@ -722,13 +722,13 @@ You can return dynamic information about the response in the response header. Fo
    ```
 
 1. Optional: Clean up the resources that you created.  
-   {{< tabs items="HTTPRoute,TrafficPolicy" tabTotal="2" >}}
-   {{% tab tabName="HTTPRoute" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    ```
    {{% /tab %}}
-   {{% tab tabName="EnterpriseKgatewayTrafficPolicy" %}}
+   {{% tab name="TrafficPolicy" %}}
    ```sh
    kubectl delete httproute httpbin-headers -n httpbin
    kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} httpbin-headers -n {{< reuse "docs/snippets/namespace.md" >}}

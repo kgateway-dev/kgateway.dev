@@ -89,13 +89,13 @@ Review route precedence in action:
 
 3. Send a request to the `/anything/a` path. The request matches both the rules for `/anything` and `/anything/a`. Because the more specific `/anything/a` rule takes precedence, the request routes to the hello-world service instead of the httpbin service.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/a -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/a -H "host: www.example.com"
    ```
@@ -123,13 +123,13 @@ Review route precedence in action:
 
 4. Send a request to the `/anything` path. This example routes to the httpbin service because it only matches the less specific rule.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything -H "host: www.example.com"
    ```
@@ -271,13 +271,13 @@ Steps to weight routes:
 
 2. Send a request to the httpbin app on the `/anything/a` path. Because the default Gateway API sorting rules give precedence to the more specific `/anything/a` route, the request is served by the hello-world service instead of the httpbin service.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/a -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/a -H "host: www.example.com"
    ```
@@ -313,13 +313,13 @@ Steps to weight routes:
 
 4. Send another request on the `/anything/a` path. Because the weight of the httpbin HTTPRoute is higher than the hello-world route, the request is served by the httpbin service instead of the hello-world service.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/a -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/a -H "host: www.example.com"
    ```

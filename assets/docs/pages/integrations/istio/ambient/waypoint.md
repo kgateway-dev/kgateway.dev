@@ -42,8 +42,8 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    ```
    
 2. Deploy the httpbin2, httpbin3, and client sample apps. 
-   {{< tabs tabTotal="3" items="httpbin2,httpbin3,client" >}}
-   {{% tab tabName="httpbin2" %}}
+   {{< tabs >}}
+   {{% tab name="httpbin2" %}}
    ```yaml
    kubectl apply -f - <<EOF                                                  
    apiVersion: v1
@@ -122,7 +122,7 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="httpbin3" %}}
+   {{% tab name="httpbin3" %}}
    ```yaml
    kubectl apply -f - <<EOF                                                  
    apiVersion: v1
@@ -201,7 +201,7 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="client" %}}
+   {{% tab name="client" %}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: v1

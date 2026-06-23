@@ -28,18 +28,18 @@ Start running an Ollama server as a local LLM provider.
 
 1. Find your local IP address.
 
-   {{< tabs items="macOS, Unix-based systems, Windows" tabTotal="3" >}}
-   {{% tab tabName="macOS" %}}
+   {{< tabs >}}
+   {{% tab name="macOS" %}}
    ```sh
    ipconfig getifaddr en0
    ```
    {{% /tab %}}
-   {{% tab tabName="Unix-based systems" %}}
+   {{% tab name="Unix-based systems" %}}
    ```sh
    ifconfig
    ```
    {{% /tab %}}
-   {{% tab tabName="Windows" %}}
+   {{% tab name="Windows" %}}
    ```sh
    ipconfig
    ```

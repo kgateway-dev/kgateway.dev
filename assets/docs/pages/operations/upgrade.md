@@ -70,8 +70,8 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
 
 {{< conditional-text include-if="envoy" >}}
 
-   {{< tabs tabTotal="3" items="Kubernetes Gateway API, Kubernetes, Istio" >}}
-{{% tab tabName="Kubernetes Gateway API" %}}
+   {{< tabs >}}
+{{% tab name="Kubernetes Gateway API" %}}
 1. Decide on the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
 
    * For help, review the [Upgrade Notes in the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/getting-started/#v12-upgrade-notes).
@@ -116,10 +116,10 @@ Before you upgrade {{< reuse "/docs/snippets/kgateway.md" >}}, review the follow
    httproutes.gateway.networking.k8s.io      v1 v1beta1  v1.2.0	experimental
    ```
 {{% /tab %}}
-{{% tab tabName="Kubernetes" %}}
+{{% tab name="Kubernetes" %}}
 For Kubernetes upgrades, consult your cloud infrastructure provider.
 {{% /tab %}}
-{{% tab tabName="Istio" %}}
+{{% tab name="Istio" %}}
 For Istio upgrades, consult the docs based on the way that you installed Istio. Example providers:
 
 * [Upstream Istio](https://istio.io/latest/docs/setup/upgrade/)

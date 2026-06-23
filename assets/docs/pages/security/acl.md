@@ -87,13 +87,13 @@ Deny all requests by default, unless they come from an IP address that is part o
 
 2. Send a request to the httpbin app from outside the cluster. Verify that your request is denied with a 403 response, because the request comes from a public IP address that is not in the `10.0.0.0/8` CIDR range.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com" | head -1
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com" | head -1
    ```
@@ -158,13 +158,13 @@ Allow all traffic by default, but block traffic from specific CIDR ranges. When 
 
 2. Send a request to the httpbin app. Verify that your request succeeds with a 200 response, because the request comes from a public IP address that is not in any of the denied RFC 1918 ranges.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com" | head -1
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com" | head -1
    ```
@@ -238,13 +238,13 @@ Use longest-prefix matching to allow a specific subnet within a broader denied r
 
 2. Send a request to the httpbin app. Verify that your request succeeds with a 200 response, because the request comes from a public IP address that falls through to `defaultAction: allow`.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```
@@ -309,13 +309,13 @@ Return a non-default HTTP status code and include extra headers in the denial re
 
 2. Send a request to the httpbin app. Verify that your request is denied with a 451 response and the `x-blocked-reason: geo-policy` header.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: www.example.com"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/status/200 -H "host: www.example.com"
    ```

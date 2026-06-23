@@ -46,8 +46,8 @@ Sometimes, your deployments might have health checks and metadata updates that u
 Define the load balancing algorithm that you want to use for your backend app in a BackendConfigPolicy.
 
 1. Create a BackendConfigPolicy to configure your load balancing algorithm for the httpbin app. 
-   {{< tabs tabTotal="3" items="Least requests,Round robin,Random" >}}
-   {{% tab tabName="Least requests" %}}
+   {{< tabs >}}
+   {{% tab name="Least requests" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
@@ -80,7 +80,7 @@ Define the load balancing algorithm that you want to use for your backend app in
    | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
-   {{% tab tabName="Round robin" %}}
+   {{% tab name="Round robin" %}}
    ```yaml
    kubectl apply -f- <<EOF
    kind: BackendConfigPolicy
@@ -111,7 +111,7 @@ Define the load balancing algorithm that you want to use for your backend app in
    | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
-   {{% tab tabName="Random" %}}
+   {{% tab name="Random" %}}
    Note that no further settings are required because the load balancing is random.
    ```yaml
    kubectl apply -f- <<EOF
