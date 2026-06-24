@@ -119,8 +119,8 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
 5. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
 
    ````sh
    curl "$INGRESS_GW_ADDRESS:8080/gemini" -H content-type:application/json  -d '{
@@ -135,7 +135,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
      ]
    }' | jq
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/gemini" -H content-type:application/json -d '{
      "contents": [
@@ -294,8 +294,8 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
 
 4. Send a request to the LLM provider API. Verify that the request succeeds and that you get back a response from the chat completion API.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
 
    ```bash
    curl "$INGRESS_GW_ADDRESS:8080/azure-openai" \
@@ -310,7 +310,7 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
 
    ```bash
    curl "localhost:8080/azure-openai" \

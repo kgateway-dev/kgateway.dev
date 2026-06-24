@@ -132,8 +132,8 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
 
-{{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain.
 
    ```yaml
@@ -167,7 +167,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    |`spec.listeners.tls.mode`|The TLS mode for incoming requests. In this example, TLS requests are passed through to the backend service without being terminated at the Gateway.|
 
 {{% /tab %}}
-{{% tab tabName="ListenerSets" %}}
+{{% tab name="ListenerSets" %}}
 
 1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -244,8 +244,8 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 ## Create a TLSRoute
 
-{{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -268,7 +268,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSets" %}}
+{{% tab name="ListenerSets" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -297,8 +297,8 @@ EOF
 
 ## Verify TLS passthrough traffic for nginx
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 1. Get the external address of the gateway proxy and save it in an environment variable.
    ```sh 
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
@@ -352,7 +352,7 @@ EOF
    * Connection #0 to host nginx.example.com left intact
    ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
    ```sh
    kubectl port-forward deployment/tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443
@@ -405,8 +405,8 @@ EOF
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 
 ```sh
 rm -r example_certs
@@ -419,7 +419,7 @@ kubectl delete service my-nginx
 kubectl delete secret nginx-server-certs   
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSet" %}}
+{{% tab name="ListenerSet" %}}
 ```sh
 rm -r example_certs
 rm nginx.conf

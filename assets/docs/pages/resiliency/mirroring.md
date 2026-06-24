@@ -130,14 +130,14 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    ```
 
 5. Send a few requests to the httpbin app on the `mirror.example` domain. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing"  tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer"  %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..5}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: mirror.example:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..5}; do curl -vi localhost:8080/headers \
    -H "host: mirror.example"; done

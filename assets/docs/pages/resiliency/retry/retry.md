@@ -129,8 +129,8 @@ To use retries, you need to install the experimental channel. You can also set u
 Set up retries to the reviews app.
 
 1. Create an HTTPRoute resource to specify your retry rules. You can apply the retry policy on an HTTPRoute, HTTPRoute rule, or Gateway listener. 
-   {{< tabs tabTotal="3" items="HTTPRoute (Kubernetes GW API),HTTPRoute and rule (TrafficPolicy),Gateway listener" >}}
-   {{% tab tabName="HTTPRoute (Kubernetes GW API)" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute (Kubernetes GW API)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -178,7 +178,7 @@ Set up retries to the reviews app.
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
    | `timeouts` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
    {{% /tab %}}
-   {{% tab tabName="HTTPRoute (EnterpriseKgatewayTrafficPolicy)" %}}
+   {{% tab name="HTTPRoute and rule (TrafficPolicy)" %}}
    1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. Note that you add a name `timeout` to your HTTPRoute rule so that you can later attach the retry policy to that rule.
       ```yaml
       kubectl apply -f- <<EOF
@@ -244,7 +244,7 @@ Set up retries to the reviews app.
       | `timeouts.request` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
    
    {{% /tab %}}
-   {{% tab tabName="Gateway listener" %}}
+   {{% tab name="Gateway listener" %}}
    1. Create an HTTPRoute that routes requests along the `retry.example` domain to the reviews app. 
       ```yaml
       kubectl apply -f- <<EOF
@@ -365,13 +365,13 @@ Set up retries to the reviews app.
 
 3. Send a request to the reviews app. Verify that the request succeeds.
  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/reviews/1 -H "host: retry.example"
    ```
@@ -418,13 +418,13 @@ Simulate a failure for the reviews app so that you can verify that the request i
 
 2. Send another request to the reviews app. This time, the request fails.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:80"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/reviews/1 -H "host: retry.example"
    ```

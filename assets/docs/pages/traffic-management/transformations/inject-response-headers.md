@@ -13,8 +13,8 @@ Use a transformation template to extract a value from a request header and add i
    * `x-response-raw`: Adds a static string values of `hello` with all escape characters intact.
    * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
    
-   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Envoy-based kgateway" %}}
+   {{< tabs >}}
+   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -43,7 +43,7 @@ Use a transformation template to extract a value from a request header and add i
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
+   {{% tab name="Agentgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -81,8 +81,8 @@ Use a transformation template to extract a value from a request header and add i
    * `x-response-raw` that is set to `hello`.
    * `x-replace` that is set to a random string.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
@@ -90,7 +90,7 @@ Use a transformation template to extract a value from a request header and add i
     -H "baz: pattern-to-replace"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \

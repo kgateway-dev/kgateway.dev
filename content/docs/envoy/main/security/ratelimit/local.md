@@ -75,13 +75,13 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    ```
 
 3. Send two requests to the httpbin app. Verify that both succeed with a 200 HTTP response code, even though the token bucket is configured with only 1 token. Because `percentEnforced` is set to `0`, the rate limit filter is running in shadow mode and is not blocking any requests.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/status/200 -H "host: ratelimit.example"; done
    ```
@@ -143,13 +143,13 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    ```
 
 6. Send two requests again. Verify that this time, only the first request succeeds. The second request is denied with a 429 HTTP response code and a `local_rate_limited` message.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..2}; do curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: ratelimit.example:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..2}; do curl -vi localhost:8080/status/200 -H "host: ratelimit.example"; done
    ```

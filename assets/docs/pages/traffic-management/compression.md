@@ -73,15 +73,15 @@ Enable gzip compression on a route so that {{< reuse "docs/snippets/kgateway.md"
    | `spec.compression.responseCompression` | Enables gzip response compression. Responses are only compressed when the client sends an `Accept-Encoding: gzip` header and the response content type matches one of the supported types. |
 
 3. Send a request to the `/html` httpbin path with the `Accept-Encoding: gzip` header. Verify that the response includes a `content-encoding: gzip` header, indicating that the response body is compressed.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/html \
      -H "host: compression.example:8080" \
      -H "Accept-Encoding: gzip"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik http://localhost:8080/html \
      -H "host: compression.example" \
@@ -105,14 +105,14 @@ Enable gzip compression on a route so that {{< reuse "docs/snippets/kgateway.md"
    ```
 
 4. Send the same request without the `Accept-Encoding: gzip` header. Verify that the response does **not** include a `content-encoding: gzip` header, confirming that compression is only applied when the client requests it.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/html \
      -H "host: compression.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik http://localhost:8080/html \
      -H "host: compression.example"
@@ -186,8 +186,8 @@ Enable gzip decompression on a route so that {{< reuse "docs/snippets/kgateway.m
    ```
 
 4. Send the compressed payload to the `/post` httpbin path with the `Content-Encoding: gzip` header. Verify that the `data` field in the response shows the decompressed string `Hello, world!`, confirming that {{< reuse "docs/snippets/kgateway.md" >}} decompressed the request body before forwarding it to httpbin.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/post \
      -H "host: decompression.example:8080" \
@@ -196,7 +196,7 @@ Enable gzip decompression on a route so that {{< reuse "docs/snippets/kgateway.m
      --data-binary @/tmp/payload.gz
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik -X POST http://localhost:8080/post \
      -H "host: decompression.example" \

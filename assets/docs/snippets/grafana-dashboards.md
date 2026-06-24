@@ -23,13 +23,13 @@ You can use the pre-built Grafana dashboards to observe the control and data pla
 
 3. Open and log in to Grafana by using the username `admin` and password `prom-operator`. 
       
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    open "http://$(kubectl -n telemetry get svc kube-prometheus-stack-grafana -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}"):3000"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    1. Port-forward the Grafana service to your local machine.
       ```sh
       kubectl port-forward deployment/kube-prometheus-stack-grafana -n telemetry 3000

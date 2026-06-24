@@ -132,13 +132,13 @@ helm upgrade -i --namespace kgateway-system --version v2.1.0 kgateway oci://cr.k
 
 Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
 
-{{< tabs items="Standard,Experimental"  >}}
-{{% tab  %}}
+{{< tabs >}}
+{{% tab name="Standard" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Experimental" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
 ```

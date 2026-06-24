@@ -45,8 +45,8 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 
 1. Create a GatewayParameters resource which enables an AI extension for the Gateway.
    
-   {{< tabs tabTotal="2" items="Cloud Provider,Local Environment" >}}
-   {{% tab tabName="Cloud Provider" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider" %}}
    For AI services in a cloud provider, use a LoadBalancer service. This way, the AI Gateway can be accessed from outside the cluster.
    ```yaml
    kubectl apply -f- <<EOF
@@ -73,7 +73,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Local Environment" %}}
+   {{% tab name="Local Environment" %}}
    For local environments such as Ollama, use a NodePort service. This way, the AI Gateway can be accessed locally.
    ```yaml
    kubectl apply -f- <<EOF

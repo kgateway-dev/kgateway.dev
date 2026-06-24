@@ -29,8 +29,8 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
    ```
 
 2. Configure the per-retry timeout. You can apply the timeout to an HTTPRoute, or Gateway listener.
-   {{< tabs tabTotal="3" items="HTTPRoute (Kubernetes GW API),HTTPRoute (TrafficPolicy),Gateway listener" >}}
-   {{% tab tabName="HTTPRoute (Kubernetes GW API)" %}}
+   {{< tabs >}}
+   {{% tab name="HTTPRoute (Kubernetes GW API)" %}}
    Use the `timeouts.backendRequest` field to configure the per-try timeout. Note that you must set a retry policy also to configure a per-try timeout. 
    ```yaml
    kubectl apply -f- <<EOF
@@ -65,7 +65,7 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="HTTPRoute (EnterpriseKgatewayTrafficPolicy)" %}}
+   {{% tab name="HTTPRoute (TrafficPolicy)" %}}
    1. Create an HTTPRoute to route requests along the `retry.example` domain to the httpbin app. Note that you add a name `timeout` to your HTTPRoute rule so that you can configure the per-try timeout for that rule later. 
       ```yaml
       kubectl apply -f- <<EOF
@@ -118,7 +118,7 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
       ```
    
    {{% /tab %}}
-   {{% tab tabName="Gateway listener" %}}
+   {{% tab name="Gateway listener" %}}
    1. Create an HTTPRoute to route requests along the `retry.example` domain to the httpbin app. 
       ```yaml
       kubectl apply -f- <<EOF
@@ -172,13 +172,13 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
    {{< /tabs >}}
 
 2. Send a request to the httpbin app along the `retry.example` domain. Verify that the `X-Envoy-Expected-Rq-Timeout-Ms` header is set to the 5 second timeout that you configured.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: retry.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/anything -H "host: retry.example"
    ```

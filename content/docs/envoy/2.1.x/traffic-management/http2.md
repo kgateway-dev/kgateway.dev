@@ -151,14 +151,14 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    ```
 
 4. Send a request to the nginx server and include the `--http2-prior-knowledge` option to send an HTTP/2 request to the Gateway. Verify that the request succeeds and that you get back a 200 HTTP response code. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/ -H "host: http2.example.com:8080" --http2-prior-knowledge 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/ -H "host: http2.example.com" --http2-prior-knowledge 
    ```
@@ -278,14 +278,14 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    ```
 
 3. Send a request to the `static.example` domain. The request is forwarded to the `nghttp2.org` path, which only accepts HTTP/2 requests. Verify that the request succeeds and that you get back a 200 HTTP response code. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/ -H "host: static.example:8080" --http2-prior-knowledge 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/ -H "host: static.example" --http2-prior-knowledge 
    ```

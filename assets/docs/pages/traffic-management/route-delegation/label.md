@@ -2,8 +2,8 @@ In this example, you learn how to use labels to delegate traffic. The parent HTT
 
 You typically configure the parent to find an HTTPRoute with a specific label in a specific namespace. However, you can also use a wildcard for the namespace when you have multiple HTTPRoutes in different namespaces that can all receive delegated traffic. This configuration can significantly simplify your route delegation setup, as it allows you to quickly add new child HTTPRoutes to the delegation chain without changing the parent HTTPRoute configuration. 
 
-{{< tabs items="Specific namespace,Wildcard namespace" tabTotal="2" >}}
-{{% tab tabName="Specific namespace" %}}
+{{< tabs >}}
+{{% tab name="Specific namespace" %}}
 
 Explore an example for delegating traffic to an HTTPRoute with a specific label in a specific namespace. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [HTTPRoutes in specific namespaces](#specific-namespace). 
 
@@ -24,7 +24,7 @@ Explore an example for delegating traffic to an HTTPRoute with a specific label 
 * The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace.
 
 {{% /tab %}}
-{{% tab tabName="Wildcard namespace" %}}
+{{% tab name="Wildcard namespace" %}}
 
 Learn how to use a wildcard for the namespace to streamline your route delegation setup. To try out this example, see the [Before you begin](#before-you-begin) section and then continue with [Use wildcard namespaces](#wildcard). 
 
@@ -138,14 +138,14 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    ```
       
 5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo \
    -H "host: delegation.example" 
@@ -194,14 +194,14 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    ```
 
 6. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
@@ -324,14 +324,14 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team1/foo \
    -H "host: delegation.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team1/foo \
    -H "host: delegation.example" 
@@ -380,14 +380,14 @@ Instead of routing to an HTTPRoute with a specific label in a specific namespace
    ```
 
 5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything/team2/bar \
    -H "host: delegation.example:8080" 

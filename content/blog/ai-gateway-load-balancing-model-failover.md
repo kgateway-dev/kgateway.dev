@@ -49,8 +49,8 @@ In kgateway, a Backend represents a service that you want to route traffic to. I
 - gpt-4.0-turbo model
 - gpt-3.5-turbo model
 
-{{< tabs items="2.1 and later,2.0" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="2.1 and later" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -86,7 +86,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="2.0" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1

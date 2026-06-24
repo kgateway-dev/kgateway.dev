@@ -103,13 +103,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
 
 3. Send an HTTP request to the httpbin app on the `redirect.example` domain. Verify that you get back a 301 HTTP response code and that your redirect location shows `https://redirect.example:8080/status/200`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: redirect.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik localhost:8080/status/200 -H "host: redirect.example"
    ```
@@ -132,13 +132,13 @@ For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md"
    ```
   
 4. Send an HTTPS request to the httpbin app on the `redirect.example` domain. Verify that you get back a 200 HTTP response code and that you can see a successful TLS handshake with the gateway. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik https://$INGRESS_GW_ADDRESS:443/status/200 -H "host: redirect.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    1. Port-forward the gateway proxy on port 8443. 
       ```sh
       kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443

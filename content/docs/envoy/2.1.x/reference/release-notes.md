@@ -15,13 +15,13 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
 
-{{< tabs items="Standard,Experimental" tabTotal= "2" >}}
-{{% tab tabName="Standard" %}}
+{{< tabs >}}
+{{% tab name="Standard" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
 {{% /tab %}}
-{{% tab tabName="Experimental" %}}
+{{% tab name="Experimental" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
 ```
@@ -38,14 +38,14 @@ Update your old configuration to the new API style as follows.
 
 LLM providers are now nested directly under the `llm` spec field, removing the previous `llm.provider` field.
 
-{{< tabs items="New llm,Old llm.provider" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New llm" %}}
 ```yaml
 llm:
   openai:
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old llm.provider" %}}
 ```yaml
 llm:
   provider:
@@ -59,15 +59,15 @@ llm:
 
 The `priorityGroups` field replaces the `multipool` field with simpler nesting for providers.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New priorityGroups" %}}
 ```yaml
 priorityGroups:
 - providers:
   - openai:
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old multipool" %}}
 ```yaml
 multipool:
   priorities:
@@ -82,8 +82,8 @@ multipool:
 
 Some LLM settings are renamed to remove redundant `Override` prefixes.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New priorityGroups" %}}
 ```yaml
 host: foo
 port: 8080
@@ -94,7 +94,7 @@ authHeader:
   headerName: bar
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old multipool" %}}
 ```yaml
 hostOverride:
   host: foo

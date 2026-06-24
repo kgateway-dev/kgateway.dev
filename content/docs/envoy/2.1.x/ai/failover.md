@@ -27,8 +27,8 @@ You can configure failover across multiple models and providers by using priorit
 
 1. Create or update the Backend for your LLM providers.
 
-   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
-   {{% tab tabName="OpenAI model priority" %}}
+   {{< tabs >}}
+   {{% tab name="OpenAI model priority" %}}
    
    In this example, you configure separate priority groups for failover across multiple models from the same LLM provider, OpenAI. The priority order of the models is as follows:
    
@@ -77,7 +77,7 @@ You can configure failover across multiple models and providers by using priorit
    ```
    
    {{% /tab %}}
-   {{% tab tabName="Cost-based priority across providers" %}}
+   {{% tab name="Cost-based priority across providers" %}}
    
    In this example, you configure failover across multiple providers with cost-based priority. The first priority group contains cheaper models. Responses are load-balanced across these models. In the event that both models are unavailable, requests fall back to the second priority group of more premium models.
    - Highest priority: Load balance across cheaper OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest` models.
@@ -170,8 +170,8 @@ You can configure failover across multiple models and providers by using priorit
 
 3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -182,7 +182,7 @@ You can configure failover across multiple models and providers by using priorit
    ]}' | jq
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -197,8 +197,8 @@ You can configure failover across multiple models and providers by using priorit
    
    Example output:
 
-   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
-   {{% tab tabName="OpenAI model priority" %}}
+   {{< tabs >}}
+   {{% tab name="OpenAI model priority" %}}
    
    Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
 
@@ -226,7 +226,7 @@ You can configure failover across multiple models and providers by using priorit
    ```
    
    {{% /tab %}}
-   {{% tab tabName="Cost-based priority across providers" %}}
+   {{% tab name="Cost-based priority across providers" %}}
    
    Note the response is from the `claude-3-5-haiku-20241022` model. With the cost-based priority configuration, requests are load balanced across the cheaper models (OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest`) in the first priority group.
 

@@ -21,13 +21,13 @@ By default, policies are attached to resources in the same namespace. This way, 
 
 1. Send a request to the httpbin service on the `/anything` path and note the expected 200 response.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything -H "host: www.example.com"
    ```
@@ -108,13 +108,13 @@ By default, policies are attached to resources in the same namespace. This way, 
 
 3. Repeat the request with the `transform:status` header. The request is now transformed from the `/anything` path to the `/status/418` path.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080" -H "transform: status"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything -H "host: www.example.com" -H "transform: status"
    ```
@@ -167,13 +167,13 @@ By default, policies are attached to resources in the same namespace. This way, 
 
 6. Repeat the request. This time, the request is not transformed. The policy cannot be attached because the resource is in a different namespace. Instead, you get the initial 200 response.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080" -H "transform: status"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything -H "host: www.example.com" -H "transform: status"
    ```
@@ -307,13 +307,13 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
 
 3. Send a request with the `transform:status` header. This time, the request is transformed even though the HTTPRoute and transformation policy are in different namespaces.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/anything -H "host: www.example.com:8080" -H "transform: status"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing"%}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/anything -H "host: www.example.com" -H "transform: status"
    ```

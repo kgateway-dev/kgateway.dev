@@ -18,8 +18,8 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 
 1. Create a gateway resource with an HTTPS listener. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
 
-   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -56,7 +56,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSets (experimental)" %}}
+   {{% tab name="ListenerSets (experimental)" %}}
 
    1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -144,8 +144,8 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
    
-   {{< tabs items="Gateway listeners,ListenerSets (experimental)" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -168,7 +168,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="ListenerSets (experimental)" %}}
+   {{% tab name="ListenerSets (experimental)" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -227,8 +227,8 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 
 5. Verify that the listener now has a route attached.
 
-   {{< tabs items="Gateway listeners,ListenerSet (experimental)" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}   
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}   
 
    ```sh
    kubectl get gateway -n {{< reuse "docs/snippets/namespace.md" >}} https -o yaml
@@ -242,7 +242,7 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    - attachedRoutes: 1
    ```
    {{% /tab %}}
-   {{% tab tabName="ListenerSet (experimental)" %}}
+   {{% tab name="ListenerSet (experimental)" %}}
 
    ```sh
    kubectl get xlistenerset -n {{< reuse "docs/snippets/namespace.md" >}} my-https-listenerset -o yaml
@@ -276,14 +276,14 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    {{< /tabs >}}
 
 6. Get the external address of the gateway and save it in an environment variable.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward svc/https -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
    ```
@@ -291,13 +291,13 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
    {{< /tabs >}}
 
 7. Send a request to the httpbin app and verify that you see the TLS handshake and you get back a 200 HTTP response code. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik --resolve "https.example.com:443:${INGRESS_GW_ADDRESS}" https://https.example.com:443/status/200
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik --connect-to https.example.com:443:localhost:8443 https://https.example.com:443/status/200
    ```
@@ -348,14 +348,14 @@ If you plan to set up your listener as part of a ListenerSet, keep the following
 
 {{< reuse "docs/snippets/cleanup.md" >}}
 
-{{< tabs items="Gateway listeners,ListenerSet (experimental)" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 ```sh
 kubectl delete -A gateways,httproutes,secret -l example=httpbin-https
 rm -rf example_certs
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSet (experimental)" %}}
+{{% tab name="ListenerSet (experimental)" %}}
 ```sh
 kubectl delete -A gateways,httproutes,xlistenersets,secret -l example=httpbin-https
 rm -rf example_certs

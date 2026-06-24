@@ -162,15 +162,15 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
 
 3. Confirm that {{< reuse "/docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -H "Host: lambda.${REGION}.amazonaws.com" \
      $INGRESS_GW_ADDRESS:8080/echo \
      -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -H "Host: lambda.${REGION}.amazonaws.com" \
      localhost:8080/echo \

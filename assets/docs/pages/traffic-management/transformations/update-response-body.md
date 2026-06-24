@@ -12,14 +12,14 @@ In this guide, you use the following methods to transform a JSON body:
 ## Update response body
 
 1. Send a request to the `json` endpoint of the httpbin app. The request returns a JSON body that you later transform.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/json \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/json \
    -H "host: www.example.com"
@@ -77,14 +77,14 @@ In this guide, you use the following methods to transform a JSON body:
    ```
    
 3. Send a request to the `json` endpoint of the httpbin app again. Verify that you see the transformed response body.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/json \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/json \
    -H "host: www.example.com"
@@ -123,14 +123,14 @@ In this guide, you use the following methods to transform a JSON body:
    ```
 
 5. Send another request to the `json` endpoint of the httpbin app. Verify that every `all` value is replaced with a random string.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/json \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/json \
    -H "host: www.example.com"

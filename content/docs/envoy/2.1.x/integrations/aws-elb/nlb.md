@@ -50,8 +50,8 @@ Keep in mind the following considerations when working with an NLB:
    
 2. Depending on the annotations that you use on your gateway proxy, you can configure the NLB in different ways. 
 
-   {{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-   {{% tab %}}
+   {{< tabs >}}
+   {{% tab name="Simple HTTP NLB" %}}
 
    Create a simple NLB that accepts HTTP traffic on port 80 and forwards this traffic to the HTTP listener on your gateway proxy. 
 
@@ -84,7 +84,7 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab name="TLS passthrough" %}}
    Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminate TLS traffic at the gateway proxy for added security. 
 
    {{< reuse-image src="/img/elb-tls-passthrough.svg" >}}
@@ -150,8 +150,8 @@ Keep in mind the following considerations when working with an NLB:
 
 ## Step 3: Test traffic to the NLB {#test-traffic}
 
-{{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="Simple HTTP NLB" %}}
    
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
@@ -193,7 +193,7 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="TLS passthrough" %}}
 
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml

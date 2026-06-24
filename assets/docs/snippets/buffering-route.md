@@ -67,8 +67,8 @@ You can configure connection buffer limits using a {{< reuse "/docs/snippets/tra
    ```
 
 5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/anything \
    -H "host: www.example.com:8080" \
@@ -76,7 +76,7 @@ You can configure connection buffer limits using a {{< reuse "/docs/snippets/tra
    -d "{\"payload\": \"$(< /tmp/large_payload_2k.txt)\"}"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik -X POST http://localhost:8080/anything \
    -H "host: www.example.com:8080" \
@@ -87,8 +87,8 @@ You can configure connection buffer limits using a {{< reuse "/docs/snippets/tra
    {{< /tabs >}}
 
 5. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/anything \
       -H "host: www.example.com:8080" \
@@ -96,7 +96,7 @@ You can configure connection buffer limits using a {{< reuse "/docs/snippets/tra
       -d "{\"payload\":  \"hello world\"}" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik -X POST http://localhost:8080/anything \
       -H "host: www.example.com:8080" \

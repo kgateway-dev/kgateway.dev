@@ -110,8 +110,8 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
 
 1. Create an SNI Gateway. The Gateway defines two hosts on the same HTTPS listener. Each host is configured with the host-specific TLS certificate that you set up earlier. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
 
-   {{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -160,7 +160,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSet" %}}
+   {{% tab name="ListenerSet" %}}
    
    1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -251,8 +251,8 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
 
 2. Create an HTTPRoute that routes incoming requests on the `httpbin.example.com` domain to the httpbin app. 
 
-   {{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}   
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}   
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -275,7 +275,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    ```
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSet" %}}
+   {{% tab name="ListenerSet" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -303,8 +303,8 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
 
 3. Create an HTTPRoute that routes incoming requests on the `petstore.example.com` domain to the petstore app. 
 
-   {{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}   
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}   
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -327,7 +327,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    ```
 
    {{% /tab %}}
-   {{% tab tabName="ListenerSet" %}}
+   {{% tab name="ListenerSet" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -354,14 +354,14 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{< /tabs >}}
 
 4. Get the external address of the Gateway and save it in an environment variable. Note that it might take a few seconds for the Gateway address to become available. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} sni -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward svc/sni -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
    ```
@@ -369,18 +369,18 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{< /tabs >}}
 
 5. Send a request to the `httpbin.example.com` domain with the client certificate that you created earlier. Verify that the gateway presents the TLS certificate for the `httpbin.example.com` domain during the TLS handshake. 
-   {{< tabs items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" tabTotal="3" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -vik --resolve "httpbin.example.com:443:${INGRESS_GW_ADDRESS}"  https://httpbin.example.com:443/anything  
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -vik --resolve "httpbin.example.com:443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://httpbin.example.com:443/anything 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik --connect-to httpbin.example.com:443:localhost:8443 https://httpbin.example.com:443/anything
    ```
@@ -447,18 +447,18 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    ```
 
 6. Send a request to the `petstore.example.com` domain with the client certificate that you created earlier. Verify that the gateway presents the TLS certificate for the `petstore.example.com` domain during the TLS handshake. 
-   {{< tabs items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" tabTotal="3" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -vik --resolve "petstore.example.com:443:${INGRESS_GW_ADDRESS}" https://petstore.example.com:443/api/pets
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -vik --resolve "petstore.example.com:443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://petstore.example.com:443/api/pets 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik --connect-to petstore.example.com:443:localhost:8443 https://petstore.example.com:443/api/pets 
    ```
@@ -512,8 +512,8 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
 
 1. Remove the routing resources for the HTTPS route, including the Kubernetes secret that holds the TLS certificate and key.
 
-   {{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-   {{% tab tabName="Gateway listeners" %}}
+   {{< tabs >}}
+   {{% tab name="Gateway listeners" %}}
 
    ```sh
    kubectl delete secret httpbin-credential -n {{< reuse "docs/snippets/namespace.md" >}}
@@ -525,7 +525,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    kubectl delete service petstore
    ```
    {{% /tab %}}
-   {{% tab tabName="ListenerSet" %}}
+   {{% tab name="ListenerSet" %}}
    ```sh
    kubectl delete secret httpbin-credential -n {{< reuse "docs/snippets/namespace.md" >}}
    kubectl delete secret petstore-credential -n {{< reuse "docs/snippets/namespace.md" >}}

@@ -2,8 +2,8 @@ Extract the values of common headers to generate a redirect URL.
 
 {{< version exclude-if="2.0.x" >}}
 <!--TODO agentgateway transformation
-   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Envoy-based kgateway" %}}
+   {{< tabs >}}
+   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -24,7 +24,7 @@ Extract the values of common headers to generate a redirect URL.
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
+   {{% tab name="Agentgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -97,14 +97,14 @@ Common pseudo headers include:
 
 2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get \
    -H "host: www.example.com" 

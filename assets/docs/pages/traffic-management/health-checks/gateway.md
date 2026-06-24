@@ -39,13 +39,13 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
       ```
 
 3. Send a request to the health check path. Because Envoy is in a draining state, the `503 Service Unavailable` message is returned.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i $INGRESS_GW_ADDRESS:8080/<path>
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/<path>
    ```
@@ -69,13 +69,13 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    ```
 
 5. Send another request to the health check path. Because Envoy is operating normally, the `200 OK` message is returned.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i $INGRESS_GW_ADDRESS:8080/<path>
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/<path>
    ```

@@ -187,8 +187,8 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
 
 1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://example.com" \
@@ -196,7 +196,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
     -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://example.com" \
@@ -274,8 +274,8 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
 
 2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com" \
@@ -283,7 +283,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
     -H "Access-Control-Request-Headers: Origin"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com" \

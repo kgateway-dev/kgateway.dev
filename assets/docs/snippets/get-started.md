@@ -1,12 +1,12 @@
 1. Deploy the Kubernetes Gateway API CRDs.
 
-   {{< tabs items="Standard, Experimental" tabTotal="2" >}}
-   {{% tab tabName="Standard" %}}
+   {{< tabs >}}
+   {{% tab name="Standard" %}}
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/standard-install.yaml
    ```
    {{% /tab %}}
-   {{% tab tabName="Experimental" %}}
+   {{% tab name="Experimental" %}}
    CRDs in the experimental channel are required to use some experimental features in the Gateway API. Guides that require experimental CRDs note this requirement in their prerequisites.
    ```sh
    kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml

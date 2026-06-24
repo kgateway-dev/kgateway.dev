@@ -161,14 +161,14 @@ otel-collector   1/1     Running   0          30s
    | `provider.openTelemetry.grpcService.backendRef` | The Kubernetes Service that receives spans over gRPC (OTLP). |
 
 2. Send a few requests to the httpbin app to generate trace data.
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -si http://$INGRESS_GW_ADDRESS:8080/get \
    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -si localhost:8080/get \
    -H "host: www.example.com"

@@ -183,14 +183,14 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
 5. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
@@ -198,15 +198,15 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{< /tabs >}}
 
 6. Send a request to the httpbin app without a client certificate on both 8443 and 8444 ports. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
    curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
@@ -214,7 +214,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -237,8 +237,8 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
 7. Repeat the request. This time, you include the client certificate that you created earlier. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -251,7 +251,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -265,7 +265,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -397,14 +397,14 @@ In this example, you override the default certificate validation configuration f
    ```
 
 2. If you have not done so yet, get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
@@ -412,15 +412,15 @@ In this example, you override the default certificate validation configuration f
    {{< /tabs >}}
 
 3. Send a request to the httpbin app on both ports without a valid certificate. Verify that the request on port 8443 fails, because the default validation configuration does not allow to establish a connection without a valid certificate. The connection on port 8444 however is established as the port-specific validation configuration mode is set to `AllowInsecureFallback`.
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
    curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
@@ -428,7 +428,7 @@ In this example, you override the default certificate validation configuration f
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -458,8 +458,8 @@ In this example, you override the default certificate validation configuration f
    ```
 
 4. Repeat the request with a valid certificate. Verify that both requests succeed. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -472,7 +472,7 @@ In this example, you override the default certificate validation configuration f
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -486,7 +486,7 @@ In this example, you override the default certificate validation configuration f
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -563,8 +563,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    | `kgateway.dev/verify-subject-alt-names` | A comma-delimited list of the Subject Alternative Names that must be present in the peer certificate that is presented during the TLS handshake.  |
 
 3. Send a request to the httpbin app with your client certificate. Verify that the request succeeds. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -572,7 +572,7 @@ You can configure your mTLS listener to limit connections to clients that presen
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -582,7 +582,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -675,8 +675,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
 5. Repeat the request to the httpbin app with your client certificate. Verify that the request now fails.
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -684,7 +684,7 @@ You can configure your mTLS listener to limit connections to clients that presen
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -694,7 +694,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \

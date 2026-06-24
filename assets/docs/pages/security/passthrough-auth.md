@@ -144,13 +144,13 @@ Deploy an auth server that implements the [Envoy external auth gRPC protocol](ht
 
 3. Send a request without the required header. Verify that the auth server denies the request with a 403 response.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com"
    ```
@@ -168,13 +168,13 @@ Deploy an auth server that implements the [Envoy external auth gRPC protocol](ht
 
 4. Send a request with the `x-ext-authz: allow` header. The Istio auth server is configured to allow requests with this header. Verify that the request succeeds.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080" -H "x-ext-authz: allow"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/headers -H "host: www.example.com" -H "x-ext-authz: allow"
    ```

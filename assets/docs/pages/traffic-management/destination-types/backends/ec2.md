@@ -85,8 +85,8 @@ For the gateway proxy to discover and route traffic to the EC2 instance, you mus
 
 For static credentials, the IAM user must have at least `ec2:DescribeInstances` permissions. For role assumption, the IAM user must have `sts:AssumeRole` permissions and the role must have at least `ec2:DescribeInstances` permissions.
 
-{{< tabs items="Static AWS credentials,Role assumption" >}}
-{{% tab tabName="Static AWS credentials" %}}
+{{< tabs >}}
+{{% tab name="Static AWS credentials" %}}
 
 Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the gateway proxy uses those credentials as-is to discover EC2 instances.
 
@@ -146,7 +146,7 @@ Use this method when your IAM user and EC2 instances are in the same AWS account
    ```
 
 {{% /tab %}}
-{{% tab tabName="Role assumption" %}}
+{{% tab name="Role assumption" %}}
 
 Use this method when you want to limit what the IAM user can do directly, or when your EC2 instances are in a different AWS account than the IAM user. The gateway proxy uses the IAM user credentials stored in the Kubernetes secret to call `sts:AssumeRole`, gets back temporary credentials for the role, and uses those to discover EC2 instances. The `ec2:DescribeInstances` permission is attached to the role, not the user. When using this method, you must also set the `ec2.roleArn` field in the Backend resource.
 
@@ -231,8 +231,8 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
 
 1. Create a Backend resource that represents the EC2 instance. Set the tag that you added to your EC2 instance earlier in the `ec2.filters` field so that the gateway proxy can discover the instance. You can also choose to route traffic to the instance's public or private IP address by using the `addressType` field. Note that if you choose a private address, your cluster must be in the same private network as the EC2 instance, such as in the same VPC.
 
-   {{< tabs items="Static AWS credentials,Role assumption" >}}
-   {{% tab tabName="Static AWS credentials" %}}
+   {{< tabs >}}
+   {{% tab name="Static AWS credentials" %}}
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -257,7 +257,7 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Role assumption" %}}
+   {{% tab name="Role assumption" %}}
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -323,13 +323,13 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
    ```
 
 4. Send a request to the EC2 instance through the gateway proxy. Verify that the output equals the output that you saw earlier when you sent a request to the EC2 directly. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl http://$INGRESS_GW_ADDRESS:8080/ -H "host: ec2.example"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl http://localhost:8080/ -H "host: ec2.example"
    ```
@@ -375,14 +375,14 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
 
 3. Clean up the AWS IAM resources.
 
-   {{< tabs items="Static AWS credentials,Role assumption" >}}
-   {{% tab tabName="Static AWS credentials" %}}
+   {{< tabs >}}
+   {{% tab name="Static AWS credentials" %}}
    ```sh
    aws iam detach-user-policy --user-name ${IAM_USERNAME} --policy-arn ${POLICY_ARN}
    aws iam delete-policy --policy-arn ${POLICY_ARN}
    ```
    {{% /tab %}}
-   {{% tab tabName="Role assumption" %}}
+   {{% tab name="Role assumption" %}}
    ```sh
    aws iam detach-role-policy --role-name kgateway-ec2-role --policy-arn ${POLICY_ARN}
    aws iam delete-role --role-name kgateway-ec2-role

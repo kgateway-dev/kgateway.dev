@@ -38,8 +38,8 @@ To set up {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway for 
    ```
    
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. All traffic from the gateway is automatically intercepted by a ztunnel that is co-located on the same node as the gateway. The ztunnel collects Layer 4 metrics before it forwards the request to the ztunnel that is co-located on the same node as the httpbin app. The connection between ztunnels is secured via mutual TLS.
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
@@ -71,7 +71,7 @@ To set up {{< reuse "/docs/snippets/kgateway.md" >}} as the ingress gateway for 
      }
    }
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    1. Port-forward the `http` pod on port 8080. 
       ```sh
       kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080

@@ -60,8 +60,8 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
 
 Create a TLS policy for the NGINX workload. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead.
 
-{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
-{{% tab tabName="BackendConfigPolicy" %}}
+{{< tabs >}}
+{{% tab name="BackendConfigPolicy" %}}
 
 1. Create a Kubernetes Secret that has the public CA certificate for the NGINX server.
 
@@ -132,7 +132,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 
 {{% /tab %}}
 
-{{% tab tabName="BackendTLSPolicy" %}}
+{{% tab name="BackendTLSPolicy" %}}
 
 1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
@@ -207,13 +207,13 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 1. Send a request to the NGINX server and verify that you get back a 200 HTTP response code. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/ -H "host: example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi http://localhost:8080/ -H "host: example.com:8080"
    ```
@@ -277,8 +277,8 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    
 2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies.
    
-   {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
-   {{% tab tabName="BackendConfigPolicy" %}}
+   {{< tabs >}}
+   {{% tab name="BackendConfigPolicy" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -297,7 +297,7 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="BackendTLSPolicy" %}}
+   {{% tab name="BackendTLSPolicy" %}}
    Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.
    ```yaml
    kubectl apply -f- <<EOF
@@ -351,13 +351,13 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
 
 4. Send a request to the `httpbin-external.example` domain. Verify that the host is rewritten to `https://httpbin.org/anything` and that you get back a 200 HTTP response code.  
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: httpbin-external.example" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi http://localhost:8080/anything -H "host: httpbin-external.example" 
    ```
@@ -396,8 +396,8 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
 
 ### In-cluster service
 
-{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
-{{% tab tabName="BackendConfigPolicy" %}}
+{{< tabs >}}
+{{% tab name="BackendConfigPolicy" %}}
 1. Delete the NGINX server.
 
    ```yaml
@@ -410,7 +410,7 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -A -l app=nginx
    ```
 {{% /tab %}}
-{{% tab tabName="BackendTLSPolicy" %}}
+{{% tab name="BackendTLSPolicy" %}}
 1. Delete the NGINX server.
 
    ```yaml
@@ -438,15 +438,15 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
 
 Delete the resources that you created. 
 
-{{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
-{{% tab tabName="BackendConfigPolicy" %}}
+{{< tabs >}}
+{{% tab name="BackendConfigPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-org
 kubectl delete backendconfigpolicy httpbin-org
 kubectl delete backend httpbin-org
 ```
 {{% /tab %}}
-{{% tab tabName="BackendTLSPolicy" %}}
+{{% tab name="BackendTLSPolicy" %}}
 ```sh
 kubectl delete httproute httpbin-org
 kubectl delete backendtlspolicy httpbin-org

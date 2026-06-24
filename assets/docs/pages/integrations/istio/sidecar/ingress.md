@@ -72,8 +72,8 @@ Create a GatewayParameters resource to configure the Istio SDS container to pull
 * Revisioned istiod deployment, such as `istiod-main`; **or** custom cluster or mesh IDs.
 * Revisionless Istio without custom cluster or mesh IDs.
 
-{{< tabs tabTotal="2" items="Revisioned Istio or custom cluster and mesh IDs,Revisionless Istio without custom IDs" >}}
-{{% tab tabName="Revisioned Istio or custom cluster and mesh IDs" %}}
+{{< tabs >}}
+{{% tab name="Revisioned Istio or custom cluster and mesh IDs" %}}
 
 Create a GatewayParameters resource to configure the revisioned istiod service address and any custom values for the Istio meta cluster ID and meta mesh ID.
 
@@ -113,7 +113,7 @@ Create a GatewayParameters resource to configure the revisioned istiod service a
    EOF
    ```  
 {{% /tab %}}
-{{% tab tabName="Revisionless Istio without custom IDs" %}}
+{{% tab name="Revisionless Istio without custom IDs" %}}
 Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository.
 ```yaml
 kubectl apply -f- <<EOF
@@ -209,14 +209,14 @@ Create or update a Gateway that includes the Istio proxy.
 
 2. Send a request to the productpage app through the gateway. Verify that you get back a 200 HTTP response code. This response code proves that the gateway proxy can establish a mutual TLS connection to the productpage app. 
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I http://$INGRESS_GW_ADDRESS:8080/productpage \
    -H "host: istio-sidecar.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -I http://localhost:8080/productpage \
    -H "host: istio-sidecar.example:8080"

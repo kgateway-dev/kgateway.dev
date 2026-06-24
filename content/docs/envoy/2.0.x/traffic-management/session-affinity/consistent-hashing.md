@@ -32,8 +32,8 @@ In the `loadBalancer` section of a BackendConfigPolicy resource, specify setting
 * **Ringhash**: You can tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup.
 * **Maglev**: You use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning.
 
-{{< tabs tabTotal="2" items="Ringhash,Maglev" >}}
-{{% tab tabName="Ringhash" %}}
+{{< tabs >}}
+{{% tab name="Ringhash" %}}
 ```yaml
 kind: BackendConfigPolicy
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -63,7 +63,7 @@ spec:
 | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
 
 {{% /tab %}}
-{{% tab tabName="Maglev" %}}
+{{% tab name="Maglev" %}}
 Note that no further settings for Maglev are required because it uses a fixed table size.
 
 ```yaml
@@ -89,8 +89,8 @@ Define the request property to use, such as a header, cookie, or source IP addre
 
 The `header`, `cookie`, and `sourceIP` hash policies are mutually exclusive, in that a request can only have one property that the algorithm uses for hashing. However, you can define multiple different hash policies within one {{< reuse "docs/snippets/trafficpolicy.md" >}} by using the `terminal` field for each hash policy. If a policy has the `terminal: true` setting and the policy is matched, any subsequent hash policies are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys.
 
-{{< tabs tabTotal="3" items="Header,Cookie,SourceIP" >}}
-{{% tab tabName="Header" %}}
+{{< tabs >}}
+{{% tab name="Header" %}}
 ```yaml
 kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
@@ -120,7 +120,7 @@ EOF
 | `header.name` | The expected header name to create the hash with. |
 | `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
 {{% /tab %}}
-{{% tab tabName="Cookie" %}}
+{{% tab name="Cookie" %}}
 ```yaml
 kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
@@ -156,7 +156,7 @@ EOF
 | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
 | `terminal` | If you define multiple `hashPolicies` in one {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can use the `terminal: true` setting to indicate the priority policy. |
 {{% /tab %}}
-{{% tab tabName="SourceIP" %}}
+{{% tab name="SourceIP" %}}
 ```yaml
 kubectl apply -f- <<EOF
 kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
@@ -250,14 +250,14 @@ To try out session affinity with consistent hashing, you can follow these steps 
    ```
 
 5. Send a request to the httpbin app and verify that you see the `session-id` cookie in the `set-cookie` header of your response. The `-c` option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i -c cookie-jar -k localhost:8080/headers \
    -H "host: www.example.com:8080"
@@ -280,15 +280,15 @@ To try out session affinity with consistent hashing, you can follow these steps 
    ```
 
 6. Repeat the request a few more times. Include the cookie that you stored in the local file by using the `-b` option. Make sure to send these requests within the 30 minute cookie validity period.
-   {{< tabs tabTotal= "2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k localhost:8080/headers \

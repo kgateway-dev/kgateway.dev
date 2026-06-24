@@ -9,8 +9,8 @@ Change the default route-level timeout of 15 seconds with an HTTPRoute or {{< re
 Specify timeouts for a specific route. 
 
 1. Configure a timeout for a specific route by using the Kubernetes Gateway API-native configuration in an HTTPRoute or by using {{< reuse "docs/snippets/kgateway.md" >}}'s {{< reuse "docs/snippets/trafficpolicy.md" >}}. In the following example, you set a timeout of 20 seconds for httpbin's `/headers` path. However, no timeout is set along the `/anything` path. 
-   {{< tabs tabTotal="2" items="Option 1: HTTPRoute (Kubernetes GW API),Option 2: TrafficPolicy" >}}
-   {{% tab tabName="Option 1: HTTPRoute (Kubernetes GW API)" %}}
+   {{< tabs >}}
+   {{% tab name="Option 1: HTTPRoute (Kubernetes GW API)" %}}
    ```yaml
    kubectl apply -n httpbin -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -49,7 +49,7 @@ Specify timeouts for a specific route.
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Option 2: EnterpriseKgatewayTrafficPolicy"  %}}
+   {{% tab name="Option 2: TrafficPolicy" %}}
    1.  Install the experimental channel of the Kubernetes Gateway API to use this feature.
        ```sh
        kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
@@ -117,13 +117,13 @@ Specify timeouts for a specific route.
    {{< /tabs >}}
 
 2. Send a request to the httpbin app along the `/headers` path that you configured a custom timeout for. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header with the custom timeout of 20 seconds (20000).
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: timeout.example"
    ```
@@ -157,13 +157,13 @@ Specify timeouts for a specific route.
    ```
   
 3. Send a request to the httpbin app along the `anything` path that does not have a custom timeout. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header with the default timeout of 15 seconds (15000). 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: timeout.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/anything -H "host: timeout.example"
    ```

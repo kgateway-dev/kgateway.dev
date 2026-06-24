@@ -24,8 +24,8 @@ Common pseudo headers include:
    * If the request contains the `foo:bar` header, the request path is rewritten to the `/post` path. In addition, the HTTP method is changed to the `POST` method.  
    * If the request does not contain the `foo:bar` header, the request path and method do not change. 
 
-   {{< tabs items="Envoy-based kgateway,Agentgateway" tabTotal="2" >}}
-   {{% tab tabName="Envoy-based kgateway" %}}
+   {{< tabs >}}
+   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF  
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -48,7 +48,7 @@ Common pseudo headers include:
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Agentgateway" %}}
+   {{% tab name="Agentgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF  
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -74,15 +74,15 @@ Common pseudo headers include:
    {{< /tabs >}}
 
 2. Send a request to the `/get` endpoint of the httpbin app. Include the `foo: bar` request header to trigger the request transformation. Verify that you get back a 200 HTTP response code and that your request path is rewritten to the `/post` endpoint. The `/post` endpoint accepts requests only if the HTTP `POST` method is used. The 200 HTTP response code therefore also indicates that the HTTP method was successfully changed from `GET` to `POST`. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "foo: bar" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get \
    -H "foo: bar" \
@@ -140,14 +140,14 @@ Common pseudo headers include:
    ```
    
 3. Send another request to the `/get` endpoint of the httpbin app. This time, you omit the `foo: bar` header. Verify that you get back a 200 HTTP response code and that the request path is not rewritten to the `/post` endpoint. The `/get` endpoint accepts requests only if the HTTP GET method is used. A 200 HTTP response code therefore also verifies that the HTTP method was not changed. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/get \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/get \
    -H "host: www.example.com"

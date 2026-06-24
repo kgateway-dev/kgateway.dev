@@ -75,13 +75,13 @@ The kgateway proxy requires passwords to be hashed using [SHA-1](https://en.wiki
 
 3. Send a request to the httpbin app without any credentials. Verify that the request fails with a 401 HTTP response code. 
    
-   {{< tabs tabTotal= "2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "localhost:8080/headers" -H "host: www.example.com"
    ```
@@ -109,15 +109,15 @@ The kgateway proxy requires passwords to be hashed using [SHA-1](https://en.wiki
    ```
 
 5. Repeat the request. This time, you include the base64 user credentials in an `Authorization` header. Verify that the request now succeeds and returns.
-   {{< tabs tabTotal= "2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "${INGRESS_GW_ADDRESS}:8080/headers" \
    -H "host: www.example.com" \
    -H "Authorization: Basic dXNlcjpwYXNzd29yZA=="
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "localhost:8080/headers" \
    -H "host: www.example.com" \

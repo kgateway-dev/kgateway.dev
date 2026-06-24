@@ -60,13 +60,13 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 
 3. Send a request without a JWT and verify that you get a `401 Unauthorized` response.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik localhost:8080/headers -H "host: www.example.com:8080"
    ```
@@ -112,15 +112,15 @@ To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"kgat
    export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtnYXRld2F5LXB1YmxpYy1rZXktMDAxIn0.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.YCxMm0TmecXsbcbNp6_GXlq5hCFGMD7KhLdOrp3EqzOKl_NX5vm6sNCMNSq5LjbCSKGThn66fnI4P6rlXke7w5kj8khIXQwDn7R0Dy5QOpLAFyE7pk8QGAjkgEGu37bxht5VjbsORdmrfxep1MTy3UEqef60Zwxwt3UtG5KmnsyyedmsCeodPNiNfuhA43r4KahpYg9cIMAnU_Wg-52ztwtqbrVRGxmoj6Efply4FE0xSKhKJZhulViriXR5K2y4zSdxenKvprO46u2ZSka7nq9ehpw_Oqhcwezw7So3lV_xpohiFz_-PGX97TXR1zi0ATjjp7VFxhkbggk8nEEFkQ
    ```
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      --header "Authorization: Bearer $TOKEN"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik localhost:8080/headers \
      -H "host: www.example.com:8080" \
@@ -168,15 +168,15 @@ You can extract claims from the verified JWT and forward them as headers to the 
 
 2. Send the request again with the JWT. Verify that the response includes the `X-Team` and `X-Org` headers, which the gateway extracted from the token's `team` and `org` claims and forwarded to the upstream service.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      --header "Authorization: Bearer $TOKEN"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vik localhost:8080/headers \
      -H "host: www.example.com:8080" \
@@ -296,14 +296,14 @@ EOF
 ```
 Send a request without a token to verify the behavior:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 
 ```sh
 curl -vik localhost:8080/headers -H "host: www.example.com:8080"
@@ -340,13 +340,13 @@ EOF
 ```
 Send a request without a token to verify the behavior:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vik localhost:8080/headers -H "host: www.example.com:8080"
 ```
@@ -388,15 +388,15 @@ EOF
 ```
 Send a request with the sample token to verify audience enforcement:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
   -H "host: www.example.com:8080" \
   --header "Authorization: Bearer $TOKEN"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vik localhost:8080/headers \
   -H "host: www.example.com:8080" \
@@ -443,15 +443,15 @@ EOF
 ```
 Send a request with the token in the `x-jwt` header:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
   -H "host: www.example.com:8080" \
   -H "x-jwt: Bearer $TOKEN"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vik localhost:8080/headers \
   -H "host: www.example.com:8080" \
@@ -490,15 +490,15 @@ EOF
 ```
 Send a request with the token to verify it is forwarded to the upstream:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
   -H "host: www.example.com:8080" \
   --header "Authorization: Bearer $TOKEN"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vik localhost:8080/headers \
   -H "host: www.example.com:8080" \

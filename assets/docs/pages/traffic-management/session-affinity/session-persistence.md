@@ -132,14 +132,14 @@ To try out session persistence, you can follow these steps to define cookie-base
    ```
 
 4. Send a request to the httpbin app and verify that you see the `Session-A` cookie in the `set-cookie` header of your response. The `-c` option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i -c cookie-jar -k localhost:8080/headers \
    -H "host: www.example.com:8080"
@@ -162,15 +162,15 @@ To try out session persistence, you can follow these steps to define cookie-base
    ```
 
 5. Repeat the request a few more times. Include the cookie that you stored in the local file by using the `-b` option. Make sure to send these requests within the 30 minute cookie validity period.
-   {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address or hostname" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k localhost:8080/headers \
@@ -210,29 +210,29 @@ To try out session persistence, you can follow these steps to define cookie-base
       http-7dd94b74-k26j6   3/3     Running   0          8s
       ```
    3. Get the new external address that is assigned to the gateway, or restart local port forwarding.
-      {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-      {{% tab tabName="Cloud Provider LoadBalancer" %}}
+      {{< tabs >}}
+      {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} http -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
       {{% /tab %}}
-      {{% tab tabName="Port-forward for local testing"  %}}
+      {{% tab name="Port-forward for local testing" %}}
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
    ```
       {{% /tab %}}
       {{< /tabs >}}
    4. Repeat the same request with the session cookie. Make sure to send this request within the 30 minute cookie validity period.
-      {{< tabs tabTotal="2" items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-      {{% tab tabName="LoadBalancer IP address or hostname" %}}
+      {{< tabs >}}
+      {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
       {{% /tab %}}
-      {{% tab tabName="Port-forward for local testing" %}}
+      {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
    curl -i -b cookie-jar -k localhost:8080/headers \

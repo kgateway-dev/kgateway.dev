@@ -56,8 +56,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    * `x-response-raw` that is set to `hello`.
    * `x-replace` that is set to a random string.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
@@ -65,7 +65,7 @@ Use an Inja template to extract a value from a request header and add it as a he
     -H "baz: pattern-to-replace"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
