@@ -15,6 +15,12 @@ Install the experimental channel of the {{< reuse "docs/snippets/k8s-gateway-api
 ```shell
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
 ```
+{{< callout type="warning" >}}
+In kgateway 2.2 and later, experimental Gateway API features such as
+`TLSRoute` require the
+`KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=true`
+environment variable to be enabled.
+{{< /callout >}}
 
 ## Create a TLS certificate
 
