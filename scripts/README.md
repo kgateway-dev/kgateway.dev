@@ -2,6 +2,17 @@
 
 This directory contains scripts and tools that help build the kgateway website and documentation.
 
+## Link fix-ups
+
+`generate-ref-docs.py` regenerates the API, Helm, and metrics reference docs from the kgateway repository. Some of those docs contain links that come straight from upstream source comments (Go doc comments and Helm `values.yaml`). When such a link breaks, the real fix belongs in the kgateway source, but the reference docs are also regenerated nightly from **released** kgateway tags, which are immutable. That means a broken URL keeps reappearing for already-released versions even after upstream source is corrected.
+
+`scripts/link-fixups.json` is the safety net. Each entry maps a broken `old` URL to a working `new` URL, and the generator rewrites every occurrence in the generated content for all versions. To add a fix-up:
+
+1. Append an entry to `scripts/link-fixups.json` with the broken URL (`old`), the working URL (`new`), and a short `reason`.
+2. Also fix the link in the kgateway source so new releases ship the correct URL; this file only patches docs generated from older, frozen releases.
+
+Matching is plain substring replacement, not regex.
+
 ## Unit tests
 
 Unit tests for scripts in this directory live in `scripts/tests/`.
@@ -28,6 +39,7 @@ The tests for `generate-ref-docs.py` check that the script:
 - Resolves the expected branch or release tag for a docs version.
 - Skips prerelease tags such as release candidates and beta releases when choosing the latest stable tag.
 - Calls `generate-shared-types.py` with the expected inputs when shared Go types are present.
+- Rewrites every broken link in `scripts/link-fixups.json` to its working URL, leaves already-correct links untouched, and tolerates a missing fix-ups file.
 
 These tests replace real `git` subprocess calls with test doubles so they run quickly and do not require network access.
 
