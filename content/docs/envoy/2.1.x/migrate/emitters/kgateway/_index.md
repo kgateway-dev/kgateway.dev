@@ -92,7 +92,6 @@ routing rules.
 - `nginx.ingress.kubernetes.io/limit-rps`: Not an exact 1:1 mapping for `limit-rps`. See the [rate limiting migration example](../../examples/rate-limiting/) for details.
 - `nginx.ingress.kubernetes.io/limit-rpm`: Not an exact 1:1 mapping for `limit-rpm`. See the [rate limiting migration example](../../examples/rate-limiting/) for details.
 - `nginx.ingress.kubernetes.io/limit-burst-multiplier`
-
 - `nginx.ingress.kubernetes.io/proxy-send-timeout`
 - `nginx.ingress.kubernetes.io/proxy-read-timeout`
 - `nginx.ingress.kubernetes.io/ssl-redirect`: When set to `"true"`, adds a `RequestRedirect` filter to HTTPRoute rules that redirects HTTP to HTTPS with a 301 status code. Note that ingress-nginx redirects with code 308, but that isn't supported by gateway API.
