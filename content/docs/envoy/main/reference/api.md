@@ -247,6 +247,23 @@ _Appears in:_
 | `PublicIP` | AwsAddressTypePublicIP routes to the instance public IP.<br /> |
 
 
+#### AwsAssumeRole
+
+
+
+AwsAssumeRole configures assuming an IAM role via STS to obtain the credentials
+used to interact with the backend (signing Lambda requests, or listing EC2 instances).
+
+
+
+_Appears in:_
+- [AwsAuth](#awsauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `roleArn` _string_ | RoleArn is the ARN of the IAM role to assume, e.g.<br />"arn:aws:iam::123456789012:role/my-invoke-role". |  | MaxLength: 2048 <br />MinLength: 1 <br />Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
+
+
 #### AwsAuth
 
 
@@ -260,8 +277,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
+| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret AssumeRole] <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken".<br />Required when type is 'Secret'. |  |  |
+| `assumeRole` _[AwsAssumeRole](#awsassumerole)_ | AssumeRole configures STS role chaining. The backend's ambient credentials<br />(the gateway ServiceAccount's IRSA identity for Lambda request signing, or the<br />controller's identity for EC2 discovery; more generally any credential resolved<br />by the default provider chain) are used to assume the target role. The resulting<br />temporary credentials are then used to sign requests to the backend (Lambda) or<br />to list instances (EC2). This enables per-backend, least-privilege roles without<br />granting the gateway/controller role direct access to every target.<br />Required when type is 'AssumeRole'. |  |  |
 
 
 #### AwsAuthType
@@ -278,6 +296,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Secret` | AwsAuthTypeSecret uses credentials stored in a Kubernetes Secret.<br /> |
+| `AssumeRole` | AwsAuthTypeAssumeRole assumes an IAM role via STS, chaining off the<br />backend's ambient credentials (the gateway ServiceAccount's IRSA identity<br />for Lambda request signing, or the controller's identity for EC2<br />discovery). The temporary credentials returned by STS are used to<br />interact with the backend.<br /> |
 
 
 #### AwsBackend
@@ -315,7 +334,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
 | `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
-| `roleArn` _string_ | RoleArn is an optional IAM role to assume before listing instances. |  | Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
 | `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
 
 
