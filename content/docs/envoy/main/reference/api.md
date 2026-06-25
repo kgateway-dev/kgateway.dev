@@ -1277,6 +1277,7 @@ _Appears in:_
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 | `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
 | `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
+| `requestAttributes` _string array_ | RequestAttributes specifies a list of Envoy attribute expressions whose values will be<br />included in the ProcessingRequest.attributes map sent to the external processing server<br />on every HTTP request.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto |  |  |
 | `filterStage` _[FilterStageSpec](#filterstagespec)_ | FilterStage specifies where in the HTTP filter chain the ExtProc filter<br />should be placed. If not specified, the ExtProc filter defaults to running<br />after the AuthZ stage. |  |  |
 
 
