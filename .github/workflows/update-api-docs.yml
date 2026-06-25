@@ -10,6 +10,14 @@ on:
         type: string
   release:  # Automatically trigger on new releases
     types: [published]
+  schedule:
+    # Nightly at 07:00 UTC: regenerate every version (incl. main) so docs don't drift from code.
+    - cron: '0 7 * * *'
+
+# Queue overlapping runs (e.g. nightly cron + a manual dispatch) so they don't force-push the same PR branch concurrently.
+concurrency:
+  group: update-api-docs
+  cancel-in-progress: false
 
 jobs:
   generate-api-docs:
@@ -76,7 +84,8 @@ jobs:
         env:
           GITHUB_EVENT_NAME: ${{ github.event_name }}
           GITHUB_RELEASE_TAG: ${{ github.event.release.tag_name }}
-          INPUT_VERSION: ${{ inputs.version }}
+          # On schedule, inputs.version is null — default to "all" so nightly regenerates every version.
+          INPUT_VERSION: ${{ inputs.version || 'all' }}
           KUBE_VERSION: ${{ env.KUBE_VERSION }}
         run: |
           cd kgateway.dev
@@ -93,29 +102,28 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           path: kgateway.dev
-          commit-message: "docs: Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || format(' for {0}', inputs.version == 'all' && 'all versions' || inputs.version) }}"
+          commit-message: "docs: Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || (inputs.version != '' && inputs.version != 'all') && format(' for {0}', inputs.version) || ' for all versions' }}"
           signoff: true
-          title: "Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || format(' for {0}', inputs.version == 'all' && 'all versions' || inputs.version) }}"
+          title: "Update API, Helm, and Metrics reference docs${{ github.event_name == 'release' && format(' for release {0}', github.event.release.tag_name) || (inputs.version != '' && inputs.version != 'all') && format(' for {0}', inputs.version) || ' for all versions' }}"
           body: |
-            ${{ github.event_name == 'release' && format('🎉 **Automated documentation update for release {0}**', github.event.release.tag_name) || format('📝 **Manual documentation update for {0}**', inputs.version == 'all' && 'all supported versions' || format('version {0}', inputs.version)) }}
-            
+            ${{ github.event_name == 'release' && format('🎉 **Automated documentation update for release {0}**', github.event.release.tag_name) || github.event_name == 'schedule' && '🌙 **Nightly automated documentation update for all supported versions**' || format('📝 **Manual documentation update for {0}**', (inputs.version != '' && inputs.version != 'all') && format('version {0}', inputs.version) || 'all supported versions') }}
+
             This PR updates API, Helm, and Metrics reference documentation based on the latest tags from the **kgateway** repository.
-            
-            **Trigger:** ${{ github.event_name == 'release' && '🚀 Release published' || '👤 Manual workflow dispatch' }}
-            ${{ github.event_name == 'release' && format('**Release:** `{0}`', github.event.release.tag_name) || format('**Target version:** `{0}`', inputs.version) }}
-            
+
+            **Trigger:** ${{ github.event_name == 'release' && '🚀 Release published' || github.event_name == 'schedule' && '🌙 Nightly schedule' || '👤 Manual workflow dispatch' }}
+            ${{ github.event_name == 'release' && format('**Release:** `{0}`', github.event.release.tag_name) || format('**Target version:** `{0}`', inputs.version || 'all') }}
+
             **Updates included:**
-            - API reference documentation 
+            - API reference documentation
             - Helm chart reference documentation
             - Control plane metrics documentation
             - Each version uses the latest corresponding tag from the kgateway repository
-            
+
             **File locations:**
             - API docs: `content/docs/envoy/{VERSION}/reference/api.md`
             - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
             - Metrics docs: `assets/docs/snippets/{VERSION}/metrics-control-plane.md`
           branch: api-gen-update
-          branch-suffix: timestamp
           delete-branch: true
           base: main
           labels: |

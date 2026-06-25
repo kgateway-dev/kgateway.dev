@@ -126,7 +126,7 @@ Note that this change does not impact the other delegation annotations:
 
 #### Deprecated support for AI Gateway and Inference Extension with Envoy
 
-AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, use an [agentgateway proxy](https://agentgateway.dev/docs/kubernetes/latest/) instead.
+AI Gateway and Inference Extension support for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs) instead.
 
 #### Fail open policy for ExtProc providers
 
@@ -181,7 +181,7 @@ Disabling policies can be applied to CORS, extAuth, extProc, and rate limit poli
 
 #### Agentgateway integration {#v21-agentgateway}
 
-Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [Agentgateway docs](../../ai/).
+Kgateway now supports [agentgateway](https://agentgateway.dev/), an open source, highly available, highly scalable, and enterprise-grade gateway data plane that provides AI connectivity for agents and tools in any environment. For more information, see the [agentgateway docs](../../ai/).
 
 #### Global policy attachment {#v21-global-policy-attachment}
 
@@ -203,7 +203,7 @@ For more information, see [Customize the gateway]({{< link-hextra path="/setup/c
 
 #### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
 
-Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies, not the agentgateway proxy.
+Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies.
 
 
 #### Horizontal Pod Autoscaling {#hpa}

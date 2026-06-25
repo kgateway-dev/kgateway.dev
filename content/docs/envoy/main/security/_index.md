@@ -1,9 +1,9 @@
 ---
 title: Security
+icon: security
 weight: 450
 description: Secure your gateway to prevent unauthenticated and unauthorized access to your apps. 
 ---
-
 Secure your gateway to prevent unauthenticated and unauthorized access to your apps. 
 
 Securing your API gateway involves multiple layers of protection to safeguard traffic, enforce encryption, and maintain observability. These security features work best in combination. 
@@ -27,3 +27,6 @@ For example, you might use HTTPS listeners for external client connections, enfo
 {{< /cards >}}
 
 <!--{{< card path="/integrations/istio/" title="Istio service mesh for mTLS" icon="bookmark">}}-->
+
+<!--{{< card path="/integrations/istio/" title="Istio service mesh for mTLS" icon="bookmark" subtitle="Use kgateway as the ingress gateway for an Istio ambient or sidecar service mesh.">}}-->
+

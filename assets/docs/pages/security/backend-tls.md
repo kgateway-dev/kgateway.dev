@@ -8,7 +8,7 @@ Originate a one-way TLS connection from the Gateway to a backend.
 
 When you configure a TLS listener on your Gateway, the Gateway typically terminates incoming TLS traffic and forwards the unencrypted traffic to the backend service. However, you might have a service that only accepts TLS connections, or you want to forward traffic to a secured Backend service that is external to the cluster.
 
-You can use the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
+You can use the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
 
 However, to additionally set up different hostnames on the Backend that you want to route to via SNI, or to originate TLS connections to an external backend, use the {{< reuse "docs/snippets/kgateway.md" >}} BackendConfigPolicy instead. 
 
@@ -25,10 +25,6 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 ## In-cluster service
 
 Deploy an NGINX server in your cluster that is configured for TLS traffic. Then, instruct the gateway proxy to terminate TLS traffic at the gateway and originate a new TLS connection from the gateway proxy to the NGINX server.
-
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
 
 ### Deploy the sample app
 
@@ -168,7 +164,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+   {{< reuse "docs/snippets/review-table.md" >}} For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/).
 
    | Setting | Description |
    |---------|-------------|
@@ -258,6 +254,10 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
 
+{{< callout type="info">}}
+If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS can override the TLS settings from your BackendTLSPolicy or BackendConfigPolicy, causing backend TLS connections to fail. To prevent this failure, add the `kgateway.dev/disable-istio-auto-mtls: "true"` annotation to the Backend resource. For more information, see [Istio ingress]({{< link-hextra path="/integrations/istio/sidecar/ingress/" >}}).
+{{< /callout >}}
+
 1. Create a Backend resource that represents your external service. In this example, you use a static Backend that routes traffic to the `httpbin.org` site. Make sure to include the HTTPS port 443 so that traffic is routed to this port. 
    ```yaml
    kubectl apply -f- <<EOF
@@ -275,12 +275,10 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    EOF
    ```
    
-2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies. For agentgateway proxies, use the BackendTLSPolicy.
+2. Create a TLS policy that originates a TLS connection to the Backend that you created in the previous step. To originate the TLS connection, you use known trusted CA certificates. You can use the Gateway API BackendTLSPolicy for simple, one-way TLS connections. For more advanced TLS connections or simply to reduce the number of resources if you use other backend connections, create a BackendConfigPolicy instead. Note that the BackendConfigPolicy is only supported for Envoy-based kgateway proxies.
    
    {{< tabs tabTotal="2" items="BackendConfigPolicy,BackendTLSPolicy" >}}
    {{% tab tabName="BackendConfigPolicy" %}}
-   
-   {{< reuse "docs/snippets/proxy-kgateway.md" >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

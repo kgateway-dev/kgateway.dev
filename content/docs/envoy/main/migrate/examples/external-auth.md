@@ -1,5 +1,6 @@
 ---
 title: "External Auth"
+description: Convert Ingress NGINX auth-url annotations to a kgateway external auth GatewayExtension.
 weight: 60
 ---
 

@@ -1,5 +1,6 @@
 ---
 title: "Canary Deployments"
+description: Convert Ingress NGINX canary annotations to weighted HTTPRoute backends.
 weight: 70
 ---
 

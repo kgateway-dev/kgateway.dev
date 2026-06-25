@@ -1,5 +1,6 @@
 ---
 title: Access AWS Lambda with a credentials secret
+description: Authenticate to AWS Lambda by using long-lived credentials stored in a Kubernetes secret.
 weight: 20
 ---
 

@@ -7,11 +7,142 @@ h6 {
     font-family: 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.nav-container {
-    font-family: 'Figtree', 'ui-sans-serif', 'system-ui', 'sans-serif', "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+/* ──────────────────────────────────────────────────────────────────────
+ * Tailwind 4 hx: utility fallbacks.
+ *
+ * Hextra v0.12.3 ships a precompiled main.css generated from its own
+ * template scan only. Any hx-prefixed utility kgateway's local templates
+ * use that Hextra itself doesn't happen to use is absent from the bundle.
+ * These rules fill those specific gaps. They mirror Tailwind 4's emit
+ * shape (including the :where(.dark, .dark *) compound for dark variants
+ * and a calc-based color-mix for hover variants) and pull from Hextra's
+ * own --hx-color-* CSS variables so they track Hextra's palette.
+ *
+ * Audited 2026-05-21. When upgrading Hextra, re-audit by diffing
+ * hugo_stats.json against the compiled bundle. Any new misses can land
+ * here without touching templates.
+ * ────────────────────────────────────────────────────────────────────── */
+
+/* Nav logo light/dark variant visibility. The navbar emits two <img>s — a
+   light-mode logo with `hx:block hx:dark:hidden` and a dark-mode logo with
+   `hx:hidden hx:dark:block`. The hextra-bundled utility classes are present
+   and in the expected source order in the compiled bundle, yet in dark mode
+   both logos render side-by-side on this site (root cause unclear — possibly
+   a Tailwind 4 layer/cascade interaction specific to multi-utility display
+   resolution). Pin visibility with higher-specificity `.dark .nav-container`
+   selectors plus !important so only the correct variant shows in each mode. */
+.nav-container a img.hx\:dark\:hidden { display: block !important; }
+.nav-container a img.hx\:dark\:block  { display: none  !important; }
+.dark .nav-container a img.hx\:dark\:hidden { display: none  !important; }
+.dark .nav-container a img.hx\:dark\:block  { display: block !important; }
+
+.hx\:flex-1 { flex: 1 1 0% }
+.hx\:ml-1 { margin-left: calc(var(--hx-spacing) * 1) }
+.hx\:ml-auto { margin-left: auto }
+.hx\:mb-0\.5 { margin-bottom: calc(var(--hx-spacing) * 0.5) }
+.hx\:order-first { order: -9999 }
+.hx\:max-w-6xl { max-width: 72rem }
+.hx\:rotate-90 { rotate: 90deg }
+.hx\:space-y-1 > :not([hidden]) ~ :not([hidden]) { margin-top: calc(var(--hx-spacing) * 1) }
+.hx\:text-gray-400 { color: var(--hx-color-gray-400) }
+
+.hx\:dark\:bg-gray-900:where(.dark, .dark *) { background-color: var(--hx-color-gray-900) }
+.hx\:dark\:hover\:bg-gray-900:where(.dark, .dark *):hover { background-color: var(--hx-color-gray-900) }
+.hx\:dark\:inline-block:where(.dark, .dark *) { display: inline-block }
+.hx\:dark\:text-gray-500:where(.dark, .dark *) { color: var(--hx-color-gray-500) }
+
+/* Theme-toggle trigger: collapse the 3 stacked icons (sun/moon/contrast)
+   down to the one matching the current data-theme. Hextra's bundled
+   `group-data-[theme=X]:hidden:is(:where(.hx\:group)[data-theme=X] *)`
+   rule SHOULD do this on its own, but in this build the icons all show
+   anyway — likely a Tailwind 4 compound-selector quirk with how the
+   class name escapes interact with the `:is(:where(...) *)` form. These
+   override rules use a simpler `[data-theme]` ancestor matcher that
+   shadows the bundled rule. */
+[data-theme="light"] .hx\:group-data-\[theme\=light\]\:hidden,
+[data-theme="dark"]  .hx\:group-data-\[theme\=dark\]\:hidden,
+[data-theme="system"] .hx\:group-data-\[theme\=system\]\:hidden {
+  display: none !important;
 }
 
-.hextra-card-subtitle {
-    text-align: left !important;
+/* Theme-toggle dropdown popover: direct rules for the same reason as
+   above — the Tailwind 4 `hx:*` utility classes on the <ul> render
+   correctly in compiled CSS but don't visually apply here. Hardcode
+   the box chrome (white bg, gray border, rounded, shadow, padding,
+   spacing) so the popup looks like the docs site's. */
+.hextra-theme-toggle-options {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  padding: 0.25rem;
+  min-width: 8rem;
+  font-size: 0.875rem;
+  list-style: none;
+  z-index: 20;
+}
+.dark .hextra-theme-toggle-options {
+  background: #171717;
+  border-color: #404040;
+}
+.hextra-theme-toggle-options button[role="menuitemradio"] {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  color: #374151;
+  position: relative;
+  white-space: nowrap;
+}
+.dark .hextra-theme-toggle-options button[role="menuitemradio"] {
+  color: #d1d5db;
+}
+.hextra-theme-toggle-options button[role="menuitemradio"]:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+.dark .hextra-theme-toggle-options button[role="menuitemradio"]:hover {
+  background: #262626;
+  color: #f3f4f6;
 }
 
+/* Align the centralized docs sidebar and TOC with the breadcrumb on
+   kgw docs pages. Kgw's main hx:pt-6 leaves the breadcrumb ~30px below
+   the navbar shadow; the centralized .sidebar-nav-wrapper and
+   .solo-toc-inner default to a much smaller top offset (tuned for
+   agw's tighter pt-2 layout), so pad them down here. */
+aside.sidebar-container > .sidebar-nav-wrapper {
+  padding-top: 1.1875rem;
+}
+nav.hextra-toc > div.hextra-scrollbar {
+  padding-top: 1.875rem;
+}
+
+/* Blog page background: no Tailwind bg class on the element so there is
+   nothing to fight. Light mode is plain white; dark mode uses the same
+   --hx-color-dark variable the top nav blur div uses, guaranteeing an
+   exact colour match without needing to know the hex value. */
+.blog-page,
+.resource-page {
+  background-color: white;
+}
+.dark .blog-page,
+.dark .resource-page {
+  background-color: var(--hx-color-dark);
+}
+
+/* Content link dark mode: docs-theme-extras hardcodes .content a to
+   #158bc2 (42% lightness) with no dark variant. brand-oss.css already
+   defines --theme-primary at hsl(212,100%,60%) for dark mode — wire links
+   up to it so they're readable on the dark background. Applies to both
+   blog pages and docs pages that load brand-oss. */
+.dark .content a {
+  color: var(--theme-primary);
+}
+.dark .content a:hover {
+  color: hsl(212, 100%, 72%);
+}

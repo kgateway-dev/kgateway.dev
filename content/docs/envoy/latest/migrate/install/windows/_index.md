@@ -1,5 +1,6 @@
 ---
 title: "Windows Installation"
+description: Install the ingress2gateway CLI on Windows.
 weight: 30
 ---
 
@@ -8,7 +9,7 @@ weight: 30
 1. Set your environment variables.
 
     ```bash
-    VERSION=v0.4.0
+    VERSION=v0.5.0
     OS=Windows
     # One of arm64|x86_64|i386
     ARCH=arm64

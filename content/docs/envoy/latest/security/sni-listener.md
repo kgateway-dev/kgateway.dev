@@ -1,5 +1,6 @@
 ---
 title: SNI listener
+description: Route HTTPS traffic to different backends based on the SNI hostname presented by the client.
 weight: 20
 ---
 

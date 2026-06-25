@@ -1,5 +1,6 @@
 ---
 title: "Linux Installation"
+description: Install the ingress2gateway CLI on Linux.
 weight: 20
 ---
 

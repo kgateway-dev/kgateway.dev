@@ -11,11 +11,20 @@ kgateway_resources_status_syncs_completed_total|counter|gateway, namespace, reso
 kgateway_resources_status_syncs_started_total|counter|gateway, namespace, resource|Total number of status syncs started
 kgateway_resources_updates_dropped_total|counter||Total number of resources metrics updates dropped. If this metric is ever greater than 0, all resources subsystem metrics should be considered invalid until process restart
 kgateway_routing_domains|gauge|namespace, gateway, port|Number of domains per listener
+kgateway_routing_replacements_total|counter|gateway_namespace, gateway, error_type|Number of routes, virtual hosts, or route configurations replaced with a synthetic 500 direct response due to invalid configuration detected during translation.
 kgateway_status_syncer_status_sync_duration_seconds|histogram|name, namespace, syncer|Status sync duration
 kgateway_status_syncer_status_syncs_total|counter|name, namespace, syncer, result|Total number of status syncs
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
 kgateway_translator_translations_running|gauge|name, namespace, translator|Current number of translations running
 kgateway_translator_translations_total|counter|name, namespace, translator, result|Total number of translations
+kgateway_validation_cache_hits_total|counter|caller|Total number of Envoy validation cache hits.
+kgateway_validation_cache_misses_total|counter|caller|Total number of Envoy validation cache misses.
+kgateway_validation_calls_total|counter|caller|Total number of Envoy validation requests.
+kgateway_validation_duration_seconds|histogram|caller, result|Duration of Envoy validation requests.
+kgateway_validation_invalid_xds_total|counter|caller|Total number of Envoy invalid-xDS validation results.
+kgateway_validation_invocation_errors_total|counter|caller|Total number of Envoy validation invocation errors.
+kgateway_validation_mode|gauge|mode, validator_mode|Configured validation mode. The active mode series has value 1.
+kgateway_validation_valid_total|counter|caller|Total number of successful Envoy validation results.
 kgateway_xds_auth_rq_failure_total|counter||Total number of failed xDS auth requests
 kgateway_xds_auth_rq_success_total|counter||Total number of successful xDS auth requests
 kgateway_xds_auth_rq_total|counter||Total number of xDS auth requests

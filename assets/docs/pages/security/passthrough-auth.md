@@ -99,7 +99,7 @@ Deploy an auth server that implements the [Envoy external auth gRPC protocol](ht
 
 ## Set up passthrough auth
 
-1. Create a GatewayExtension resource that points the proxy to your auth server. The GatewayExtension must be in the same namespace as the Service that backs the auth server, or you must set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/).
+1. Create a GatewayExtension resource that points the proxy to your auth server. The GatewayExtension must be in the same namespace as the Service that backs the auth server, or you must set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/).
 
    ```yaml
    kubectl apply -f - <<EOF

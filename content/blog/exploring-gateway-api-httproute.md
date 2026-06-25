@@ -6,7 +6,7 @@ author: Nadine Spies
 excludeSearch: true
 ---
 
-An [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/) resource is the main resource in the Kubernetes Gateway API to define HTTP routing rules for one or more services in your cluster. Its configuration is simple and easy to comprehend.
+An [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/) resource is the main resource in the Kubernetes Gateway API to define HTTP routing rules for one or more services in your cluster. Its configuration is simple and easy to comprehend.
 
 Take the following example route:
 
@@ -153,7 +153,7 @@ I vividly recall how Netflix years ago [presented a talk](https://youtu.be/mHHHp
 Think about what else you can achieve with matchers. Another powerful capability is to segment traffic based on the user’s geolocation, which can improve performance and the overall user experience, but also help meet compliance standards. 
 
 ## Filters
-If you are excited about matches, wait until you explore what filters can do for you. With filters, you have another powerful tool at hand that allows you to modify, inspect, and manipulate matched requests. The Kubernetes Gateway API specifies several [types of filters](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteFilterType) including:
+If you are excited about matches, wait until you explore what filters can do for you. With filters, you have another powerful tool at hand that allows you to modify, inspect, and manipulate matched requests. The Kubernetes Gateway API specifies several [types of filters](https://gateway-api.sigs.k8s.io/reference/api-spec/#httproutefiltertype) including:
 
 - **RequestRedirect** which is great to redirect HTTP traffic to HTTPS.
 - **URLRewrite** which is a useful tool when dealing with API evolution so that you can continue to support deprecated routes while removing newer versions of an API.  
@@ -205,7 +205,7 @@ However, when traffic comes in on the `/direct-response` path, the gateway will 
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: httpbin-direct-resonse
+  name: httpbin-direct-response
   namespace: httpbin
 spec:
   parentRefs:

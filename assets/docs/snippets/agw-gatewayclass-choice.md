@@ -1,1 +1,1 @@
-To use the default Envoy-based {{< reuse "/docs/snippets/kgateway.md" >}} proxy, set the `gatewayClassName` to `{{< reuse "/docs/snippets/gatewayclass.md" >}}`. To use [agentgateway](https://agentgateway.dev/docs/), set the `gatewayClassName` to `agentgateway`.
+Set the `gatewayClassName` to `{{< reuse "/docs/snippets/gatewayclass.md" >}}`.

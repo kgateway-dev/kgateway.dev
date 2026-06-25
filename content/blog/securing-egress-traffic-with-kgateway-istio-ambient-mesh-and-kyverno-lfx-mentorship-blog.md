@@ -9,7 +9,7 @@ excludeSearch:
 Modern Kubernetes platforms already secure in-cluster (east–west) communication through service meshes like Istio. But the same rigor rarely applies to outbound (egress) traffic — calls leaving the cluster to reach APIs, model endpoints, or third-party services. Without standardized policies, teams often struggle to track which workloads are reaching out to the internet, whether those requests are properly authorized, and how to enforce consistent authentication without adding custom code in every service. This blog reflects my LFX Mentorship journey, where I deep-dived into designing a well governed, observable, and secure egress pathway for Kubernetes workloads.
 Modern Kubernetes platforms already secure in-cluster (east–west) communication.
 
-These inconsistencies create both visibility gaps and compliance risks. Platform engineers also need to ensure that failures in external dependencies don’t cascade back into the cluster. The goal of this post is to design a policy-enforced, resilient egress path that is observable, auditable, and governed, using three key technologies working together: **[kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/)** (an Envoy-based pluggable gateway), **[Istio Ambient Mesh](https://ambientmesh.io/docs/about/overview/)** (providing secure L4 identity and mTLS), and **[Kyverno](https://kyverno.io/docs/installation/)** (for external authorization and configuration governance).
+These inconsistencies create both visibility gaps and compliance risks. Platform engineers also need to ensure that failures in external dependencies don’t cascade back into the cluster. The goal of this post is to design a policy-enforced, resilient egress path that is observable, auditable, and governed, using three key technologies working together: **[kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/)** (an Envoy-based pluggable gateway), **[Istio Ambient Mesh](https://ambientmesh.io/docs/about/overview/)** (providing secure L4 identity and mTLS), and **[Kyverno](https://kyverno.io/docs/installation/installation/)** (for external authorization and configuration governance).
 
 ## The challenge with outgoing traffic
 
@@ -58,14 +58,14 @@ flowchart LR
 
 ```
 
-## Prequisites
+## Prerequisites
 Before setting up the integration between kgateway, Istio Ambient Mesh, and Kyverno, ensure that your local or lab environment includes the following tools and configurations:
-* [Docker](https://docs.docker.com/get-docker/)
+* [Docker](https://docs.docker.com/get-started/get-docker/)
 * [kind (Kubernetes in Docker)](https://kind.sigs.k8s.io/docs/user/quick-start/)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [Helm](https://helm.sh/docs/intro/install/)
 * [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/)
-* [Kyverno](https://kyverno.io/docs/installation/)
+* [Kyverno](https://kyverno.io/docs/installation/installation/)
 
 
 # How Istio Ambient Mesh is different from Service Mesh
@@ -79,10 +79,10 @@ This separation lets platform teams choose when L7 processing is necessary, redu
 
 ## kgateway's integration with Ambient Mesh
 kgateway integrates to Ambient Mesh for managing our workloads through Layer 4 and Layer 7 network policies. But the thing that sets its apart from other Gateway solutions is that, kgateway is the first project that can be used as a pluggable waypoint for Istio. 
-kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatability, Shared Observability, Faster Adoption of Security Featrues and Unified Configurational Model with Ambient Mesh.
+kgateway has been built on same Envoy engine that Istio’s waypoint implementation uses, which has certain features including Istio API Compatibility, Shared Observability, Faster Adoption of Security Features and Unified Configuration Model with Ambient Mesh.
 
 ## Prepare your kgateway environment
-Before integrating kagteway with Istio Ambient, ensure we have: 
+Before integrating kgateway with Istio Ambient, ensure we have: 
 1. Follow the [Get started guide](https://kgateway.dev/docs/envoy/latest/quickstart/) to install kgateway in a kind cluster
 2. Follow the [Sample app guide](https://kgateway.dev/docs/envoy/latest/install/sample-app/) to create a gateway proxy with an HTTP listener and deploy the httpbin sample app.
 3. Set up an ambient mesh in your cluster to secure service-to-service communication with mutual TLS by following the [ambientmesh.io](https://ambientmesh.io/docs/quickstart/) quickstart documentation.
@@ -90,9 +90,9 @@ Before integrating kagteway with Istio Ambient, ensure we have:
    ```
    docker run -d -v ollama:/root/.ollama -p 11434:11434 -e OLLAMA_HOST=0.0.0.0 ollama/ollama --name ollama-server
    ```
-5. Get the Container IP of ollama container which will be inserted at all the **`address filds` which is 172.17.0.2 in our case.
+5. Get the Container IP of ollama container which will be inserted at all the **`address fields` which is 172.17.0.2 in our case.
    ```
-   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTIANER_NAME>
+   docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <CONTAINER_NAME>
    ```
    Here it will get container's IP as an output:
    ```
@@ -407,28 +407,29 @@ Through this Blog we addressed one of the most overlooked challenges in service 
 
 # Demo
 
-[Demo](https://youtu.be/5PegECeu0v0)
 
 
+<div style="margin: 1.5rem 0;">
 {{< youtube 5PegECeu0v0 >}}
+</div>
 
 # My LFX Mentorship Experience
-It's always great to contribute to a project and gain skills, experience, expertise and knowledge while working on certain different features of that project, but one of the most important part of contributing to an open source or being a part of an amazing project like kgateway is building up a strong confidence towards the future of the project and building up a commitement for the future to keep contributing as much value back to the project, to keep project's growth gain a consistent or exponential growth sustainably over the interval.
+It's always great to contribute to a project and gain skills, experience, expertise and knowledge while working on certain different features of that project, but one of the most important part of contributing to an open source or being a part of an amazing project like kgateway is building up a strong confidence towards the future of the project and building up a commitment for the future to keep contributing as much value back to the project, to keep project's growth gain a consistent or exponential growth sustainably over the interval.
 
 This is only possible with project's strong aim to solve problems in the most required format and with a strong community which is committed to keep the things **Up and Running**, inspired in a direction to solve issues that really messes around with the minds and tasks of the Developers but still remains ignored amid its complexity. 
 
-For a Mentee, his Mentors are the faces of the entire project's community, on which they are working! Thus, it would'nt have been possible without the help of my Mentors - **Nina Polshakova** who kept helping me in the journey of this entire mentorship with every PR added & weekly targets, while contributing constantly to the latest Release v2.1 of kgateway with its first and biggest integration with agentgateway, and **Lin Sun** who helped me and the presiding the entire open source community while managing projects like agentgateway and kagent while working on kgateway's latest release v2.1!
+For a Mentee, his Mentors are the faces of the entire project's community, on which they are working! Thus, it wouldn't have been possible without the help of my Mentors - **Nina Polshakova** who kept helping me in the journey of this entire mentorship with every PR added & weekly targets, while contributing constantly to the latest Release v2.1 of kgateway with its first and biggest integration with agentgateway, and **Lin Sun** who helped me and the presiding the entire open source community while managing projects like agentgateway and kagent while working on kgateway's latest release v2.1!
 
-Community at **Kgateway** have been constantly focussing to solve issues which revolves around integration, observability, Security, AI collaboration and Governance implementing the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls. Community have been markign a huge impact by managing projects that can really impact the Workload orchestration and management through projects like:
+Community at **Kgateway** have been constantly focussing to solve issues which revolves around integration, observability, Security, AI collaboration and Governance implementing the Kubernetes Gateway API with a control plane that scales from lightweight microgateway deployments between services, to massively parallel centralized gateways handling billions of API calls. Community have been marking a huge impact by managing projects that can really impact the Workload orchestration and management through projects like:
 - **kgateway** to focus on control plane while integrating with Envoy-based data plane for secure API management of ingress, egress and service mesh.
 - **agentgateway** to provide an AI-first enterprise data plane for connectivity across agents, MCP tools, LLMs and interferences written in Rust.
 
 ## Community Interaction & Participation
-It's always a good idea to go through the project and interract with the community before applying, but many menntees get too excited here and staright away apply for the mentorship which might highlight add some lack of interest in the project in Future.
+It's always a good idea to go through the project and interact with the community before applying, but many mentees get too excited here and straight away apply for the mentorship which might highlight add some lack of interest in the project in Future.
 
 For me, **the value that the project have been adding to the entire landscape matters the most**. kgateway attracted my attention with its contributions, which made me to go through the documentation and even make a [YouTube Video](https://www.youtube.com/watch?v=RWQbUvVBUTI), explaining about Architecture of kgateway's Control Plane & Data Plane components, and Project's Deployment Patterns, before the mentorship was even announced!
 
-For collaborating with the community Members, I tied attending Community Meetings and even organized a [Podcast](https://www.youtube.com/watch?v=raWq9Q0Pmws) with my Mentor **Lin Sun** on my [YouTube channel](https://www.youtube.com/@AryanParashar_) on the ocassion of kagteway getting accepted as a CNCF Sandbox Project, where I tried understanding about the kgateway community's future goals, its capabilities which sets it apart from other gateway projects and get to know about the experiences of the kgateway's community members who have have been leading and contributing to the entire Kubernetes Project!
+For collaborating with the community Members, I tied attending Community Meetings and even organized a [Podcast](https://www.youtube.com/watch?v=raWq9Q0Pmws) with my Mentor **Lin Sun** on my [YouTube channel](https://www.youtube.com/@AryanParashar_) on the occasion of kgateway getting accepted as a CNCF Sandbox Project, where I tried understanding about the kgateway community's future goals, its capabilities which sets it apart from other gateway projects and get to know about the experiences of the kgateway's community members who have have been leading and contributing to the entire Kubernetes Project!
 
 These community collaborations and experiences attracted my attention to feel that working closely and contributing to this Project can really increase my experience and then LFX Mentorship came up as the best opportunity for me to get myself involved deeply within the Project and it's capabilities!
 
@@ -441,16 +442,16 @@ Working on a Mentorship Project can be really exciting that has been bound to th
 5. **Reflect your Technical Experience**: prove your technical expertise through actual code contributions.
 6. **Participation in Community**: Participate in Community's slack channel, Community Meetings to understand the future goals, Present requirements and problems that users are experiencing and maintain Regularly sync progress with mentors
 
-### My Contributions made during Mentoship
+### My Contributions made during Mentorship
 During this mentorship, I had the opportunity to work across several areas of the kgateway ecosystem, contributing through hands-on development, documentation improvements, and technical deep dives including: 
-1. Documnetation for ServiceEntries management with kgateway and Istio.
+1. Documentation for ServiceEntries management with kgateway and Istio.
 2. Fixing Bugs in **exAuth** Policies of kgateway.
-3. Opening Issues related to Docuemntation improvements like **Traffic Management with gRPC services, GAMMA Integration, exAuth, etc**.
+3. Opening Issues related to Documentation improvements like **Traffic Management with gRPC services, GAMMA Integration, exAuth, etc**.
 4. Contributed to kgateway's latest version **v2.1** Release Blog.
 5. Building Security integration of kgateway with Istio and Kyverno for its exAuth and CEL based Authz testing policies.
 6. Running Demo for Security integration of kgateway with Istio & Kyverno.
 7. Contributing to **Argo Rollouts** integration to kgateway, while using **agentgateway** as its gatewayClass.
-8. Advocating for kgateway project through a demo video on my Youtube channel with its agentgaetway integration in version v2.1 and MCP walkthrough.
+8. Advocating for kgateway project through a demo video on my Youtube channel with its agentgateway integration in version v2.1 and MCP walkthrough.
 
 ## Mentorship Conclusion
 My LFX Mentorship with the kgateway community has been much more than completing weekly tasks or shipping a handful of PRs — it has fundamentally shaped how I think about open-source collaboration, real-world infrastructure design, and the responsibility that comes with contributing to a CNCF ecosystem project. This journey helped me understand the true depth of modern API gateways, the evolving role of Ambient Mesh, and how governance, observability, security, and automation must work together to create reliable platforms.
@@ -460,5 +461,5 @@ Most importantly, this mentorship strengthened my confidence as an engineer. Thr
 The experience I gained around Gateway API, Envoy, kgateway, agentgateway, Argo Rollouts and Istio Ambient Mesh will continue to influence my career for years to come. But beyond the technical depth, the mentorship taught me the value of community, communication, and consistency.
 This mentorship has been one of the most meaningful steps in my cloud-native journey. Working closely with the kgateway community gave me the opportunity to contribute to real features, solve practical problems, and understand how modern API gateways are evolving around security, governance, and interoperability. From improving documentation and debugging exAuth policies to helping with the v2.1 release, building security demos, and integrating Argo Rollouts with agentgateway. I am deeply grateful to my mentors, the kgateway community, and the CNCF for trusting me with this opportunity and for helping me grow as an open-source contributor.
 
-This is not the end — just the beginning. I will be continuing my regular contributions, sharing what I’ve learned with the community, and helping the **kgateway** Project evolve as it grows. The journey has been inspiring, and I’m really excited to keep building, collaborating, and contributing to the future of **kgateway, aganetgateway** and all cloud-native technologies.
+This is not the end — just the beginning. I will be continuing my regular contributions, sharing what I’ve learned with the community, and helping the **kgateway** Project evolve as it grows. The journey has been inspiring, and I’m really excited to keep building, collaborating, and contributing to the future of **kgateway, agentgateway** and all cloud-native technologies.
 

@@ -1,5 +1,6 @@
 ---
 title: Backends
+description: Route to backends outside your cluster, including static hosts, AWS Lambda functions, and AWS EC2 instances.
 weight: 20
 ---
 
@@ -8,13 +9,6 @@ Use a Backend resource to define a backing destination that you want kgateway to
 ## Types
 
 Check out the following guides for examples on how to use the supported Backends types with kgateway. 
-
-{{< cards >}}
-  {{< card link="static" title="Static IP address or hostname" >}}
-  {{< card link="lambda" title="AWS Lambda" >}}
-  {{< card link="../../dfp" title="Dynamic Forward Proxy (DFP)" >}}
-{{< /cards >}}
-
 ## Routing
 
 You can route to a Backend by referencing that Backend in the `backendRefs` section of your HTTPRoute resource as shown in the following example. Note that if your Backend and HTTPRoute resources exist in different namespaces, you must create a Kubernetes ReferenceGrant resource to allow the HTTPRoute to access the Backend.

@@ -1,0 +1,39 @@
+{{- /*
+  Module bootstrap MUST be the first call here. docs-theme-extras ships
+  its head-end content (brand CSS, fonts, sidebar-loading, hash scroll,
+  TOC scroll-spy, Copy-as-Markdown, version dropdown JS) inside
+  themeExtras/head-end.html instead of partials/custom/head-end.html
+  because Hugo's project-over-imports precedence would let this very file
+  silently win and drop the module's bootstrap. The explicit invocation
+  below is the documented contract — see the module's
+  themeExtras/head-end.html header for the why.
+
+  Everything BELOW the partial call is kgateway-specific (the local
+  PostCSS pipeline, Figtree font, glossary tooltip stylesheet).
+*/ -}}
+{{ partial "themeExtras/head-end.html" . }}
+
+{{/* Consumer-local PostCSS pipeline. The module ships the docs-theme-extras
+     CSS (component baseline + brand layer) via themeExtras/head-end.html;
+     this bundle on top carries kgateway-specific Tailwind utility usage. */}}
+{{ $options := dict "inlineImports" true "config" "./assets/css/postcss.config.js" }}
+{{ $styles := resources.Get "css/styles.css" }}
+{{ $styles = $styles | css.PostCSS $options }}
+{{- if hugo.IsProduction }}
+{{ $styles = $styles | minify | fingerprint | resources.PostProcess }}
+<link href="{{ $styles.Permalink }}" rel="stylesheet" integrity="{{ $styles.Data.Integrity }}" />
+{{- else }}
+<link href="{{ $styles.Permalink }}" rel="stylesheet" />
+{{ end }}
+
+{{/* Font preconnects — perf hints. The module's themeExtras/head-end.html
+     emits the brand-conditional font (Open Sans for oss); the Figtree
+     family is kgateway-only and stays here. */}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+
+{{- /* Glossary tooltip CSS + JS are now centralized in docs-theme-extras
+       (loaded from themeExtras/head-end.html above). */ -}}
+</content>
+</invoke>

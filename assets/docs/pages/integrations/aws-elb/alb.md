@@ -41,6 +41,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: alb
+     namespace: {{< reuse "docs/snippets/namespace.md" >}}
    spec:
      gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
      listeners:

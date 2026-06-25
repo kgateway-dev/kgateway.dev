@@ -1,5 +1,6 @@
 ---
 title: Static
+description: Route to static IP addresses or hostnames outside the cluster with a Backend resource.
 weight: 10
 ---
 

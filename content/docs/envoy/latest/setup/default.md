@@ -1,6 +1,7 @@
 ---
 title: Default proxy setup
-weight: 10
+description: Walk through the default GatewayClass, GatewayParameters, and proxy resources that kgateway creates.
+weight: 5
 next: /docs/setup/customize
 ---
 

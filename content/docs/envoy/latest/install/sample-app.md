@@ -58,7 +58,7 @@ The following configuration file creates the httpbin app. To review the source f
 
 Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}.
 
-1. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces.
+1. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces.{{< conditional-text include-if="envoy" >}} For more information about which GatewayClass to use, see [About gateway proxies](../../about/proxies/).{{< /conditional-text >}}
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -139,7 +139,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
    |--|--|
    |`spec.parentRefs`|The name and namespace of the Gateway resource that serves the route. In this example, you use the `http` Gateway that you created earlier.  |
    |`spec.hostnames`|A list of hostnames that the route is exposed on. In the example, the route is exposed on `www.example.com`. |
-   |`spec.rules.backendRefs`| The Kubernetes service that serves the incoming request. In this example, requests to `www.example.com` are forwarded to the httpbin app on port 8000. Note that you must create the HTTPRoute in the same namespace as the service that serves that route. To create the HTTPRoute resource in a different namespace, you must create a ReferenceGrant resource to allow the HTTPRoute to forward requests to a service in a different namespace. For more information, see the [Kubernetes API Gateway documentation](https://gateway-api.sigs.k8s.io/api-types/referencegrant/). |
+   |`spec.rules.backendRefs`| The Kubernetes service that serves the incoming request. In this example, requests to `www.example.com` are forwarded to the httpbin app on port 8000. Note that you must create the HTTPRoute in the same namespace as the service that serves that route. To create the HTTPRoute resource in a different namespace, you must create a ReferenceGrant resource to allow the HTTPRoute to forward requests to a service in a different namespace. For more information, see the [Kubernetes API Gateway documentation](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/). |
 
 2. Verify that the HTTPRoute is applied successfully. 
    

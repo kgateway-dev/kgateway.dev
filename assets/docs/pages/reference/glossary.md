@@ -48,12 +48,7 @@ A service mesh architecture that removes the need for sidecars. Instead of injec
 ### API Gateway
 The central entry point for controlling, securing, and routing API traffic.
 
-In kgateway, two types of proxies can act as API Gateways:
-
-- The **Envoy-based Kgateway proxy** (traditional API and service mesh traffic)  
-- **Agentgateway** (AI/LLM-specific traffic)
-
-{{< reuse "docs/snippets/control-plane-note.md" >}}
+In kgateway, the **Envoy-based kgateway proxy** acts as the API gateway for traditional API and service mesh traffic. For AI and LLM-specific traffic, use [agentgateway](https://agentgateway.dev/docs).
 
 ### Backends
 Destination services or endpoints that kgateway routes traffic to, such as Kubernetes Services, Lambdas, external hosts, or custom backends. These backends are connected to routes for forwarding traffic.
@@ -68,9 +63,7 @@ A logical group of upstream endpoints used by Envoy for load balancing. The Envo
 
 ### Control Plane
 The system that configures and manages the data plane.  
-In kgateway, the control plane distributes routing rules, policies, and extension configuration to the supported data plane proxies: the Envoy-based kgateway proxy and the agentgateway proxy.
-
-{{< reuse "docs/snippets/control-plane-note.md" >}}
+In kgateway, the control plane distributes routing rules, policies, and extension configuration to the Envoy-based kgateway proxy.
 
 ### CRDs (Custom Resource Definitions)
 Extend the Kubernetes API with custom resource types.
@@ -80,12 +73,7 @@ Extend the Kubernetes API with custom resource types.
 ## D–F
 
 ### Data Plane
-The layer that actually processes live traffic. Kgateway supports the following data plane proxies:
-
-- Envoy-based Kgateway proxies
-- Agentgateway (for AI workloads)
-
-{{< reuse "docs/snippets/control-plane-note.md" >}} 
+The layer that actually processes live traffic. Kgateway uses the Envoy-based kgateway proxy as its data plane.
 
 ### Delegation
 A way to share routing responsibility across teams or namespaces. A parent route delegates part of its routing logic to child routes, allowing flexible ownership.
@@ -107,12 +95,12 @@ An Envoy extension that offloads authorization decisions to an external service.
 ### Gateway
 A Gateway API resource that represents the instantiation of a gateway implementation.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.Gateway
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#gateway
 
 ### GatewayClass
 Defines a class of Gateways with a shared configuration or implementation. Depending on how you install kgateway, you may have one or more GatewayClass resources created for you.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GatewayClass
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#gatewayclass
 
 ### Gateway Extension
 A kgateway resource that integrates extended services such as external authorization, rate limits, and processors into the Gateway data plane configuration.
@@ -127,12 +115,12 @@ Configures template, deployment, and runtime settings for a Gateway instance (in
 ### GRPCRoute
 A Gateway API resource for configuring gRPC routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GRPCRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#grpcroute
 
 ### HTTPRoute
 A Gateway API resource for configuring HTTP/HTTPS routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.HTTPRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#httproute
 
 ### Inference Extension Project
 Mechanisms for running inference or AI processing in traffic flows—typically implemented as Envoy filters or external processors.
@@ -143,10 +131,10 @@ Mechanisms for running inference or AI processing in traffic flows—typically i
 Serverless compute functions in Amazon Web Services (AWS) that kgateway can route traffic to via Backends.
 
 ### Large Language Model (LLM)
-AI models trained on massive datasets to generate human-like text. Kgateway manages LLM traffic by using the agentgateway data plane.
+AI models trained on massive datasets to generate human-like text. For LLM and agent traffic, use [agentgateway](https://agentgateway.dev/docs).
 
 ### LLM Gateway / AI Gateway
-A traffic-management pattern specialized for LLM, agent, MCP, and AI inference traffic. Agentgateway acts as the data plane for this pattern.
+A traffic-management pattern specialized for LLM, agent, MCP, and AI inference traffic. See the [agentgateway documentation](https://agentgateway.dev/docs).
 
 ## M–O
 
@@ -169,7 +157,7 @@ Controls how many requests can reach your services over time. Often implemented 
 ### ReferenceGrant
 A Gateway API resource that controls cross-namespace references.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.ReferenceGrant
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#referencegrant
 
 ### Resiliency
 Techniques like retries, timeouts, and circuit breakers that make applications more reliable when failures occur.
@@ -185,7 +173,7 @@ A network layer for service-to-service communication. Kgateway integrates with I
 ### TCPRoute
 A Gateway API resource for configuring TCP routing rules.
 
-🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.TCPRoute
+🔗 *See official documentation*: https://gateway-api.sigs.k8s.io/reference/api-spec/#tcproute
 
 ### Traffic Management
 Features that shape, route, or modify traffic, such as load balancing, matching, filtering, and transformations.
@@ -196,4 +184,4 @@ A kgateway resource that defines advanced traffic management settings, retries, 
 **Learn more**: [TrafficPolicy concept docs]({{< link-hextra path="/about/policies/trafficpolicy/" >}})
 
 ### Translation
-The kgateway control plane process that converts Gateway API resources and CRDs into xDS configuration for enforcement in the Envoy-based kgateway or agentgateway data planes.
+The kgateway control plane process that converts Gateway API resources and CRDs into xDS configuration for enforcement in the Envoy-based kgateway data plane.

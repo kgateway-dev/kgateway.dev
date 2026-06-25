@@ -946,3 +946,13 @@
 /docs/main/traffic-management/transformations/update-response-body/ /docs/envoy/main/traffic-management/transformations/update-response-body/ 301
 /docs/main/traffic-management/weighted-routes /docs/envoy/main/traffic-management/weighted-routes 301
 /docs/main/traffic-management/weighted-routes/ /docs/envoy/main/traffic-management/weighted-routes/ 301
+
+# JWT docs restructured under simple/ (kkb-jwt-update)
+/docs/envoy/2.1.x/security/jwt/basic /docs/envoy/2.1.x/security/jwt/simple/basic 301
+/docs/envoy/2.1.x/security/jwt/basic/ /docs/envoy/2.1.x/security/jwt/simple/basic/ 301
+/docs/envoy/2.2.x/security/jwt/basic /docs/envoy/2.2.x/security/jwt/simple/basic 301
+/docs/envoy/2.2.x/security/jwt/basic/ /docs/envoy/2.2.x/security/jwt/simple/basic/ 301
+/docs/envoy/latest/security/jwt/basic /docs/envoy/latest/security/jwt/simple/basic 301
+/docs/envoy/latest/security/jwt/basic/ /docs/envoy/latest/security/jwt/simple/basic/ 301
+/docs/envoy/main/security/jwt/basic /docs/envoy/main/security/jwt/simple/basic 301
+/docs/envoy/main/security/jwt/basic/ /docs/envoy/main/security/jwt/simple/basic/ 301

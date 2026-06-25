@@ -1,8 +1,4 @@
-Capture an access log for all the requests that enter the gateway. 
-
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
+Capture an access log for all the requests that enter the gateway.
 
 ## About access logging
 

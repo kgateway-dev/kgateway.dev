@@ -1,5 +1,6 @@
 ---
 title: "macOS Installation"
+description: Install the ingress2gateway CLI on macOS.
 weight: 10
 ---
 
@@ -8,7 +9,7 @@ weight: 10
 1. Set the environment variables.
 
     ```bash
-    VERSION=v0.4.0
+    VERSION=v0.5.0
     OS=Darwin
     # One of arm64|x86_64
     ARCH=arm64

@@ -62,9 +62,7 @@
    EOF
    ```
 
-6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. You might also need the following parameters:
-   * **Development builds**: `controller.image.pullPolicy=Always` to ensure you get the latest image.
-   * **Experimental Gateway API features**: `controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES=true` to enable experimental features such as TCPRoutes.
+6. Create an Argo CD application to install the {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart. For development builds, you might also need the parameter `controller.image.pullPolicy=Always` to ensure you get the latest image.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -85,8 +83,6 @@
          parameters:
          - name: controller.image.pullPolicy
            value: "Always"
-         - name: controller.extraEnv.KGW_ENABLE_GATEWAY_API_EXPERIMENTAL_FEATURES
-           value: "true"
        repoURL: {{< reuse "/docs/snippets/helm-path.md" >}}/charts
        targetRevision: {{< reuse "docs/versions/helm-version-flag.md" >}}
      syncPolicy:

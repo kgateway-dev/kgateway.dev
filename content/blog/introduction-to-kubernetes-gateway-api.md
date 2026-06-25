@@ -73,7 +73,7 @@ Use GatewayClass and Gateway to define the overall gateway capabilities, such as
 Define HTTPRoute (or TLSRoute, etc.) resources that attach to Gateways. They control how traffic is routed to backend services, canary versions, or particular subsets of pods—without needing cluster-admin-level access.
 
 **Security / Ops Teams:**
-Leverage policy attachment points to insert custom capabilities (rate limiting, WAF configuration, etc.) in a consistent way by using [extension points](https://gateway-api.sigs.k8s.io/guides/migrating-from-ingress/?h=extensionref#approach-to-extensibility) within the API.
+Leverage policy attachment points to insert custom capabilities (rate limiting, WAF configuration, etc.) in a consistent way by using [extension points](https://gateway-api.sigs.k8s.io/guides/getting-started/migrating-from-ingress/#approach-to-extensibility) within the API.
 
 This separation of concerns mirrors successful design patterns in Kubernetes, such as the way storage classes are managed by platform teams while developers issue persistent volume claims. It’s a more secure and maintainable approach that fosters collaboration within organizations.
 
@@ -99,13 +99,13 @@ Below is an example where an implementation might augment Gateway API with its o
 
 ## Looking Ahead
 
-Gateway API is already fulfilling its promise as a widely adopted standard, [over two dozen implementations](https://gateway-api.sigs.k8s.io/implementations/) across the Kubernetes ecosystem. As the specification continues to evolve, we can expect even broader adoption and deeper [integrations for Gateway API](https://gateway-api.sigs.k8s.io/implementations/#integrations), including:
+Gateway API is already fulfilling its promise as a widely adopted standard, [over two dozen implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/) across the Kubernetes ecosystem. As the specification continues to evolve, we can expect even broader adoption and deeper [integrations for Gateway API](https://gateway-api.sigs.k8s.io/docs/implementations/list/#integrations), including:
 
 * [cert-manager](https://cert-manager.io/docs/usage/gateway/) to automate certificate management in cloud native environments using Gateway API.
 
 * [Flagger](https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery) and [Argo Rollouts](https://rollouts-plugin-trafficrouter-gatewayapi.readthedocs.io/en/latest/) to support advanced deployment methods such as blue/green and canary rollouts
 
-* [Istio](https://istio.io/latest/docs/overview/what-is-istio/) service mesh which supports the GAMMA initiative and leverages Gateway API to program [waypoints](https://ambientmesh.io/docs/about/architecture/#gateways-and-waypoints) for service-to-service routing and policy management
+* [Istio](https://istio.io/latest/docs/overview/what-is-istio/) service mesh which supports the GAMMA initiative and leverages Gateway API to program [waypoints](https://ambientmesh.io/docs/about/architecture/#ingress-gateways-and-waypoints) for service-to-service routing and policy management
 
 ## Next in the series..
 

@@ -1,5 +1,6 @@
 ---
 title: HTTPS listener
+description: Terminate TLS at an HTTPS listener on the gateway by using a referenced certificate secret.
 weight: 20
 ---
 

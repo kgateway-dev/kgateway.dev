@@ -1,5 +1,6 @@
 ---
 title: "Linux Installation"
+description: Install the ingress2gateway CLI on Linux.
 weight: 20
 ---
 
@@ -8,7 +9,7 @@ weight: 20
 1. Set your environment variables.
 
     ```bash
-    VERSION=v0.4.0
+    VERSION=v0.5.0
     OS=Linux
     # One of arm64|x86_64|i386
     ARCH=arm64

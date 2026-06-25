@@ -4,7 +4,12 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
-You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
+You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI. 
+
+Set the version you want to configure in an environment variable, such as the patch version (2.1.3):
+ ```sh
+ export NEW_VERSION=2.1.3
+ ```
 
 * **Show all values**: 
       
@@ -56,3 +61,16 @@ discoveryNamespaceSelectors:
 - matchLabels:
     version: v3
 ```
+
+## Strict validation
+
+Set the `validation.level` Helm value to `strict` when you install or upgrade kgateway. Restart the control plane to apply the change.
+
+```yaml
+validation:
+  level: strict
+```
+
+Internally, the Helm chart passes the value to the control plane through the `KGW_VALIDATION_MODE` environment variable. If you manage the control plane deployment manually, set `KGW_VALIDATION_MODE=STRICT` on the kgateway container.
+
+The accepted values for `validation.level` are `standard` and `strict` (case-insensitive). Any other value causes the Helm install to fail.

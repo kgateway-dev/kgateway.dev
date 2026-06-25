@@ -1,5 +1,6 @@
 ---
 title: "Install"
+description: Install the ingress2gateway CLI on your operating system.
 weight: 20
 ---
 

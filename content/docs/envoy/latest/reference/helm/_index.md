@@ -1,9 +1,8 @@
 ---
 title: Helm value reference
 weight: 20
-description: 
+description: Look up the supported Helm chart values for the kgateway control plane and CRD charts.
 ---
-
 ## Download the Helm chart {#download}
 
 You can download the Helm chart to review the Helm values that are supported. 
@@ -26,8 +25,3 @@ You can download the Helm chart to review the Helm values that are supported.
 ## Helm charts
 
 Review the documentation for the following Helm charts.
-
-{{< cards >}}
-  {{< card link="kgateway-crds" title="kgateway-crds" >}}
-  {{< card link="kgateway" title="kgateway" >}}
-{{< /cards >}}

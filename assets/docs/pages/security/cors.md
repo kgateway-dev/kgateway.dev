@@ -25,7 +25,7 @@ CORS policies are typically implemented to limit access to server resources for 
 
 You can configure the CORS policy at two levels:
 
-* **HTTPRoute**: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any {{< reuse "docs/snippets/trafficpolicy.md" >}} CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
+* **HTTPRoute**: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any {{< reuse "docs/snippets/trafficpolicy.md" >}} CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
 * **{{< reuse "docs/snippets/trafficpolicy.md" >}}**: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the {{< reuse "docs/snippets/trafficpolicy.md" >}}. You can attach a {{< reuse "docs/snippets/trafficpolicy.md" >}} to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [{{< reuse "docs/snippets/trafficpolicy.md" >}} concept docs](../../about/policies/trafficpolicy/).
 
 {{< /version >}}
@@ -185,13 +185,13 @@ EOF
 
 Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snippets/trafficpolicy.md" >}}, you can test the policies.
 
-1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com/` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
+1. Send a request to the httpbin app on the `cors.example` domain and use `https://example.com` as the origin. Verify that your request succeeds and that you get back the configured CORS headers.
    
    {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" \
+    -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -199,7 +199,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://example.com/" \
+    -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -219,7 +219,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -239,7 +239,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -259,7 +259,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    content-length: 0
    
    HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com/
+   access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
    access-control-allow-headers: Origin, Authorization, Content-Type
@@ -278,7 +278,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -I -X OPTIONS http://$INGRESS_GW_ADDRESS:8080/get -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" \
+    -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -286,7 +286,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    {{% tab tabName="Port-forward for local testing" %}}
    ```sh
    curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
-    -H "Origin: https://notallowed.com/" \
+    -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
    ```
@@ -304,7 +304,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "docs/snip
    access-control-allow-credentials: true
    access-control-allow-headers: Origin
    access-control-allow-methods: GET, POST, HEAD, PUT, DELETE, PATCH, OPTIONS
-   access-control-allow-origin: https://notallowed.com/
+   access-control-allow-origin: https://notallowed.com
    access-control-max-age: 3600
    date: Tue, 24 Jun 2025 13:21:20 GMT
    content-length: 0

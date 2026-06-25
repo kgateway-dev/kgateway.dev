@@ -1,5 +1,6 @@
 ---
 title: Gateway health checks
+description: Expose a health endpoint on the gateway listener for load balancer probes.
 weight: 10
 ---
 

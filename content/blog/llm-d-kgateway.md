@@ -38,7 +38,7 @@ At the heart of llm-d's architecture is its intelligent routing layer, built on 
 
 ## kgateway: The Enabler of Intelligent Inference
 
-kgateway provides the perfect foundation for llm-d's intelligent routing through its implementation of the Inference Extension. This extension introduces InferenceModel and InferencePool resources that enable AI-specific routing patterns. For out-of-the-box inference capabilities in kgateway, when a request comes to the gateway, it flows through the Endpoint Selection Extension (following the Endpoint Picker Protocol) which examines the model name, LoRA adapter requirements, and request criticality; then [selects the optimal backend based on queue depth, KV cache utilization, and adapter availability](https://kgateway.dev/blog/deep-dive-inference-extensions/).
+kgateway provides the perfect foundation for llm-d's intelligent routing through its implementation of the Inference Extension. This extension introduces InferenceModel and InferencePool resources that enable AI-specific routing patterns. For out-of-the-box inference capabilities in kgateway, when a request comes to the gateway, it flows through the Endpoint Selection Extension (following the Endpoint Picker Protocol) which examines the model name, LoRA adapter requirements, and request criticality; then selects the optimal backend based on queue depth, KV cache utilization, and adapter availability.
 
 This allows critical requests to be prioritized, while sheddable requests can be handled opportunistically or even dropped when the system is under pressure — all while maximizing GPU resource utilization. llm-d introduces its own scheduler that implements the EPP and brings more powerful selection decisioning.
 

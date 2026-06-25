@@ -1,5 +1,6 @@
 ---
 title: Add documentation
+description: Steps for adding a new documentation page to the kgateway docs repository.
 weight: 10
 ---
 

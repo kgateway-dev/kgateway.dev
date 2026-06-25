@@ -1,11 +1,5 @@
 ---
 title: Retries
 weight: 10
-description:
+description: Automatically retry failed requests against backends with configurable conditions and budgets.
 ---
-
-{{< cards >}}
-{{< card link="about" title="About retries" >}}
-{{< card link="retry" title="Request retries" >}}
-{{< card link="per-try-timeout" title="Per-try timeouts">}}
-{{< /cards >}}

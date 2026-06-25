@@ -1,0 +1,65 @@
+# Configuration for the docs-theme-extras Playwright harness when run
+# against kgateway.dev.
+#
+# The harness lives in github.com/solo-io/docs-theme-extras and reads this
+# file via the DOCS_TEST_CONFIG env var (set by the Makefile or CI). All
+# relative paths are resolved against this file's directory.
+#
+# First-pass config: covers structural HTML quality (no shortcode leaks,
+# no markdown bleed, image alt text, etc.) against the production build.
+# Tighten or expand as the suite stabilizes.
+
+version = "1"
+name    = "kgateway"
+brand   = "oss"
+
+# Where the consumer's built HTML lives. Everything operates on this tree.
+# The harness does NOT build the site — `make build` (Hugo) runs first
+# and writes here.
+builtRoot = "./public"
+baseURL   = "/"
+
+# Source-tree roots for author-side lints (curl-quotes scans markdown
+# directly). Narrowed to docs content so the lint doesn't trip on blog
+# posts and marketing copy that follow looser conventions.
+scanRoots = [
+  "./content/docs",
+]
+
+# URL versioning. kgateway versions are under /docs/envoy/<version>/...
+# and /docs/agentgateway/<version>/... ; the spec gracefully skips pages
+# that don't match the regex.
+[versioning]
+versionFromPath = "^/docs/(?:envoy|agentgateway)/(?<version>[^/]+)/"
+versions        = ["main", "latest", "2.2.x", "2.1.x", "2.0.x"]
+
+# All checks default to enabled. Turn off the slow / opt-in projects.
+[checks]
+# Smoke is for cross-product runs (SMOKE_PRODUCT env); kgateway is a
+# single site, so skip.
+smoke        = false
+crossBrowser = false
+
+# Allowlists for known-benign noise that surfaces against real product
+# content (test fixture has none of this). Tighten as content is fixed.
+[allowlists]
+hugoWarnings = [
+  "\\.Site\\.Data was deprecated",
+  "'items' parameter of the 'tabs' shortcode is deprecated",
+]
+
+# console-errors (browser-smoke) suppressions. Each pattern is matched
+# (as a RegExp) against the full error string; for uncaught exceptions the
+# string includes the stack, so a pattern can be scoped to the source file.
+consoleErrors = [
+  # Hextra's vendored js/main.min.<hash>.js wires the sidebar/hamburger on
+  # EVERY page at DOMContentLoaded and calls `.hextra-sidebar-container`
+  # .removeAttribute("aria-hidden") without a null guard. On the ~70 pages
+  # with no docs sidebar (homepage, /blog/ + posts, /docs/ landing, resources,
+  # learn, marketing) it throws "Cannot read properties of null (reading
+  # 'removeAttribute')". Not fixable in docs-theme-extras (it's the minified
+  # upstream bundle). Scoped to the message AND the Hextra bundle filename via
+  # the stack frame, so it cannot mask a removeAttribute error from our own or
+  # the theme's JS. Versioned docs pages have the sidebar and are unaffected.
+  "reading 'removeAttribute'\\)[\\s\\S]*main\\.min\\.[0-9a-f]+\\.js",
+]

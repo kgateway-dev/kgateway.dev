@@ -1,12 +1,6 @@
 ---
 title: Istio
 weight: 10
-description: 
+description: Use kgateway as the ingress gateway for an Istio ambient or sidecar service mesh.
 ---
-
 Integrate kgateway with an Istio service mesh.
-
-{{< cards >}}
-  {{< card link="ambient" title="Ambient" >}}
-  {{< card link="sidecar" title="Sidecar" >}}
-{{< /cards >}}

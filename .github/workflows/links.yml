@@ -19,25 +19,28 @@ jobs:
   linkChecker:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    permissions:
+      contents: read
+      issues: write
     env:
       PRODUCT_NAME: kgateway OSS
       ISSUE_TITLE: Link Checker Report - kgateway OSS
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 100
 
       - name: Checkout shared link-checking scripts
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: solo-io/docs-link-checking
           path: docs-link-checking
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Hugo
-        uses: peaceiris/actions-hugo@75d2e84710de30f6ff7268e08f310b60ef14033f # v3
+        uses: peaceiris/actions-hugo@2752ce1d29631191ea3f27c23495fa06139a5b78 # v3.2.1
         with:
-          hugo-version: '0.147.0'
+          hugo-version: '0.160.1'
           extended: true
 
       - name: Install Lychee
@@ -63,6 +66,7 @@ jobs:
 
           LYCHEE_COMMON=(lychee
             --verbose
+            --exclude-path public/docs/envoy/2.0.x
             --config docs-link-checking/lychee.toml
             --root-dir "${{ github.workspace }}/public"
             --index-files index.html
@@ -97,6 +101,7 @@ jobs:
           echo "has_failures=$([ "$EXIT" != "0" ] && echo 'true' || echo 'false')" >> "$GITHUB_OUTPUT"
 
       - name: Generate markdown report from JSON
+        id: report
         if: hashFiles('artifacts/kgateway-oss-links.json') != ''
         run: |
           chmod +x docs-link-checking/generate-link-report.sh
@@ -107,7 +112,7 @@ jobs:
             "${{ github.event_name == 'pull_request' && 'pr' || '' }}"
 
       - name: Create issue from report
-        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        if: steps.report.outputs.has_issues == 'true' && github.event_name != 'pull_request'
         id: create-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -117,7 +122,7 @@ jobs:
           content-filepath: ./artifacts/kgateway-oss-links.md
 
       - name: Set issue URL for Slack
-        if: steps.lychee.outputs.has_failures == 'true' && github.event_name != 'pull_request'
+        if: steps.report.outputs.has_issues == 'true' && github.event_name != 'pull_request'
         id: issue-url
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -130,10 +135,12 @@ jobs:
           docs-link-checking/set-issue-url.sh
 
       - name: Remove public directory
+        if: always()
         run: rm -rf public
 
       - name: Read link checker results
         id: link-stats
+        if: always() && hashFiles('artifacts/kgateway-oss-links.json') != ''
         env:
           MD_FILE: artifacts/kgateway-oss-links.md
           JSON_FILE: artifacts/kgateway-oss-links.json
@@ -142,7 +149,7 @@ jobs:
           docs-link-checking/read-link-stats.sh
 
       - name: Post results to Slack
-        if: github.event_name != 'pull_request'
+        if: always() && github.event_name != 'pull_request' && steps.link-stats.conclusion == 'success'
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: "#doctopus-tests"
@@ -159,13 +166,13 @@ jobs:
 
       - name: Upload artifacts
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
           name: link-checker-assets
           path: artifacts/*
 
       - name: Write report to job summary
-        if: hashFiles('artifacts/kgateway-oss-links.md') != ''
+        if: always() && hashFiles('artifacts/kgateway-oss-links.md') != ''
         run: cat artifacts/kgateway-oss-links.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail check if errors exist

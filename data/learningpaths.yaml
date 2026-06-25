@@ -36,7 +36,7 @@
     lab: understanding-kgateway-patterns-of-extensions
   - title: Canary Release with Argo
     youtube: nI52m7S5gLY
-    lab: understanding-kgateway-patterns-of-extensions
+    lab: canary-releases-with-argo-rollouts-kgateway
     blog: canary-deployments-argo-rollouts
 - id: kgw
   title: Kgateway Fundamentals
@@ -71,6 +71,5 @@
   - title: Model Failover
     lab: gloo-ai-gateway-rate-limiting-model-failover
   - title: Gateway API Inference Extensions with kgateway
-    blog: deep-dive-inference-extensions
     youtube: 5sAB9_fScMo
     lab: kgateway-lab-gateway-api-inference-extensions-with-kgateway
