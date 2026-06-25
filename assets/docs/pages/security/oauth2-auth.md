@@ -124,7 +124,6 @@ EOF
 | `targetRefs` | Selects the resource to apply the authentication policy to (e.g. Gateway or HTTPRoute). |
 | `oauth2.extensionRef` | References the `GatewayExtension` created in the previous step. |
 
----
 
 ## Verify the authentication flow
 
@@ -134,7 +133,65 @@ EOF
 4. Verify that you are redirected back to your application and the request succeeds.
 5. Inspect the cookies in your browser; you should see secure, HTTP-only cookies containing the session tokens.
 
----
+### Test with curl
+
+You can also test the authentication flow using curl commands.
+
+**Send a request without authentication:**
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+**Expected output**:
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
+
+**Send a request with a valid token**:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+**Expected output**:
+
+```text
+< HTTP/1.1 200 OK
+```
+
 
 ## Advanced configurations
 
@@ -196,7 +253,6 @@ spec:
           value: XMLHttpRequest
 ```
 
----
 
 ## Cleanup
 
