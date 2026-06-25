@@ -120,10 +120,10 @@ When you install the [OTel stack](/docs/envoy/latest/observability/otel-stack/),
 
 Leader election is now enabled by default to ensure that you can run kgateway in a multi-control plane replica setup for high availability. 
 
-You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
+You can disable leader election by setting the `KGW_DISABLE_LEADER_ELECTION` environment variable to `"true"` through the `controller.extraEnv` Helm value.
 
 ```sh
-helm upgrade -i --namespace kgateway-system --version v2.1.0 kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
+helm upgrade -i --namespace kgateway-system --version v2.1.0 kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set-string controller.extraEnv.KGW_DISABLE_LEADER_ELECTION=true
 ```
 
 ## 🔥 Breaking changes from the previous release
