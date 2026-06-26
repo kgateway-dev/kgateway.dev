@@ -13,7 +13,6 @@ Add custom labels to all resources that are created by the Helm charts, includin
 The following snippet adds the `label-key` and `kgw-managed` labels to all resources. 
 
 ```yaml
-
 commonLabels: 
   label-key: label-value
   kgw-managed: "true"
@@ -28,7 +27,6 @@ For more information, see the [Kubernetes topology spread constraints documentat
 The following example spreads controller pods evenly across availability zones, and prevents scheduling if the skew cannot be satisfied.
 
 ```yaml
-
 topologySpreadConstraints:
   - maxSkew: 1
     topologyKey: topology.kubernetes.io/zone
@@ -59,7 +57,6 @@ EOF
 In your Helm values file, add the name of the PriorityClass in the `controller.priorityClassName` field. 
 
 ```yaml
-
 controller: 
   priorityClassName: 
 ```
@@ -84,7 +81,6 @@ Vertical Pod Autoscaler (VPA) is a Kubernetes component that automatically adjus
 The following Helm configuration ensures that the control plane pod is always assigned a minimum of 0.1 CPU cores (100millicores) and 128Mi of memory. 
 
 ```yaml
-
 controller:
   verticalPodAutoscaler:
     updatePolicy:
@@ -103,7 +99,6 @@ Horizontal Pod Autoscaler (HPA) adds more instances of the pod to your environme
 
 In the following example, you want to have 1 control plane replica running at any given time. If the CPU utilization averages 80%, you want to gradually scale up your replicas. You can have a maximum of 5 replicas at any given time. 
 ```yaml
-
 controller: 
   horizontalPodAutoscaler:
     minReplicas: 1
@@ -135,12 +130,61 @@ Then, start monitoring CPU and memory consumption with the `kubectl top pod` com
 Configure a Pod Disruption Budget to ensure that a minimum number of control plane instances are up and running at any given time during voluntary disruptions, such as upgrades. In this example, 50% of your control plane instances must be running.
 
 ```yaml
-
 controller: 
   podDisruptionBudget:
     minAvailable: 50%
 ```
 
+## Controller probes
 
+You can customize the readiness and startup probes for the kgateway controller container by using the `controller.readinessProbe` and `controller.startupProbe` Helm values. Your settings are deep-merged with the default probe configuration, so you only need to specify the fields you want to change.
+
+By default, both probes use an `httpGet` handler that checks the `/readyz` endpoint on the health port. The default readiness probe polls every 10 seconds with an initial delay of 1 second. The default startup probe polls every second with no initial delay and a failure threshold of 600, allowing up to 10 minutes for the controller to start.
+
+If you provide an `exec`, `grpc`, or `tcpSocket` handler, the default `httpGet` handler is replaced entirely. Otherwise, the `httpGet` handler is kept and your overrides are merged on top.
+
+The following example adjusts the timing fields of the default readiness probe without changing the default `httpGet` handler.
+
+```yaml
+controller:
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 20
+    failureThreshold: 3
+```
+
+The following example replaces the default `httpGet` handler with a custom `exec` handler on the startup probe.
+
+```yaml
+controller:
+  startupProbe:
+    exec:
+      command: ["cat", "/tmp/ready"]
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 60
+```
+
+## Controller admin server bind address
+
+The kgateway controller runs an admin and debug server on port 9095. By default, the server binds to `localhost` and is only accessible from within the pod.
+
+To access the admin and debug servers from your local machine, use the `kubectl port-forward` command to expose port 9095 on your local machine. No change of the bind address is required.
+
+```sh
+kubectl port-forward deployment/kgateway -n {{< reuse "docs/snippets/namespace.md" >}} 9095:9095
+```
+
+If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name=kgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o wide`.
+
+{{< callout type="warning" >}}
+The admin server exposes pprof profiling endpoints, logging controls, and internal config snapshots. Only expose it outside the pod in trusted environments, such as a local development cluster or a dedicated profiling setup.
+{{< /callout >}}
+
+```yaml
+controller:
+  admin:
+    bindAddress: 0.0.0.0
+```
 
 
