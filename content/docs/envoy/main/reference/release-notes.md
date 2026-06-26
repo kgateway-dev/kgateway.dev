@@ -72,7 +72,7 @@ When a remote cluster's east-west gateway is annotated with `solo.io/draining-we
 | Partial | `solo.io/draining-weight: "40"` | 60% (100% minus the draining weight) |
 | Full | `solo.io/draining-weight: "100"` | 0% (cluster excluded from Envoy endpoint set) |
 
-#### Inject header values from Kubernetes Secrets {#v23-header-from-secret}
+#### Inject header values from Kubernetes Secrets {#v24-header-from-secret}
 
 You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
 
