@@ -48,13 +48,43 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 
 For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
 
+#### Limit request header count {#v24-max-headers-count}
+
+Added the `maxHeadersCount` field to the HTTP settings of the ListenerPolicy resource. You can use this field to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used.
+
+For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
+
 #### AWS EC2 backend {#v24-ec2-backend}
 
 You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values.
 
 For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 
-<!-- TODO release 2.2
+#### Solo Istio cluster draining weights {#v24-cluster-draining}
+
+kgateway now honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but kgateway continued to send ingress traffic to a draining cluster, resulting in connection errors.
+
+When a remote cluster's east-west gateway is annotated with `solo.io/draining-weight`, kgateway adjusts the Envoy load balancing weights for that cluster's endpoints on the ingress path:
+
+| Draining mode | Annotation value | Traffic to remote cluster |
+|---|---|---|
+| Off (default) | `solo.io/draining-weight: "0"` or absent | 100% |
+| Partial | `solo.io/draining-weight: "40"` | 60% (100% minus the draining weight) |
+| Full | `solo.io/draining-weight: "100"` | 0% (cluster excluded from Envoy endpoint set) |
+
+#### Inject header values from Kubernetes Secrets {#v24-header-from-secret}
+
+You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
+
+For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
+
+#### Downstream HTTP/2 protocol options {#v24-http2-protocol-options}
+
+You can now configure the HTTP/2 connection behavior between downstream clients and the gateway proxy by setting the `http2ProtocolOptions` field in the ListenerPolicy resource. The new settings let you configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
+
+For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-management/http2-downstream/" >}}).
+
+<!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
 

@@ -262,6 +262,18 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 * `MatchingPort`: Removes the port only if it matches the listener's own port.  
 
 For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
+
+#### Limit request header count {#v23-max-headers-count}
+
+Added the `maxHeadersCount` field to the HTTP settings of the ListenerPolicy resource. You can use this field to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used.
+
+For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
+
+#### Inject header values from Kubernetes Secrets {#v23-header-from-secret}
+
+You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
+
+For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

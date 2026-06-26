@@ -8,7 +8,8 @@ You might have services in your Kubernetes cluster that use HTTP/2 for communica
 
 Enable access logging on the Gateway. You can use the access logs later to verify that the request used the HTTP/2 protocol.
 
-{{< version include-if="2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x" >}}
+
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
