@@ -7,7 +7,7 @@ The following steps show you how to quickly view the metrics endpoint of the gat
 1. Port-forward the gateway deployment on port 19000.
    
    ```sh
-   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} port-forward deployment/http 19000
+   kubectl -n {{< reuse "/docs/snippets/namespace.md" >}} port-forward deployment/http 19000
    ```
 
 2. Access the gateway metrics by reviewing the [Prometheus statistics `/stats/prometheus` endpoint](http://localhost:19000/stats/prometheus).
