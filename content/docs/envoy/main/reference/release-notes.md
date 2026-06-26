@@ -84,6 +84,48 @@ You can now configure the HTTP/2 connection behavior between downstream clients 
 
 For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-management/http2-downstream/" >}}).
 
+#### Custom Envoy bootstrap config {#v24-custom-bootstrap}
+
+You can now inject custom Envoy bootstrap configuration into a managed gateway proxy by overriding the bootstrap ConfigMap that the control plane generates with a `deploymentOverlay` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. Use this method to configure bootstrap-level options that are not exposed as built-in fields, such as `stats_config.histogram_bucket_settings` to tune histogram bucket boundaries for your metrics.
+
+For more information, see [Custom Envoy bootstrap config]({{< link-hextra path="/setup/customize/envoy/custom-bootstrap/" >}}).
+
+#### Customizable controller probes {#v24-controller-probes}
+
+You can now override the readiness and startup probes for the kgateway controller container by using the `controller.readinessProbe` and `controller.startupProbe` Helm values. Settings are deep-merged with the defaults, so you only need to specify the fields you want to change. 
+
+For more information, see [Controller probes]({{< link-hextra path="/install/advanced/#controller-probes" >}}).
+
+#### Configurable admin server bind address {#v24-admin-bind-address}
+
+You can now configure the bind address for the kgateway controller's admin and debug server by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. The server listens on port 9095. By default, the server binds to `localhost` and is only accessible from within the pod. Set `bindAddress` to `0.0.0.0` to expose the server outside the pod for profiling or diagnostics in trusted environments.
+
+For more information, see [Controller admin server bind address]({{< link-hextra path="/install/advanced/#controller-admin-server-bind-address" >}}).
+
+#### Downstream TCP keepalive {#v24-downstream-tcp-keepalive}
+
+You can now configure TCP keepalive for downstream client connections on a gateway listener, such as the idle time before probes start, the interval between probes, and the maximum number of probes before a connection is considered stale, by using the `tcpKeepalive` field in the ListenerPolicy resource. 
+
+For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/tcp-keepalive/" >}}).
+
+#### PROXY protocol on the Envoy readiness listener {#v24-readiness-proxy-protocol}
+
+You can now enable the PROXY protocol listener filter on the Envoy readiness listener (port 8082) by setting `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This allows an external load balancer that prepends PROXY protocol headers, such as an AWS NLB with proxy protocol v2 enabled, to perform health checks against the readiness port. Kubelet probes continue to work because the filter accepts connections without a PROXY header.
+
+For more information, see [Readiness listener PROXY protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#readiness" >}}).
+
+#### BackendConfigPolicy merge semantics {#v24-bcp-merge}
+
+When multiple BackendConfigPolicy resources target the same backend, their fields are now merged. If two or more policy resources configure the same top-level fields, only the oldest policy fields are enforced. If a BackendConfigPolicy and a BackendTLSPolicy both target the same backend, the BackendTLSPolicy takes precedence for TLS configuration and an `Overridden` condition is set on the BackendConfigPolicy to inform you of the conflict.
+
+For more information, see [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/#policy-priority-and-merging-rules" >}}).
+
+#### Zone-aware routing {#v24-zone-aware-routing}
+
+You can now configure zone-aware routing for backend services by using the `loadBalancer.zoneAware` field in a BackendConfigPolicy resource. Zone-aware routing instructs the gateway proxy to prefer endpoints in its own availability zone, reducing cross-zone latency and network costs. 
+
+For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
