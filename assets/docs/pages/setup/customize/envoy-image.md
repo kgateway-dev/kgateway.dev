@@ -29,7 +29,7 @@ If you are unsure which Envoy minor version your kgateway release targets, check
    git checkout v2.3.0
    ```
 
-2. Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/buildx/working-with-buildx/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/).
+2. Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/build/buildkit/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/).
 
 3. Set up a container registry that your cluster can pull from and connect to it. If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "docs/snippets/gatewayparameters.md" >}}.
 
