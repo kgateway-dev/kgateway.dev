@@ -160,6 +160,44 @@ spec:
           - name: parent.otherchild.grandchild
             header: X-Grandchild
 ```
+
+**Test the nested claims extraction:**
+
+Send a request with a JWT that contains the nested claims:
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```json
+{
+  "headers": {
+    ...
+    "X-Child": ["value"],
+    "X-Grandchild": ["test"]
+  }
+}
+```
+
 **Using nested claims in CEL expressions**:
 
 In RBAC policies, access nested claims using bracket notation:
@@ -170,6 +208,39 @@ rbac:
   policy:
     matchExpressions:
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['parent']['child'] == 'value'"
+```
+
+**Verify RBAC enforcement:**
+
+When the RBAC policy checks the nested claim, the CEL expression evaluates to `true` for requests with a JWT containing `parent.child: "value"`.
+
+**Request with matching nested claim:**
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $TOKEN"
+```
+
+Expected output:
+
+```text
+< HTTP/1.1 200 OK
+```
+
+Request without the matching nested claim:
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer $INVALID_TOKEN"
+```
+
+Expected output:
+
+```text
+< HTTP/1.1 403 Forbidden
+RBAC: access denied
 ```
 
 To require multiple conditions in a single rule instead (AND logic), combine them in one expression with `&&`. The following policy allows a request only when the JWT contains the `team=dev` and `org=solo.io` claims.
