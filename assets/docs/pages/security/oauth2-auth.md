@@ -15,27 +15,29 @@ The following sequence diagram illustrates this authorization code flow:
 sequenceDiagram
     autonumber
     participant Client as User Browser
-    participant AGW as Kgateway Proxy
-    participant IdP as Identity Provider (e.g. Keycloak)
+    participant Gateway as Kgateway Proxy
+    participant IdP as Identity Provider (such as Keycloak)
     participant Backend as Upstream Service
 
-    Client->>AGW: 1. Request /api (no session cookies)
-    AGW-->>Client: 2. 302 Redirect to IdP Auth Endpoint
+    Client->>Gateway: 1. Request /api (no session cookies)
+    Gateway-->>Client: 2. 302 Redirect to IdP Auth Endpoint
     Client->>IdP: 3. Login with Credentials
     IdP-->>Client: 4. 302 Redirect to Redirect URI with Auth Code
-    Client->>AGW: 5. Callback request with Auth Code
-    AGW->>IdP: 6. POST /token (exchange code for tokens)
-    IdP-->>AGW: 7. ID, Access, & Refresh Tokens
-    AGW-->>Client: 8. 302 Redirect to original path + set session cookies
-    Client->>AGW: 9. Request /api with session cookies
-    AGW->>Backend: 10. Forward request to upstream
-    Backend-->>AGW: 11. Response
-    AGW-->>Client: 12. 200 OK + Response
+    Client->>Gateway: 5. Callback request with Auth Code
+    Gateway->>IdP: 6. POST /token (exchange code for tokens)
+    IdP-->>Gateway: 7. ID, Access, & Refresh Tokens
+    Gateway-->>Client: 8. 302 Redirect to original path + set session cookies
+    Client->>Gateway: 9. Request /api with session cookies
+    Gateway->>Backend: 10. Forward request to upstream
+    Backend-->>Gateway: 11. Response
+    Gateway-->>Client: 12. 200 OK + Response
 ```
 
 ## Before you begin
 
 {{< reuse "docs/snippets/prereq.md" >}}
+
+This guide requires an OIDC IdP, such as Keycloak, deployed in-cluster and reachable, and an HTTPRoute for your app.
 
 ## Set up OAuth2/OIDC authentication
 
@@ -90,8 +92,8 @@ EOF
 
 | Setting | Description |
 | ------- | ----------- |
-| `backendRef` | Reference to the Kubernetes Service representing your Identity Provider (IdP). |
-| `issuerURI` | The issuer URL of the OpenID provider used to discover the auth, token, and JWKS endpoints. |
+| `backendRef` | Reference to the Kubernetes Service representing your Identity Provider (IdP). This is the internal network path the gateway uses to communicate with the IdP. |
+| `issuerURI` | The public issuer URL of the OpenID provider used to discover the auth, token, and JWKS endpoints. Note that while `backendRef` points to the in-cluster location for direct networking, `issuerURI` represents the identity of the issuer as seen by the browser or external clients. |
 | `redirectURI` | The callback URI registered with your IdP. The gateway intercepts this endpoint to complete the code exchange. |
 | `credentials.clientID` | The client ID registered with your IdP. |
 | `credentials.clientSecretRef` | Reference to the Kubernetes Secret containing the client secret. |
@@ -121,14 +123,14 @@ EOF
 
 | Setting | Description |
 | ------- | ----------- |
-| `targetRefs` | Selects the resource to apply the authentication policy to (e.g. Gateway or HTTPRoute). |
+| `targetRefs` | Selects the resource to apply the authentication policy to (such as a Gateway or HTTPRoute). |
 | `oauth2.extensionRef` | References the `GatewayExtension` created in the previous step. |
 
 ---
 
 ## Verify the authentication flow
 
-1. Open your browser and navigate to the application URL (e.g., `https://my-app.example.com/`).
+1. Open your browser and navigate to the application URL (for example, `https://my-app.example.com/`).
 2. Verify that you are redirected to the Keycloak login screen.
 3. Authenticate with your credentials.
 4. Verify that you are redirected back to your application and the request succeeds.
@@ -168,7 +170,7 @@ spec:
 
 ### Extract JWT claims to custom request headers
 
-If your Identity Provider issues tokens in JWT format, you can configure kgateway to verify the signatures and copy specific claims (e.g. user `email`, `sub`, or custom roles) directly into HTTP headers forwarded to the backend:
+If your Identity Provider issues tokens in JWT format, you can configure kgateway to verify the signatures and copy specific claims (such as the user `email`, `sub`, or custom roles) directly into HTTP headers forwarded to the backend:
 
 ```yaml
 spec:
@@ -185,7 +187,7 @@ spec:
 
 ### Deny redirect for AJAX / API requests
 
-For API calls or AJAX requests (e.g. `fetch` or `XMLHttpRequest`), a `302 Redirect` back to a login screen is undesirable. Use `denyRedirect` to specify header match rules. When a request matches these rules, the gateway returns a `401 Unauthorized` response instead of redirecting:
+For API calls or AJAX requests (such as `fetch` or `XMLHttpRequest`), a `302 Redirect` back to a login screen is undesirable. Use `denyRedirect` to specify header match rules. When a request matches these rules, the gateway returns a `401 Unauthorized` response instead of redirecting:
 
 ```yaml
 spec:
