@@ -2,7 +2,7 @@ By default, {{< reuse "/docs/snippets/kgateway.md" >}} exposes metrics in Promet
 
 ## View default data plane metrics in Prometheus {#prometheus-metrics}
 
-The following steps show you how to quickly view the metrics endpoint of the gateway proxy deployment.
+The following steps show you how to quickly view the metrics endpoint of the gateway proxy deployment. {{< version exclude-if="2.0.x" >}}To integrate the Prometheus metrics into your observability stack, see the [OpenTelemetry guide]({{< link-hextra path="/observability/otel-stack/" >}}).{{< /version >}}
 
 1. Port-forward the gateway deployment on port 19000.
    
