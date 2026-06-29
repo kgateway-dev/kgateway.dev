@@ -1,5 +1,9 @@
 Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
+{{< callout >}}
+This guide covers gRPC-based external authorization services. For HTTP-based services, see the [HTTP guide]({{< link-hextra path="/security/extauth/byo-ext-auth-service/http/" >}}).
+{{< /callout >}}
+
 ## About external auth {#about}
 
 {{< reuse "/docs/snippets/kgateway-capital.md" >}} lets you integrate your own external authorization service to your Gateway, based on the [Envoy external authorization filter](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ext_authz_filter). Then, this external authorization service makes authorization decisions for requests that go through the Gateway, as shown in the following diagram.
@@ -262,7 +266,6 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    ```
 
 5. Create another {{< reuse "docs/snippets/trafficpolicy.md" >}} to disable external authorization for a particular HTTPRoute. This way, requests that do not require external authorization, such as health checks, are allowed through while the external authorization service is still in place for requests to other routes on the Gateway.
-   {{< version exclude-if="2.0.x" >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -281,27 +284,6 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
        disable: {}
    EOF
    ```
-   {{< /version >}}
-   {{< version include-if="2.0.x" >}}
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     namespace: httpbin
-     name: route-ext-auth-policy
-     labels:
-       app: ext-authz
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     extAuth:
-       enablement: DisableAll
-   EOF
-   ``` 
-   {{< /version >}}
 
 6. Send a request without the `x-ext-authz` header and verify that you get back a 200 OK response. This time, the TrafficPolicy with the disabled external authorization service takes precedence so that the request is allowed through.
 
