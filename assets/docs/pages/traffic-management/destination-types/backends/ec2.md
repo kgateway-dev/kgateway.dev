@@ -20,7 +20,7 @@ Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm valu
    helm upgrade -i {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
      --namespace {{< reuse "docs/snippets/namespace.md" >}} \
      --reuse-values \
-     --version v{{< reuse "docs/versions/n-patch.md" >}} \
+     --version {{< reuse "docs/versions/helm-version-flag.md" >}} \
      --set controller.enableAwsEc2Discovery=true
    ```
 
@@ -32,7 +32,7 @@ Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm valu
 
 ## Step 2: Create an AWS EC2 instance {#ec2-instance}
 
-1. Follow the AWS documentation to [launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html#ec2-launch-instance) with the following settings:
+1. Follow the AWS documentation to [launch an EC2 instance](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html) with the following settings:
    - Use an Amazon Linux image.
    - Allow inbound HTTP traffic on port 80 in the instance's security group.
    - Add at least one tag that you later use to discover the instance, for example `app: payments`.
@@ -90,9 +90,23 @@ For static credentials, the IAM user must have at least `ec2:DescribeInstances` 
 
 Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the gateway proxy uses those credentials as-is to discover EC2 instances.
 
-1. Create the policy document and save the ARN in an environment variable. At a minimum, you must assign the `ec2:DescribeInstances` permission. 
+{{< callout type="info" >}}
+The steps in this example require a permanent IAM user with long-lived credentials. If you authenticate through AWS SSO (IAM Identity Center), `aws sts get-caller-identity` returns a role ARN rather than an IAM user ARN, and `aws iam create-access-key` fails with a `NoSuchEntity` error. In this case, create a dedicated IAM user first:
+```sh
+aws iam create-user --user-name kgateway-ec2-user
+export IAM_USERNAME=kgateway-ec2-user
+```
+Then, skip step 1 to export your `IAM_USERNAME` and continue with the remaining steps.
+{{< /callout >}}
+
+1. Get your IAM username. If you are using AWS SSO, skip this command and use the `IAM_USERNAME` value you set earlier.
    ```sh
-   export POLICY_ARN=$(aws iam create-policy \
+   export IAM_USERNAME=$(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)
+   ```
+
+2. Create the policy document and save the ARN in an environment variable. At a minimum, you must assign the `ec2:DescribeInstances` permission. 
+   ```sh
+   aws iam create-policy \
      --policy-name kgateway-ec2-discovery \
      --policy-document '{
        "Version": "2012-10-17",
@@ -103,24 +117,21 @@ Use this method when your IAM user and EC2 instances are in the same AWS account
            "Resource": "*"
          }
        ]
-     }' \
-     --query 'Policy.Arn' \
-     --output text)
+     }'
 
+   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+   export POLICY_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:policy/kgateway-ec2-discovery"
    echo $POLICY_ARN
    ```
 
-2. Get your IAM username and attach the policy directly to your IAM user.
+3. Attach the policy directly to your IAM user.
    ```sh
-   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-   export IAM_USERNAME=$(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)
-
    aws iam attach-user-policy \
      --user-name ${IAM_USERNAME} \
      --policy-arn $POLICY_ARN
    ```
 
-3. Create permanent AWS credentials for your user. 
+4. Create permanent AWS credentials for your user. 
    ```sh
    eval $(aws iam create-access-key --user-name ${IAM_USERNAME} \
      --query 'AccessKey.[AccessKeyId,SecretAccessKey]' \
@@ -131,7 +142,7 @@ Use this method when your IAM user and EC2 instances are in the same AWS account
    echo "AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY"
    ```
 
-4. Create a Kubernetes secret that holds the credentials.
+5. Create a Kubernetes secret that holds the credentials.
    ```yaml
    kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
    apiVersion: v1
@@ -148,11 +159,46 @@ Use this method when your IAM user and EC2 instances are in the same AWS account
 {{% /tab %}}
 {{% tab name="Role assumption" %}}
 
-Use this method when you want to limit what the IAM user can do directly, or when your EC2 instances are in a different AWS account than the IAM user. The gateway proxy uses the IAM user credentials stored in the Kubernetes secret to call `sts:AssumeRole`, gets back temporary credentials for the role, and uses those to discover EC2 instances. The `ec2:DescribeInstances` permission is attached to the role, not the user. When using this method, you must also set the `ec2.roleArn` field in the Backend resource.
+Use this method when you want EC2 discovery to use a least-privilege IAM role rather than long-lived user credentials. The kgateway controller uses its own ambient IAM identity (configured via [IRSA](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)) to call `sts:AssumeRole` and obtain temporary credentials for the role. No Kubernetes secret is required. The `ec2:DescribeInstances` permission is attached to the role, not the controller's identity directly.
 
-1. Create the policy document and save the ARN in an environment variable. At a minimum, you must assign the `ec2:DescribeInstances` permission.
+{{< callout type="warning" >}}
+This method requires an EKS cluster with an OIDC provider. It does not work on local clusters such as Kind or minikube. If you are using a local cluster, use the **Static AWS credentials** method instead.
+{{< /callout >}}
+
+1. Verify that your EKS cluster has an OIDC provider associated with it, and save the provider ID in an environment variable.
    ```sh
-   export POLICY_ARN=$(aws iam create-policy \
+   export OIDC_PROVIDER=$(aws eks describe-cluster --name <cluster-name> \
+     --query "cluster.identity.oidc.issuer" --output text | sed 's|https://||')
+   echo $OIDC_PROVIDER
+   ```
+
+   If this command returns nothing, [associate an OIDC provider with your cluster](https://docs.aws.amazon.com/eks/latest/userguide/enable-iam-roles-for-service-accounts.html) before continuing.
+
+2. Get your AWS account ID.
+   ```sh
+   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+   ```
+
+3. Create an IAM role for the kgateway controller with an IRSA trust policy. This lets the controller's ServiceAccount use the role.
+   ```sh
+   aws iam create-role \
+     --role-name kgateway-controller-role \
+     --assume-role-policy-document "{
+       \"Version\": \"2012-10-17\",
+       \"Statement\": [{
+         \"Effect\": \"Allow\",
+         \"Principal\": {\"Federated\": \"arn:aws:iam::${AWS_ACCOUNT_ID}:oidc-provider/${OIDC_PROVIDER}\"},
+         \"Action\": \"sts:AssumeRoleWithWebIdentity\",
+         \"Condition\": {\"StringEquals\": {
+           \"${OIDC_PROVIDER}:sub\": \"system:serviceaccount:kgateway-system:kgateway\"
+         }}
+       }]
+     }"
+   ```
+
+4. Create the EC2 discovery policy and save the ARN.
+   ```sh
+   aws iam create-policy \
      --policy-name kgateway-ec2-discovery \
      --policy-document '{
        "Version": "2012-10-17",
@@ -163,32 +209,25 @@ Use this method when you want to limit what the IAM user can do directly, or whe
            "Resource": "*"
          }
        ]
-     }' \
-     --query 'Policy.Arn' \
-     --output text)
+     }'
 
+   export POLICY_ARN="arn:aws:iam::${AWS_ACCOUNT_ID}:policy/kgateway-ec2-discovery"
    echo $POLICY_ARN
    ```
 
-2. Get your AWS account ID and IAM username, then create an IAM role with a trust policy that allows your IAM user to assume it.
+5. Create the EC2 discovery role and attach the policy to it. The controller role assumes this role to list EC2 instances.
    ```sh
-   export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-   export IAM_USERNAME=$(aws sts get-caller-identity --query 'Arn' --output text | cut -d'/' -f2)
-
    aws iam create-role \
      --role-name kgateway-ec2-role \
      --assume-role-policy-document "{
        \"Version\": \"2012-10-17\",
        \"Statement\": [{
          \"Effect\": \"Allow\",
-         \"Principal\": {\"AWS\": \"arn:aws:iam::${AWS_ACCOUNT_ID}:user/${IAM_USERNAME}\"},
+         \"Principal\": {\"AWS\": \"arn:aws:iam::${AWS_ACCOUNT_ID}:role/kgateway-controller-role\"},
          \"Action\": \"sts:AssumeRole\"
        }]
      }"
-   ```
 
-3. Attach the policy to the role and save the role ARN in an environment variable.
-   ```sh
    aws iam attach-role-policy \
      --role-name kgateway-ec2-role \
      --policy-arn $POLICY_ARN
@@ -197,29 +236,30 @@ Use this method when you want to limit what the IAM user can do directly, or whe
    echo $ROLE_ARN
    ```
 
-4. Create permanent AWS credentials for your IAM user. The gateway proxy uses these credentials to assume the role.
+6. Allow the controller role to assume the EC2 discovery role.
    ```sh
-   eval $(aws iam create-access-key --user-name ${IAM_USERNAME} \
-     --query 'AccessKey.[AccessKeyId,SecretAccessKey]' \
-     --output text | \
-     awk '{print "export AWS_ACCESS_KEY_ID="$1"\nexport AWS_SECRET_ACCESS_KEY="$2}')
-
-   echo "AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY_ID"
-   echo "AWS_SECRET_ACCESS_KEY $AWS_SECRET_ACCESS_KEY"
+   aws iam put-role-policy \
+     --role-name kgateway-controller-role \
+     --policy-name assume-ec2-role \
+     --policy-document "{
+       \"Version\": \"2012-10-17\",
+       \"Statement\": [{
+         \"Effect\": \"Allow\",
+         \"Action\": \"sts:AssumeRole\",
+         \"Resource\": \"${ROLE_ARN}\"
+       }]
+     }"
    ```
 
-5. Create a Kubernetes secret that holds the IAM user credentials.
-   ```yaml
-   kubectl apply -n {{< reuse "docs/snippets/namespace.md" >}} -f - <<EOF
-   apiVersion: v1
-   kind: Secret
-   metadata:
-     name: aws-creds
-   type: Opaque
-   stringData:
-     accessKey: "${AWS_ACCESS_KEY_ID}"
-     secretKey: "${AWS_SECRET_ACCESS_KEY}"
-   EOF
+7. Annotate the kgateway controller's ServiceAccount with the controller role ARN and restart the controller.
+   ```sh
+   export CONTROLLER_ROLE_ARN=$(aws iam get-role --role-name kgateway-controller-role --query 'Role.Arn' --output text)
+
+   kubectl annotate serviceaccount {{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}  \
+     eks.amazonaws.com/role-arn=${CONTROLLER_ROLE_ARN}
+
+   kubectl rollout restart deployment/{{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/{{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}}
    ```
 
 {{% /tab %}}
@@ -269,13 +309,12 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
      aws:
        region: ${AWS_REGION}
        auth:
-         type: Secret
-         secretRef:
-           name: aws-creds
+         type: AssumeRole
+         assumeRole:
+           roleArn: "${ROLE_ARN}"
        ec2:
          port: 80
          addressType: PublicIP
-         roleArn: "${ROLE_ARN}"
          filters:
          - keyValue:
              key: app
@@ -289,8 +328,9 @@ Create a Backend resource that represents your EC2 instance and an HTTPRoute to 
    |---|---|
    | `ec2.port` | The port on the EC2 instance to route to. |
    | `ec2.addressType` | `PublicIP` to route to the public IP address; `PrivateIP` to route to the private IP address. |
-   | `ec2.roleArn` | The ARN of the IAM role to assume before listing instances. Required only when using role assumption. |
    | `ec2.filters` | Tag-based filters to select EC2 instances. Only running instances that match all filters are included as endpoints. |
+   | `auth.type` | The authentication method. Use `Secret` for static credentials stored in a Kubernetes secret, or `AssumeRole` to have the controller assume an IAM role using its ambient identity. |
+   | `auth.assumeRole.roleArn` | The ARN of the IAM role to assume. Required when `auth.type` is `AssumeRole`. |
 
 2. Create an HTTPRoute resource that references the `ec2-backend` Backend.
    ```yaml
