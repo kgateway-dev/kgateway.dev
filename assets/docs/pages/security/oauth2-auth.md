@@ -128,10 +128,26 @@ EOF
 ## Verify the authentication flow
 
 1. Open your browser and navigate to the application URL (e.g., `https://my-app.example.com/`).
+
+{{< reuse-image src="img/oauth2/application-url.png" >}}
+{{< reuse-image-dark srcDark="img/oauth2/application-url.png" >}}
+
 2. Verify that you are redirected to the Keycloak login screen.
+
+{{< reuse-image src="img/oauth2/keycloak-login.png" >}}
+{{< reuse-image-dark srcDark="img/oauth2/keycloak-login.png" >}}
+
 3. Authenticate with your credentials.
+
 4. Verify that you are redirected back to your application and the request succeeds.
+
+{{< reuse-image src="img/oauth2/redirected.png" >}}
+{{< reuse-image-dark srcDark="img/oauth2/redirected.png" >}}
+
 5. Inspect the cookies in your browser; you should see secure, HTTP-only cookies containing the session tokens.
+
+{{< reuse-image src="img/oauth2/cookies.png" >}}
+{{< reuse-image-dark srcDark="img/oauth2/cookies.png" >}}
 
 ### Test with curl
 
