@@ -110,7 +110,7 @@ For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/tcp-
 
 #### PROXY protocol on the Envoy readiness listener {#v24-readiness-proxy-protocol}
 
-You can now enable the PROXY protocol listener filter on the Envoy readiness listener (port 8082) by setting `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This allows an external load balancer that prepends PROXY protocol headers, such as an AWS NLB with proxy protocol v2 enabled, to perform health checks against the readiness port. Kubelet probes continue to work because the filter accepts connections without a PROXY header.
+You can now enable the PROXY protocol listener filter on the Envoy readiness listener (port 8082) by setting `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource. This configuration allows an external load balancer that prepends PROXY protocol headers, such as an AWS NLB with proxy protocol v2 enabled, to perform health checks against the readiness port. Kubelet probes continue to work because the filter accepts connections without a PROXY header.
 
 For more information, see [Readiness listener PROXY protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#readiness" >}}).
 
