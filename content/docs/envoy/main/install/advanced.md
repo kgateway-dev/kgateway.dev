@@ -172,10 +172,10 @@ The kgateway controller runs an admin and debug server on port 9095. By default,
 To access the admin and debug servers from your local machine, use the `kubectl port-forward` command to expose port 9095 on your local machine. No change of the bind address is required.
 
 ```sh
-kubectl port-forward deployment/kgateway -n {{< reuse "docs/snippets/namespace.md" >}} 9095:9095
+kubectl port-forward deployment/{{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 9095:9095
 ```
 
-If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name=kgateway -n {{< reuse "docs/snippets/namespace.md" >}} -o wide`.
+If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name={{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o wide`.
 
 {{< callout type="warning" >}}
 The admin server exposes pprof profiling endpoints, logging controls, and internal config snapshots. Only expose it outside the pod in trusted environments, such as a local development cluster or a dedicated profiling setup.

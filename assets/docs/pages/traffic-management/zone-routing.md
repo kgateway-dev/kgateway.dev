@@ -211,5 +211,5 @@ You can optionally verify zone-aware routing by checking the `lb_zone_*` metrics
 
 ```sh
 kubectl delete BackendConfigPolicy httpbin-zone-aware -n httpbin
-kubectl delete GatewayParameters zone-aware-gw-params -n kgateway-system
+kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} zone-aware-gw-params -n kgateway-system
 ```
