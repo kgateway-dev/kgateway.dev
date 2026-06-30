@@ -3,7 +3,7 @@ Inject custom Envoy bootstrap configuration into a managed gateway proxy by over
 Use this technique to set bootstrap-level Envoy options that are not exposed as built-in fields on the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource, such as the [`stats_config.histogram_bucket_settings`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/metrics/v3/stats.proto#envoy-v3-api-msg-config-metrics-v3-statsconfig) to tune histogram bucket boundaries for your metrics.
 
 {{< callout type="warning" >}}
-This is an advanced workaround. Prefer the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) whenever they cover your use case, because they are validated at apply time and updated automatically when you upgrade. A custom bootstrap ConfigMap is **not** validated by the control plane and is **not** updated automatically on upgrade. You must keep it in sync with the generated bootstrap format yourself. If you need to change the entire proxy template, use a [self-managed gateway]({{< link-hextra path="/setup/customize/selfmanaged/" >}}) instead.
+This is an advanced workaround. Prefer the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) whenever they cover your use case, because they are validated at apply time and updated automatically when you upgrade. A custom bootstrap ConfigMap is **not** validated by the control plane and is **not** updated automatically on upgrade. You must keep it in sync with the generated bootstrap format yourself. 
 {{< /callout >}}
 
 ## How it works
@@ -167,7 +167,7 @@ open envoy.yaml
 
 When you upgrade {{< reuse "docs/snippets/kgateway.md" >}}, the generated bootstrap format can change to add new fields, clusters, or listeners. Because your custom ConfigMap is a copy, it does not pick up these changes automatically. After each upgrade, regenerate the bootstrap from a proxy that uses the default configuration, re-apply your customization, and update your custom ConfigMap.
 
-To avoid this maintenance, use the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) where possible, and open a [feature request](https://github.com/kgateway-dev/kgateway/issues) if you need a built-in field for your bootstrap setting.
+To avoid this maintenance, use the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) where possible, and open a [feature request](https://github.com/kgateway-dev/kgateway/issues) if you need a built-in field for your bootstrap setting. 
 
 ## Cleanup
 

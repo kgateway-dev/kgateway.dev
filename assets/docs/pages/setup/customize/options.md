@@ -22,7 +22,7 @@ Review the built-in configurations that are provided via the [{{< reuse "docs/sn
 | `service` | Configure the Kubernetes Service that exposes the proxy, including the type, ports, labels, annotations, and external traffic policy. |
 | `serviceAccount` | Configure the ServiceAccount for the proxy pods. |
 | `istio` | Configure the Istio integration for the proxy. |
-| `stats` | Configure the stats server that exposes Prometheus metrics. |
+| `stats` | Configure the stats server that exposes Prometheus metrics, including enabling the stats endpoint, rewriting the stats route prefix, and [filtering which stats Envoy emits]({{< link-hextra path="/observability/gateway-metrics/#filter-stats" >}}). |
 
 {{< callout type="info" >}}
 Use the built-in fields where possible. Built-in fields are validated at apply time, are considered stable, and are updated automatically when you upgrade your gateway proxies.
