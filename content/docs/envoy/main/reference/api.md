@@ -2120,6 +2120,42 @@ _Appears in:_
 
 
 
+#### InternalRedirect
+
+
+
+InternalRedirect configures the gateway to handle upstream 3xx redirects inside the
+gateway. The gateway follows a valid, fully qualified Location header and returns only
+the final response to the client.
+Applies only to routes that forward traffic to a backend.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
+| `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
+| `responseHeadersToCopy` _[HTTPHeaderName](#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `maxRedirects` _[uint32](#uint32)_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
+
+
+#### InternalRedirectResponseCode
+
+_Underlying type:_ _integer_
+
+InternalRedirectResponseCode is a 3xx response code supported for internal redirects.
+
+_Validation:_
+- Enum: [301 302 303 307 308]
+
+_Appears in:_
+- [InternalRedirect](#internalredirect)
+
+
+
 #### IstioContainer
 
 
@@ -2176,6 +2212,28 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `local` _[LocalJWKS](#localjwks)_ | LocalJWKS configures getting the public keys to validate the JWT from a Kubernetes configmap,<br />or inline (raw string) JWKS. |  |  |
 | `remote` _[RemoteJWKS](#remotejwks)_ | RemoteJWKS configures getting the public keys to validate the JWT from a remote JWKS server. |  |  |
+
+
+
+
+#### JWKSRetryBackOff
+
+
+
+JWKSRetryBackOff configures an exponential backoff strategy.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/backoff.proto#envoy-v3-api-msg-config-core-v3-backoffstrategy
+
+
+
+_Appears in:_
+- [JWKSRetryPolicy](#jwksretrypolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BaseInterval is the base interval for the exponential backoff computation.<br />It must be greater than zero and less than or equal to MaxInterval. |  |  |
+| `maxInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxInterval is the maximum interval between retries. If set, it must be greater than<br />or equal to BaseInterval. Defaults to 10 times the BaseInterval. |  |  |
+
+
 
 
 #### JWT
@@ -3274,6 +3332,8 @@ _Appears in:_
 | `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
 | `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
 | `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
+| `asyncFetch` _[JWKSAsyncFetch](#jwksasyncfetch)_ | AsyncFetch configures fetching the JWKS asynchronously and caching it on a timer,<br />instead of fetching it on demand during request handling. |  |  |
+| `retryPolicy` _[JWKSRetryPolicy](#jwksretrypolicy)_ | RetryPolicy configures how the JWKS fetch is retried (with exponential backoff)<br />when the remote JWKS server is unavailable. |  |  |
 
 
 #### RequestDecompression
@@ -3946,6 +4006,7 @@ _Appears in:_
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and ListenerSets, and ignored for other targeted kinds. |  |  |
+| `internalRedirect` _[InternalRedirect](#internalredirect)_ | InternalRedirect handles upstream 3xx redirects inside the gateway.<br />Applies only to routes that forward traffic to a backend. |  |  |
 | `rbac` _[Authorization](#authorization)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. This means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. |  |  |
 | `jwtAuth` _[JWTAuth](#jwtauth)_ | JWT specifies the JWT authentication configuration for the policy.<br />This defines the JWT providers and their configurations. |  |  |
 | `urlRewrite` _[URLRewrite](#urlrewrite)_ | UrlRewrite specifies URL rewrite rules for matching requests.<br />NOTE: This field is only honored for HTTPRoute targets. |  |  |
@@ -4356,6 +4417,36 @@ IPOrCIDR accepts either a bare IP address or an address range in CIDR notation. 
 
 **Validation:**
 - Pattern=`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}(\/([0-9]|[1-2][0-9]|3[0-2]))?$|^((?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|:(?::[0-9A-Fa-f]{1,4}){1,7}|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,6}))(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?$`
+
+#### JWKSAsyncFetch
+
+JWKSAsyncFetch configures asynchronous fetching of the remote JWKS.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `fastListener` | *bool | FastListener controls when the listener is considered ready relative to the initial JWKS fetch. If false or unset, the listener waits for the first JWKS fetch to complete before it starts serving traffic, so requests are never validated against an empty key set. If true, the listener starts immediately and the first fetch happens in the background. |
+| `failedRefetchDuration` | *metav1.Duration | FailedRefetchDuration is how long to wait before retrying the fetch after a failure. If unspecified, Envoy default of 1 second is used. |
+
+#### JWKSRetryBackOff
+
+JWKSRetryBackOff configures an exponential backoff strategy. Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/backoff.proto#envoy-v3-api-msg-config-core-v3-backoffstrategy
+
+**Validation:**
+- XValidation:rule="!has(self.maxInterval) || duration(self.maxInterval) >= duration(self.baseInterval)",message="maxInterval must be greater than or equal to baseInterval"
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `baseInterval` | metav1.Duration | BaseInterval is the base interval for the exponential backoff computation. It must be greater than zero and less than or equal to MaxInterval. **Required.** |
+| `maxInterval` | *metav1.Duration | MaxInterval is the maximum interval between retries. If set, it must be greater than or equal to BaseInterval. Defaults to 10 times the BaseInterval. |
+
+#### JWKSRetryPolicy
+
+JWKSRetryPolicy configures retries with an exponential backoff for fetching the remote JWKS when the server is unavailable. Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `numRetries` | *int32 | NumRetries is the allowed number of retries when fetching the JWKS fails. Defaults to 1 if unset. |
+| `backOff` | *[JWKSRetryBackOff](#jwksretrybackoff) | BackOff configures the exponential backoff strategy between retries. If unset, the default base interval is 1000ms and the default maximum interval is 10 times the base interval. |
 
 #### KeyAnyValue
 
