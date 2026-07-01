@@ -14,7 +14,7 @@ In the Kubernetes Gateway API, you can create listeners in two main ways:
 
 A common, simple approach is to write the listener inline on the Gateway resource. You have the flexibility to write different protocols, ports, and even TLS certificates. Each listener can specify its own hostname, or inherit the hostname of the Gateway. Gateways support up to 64 listeners.
 
-Most examples in both the {{< reuse "docs/snippets/kgateway.md" >}} and Kubernetes Gateway API docs use the inline approach.
+Most examples in both the {{< reuse "kgw-docs/snippets/kgateway.md" >}} and Kubernetes Gateway API docs use the inline approach.
 
 ## ListenerSets {#listenersets}
 

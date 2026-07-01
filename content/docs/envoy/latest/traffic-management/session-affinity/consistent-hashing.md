@@ -4,4 +4,4 @@ description: Pin requests from the same client to the same backend by using cons
 weight: 20
 ---
 
-{{< reuse "docs/pages/traffic-management/session-affinity/consistent-hashing.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/session-affinity/consistent-hashing.md" >}}

@@ -9,4 +9,4 @@ If your load balancer prepends PROXY protocol headers to health check connection
 {{< /callout >}}
 
 
-{{< reuse "docs/pages/traffic-management/health-checks/gateway.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/health-checks/gateway.md" >}}

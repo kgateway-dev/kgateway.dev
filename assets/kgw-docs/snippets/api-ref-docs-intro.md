@@ -1,0 +1,1 @@
+Review the API reference documentation for {{< reuse "kgw-docs/snippets/kgateway-and-data-plane.md" >}}.

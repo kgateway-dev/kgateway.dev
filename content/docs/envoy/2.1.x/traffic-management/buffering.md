@@ -5,8 +5,8 @@ next: /docs/traffic-management/header-control
 prev: /docs/traffic-management/route-delegation
 ---
 
-{{< reuse "docs/pages/traffic-management/buffering.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/buffering.md" >}}
 
-{{< reuse "docs/snippets/buffering-route.md" >}}
+{{< reuse "kgw-docs/snippets/buffering-route.md" >}}
 
-{{< reuse "docs/snippets/buffering-cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/buffering-cleanup.md" >}}

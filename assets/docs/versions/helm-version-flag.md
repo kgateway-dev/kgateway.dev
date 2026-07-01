@@ -1,1 +1,0 @@
-v{{< reuse "docs/versions/n-patch.md" >}}

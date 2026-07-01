@@ -3,7 +3,7 @@ title: Model failover
 weight: 30
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Prioritize the failover of requests across different models from an LLM provider.
 
@@ -19,7 +19,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 1. [Set up AI Gateway](../setup/).
 2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}
 
@@ -44,7 +44,7 @@ You can configure failover across multiple models and providers by using priorit
      labels:
        app: model-failover
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -93,7 +93,7 @@ You can configure failover across multiple models and providers by using priorit
      labels:
        app: model-failover
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -142,13 +142,13 @@ You can configure failover across multiple models and providers by using priorit
    kind: HTTPRoute
    metadata:
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: model-failover
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -162,7 +162,7 @@ You can configure failover across multiple models and providers by using priorit
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -259,10 +259,10 @@ You can configure failover across multiple models and providers by using priorit
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete backend,httproute -n {{< reuse "docs/snippets/namespace.md" >}} -l app=model-failover
+   kubectl delete backend,httproute -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app=model-failover
    ```
 
 ## Next

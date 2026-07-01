@@ -10,17 +10,17 @@ Update the response status based on headers being present in a response.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 
 ## Change the response status
 
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
+1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -127,8 +127,8 @@ Update the response status based on headers being present in a response.
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 ```

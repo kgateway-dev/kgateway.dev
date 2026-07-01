@@ -4,4 +4,4 @@ description: Route traffic to the nearest backend endpoints by zone to reduce cr
 weight: 20
 ---
 
-{{< reuse "docs/pages/traffic-management/zone-routing.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/zone-routing.md" >}}

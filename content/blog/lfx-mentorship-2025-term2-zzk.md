@@ -110,7 +110,7 @@ Through this project, we added complete distributed tracing support to kgateway'
 Want to experience this distributed tracing feature yourself? Follow these steps to quickly set up a complete test environment:
 
 #### 1. Install Gateway
-Follow the [Get started](https://kgateway.dev/docs/envoy/latest/quickstart/) guide. For the installation, choose the development version, v{{< reuse "docs/versions/patch-dev.md" >}}.
+Follow the [Get started](https://kgateway.dev/docs/envoy/latest/quickstart/) guide. For the installation, choose the development version, v{{< reuse "kgw-docs/versions/patch-dev.md" >}}.
 
 #### 2. Enable AI Extension
 As you follow the [Set up AI Gateway](https://kgateway.dev/docs/envoy/2.1.x/ai/setup/), note the following configurations:

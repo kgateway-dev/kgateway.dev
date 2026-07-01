@@ -19,7 +19,7 @@ You can set up proxy protocol for the following traffic directions:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Inbound proxy protocol {#inbound}
 
@@ -34,7 +34,7 @@ Configure a ListenerPolicy to accept PROXY protocol headers on incoming connecti
    kind: ListenerPolicy
    metadata:
      name: proxy-protocol
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -122,7 +122,7 @@ This setting can be useful in environments where some clients send PROXY headers
    kind: ListenerPolicy
    metadata:
      name: proxy-protocol
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -155,21 +155,21 @@ This setting can be useful in environments where some clients send PROXY headers
 
 Some external load balancers, such as an AWS Network Load Balancer (NLB) with proxy protocol v2 enabled at the target group level (`service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"`), prepend a PROXY protocol header to every TCP connection they make, including health check connections. By default, the Envoy readiness listener on port 8082 cannot parse these headers and drops the connection, which causes Load Balancer health checks to fail.
 
-Set `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource to enable the readiness listener to accept connections that include a PROXY protocol header. This allows load balancers that prepend PROXY headers to all TCP connections to successfully health check the gateway on port 8082. Connections without a PROXY header, such as kubelet probes, are also accepted.
+Set `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to enable the readiness listener to accept connections that include a PROXY protocol header. This allows load balancers that prepend PROXY headers to all TCP connections to successfully health check the gateway on port 8082. Connections without a PROXY header, such as kubelet probes, are also accepted.
 
 {{< callout type="info" >}}
-Port 8082 is not included in the generated LoadBalancer Service by default. You must explicitly add it to `spec.kube.service.ports` in the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource for the load balancer to reach the readiness listener.
+Port 8082 is not included in the generated LoadBalancer Service by default. You must explicitly add it to `spec.kube.service.ports` in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource for the load balancer to reach the readiness listener.
 {{< /callout >}}
 
-1. Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource with `enableReadinessProbeProxyProtocol: true` and expose port 8082 through the gateway Service.
+1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with `enableReadinessProbeProxyProtocol: true` and expose port 8082 through the gateway Service.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: gw-params
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      kube:
        envoyContainer:
@@ -181,7 +181,7 @@ Port 8082 is not included in the generated LoadBalancer Service by default. You 
    EOF
    ```
 
-2. Reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource from your Gateway.
+2. Reference the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource from your Gateway.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -189,13 +189,13 @@ Port 8082 is not included in the generated LoadBalancer Service by default. You 
    kind: Gateway
    metadata:
      name: http
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
-         group: {{< reuse "docs/snippets/gatewayparam-group.md" >}}
-         kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+         group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+         kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
          name: gw-params
      listeners:
      - protocol: HTTP
@@ -210,7 +210,7 @@ Port 8082 is not included in the generated LoadBalancer Service by default. You 
 3. Verify that the filter is applied by checking the Envoy listener configuration.
 
    ```sh
-   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000:19000 &
+   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000:19000 &
    PF_PID=$!
    sleep 2
    curl -s 127.0.0.1:19000/config_dump | \
@@ -319,7 +319,7 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
      - "echo.example.com"
      rules:
@@ -374,14 +374,14 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete listenerpolicy proxy-protocol -n {{< reuse "docs/snippets/namespace.md" >}} --ignore-not-found
+kubectl delete listenerpolicy proxy-protocol -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
 kubectl delete pod proxy-echo -n default --ignore-not-found
 kubectl delete service proxy-echo -n default --ignore-not-found
 kubectl delete backendconfigpolicy proxy-echo-upstream-pp -n default --ignore-not-found
 kubectl delete httproute proxy-echo -n default --ignore-not-found
-kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}} --ignore-not-found
-kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} gw-params -n {{< reuse "docs/snippets/namespace.md" >}} --ignore-not-found
+kubectl delete gateway http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+kubectl delete {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} gw-params -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
 ```

@@ -6,11 +6,11 @@ description: Rewrite path prefixes in requests.
 
 Rewrite path prefixes in requests by using the `URLRewrite` filter. 
 
-For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/#httpurlrewritefilter).
+For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/#httpurlrewritefilter).
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Rewrite prefix path
 
@@ -32,7 +32,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - rewrite.example
      rules:
@@ -142,7 +142,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - external-rewrite.example
      rules:
@@ -239,7 +239,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - rewrite.example
      rules:
@@ -349,7 +349,7 @@ Use the [HTTPPathModifier](https://gateway-api.sigs.k8s.io/reference/api-spec/ma
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - external-rewrite.example
      rules:
@@ -434,7 +434,7 @@ For regex-based path rewriting in v2.1.x, consider these alternatives:
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete httproute httpbin-rewrite -n httpbin

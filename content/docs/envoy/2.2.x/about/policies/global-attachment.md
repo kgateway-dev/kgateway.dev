@@ -13,7 +13,7 @@ Because it increases the number of policy attachments to calculate, the global p
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Step 1: Review default policy behavior {#default-policy}
 
@@ -84,12 +84,12 @@ By default, policies are attached to resources in the same namespace. This way, 
    }
    ```
 
-2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that rewrites the path to `/status/418` if it has the `transform:status` header. Note that the policy is in the same namespace as the HTTPRoute.
+2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that rewrites the path to `/status/418` if it has the `transform:status` header. Note that the policy is in the same namespace as the HTTPRoute.
 
    ```yaml
    kubectl apply -f- <<EOF  
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -137,21 +137,21 @@ By default, policies are attached to resources in the same namespace. This way, 
    I'm a teapot!
    ```
 
-4. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+4. Delete the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 
    ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n httpbin transformation
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} -n httpbin transformation
    ```
 
-5. Create the same {{< reuse "docs/snippets/trafficpolicy.md" >}} but in a different namespace, such as the `{{< reuse "docs/snippets/namespace.md" >}}` namespace.
+5. Create the same {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} but in a different namespace, such as the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace.
 
    ```yaml
    kubectl apply -f- <<EOF  
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -232,33 +232,33 @@ By default, policies are attached to resources in the same namespace. This way, 
 
 ## Step 2: Enable global policy attachment {#enable-global-policy-attachment}
 
-To enable the global policy attachment feature, upgrade your {{< reuse "/docs/snippets/kgateway.md" >}} Helm installation.
+To enable the global policy attachment feature, upgrade your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm installation.
 
 1. Get the Helm values for your current Helm installation. 
    ```sh
-   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
-   open {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
+   open {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
-2. Add the following values to the Helm values file to enable the global policy namespace feature. The example uses the `{{< reuse "docs/snippets/namespace.md" >}}` namespace as the "global" namespace, but you can use any existing namespace that you want.
+2. Add the following values to the Helm values file to enable the global policy namespace feature. The example uses the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace as the "global" namespace, but you can use any existing namespace that you want.
    ```yaml
    
    controller:
      extraEnv:
-       KGW_GLOBAL_POLICY_NAMESPACE: {{< reuse "docs/snippets/namespace.md" >}}
+       KGW_GLOBAL_POLICY_NAMESPACE: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
    
-3. Upgrade your Helm installation. Replace the `--version {{< reuse "/docs/versions/helm-version-flag.md" >}}` option to match your current version.
+3. Upgrade your Helm installation. Replace the `--version {{< reuse "/kgw-docs/versions/helm-version-flag.md" >}}` option to match your current version.
    
    ```sh
-   helm upgrade -i --namespace {{< reuse "docs/snippets/namespace.md" >}} --version {{< reuse "/docs/versions/helm-version-flag.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/docs/snippets/helm-kgateway.md" >}}.yaml
+   helm upgrade -i --namespace {{< reuse "kgw-docs/snippets/namespace.md" >}} --version {{< reuse "/kgw-docs/versions/helm-version-flag.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
    ```
 
 ## Step 3: Create a global policy {#create-global-policy}
 
-Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` namespace. Then, use a `global-policy` label selector to attach the policy to resources in any namespace.
+Create a global policy in the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace. Then, use a `global-policy` label selector to attach the policy to resources in any namespace.
 
-1. Update the HTTPRoute for the httpbin service to add a label selector. The label selector can be any value that you want, but it must match the label selector that you add in the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+1. Update the HTTPRoute for the httpbin service to add a label selector. The label selector can be any value that you want, but it must match the label selector that you add in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -272,7 +272,7 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -282,15 +282,15 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
    EOF
    ```
 
-2. Update the {{< reuse "docs/snippets/trafficpolicy.md" >}} to target the HTTPRoute by using the `global-policy` label in the `targetSelectors` field (instead of the `targetRefs` field).
+2. Update the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to target the HTTPRoute by using the `global-policy` label in the `targetSelectors` field (instead of the `targetRefs` field).
 
    ```yaml
    kubectl apply -f- <<EOF  
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetSelectors:
      - group: gateway.networking.k8s.io
@@ -339,12 +339,12 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
 
 ## Cleanup {#cleanup}
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 1. Delete the transformation policy.
 
    ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} transformation
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} transformation
    ```
 
 2. Restore the sample httpbin HTTPRoute.
@@ -359,7 +359,7 @@ Create a global policy in the `{{< reuse "docs/snippets/namespace.md" >}}` names
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:

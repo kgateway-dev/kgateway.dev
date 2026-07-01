@@ -4,4 +4,4 @@ description: Use kgateway as the ingress gateway for an Istio sidecar service me
 weight: 10
 ---
 
-{{< reuse "docs/pages/integrations/istio/sidecar/ingress.md" >}}
+{{< reuse "kgw-docs/pages/integrations/istio/sidecar/ingress.md" >}}

@@ -4,7 +4,7 @@ weight: 5
 description: Limit the number of requests that are allowed to enter the cluster before global rate limiting and external auth policies are applied.  
 ---
 
-{{< reuse "docs/pages/security/ratelimit/local.md" >}}
+{{< reuse "kgw-docs/pages/security/ratelimit/local.md" >}}
 
 ## Gradual rollout and shadow mode {#gradual-rollout}
 
@@ -15,11 +15,11 @@ The `percentEnabled` and `percentEnforced` fields let you control how aggressive
 
 The following steps walk through a shadow mode setup where rate limiting is observed but not enforced. You switch to full rate limit enforcement in subsequent steps. 
 
-1. Create a rate limit config in your {{< reuse "docs/snippets/trafficpolicy.md" >}}. In this example, the rate limit filter is enabled for all requests (`percentEnabled: 100`), but no requests are blocked (`percentEnforced: 0`).
+1. Create a rate limit config in your {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. In this example, the rate limit filter is enabled for all requests (`percentEnabled: 100`), but no requests are blocked (`percentEnforced: 0`).
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: local-ratelimit
      namespace: httpbin
@@ -43,7 +43,7 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    | `percentEnabled` | The percentage of requests for which the rate limit filter is enabled. Set to `100` so that the filter runs on all requests and collects statistics. |
    | `percentEnforced` | The percentage of requests for which the rate limit is enforced. Set to `0` so that no requests are blocked, even when the token bucket is exhausted. |
 
-2. Create an HTTPRoute that applies the {{< reuse "docs/snippets/trafficpolicy.md" >}} to the httpbin app along the `ratelimit.example` domain.
+2. Create an HTTPRoute that applies the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to the httpbin app along the `ratelimit.example` domain.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -54,7 +54,7 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
      - ratelimit.example
      rules:
@@ -66,8 +66,8 @@ The following steps walk through a shadow mode setup where rate limiting is obse
        - type: ExtensionRef
          extensionRef:
            name: local-ratelimit
-           group: {{< reuse "docs/snippets/trafficpolicy-group.md" >}}
-           kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+           group: {{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}
+           kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
        backendRefs:
        - name: httpbin
          port: 8000
@@ -102,7 +102,7 @@ The following steps walk through a shadow mode setup where rate limiting is obse
 
    Port-forward to the Envoy admin endpoint on the gateway proxy pod and query the local rate limit stats:
    ```sh
-   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000:19000 & sleep 1 && curl -s localhost:19000/stats | grep local_rate_limit; kill %1
+   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000:19000 & sleep 1 && curl -s localhost:19000/stats | grep local_rate_limit; kill %1
    ```
 
    Example output:
@@ -122,11 +122,11 @@ The following steps walk through a shadow mode setup where rate limiting is obse
 
    In this example, 2 requests were processed by the filter, 1 was within the token limit (`ok: 1`), and 1 would have been rate limited (`rate_limited: 1`), but nothing was actually blocked (`enforced: 0`). Use the `rate_limited` counter to assess whether your token bucket settings reflect realistic traffic patterns before moving to enforcement.
 
-5. When you are satisfied with your token bucket configuration, update the {{< reuse "docs/snippets/trafficpolicy.md" >}} to enforce rate limiting for all requests by setting `percentEnforced` to `100`.
+5. When you are satisfied with your token bucket configuration, update the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to enforce rate limiting for all requests by setting `percentEnforced` to `100`.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: local-ratelimit
      namespace: httpbin
@@ -182,12 +182,12 @@ The following steps walk through a shadow mode setup where rate limiting is obse
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} local-ratelimit -n httpbin
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} local-ratelimit -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} disable-ratelimit -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} local-ratelimit -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} local-ratelimit -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} disable-ratelimit -n httpbin
 kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
 ```

@@ -20,7 +20,7 @@ Note that system and user prompts are not mutually exclusive, and can be combine
 
 1. [Set up AI Gateway](../setup/).
 2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Refactor LLM prompts
 
@@ -136,7 +136,7 @@ Use a TrafficPolicy resource to enrich prompts by appending or prepending system
    kind: TrafficPolicy
    metadata:
      name: openai-opt
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -305,10 +305,10 @@ To overwrite a setting that you added to a TrafficPolicy resource, you simply in
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ai-gateway
+kubectl delete TrafficPolicy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app=ai-gateway
 ```
 
 ## Next

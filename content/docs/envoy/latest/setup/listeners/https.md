@@ -8,18 +8,18 @@ Create an HTTPS listener on your API gateway. Then, your API gateway listens for
 
 ## Before you begin
 
-{{< reuse "docs/snippets/cert-prereqs.md" >}}
+{{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
 ## Create a TLS certificate
 
-{{< reuse "docs/snippets/listeners-https-create-cert.md" >}}
+{{< reuse "kgw-docs/snippets/listeners-https-create-cert.md" >}}
 
 ## Set up an HTTPS listener {#setup-https}
 
 Set up an HTTPS listener on your Gateway. 
 
 
-1. Create a gateway resource with an HTTPS listener. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
+1. Create a gateway resource with an HTTPS listener. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}}
 
    {{< tabs >}}
    {{% tab name="Gateway listeners" %}}
@@ -29,11 +29,11 @@ Set up an HTTPS listener on your Gateway.
    kind: Gateway
    metadata:
      name: https
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        example: httpbin-https
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTPS
        port: 443
@@ -49,11 +49,11 @@ Set up an HTTPS listener on your Gateway.
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}} |
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}} |
    |`spec.listeners`|Configure the listeners for this Gateway. The Gateway can serve HTTPS routes from any namespace. |
    |`spec.listeners.tls.mode`|The TLS mode that you want to use for incoming requests. In this example, HTTPS requests are terminated at the Gateway and the unencrypted request is forwarded to the service in the cluster. |
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
@@ -69,11 +69,11 @@ Set up an HTTPS listener on your Gateway.
       kind: Gateway
       metadata:
         name: https
-        namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
         labels:
           example: httpbin-https
       spec:
-        gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+        gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
         allowedListeners:
           namespaces:
             from: All        
@@ -87,13 +87,13 @@ Set up an HTTPS listener on your Gateway.
       EOF
       ```
 
-      {{< reuse "docs/snippets/review-table.md" >}}
+      {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
       |Setting|Description|
       |---|---|
-      |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}} |
+      |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}} |
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
-      |`spec.listeners`| {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later. |
+      |`spec.listeners`| {{< reuse "kgw-docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 443 in the ListenerSet that you create later. |
 
    2. Create a ListenerSet that configures an HTTPS listener for the Gateway.
 
@@ -103,13 +103,13 @@ Set up an HTTPS listener on your Gateway.
       kind: ListenerSet
       metadata:
         name: my-https-listenerset
-        namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
         labels:
           example: httpbin-https
       spec:
         parentRef:
           name: https
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
           kind: Gateway
           group: gateway.networking.k8s.io
         listeners:
@@ -128,7 +128,7 @@ Set up an HTTPS listener on your Gateway.
       EOF
       ```
 
-      {{< reuse "docs/snippets/review-table.md" >}}
+      {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
       |Setting|Description|
       |--|--|
@@ -142,7 +142,7 @@ Set up an HTTPS listener on your Gateway.
 
 2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
    ```sh
-   kubectl get gateway https -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   kubectl get gateway https -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
@@ -163,7 +163,7 @@ Set up an HTTPS listener on your Gateway.
        - https.example.com
      parentRefs:
        - name: https
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
            - name: httpbin
@@ -184,7 +184,7 @@ Set up an HTTPS listener on your Gateway.
    spec:
      parentRefs:
        - name: my-https-listenerset
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          kind: ListenerSet
          group: gateway.networking.k8s.io
      rules:
@@ -225,7 +225,7 @@ Set up an HTTPS listener on your Gateway.
        group: gateway.networking.k8s.io
        kind: Gateway
        name: https
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 5. Verify that the listener now has a route attached.
@@ -234,7 +234,7 @@ Set up an HTTPS listener on your Gateway.
    {{% tab name="Gateway listeners" %}}   
 
    ```sh
-   kubectl get gateway -n {{< reuse "docs/snippets/namespace.md" >}} https -o yaml
+   kubectl get gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} https -o yaml
    ```
 
    Example output:
@@ -248,7 +248,7 @@ Set up an HTTPS listener on your Gateway.
    {{% tab name="ListenerSet" %}}
 
    ```sh
-   kubectl get listenerset -n {{< reuse "docs/snippets/namespace.md" >}} my-https-listenerset -o yaml
+   kubectl get listenerset -n {{< reuse "kgw-docs/snippets/namespace.md" >}} my-https-listenerset -o yaml
    ```
 
    Example output:
@@ -262,7 +262,7 @@ Set up an HTTPS listener on your Gateway.
    Note that because the HTTPRoute is attached to the ListenerSet, the Gateway does not show the route in its status.
 
    ```sh
-   kubectl get gateway -n {{< reuse "docs/snippets/namespace.md" >}} https -o yaml
+   kubectl get gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} https -o yaml
    ```
 
    Example output:
@@ -282,13 +282,13 @@ Set up an HTTPS listener on your Gateway.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} https -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward svc/https -n {{< reuse "docs/snippets/namespace.md" >}} 8443:443
+   kubectl port-forward svc/https -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:443
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -349,7 +349,7 @@ Set up an HTTPS listener on your Gateway.
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}

@@ -9,7 +9,7 @@ Set up cloud LLM providers with AI Gateway.
 ## Before you begin
 
 1. [Set up AI Gateway](../setup/).
-2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+2. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 3. Choose a [supported LLM provider](#supported-llm-providers).
 
 ## Supported LLM providers {#supported-llm-providers}
@@ -20,7 +20,7 @@ The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but 
 The following sections in this guide provide examples that are tailored to the specific LLM provider. If the provider is not listed, you can adapt the examples to your own provider. Note that some differences might exist, such as different required fields in the Backend resource.
 {{< /callout >}}
 
-{{< reuse "docs/snippets/llm-providers.md" >}}
+{{< reuse "kgw-docs/snippets/llm-providers.md" >}}
 
 ## OpenAI {#openai}
 
@@ -44,7 +44,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    kind: Secret
    metadata:
      name: google-secret
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    type: Opaque
@@ -63,7 +63,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
      labels:
        app: ai-gateway
      name: google
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      ai:
        llm:
@@ -79,7 +79,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    | Setting      | Description                                                                                                                                                                                                                                                                                                           |
    | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -96,13 +96,13 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
    kind: HTTPRoute
    metadata:
      name: google
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -110,7 +110,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
            value: /gemini
        backendRefs:
        - name: google
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -196,7 +196,7 @@ To set up OpenAI, continue with the [Authenticate to the LLM](../auth/) guide.
 
 You can customize the default endpoint paths and authentication headers for LLM providers using override settings. Overrides are useful when you need to route requests to custom API endpoints or use different authentication schemes while maintaining compatibility with the provider's API structure. For example, Azure OpenAI supports authentication via an `Authorization` or `api-key` header. 
 
-By default, {{< reuse "docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use an API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
+By default, {{< reuse "kgw-docs/snippets/kgateway.md" >}} assumes that you provide your credentials in an `Authorization` header. However, you might want to use an API key instead. This example walks you through how to override the default `Authorization` header and customize the host URL and path for your LLM provider. 
 
 For more information, see the overrides in the [LLM provider API docs]({{< link-hextra path="/reference/api/#llmprovider" >}}).
 
@@ -213,7 +213,7 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
    kind: Secret
    metadata:
      name: azure-openai-secret
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    type: Opaque
@@ -230,7 +230,7 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
    kind: Backend
    metadata:
      name: azure-openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -253,7 +253,7 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    | Setting              | Description                                                                                     |
    | -------------------- | ----------------------------------------------------------------------------------------------- |
@@ -271,13 +271,13 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
    kind: HTTPRoute
    metadata:
      name: azure-openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -285,7 +285,7 @@ For more information, see the overrides in the [LLM provider API docs]({{< link-
            value: /azure-openai
        backendRefs:
        - name: azure-openai
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF

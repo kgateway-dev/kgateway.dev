@@ -9,7 +9,7 @@ Route traffic directly to an AWS EC2 instance.
 
 ## Before you begin 
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Set up an AWS EC2 instance
 
