@@ -20,11 +20,11 @@ The mentorship program offered an ideal starting point.
 
 ## Why an LFX Mentorship?
 
-There is a common misconception that the LFX Mentorship program is only for students or early career engineers. With five years of experience in cloud native API gateways and networking, I was already comfortable working with Go, Kubernetes, and Envoy Proxy. However, joining a mature open source ecosystem as a newcomer can still be challenging. Every project has its own architecture, governance model, testing practices, and community norms that take time to understand.
+There is a common misconception that the LFX Mentorship program is only for students or early-career engineers. With five years of experience in cloud native API gateways and networking, I was already comfortable working with Go, Kubernetes, and Envoy Proxy. However, joining a mature open source ecosystem as a newcomer can still be challenging. Every project has its own architecture, governance model, testing practices, and community norms that take time to understand.
 
-At the same time, balancing a full time job and family commitments means open source contributions often lack consistency without structure. Without a clear scope and guidance, it’s easy for contributions to get delayed or lose momentum.
+At the same time, balancing a full-time job and family commitments means open source contributions often lack consistency without structure. Without a clear scope and guidance, it’s easy for contributions to get delayed or lose momentum.
 
-I saw the [LFX Mentorship for kgateway](https://mentorship.lfx.linuxfoundation.org/project/b8acc432-094a-431a-877a-97f209893672) as the ideal starting point. It provided structured onboarding, a well defined project scope, and direct weekly interaction with core maintainers.
+I saw the [LFX Mentorship for kgateway](https://mentorship.lfx.linuxfoundation.org/project/b8acc432-094a-431a-877a-97f209893672) as the ideal starting point. It provided structured onboarding, a well-defined project scope, and direct weekly interaction with core maintainers.
 
 I applied, was accepted, and my journey began.
 
