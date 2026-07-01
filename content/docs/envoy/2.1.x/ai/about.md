@@ -4,7 +4,7 @@ weight: 5
 description: Unleash developer productivity and accelerate AI innovation with AI Gateway.  
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Unleash developer productivity and accelerate AI innovation with AI Gateway.
 
@@ -53,6 +53,6 @@ AI Gateway supports chat streaming, which allows the LLMs to stream out tokens a
 
 ## Supported LLM providers {#supported-llm-providers}
 
-{{< reuse "/docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](../cloud-providers/) guide.
+{{< reuse "/kgw-docs/snippets/kgateway-capital.md" >}} supports the following LLM providers. For more information, refer to the [LLM providers](../cloud-providers/) guide.
 
-{{< reuse "docs/snippets/llm-providers.md" >}}
+{{< reuse "kgw-docs/snippets/llm-providers.md" >}}

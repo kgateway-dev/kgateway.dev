@@ -8,7 +8,7 @@ Specify the number of times and duration for the gateway to try a connection to 
 You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/">}}) to ensure that your apps are available even if they are temporarily unavailable.
 
 {{< callout type="warning" >}} 
-{{< reuse "docs/versions/warn-experimental.md" >}}
+{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
 ## About request retries
@@ -17,7 +17,7 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-x-channel.md" >}}
+{{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 
 ## Step 1: Set up your environment for retries
 
@@ -26,7 +26,7 @@ To use retries, you need to install the experimental channel. You can also set u
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 
 2. Install a sample app that you can simulate a failure for, such as adding a `sleep` command to the [Bookinfo reviews app](https://istio.io/latest/docs/examples/bookinfo/).
@@ -108,7 +108,7 @@ To use retries, you need to install the experimental channel. You can also set u
    kind: HTTPListenerPolicy
    metadata:
      name: access-logs
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -149,7 +149,7 @@ Set up retries to the reviews app.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches: 
        - path:
@@ -168,7 +168,7 @@ Set up retries to the reviews app.
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    | Field | Description |
    |-------|-------------|
@@ -198,7 +198,7 @@ Set up retries to the reviews app.
         - group: gateway.networking.k8s.io
           kind: Gateway
           name: http
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
         rules:
         - matches: 
           - path:
@@ -212,11 +212,11 @@ Set up retries to the reviews app.
           name: timeout
       EOF
       ```
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `timeout` HTTPRoute rule. 
+   2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `timeout` HTTPRoute rule. 
       ```yaml
       kubectl apply -f- <<EOF
-      apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-      kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+      apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
       metadata:
         name: retry
         namespace: default
@@ -237,7 +237,7 @@ Set up retries to the reviews app.
       EOF
       ```
       
-      {{< reuse "docs/snippets/review-table.md" >}}
+      {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
       | Field | Description |
       |-------|-------------|
@@ -264,7 +264,7 @@ Set up retries to the reviews app.
         - group: gateway.networking.k8s.io
           kind: Gateway
           name: http
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
         rules:
         - matches: 
           - path:
@@ -277,14 +277,14 @@ Set up retries to the reviews app.
             port: 9080 
       EOF
       ```
-   2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `http` Gateway listener. You set up this Gateway in the [before you begin](#before-you-begin) section.  
+   2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that applies a retry policy to the `http` Gateway listener. You set up this Gateway in the [before you begin](#before-you-begin) section.  
       ```yaml
       kubectl apply -f- <<EOF
-      apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-      kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+      apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
       metadata:
         name: retry
-        namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
       spec:
         targetRefs:
         - kind: Gateway
@@ -315,7 +315,7 @@ Set up retries to the reviews app.
    1. Port-forward the gateway proxy on port 19000.
 
       ```sh
-      kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000
+      kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
       ```
 
    2. Get the configuration of your gateway proxy as a config dump.
@@ -393,7 +393,7 @@ Set up retries to the reviews app.
 4. Check the gateway's access logs to verify that the request was not retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field is `-`, which means that the request was not retried.
@@ -446,7 +446,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Check the gateway's access logs to verify that the request was retried.
    
    ```sh
-   kubectl logs -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
+   kubectl logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http | tail -1 | jq
    ```
 
    Example output: Note that the `response_flags` field now has values as follows:
@@ -468,7 +468,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 1. Delete the HTTPRoute resource.
    
@@ -487,13 +487,13 @@ Simulate a failure for the reviews app so that you can verify that the request i
 3. Delete the access log policy.
 
    ```sh
-   kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete httplistenerpolicy access-logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
    
-4. Delete the {{< reuse "docs/snippets/trafficpolicy.md" >}}.
+4. Delete the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
    ```sh
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} retry 
-   kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} retry -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} retry 
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} retry -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 

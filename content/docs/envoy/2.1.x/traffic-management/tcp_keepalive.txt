@@ -52,7 +52,7 @@ If the client does not automatically retry, this might show up as an error. You 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## TCP keepalive on downstream connections {#downstream}
 
@@ -107,7 +107,7 @@ EOF
 
 ### Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete listeneroption tcpkeepalive -n kgateway-system

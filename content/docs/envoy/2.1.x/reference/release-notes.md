@@ -197,13 +197,13 @@ You can now apply deep merging for extAuth and extProc policies. In addition, yo
 
 #### Additional proxy pod template customization {#podtemplate}
 
-Gateway proxies are created with a default proxy template that is stored in the default GatewayParameters resource. To change the default settings, you create a custom GatewayParameters resource and deploy a Gateway with it. {{< reuse "docs/snippets/kgateway-capital.md" >}} now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
+Gateway proxies are created with a default proxy template that is stored in the default GatewayParameters resource. To change the default settings, you create a custom GatewayParameters resource and deploy a Gateway with it. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
 
 For more information, see [Customize the gateway]({{< link-hextra path="/setup/customize/" >}}). To find all the values that you can change, see the [PodTemplate reference]({{< link-hextra path="/reference/api/#pod" >}}) in the GatewayParameters API.
 
-#### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
+#### Header modifier filter for {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} {#header-modifier}
 
-Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies.
+Now, you can apply header request and response modifiers in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies.
 
 
 #### Horizontal Pod Autoscaling {#hpa}
@@ -254,7 +254,7 @@ Leader election is now enabled by default to ensure that you can run kgateway in
 You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
 
 ```sh
-helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
+helm upgrade -i --namespace kgateway-system --version v{{< reuse "kgw-docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
 ```
 
 

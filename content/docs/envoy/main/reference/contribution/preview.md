@@ -4,4 +4,4 @@ description: Build and preview the kgateway docs locally before opening a pull r
 weight: 20
 ---
 
-{{< reuse "docs/pages/reference/contribution/preview.md" >}} 
+{{< reuse "kgw-docs/pages/reference/contribution/preview.md" >}} 

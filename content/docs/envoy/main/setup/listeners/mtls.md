@@ -30,7 +30,7 @@ Self-signed certificates are used for demonstration purposes. Do not use self-si
 
 ## Before you begin
 
-{{< reuse "docs/snippets/cert-prereqs.md" >}}
+{{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
 ## Create TLS certificates 
 
@@ -84,14 +84,14 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    kubectl create secret tls https-cert \
      --cert=server-cert.pem \
      --key=server-key.pem \
-     -n {{< reuse "docs/snippets/namespace.md" >}}
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 5. Store the CA certificates in a configmap. The gateway proxy later uses these certificates to validate the client certificate that is presented during the TLS handshake. 
    ```sh
    kubectl create configmap ca-cert \
      --from-file=ca.crt=ca-cert.pem \
-     -n {{< reuse "docs/snippets/namespace.md" >}}
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 6. Create a client certificate and private key. You use these credentials later when sending a request to the gateway proxy. The client certificate is signed by the same CA that you used for the gateway proxy.
@@ -121,9 +121,9 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -174,7 +174,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      - "example.com"
      parentRefs:
        - name: mtls
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
            - name: httpbin
@@ -186,13 +186,13 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
+   kubectl port-forward deploy/mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -349,9 +349,9 @@ In this example, you override the default certificate validation configuration f
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -400,13 +400,13 @@ In this example, you override the default certificate validation configuration f
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
+   kubectl port-forward deploy/mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -527,9 +527,9 @@ You can configure your mTLS listener to limit connections to clients that presen
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -644,9 +644,9 @@ You can configure your mTLS listener to limit connections to clients that presen
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -718,13 +718,13 @@ You can configure your mTLS listener to limit connections to clients that presen
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete httproute httpbin-https -n httpbin
-kubectl delete gateway mtls -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete secret https-cert -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete configmap ca-cert -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete secret https-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete configmap ca-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf ../example_certs
 ```
    

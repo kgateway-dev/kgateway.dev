@@ -4,4 +4,4 @@ description: Scrape Envoy proxy metrics from gateway pods to track request rates
 weight: 20
 ---
 
-{{< reuse "docs/pages/observability/gateway-metrics.md" >}}
+{{< reuse "kgw-docs/pages/observability/gateway-metrics.md" >}}

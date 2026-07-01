@@ -4,4 +4,4 @@ weight: 20
 description: Configure a service to use HTTP/2. 
 ---
 
-{{< reuse "docs/pages/traffic-management/http2.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/http2.md" >}}

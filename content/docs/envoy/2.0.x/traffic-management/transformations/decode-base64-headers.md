@@ -15,7 +15,7 @@ Combine multiple Inja functions to accomplish the following tasks:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Decode base64 headers
 
@@ -29,12 +29,12 @@ Combine multiple Inja functions to accomplish the following tasks:
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -97,8 +97,8 @@ Combine multiple Inja functions to accomplish the following tasks:
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 ```

@@ -6,4 +6,4 @@ build:
   list: never
 ---
 
-{{< reuse "docs/pages/not-in-version.md" >}}
+{{< reuse "kgw-docs/pages/not-in-version.md" >}}

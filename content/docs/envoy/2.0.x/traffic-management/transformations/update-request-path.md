@@ -24,18 +24,18 @@ Common pseudo headers include:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Update request paths and HTTP methods
    
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules: 
+1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules: 
    * If the request contains the `foo:bar` header, the request path is rewritten to the `/post` path. In addition, the HTTP method is changed to the `POST` method.  
    * If the request does not contain the `foo:bar` header, the request path and method do not change. 
 
    ```yaml
    kubectl apply -f- <<EOF  
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -177,8 +177,8 @@ Common pseudo headers include:
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 ```

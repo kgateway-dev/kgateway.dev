@@ -4,7 +4,7 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
-{{< reuse "docs/pages/install/advanced.md" >}}
+{{< reuse "kgw-docs/pages/install/advanced.md" >}}
 
 ## Common labels
 
@@ -63,10 +63,10 @@ controller:
 
 ## Autoscaling
 
-You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
+You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
 
 {{< callout type="info" >}}
-Note that {{< reuse "docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
+Note that {{< reuse "kgw-docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
 {{< /callout >}}
 
 {{< callout type="warning" >}}
@@ -172,10 +172,10 @@ The kgateway controller runs an admin and debug server on port 9095. By default,
 To access the admin and debug servers from your local machine, use the `kubectl port-forward` command to expose port 9095 on your local machine. No change of the bind address is required.
 
 ```sh
-kubectl port-forward deployment/{{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} 9095:9095
+kubectl port-forward deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 9095:9095
 ```
 
-If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name={{< reuse "docs/snippets/pod-name.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o wide`.
+If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name={{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o wide`.
 
 {{< callout type="warning" >}}
 The admin server exposes pprof profiling endpoints, logging controls, and internal config snapshots. Only expose it outside the pod in trusted environments, such as a local development cluster or a dedicated profiling setup.

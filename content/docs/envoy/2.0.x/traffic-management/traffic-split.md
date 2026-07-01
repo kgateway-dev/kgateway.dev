@@ -3,4 +3,4 @@ title: Traffic splitting
 weight: 20
 ---
 
-{{< reuse "docs/pages/traffic-management/traffic-split.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/traffic-split.md" >}}

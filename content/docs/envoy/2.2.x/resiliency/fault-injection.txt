@@ -22,7 +22,7 @@ For more information, see the [Fault API]({{< link-hextra path="/reference/api/f
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Aborts {#aborts}
    

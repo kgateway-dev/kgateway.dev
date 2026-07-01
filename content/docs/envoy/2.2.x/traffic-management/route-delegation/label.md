@@ -4,4 +4,4 @@ weight: 15
 description: Use labels to delegate traffic from a parent HTTPRoute to different child HTTPRoutes.
 ---
 
-{{< reuse "docs/pages/traffic-management/route-delegation/label.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/route-delegation/label.md" >}}

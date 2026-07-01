@@ -4,4 +4,4 @@ description: Expose your gateway behind an AWS Network Load Balancer for layer 4
 weight: 10
 ---
 
-{{< reuse "docs/pages/integrations/aws-elb/nlb.md" >}}
+{{< reuse "kgw-docs/pages/integrations/aws-elb/nlb.md" >}}

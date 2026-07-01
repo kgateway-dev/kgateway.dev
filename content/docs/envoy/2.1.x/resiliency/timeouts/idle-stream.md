@@ -4,4 +4,4 @@ weight: 25
 description:
 ---
 
-{{< reuse "docs/pages/resiliency/timeouts/idle-stream.md" >}}
+{{< reuse "kgw-docs/pages/resiliency/timeouts/idle-stream.md" >}}

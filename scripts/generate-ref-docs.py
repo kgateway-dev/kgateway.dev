@@ -564,7 +564,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(envoy_content)
             
             # Apply post-processing
@@ -594,7 +594,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(generated_content)
             
             # Apply post-processing
@@ -663,7 +663,7 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
         # Write the raw helm-docs output to assets directory
         # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
         # This prevents overwriting when promoting versions
-        assets_path = f'assets/docs/pages/reference/helm/{version}/'
+        assets_path = f'assets/kgw-docs/pages/reference/helm/{version}/'
         os.makedirs(assets_path, exist_ok=True)
         
         helm_file = f'{assets_path}{file_name}.md'
@@ -741,7 +741,7 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
     '''Generate control plane metrics documentation'''
     print(f'  → Generating metrics docs for version {version}')
     
-    os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
+    os.makedirs(f'assets/kgw-docs/snippets/{link_version}', exist_ok=True)
     
     # Check if metrics tool exists
     metrics_tool_path = f'{kgateway_dir}/pkg/metrics/cmd/findmetrics/main.go'
@@ -757,10 +757,10 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
     
     metrics_content = _apply_link_fixups(result.stdout)
 
-    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+    with open(f'assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
         f.write(metrics_content)
     
-    print(f'    ✓ Generated metrics docs in assets/docs/snippets/{link_version}/metrics-control-plane.md')
+    print(f'    ✓ Generated metrics docs in assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md')
     return True
 
 

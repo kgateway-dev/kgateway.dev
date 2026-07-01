@@ -11,7 +11,7 @@ To configure authentication, you provide the authentication details in the Backe
 ## Before you begin
 
 1. [Set up AI Gateway](../setup/).
-2. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+2. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 3. Choose from the following configuration options for authentication.
    
    * [Inline token](#inline)
@@ -38,7 +38,7 @@ Provide the token directly in the configuration for the Backend. This option is 
      labels:
        app: ai-gateway
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -52,7 +52,7 @@ Provide the token directly in the configuration for the Backend. This option is 
    EOF
    ``` 
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "kgw-docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -69,13 +69,13 @@ Provide the token directly in the configuration for the Backend. This option is 
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -89,7 +89,7 @@ Provide the token directly in the configuration for the Backend. This option is 
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -187,7 +187,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    kind: Secret
    metadata:
      name: openai-secret
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    type: Opaque
@@ -206,7 +206,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
      labels:
        app: ai-gateway
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -221,7 +221,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    EOF
    ```
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "kgw-docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -238,13 +238,13 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -258,7 +258,7 @@ Store the API key in a Kubernetes secret. Then, refer to the secret in the Backe
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -355,7 +355,7 @@ Pass through an existing token directly from the client or a successful OpenID C
      labels:
        app: ai-gateway
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -368,7 +368,7 @@ Pass through an existing token directly from the client or a successful OpenID C
    EOF
    ``` 
 
-   {{% reuse "docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
+   {{% reuse "kgw-docs/snippets/review-table.md" %}} For more information or other providers, see the [API reference]({{< link-hextra path="/reference/api/#aibackend" >}}).
 
    | Setting     | Description |
    |-------------|-------------|
@@ -385,13 +385,13 @@ Pass through an existing token directly from the client or a successful OpenID C
    kind: HTTPRoute
    metadata:
      name: openai
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -405,7 +405,7 @@ Pass through an existing token directly from the client or a successful OpenID C
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: openai
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF

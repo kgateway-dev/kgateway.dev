@@ -10,7 +10,7 @@ Next, you set up an HTTPRoute resource to route requests through the Gateway to 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-listeners.md" >}}
+{{< reuse "kgw-docs/snippets/prereq-listeners.md" >}}
    
 ## Set up an HTTP listener {#setup-http}
 
@@ -27,11 +27,11 @@ Set up an HTTP listener on your Gateway.
    kind: Gateway
    metadata:
      name: my-http-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        example: httpbin-mydomain
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -43,11 +43,11 @@ Set up an HTTP listener on your Gateway.
    EOF
    ```
    
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
    
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you.  |
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you.  |
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure an HTTP Gateway that listens for incoming traffic for the `mydomain.com` domain on port 8080. The Gateway can serve HTTP routes from any namespace. |
 
    {{% /tab %}}
@@ -61,11 +61,11 @@ Set up an HTTP listener on your Gateway.
       kind: Gateway
       metadata:
         name: my-http-gateway
-        namespace: {{< reuse "docs/snippets/namespace.md" >}}
+        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
         labels:
           example: httpbin-mydomain
       spec:
-        gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+        gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
         allowedListeners:
           namespaces:
             from: All        
@@ -79,13 +79,13 @@ Set up an HTTP listener on your Gateway.
       EOF
       ```
    
-      {{< reuse "docs/snippets/review-table.md" >}}
+      {{< reuse "kgw-docs/snippets/review-table.md" >}}
    
       |Setting|Description|
       |---|---|
-      |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
+      |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
       |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace, which is helpful in multitenant environments. You can also limit the allowed listeners. To limit to listeners in the same namespace as the Gateway, set this value to `Same`. To limit to listeners with a particular label, set this value to `Selector`. |
-      |`spec.listeners`| {{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8080 in the ListenerSet that you create later. |
+      |`spec.listeners`| {{< reuse "kgw-docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8080 in the ListenerSet that you create later. |
 
    2. Create a ListenerSet that configures an HTTP listener for the Gateway.
 
@@ -101,7 +101,7 @@ Set up an HTTP listener on your Gateway.
       spec:
         parentRef:
           name: my-http-gateway
-          namespace: {{< reuse "docs/snippets/namespace.md" >}}
+          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
           kind: Gateway
           group: gateway.networking.k8s.io
         listeners:
@@ -115,7 +115,7 @@ Set up an HTTP listener on your Gateway.
       EOF
       ```
 
-      {{< reuse "docs/snippets/review-table.md" >}}
+      {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
       |Setting|Description|
       |--|--|
@@ -127,7 +127,7 @@ Set up an HTTP listener on your Gateway.
 
 2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
    ```sh
-   kubectl get gateway my-http-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   kubectl get gateway my-http-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the Gateway that you created.
@@ -146,7 +146,7 @@ Set up an HTTP listener on your Gateway.
    spec:
      parentRefs:
        - name: my-http-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
            - name: httpbin
@@ -208,7 +208,7 @@ Set up an HTTP listener on your Gateway.
        group: gateway.networking.k8s.io
        kind: Gateway
        name: my-http-gateway
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 5. Verify that the listener now has a route attached.
@@ -217,7 +217,7 @@ Set up an HTTP listener on your Gateway.
    {{% tab name="Gateway listeners" %}}   
 
    ```sh
-   kubectl get gateway -n {{< reuse "docs/snippets/namespace.md" >}} my-http-gateway -o yaml
+   kubectl get gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} my-http-gateway -o yaml
    ```
 
    Example output:
@@ -245,7 +245,7 @@ Set up an HTTP listener on your Gateway.
    Note that because the HTTPRoute is attached to the ListenerSet, the Gateway does not show the route in its status.
 
    ```sh
-   kubectl get gateway -n {{< reuse "docs/snippets/namespace.md" >}} my-http-gateway -o yaml
+   kubectl get gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} my-http-gateway -o yaml
    ```
 
    Example output:
@@ -265,13 +265,13 @@ Set up an HTTP listener on your Gateway.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} my-http-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} my-http-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/my-http-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/my-http-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -312,7 +312,7 @@ Set up an HTTP listener on your Gateway.
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}

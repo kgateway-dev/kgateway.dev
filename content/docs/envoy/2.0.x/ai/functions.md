@@ -72,7 +72,7 @@ Each AI provider has a different way of handling function calling. For example, 
 
 2. [Authenticate to the LLM](../auth/).
 
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Example of function calling {#function-call}
 

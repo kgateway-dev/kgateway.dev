@@ -16,7 +16,7 @@ The time an app needs to process a request can vary a lot which is why applying 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Set up timeouts {#timeouts}
    
@@ -36,7 +36,7 @@ Specify timeouts for a specific route.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches: 
        - path:
@@ -52,7 +52,7 @@ Specify timeouts for a specific route.
    EOF
    ```
 
-2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "/docs/snippets/kgateway.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
+2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -94,7 +94,7 @@ Specify timeouts for a specific route.
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 Delete the HTTPRoute resource.
    

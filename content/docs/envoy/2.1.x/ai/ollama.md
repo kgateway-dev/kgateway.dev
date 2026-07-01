@@ -4,7 +4,7 @@ weight: 15
 description: Set up Ollama as a local LLM provider with AI Gateway.
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Instead of a cloud LLM provider, you might want to use a local LLM provider such as [Ollama](https://ollama.com/) for local development. 
 
@@ -15,7 +15,7 @@ Instead of a cloud LLM provider, you might want to use a local LLM provider such
 2. As part of the AI Gateway setup, make sure that you set up the GatewayParameters resource to use a NodePort service.
    
    ```sh
-   kubectl get GatewayParameters ai-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -o jsonpath='{.items[*].spec.kube.service.type}'
+   kubectl get GatewayParameters ai-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o jsonpath='{.items[*].spec.kube.service.type}'
    ```
 
    Example output:
@@ -100,7 +100,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
      labels:
        app: ai-gateway
      name: ollama
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -115,7 +115,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
    EOF
    ```
    
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    | Setting | Description |
    |---------|-------------|
@@ -132,13 +132,13 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
    kind: HTTPRoute
    metadata:
      name: ollama
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -152,7 +152,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
              replaceFullPath: /v1/models
        backendRefs:
        - name: ollama
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -161,7 +161,7 @@ To use Ollama with AI Gateway, create Backend and HTTPRoute resources.
 3. For local testing: Port forward the AI Gateway service.
 
    ```sh
-   kubectl port-forward svc/ai-gateway 8080:8080 -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl port-forward svc/ai-gateway 8080:8080 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ``` 
 
 4. Send a request to the Ollama server that you started in the previous section. Verify that the request succeeds and that you get back a response from the chat completion API.

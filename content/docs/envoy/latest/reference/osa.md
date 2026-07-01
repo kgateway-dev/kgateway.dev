@@ -6,4 +6,4 @@ prev: /docs/reference/contribution
 ---
 
 ## Third-party open source software provided by kgateway
-{{< reuse "docs/snippets/osa-provided.md" >}}
+{{< reuse "kgw-docs/snippets/osa-provided.md" >}}

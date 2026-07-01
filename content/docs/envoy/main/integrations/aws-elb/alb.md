@@ -4,4 +4,4 @@ description: Expose your gateway behind an AWS Application Load Balancer for lay
 weight: 20
 ---
 
-{{< reuse "docs/pages/integrations/aws-elb/alb.md" >}} 
+{{< reuse "kgw-docs/pages/integrations/aws-elb/alb.md" >}} 

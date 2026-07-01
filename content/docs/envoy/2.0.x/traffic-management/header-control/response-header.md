@@ -9,7 +9,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Add response headers {#add-response-headers-route}
 
@@ -26,7 +26,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -104,7 +104,7 @@ Setting headers is similar to adding headers. If the response does not include t
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -213,7 +213,7 @@ curl -vi localhost:8080/response-headers -H "host: www.example.com"
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:

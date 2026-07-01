@@ -15,7 +15,7 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-listeners.md" >}}
+{{< reuse "kgw-docs/snippets/prereq-listeners.md" >}}
 
 ## Set up HTTP 1.0 support
 
@@ -26,7 +26,7 @@ Both protocol versions are rarely used nowadays. However, some applications migh
    kind: HTTPListenerPolicy
    metadata:
      name: accept-http10
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -38,7 +38,7 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 
 2. Port-forward the gateway proxy on port 19000 to open the Envoy admin interface.
    ```sh
-   kubectl port-forward deploy/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000
+   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
    ```
 
 3. Extract the `http_protocol_options` filter in your Envoy filter chain and verify that the `accept_http_10` field is set to `true`. Alternatively, you can open the [Envoy admin interface](http://localhost:19000/config_dump) and look for this setting in the config dump. 
@@ -55,8 +55,8 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httplistenerpolicy accept-http10 -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httplistenerpolicy accept-http10 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
