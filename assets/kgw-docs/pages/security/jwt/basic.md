@@ -522,6 +522,99 @@ Example output:
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
 
+### Disable JWT filter {#disable-jwt}
+
+The `disable` field lets you turn off JWT authentication at a higher policy level. This is useful when you want to override a JWT policy applied at the Gateway level for a specific HTTPRoute.
+
+**Example:**
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: jwt-disable
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin
+  jwtAuth:
+    disable: {}
+EOF
+```
+In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+
+### asyncFetch {#async-fetch}
+
+When using a remote JWKS, you can configure `asyncFetch` to control how the gateway fetches and caches the JWKS. This is useful for improving performance and controlling startup behavior.
+
+| Field | Description | Default |
+| ----- | ----------- | ------- |
+| `fastListener` | If `false`, the listener waits for the first JWKS fetch to complete before serving traffic. If `true`, the listener starts immediately and the first fetch happens in the background. | `false` |
+| `failedRefetchDuration` | How long to wait before retrying the fetch after a failure. | `1s` |
+
+**Example:**
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            asyncFetch:
+              fastListener: false
+              failedRefetchDuration: 5s
+EOF
+```
+For more information, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
+
+### retryPolicy {#retry-policy}
+
+Configure how the gateway retries JWKS fetch when the remote server is unavailable. This ensures that temporary network issues do not cause authentication failures.
+
+| Field | Description | Default |
+| ----- | ----------- | ------- |
+| `numRetries` | Number of retry attempts when fetching the JWKS fails. | `1` |
+| `backOff.baseInterval` | Starting wait time between retries. | `1000ms` |
+| `backOff.maxInterval` | Maximum wait time between retries. If not set, defaults to 10 times the base interval. | `10x base` |
+
+**Example:**
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            retryPolicy:
+              numRetries: 3
+              backOff:
+                baseInterval: 2s
+                maxInterval: 30s
+EOF
+```
+For more information, see the [API docs]({{< link-hextra path="/reference/api/#jwksretrypolicy" >}})
+
 ## Cleanup {#cleanup}
 
 ```sh
