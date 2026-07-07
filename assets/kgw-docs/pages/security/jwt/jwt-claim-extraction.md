@@ -30,7 +30,7 @@ sequenceDiagram
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Extract claims to headers
 
@@ -40,11 +40,11 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
    kind: GatewayExtension
    metadata:
      name: jwt-provider
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      jwt:
        providers:
@@ -62,15 +62,15 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
    EOF
    ```
 
-2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource that applies the JWT authentication to your gateway.
+2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that applies the JWT authentication to your gateway.
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: jwt-auth-policy
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
        - group: gateway.networking.k8s.io
@@ -79,7 +79,7 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
      jwt:
        extensionRef:
          name: jwt-provider
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    EOF
    ```
 
@@ -106,11 +106,11 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} jwt-auth-policy -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete gatewayextension jwt-provider -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-auth-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete gatewayextension jwt-provider -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 ## Advanced usage
