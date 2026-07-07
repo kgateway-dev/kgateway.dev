@@ -25,7 +25,7 @@ But because that would be incredibly cumbersome to do manually, you can use the 
 In the next two sections, you’ll first deploy an object with Ingress NGINX into your Kubernetes cluster and then you’ll learn how to migrate it to **kgateway**, a [conformant Gateway API implementation](https://gateway-api.sigs.k8s.io/docs/implementations/list/#kgateway).
 
 ## Using The Migration Tool
-The first step is to download the migration tool. You can find the installation options for your Operating System in the [docs here]({{< relref "kgw-docs/envoy/latest/migrate/install/_index.md" >}}).
+The first step is to download the migration tool. You can find the installation options for your Operating System in the [docs here]({{< relref "docs/envoy/latest/migrate/install/_index.md" >}}).
 
 You can verify that the command works by running the build/binary, as in the following output.
 
