@@ -12,7 +12,6 @@ Note that the Ingress-NGINX annotation to kgateway TrafficPolicy mapping is not 
 - Per-client IP address: If you need per-client-IP rate limiting, use global rate limiting with a `RemoteAddress` descriptor entry (keys on the effective downstream address).
 - Forwarded headers: If you need a `Header` descriptor with `X-Forwarded-For`, only do so when XFF is validated via trusted-proxy or trusted-hops configuration and normalized to the intended client IP address (for example, the leftmost untrusted hop). Otherwise, clients can spoof or rotate the header and it might include multiple IP addresses.
 
-
 ## Before: Ingress with rate limits
 
 ```bash
