@@ -5,7 +5,7 @@ You need three resources: a `Backend` pointing at your Keycloak host, a `Gateway
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 4. A running Keycloak instance with a configured realm and OIDC client. At minimum, set the following on the Keycloak client:
 
@@ -25,7 +25,7 @@ Create a Kubernetes Secret with the Keycloak client secret. kgateway reads the v
 ```shell
 kubectl create secret generic keycloak-client-secret \
   --from-literal=client-secret=YOUR_CLIENT_SECRET \
-  -n {{< reuse "docs/snippets/namespace.md" >}}
+  -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 Grab `YOUR_CLIENT_SECRET` from the **Credentials** tab of your Keycloak client.
@@ -40,7 +40,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: Backend
 metadata:
   name: keycloak
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   type: Static
   static:
@@ -58,16 +58,16 @@ The `GatewayExtension` holds everything the gateway needs to talk to Keycloak. T
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: GatewayExtension
 metadata:
   name: keycloak-oauth2
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
     backendRef:
       name: keycloak
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://keycloak.example.com/realms/myrealm
     authorizationEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth
     tokenEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token
@@ -101,11 +101,11 @@ Create a `TrafficPolicy` that references the extension by name. This policy tell
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: keycloak-oauth2
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
@@ -114,7 +114,7 @@ spec:
   oauth2:
     extensionRef:
       name: keycloak-oauth2
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 EOF
 ```
 
@@ -182,16 +182,16 @@ The full `GatewayExtension` with `denyRedirect` included:
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: GatewayExtension
 metadata:
   name: keycloak-oauth2
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
     backendRef:
       name: keycloak
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://keycloak.example.com/realms/myrealm
     authorizationEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth
     tokenEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token
@@ -261,11 +261,11 @@ EOF
 
 ## Cleanup {#cleanup}
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} keycloak-oauth2 -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete GatewayExtension keycloak-oauth2 -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete Backend keycloak -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete secret keycloak-client-secret -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete GatewayExtension keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete Backend keycloak -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete secret keycloak-client-secret -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
