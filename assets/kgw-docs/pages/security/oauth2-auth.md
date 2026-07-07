@@ -15,7 +15,7 @@ The following sequence diagram illustrates this authorization code flow:
 sequenceDiagram
     autonumber
     participant Client as User Browser
-    participant Gateway as Kgateway Proxy
+    participant Gateway as kgateway proxy
     participant IdP as Identity Provider (such as Keycloak)
     participant Backend as Upstream Service
 
@@ -140,17 +140,37 @@ EOF
 
 ## Advanced configurations
 
-Review these optional configurations to customize the OAuth2/OIDC behavior.
+Review these optional configurations to customize the OAuth2/OIDC behavior. Each of the following examples re-applies the `GatewayExtension` that you created in [step 2](#2-create-a-gatewayextension-for-oauth2) with an additional `spec.oauth2` field. Because the resource name is unchanged, re-applying updates your existing `GatewayExtension`.
 
 ### Forward access token to backend
 
 By default, the gateway proxy stores tokens in cookies and does not forward them to backend services. Set `forwardAccessToken: true` in your `GatewayExtension` to forward the access token upstream in the `Authorization: Bearer <token>` header:
 
 ```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: keycloak-oauth2
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
+    backendRef:
+      name: keycloak
+      namespace: keycloak-system
+      port: 8080
+    issuerURI: https://keycloak.example.com/realms/master
+    redirectURI: https://my-app.example.com/oauth2/redirect
+    credentials:
+      clientID: my-client-id
+      clientSecretRef:
+        name: oauth2-client-secret
+    scopes:
+      - openid
+      - email
+      - profile
     forwardAccessToken: true
-    # ... other settings
+EOF
 ```
 
 ### Customize cookie configuration
@@ -158,14 +178,35 @@ spec:
 You can customize the names, domain, and `sameSite` policy of the cookies used to store session tokens:
 
 ```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: keycloak-oauth2
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
+    backendRef:
+      name: keycloak
+      namespace: keycloak-system
+      port: 8080
+    issuerURI: https://keycloak.example.com/realms/master
+    redirectURI: https://my-app.example.com/oauth2/redirect
+    credentials:
+      clientID: my-client-id
+      clientSecretRef:
+        name: oauth2-client-secret
+    scopes:
+      - openid
+      - email
+      - profile
     cookies:
       domain: example.com
       sameSite: Lax
       names:
         accessToken: my-custom-access-token
         idToken: my-custom-id-token
+EOF
 ```
 
 ### Extract JWT claims to custom request headers
@@ -173,8 +214,28 @@ spec:
 If your Identity Provider issues tokens in JWT format, you can configure kgateway to verify the signatures and copy specific claims (such as the user `email`, `sub`, or custom roles) directly into HTTP headers forwarded to the backend:
 
 ```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: keycloak-oauth2
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
+    backendRef:
+      name: keycloak
+      namespace: keycloak-system
+      port: 8080
+    issuerURI: https://keycloak.example.com/realms/master
+    redirectURI: https://my-app.example.com/oauth2/redirect
+    credentials:
+      clientID: my-client-id
+      clientSecretRef:
+        name: oauth2-client-secret
+    scopes:
+      - openid
+      - email
+      - profile
     jwt:
       jwksURI: https://keycloak.example.com/realms/master/protocol/openid-connect/certs
       idToken:
@@ -183,6 +244,7 @@ spec:
             header: x-user-id
           - name: email
             header: x-user-email
+EOF
 ```
 
 ### Deny redirect for AJAX / API requests
@@ -190,12 +252,33 @@ spec:
 For API calls or AJAX requests (such as `fetch` or `XMLHttpRequest`), a `302 Redirect` back to a login screen is undesirable. Use `denyRedirect` to specify header match rules. When a request matches these rules, the gateway returns a `401 Unauthorized` response instead of redirecting:
 
 ```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: keycloak-oauth2
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   oauth2:
+    backendRef:
+      name: keycloak
+      namespace: keycloak-system
+      port: 8080
+    issuerURI: https://keycloak.example.com/realms/master
+    redirectURI: https://my-app.example.com/oauth2/redirect
+    credentials:
+      clientID: my-client-id
+      clientSecretRef:
+        name: oauth2-client-secret
+    scopes:
+      - openid
+      - email
+      - profile
     denyRedirect:
       headers:
         - name: X-Requested-With
           value: XMLHttpRequest
+EOF
 ```
 
 ---
