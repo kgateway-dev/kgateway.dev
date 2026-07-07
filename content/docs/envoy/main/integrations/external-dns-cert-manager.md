@@ -4,4 +4,4 @@ description: Automate DNS record creation and TLS certificate provisioning with 
 weight: 10
 ---
 
-{{< reuse "docs/pages/integrations/external-dns-cert-manager.md" >}} 
+{{< reuse "kgw-docs/pages/integrations/external-dns-cert-manager.md" >}} 

@@ -4,4 +4,4 @@ description: Route traffic to AWS EC2 instances discovered dynamically by tag fi
 weight: 30
 ---
 
-{{< reuse "docs/pages/traffic-management/destination-types/backends/ec2.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/destination-types/backends/ec2.md" >}}

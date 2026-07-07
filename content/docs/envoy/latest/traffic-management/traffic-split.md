@@ -4,4 +4,4 @@ description: Split traffic across multiple backends by weight for canary and blu
 weight: 20
 ---
 
-{{< reuse "docs/pages/traffic-management/traffic-split.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/traffic-split.md" >}}

@@ -8,7 +8,7 @@ Set up a TLS listener on the Gateway that serves one or more hosts and passes TL
 
 ## Before you begin
 
-{{< reuse "docs/snippets/cert-prereqs.md" >}}
+{{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
 ## Deploy an nginx server that is configured for HTTPS traffic
 
@@ -132,8 +132,8 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
 To route TLS traffic to the nginx server directly without terminating the TLS connection at the Gateway, you can use either an inline Gateway listener or a ListenerSet. Then, you create a TLSRoute that represents the route to your nginx server and attach it to the Gateway or ListenerSet.
 
 
-{{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 1. Create a Gateway that passes through incoming TLS requests for the `nginx.example.com` domain.
 
    ```yaml
@@ -142,9 +142,9 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    kind: Gateway
    metadata:
      name: tls-passthrough
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - name: tls
        protocol: TLS
@@ -158,16 +158,16 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}|
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}}|
    |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TLS passthrough Gateway that listens for incoming traffic for the `nginx.example.com` domain on port 8443. The Gateway can serve TLS routes from any namespace.|
    |`spec.listeners.tls.mode`|The TLS mode for incoming requests. In this example, TLS requests are passed through to the backend service without being terminated at the Gateway.|
 
 {{% /tab %}}
-{{% tab tabName="ListenerSets" %}}
+{{% tab name="ListenerSets" %}}
 
 1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -177,9 +177,9 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    kind: Gateway
    metadata:
      name: tls-passthrough
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      allowedListeners:
        namespaces:
          from: All
@@ -195,13 +195,13 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    |Setting|Description|
    |---|---|
-   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}} |
+   |`spec.gatewayClassName`|The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}} |
    |`spec.allowedListeners`|Enable the attachment of ListenerSets to this Gateway. The example allows listeners from any namespace.|
-   |`spec.listeners`|{{< reuse "docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8443 in the ListenerSet that you create later.|
+   |`spec.listeners`|{{< reuse "kgw-docs/snippets/generic-listener.md" >}} In this example, the generic listener is configured on port 80, which differs from port 8443 in the ListenerSet that you create later.|
 
 2. Create a ListenerSet that configures a TLS passthrough listener for the Gateway.
 
@@ -211,11 +211,11 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    kind: ListenerSet
    metadata:
      name: my-tls-listenerset
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      parentRef:
        name: tls-passthrough
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
        kind: Gateway
        group: gateway.networking.k8s.io
      listeners:
@@ -231,7 +231,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    |Setting|Description|
    |--|--|
@@ -244,8 +244,8 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 ## Create a TLSRoute
 
-{{< tabs items="Gateway listeners,ListenerSets" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -258,7 +258,7 @@ spec:
     - nginx.example.com
   parentRefs:
     - name: tls-passthrough
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
   rules:
     - backendRefs:
         - group: ""
@@ -268,7 +268,7 @@ spec:
 EOF
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSets" %}}
+{{% tab name="ListenerSets" %}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -281,7 +281,7 @@ spec:
     - nginx.example.com
   parentRefs:
     - name: my-tls-listenerset
-      namespace: {{< reuse "docs/snippets/namespace.md" >}}
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
       kind: ListenerSet
       group: gateway.networking.k8s.io
   rules:
@@ -297,11 +297,11 @@ EOF
 
 ## Verify TLS passthrough traffic for nginx
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 1. Get the external address of the gateway proxy and save it in an environment variable.
    ```sh 
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} tls-passthrough -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
 2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
@@ -352,10 +352,10 @@ EOF
    * Connection #0 to host nginx.example.com left intact
    ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 1. Port-forward the tls-passthrough gateway proxy pod on port 8443.
    ```sh
-   kubectl port-forward deployment/tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443
+   kubectl port-forward deployment/tls-passthrough -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443
    ```
 2. Send a request to the `nginx.example.com` domain and verify that you get back a 200 HTTP response code from your nginx server. Because nginx accepts incoming TLS traffic only, the 200 HTTP response code proves that TLS traffic was not terminated at the Gateway. In addition, you can verify that you get back the server certificate that you configured your nginx server with in the beginning. 
    ```sh
@@ -403,30 +403,30 @@ EOF
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-{{< tabs items="Gateway listeners,ListenerSet" tabTotal="2" >}}
-{{% tab tabName="Gateway listeners" %}}
+{{< tabs >}}
+{{% tab name="Gateway listeners" %}}
 
 ```sh
 rm -r example_certs
 rm nginx.conf
 kubectl delete configmap nginx-configmap
 kubectl delete tlsroute tlsroute
-kubectl delete gateway tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway tls-passthrough -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete deployment my-nginx
 kubectl delete service my-nginx
 kubectl delete secret nginx-server-certs   
 ```
 {{% /tab %}}
-{{% tab tabName="ListenerSet" %}}
+{{% tab name="ListenerSet" %}}
 ```sh
 rm -r example_certs
 rm nginx.conf
 kubectl delete configmap nginx-configmap
 kubectl delete tlsroute tlsroute
-kubectl delete listenerset my-tls-listenerset -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete gateway tls-passthrough -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete listenerset my-tls-listenerset -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete gateway tls-passthrough -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete deployment my-nginx
 kubectl delete service my-nginx
 kubectl delete secret nginx-server-certs   

@@ -4,4 +4,4 @@ description: Capture distributed traces of requests as they pass through your ga
 weight: 30
 ---
 
-{{< reuse "docs/pages/observability/tracing.md" >}}
+{{< reuse "kgw-docs/pages/observability/tracing.md" >}}

@@ -4,6 +4,6 @@ description: Steps for adding a new documentation page to the kgateway docs repo
 weight: 10
 ---
 
-{{< reuse "docs/pages/reference/add-docs.md" >}}
+{{< reuse "kgw-docs/pages/reference/add-docs.md" >}}
 
 # {#audience}

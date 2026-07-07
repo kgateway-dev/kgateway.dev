@@ -3,9 +3,9 @@ title: OTel stack
 weight: 10
 ---
 
-{{< reuse "docs/snippets/otel-prereq.md" >}}
+{{< reuse "kgw-docs/snippets/otel-prereq.md" >}}
 
-{{< reuse "docs/pages/observability/otel-stack.md" >}}
+{{< reuse "kgw-docs/pages/observability/otel-stack.md" >}}
 
 ## Step 4: Configure telemetry policies {#policies}
 
@@ -19,7 +19,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    kind: HTTPListenerPolicy
    metadata:
      name: logging-policy
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -51,7 +51,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
      from:
      - group: gateway.kgateway.dev
        kind: HTTPListenerPolicy
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      to:
      - group: ""
        kind: Service
@@ -67,7 +67,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
    kind: HTTPListenerPolicy
    metadata:
      name: tracing-policy
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -99,7 +99,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
      from:
      - group: gateway.kgateway.dev
        kind: HTTPListenerPolicy
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      to:
      - group: ""
        kind: Service
@@ -113,15 +113,15 @@ To verify that your setup is working, generate sample traffic and review the log
    
 1. Generate traffic for the httpbin app. 
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
 
    ```sh
    for i in {1..5}; do curl -v http://$INGRESS_GW_ADDRESS:8080/status/418 -H "host: www.example.com:8080"; done
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    
    ```sh
    for i in {1..5}; do curl -v localhost:8080/status/418 -H "host: www.example.com:8080"; done
@@ -166,26 +166,26 @@ To verify that your setup is working, generate sample traffic and review the log
    
 ## Step 6: Explore Grafana dashboards
 
-{{< reuse "docs/snippets/grafana-dashboards.md" >}}
+{{< reuse "kgw-docs/snippets/grafana-dashboards.md" >}}
 
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 1. Remove the configmap for the Envoy gateway proxy dashboard and delete the `envoy.json` file.
    ```sh
    kubectl delete cm envoy-dashboard -n telemetry
    rm envoy.json
-   kubectl delete cm {{< reuse "docs/snippets/pod-name.md" >}}-dashboard -n telemetry
-   rm {{< reuse "docs/snippets/pod-name.md" >}}.json
+   kubectl delete cm {{< reuse "kgw-docs/snippets/pod-name.md" >}}-dashboard -n telemetry
+   rm {{< reuse "kgw-docs/snippets/pod-name.md" >}}.json
    ```
 
 2. Delete the HTTPListenerPolicy policies that collect logs and traces.
 
    ```sh
-   kubectl delete httplistenerpolicy logging-policy -n {{< reuse "docs/snippets/namespace.md" >}}
-   kubectl delete httplistenerpolicy tracing-policy -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete httplistenerpolicy logging-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl delete httplistenerpolicy tracing-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 3. Uninstall the Grafana Loki and Tempo components. 

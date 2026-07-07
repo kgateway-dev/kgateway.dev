@@ -4,4 +4,4 @@ description: Choose a load balancing algorithm, such as round robin or least req
 weight: 10
 ---
 
-{{< reuse "docs/pages/traffic-management/session-affinity/loadbalancing.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/session-affinity/loadbalancing.md" >}}

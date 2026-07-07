@@ -3,7 +3,7 @@ title: API reference
 weight: 10
 ---
 
-{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}
+{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}
 
 ## Packages
 - [gateway.kgateway.dev/v1alpha1](#gatewaykgatewaydevv1alpha1)
@@ -247,6 +247,23 @@ _Appears in:_
 | `PublicIP` | AwsAddressTypePublicIP routes to the instance public IP.<br /> |
 
 
+#### AwsAssumeRole
+
+
+
+AwsAssumeRole configures assuming an IAM role via STS to obtain the credentials
+used to interact with the backend (signing Lambda requests, or listing EC2 instances).
+
+
+
+_Appears in:_
+- [AwsAuth](#awsauth)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `roleArn` _string_ | RoleArn is the ARN of the IAM role to assume, e.g.<br />"arn:aws:iam::123456789012:role/my-invoke-role". |  | MaxLength: 2048 <br />MinLength: 1 <br />Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
+
+
 #### AwsAuth
 
 
@@ -260,8 +277,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret] <br /> |
-| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken". |  |  |
+| `type` _[AwsAuthType](#awsauthtype)_ | Type specifies the authentication method to use for the backend. |  | Enum: [Secret AssumeRole] <br /> |
+| `secretRef` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core)_ | SecretRef references a Kubernetes Secret containing the AWS credentials.<br />The Secret must have keys "accessKey", "secretKey", and optionally "sessionToken".<br />Required when type is 'Secret'. |  |  |
+| `assumeRole` _[AwsAssumeRole](#awsassumerole)_ | AssumeRole configures STS role chaining. The backend's ambient credentials<br />(the gateway ServiceAccount's IRSA identity for Lambda request signing, or the<br />controller's identity for EC2 discovery; more generally any credential resolved<br />by the default provider chain) are used to assume the target role. The resulting<br />temporary credentials are then used to sign requests to the backend (Lambda) or<br />to list instances (EC2). This enables per-backend, least-privilege roles without<br />granting the gateway/controller role direct access to every target.<br />Required when type is 'AssumeRole'. |  |  |
 
 
 #### AwsAuthType
@@ -278,6 +296,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Secret` | AwsAuthTypeSecret uses credentials stored in a Kubernetes Secret.<br /> |
+| `AssumeRole` | AwsAuthTypeAssumeRole assumes an IAM role via STS, chaining off the<br />backend's ambient credentials (the gateway ServiceAccount's IRSA identity<br />for Lambda request signing, or the controller's identity for EC2<br />discovery). The temporary credentials returned by STS are used to<br />interact with the backend.<br /> |
 
 
 #### AwsBackend
@@ -315,7 +334,6 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
 | `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
-| `roleArn` _string_ | RoleArn is an optional IAM role to assume before listing instances. |  | Pattern: `^arn:aws[a-z-]*:iam::[0-9]\{12\}:role/.+$` <br /> |
 | `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
 
 
@@ -1259,6 +1277,7 @@ _Appears in:_
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 | `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
 | `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
+| `requestAttributes` _string array_ | RequestAttributes specifies a list of Envoy attribute expressions whose values will be<br />included in the ProcessingRequest.attributes map sent to the external processing server<br />on every HTTP request.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto |  |  |
 | `filterStage` _[FilterStageSpec](#filterstagespec)_ | FilterStage specifies where in the HTTP filter chain the ExtProc filter<br />should be placed. If not specified, the ExtProc filter defaults to running<br />after the AuthZ stage. |  |  |
 
 
@@ -2101,6 +2120,42 @@ _Appears in:_
 
 
 
+#### InternalRedirect
+
+
+
+InternalRedirect configures the gateway to handle upstream 3xx redirects inside the
+gateway. The gateway follows a valid, fully qualified Location header and returns only
+the final response to the client.
+Applies only to routes that forward traffic to a backend.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
+| `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
+| `responseHeadersToCopy` _[HTTPHeaderName](#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `maxRedirects` _[uint32](#uint32)_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
+
+
+#### InternalRedirectResponseCode
+
+_Underlying type:_ _integer_
+
+InternalRedirectResponseCode is a 3xx response code supported for internal redirects.
+
+_Validation:_
+- Enum: [301 302 303 307 308]
+
+_Appears in:_
+- [InternalRedirect](#internalredirect)
+
+
+
 #### IstioContainer
 
 
@@ -2157,6 +2212,28 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `local` _[LocalJWKS](#localjwks)_ | LocalJWKS configures getting the public keys to validate the JWT from a Kubernetes configmap,<br />or inline (raw string) JWKS. |  |  |
 | `remote` _[RemoteJWKS](#remotejwks)_ | RemoteJWKS configures getting the public keys to validate the JWT from a remote JWKS server. |  |  |
+
+
+
+
+#### JWKSRetryBackOff
+
+
+
+JWKSRetryBackOff configures an exponential backoff strategy.
+Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/backoff.proto#envoy-v3-api-msg-config-core-v3-backoffstrategy
+
+
+
+_Appears in:_
+- [JWKSRetryPolicy](#jwksretrypolicy)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | BaseInterval is the base interval for the exponential backoff computation.<br />It must be greater than zero and less than or equal to MaxInterval. |  |  |
+| `maxInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxInterval is the maximum interval between retries. If set, it must be greater than<br />or equal to BaseInterval. Defaults to 10 times the BaseInterval. |  |  |
+
+
 
 
 #### JWT
@@ -3255,6 +3332,8 @@ _Appears in:_
 | `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
 | `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
 | `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
+| `asyncFetch` _[JWKSAsyncFetch](#jwksasyncfetch)_ | AsyncFetch configures fetching the JWKS asynchronously and caching it on a timer,<br />instead of fetching it on demand during request handling. |  |  |
+| `retryPolicy` _[JWKSRetryPolicy](#jwksretrypolicy)_ | RetryPolicy configures how the JWKS fetch is retried (with exponential backoff)<br />when the remote JWKS server is unavailable. |  |  |
 
 
 #### RequestDecompression
@@ -3927,6 +4006,7 @@ _Appears in:_
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and ListenerSets, and ignored for other targeted kinds. |  |  |
+| `internalRedirect` _[InternalRedirect](#internalredirect)_ | InternalRedirect handles upstream 3xx redirects inside the gateway.<br />Applies only to routes that forward traffic to a backend. |  |  |
 | `rbac` _[Authorization](#authorization)_ | RBAC specifies the role-based access control configuration for the policy.<br />This defines the rules for authorization based on roles and permissions.<br />RBAC policies applied at different attachment points in the configuration<br />hierarchy are not cumulative, and only the most specific policy is enforced. This means an RBAC policy<br />attached to a route will override any RBAC policies applied to the gateway or listener. |  |  |
 | `jwtAuth` _[JWTAuth](#jwtauth)_ | JWT specifies the JWT authentication configuration for the policy.<br />This defines the JWT providers and their configurations. |  |  |
 | `urlRewrite` _[URLRewrite](#urlrewrite)_ | UrlRewrite specifies URL rewrite rules for matching requests.<br />NOTE: This field is only honored for HTTPRoute targets. |  |  |
@@ -4337,6 +4417,36 @@ IPOrCIDR accepts either a bare IP address or an address range in CIDR notation. 
 
 **Validation:**
 - Pattern=`^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}(\/([0-9]|[1-2][0-9]|3[0-2]))?$|^((?:[0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,7}:|:(?::[0-9A-Fa-f]{1,4}){1,7}|(?:[0-9A-Fa-f]{1,4}:){1,6}:[0-9A-Fa-f]{1,4}|(?:[0-9A-Fa-f]{1,4}:){1,5}(?::[0-9A-Fa-f]{1,4}){1,2}|(?:[0-9A-Fa-f]{1,4}:){1,4}(?::[0-9A-Fa-f]{1,4}){1,3}|(?:[0-9A-Fa-f]{1,4}:){1,3}(?::[0-9A-Fa-f]{1,4}){1,4}|(?:[0-9A-Fa-f]{1,4}:){1,2}(?::[0-9A-Fa-f]{1,4}){1,5}|[0-9A-Fa-f]{1,4}:(?:(?::[0-9A-Fa-f]{1,4}){1,6})|:(?:(?::[0-9A-Fa-f]{1,4}){1,6}))(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?$`
+
+#### JWKSAsyncFetch
+
+JWKSAsyncFetch configures asynchronous fetching of the remote JWKS.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `fastListener` | *bool | FastListener controls when the listener is considered ready relative to the initial JWKS fetch. If false or unset, the listener waits for the first JWKS fetch to complete before it starts serving traffic, so requests are never validated against an empty key set. If true, the listener starts immediately and the first fetch happens in the background. |
+| `failedRefetchDuration` | *metav1.Duration | FailedRefetchDuration is how long to wait before retrying the fetch after a failure. If unspecified, Envoy default of 1 second is used. |
+
+#### JWKSRetryBackOff
+
+JWKSRetryBackOff configures an exponential backoff strategy. Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/backoff.proto#envoy-v3-api-msg-config-core-v3-backoffstrategy
+
+**Validation:**
+- XValidation:rule="!has(self.maxInterval) || duration(self.maxInterval) >= duration(self.baseInterval)",message="maxInterval must be greater than or equal to baseInterval"
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `baseInterval` | metav1.Duration | BaseInterval is the base interval for the exponential backoff computation. It must be greater than zero and less than or equal to MaxInterval. **Required.** |
+| `maxInterval` | *metav1.Duration | MaxInterval is the maximum interval between retries. If set, it must be greater than or equal to BaseInterval. Defaults to 10 times the BaseInterval. |
+
+#### JWKSRetryPolicy
+
+JWKSRetryPolicy configures retries with an exponential backoff for fetching the remote JWKS when the server is unavailable. Ref: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/base.proto#envoy-v3-api-msg-config-core-v3-retrypolicy
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `numRetries` | *int32 | NumRetries is the allowed number of retries when fetching the JWKS fails. Defaults to 1 if unset. |
+| `backOff` | *[JWKSRetryBackOff](#jwksretrybackoff) | BackOff configures the exponential backoff strategy between retries. If unset, the default base interval is 1000ms and the default maximum interval is 10 times the base interval. |
 
 #### KeyAnyValue
 

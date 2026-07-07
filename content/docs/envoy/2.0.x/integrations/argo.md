@@ -4,4 +4,4 @@ weight: 10
 description: Use kgateway with Argo Rollouts. 
 ---
 
-{{< reuse "docs/pages/integrations/argo.md" >}}
+{{< reuse "kgw-docs/pages/integrations/argo.md" >}}

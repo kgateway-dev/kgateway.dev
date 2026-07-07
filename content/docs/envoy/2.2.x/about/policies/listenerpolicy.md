@@ -48,7 +48,7 @@ apiVersion: gateway.networking.k8s.io/v1
 metadata:
   name: http
 spec:
-  gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   listeners:
   - name: http
     protocol: HTTP

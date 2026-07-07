@@ -4,4 +4,4 @@ weight: 20
 description:
 ---
 
-{{< reuse "docs/pages/traffic-management/dfp.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/dfp.md" >}}

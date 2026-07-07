@@ -4,4 +4,4 @@ description: Style and formatting conventions for kgateway documentation contrib
 weight: 30
 ---
 
-{{< reuse "docs/pages/reference/contribution/styleguide.md" >}} 
+{{< reuse "kgw-docs/pages/reference/contribution/styleguide.md" >}} 

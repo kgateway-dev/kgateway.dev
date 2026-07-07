@@ -4,7 +4,7 @@ weight: 40
 description: Secure access to the LLM and the data that is returned with Web Application Filter and Data Loss Prevention policies. 
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Secure access to the LLM and the data that is returned with Web Application Filter and Data Loss Prevention policies. 
 
@@ -18,7 +18,7 @@ With AI Gateway, you can set up prompt guards to block unwanted requests to the 
 
 1. [Set up AI Gateway](../setup/).
 2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Reject unwanted requests
 
@@ -32,7 +32,7 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
    kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -68,9 +68,9 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
 
 2. Send a request to the AI API that includes the string `credit card` in the request body. Verify that the request is denied with a 403 HTTP response code and the custom response message is returned.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs >}}
 
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -84,7 +84,7 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
    ```
    {{% /tab %}}
 
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v "localhost:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -118,9 +118,9 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
    OpenAI is configured to not return any sensitive information, such as credit card or Social Security Numbers, even if they are fake. Because of that, the request does not return a list of credit card numbers.
    {{< /callout >}}
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs >}}
 
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -134,7 +134,7 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
    ```
    {{% /tab %}}
 
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -196,7 +196,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
    kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -216,9 +216,9 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
 
 2. Send another request to the AI API and include a fake VISA credit card number. Verify that the VISA number is detected and masked in your response.
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs >}}
 
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -232,7 +232,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
    ```
    {{% /tab %}}
 
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -285,7 +285,7 @@ You can add the `moderation` section of any TrafficPolicy resource, either as a 
    kind: TrafficPolicy
    metadata:
      name: openai-prompt-guard
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -310,9 +310,9 @@ You can add the `moderation` section of any TrafficPolicy resource, either as a 
 
 2. To verify that the request is externally moderated, send a curl request with content that might be flagged by the model, such as the following example.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+   {{< tabs >}}
 
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl "$INGRESS_GW_ADDRESS:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -326,7 +326,7 @@ You can add the `moderation` section of any TrafficPolicy resource, either as a 
    ```
    {{% /tab %}}
 
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl "localhost:8080/openai" -H content-type:application/json -d '{
      "model": "gpt-3.5-turbo",
@@ -383,10 +383,10 @@ You can add the `moderation` section of any TrafficPolicy resource, either as a 
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete TrafficPolicy -n {{< reuse "docs/snippets/namespace.md" >}} -l app=ai-gateway
+kubectl delete TrafficPolicy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app=ai-gateway
 ```
 
 ## Next

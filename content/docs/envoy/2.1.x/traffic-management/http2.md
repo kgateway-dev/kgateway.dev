@@ -4,11 +4,11 @@ weight: 20
 description: Configure a service to use HTTP/2. 
 ---
 
-You might have services in your Kubernetes cluster that use HTTP/2 for communication. Typically these are gRPC services, but it could apply to any service that uses HTTP/2 in its transport layer. To enable HTTP/2 communication, you simply set the app protocol on the service to HTTP/2. This setting instructs {{< reuse "docs/snippets/kgateway.md" >}} to use HTTP/2 for communication with the destination.
+You might have services in your Kubernetes cluster that use HTTP/2 for communication. Typically these are gRPC services, but it could apply to any service that uses HTTP/2 in its transport layer. To enable HTTP/2 communication, you simply set the app protocol on the service to HTTP/2. This setting instructs {{< reuse "kgw-docs/snippets/kgateway.md" >}} to use HTTP/2 for communication with the destination.
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Enable access logging
 
@@ -20,7 +20,7 @@ apiVersion: gateway.kgateway.dev/v1alpha1
 kind: HTTPListenerPolicy
 metadata:
   name: access-logs
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   targetRefs:
   - group: gateway.networking.k8s.io
@@ -140,7 +140,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - http2.example.com
      rules:
@@ -151,14 +151,14 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    ```
 
 4. Send a request to the nginx server and include the `--http2-prior-knowledge` option to send an HTTP/2 request to the Gateway. Verify that the request succeeds and that you get back a 200 HTTP response code. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/ -H "host: http2.example.com:8080" --http2-prior-knowledge 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/ -H "host: http2.example.com" --http2-prior-knowledge 
    ```
@@ -206,7 +206,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 5. Get the access logs of your gateway proxy. 
    ```sh
-   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq --sort-keys
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq --sort-keys
    ```
    
    Example output: 
@@ -262,7 +262,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - static.example
      rules:
@@ -278,14 +278,14 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
    ```
 
 3. Send a request to the `static.example` domain. The request is forwarded to the `nghttp2.org` path, which only accepts HTTP/2 requests. Verify that the request succeeds and that you get back a 200 HTTP response code. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vik http://$INGRESS_GW_ADDRESS:8080/ -H "host: static.example:8080" --http2-prior-knowledge 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/ -H "host: static.example" --http2-prior-knowledge 
    ```
@@ -334,7 +334,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 4. Get the access logs of your gateway proxy. 
    ```sh
-   kubectl -n {{< reuse "docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq --sort-keys
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq --sort-keys
    ```
    
    Example output: 
@@ -364,10 +364,10 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httplistenerpolicy access-logs -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete httplistenerpolicy access-logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete httproute nginx
 kubectl delete pod nginx
 kubectl delete service nginx

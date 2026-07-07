@@ -4,4 +4,4 @@ description: Get a primer on ingress, API gateways, and how kgateway extends the
 weight: 10
 ---
 
-{{< reuse "docs/pages/about/overview.md" >}}
+{{< reuse "kgw-docs/pages/about/overview.md" >}}

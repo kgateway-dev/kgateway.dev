@@ -6,4 +6,4 @@ description: Install kgateway, deploy a sample app, and route traffic through a 
 weight: 1
 next: /docs/about
 ---
-{{< reuse "docs/pages/envoy/quickstart.md" >}}
+{{< reuse "kgw-docs/pages/envoy/quickstart.md" >}}

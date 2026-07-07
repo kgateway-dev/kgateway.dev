@@ -4,4 +4,4 @@ description: Inspect logs, dump Envoy configuration, and gather state to debug g
 weight: 15
 ---
 
-{{< reuse "docs/pages/operations/debug.md" >}}
+{{< reuse "kgw-docs/pages/operations/debug.md" >}}

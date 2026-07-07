@@ -3,10 +3,10 @@ title: AWS ALB
 weight: 10
 ---
 
-{{< reuse "docs/pages/integrations/aws-elb/alb.md" >}} 
+{{< reuse "kgw-docs/pages/integrations/aws-elb/alb.md" >}} 
 
 {{< callout type="warning" >}}
-The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
+The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
 {{< /callout >}}
 
 ## Before you begin
@@ -97,7 +97,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 ## Step 2: Create an ALB with the AWS Load Balancer controller
 
-{{< reuse "docs/snippets/aws-elb-controller-install.md" >}}
+{{< reuse "kgw-docs/snippets/aws-elb-controller-install.md" >}}
 
 5. Use an Ingress resource to define your ALB. When you apply this resource, the AWS Load Balancer Controller creates the ALB in your account.
    ```yaml
@@ -160,7 +160,7 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 1. Delete the Ingress, HTTPRoute, DirectResponse, and Gateway resources.
    ```sh

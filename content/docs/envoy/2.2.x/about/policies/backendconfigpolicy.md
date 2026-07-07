@@ -4,4 +4,4 @@ weight: 10
 description: 
 ---
 
-{{< reuse "docs/pages/about/backendconfigpolicy.md" >}}
+{{< reuse "kgw-docs/pages/about/backendconfigpolicy.md" >}}

@@ -4,4 +4,4 @@ weight: 60
 description:
 ---
 
-{{< reuse "docs/pages/setup/http10.md" >}}
+{{< reuse "kgw-docs/pages/setup/http10.md" >}}
