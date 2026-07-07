@@ -1,0 +1,1 @@
+Set the `gatewayClassName` to `{{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}`.

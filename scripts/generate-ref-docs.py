@@ -16,6 +16,54 @@ import shutil
 import stat
 
 
+_LINK_FIXUPS_CACHE = None
+
+
+def _load_link_fixups(path='scripts/link-fixups.json'):
+    '''Load the list of broken->working link replacements (cached).
+
+    Returns a list of {old, new} dicts. Missing or malformed files are treated
+    as "no fix-ups" so doc generation never fails just because the fix-up file
+    is absent.
+    '''
+    global _LINK_FIXUPS_CACHE
+    if _LINK_FIXUPS_CACHE is not None:
+        return _LINK_FIXUPS_CACHE
+
+    fixups = []
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            fixups = data.get('replacements', [])
+        except (json.JSONDecodeError, OSError) as e:
+            print(f'    Warning: could not load link fixups from {path}: {e}')
+    _LINK_FIXUPS_CACHE = fixups
+    return fixups
+
+
+def _apply_link_fixups(content):
+    '''Rewrite known-broken links in generated content.
+
+    Links sourced from immutable kgateway release tags can't be fixed at the
+    source for already-released versions, so we rewrite them here. See
+    scripts/link-fixups.json for the mapping and rationale.
+    '''
+    total = 0
+    for fixup in _load_link_fixups():
+        old = fixup.get('old')
+        new = fixup.get('new')
+        if not old or new is None:
+            continue
+        occurrences = content.count(old)
+        if occurrences:
+            content = content.replace(old, new)
+            total += occurrences
+    if total:
+        print(f'    ✓ Applied {total} link fixup(s)')
+    return content
+
+
 def safe_rmtree(path):
     '''Safely remove a directory tree, handling read-only permissions on Windows'''
     def _remove_readonly(func, p, excinfo):
@@ -451,6 +499,9 @@ def _post_process_api_docs(api_file):
     #    (Goldmark turns "\<" into a literal "<"). Unescape it to a real break.
     content = re.sub(r'\\(<br\s*/?>)', r'\1', content)
 
+    # Rewrite any known-broken links restored from upstream source comments.
+    content = _apply_link_fixups(content)
+
     with open(api_file, 'w') as f:
         f.write(content)
 
@@ -513,7 +564,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(envoy_content)
             
             # Apply post-processing
@@ -543,7 +594,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(generated_content)
             
             # Apply post-processing
@@ -612,7 +663,7 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
         # Write the raw helm-docs output to assets directory
         # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
         # This prevents overwriting when promoting versions
-        assets_path = f'assets/docs/pages/reference/helm/{version}/'
+        assets_path = f'assets/kgw-docs/pages/reference/helm/{version}/'
         os.makedirs(assets_path, exist_ok=True)
         
         helm_file = f'{assets_path}{file_name}.md'
@@ -672,7 +723,10 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
             else:
                 swapped_lines.append(line)
         content = '\n'.join(swapped_lines)
-        
+
+        # Rewrite any known-broken links restored from upstream values.yaml comments.
+        content = _apply_link_fixups(content)
+
         with open(helm_file, 'w', encoding='utf-8') as f:
             f.write(content)
         
@@ -687,7 +741,7 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
     '''Generate control plane metrics documentation'''
     print(f'  → Generating metrics docs for version {version}')
     
-    os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
+    os.makedirs(f'assets/kgw-docs/snippets/{link_version}', exist_ok=True)
     
     # Check if metrics tool exists
     metrics_tool_path = f'{kgateway_dir}/pkg/metrics/cmd/findmetrics/main.go'
@@ -701,10 +755,12 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
         '--markdown', f'./{kgateway_dir}'
     ], capture_output=True, text=True, check=True)
     
-    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
-        f.write(result.stdout)
+    metrics_content = _apply_link_fixups(result.stdout)
+
+    with open(f'assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+        f.write(metrics_content)
     
-    print(f'    ✓ Generated metrics docs in assets/docs/snippets/{link_version}/metrics-control-plane.md')
+    print(f'    ✓ Generated metrics docs in assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md')
     return True
 
 

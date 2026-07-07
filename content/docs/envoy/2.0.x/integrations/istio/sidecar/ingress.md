@@ -3,5 +3,5 @@ title: Ingress
 weight: 10
 --- 
 
-{{< reuse "docs/pages/integrations/istio/sidecar/ingress.md" >}}
+{{< reuse "kgw-docs/pages/integrations/istio/sidecar/ingress.md" >}}
 

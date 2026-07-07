@@ -4,4 +4,4 @@ description: Expose a health endpoint on the gateway listener for load balancer 
 weight: 10
 ---
 
-{{< reuse "docs/pages/traffic-management/health-checks/gateway.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/health-checks/gateway.md" >}}

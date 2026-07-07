@@ -1,0 +1,15 @@
+The following policy inheritance and override rules apply for TrafficPolicies: 
+* Policies that are defined in a TrafficPolicy resource and applied to a parent HTTPRoute resource are automatically inherited by all child and grandchild HTTPRoutes along the route delegation chain. 
+* If the TrafficPolicy applies to a child or grandchild HTTPRoute and defines a top-level policy that is different from the policy that is defined on the parent, the policies are merged and both the parent and child/grandchild policies are applied. For example, if the parent applies a rate limiting policy and the child applies a transformation policy, both policies are applied.
+* If the TrafficPolicy applies to a child or grandchild HTTPRoute and defines the same top-level policy, the policy of the child takes precedence and the policy on the parent is ignored (`kgateway.dev/inherited-policy-priority: ShallowMergePreferChild`). Note that you can add the `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent` annotation to the parent HTTPRoute to preserve the top-level parent policies on delegated routes.
+  {{< callout type="warning" >}}
+  **Authentication and authorization policies can be overridden by delegated child routes.**
+
+  With the default `ShallowMergePreferChild` policy merge strategy, a delegated child route can override and effectively disable authentication and authorization policies inherited from the parent route. For example, a child route can set `extAuth.disable: {}` or `jwtAuth.disable: {}` in a TrafficPolicy to bypass the ext-authz or JWT authentication that the parent mandates. Because a tenant who owns a delegated child HTTPRoute can create TrafficPolicies in their own namespace without access to the parent route or platform namespace, this bypass requires no elevated permissions beyond the normal delegatee role.
+
+  If you are a platform operator who must enforce mandatory authentication or authorization across all delegated routes, set the `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent` annotation on the parent HTTPRoute. This ensures that parent security policies take precedence and cannot be overridden by child routes. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
+  {{< /callout >}}
+* If you used [multiple attachment options]({{< link-hextra path="/about/policies/trafficpolicy/#policy-priority-and-merging-rules" >}}) to apply a TrafficPolicy with the same top-level policy to a parent or child HTTPRoute, only the policy with the highest priority is applied. The priority is determined by the attachment option that you chose. The following options are sorted from highest to lowest. 
+  * Policy defined in a TrafficPolicy and attached to an HTTPRoute via the HTTPRoute's `extensionRef` filter
+  * Policy defined in a TrafficPolicy resource and attached to an HTTPRouteRule via the `targetRef.sectionName` option
+  * Policy defined in a TrafficPolicy resource and attached to an HTTPRoute via the `targetRef` option

@@ -111,7 +111,7 @@ For more information, see [Static IP address]({{< link-hextra path="/setup/gatew
 
 #### Local rate limit filter options {#v23-local-rate-limit-filter-options}
 
-The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports the `percentEnabled` and `percentEnforced` optional fields to control the percentage of requests for which the local rate limit filter is enabled or enforced. If not set, both fields default to `100`, which enables and enforces the local rate limiting filter for 100% of all requests.
+The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports the `percentEnabled` and `percentEnforced` optional fields to control the percentage of requests for which the local rate limit filter is enabled or enforced. If not set, both fields default to `100`, which enables and enforces the local rate limiting filter for 100% of all requests.
 
 Use these fields for gradual rollouts or to run the filter in shadow mode (`percentEnabled: 100`, `percentEnforced: 0`), where rate limiting statistics are collected without blocking any requests.
 
@@ -143,11 +143,11 @@ The following example sets a custom base ID and enables CPU set threading:
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
   name: gw-params
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
     envoyContainer:
@@ -178,13 +178,13 @@ For more information, see [Track remaining capacity]({{< link-hextra path="/resi
 
 #### IP-based access control (ACL) {#v23-acl}
 
-The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports an `acl` field for IP-based access control. You can define allow and deny rules by using CIDR blocks or bare IP addresses, set a `defaultAction` for unmatched requests, and customize denial responses with a custom HTTP status code and headers. 
+The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports an `acl` field for IP-based access control. You can define allow and deny rules by using CIDR blocks or bare IP addresses, set a `defaultAction` for unmatched requests, and customize denial responses with a custom HTTP status code and headers. 
 
 For more information, see [IP-based access control (ACL)]({{< link-hextra path="/security/acl/" >}}).
 
 #### Fault injection {#v23-fault-injection}
 
-The {{< reuse "docs/snippets/trafficpolicy.md" >}} resource now supports a `faultInjection` field for chaos engineering and resiliency testing. You can inject the following fault types into a percentage of requests:
+The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports a `faultInjection` field for chaos engineering and resiliency testing. You can inject the following fault types into a percentage of requests:
 
 - **Delays**: Inject a fixed latency before forwarding the request upstream to simulate slow networks or overloaded backends.
 - **Aborts**: Return an HTTP or gRPC error code without forwarding the request to simulate upstream failures.
@@ -262,6 +262,18 @@ Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy
 * `MatchingPort`: Removes the port only if it matches the listener's own port.  
 
 For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
+
+#### Limit request header count {#v23-max-headers-count}
+
+Added the `maxHeadersCount` field to the HTTP settings of the ListenerPolicy resource. You can use this field to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used.
+
+For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
+
+#### Inject header values from Kubernetes Secrets {#v23-header-from-secret}
+
+You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
+
+For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

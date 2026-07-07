@@ -1,0 +1,57 @@
+{
+  "_comment": [
+    "Link fix-ups applied to generated reference docs (API, Helm, metrics).",
+    "",
+    "Some links live in kgateway source comments (Go doc comments, Helm values.yaml).",
+    "When those comments contain a URL that has since broken, the fix must land in the",
+    "kgateway repo's source. But the reference docs here are regenerated nightly from",
+    "released kgateway tags (2.x.y), which are immutable -- so the broken URL keeps",
+    "coming back for already-released versions even after upstream source is fixed.",
+    "",
+    "Each entry below rewrites an exact 'old' URL string to 'new' during doc generation,",
+    "so the published docs stay correct regardless of which upstream tag is rendered.",
+    "Matching is plain substring replacement (not regex) and runs over the full",
+    "generated content of every version.",
+    "",
+    "To add a fix-up: append an entry with the broken URL ('old'), the working URL",
+    "('new'), and a short 'reason'. Also fix the source in the kgateway repo so new",
+    "releases ship the correct link; this file is the safety net for older releases."
+  ],
+  "replacements": [
+    {
+      "old": "https://kgateway.dev/docs/operations/install/#namespace-discovery",
+      "new": "https://kgateway.dev/docs/envoy/latest/install/advanced/#namespace-discovery",
+      "reason": "Helm discoveryNamespaceSelectors doc link; the operations/install path 404s."
+    },
+    {
+      "old": "https://kgateway.dev/docs/latest/install/advanced/#namespace-discovery",
+      "new": "https://kgateway.dev/docs/envoy/latest/install/advanced/#namespace-discovery",
+      "reason": "Helm discoveryNamespaceSelectors doc link; docs are served under /docs/envoy/."
+    },
+    {
+      "old": "https://kgateway.dev/docs/integrations/inference-extension/",
+      "new": "https://kgateway.dev/docs/envoy/2.0.x/integrations/inference-extension/",
+      "reason": "Helm inferenceExtension doc link; docs are served under /docs/envoy/{version}/."
+    },
+    {
+      "old": "https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
+      "new": "https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/",
+      "reason": "Kubernetes moved assign-pod-node from concepts/configuration to concepts/scheduling-eviction."
+    },
+    {
+      "old": "https://gateway-api.sigs.k8s.io/reference/spec/#httpurlrewritefilter",
+      "new": "https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter",
+      "reason": "Gateway API spec reference moved under /reference/api-spec/main/spec/."
+    },
+    {
+      "old": "https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html",
+      "new": "https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-03.html",
+      "reason": "IETF retired tools.ietf.org; drafts now live on datatracker.ietf.org."
+    },
+    {
+      "old": "https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md",
+      "new": "https://github.com/kubernetes/community/blob/main/contributors/devel/sig-api-machinery/strategic-merge-patch.md",
+      "reason": "kubernetes/community renamed its default branch from master to main."
+    }
+  ]
+}

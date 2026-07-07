@@ -14,7 +14,7 @@ Note that the idle timeout configures the timeout for the entire connection from
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Set up idle timeouts
 
@@ -26,7 +26,7 @@ Note that the idle timeout configures the timeout for the entire connection from
    kind: HTTPListenerPolicy
    metadata:
      name: idle-time
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -40,7 +40,7 @@ Note that the idle timeout configures the timeout for the entire connection from
    1. Port-forward the gateway proxy on port 19000.
 
       ```sh
-      kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 19000
+      kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
       ```
 
    2. Get the configuration of your gateway proxy as a config dump.
@@ -93,10 +93,10 @@ Note that the idle timeout configures the timeout for the entire connection from
       
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
    
 ```sh
-kubectl delete httplistenerpolicy idle-time -n {{< reuse "docs/snippets/namespace.md" >}} 
+kubectl delete httplistenerpolicy idle-time -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 
 ```
 
 

@@ -19,7 +19,7 @@ You can set up proxy protocol for the following traffic directions:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Inbound proxy protocol {#inbound}
 
@@ -34,7 +34,7 @@ Configure a ListenerPolicy to accept PROXY protocol headers on incoming connecti
    kind: ListenerPolicy
    metadata:
      name: proxy-protocol
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -122,7 +122,7 @@ This setting can be useful in environments where some clients send PROXY headers
    kind: ListenerPolicy
    metadata:
      name: proxy-protocol
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      targetRefs:
      - group: gateway.networking.k8s.io
@@ -154,7 +154,7 @@ This setting can be useful in environments where some clients send PROXY headers
 ### Cleanup {#inbound-cleanup}
 
 ```sh
-kubectl delete listenerPolicy proxy-protocol -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete listenerPolicy proxy-protocol -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 ## Outbound proxy protocol {#outbound}
@@ -240,7 +240,7 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
      - "echo.example.com"
      rules:

@@ -4,5 +4,5 @@ weight: 444
 description: Create custom HTTP redirect status codes.
 ---
 
-{{< reuse "docs/pages/traffic-management/redirect/custom.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/redirect/custom.md" >}}
 

@@ -3,4 +3,4 @@ title: Overview
 weight: 10
 ---
 
-{{< reuse "docs/pages/about/overview.md" >}}
+{{< reuse "kgw-docs/pages/about/overview.md" >}}

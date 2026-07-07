@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 > [!CAUTION]  
-> Don't open a doc release PR too early! The release PR makes changes to the doc directories that content is published in. Therefore, in-progress doc PRs can be impacted. If those PRs update mostly only reuse files in the assets/docs directory, the impact is probably not as large, but they might need to update version tags or the content/docs skeleton pages that call the reuse files. 
+> Don't open a doc release PR too early! The release PR makes changes to the doc directories that content is published in. Therefore, in-progress doc PRs can be impacted. If those PRs update mostly only reuse files in the assets/kgw-docs directory, the impact is probably not as large, but they might need to update version tags or the content/docs skeleton pages that call the reuse files. 
 
 ## Pre-release
 
@@ -17,8 +17,8 @@ assignees: ''
 - [ ] In the `hugo.yaml` file, update the `versions` to include the new minor version as main, the previous main as latest, and the previous latest as its version.
 - [ ] In the `versions.json` file, update the `versions` to include the new minor version as main, the previous main as latest, and the previous latest as its version.
 - [ ] Retire any version older than `n-3` (remove the directory and version from the `hugo.yaml` file)
-- [ ] Update the version conrefs in the `assets/docs/versions` directory. Often, there is not a release for the next version, so you might have to use the same for latest and main.
-- [ ] Add the release date to the version table in `assets/docs/pages/reference/versions.md`, and remove any retired versions.
+- [ ] Update the version conrefs in the `assets/kgw-docs/versions` directory. Often, there is not a release for the next version, so you might have to use the same for latest and main.
+- [ ] Add the release date to the version table in `assets/kgw-docs/pages/reference/versions.md`, and remove any retired versions.
 - [ ] Update the version shortcodes to include the newest version. For example, if 2.2.x is the latest release, search for `version include-if="2.1.x"` to add `version include-if="2.2.x,2.1.x"`. Keep in mind that the include-if might start with different versions, like `include-if="2.0.x,2.1.x,2.2.x"` so do a few searches.
   - Example find and replacements for a hypothetical 2.8 release
     1. `"2.8.x,` > `"2.9.x,2.8.x,`

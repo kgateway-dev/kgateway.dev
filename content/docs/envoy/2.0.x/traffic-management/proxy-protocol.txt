@@ -12,7 +12,7 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Enable proxy protocol for a listener
 
@@ -57,7 +57,7 @@ Proxy Protocol is used to ensure that backend services receive the full network 
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete listeneroption proxy-protocol -n kgateway-system

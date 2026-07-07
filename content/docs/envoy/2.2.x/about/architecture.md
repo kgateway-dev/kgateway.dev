@@ -3,4 +3,4 @@ title: Architecture
 weight: 15
 ---
 
-{{< reuse "docs/pages/about/architecture.md" >}}
+{{< reuse "kgw-docs/pages/about/architecture.md" >}}

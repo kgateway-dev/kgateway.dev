@@ -6,4 +6,4 @@ description: Reference for the MiniJinja-style templating language used in trans
 weight: 10
 ---
 
-{{< reuse "docs/pages/traffic-management/transformations/templating-language.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/transformations/templating-language.md" >}}

@@ -3,4 +3,4 @@ title: HTTP
 weight: 10
 ---
 
-{{< reuse "docs/pages/setup/listeners/http.md" >}}
+{{< reuse "kgw-docs/pages/setup/listeners/http.md" >}}

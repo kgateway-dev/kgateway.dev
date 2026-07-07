@@ -4,6 +4,6 @@ description: Remove the port from the `Host` or `authority` header before reques
 weight: 40
 ---
 
-{{< reuse "docs/pages/traffic-management/header-control/strip-port-host.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/header-control/strip-port-host.md" >}}
 
 

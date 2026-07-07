@@ -7,4 +7,4 @@ weight: 1
 next: /docs/about
 ---
 
-{{< reuse "docs/pages/envoy/quickstart.md" >}}
+{{< reuse "kgw-docs/pages/envoy/quickstart.md" >}}
