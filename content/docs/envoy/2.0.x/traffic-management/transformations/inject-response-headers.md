@@ -10,21 +10,21 @@ Use an Inja template to extract a value from a request header and add it as a he
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Inject response headers
    
-1. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules: 
+1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with the following transformation rules: 
    * `x-gateway-response`: Use the value from the `x-gateway-request` request header and populate the value of that header into an `x-gateway-response` response header.
-   * `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the `x-podname` response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml and look at the `spec.containers.env` section.
+   * `x-podname`: Retrieve the value of the `POD_NAME` environment variable and add the value to the `x-podname` response header. Because the transformation is processed in the gateway proxy, these environment variables refer to the variables that are set on the proxy. You can view supported environment variables when you run `kubectl get deployment http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml and look at the `spec.containers.env` section.
    * `x-season`: Adds a static string value of `summer` to the `x-season` response header.
    * `x-response-raw`: Adds a static string values of `hello` with all escape characters intact.
    * `x-replace`: Replaces the pattern-to-replace text in the `baz` header with a random string.
    
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -56,8 +56,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    * `x-response-raw` that is set to `hello`.
    * `x-replace` that is set to a random string.
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
@@ -65,7 +65,7 @@ Use an Inja template to extract a value from a request header and add it as a he
     -H "baz: pattern-to-replace"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
@@ -111,8 +111,8 @@ Use an Inja template to extract a value from a request header and add it as a he
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 ```

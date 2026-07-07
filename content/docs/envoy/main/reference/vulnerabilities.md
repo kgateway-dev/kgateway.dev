@@ -4,4 +4,4 @@ description: Reported security vulnerabilities and the kgateway versions that co
 weight: 50
 ---
 
-{{< reuse "docs/pages/reference/vulnerabilities.md" >}}
+{{< reuse "kgw-docs/pages/reference/vulnerabilities.md" >}}

@@ -4,4 +4,4 @@ weight: 10
 description:
 ---
 
-{{< reuse "docs/pages/setup/listener-mtls.md" >}}
+{{< reuse "kgw-docs/pages/setup/listener-mtls.md" >}}

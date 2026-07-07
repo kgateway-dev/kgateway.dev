@@ -3,4 +3,4 @@ title: TCP
 weight: 10
 ---
 
-{{< reuse "docs/pages/setup/listeners/tcp.md" >}}
+{{< reuse "kgw-docs/pages/setup/listeners/tcp.md" >}}

@@ -3,7 +3,7 @@ title: AWS NLB
 weight: 20
 ---
 
-{{< reuse "docs/pages/integrations/aws-elb/nlb.md" >}}
+{{< reuse "kgw-docs/pages/integrations/aws-elb/nlb.md" >}}
 
 * **NLB HTTP**: Create an HTTP listener on the NLB that exposes an HTTP endpoint on your gateway proxy. Traffic from the NLB to the proxy is not secured. 
 * **TLS passthrough**: Expose an HTTPS endpoint of your gateway with an NLB. The NLB passes through HTTPS traffic to the gateway proxy where the traffic is terminated. 
@@ -20,7 +20,7 @@ Keep in mind the following considerations when working with an NLB:
 
 ## Step 1: Deploy the AWS Load Balancer controller
 
-{{< reuse "docs/snippets/aws-elb-controller-install.md" >}}
+{{< reuse "kgw-docs/snippets/aws-elb-controller-install.md" >}}
    
 ## Step 2: Deploy your gateway proxy
 
@@ -50,8 +50,8 @@ Keep in mind the following considerations when working with an NLB:
    
 2. Depending on the annotations that you use on your gateway proxy, you can configure the NLB in different ways. 
 
-   {{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-   {{% tab %}}
+   {{< tabs >}}
+   {{% tab name="Simple HTTP NLB" %}}
 
    Create a simple NLB that accepts HTTP traffic on port 80 and forwards this traffic to the HTTP listener on your gateway proxy. 
 
@@ -84,14 +84,14 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab name="TLS passthrough" %}}
    Pass through HTTPS requests from the AWS NLB to your gateway proxy, and terminate TLS traffic at the gateway proxy for added security. 
 
    {{< reuse-image src="/img/elb-tls-passthrough.svg" >}}
    {{< reuse-image-dark srcDark="/img/elb-tls-passthrough.svg" >}}
 
    1. Create a self-signed TLS certificate to configure your gateway proxy with an HTTPS listener. 
-      {{< reuse "docs/snippets/listeners-https-create-cert.md" >}}
+      {{< reuse "kgw-docs/snippets/listeners-https-create-cert.md" >}}
 
    2. Create a Gateway with an HTTPS listener that terminates incoming TLS traffic. Make sure to reference the custom GatewayParameters resource and the Kubernetes secret that contains the TLS certificate information. 
       ```yaml
@@ -150,8 +150,8 @@ Keep in mind the following considerations when working with an NLB:
 
 ## Step 3: Test traffic to the NLB {#test-traffic}
 
-{{< tabs items="Simple HTTP NLB,TLS passthrough" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="Simple HTTP NLB" %}}
    
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
@@ -193,7 +193,7 @@ Keep in mind the following considerations when working with an NLB:
    ```
 
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="TLS passthrough" %}}
 
 1. Create an HTTPRoute resource and associate it with the gateway that you created. 
    ```yaml
@@ -271,7 +271,7 @@ Keep in mind the following considerations when working with an NLB:
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 1. Delete the Ingress and Gateway resources.
    ```sh

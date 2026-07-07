@@ -76,7 +76,7 @@ The default transformation engine changed from the C++ classic filter (Inja) to 
 
 The two engines are syntactically similar but not identical. Existing classic-engine templates from 2.1.x or earlier might render differently or fail to render under rustformation. Review the following differences before you upgrade:
 
-{{< reuse "docs/pages/traffic-management/transformations/migrating-classic.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/transformations/migrating-classic.md" >}}
 
 If you hit a regression you can't easily migrate around, you can opt out of rustformation on `x86_64` by setting `useRustFormations: false` in your Helm values (or `USE_RUST_FORMATIONS=false` as a controller environment variable). The classic engine is not available on `arm64` and is removed entirely in 2.3.x, so plan to migrate templates before you upgrade further.
 

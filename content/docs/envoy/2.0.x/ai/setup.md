@@ -8,28 +8,28 @@ Configure your Helm chart installation to use AI Gateway. Then, use a custom Gat
 
 ## Before you begin
 
-[Get started]({{< link-hextra path="/quickstart/" >}}) to install the {{< reuse "docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/docs/snippets/kgateway.md" >}}.
+[Get started]({{< link-hextra path="/quickstart/" >}}) to install the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md">}} CRDs and {{< reuse "/kgw-docs/snippets/kgateway.md" >}}.
 
 ## Enable the AI extension {#ai-extension}
 
-Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
+Configure your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart installation to use AI Gateway.
 
-1. [Upgrade]({{< link-hextra path="/operations/upgrade/" >}}) {{< reuse "/docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
+1. [Upgrade]({{< link-hextra path="/operations/upgrade/" >}}) {{< reuse "/kgw-docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled.
 
    {{< callout type="warning" >}}
    If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
    {{< /callout >}}
 
    ```shell
-   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
         --set gateway.aiExtension.enabled=true \
-        --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+        --version {{< reuse "kgw-docs/versions/helm-version-upgrade.md" >}}
    ```
 
 2. Verify that your Helm installation is updated.
 
    ```shell
-   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
 
    Example output:
@@ -45,8 +45,8 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
 
 1. Create a GatewayParameters resource which enables an AI extension for the Gateway.
    
-   {{< tabs tabTotal="2" items="Cloud Provider,Local Environment" >}}
-   {{% tab tabName="Cloud Provider" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider" %}}
    For AI services in a cloud provider, use a LoadBalancer service. This way, the AI Gateway can be accessed from outside the cluster.
    ```yaml
    kubectl apply -f- <<EOF
@@ -54,7 +54,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    kind: GatewayParameters
    metadata:
      name: ai-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -73,7 +73,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    EOF
    ```
    {{% /tab %}}
-   {{% tab tabName="Local Environment" %}}
+   {{% tab name="Local Environment" %}}
    For local environments such as Ollama, use a NodePort service. This way, the AI Gateway can be accessed locally.
    ```yaml
    kubectl apply -f- <<EOF
@@ -81,7 +81,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    kind: GatewayParameters
    metadata:
      name: ai-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
@@ -102,7 +102,7 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Create a Gateway that uses the default GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step. {{< reuse "docs/snippets/agw-gatewayclass-choice.md" >}}
+2. Create a Gateway that uses the default GatewayClass and the AI-enabled GatewayParameters resource you created in the previous step. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -110,11 +110,11 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: ai-gateway
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: ai-gateway
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: ai-gateway
@@ -142,16 +142,16 @@ Configure your {{< reuse "/docs/snippets/kgateway.md" >}} Helm chart installatio
    Example output: 
    ```
    NAMESPACE         NAME                                           CLASS      ADDRESS       PROGRAMMED   AGE
-   {{< reuse "docs/snippets/namespace.md" >}}   gateway.gateway.networking.k8s.io/ai-gateway   kgateway   xx.xx.xx.xx   True         13s
+   {{< reuse "kgw-docs/snippets/namespace.md" >}}   gateway.gateway.networking.k8s.io/ai-gateway   kgateway   xx.xx.xx.xx   True         13s
    
    NAMESPACE         NAME                              READY   STATUS             RESTARTS   AGE
-   {{< reuse "docs/snippets/namespace.md" >}}   pod/ai-gateway-6f4786fcb6-gqhlm   2/2     Running   0          13s
+   {{< reuse "kgw-docs/snippets/namespace.md" >}}   pod/ai-gateway-6f4786fcb6-gqhlm   2/2     Running   0          13s
    ```
 
    If you see an error, check the logs of the `kgateway-ai-extension` container.
 
    ```sh
-   kubectl logs -l app.kubernetes.io/app=ai-gateway -n {{< reuse "docs/snippets/namespace.md" >}} -c kgateway-ai-extension
+   kubectl logs -l app.kubernetes.io/app=ai-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -c kgateway-ai-extension
    ```
 
 ## Next

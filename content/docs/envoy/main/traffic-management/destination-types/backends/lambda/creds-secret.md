@@ -4,4 +4,4 @@ description: Authenticate to AWS Lambda by using long-lived credentials stored i
 weight: 20
 ---
 
-{{< reuse "docs/pages/traffic-management/destination-types/backends/lambda/creds-secret.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/destination-types/backends/lambda/creds-secret.md" >}}

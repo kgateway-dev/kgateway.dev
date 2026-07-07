@@ -77,7 +77,7 @@ jobs:
 
       - name: Read max Kubernetes version
         run: |
-          KUBE_VERSION=$(cat kgateway.dev/assets/docs/versions/max-kube.md | tr -d '\n')
+          KUBE_VERSION=$(cat kgateway.dev/assets/kgw-docs/versions/max-kube.md | tr -d '\n')
           echo "KUBE_VERSION=$KUBE_VERSION" >> $GITHUB_ENV
 
       - name: Generate all documentation for selected version(s)
@@ -121,8 +121,8 @@ jobs:
 
             **File locations:**
             - API docs: `content/docs/envoy/{VERSION}/reference/api.md`
-            - Helm docs: `assets/docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
-            - Metrics docs: `assets/docs/snippets/{VERSION}/metrics-control-plane.md`
+            - Helm docs: `assets/kgw-docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
+            - Metrics docs: `assets/kgw-docs/snippets/{VERSION}/metrics-control-plane.md`
           branch: api-gen-update
           delete-branch: true
           base: main

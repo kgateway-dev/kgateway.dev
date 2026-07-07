@@ -20,16 +20,16 @@ flowchart LR
 
 ## Before you begin
 
-Set up {{< reuse "/docs/snippets/kgateway.md" >}} by following the [Quick start](../../quickstart/) or [Installation]({{< link-hextra path="/install" >}}) guides.
+Set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} by following the [Quick start](../../quickstart/) or [Installation]({{< link-hextra path="/install" >}}) guides.
 
 ## Deploy a sample app {#deploy-app}
 
-The following configuration file creates the httpbin app. To review the source file, see [the kgateway project](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml).
+The following configuration file creates the httpbin app. To review the source file, see [the kgateway project](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "kgw-docs/versions/github-branch.md" >}}/examples/httpbin.yaml).
 
 1. Create the httpbin app.
 
    ```shell
-   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
+   kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "kgw-docs/versions/github-branch.md" >}}/examples/httpbin.yaml
    ```
 
    Example output:
@@ -56,7 +56,7 @@ The following configuration file creates the httpbin app. To review the source f
 
 ## Set up an API gateway {#api-gateway}
 
-Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippets/k8s-gateway-api-name.md" >}}.
+Create an API gateway with an HTTP listener by using the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}.
 
 1. Create a Gateway resource and configure an HTTP listener. The following Gateway can serve HTTPRoute resources from all namespaces.{{< conditional-text include-if="envoy" >}} For more information about which GatewayClass to use, see [About gateway proxies](../../about/proxies/).{{< /conditional-text >}}
    
@@ -66,9 +66,9 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
    apiVersion: gateway.networking.k8s.io/v1
    metadata:
      name: http
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "/docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080
@@ -82,20 +82,20 @@ Create an API gateway with an HTTP listener by using the {{< reuse "docs/snippet
 2. Verify that the Gateway is created successfully. You can also review the external address that is assigned to the Gateway. Note that depending on your environment it might take a few minutes for the load balancer service to be assigned an external address. If you are using a local Kind cluster without a load balancer such as `metallb`, you might not have an external address.
    
    ```sh
-   kubectl get gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl get gateway http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
    Example output: 
    
    ```txt
    NAME   CLASS      ADDRESS                                  PROGRAMMED   AGE
-   http   {{< reuse "/docs/snippets/gatewayclass.md" >}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
+   http   {{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}   1234567890.us-east-2.elb.amazonaws.com   True         93s
    ```
 
 3. Verify that the gateway proxy pod is running.
 
    ```sh
-   kubectl get po -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http
+   kubectl get po -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http
    ```
 
    Example output:
@@ -125,7 +125,7 @@ Now that you have an app and a gateway proxy, you can create a route to access t
    spec:
      parentRefs:
        - name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - "www.example.com"
      rules:
@@ -170,19 +170,19 @@ Now that you have an app and a gateway proxy, you can create a route to access t
          group: gateway.networking.k8s.io
          kind: Gateway
          name: http
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 ## Send a request {#send-request}
 
 Now that your httpbin app is running and exposed on the gateway proxy, you can send a request to the app. The steps vary depending on your load balancer setup.
 
-{{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 1. Get the external address of the gateway proxy and save it in an environment variable.
    
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} http -o=jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS
    ```
 
@@ -229,11 +229,11 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
    }
    ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing"%}}
+{{% tab name="Port-forward for local testing" %}}
 1. Port-forward the gateway proxy `http` pod on port 8080. 
    
    ```sh
-   kubectl port-forward deployment/http -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8080:8080
    ```
 
 2. Send a request to the httpbin app and verify that you get back a 200 HTTP response code. 
@@ -283,7 +283,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
 
 ## Next steps
 
-Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
+Now that you have {{< reuse "/kgw-docs/snippets/kgateway.md" >}} set up and running, check out the following guides to expand your API gateway capabilities.
 
 - Add routing capabilities to your httpbin route by using the [Traffic management](../../traffic-management) guides. 
 - Explore ways to make your routes more resilient by using the [Resiliency](../../resiliency) guides. 
@@ -291,13 +291,13 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 
 1. Delete the httpbin app.
 
    ```sh
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "docs/versions/github-branch.md" >}}/examples/httpbin.yaml
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "kgw-docs/versions/github-branch.md" >}}/examples/httpbin.yaml
    ```
 
 2. Delete the HTTPRoute.
@@ -309,5 +309,5 @@ Now that you have {{< reuse "/docs/snippets/kgateway.md" >}} set up and running,
 3. Delete the Gateway.
 
    ```sh
-   kubectl delete gateway http -n {{< reuse "docs/snippets/namespace.md" >}}
+   kubectl delete gateway http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```

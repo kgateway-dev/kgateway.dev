@@ -3,7 +3,7 @@ title: AI observability
 weight: 90
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Observability helps you understand how your system is performing, identify issues, and troubleshoot problems. AI Gateway provides a rich set of observability features that help you monitor and analyze the performance of your AI Gateway and the LLM providers that it interacts with. 
 
@@ -15,16 +15,16 @@ Observability helps you understand how your system is performing, identify issue
 
 3. Get the external address of the gateway and save it in an environment variable.
    
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} ai-gateway -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS  
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deployment/ai-gateway -n {{< reuse "docs/snippets/namespace.md" >}} 8080:8080
+   kubectl port-forward deployment/ai-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8080:8080
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -54,7 +54,7 @@ Take a look at the default metrics that the system outputs.
 
 1. In another tab in your terminal, port-forward the `ai-gateway` container of the gateway proxy.
    ```sh
-   kubectl port-forward -n {{< reuse "docs/snippets/namespace.md" >}} deploy/ai-gateway 9092
+   kubectl port-forward -n {{< reuse "kgw-docs/snippets/namespace.md" >}} deploy/ai-gateway 9092
    ```
 
 2. In the previous tab, run the following command to view the metrics.

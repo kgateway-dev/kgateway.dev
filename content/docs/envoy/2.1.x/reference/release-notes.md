@@ -15,13 +15,13 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 Now, kgateway supports version 1.4.0 of the Kubernetes Gateway API. As part of this change, the BackendTLSPolicy API version in the experimental channel is promoted from `v1alpha3` to `v1`. Before you upgrade kgateway, make sure to upgrade the Kubernetes Gateway API to version 1.4.0.
 
-{{< tabs items="Standard,Experimental" tabTotal= "2" >}}
-{{% tab tabName="Standard" %}}
+{{< tabs >}}
+{{% tab name="Standard" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
 ```
 {{% /tab %}}
-{{% tab tabName="Experimental" %}}
+{{% tab name="Experimental" %}}
 ```sh
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/experimental-install.yaml
 ```
@@ -38,14 +38,14 @@ Update your old configuration to the new API style as follows.
 
 LLM providers are now nested directly under the `llm` spec field, removing the previous `llm.provider` field.
 
-{{< tabs items="New llm,Old llm.provider" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New llm" %}}
 ```yaml
 llm:
   openai:
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old llm.provider" %}}
 ```yaml
 llm:
   provider:
@@ -59,15 +59,15 @@ llm:
 
 The `priorityGroups` field replaces the `multipool` field with simpler nesting for providers.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New priorityGroups" %}}
 ```yaml
 priorityGroups:
 - providers:
   - openai:
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old multipool" %}}
 ```yaml
 multipool:
   priorities:
@@ -82,8 +82,8 @@ multipool:
 
 Some LLM settings are renamed to remove redundant `Override` prefixes.
 
-{{< tabs items="New priorityGroups,Old multipool" >}}
-{{% tab %}}
+{{< tabs >}}
+{{% tab name="New priorityGroups" %}}
 ```yaml
 host: foo
 port: 8080
@@ -94,7 +94,7 @@ authHeader:
   headerName: bar
 ```
 {{% /tab %}}
-{{% tab %}}
+{{% tab name="Old multipool" %}}
 ```yaml
 hostOverride:
   host: foo
@@ -197,13 +197,13 @@ You can now apply deep merging for extAuth and extProc policies. In addition, yo
 
 #### Additional proxy pod template customization {#podtemplate}
 
-Gateway proxies are created with a default proxy template that is stored in the default GatewayParameters resource. To change the default settings, you create a custom GatewayParameters resource and deploy a Gateway with it. {{< reuse "docs/snippets/kgateway-capital.md" >}} now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
+Gateway proxies are created with a default proxy template that is stored in the default GatewayParameters resource. To change the default settings, you create a custom GatewayParameters resource and deploy a Gateway with it. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} now has more options to customize the gateway proxies' default pod template, including configuration for `nodeSelectors`,`affinity`, `tolerations`, `topologySpreadConstraints`, and `externalTrafficPolicy`.
 
 For more information, see [Customize the gateway]({{< link-hextra path="/setup/customize/" >}}). To find all the values that you can change, see the [PodTemplate reference]({{< link-hextra path="/reference/api/#pod" >}}) in the GatewayParameters API.
 
-#### Header modifier filter for {{< reuse "docs/snippets/trafficpolicy.md" >}} {#header-modifier}
+#### Header modifier filter for {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} {#header-modifier}
 
-Now, you can apply header request and response modifiers in a {{< reuse "docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies.
+Now, you can apply header request and response modifiers in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. This way, you get more flexible policy attachment options such as a gateway-level policy. For more information, see the [Header control](../../traffic-management/header-control/) docs. Note that this feature is available only for Envoy-based kgateway proxies.
 
 
 #### Horizontal Pod Autoscaling {#hpa}
@@ -251,10 +251,10 @@ When you install the [OTel stack]({{< link-hextra path="/observability/otel-stac
 
 Leader election is now enabled by default to ensure that you can run kgateway in a multi-control plane replica setup for high availability. 
 
-You can disable leader election by setting the `controller.disableLeaderElection` to `true` in your Helm chart. 
+You can disable leader election by setting the `KGW_DISABLE_LEADER_ELECTION` environment variable to `"true"` through the `controller.extraEnv` Helm value.
 
 ```sh
-helm upgrade -i --namespace kgateway-system --version v{{< reuse "docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set controller.disableLeaderElection=true
+helm upgrade -i --namespace kgateway-system --version v{{< reuse "kgw-docs/versions/n-patch.md" >}} kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway --set-string controller.extraEnv.KGW_DISABLE_LEADER_ELECTION=true
 ```
 
 

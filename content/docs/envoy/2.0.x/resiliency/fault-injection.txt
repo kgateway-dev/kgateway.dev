@@ -22,7 +22,7 @@ For more information, see the [Fault API]({{< link-hextra path="/reference/api/f
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Aborts {#aborts}
    
@@ -73,13 +73,13 @@ Use a TrafficPolicy resource to abort all incoming requests to a specific route.
    ```
 
 3. Send a few requests to the httpbin app on the `faults.example` domain. Verify that some requests succeed with a 200 HTTP response code and other requests are rejected with a 503 HTTP response code.  
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: faults.example:8080"
    ```
    {{% /tab %}}
-   {{% tab  %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/status/200 -H "host: faults.example"
    ```
@@ -161,13 +161,13 @@ Use a TrafficPolicy resource to deny incoming requests to a specific route.
    ```
 
 3. Send a few requests to the httpbin app on the `faults.example` domain. Verify that some requests succeed immediately and other requests are delayed by 5 seconds.   
-   {{< tabs items="LoadBalancer IP address or hostname,Port-forward for local testing" >}}
-   {{% tab %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address or hostname" %}}
    ```sh
    curl -i http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: faults.example:8080"
    ```
    {{% /tab %}}
-   {{% tab %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -i localhost:8080/status/200 -H "host: faults.example"
    ```

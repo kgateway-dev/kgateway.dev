@@ -1,1 +1,0 @@
-Set the `gatewayClassName` to `{{< reuse "/docs/snippets/gatewayclass.md" >}}`.

@@ -4,4 +4,4 @@ weight: 10
 description: 
 ---
 
-{{< reuse "docs/pages/setup/listeners/sni.md" >}}
+{{< reuse "kgw-docs/pages/setup/listeners/sni.md" >}}
