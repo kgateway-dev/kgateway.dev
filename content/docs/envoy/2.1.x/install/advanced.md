@@ -4,31 +4,36 @@ weight: 70
 description: Install kgateway and related components.
 ---
 
-You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI.
+You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI. 
+
+Set the version you want to configure in an environment variable, such as the patch version (2.1.3):
+ ```sh
+ export NEW_VERSION=2.1.3
+ ```
 
 * **Show all values**: 
       
   ```sh
-  helm show values oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
+  helm show values oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} --version {{< reuse "kgw-docs/versions/helm-version-upgrade.md" >}}
   ```
 
-* **Get a file with all values**: You can get a `{{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml` file for the upgrade version by pulling and inspecting the Helm chart locally.
+* **Get a file with all values**: You can get a `{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}/values.yaml` file for the upgrade version by pulling and inspecting the Helm chart locally.
       
   ```sh
-  helm pull oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} --version {{< reuse "docs/versions/helm-version-upgrade.md" >}}
-  tar -xvf {{< reuse "/docs/snippets/helm-kgateway.md" >}}-{{< reuse "docs/versions/helm-version-upgrade.md" >}}.tgz
-  open {{< reuse "/docs/snippets/helm-kgateway.md" >}}/values.yaml
+  helm pull oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} --version {{< reuse "kgw-docs/versions/helm-version-upgrade.md" >}}
+  tar -xvf {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}-{{< reuse "kgw-docs/versions/helm-version-upgrade.md" >}}.tgz
+  open {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}/values.yaml
   ```
 
 For more information, see the [Helm reference docs]({{< link-hextra path="/reference/helm/" >}}).
 
 ## Development builds
 
-When using the development build {{< reuse "docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
+When using the development build {{< reuse "kgw-docs/versions/patch-dev.md" >}}, add `--set controller.image.pullPolicy=Always` to ensure you get the latest image. For production environments, this setting is not recommended as it might impact performance.
 
 ## Namespace discovery {#namespace-discovery}
 
-You can limit the namespaces that {{< reuse "/docs/snippets/kgateway.md" >}} watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit {{< reuse "/docs/snippets/kgateway.md" >}} to only watch a specific namespace for gateway configuration.
+You can limit the namespaces that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} watches for gateway configuration. For example, you might have a multi-tenant cluster with different namespaces for different tenants. You can limit {{< reuse "/kgw-docs/snippets/kgateway.md" >}} to only watch a specific namespace for gateway configuration.
 
 Namespace selectors are a list of matched expressions or labels.
 

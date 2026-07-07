@@ -376,31 +376,6 @@
       {{- end -}}
     {{- end -}}
     
-    {{ if and $versions $version }}
-    {{- /* Version dropdown — visible on lg+ only. On mobile the same items
-           are folded into the hamburger drawer further down. */ -}}
-    <div class="dropdown hx:px-2 hx:relative nav-desktop-only">
-        <button class="hx:text-sm hx:font-normal hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200 hx:inline-flex hx:items-center hx:whitespace-nowrap hx:cursor-pointer" type="button">
-          {{- $foundVersion := false -}}
-          {{- range $versions -}}
-            {{- if eq $version .linkVersion -}}
-               {{- printf "%s" .dropdown -}}
-               {{- $foundVersion = true -}}
-               {{ break }}
-            {{- end -}}
-          {{- end -}}
-          {{- if not $foundVersion -}}
-            {{- /* Fallback if version not found */ -}}
-            {{- $version -}}
-          {{- end -}}
-          {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-1 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
-        </button>
-        <ul class="dropdown-content navbar-dropdown-content">
-          {{ partial "navbar-version.html" }}
-        </ul>
-    </div>
-    {{ end }}
-
     {{- $currentPage := . -}}
     {{- range .Site.Menus.main -}}
       {{- if eq .Params.type "search" -}}
@@ -422,26 +397,60 @@
           {{- end -}}
         {{- end -}}
 
-        {{/* Check if this is the Docs menu item and render as dropdown */}}
+        {{/* Docs dropdown — renders on all pages using this navbar */}}
         {{- if eq .Name "Docs" -}}
-          {{- $active := or ($currentPage.HasMenuCurrent "main" .) ($currentPage.IsMenuCurrent "main" .) -}}
-          {{- /* Use the same color/weight for active and inactive — visual
-                 emphasis on the current page differs from agw's nav, which
-                 styles all top-nav items uniformly. The $active value is
-                 still computed in case future styles want to differentiate. */ -}}
           {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
           <div class="dropdown hx:relative hx:-ml-2 nav-desktop-only">
             <a
               title="{{ or (T .Identifier) .Name | safeHTML }}"
               href="{{ $link }}"
-              class="hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:whitespace-nowrap hx:p-2 hx:inline-flex hx:items-center {{ $activeClass }}"
+              class="hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:whitespace-nowrap hx:px-3 hx:py-2 hx:inline-flex hx:items-center {{ $activeClass }}"
             >
               <span class="hx:text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
               {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-2 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
             </a>
             <div class="dropdown-content navbar-dropdown-content">
               <a href="/docs/envoy/latest" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Kgateway (Envoy)</a>
-              <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Agentgateway</a>
+              <a href="https://agentgateway.dev/docs/kubernetes/latest/" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Agentgateway<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:4px;opacity:0.6"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+            </div>
+          </div>
+          {{- /* Version dropdown — immediately after Docs, docs pages only. */ -}}
+          {{- if and $versions $version -}}
+          <div class="dropdown hx:relative nav-desktop-only">
+            <button class="hx:text-sm hx:font-normal hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200 hx:inline-flex hx:items-center hx:whitespace-nowrap hx:px-3 hx:py-2 hx:cursor-pointer hx:bg-transparent hx:border-0" type="button">
+              {{- $foundVersion := false -}}
+              {{- range $versions -}}
+                {{- if eq $version .linkVersion -}}
+                   {{- printf "%s" .dropdown -}}
+                   {{- $foundVersion = true -}}
+                   {{ break }}
+                {{- end -}}
+              {{- end -}}
+              {{- if not $foundVersion -}}{{- $version -}}{{- end -}}
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-2 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
+            </button>
+            <ul class="dropdown-content navbar-dropdown-content">
+              {{ partial "navbar-version.html" }}
+            </ul>
+          </div>
+          {{- end -}}
+        {{/* Resources dropdown */}}
+        {{- else if eq .Name "Resources" -}}
+          {{- $activeClass := "hx:text-gray-600 hx:hover:text-gray-800 hx:dark:text-gray-400 hx:dark:hover:text-gray-200" -}}
+          <div class="dropdown hx:relative hx:-ml-2 nav-desktop-only">
+            <a
+              title="{{ or (T .Identifier) .Name | safeHTML }}"
+              href="{{ $link }}"
+              class="hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:whitespace-nowrap hx:px-3 hx:py-2 hx:inline-flex hx:items-center {{ $activeClass }}"
+            >
+              <span class="hx:text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
+              {{ partial "utils/icon.html" (dict "name" "chevron-down" "attributes" "class='hx:ml-2 hx:mb-0 hx:inline hx:w-4 hx:h-4'") }}
+            </a>
+            <div class="dropdown-content navbar-dropdown-content">
+              <a href="/resources/labs" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Labs</a>
+              <a href="/resources/videos" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Videos</a>
+              <a href="/learn" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Learning paths</a>
+              <a href="https://github.com/kgateway-dev/community" class="hx:block hx:px-4 hx:py-3 hx:text-sm hx:text-gray-700 hx:dark:text-gray-300 hx:hover:bg-gray-100">Community<svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-left:4px;opacity:0.6;width:11px;height:11px;max-width:11px;max-height:11px"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
             </div>
           </div>
         {{/* Display icon menu item — hidden on mobile; surfaced in hamburger drawer instead */}}
@@ -467,7 +476,7 @@
             title="{{ or (T .Identifier) .Name | safeHTML }}"
             href="{{ $link }}"
             {{ if $external }}target="_blank" rel="noreferer"{{ end }}
-            class="nav-desktop-only hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:relative hx:-ml-2 hx:whitespace-nowrap hx:p-2 {{ $activeClass }}"
+            class="nav-desktop-only hx:text-sm hx:contrast-more:text-gray-700 hx:contrast-more:dark:text-gray-100 hx:relative hx:-ml-2 hx:whitespace-nowrap hx:px-3 hx:py-2 {{ $activeClass }}"
           >
             <span class="hx:text-center">{{ or (T .Identifier) .Name | safeHTML }}</span>
           </a>
@@ -524,6 +533,20 @@
       </button>
     {{- end -}}
 
+    {{- /* Resources section header + sub-links. */ -}}
+    <div class="nav-mobile-drawer-section">
+      <div class="nav-mobile-drawer-header">Resources</div>
+      <a class="nav-mobile-drawer-link" href="/resources/labs">Labs</a>
+      <a class="nav-mobile-drawer-link" href="/resources/videos">Videos</a>
+      <a class="nav-mobile-drawer-link" href="/learn">Learning paths</a>
+      <a class="nav-mobile-drawer-link" href="https://github.com/kgateway-dev/community">Community</a>
+    </div>
+
+    {{- /* Blog — sits between Resources and Docs in the desired order. */ -}}
+    <div class="nav-mobile-drawer-section">
+      <a href="/blog" class="nav-mobile-drawer-header nav-mobile-drawer-header-link">Blog</a>
+    </div>
+
     {{- /* Docs section header + section switcher children. */ -}}
     <div class="nav-mobile-drawer-section">
       <div class="nav-mobile-drawer-header">Docs</div>
@@ -548,7 +571,7 @@
            child-link styling. Icons are dropped here since the header
            treatment is text-only. */ -}}
     {{- range .Site.Menus.main -}}
-      {{- if or (eq .Params.type "search") (eq .Name "Docs") -}}{{- continue -}}{{- end -}}
+      {{- if or (eq .Params.type "search") (eq .Name "Docs") (eq .Name "Resources") (eq .Name "Blog") -}}{{- continue -}}{{- end -}}
       {{- $link := .URL -}}
       {{- $external := strings.HasPrefix $link "http" -}}
       {{- with .PageRef -}}

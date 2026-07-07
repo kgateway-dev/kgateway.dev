@@ -3,7 +3,7 @@ title: API reference
 weight: 10
 ---
 
-{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}
+{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}
 
 ## Packages
 - [gateway.kgateway.dev/v1alpha1](#gatewaykgatewaydevv1alpha1)
@@ -139,7 +139,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -590,7 +590,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -617,7 +617,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) |  |  |
 | `authority` _string_ | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name.<br />Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |  |  |
 | `maxReceiveMessageLength` _integer_ | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error.<br />Defaults to 0, which means unlimited. |  | Minimum: 1 <br /> |
 | `skipEnvoyHeaders` _boolean_ | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |  |  |
@@ -897,7 +897,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `logLevel` _string_ | Envoy log level. Options include "trace", "debug", "info", "warn", "error",<br />"critical" and "off". Defaults to "info". See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information. |  |  |
-| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	```yaml<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	```<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
+| `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 
 
 #### EnvoyContainer
@@ -1019,7 +1019,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend GRPC service. |  |  |
 | `authority` _string_ | Authority is the authority header to use for the GRPC service. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the gRPC request. This is the timeout for a specific request. |  |  |
 | `retry` _[ExtSvcRetryPolicy](#extsvcretrypolicy)_ | Retry specifies the retry policy for gRPC streams associated with the service. |  |  |
@@ -1038,7 +1038,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef references the backend HTTP service. |  |  |
 | `pathPrefix` _string_ | PathPrefix specifies a prefix to the value of the authorization request's path header.<br />This allows customizing the path at which the authorization server expects to receive requests.<br />For example, if the authorization server expects requests at "/verify", set this to "/verify".<br />If not specified, the original request path is used. |  |  |
 | `requestTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RequestTimeout is the timeout for the HTTP request. Default timeout is 2 seconds. |  |  |
 | `authorizationRequest` _[AuthorizationRequest](#authorizationrequest)_ | AuthorizationRequest configures the authorization request to the external service. |  |  |
@@ -1382,6 +1382,7 @@ _Appears in:_
 | `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connnections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `maxHeadersCount` _integer_ | MaxHeadersCount sets the maximum number of headers allowed in a request.<br />Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and a<br />stream reset for HTTP/2. If unset, defaults to Envoy's built-in default of 100.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-headers-count |  | Minimum: 1 <br /> |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
 | `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
@@ -1414,6 +1415,7 @@ _Appears in:_
 | `serverHeaderTransformation` _[ServerHeaderTransformation](#serverheadertransformation)_ | ServerHeaderTransformation determines how the server header is transformed.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-server-header-transformation |  | Enum: [Overwrite AppendIfAbsent PassThrough] <br /> |
 | `streamIdleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | StreamIdleTimeout is the idle timeout for HTTP streams.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-stream-idle-timeout |  |  |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | IdleTimeout is the idle timeout for connnections.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-httpprotocoloptions |  |  |
+| `maxHeadersCount` _integer_ | MaxHeadersCount sets the maximum number of headers allowed in a request.<br />Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and a<br />stream reset for HTTP/2. If unset, defaults to Envoy's built-in default of 100.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-headers-count |  | Minimum: 1 <br /> |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
 | `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
@@ -2336,7 +2338,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
+| `backendRef` _[BackendRef](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref)_ | BackendRef specifies the Backend to use for the OAuth2 provider. |  |  |
 | `authorizationEndpoint` _[HttpsUri](#httpsuri)_ | AuthorizationEndpoint specifies the endpoint to redirect to for authorization in response to unauthorized requests.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `tokenEndpoint` _[HttpsUri](#httpsuri)_ | TokenEndpoint specifies the endpoint on the authorization server to retrieve the access token from.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.2 for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `redirectURI` _string_ | RedirectURI specifies the URL passed to the authorization endpoint.<br />Defaults to <request-scheme>://<host>/oauth2/redirect, where the URL scheme and host are derived from the original request.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.1.2 for more details. |  |  |
@@ -2461,7 +2463,7 @@ _Appears in:_
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the Pod object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
 | `securityContext` _[PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#podsecuritycontext-v1-core)_ | The pod security context. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#podsecuritycontext-v1-core<br />for details. |  |  |
 | `imagePullSecrets` _[LocalObjectReference](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#localobjectreference-v1-core) array_ | An optional list of references to secrets in the same namespace to use for<br />pulling any of the images used by this Pod spec. See<br />https://kubernetes.io/docs/concepts/containers/images/#specifying-imagepullsecrets-on-a-pod<br />for details. |  |  |
-| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/configuration/assign-pod-node/ for<br />details. |  |  |
+| `nodeSelector` _object (keys:string, values:string)_ | A selector which must be true for the pod to fit on a node. See<br />https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/ for<br />details. |  |  |
 | `affinity` _[Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#affinity-v1-core)_ | If specified, the pod's scheduling constraints. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#affinity-v1-core<br />for details. |  |  |
 | `tolerations` _[Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#toleration-v1-core) array_ | do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />If specified, the pod's tolerations. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#toleration-v1-core<br />for details. |  |  |
 | `gracefulShutdown` _[GracefulShutdownSpec](#gracefulshutdownspec)_ | If specified, the pod's graceful shutdown spec. |  |  |
@@ -2670,7 +2672,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `url` _string_ | URL is the URL of the remote JWKS server, it must be a full FQDN with protocol, host and path.<br />For example, https://example.com/keys |  | MaxLength: 2048 <br />MinLength: 1 <br /> |
-| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef is reference to the backend of the JWKS server. |  |  |
 | `cacheDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Duration after which the cached JWKS expires.<br />If unspecified, the default cache duration is 5 minutes. |  |  |
 
 
@@ -3255,7 +3257,7 @@ _Appears in:_
 | `cors` _[CorsPolicy](#corspolicy)_ | Cors specifies the CORS configuration for the policy. |  |  |
 | `csrf` _[CSRFPolicy](#csrfpolicy)_ | Csrf specifies the Cross-Site Request Forgery (CSRF) policy for this traffic policy. |  |  |
 | `headerModifiers` _[HeaderModifiers](#headermodifiers)_ | HeaderModifiers defines the policy to modify request and response headers. |  |  |
-| `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honored for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
+| `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honored for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests<br />It is applicable to HTTPRoutes and ignored for other targeted kinds. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, Gateway listeners and XListenerSets, and ignored for other targeted kinds. |  |  |
@@ -3372,7 +3374,7 @@ _Appears in:_
 | Field | Description |
 | --- | --- |
 | `Off` | XRateLimitHeaderOff disables emitting of XRateLimit headers.<br /> |
-| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://tools.ietf.org/id/draft-polli-ratelimit-headers-03.html).<br /> |
+| `DraftVersion03` | XRateLimitHeaderDraftV03 outputs headers as described in [draft RFC version 03](https://datatracker.ietf.org/doc/id/draft-polli-ratelimit-headers-03.html).<br /> |
 
 
 
@@ -3397,6 +3399,39 @@ AnyValue is used to represent any type of attribute value. AnyValue may contain 
 | `stringValue` | *string |  |
 | `arrayValue` | [][AnyValue](#anyvalue) | TODO: Add support for ArrayValue && KvListValue |
 | `kvListValue` | *[KeyAnyValueList](#keyanyvaluelist) |  |
+
+#### Authorization
+
+Authorization defines the configuration for role-based access control.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `policy` | [AuthorizationPolicy](#authorizationpolicy) | Policy specifies the Authorization rule to evaluate. A policy matches when **any** of the conditions evaluates to true. **Required.** |
+| `action` | [AuthorizationPolicyAction](#authorizationpolicyaction) | Action defines whether the rule allows or denies the request if matched. If unspecified, the default is "Allow". |
+
+#### AuthorizationPolicy
+
+AuthorizationPolicy defines a single Authorization rule.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `matchExpressions` | [][CELExpression](#celexpression) | MatchExpressions defines a set of conditions that must be satisfied for the rule to match. These expression should be in the form of a Common Expression Language (CEL) expression.  **Required.** |
+
+#### AuthorizationPolicyAction
+
+_Underlying type:_ _string_
+
+AuthorizationPolicyAction defines the action to take when the RBACPolicies matches.
+
+#### CELExpression
+
+_Underlying type:_ _string_
+
+CELExpression represents a Common Expression Language (CEL) expression.
+
+**Validation:**
+- MinLength=1
+- MaxLength=16384
 
 #### ComparisonFilter
 

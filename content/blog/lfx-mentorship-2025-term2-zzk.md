@@ -62,7 +62,7 @@ Our goal was to provide complete observability support for AI Gateway:
 
 ### Design Approach
 
-The project was divided into two main parts. For more details, see: [EP-11777](https://github.com/kgateway-dev/kgateway/blob/main/design/11177.md):
+The project was divided into two main parts. For more details, see: [EP-11777](https://github.com/kgateway-dev/kgateway/blob/main/design/11177-ai-extensions-opentelemetry-tracing-support.md):
 
 **Control Plane**: Provides configuration interface through GatewayParameters API, where users can specify tracing backends, sampling rates, and other parameters.
 
@@ -110,7 +110,7 @@ Through this project, we added complete distributed tracing support to kgateway'
 Want to experience this distributed tracing feature yourself? Follow these steps to quickly set up a complete test environment:
 
 #### 1. Install Gateway
-Follow the [Get started](https://kgateway.dev/docs/envoy/latest/quickstart/) guide. For the installation, choose the development version, v{{< reuse "docs/versions/patch-dev.md" >}}.
+Follow the [Get started](https://kgateway.dev/docs/envoy/latest/quickstart/) guide. For the installation, choose the development version, v{{< reuse "kgw-docs/versions/patch-dev.md" >}}.
 
 #### 2. Enable AI Extension
 As you follow the [Set up AI Gateway](https://kgateway.dev/docs/envoy/2.1.x/ai/setup/), note the following configurations:

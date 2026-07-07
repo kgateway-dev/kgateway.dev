@@ -3,7 +3,7 @@ title: Model failover
 weight: 30
 ---
 
-{{< reuse "docs/snippets/ai-deprecation-note.md" >}}
+{{< reuse "kgw-docs/snippets/ai-deprecation-note.md" >}}
 
 Prioritize the failover of requests across different models from an LLM provider.
 
@@ -19,7 +19,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 1. [Set up AI Gateway](../setup/).
 2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}
 
@@ -27,8 +27,8 @@ You can configure failover across multiple models and providers by using priorit
 
 1. Create or update the Backend for your LLM providers.
 
-   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
-   {{% tab tabName="OpenAI model priority" %}}
+   {{< tabs >}}
+   {{% tab name="OpenAI model priority" %}}
    
    In this example, you configure separate priority groups for failover across multiple models from the same LLM provider, OpenAI. The priority order of the models is as follows:
    
@@ -44,7 +44,7 @@ You can configure failover across multiple models and providers by using priorit
      labels:
        app: model-failover
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -77,7 +77,7 @@ You can configure failover across multiple models and providers by using priorit
    ```
    
    {{% /tab %}}
-   {{% tab tabName="Cost-based priority across providers" %}}
+   {{% tab name="Cost-based priority across providers" %}}
    
    In this example, you configure failover across multiple providers with cost-based priority. The first priority group contains cheaper models. Responses are load-balanced across these models. In the event that both models are unavailable, requests fall back to the second priority group of more premium models.
    - Highest priority: Load balance across cheaper OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest` models.
@@ -93,7 +93,7 @@ You can configure failover across multiple models and providers by using priorit
      labels:
        app: model-failover
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -142,13 +142,13 @@ You can configure failover across multiple models and providers by using priorit
    kind: HTTPRoute
    metadata:
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: model-failover
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -162,7 +162,7 @@ You can configure failover across multiple models and providers by using priorit
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -170,8 +170,8 @@ You can configure failover across multiple models and providers by using priorit
 
 3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -182,7 +182,7 @@ You can configure failover across multiple models and providers by using priorit
    ]}' | jq
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -197,8 +197,8 @@ You can configure failover across multiple models and providers by using priorit
    
    Example output:
 
-   {{< tabs tabTotal="2" items="OpenAI model priority,Cost-based priority across providers" >}}
-   {{% tab tabName="OpenAI model priority" %}}
+   {{< tabs >}}
+   {{% tab name="OpenAI model priority" %}}
    
    Note the response is from the `gpt-4o` model, which is the first model in the priority order from the Backend.
 
@@ -226,7 +226,7 @@ You can configure failover across multiple models and providers by using priorit
    ```
    
    {{% /tab %}}
-   {{% tab tabName="Cost-based priority across providers" %}}
+   {{% tab name="Cost-based priority across providers" %}}
    
    Note the response is from the `claude-3-5-haiku-20241022` model. With the cost-based priority configuration, requests are load balanced across the cheaper models (OpenAI `gpt-3.5-turbo` and Anthropic `claude-3-5-haiku-latest`) in the first priority group.
 
@@ -259,10 +259,10 @@ You can configure failover across multiple models and providers by using priorit
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete backend,httproute -n {{< reuse "docs/snippets/namespace.md" >}} -l app=model-failover
+   kubectl delete backend,httproute -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app=model-failover
    ```
 
 ## Next

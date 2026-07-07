@@ -8,4 +8,4 @@ description: You can use an HTTPListenerPolicy resource to attach policies to HT
 The HTTPListenerPolicy is deprecated and will be removed in future releases. Move your configuration to the ListenerPolicy instead.
 {{< /callout >}}
 
-{{< reuse "docs/pages/about/httplistenerpolicy.md" >}}
+{{< reuse "kgw-docs/pages/about/httplistenerpolicy.md" >}}

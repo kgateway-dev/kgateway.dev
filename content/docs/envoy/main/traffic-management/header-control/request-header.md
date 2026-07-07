@@ -4,4 +4,4 @@ description: Add, set, or remove headers on requests that the gateway forwards t
 weight: 10
 ---
 
-{{< reuse "docs/pages/traffic-management/header-control/request-header.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/header-control/request-header.md" >}}

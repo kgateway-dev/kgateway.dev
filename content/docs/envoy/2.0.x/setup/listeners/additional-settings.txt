@@ -6,7 +6,7 @@ description:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Configure backend connections
 
@@ -90,7 +90,7 @@ description:
     
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete backendconfigpolicy httpbin-connection -n httpbin

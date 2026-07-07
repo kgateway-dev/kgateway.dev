@@ -3,4 +3,4 @@ title: Security vulnerabilities
 weight: 50
 ---
 
-{{< reuse "docs/pages/reference/vulnerabilities.md" >}}
+{{< reuse "kgw-docs/pages/reference/vulnerabilities.md" >}}

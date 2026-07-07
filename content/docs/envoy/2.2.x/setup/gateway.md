@@ -4,7 +4,7 @@ weight: 5
 description: Set up your first gateway proxy and explore how to use it to route traffic to a sample app. 
 ---
 
-{{< reuse "docs/snippets/setup-gateway.md" >}}
+{{< reuse "kgw-docs/snippets/setup-gateway.md" >}}
 
 ## Next 
 
@@ -23,9 +23,9 @@ kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
   name: http
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   addresses:
     - type: IPAddress
       value: 203.0.113.11

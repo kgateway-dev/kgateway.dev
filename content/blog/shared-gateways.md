@@ -32,7 +32,7 @@ Over the years, projects such as [Gloo Gateway](https://www.solo.io/products/glo
 
 Gateway API formalizes the successes and lessons learned from these projects into a standardized approach, ensuring that persona-based management is consistent across various provider implementations. By incorporating the concept of personas into the API itself, Gateway API provides governance over critical infrastructure while empowering application teams with self-service capabilities with the added benefit of avoiding vendor lock-in. This separation of concerns enables Application teams to define routing configurations without requiring cluster-admin privileges and Platform teams to manage gateway lifecycles, control which ports and hostnames are available, and enforce security policies such as TLS management. 
 
-For a deeper dive, take a look at the section [Why does a role-oriented API matter?](https://gateway-api.sigs.k8s.io/#why-does-a-role-oriented-api-matter) in the Gateway API documentation.
+For a deeper dive, take a look at the section [Why does a role-oriented API matter?](https://gateway-api.sigs.k8s.io/docs/#why-does-a-role-oriented-api-matter) in the Gateway API documentation.
 
 ## Example: Shared Gateways in Action
 

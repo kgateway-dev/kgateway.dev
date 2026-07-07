@@ -7,16 +7,16 @@ description:
 Originate a one-way TLS connection from the Gateway to a backend. 
 
 {{< callout type="warning" >}}
-{{< reuse "docs/versions/warn-experimental.md" >}}
+{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /callout >}}
 
 ## About one-way TLS
 
 When you configure a TLS listener on your Gateway, the Gateway typically terminates incoming TLS traffic and forwards the unencrypted traffic to the backend service. However, you might have a service that only accepts TLS connections, or you want to forward traffic to a secured Backend service that is external to the cluster.
 
-You can use the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
+You can use the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} BackendTLSPolicy](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/) to configure TLS origination from the Gateway to a service in the cluster. This policy supports simple, one-way TLS use cases. 
 
-However, to additionally set up different hostnames on the Backend that you want to route to via SNI, or to originate TLS connections to an external backend, use the {{< reuse "docs/snippets/kgateway.md" >}} BackendConfigPolicy instead. 
+However, to additionally set up different hostnames on the Backend that you want to route to via SNI, or to originate TLS connections to an external backend, use the {{< reuse "kgw-docs/snippets/kgateway.md" >}} BackendConfigPolicy instead. 
 
 ## About this guide
 
@@ -26,7 +26,7 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq-x-channel.md" >}}
+{{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 
 ## In-cluster service
 
@@ -34,7 +34,7 @@ Deploy an NGINX server in your cluster that is configured for TLS traffic. Then,
 
 ### Deploy the sample app
 
-The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
+The following example uses an NGINX server with a self-signed TLS certificate. For the configuration, see the [test directory in the kgateway GitHub repository](https://github.com/kgateway-dev/kgateway/tree/{{< reuse "kgw-docs/versions/github-branch.md" >}}/test/kubernetes/e2e/features/backendtls/inputs).
 
 
 1. Deploy the NGINX server with a self-signed TLS certificate.
@@ -58,7 +58,7 @@ The following example uses an NGINX server with a self-signed TLS certificate. F
    
 ### Create a BackendTLSPolicy {#create-backend-tls-policy}
 
-Create the BackendTLSPolicy for the NGINX workload. For more information, see the [{{< reuse "docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/).
+Create the BackendTLSPolicy for the NGINX workload. For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} docs](https://gateway-api.sigs.k8s.io/reference/api-types/policy/backendtlspolicy/).
 
 1. Create a Kubernetes ConfigMap that has the public CA certificate for the NGINX server.
 
@@ -92,7 +92,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    EOF
    ```
 
-   {{< reuse "docs/snippets/review-table.md" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
 
    | Setting | Description |
    |---------|-------------|
@@ -113,7 +113,7 @@ Create the BackendTLSPolicy for the NGINX workload. For more information, see th
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
      - "example.com"
      rules:
@@ -129,13 +129,13 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 1. Send a request to the NGINX server and verify that you get back a 200 HTTP response code. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/ -H "host: example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi http://localhost:8080/ -H "host: example.com:8080"
    ```
@@ -223,7 +223,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
      - "httpbin-external.example"
      rules:
@@ -244,13 +244,13 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 4. Send a request to the `httpbin-external.example` domain. Verify that the host is rewritten to `https://httpbin.org/anything` and that you get back a 200 HTTP response code.  
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/anything -H "host: httpbin-external.example" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi http://localhost:8080/anything -H "host: httpbin-external.example" 
    ```
@@ -285,7 +285,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ### In-cluster service
 
@@ -308,7 +308,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    {{< /callout >}}
 
    ```sh
-   kubectl rollout restart -n kgateway-system deployment/{{< reuse "docs/snippets/pod-name.md" >}}
+   kubectl rollout restart -n kgateway-system deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}}
    ```
    
 ### External service

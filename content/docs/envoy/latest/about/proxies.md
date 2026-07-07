@@ -1,7 +1,7 @@
 ---
 title: Gateway proxies
-description: Compare kgateway, agentgateway, and other supported gateway proxy types.
+description: Learn about the Envoy-based kgateway gateway proxy that the kgateway control plane manages.
 weight: 30
 ---
 
-{{< reuse "docs/pages/about/proxies.md" >}}
+{{< reuse "kgw-docs/pages/about/proxies.md" >}}

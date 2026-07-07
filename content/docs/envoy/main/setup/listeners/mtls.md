@@ -3,7 +3,7 @@ title: mTLS (FrontendTLS)
 weight: 10 
 description: Create a FrontendTLSConfig on a Gateway to enforce mutual TLS between clients and listeners.
 ---
-Add a [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/1.4/spec/#frontendtlsconfig) to a Gateway to create a mutual TLS (mTLS) listener. 
+Add a [FrontendTLSConfig](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#frontendtlsconfig) to a Gateway to create a mutual TLS (mTLS) listener. 
 
 ## About FrontendTLS
 
@@ -25,19 +25,19 @@ In this guide, you learn how to apply default certificate validation configurati
 Throughout this guide, you use self-signed TLS certificates for the Certificate Authority. These certificates are used to sign the TLS certificates for the gateway proxy (server) and httpbin client. 
 
 {{< callout type="warning" >}}
-Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trust Certificate Authority. 
+Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trusted Certificate Authority. 
 {{< /callout >}}
 
 ## Before you begin
 
-{{< reuse "docs/snippets/cert-prereqs.md" >}}
+{{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
 ## Create TLS certificates 
 
 Create self-signed TLS certificates that you use for the mutual TLS connection between your client application (`curl`) and the gateway proxy. 
 
 {{< callout type="warning" >}}
-Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trust Certificate Authority. 
+Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trusted Certificate Authority. 
 {{< /callout >}}
 
 <!-- >
@@ -84,14 +84,14 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    kubectl create secret tls https-cert \
      --cert=server-cert.pem \
      --key=server-key.pem \
-     -n {{< reuse "docs/snippets/namespace.md" >}}
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 5. Store the CA certificates in a configmap. The gateway proxy later uses these certificates to validate the client certificate that is presented during the TLS handshake. 
    ```sh
    kubectl create configmap ca-cert \
      --from-file=ca.crt=ca-cert.pem \
-     -n {{< reuse "docs/snippets/namespace.md" >}}
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 6. Create a client certificate and private key. You use these credentials later when sending a request to the gateway proxy. The client certificate is signed by the same CA that you used for the gateway proxy.
@@ -121,9 +121,9 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -174,7 +174,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      - "example.com"
      parentRefs:
        - name: mtls
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
        - backendRefs:
            - name: httpbin
@@ -183,30 +183,30 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
 5. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
+   kubectl port-forward deploy/mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
 6. Send a request to the httpbin app without a client certificate on both 8443 and 8444 ports. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
    curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
@@ -214,7 +214,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -237,8 +237,8 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
 7. Repeat the request. This time, you include the client certificate that you created earlier. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -251,7 +251,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -265,7 +265,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -349,9 +349,9 @@ In this example, you override the default certificate validation configuration f
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -397,30 +397,30 @@ In this example, you override the default certificate validation configuration f
    ```
 
 2. If you have not done so yet, get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing">}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
    echo $INGRESS_GW_ADDRESS   
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
-   kubectl port-forward deploy/mtls -n {{< reuse "docs/snippets/namespace.md" >}} 8443:8443 8444:8444
+   kubectl port-forward deploy/mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443 8444:8444
    ```
    {{% /tab %}}
    {{< /tabs >}}
 
 3. Send a request to the httpbin app on both ports without a valid certificate. Verify that the request on port 8443 fails, because the default validation configuration does not allow to establish a connection without a valid certificate. The connection on port 8444 however is established as the port-specific validation configuration mode is set to `AllowInsecureFallback`.
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
    curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
@@ -428,7 +428,7 @@ In this example, you override the default certificate validation configuration f
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -458,8 +458,8 @@ In this example, you override the default certificate validation configuration f
    ```
 
 4. Repeat the request with a valid certificate. Verify that both requests succeed. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -472,7 +472,7 @@ In this example, you override the default certificate validation configuration f
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -486,7 +486,7 @@ In this example, you override the default certificate validation configuration f
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -507,7 +507,7 @@ In this example, you override the default certificate validation configuration f
 
 ## Additional TLS settings
 
-You can configure your mTLS listener to limit connections to clients that present a certificate with a specific certificate hash and Subject Alternative Names. Alternatively, you can configure your listeners to enforce other TLS settings, such as a minimum or maximum TLS version, specific cipher suites, or CSDH curves. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}). 
+You can configure your mTLS listener to limit connections to clients that present a certificate with a specific certificate hash and Subject Alternative Names. Alternatively, you can configure your listeners to enforce other TLS settings, such as a minimum or maximum TLS version, specific cipher suites, or ECDH curves. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}). 
 
 
 1. Get the certificate hash of the client certificate. 
@@ -527,9 +527,9 @@ You can configure your mTLS listener to limit connections to clients that presen
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -563,8 +563,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    | `kgateway.dev/verify-subject-alt-names` | A comma-delimited list of the Subject Alternative Names that must be present in the peer certificate that is presented during the TLS handshake.  |
 
 3. Send a request to the httpbin app with your client certificate. Verify that the request succeeds. 
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -572,7 +572,7 @@ You can configure your mTLS listener to limit connections to clients that presen
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -582,7 +582,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -644,9 +644,9 @@ You can configure your mTLS listener to limit connections to clients that presen
    kind: Gateway
    metadata:
      name: mtls
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      tls:
        frontend:
          default:
@@ -675,8 +675,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
 5. Repeat the request to the httpbin app with your client certificate. Verify that the request now fails.
-   {{< tabs tabTotal="3" items="LoadBalancer IP address,LoadBalancer hostname,Port-forward for local testing" >}}
-   {{% tab tabName="LoadBalancer IP address" %}}
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -684,7 +684,7 @@ You can configure your mTLS listener to limit connections to clients that presen
      --cacert ca-cert.pem
    ```
    {{% /tab %}}
-   {{% tab tabName="LoadBalancer hostname" %}}
+   {{% tab name="LoadBalancer hostname" %}}
    ```sh
    curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
@@ -694,7 +694,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    ```
 
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v -k https://localhost:8443/get \
      --resolve example.com:8443:127.0.0.1 \
@@ -718,13 +718,13 @@ You can configure your mTLS listener to limit connections to clients that presen
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete httproute httpbin-https -n httpbin
-kubectl delete gateway mtls -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete secret https-cert -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete configmap ca-cert -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete secret https-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete configmap ca-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf ../example_certs
 ```
    

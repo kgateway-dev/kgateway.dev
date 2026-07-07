@@ -1,1 +1,0 @@
-v$NEW_VERSION

@@ -5,8 +5,4 @@ description:
 ---
 
 
-Learn how policies can be inherited or overridden along the delegation chain: 
-
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
+Learn how policies can be inherited or overridden along the delegation chain.

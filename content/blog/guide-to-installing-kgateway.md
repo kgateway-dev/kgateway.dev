@@ -16,7 +16,7 @@ To help the community learn about Gateway API, we plan to publish [blogs](https:
 * Moving forward, we’ll discuss the unique capabilities and advanced functionality offered by kgateway, including special extensions and policy attachments.
 * Finally, we’ll wrap up by examining how kgateway integrates with service mesh and AI-based features, offering insights into where the technology is headed.
 
-Although we are using kgateway as a reference example, the same concepts can be applied to any of the [over two dozen implementations](https://gateway-api.sigs.k8s.io/implementations/) of Gateway API, which is one of the major strengths of an open, vendor-neutral standard discussed in part one of this blog series. Whether you’re new to the Gateway API or simply looking for a modern, flexible solution for traffic routing and policy management, kgateway is a great starting point for experimenting with Gateway API.
+Although we are using kgateway as a reference example, the same concepts can be applied to any of the [over two dozen implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/) of Gateway API, which is one of the major strengths of an open, vendor-neutral standard discussed in part one of this blog series. Whether you’re new to the Gateway API or simply looking for a modern, flexible solution for traffic routing and policy management, kgateway is a great starting point for experimenting with Gateway API.
 
 In this first writeup, we simply want to point you in the right direction, by following the [quickstart](https://kgateway.dev/docs/envoy/latest/quickstart/) instructions to install kgateway and diving deeper into the underlying components
 
@@ -30,7 +30,7 @@ Before installing on a Kubernetes cluster, it’s important to understand that t
 
 **Experimental:** Includes everything in the standard channel, plus alpha features (e.g., TCPRoute, TLSRoute, UDPRoute) that may be removed or changed in the future. Suitable for development environments or rapid feature testing.
 
-The Gateway API community provides guidance in their [versioning](https://gateway-api.sigs.k8s.io/concepts/versioning/) documentation around how CRDs in the experimental channel eventually graduate to be provided in the standard channel.
+The Gateway API community provides guidance in their [versioning](https://gateway-api.sigs.k8s.io/docs/concepts/versioning/) documentation around how CRDs in the experimental channel eventually graduate to be provided in the standard channel.
 
 kgateway's instructions steer us to the experimental channel, which enables us to quickly
 iterate and test the latest and greatest features. Currently this includes CRDs that are still deemed to be "alpha" quality such as TCPRoute, TLSRoute, UDPRoute, and others.
@@ -84,7 +84,7 @@ trafficpolicies        rp           gateway.kgateway.dev/v1alpha1   true        
 upstreams              up           gateway.kgateway.dev/v1alpha1   true         Upstream
 ```
 
-We can also inspect the default [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/) that gets created as part of the Helm installation:
+We can also inspect the default [GatewayClass](https://gateway-api.sigs.k8s.io/reference/api-types/gatewayclass/) that gets created as part of the Helm installation:
 
 ```sh
 kubectl get gatewayclass kgateway -o yaml | bat -l yaml

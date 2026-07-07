@@ -8,10 +8,6 @@ Set a maximum time for the gateway to handle a request.
 
 The Kubernetes Gateway API provides a way to configure timeouts on your HTTPRoutes. You might commonly use timeouts alongside [Retries]({{< link-hextra path="/resiliency/retry/" >}}) to ensure that your apps are available even if they are temporarily unavailable.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About
 
 A timeout is the amount of time ([duration](https://protobuf.dev/reference/protobuf/google.protobuf/#duration)) that the gateway waits for replies from a backend service before the service is considered unavailable. This setting can be useful to avoid your apps from hanging or fail if no response is returned in a specific timeframe. With timeouts, calls either succeed or fail within a predictable timeframe.
@@ -20,7 +16,7 @@ The time an app needs to process a request can vary a lot which is why applying 
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Set up timeouts {#timeouts}
    
@@ -40,7 +36,7 @@ Specify timeouts for a specific route.
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches: 
        - path:
@@ -56,14 +52,14 @@ Specify timeouts for a specific route.
    EOF
    ```
 
-2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "/docs/snippets/kgateway.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+2. Send a request to the httpbin app. Verify that the request succeeds and that you see a `X-Envoy-Expected-Rq-Timeout-Ms` header. If the header is present, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} expects requests to the httpbin app to succeed within the set timeout. 
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: timeout.example:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/headers -H "host: timeout.example"
    ```
@@ -98,7 +94,7 @@ Specify timeouts for a specific route.
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 Delete the HTTPRoute resource.
    

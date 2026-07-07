@@ -6,7 +6,7 @@ author: Lin Sun & Michael Levan
 excludeSearch: true
 ---
 
-During KubeConNA last week, the Kubernetes community [announced](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) the **Ingress NGINX retirement** and recommended that users move to the **Gateway API**, which is the modern replacement for Ingress. Best-effort maintenance of Ingress NGINX will continue until **March 2026**, meaning users need a migration plan soon.
+During KubeCon NA last week, the Kubernetes community [announced](https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/) the **Ingress NGINX retirement** and recommended that users move to the **Gateway API**, which is the modern replacement for Ingress. Best-effort maintenance of Ingress NGINX will continue until **March 2026**, meaning users need a migration plan soon.
 
 This announcement is significant—Ingress NGINX has been one of the most popular ingress controllers for traffic into Kubernetes clusters. It’s part of the core Kubernetes project with over 19,000 stars on [GitHub](https://github.com/kubernetes/ingress-nginx). In this blog, we’ll share key considerations to help you choose a replacement.
 
@@ -126,7 +126,7 @@ status:
 
 ## Envoy Proxy
 
-Many Gateway API [implementations](https://gateway-api.sigs.k8s.io/implementations/) are built on **Envoy**, a high-performance modern proxy. Projects like Istio, kgateway, Contour, Cilium, Envoy Gateway, and Emissary-Ingress use Envoy as the data plane.
+Many Gateway API [implementations](https://gateway-api.sigs.k8s.io/docs/implementations/list/) are built on **Envoy**, a high-performance modern proxy. Projects like Istio, kgateway, Contour, Cilium, Envoy Gateway, and Emissary-Ingress use Envoy as the data plane.
 
 While multiple gateways may share the same data plane, the **control plane** is what sets them apart. The control plane translates Gateway API resources into Envoy configuration. For small setups, this is simple, but for large-scale deployments (e.g., 20,000 routes → 500,000+ lines of Envoy config), control plane **efficiency and scalability** are critical.
 

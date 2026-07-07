@@ -37,19 +37,19 @@ render:
     # Gateway API types
     - name: BackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendref
     - name: BackendObjectReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#backendobjectreference
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference
     - name: ParentReference
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#parentreference
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#parentreference
     - name: GRPCBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#grpcbackendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcbackendref
     - name: HTTPBackendRef
       package: sigs.k8s.io/gateway-api/apis/v1
-      link: https://gateway-api.sigs.k8s.io/reference/spec/#httpbackendref
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpbackendref
     - name: HTTPHeaderFilter
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter
@@ -59,6 +59,18 @@ render:
     - name: HTTPRouteRetryStatusCode
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouteretrystatuscode
+    - name: HTTPURLRewriteFilter
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter
+    - name: HTTPPathMatch
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httppathmatch
+    - name: TCPRoute
+      package: sigs.k8s.io/gateway-api/apis/v1alpha2
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#tcproute
+    - name: GRPCRoute
+      package: sigs.k8s.io/gateway-api/apis/v1
+      link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcroute
     - name: ObjectName
       package: sigs.k8s.io/gateway-api/apis/v1
       link: https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#objectname
@@ -92,3 +104,54 @@ render:
     - name: LocalObjectReference
       package: k8s.io/api/core/v1
       link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#localobjectreference-v1-core
+
+    # Kubernetes core/v1 workload types. Without these, crd-ref-docs emits
+    # intra-page links to anchors that don't exist on the page, which surface as
+    # broken anchors in the link checker.
+    - name: Affinity
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#affinity-v1-core
+    - name: Container
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#container-v1-core
+    - name: EnvVar
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#envvar-v1-core
+    - name: PodSecurityContext
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#podsecuritycontext-v1-core
+    - name: Probe
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#probe-v1-core
+    - name: SecurityContext
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#securitycontext-v1-core
+    - name: Toleration
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#toleration-v1-core
+    - name: TopologySpreadConstraint
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#topologyspreadconstraint-v1-core
+    - name: Volume
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#volume-v1-core
+    - name: VolumeMount
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#volumemount-v1-core
+    # Enum types whose generated anchors don't exist on the k8s API reference page.
+    - name: PullPolicy
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy
+    - name: ServiceType
+      package: k8s.io/api/core/v1
+      link: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+    # Kubernetes apps/v1, apiextensions/v1, and apimachinery runtime types.
+    - name: DeploymentStrategy
+      package: k8s.io/api/apps/v1
+      link: https://kubernetes.io/docs/reference/generated/kubernetes-api/v${KUBE_VERSION}/#deploymentstrategy-v1-apps
+    - name: JSON
+      package: k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1
+      link: https://pkg.go.dev/k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1#JSON
+    - name: RawExtension
+      package: k8s.io/apimachinery/pkg/runtime
+      link: https://pkg.go.dev/k8s.io/apimachinery/pkg/runtime#RawExtension

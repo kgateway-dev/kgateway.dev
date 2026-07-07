@@ -39,7 +39,7 @@ referencegrants                     refgrant             gateway.networking.k8s.
 
 This is a list of all the installed CRDs (think of them as just API specs at this point; we will be building actual resources based on their spec). In this blog, we are just covering the creation of the bare necessities, a gateway, and a route.
 
-While that covers the CRDs needed for the Kubernetes Gateway API spec, you still need something to process the configuration. In our case, it's going to be [kgateway](http://kgateway.dev), which we will install with helm:
+While that covers the CRDs needed for the Kubernetes Gateway API spec, you still need something to process the configuration. In our case, it's going to be [kgateway](https://kgateway.dev), which we will install with helm:
 
 ```yaml
 #install kgateway CRDs
@@ -54,11 +54,11 @@ kubectl get pods -n kgateway-system
 
 ## Creating a Gateway Object
 
-The concrete implementation that a Gateway leverages is specified by referencing the name of a [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/), which in turn is associated with a specific controller.
+The concrete implementation that a Gateway leverages is specified by referencing the name of a [GatewayClass](https://gateway-api.sigs.k8s.io/reference/api-types/gatewayclass/), which in turn is associated with a specific controller.
 
 Let us then proceed to assume the role of the cluster operator, primarily concerned with creating gateways and governing what ports and protocols to expose.
 
-For that, the Gateway API provides the [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/#gateway) resource:
+For that, the Gateway API provides the [Gateway](https://gateway-api.sigs.k8s.io/reference/api-types/gateway/) resource:
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -153,7 +153,7 @@ Let's build out a simple `httpbin` so we can attach a route to it and have it re
 kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/examples/httpbin.yaml
 ```
 
-Once that's in place, we can apply [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/) below to attach to it:
+Once that's in place, we can apply [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-types/httproute/) below to attach to it:
 
 ```yaml
 kubectl apply -f- <<EOF

@@ -5,10 +5,6 @@ weight: 30
 
 Prioritize the failover of requests across different models from an LLM provider.
 
-{{< callout >}}
-{{< reuse "docs/snippets/proxy-kgateway.md" >}}
-{{< /callout >}}
-
 ## About failover {#about}
 
 Failover is a way to keep services running smoothly by automatically switching to a backup system when the main one fails or becomes unavailable.
@@ -21,7 +17,7 @@ This approach increases the resiliency of your network environment by ensuring t
 
 1. [Set up AI Gateway](../setup/).
 2. [Authenticate to the LLM](../auth/).
-3. {{< reuse "docs/snippets/ai-gateway-address.md" >}}
+3. {{< reuse "kgw-docs/snippets/ai-gateway-address.md" >}}
 
 ## Fail over to other models {#model-failover}
 
@@ -41,7 +37,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
      labels:
        app: model-failover
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
      type: AI
      ai:
@@ -82,13 +78,13 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    kind: HTTPRoute
    metadata:
      name: model-failover
-     namespace: {{< reuse "docs/snippets/namespace.md" >}}
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: model-failover
    spec:
      parentRefs:
        - name: ai-gateway
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      rules:
      - matches:
        - path:
@@ -102,7 +98,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
              replaceFullPath: /v1/chat/completions
        backendRefs:
        - name: model-failover
-         namespace: {{< reuse "docs/snippets/namespace.md" >}}
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          group: gateway.kgateway.dev
          kind: Backend
    EOF
@@ -110,8 +106,8 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 
 3. Send a request to observe the failover. In your request, do not specify a model. Instead, the Backend automatically uses the model from the first pool in the priority order.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
    curl -v "$INGRESS_GW_ADDRESS:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -122,7 +118,7 @@ In this example, you create a Backend with multiple pools for the same LLM provi
    ]}' | jq
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```bash
    curl -v "localhost:8080/model" -H content-type:application/json -d '{
      "messages": [
@@ -162,10 +158,10 @@ In this example, you create a Backend with multiple pools for the same LLM provi
 
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
    ```shell
-   kubectl delete backend,httproute -n {{< reuse "docs/snippets/namespace.md" >}} -l app=model-failover
+   kubectl delete backend,httproute -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app=model-failover
    ```
 
 ## Next

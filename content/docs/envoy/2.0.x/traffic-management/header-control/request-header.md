@@ -5,11 +5,11 @@ weight: 10
 
 Use the `RequestHeaderModifier` filter to add, append, overwrite, or remove request headers for a specific route. 
 
-For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/spec/#httpheaderfilter).
+For more information, see the [HTTPHeaderFilter specification](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheaderfilter).
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Add and append request headers {#add-request-header}
 
@@ -26,7 +26,7 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -50,13 +50,13 @@ Add headers to incoming requests before they are forwarded to an upstream servic
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain and verify that you get back a 200 HTTP response code and that you see the `my-header` request header. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: headers.example"
 ```
@@ -87,14 +87,14 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    ```
 
 4. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is appended with the value from the `RequestHeaderModifier` filter. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
 -H "my-header: foo"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: headers.example" \
 -H "my-header: foo" 
@@ -143,7 +143,7 @@ Setting headers is similar to adding headers. If the request does not include th
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -167,13 +167,13 @@ Setting headers is similar to adding headers. If the request does not include th
    |`spec.rules.backendRefs`|The Kubernetes service you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-header: hello` header was added. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: headers.example"
 ```
@@ -204,14 +204,14 @@ curl -vi localhost:8080/headers -H "host: headers.example"
    ```
 
 3. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is overwritten with the value from the `RequestHeaderModifier` filter. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
 -H "my-header: foo"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: headers.example" \
 -H "my-header: foo" 
@@ -249,13 +249,13 @@ curl -vi localhost:8080/headers -H "host: headers.example" \
 You can remove HTTP headers from a request before the request is forwarded to the target service in the cluster. 
 
 1. Send a request to the httpbin app and find the `User-Agent` header. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: www.example.com"
 ```
@@ -300,7 +300,7 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    spec:
      parentRefs:
      - name: http
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      hostnames:
        - headers.example
      rules:
@@ -323,13 +323,13 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
 
 3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `User-Agent` request header is removed. 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
 curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
 ```
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 ```sh
 curl -vi localhost:8080/headers -H "host: headers.example"
 ```

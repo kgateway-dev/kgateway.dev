@@ -4,4 +4,4 @@ description: Ports that the kgateway control plane and gateway proxies reserve a
 weight: 50
 ---
 
-{{< reuse "docs/pages/reference/ports.md" >}}
+{{< reuse "kgw-docs/pages/reference/ports.md" >}}

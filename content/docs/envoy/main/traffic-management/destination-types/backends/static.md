@@ -4,6 +4,6 @@ description: Route to static IP addresses or hostnames outside the cluster with 
 weight: 10
 ---
 
-{{< reuse "docs/pages/traffic-management/static.md" >}}
+{{< reuse "kgw-docs/pages/traffic-management/static.md" >}}
 
 # {#before-you-begin}

@@ -12,6 +12,67 @@ import subprocess
 import os
 import re
 import platform
+import shutil
+import stat
+
+
+_LINK_FIXUPS_CACHE = None
+
+
+def _load_link_fixups(path='scripts/link-fixups.json'):
+    '''Load the list of broken->working link replacements (cached).
+
+    Returns a list of {old, new} dicts. Missing or malformed files are treated
+    as "no fix-ups" so doc generation never fails just because the fix-up file
+    is absent.
+    '''
+    global _LINK_FIXUPS_CACHE
+    if _LINK_FIXUPS_CACHE is not None:
+        return _LINK_FIXUPS_CACHE
+
+    fixups = []
+    if os.path.exists(path):
+        try:
+            with open(path) as f:
+                data = json.load(f)
+            fixups = data.get('replacements', [])
+        except (json.JSONDecodeError, OSError) as e:
+            print(f'    Warning: could not load link fixups from {path}: {e}')
+    _LINK_FIXUPS_CACHE = fixups
+    return fixups
+
+
+def _apply_link_fixups(content):
+    '''Rewrite known-broken links in generated content.
+
+    Links sourced from immutable kgateway release tags can't be fixed at the
+    source for already-released versions, so we rewrite them here. See
+    scripts/link-fixups.json for the mapping and rationale.
+    '''
+    total = 0
+    for fixup in _load_link_fixups():
+        old = fixup.get('old')
+        new = fixup.get('new')
+        if not old or new is None:
+            continue
+        occurrences = content.count(old)
+        if occurrences:
+            content = content.replace(old, new)
+            total += occurrences
+    if total:
+        print(f'    ✓ Applied {total} link fixup(s)')
+    return content
+
+
+def safe_rmtree(path):
+    '''Safely remove a directory tree, handling read-only permissions on Windows'''
+    def _remove_readonly(func, p, excinfo):
+        os.chmod(p, stat.S_IWRITE)
+        func(p)
+
+    if os.path.exists(path):
+        shutil.rmtree(path, onerror=_remove_readonly)
+
 
 
 def resolve_tag_for_version(version, link_version):
@@ -79,8 +140,7 @@ def resolve_branch_for_version(version, link_version):
 def clone_repository(ref, kgateway_dir='kgateway'):
     '''Clone the kgateway repository at the specified branch or tag'''
     # Clean up any existing directory
-    if os.path.exists(kgateway_dir):
-        subprocess.run(['rm', '-rf', kgateway_dir], check=True)
+    safe_rmtree(kgateway_dir)
     
     # Clone repository
     if ref == 'main':
@@ -415,7 +475,33 @@ def _post_process_api_docs(api_file):
         i += 1
     
     content = '\n'.join(final_lines)
-    
+
+    # ── Markdown-leak fixes ──────────────────────────────────────────────
+    # crd-ref-docs renders multi-line field comments into single table cells
+    # by replacing newlines with "<br />". Two patterns from that leak into
+    # the rendered HTML as literal text:
+    #
+    # 1. A fenced code block (```...```) inside a comment ends up inside a
+    #    table cell. Markdown can't put a code block in a cell, so it escapes
+    #    the cell contents and the surrounding "<br />" surface as literal
+    #    "&lt;br /&gt;" text. Strip the fence tokens on table-row lines (those
+    #    starting with "|") so the example renders as <br />-separated text.
+    #    Real, standalone fenced blocks have ``` on their own line (never
+    #    starting with "|") and are left untouched.
+    fixed_lines = []
+    for line in content.split('\n'):
+        if line.startswith('|') and '```' in line:
+            line = re.sub(r'```[a-zA-Z0-9]*', '', line)
+        fixed_lines.append(line)
+    content = '\n'.join(fixed_lines)
+
+    # 2. A backslash-escaped "\<br />" renders as the literal text "<br />"
+    #    (Goldmark turns "\<" into a literal "<"). Unescape it to a real break.
+    content = re.sub(r'\\(<br\s*/?>)', r'\1', content)
+
+    # Rewrite any known-broken links restored from upstream source comments.
+    content = _apply_link_fixups(content)
+
     with open(api_file, 'w') as f:
         f.write(content)
 
@@ -478,7 +564,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(envoy_content)
             
             # Apply post-processing
@@ -508,7 +594,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
                 f.write('title: API reference\n')
                 f.write('weight: 10\n')
                 f.write('---\n\n')
-                f.write('{{< reuse "/docs/snippets/api-ref-docs-intro.md" >}}\n\n')
+                f.write('{{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}\n\n')
                 f.write(generated_content)
             
             # Apply post-processing
@@ -526,14 +612,22 @@ def _generate_shared_types(api_file, kgateway_dir='kgateway'):
     '''Append shared types documentation to the API reference file.'''
     shared_dir = f'{kgateway_dir}/api/v1alpha1/shared'
     kgateway_source_dir = f'{kgateway_dir}/api/v1alpha1/kgateway'
-    if not os.path.exists(shared_dir):
+    flat_dir = f'{kgateway_dir}/api/v1alpha1'
+    if os.path.exists(shared_dir):
+        # 2.2.x+ split layout: shared/ and kgateway/ subpackages.
+        args = [shared_dir, api_file, kgateway_source_dir]
+    elif os.path.exists(flat_dir):
+        # Older versions (e.g. 2.0.x, 2.1.x) use a flat api/v1alpha1 layout with no
+        # shared/ subpackage. Parse the flat directory so the appender can still
+        # document types that crd-ref-docs referenced but did not render; otherwise
+        # their intra-page anchors (e.g. #grpcstatus, #policystatus) stay dead.
+        args = [flat_dir, api_file]
+    else:
         return
     try:
         subprocess.run([
             'python3', 'scripts/generate-shared-types.py',
-            shared_dir,
-            api_file,
-            kgateway_source_dir,
+            *args,
         ], check=True)
     except subprocess.CalledProcessError as e:
         print(f'    Warning: generate-shared-types failed: {e}')
@@ -569,7 +663,7 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
         # Write the raw helm-docs output to assets directory
         # Use actual version numbers (2.2.x, 2.1.x, etc.) not linkVersion (main, latest)
         # This prevents overwriting when promoting versions
-        assets_path = f'assets/docs/pages/reference/helm/{version}/'
+        assets_path = f'assets/kgw-docs/pages/reference/helm/{version}/'
         os.makedirs(assets_path, exist_ok=True)
         
         helm_file = f'{assets_path}{file_name}.md'
@@ -629,7 +723,10 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
             else:
                 swapped_lines.append(line)
         content = '\n'.join(swapped_lines)
-        
+
+        # Rewrite any known-broken links restored from upstream values.yaml comments.
+        content = _apply_link_fixups(content)
+
         with open(helm_file, 'w', encoding='utf-8') as f:
             f.write(content)
         
@@ -644,7 +741,7 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
     '''Generate control plane metrics documentation'''
     print(f'  → Generating metrics docs for version {version}')
     
-    os.makedirs(f'assets/docs/snippets/{link_version}', exist_ok=True)
+    os.makedirs(f'assets/kgw-docs/snippets/{link_version}', exist_ok=True)
     
     # Check if metrics tool exists
     metrics_tool_path = f'{kgateway_dir}/pkg/metrics/cmd/findmetrics/main.go'
@@ -658,10 +755,12 @@ def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgatewa
         '--markdown', f'./{kgateway_dir}'
     ], capture_output=True, text=True, check=True)
     
-    with open(f'assets/docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
-        f.write(result.stdout)
+    metrics_content = _apply_link_fixups(result.stdout)
+
+    with open(f'assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
+        f.write(metrics_content)
     
-    print(f'    ✓ Generated metrics docs in assets/docs/snippets/{link_version}/metrics-control-plane.md')
+    print(f'    ✓ Generated metrics docs in assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md')
     return True
 
 
@@ -762,7 +861,7 @@ def main():
             print(f'   ⚠ Metrics docs failed: {e}')
         
         # Clean up repository after processing this version
-        subprocess.run(['rm', '-rf', 'kgateway'], check=True)
+        safe_rmtree('kgateway')
         
         print(f'✅ Completed version {version} - generated {success_count}/3 doc types')
     

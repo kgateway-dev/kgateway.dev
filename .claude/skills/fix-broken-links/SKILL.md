@@ -50,16 +50,16 @@ cat versions.json
 
 ### Shared content
 
-Shared content lives in `assets/docs/`:
+Shared content lives in `assets/kgw-docs/`:
 
-- **`assets/docs/pages/`** — Full page bodies reused across versions via `{{</* reuse "docs/pages/..." */>}}`
-- **`assets/docs/snippets/`** — Smaller fragments reused via `{{</* reuse "docs/snippets/..." */>}}`
+- **`assets/kgw-docs/pages/`** — Full page bodies reused across versions via `{{</* reuse "kgw-docs/pages/..." */>}}`
+- **`assets/kgw-docs/snippets/`** — Smaller fragments reused via `{{</* reuse "kgw-docs/snippets/..." */>}}`
 
 **Always edit the shared file, not the thin content wrapper.** Editing the shared file fixes all versions that reuse it.
 
 ### Enterprise docs sharing
 
-This repo is imported as a Hugo module by `solo-io/docs` (the enterprise kgateway docs). Shared assets under `assets/docs/` are consumed by both sites. When fixing links in shared assets, verify that:
+This repo is imported as a Hugo module by `solo-io/docs` (the enterprise kgateway docs). Shared assets under `assets/kgw-docs/` are consumed by both sites. When fixing links in shared assets, verify that:
 
 - The target page exists on both OSS (kgateway.dev) and enterprise (docs.solo.io/kgateway)
 - If the page only exists on one site, use version or conditional-text shortcodes to gate the link
@@ -182,7 +182,7 @@ Configuration: `scripts/crd-ref-docs-config.yaml`
 | Generated file | Upstream source | Generator |
 |---|---|---|
 | `content/docs/envoy/{version}/reference/api.md` (inline) | `kgateway-dev/kgateway` `api/v1alpha1/kgateway/` | `crd-ref-docs` + `generate-shared-types.py` |
-| `assets/docs/pages/reference/helm/{version}/kgateway.md` | `kgateway-dev/kgateway` `install/helm/kgateway/values.yaml` | `helm-docs` |
+| `assets/kgw-docs/pages/reference/helm/{version}/kgateway.md` | `kgateway-dev/kgateway` `install/helm/kgateway/values.yaml` | `helm-docs` |
 
 #### How to fix broken links in reference content
 
@@ -243,7 +243,7 @@ Before diving into individual fixes, check for these patterns that explain many 
 
 ## Making edits
 
-- Edit **shared files** (`assets/docs/pages/` or `assets/docs/snippets/`) when the content wrapper is a reuse.
+- Edit **shared files** (`assets/kgw-docs/pages/` or `assets/kgw-docs/snippets/`) when the content wrapper is a reuse.
 - Edit **content files** only when version-specific.
 - Use `version` shortcode conditionals for cross-version path differences. Always use TOML version values from `versions.json`, never `linkVersion` values like `latest` or `main`.
 - For blog posts, use direct absolute links (`/docs/envoy/latest/...`), never `link-hextra`.

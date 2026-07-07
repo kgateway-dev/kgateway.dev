@@ -8,4 +8,4 @@ next: /docs/quickstart
 prev: /docs/reference
 ---
 
-{{< reuse "docs/pages/faqs.md" >}}
+{{< reuse "kgw-docs/pages/faqs.md" >}}

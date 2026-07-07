@@ -14,6 +14,7 @@ const disabledCss = {
 }
 
 module.exports = {
+    darkMode: 'class',
     content: [
         `${themeDir}/hugo_stats.json`,
     ],

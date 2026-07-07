@@ -3,4 +3,4 @@ title: HTTPS
 weight: 10
 ---
 
-{{< reuse "docs/pages/setup/listeners/https.md" >}}
+{{< reuse "kgw-docs/pages/setup/listeners/https.md" >}}

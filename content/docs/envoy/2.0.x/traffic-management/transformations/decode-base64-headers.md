@@ -15,7 +15,7 @@ Combine multiple Inja functions to accomplish the following tasks:
 
 ## Before you begin
 
-{{< reuse "docs/snippets/prereq.md" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 ## Decode base64 headers
 
@@ -29,12 +29,12 @@ Combine multiple Inja functions to accomplish the following tasks:
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-2. Create a {{< reuse "docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "docs/snippets/trafficpolicy.md" >}}
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    metadata:
      name: transformation
      namespace: httpbin
@@ -53,15 +53,15 @@ Combine multiple Inja functions to accomplish the following tasks:
 
 3. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2"  >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers \
     -H "host: www.example.com:8080" \
     -H "x-base64-encoded: dHJhbnNmb3JtYXRpb24gdGVzdA==" 
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi localhost:8080/response-headers \
    -H "host: www.example.com" \
@@ -97,8 +97,8 @@ Combine multiple Inja functions to accomplish the following tasks:
    
 ## Cleanup
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} transformation -n httpbin
 ```

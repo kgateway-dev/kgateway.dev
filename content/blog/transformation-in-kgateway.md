@@ -8,7 +8,7 @@ excludeSearch: true
 
 Transformations are a feature in kgateway that allows for the transformation of an incoming request or outgoing response. It offers the addition, removal, or replacement of HTTP headers and the manipulation of request or response body.
 
-While the Kubernetes Gateway API provides [filters for request and response header modifiers](https://gateway-api.sigs.k8s.io/guides/http-header-modifier/), those filters are scoped to the manipulation of headers only, and provide only rudimentary capabilities such as adding, removing or updating headers with static values supplied as strings.
+While the Kubernetes Gateway API provides [filters for request and response header modifiers](https://gateway-api.sigs.k8s.io/guides/user-guides/http-header-modifier/), those filters are scoped to the manipulation of headers only, and provide only rudimentary capabilities such as adding, removing or updating headers with static values supplied as strings.
 
 Transformations are more powerful in that the value of the body or header is an [inja template](https://github.com/pantor/inja), which loosely adheres to the [jinja2 template engine syntax](https://jinja.palletsprojects.com/en/stable/).
 
@@ -18,7 +18,7 @@ Through transformations, kgateway gives us access to an expression language, whi
 
 Transformations are configured with the [TrafficPolicy](https://kgateway.dev/docs/envoy/latest/reference/api/#trafficpolicy) resource and can be applied to either the request or the response, or both.
 
-The TrafficPolicy resource in turn is associated to select HTTP requests through the `targetRefs` field, which can point to an [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/spec/#httproute). The HTTPRoute routing rule's [matches field](https://gateway-api.sigs.k8s.io/reference/spec/#httproutematch) can target specific requests based on various request attributes including path, headers, query parameters, and the HTTP method.
+The TrafficPolicy resource in turn is associated to select HTTP requests through the `targetRefs` field, which can point to an [HTTPRoute](https://gateway-api.sigs.k8s.io/reference/api-spec/#httproute). The HTTPRoute routing rule's [matches field](https://gateway-api.sigs.k8s.io/reference/api-spec/#httproutematch) can target specific requests based on various request attributes including path, headers, query parameters, and the HTTP method.
 
 Let's study some examples.
 

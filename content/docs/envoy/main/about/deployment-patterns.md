@@ -4,4 +4,4 @@ description: Compare single-gateway, sharded, and service-mesh deployment patter
 weight: 20
 ---
 
-{{< reuse "docs/pages/about/deployment-patterns.md" >}}
+{{< reuse "kgw-docs/pages/about/deployment-patterns.md" >}}

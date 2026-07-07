@@ -4,6 +4,6 @@ description: Front your gateway with AWS Application or Network Load Balancers f
 weight: 20
 ---
 
-{{< reuse "docs/snippets/aws-alb-nlb.md" >}}
+{{< reuse "kgw-docs/snippets/aws-alb-nlb.md" >}}
 
 To get started, choose one of the following guides.

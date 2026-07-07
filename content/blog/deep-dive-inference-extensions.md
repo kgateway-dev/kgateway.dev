@@ -1,5 +1,6 @@
 ---
 title: Deep Dive into the Gateway API Inference Extension
+draft: true
 toc: false
 publishDate: 2025-04-01T00:00:00-00:00
 author: Christian Posta
@@ -23,7 +24,7 @@ That's exactly what the [Gateway API Inference Extension](https://gateway-api-in
 The Gateway API Inference Extension introduces two new Custom Resource Definitions (CRDs): InferenceModel and InferencePool. By using these two new resources, along with the endpoint picker, the L7 routing infrastructure becomes an “Inference Gateway” enabling you to  
 self-host GenAI/LLMs with a “model-as-a-service” mindset.
 
-The [InferenceModel CRD](https://gateway-api-inference-extension.sigs.k8s.io/api-types/inferencemodel/) is designed for AI engineers, allowing them to define logical model inference endpoints. It maps user-facing model names to backend models and provides flexibility for traffic splitting between fine-tuned adapters. For example, maybe you want to expose a model named `llama2` to clients, but the backend models may be named `vllm-llama2-7b-2024-11-20` or `vllm-llama2-7b-2024-12-10`.  Using an InferenceModel, you can do that and split traffic among those models. Maybe you want to introduce a newer model such as `vllm-llama2-7b-2025-03-24`.
+The [InferenceModel CRD](https://gateway-api-inference-extension.sigs.k8s.io/reference/spec/) is designed for AI engineers, allowing them to define logical model inference endpoints. It maps user-facing model names to backend models and provides flexibility for traffic splitting between fine-tuned adapters. For example, maybe you want to expose a model named `llama2` to clients, but the backend models may be named `vllm-llama2-7b-2024-11-20` or `vllm-llama2-7b-2024-12-10`.  Using an InferenceModel, you can do that and split traffic among those models. Maybe you want to introduce a newer model such as `vllm-llama2-7b-2025-03-24`.
 
 ```yaml
 apiVersion: inference.networking.x-k8s.io/v1alpha2
