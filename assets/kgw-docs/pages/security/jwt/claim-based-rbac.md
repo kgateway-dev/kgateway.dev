@@ -1,4 +1,4 @@
-Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/google/cel-spec) expressions to allow or deny requests based on the claims in a verified JWT. The JWT filter writes the verified token payload to Envoy dynamic metadata, and your CEL expressions read the claims from that metadata. Because the rules depend on a verified token, configure `rbac` together with `jwtAuth` in the same {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
+Use an `rbac` policy with [Common Expression Language (CEL)](https://github.com/cel-expr/cel-spec) expressions to allow or deny requests based on the claims in a verified JWT. The JWT filter writes the verified token payload to Envoy dynamic metadata, and your CEL expressions read the claims from that metadata. Because the rules depend on a verified token, configure `rbac` together with `jwtAuth` in the same {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 
 ## Before you begin
 
