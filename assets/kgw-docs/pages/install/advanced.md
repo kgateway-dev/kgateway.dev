@@ -148,7 +148,7 @@ For more information about transformation engines, see [Transformation engines](
 
 ## ReferenceGrant enforcement modes
 
-The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted. {{< reuse "kgw-docs/snippets/kgateway.md" >}} supports three enforcement modes that you set with the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane, such as with the following example.
+The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted. {{< reuse "kgw-docs/snippets/kgateway.md" >}} supports three enforcement modes that you set with the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane, such as with the following example.
 
 ```yaml
 
