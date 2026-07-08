@@ -120,7 +120,7 @@ rbac:
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['team'] == 'dev'"
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['sub'] == 'alice'"
 ```
-For nested claims extraction, see the [JWT claim extraction guide](../jwt-claim-extraction/#nested-claims).
+{{< version exclude-if="2.2.x,2.1.x" >}}For nested claims extraction, see the [JWT claim extraction guide]({{< link-hextra path="/security/jwt/jwt-claim-extraction/#extracting-nested-claims" >}}).{{< /version >}}
 
 ### Match an OAuth scope {#scope}
 
