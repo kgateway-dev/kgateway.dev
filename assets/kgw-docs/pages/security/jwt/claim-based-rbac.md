@@ -120,16 +120,7 @@ rbac:
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['team'] == 'dev'"
       - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['sub'] == 'alice'"
 ```
-
-To require multiple conditions in a single rule instead (AND logic), combine them in one expression with `&&`. The following policy allows a request only when the JWT contains the `team=dev` and `org=solo.io` claims.
-
-```yaml
-rbac:
-  action: Allow
-  policy:
-    matchExpressions:
-      - "metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['team'] == 'dev' && metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['org'] == 'solo.io'"
-```
+For nested claims extraction, see the [JWT claim extraction guide](../jwt-claim-extraction/#nested-claims).
 
 ### Match an OAuth scope {#scope}
 
