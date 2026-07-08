@@ -80,14 +80,15 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    Jwt is missing
    ```
 
-   {{< callout type="warning" >}}
-   **Got a `200 OK` instead?** The controller silently ignores {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that target a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
-   ```sh
-   kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
-   kubectl get gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
-   ```
-   Both resources must show an `Accepted` condition. If either has no status at all, the resource could be in the wrong namespace.
-   {{< /callout >}}
+   > [!WARNING]
+   > **Got a `200 OK` instead?** The controller silently ignores {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that target a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
+   >
+   > ```sh
+   > kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
+   > kubectl get gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
+   > ```
+   >
+   > Both resources must show an `Accepted` condition. If either has no status at all, the resource could be in the wrong namespace.
 
 4. Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the GatewayExtension resource and can be successfully validated by the gateway proxy.
 
