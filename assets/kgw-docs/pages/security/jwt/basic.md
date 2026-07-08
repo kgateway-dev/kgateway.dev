@@ -93,21 +93,20 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
 4. Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the GatewayExtension resource and can be successfully validated by the gateway proxy.
 
    <!-- Example token generated from https://jwt.io using RS256 with the following payload:
-{
-  "iss": "kgateway.dev",
-  "org": "kgateway.dev",
-  "sub": "alice",
-  "team": "dev",
-  "exp": 2074274884,
-  "llms": {
-    "openai": [
-      "gpt-3.5-turbo"
-    ]
-  }
-}
-
-To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"kgateway-public-key-001"}, paste the private key from private-key.pem, and encode.
--->
+   {
+     "iss": "kgateway.dev",
+     "org": "kgateway.dev",
+     "sub": "alice",
+     "team": "dev",
+     "exp": 2074274884,
+     "llms": {
+       "openai": [
+         "gpt-3.5-turbo"
+       ]
+     }
+   }
+   To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"kgateway-public-key-001"}, paste the private key from private-key.pem, and encode.
+   -->
 
    ```sh
    export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtnYXRld2F5LXB1YmxpYy1rZXktMDAxIn0.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.YCxMm0TmecXsbcbNp6_GXlq5hCFGMD7KhLdOrp3EqzOKl_NX5vm6sNCMNSq5LjbCSKGThn66fnI4P6rlXke7w5kj8khIXQwDn7R0Dy5QOpLAFyE7pk8QGAjkgEGu37bxht5VjbsORdmrfxep1MTy3UEqef60Zwxwt3UtG5KmnsyyedmsCeodPNiNfuhA43r4KahpYg9cIMAnU_Wg-52ztwtqbrVRGxmoj6Efply4FE0xSKhKJZhulViriXR5K2y4zSdxenKvprO46u2ZSka7nq9ehpw_Oqhcwezw7So3lV_xpohiFz_-PGX97TXR1zi0ATjjp7VFxhkbggk8nEEFkQ
