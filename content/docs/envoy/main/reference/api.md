@@ -2138,7 +2138,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
 | `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
-| `responseHeadersToCopy` _[HTTPHeaderName](#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
+| `responseHeadersToCopy` _[HTTPHeaderName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `maxRedirects` _[uint32](#uint32)_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
 
 
