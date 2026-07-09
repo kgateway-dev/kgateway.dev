@@ -2,6 +2,10 @@ By default, the OAuth2 provider uses the same `backendRef` for both the OAuth2 t
 
 The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate backend for fetching JWKS, enabling more flexible network routing and certificate management.
 
+## Prerequisites
+
+Before using this feature, ensure you have completed the [OAuth2/OIDC integration guide]({{< versioned_link_path fromRoot="/security/extauth/oauth2/" >}}).
+
 ## When to use a separate JWKS backend
 
 - When the JWKS endpoint is on a different domain than the token endpoint

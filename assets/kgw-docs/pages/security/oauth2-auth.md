@@ -513,6 +513,9 @@ spec:
 EOF
 ```
 
+## Advanced: Separate JWKS backend
+
+For scenarios where your JWKS endpoint is on a different domain than your token endpoint (e.g., Amazon Cognito), see the [two-backends OAuth page]({{< versioned_link_path fromRoot="/security/oauth2/two-backends/" >}}).
 
 ## Cleanup
 
