@@ -112,19 +112,12 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
 kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-auth-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete gatewayextension jwt-provider -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
-
 ## Advanced usage
-
-### Extracting nested claims
-
-If your JWT has nested claims (e.g., inside a `profile` object), you can use dot notation to reach them.
-
-```yaml
-claimsToHeaders:
-  - name: "profile.given_name"
-    header: "X-First-Name"
-```
 
 ### Overwriting vs. Appending
 
 By default, if the client sends a header with the same name as one of your extracted claims (e.g., a malicious client sending their own `X-User-ID` header), kgateway will **overwrite** the client's header with the verified value from the JWT. This ensures that your backend can trust the value in these headers.
+
+### Extracting nested claims
+
+For instructions on extracting nested claims using dot notation, see the [nested claims section](../simple/claim-based-rbac/#nested-claims).
