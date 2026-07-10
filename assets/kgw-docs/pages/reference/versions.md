@@ -4,8 +4,8 @@ Review the following information about released versions for kgateway.
 
 | Kgateway | Release date | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
 |----------|--------------|------------|----------------|-------|------|----------|
-{{% version include-if="2.4.x" %}}| 2.4.x | TBD | 1.32 - 1.36 | 1.4 - 1.6 | Proxy 1.38, API v3 | >= 3.12 | 1.23 - 1.30 |
-{{% /version %}}| 2.3.x | 19 May 2026 | 1.31 - 1.35 | 1.3 - 1.5 | Proxy 1.37, API v3 | >= 3.12 | 1.23 - 1.27 |
+| 2.4.x | TBD | 1.32 - 1.36 | 1.4 - 1.6 | Proxy 1.38, API v3 | >= 3.12 | 1.23 - 1.30 |
+| 2.3.x | 19 May 2026 | 1.31 - 1.35 | 1.3 - 1.5 | Proxy 1.37, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.2.x | 09 Feb 2026 | 1.31 - 1.35 | 1.2 - 1.4 | Proxy 1.36, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.2 - 1.4 | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.0.x | 01 Apr 2025 | 1.27 - 1.31 | 1.2 | Proxy 1.34, API v3 | >= 3.12 | 1.18 - 1.23 |
