@@ -526,6 +526,8 @@ For claim-based access control with a CEL `rbac` policy, see [Restrict access wi
 
 The `disable` field lets you turn off JWT authentication at a higher policy level. This is useful when you want to override a JWT policy applied at the Gateway level for a specific HTTPRoute.
 
+In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+
 **Example:**
 
 ```yaml
@@ -544,7 +546,6 @@ spec:
     disable: {}
 EOF
 ```
-In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
 
 ### asyncFetch {#async-fetch}
 
@@ -553,7 +554,7 @@ When using a remote JWKS, you can configure `asyncFetch` to control how the gate
 For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
 
 {{< callout type="info" >}}
-**Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` (see below) controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
+**Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
 {{< /callout >}}
 
 **Example:**
@@ -613,7 +614,7 @@ spec:
 EOF
 ```
 
-### Recommendations {#recommendations}
+### When to use advanced settings {#recommendations}
 
 In most cases, you do not need to configure `retryPolicy` or `asyncFetch`. The defaults are intended to work for typical JWKS endpoints.
 
