@@ -546,6 +546,55 @@ spec:
     disable: {}
 EOF
 ```
+**Send a request without a JWT to verify it's blocked:**
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output (before disabling):
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
+
+After applying the disable policy, the same request returns 200 OK because JWT authentication is disabled for that route.
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output (after disabling):
+
+```text
+< HTTP/1.1 200 OK
+```
 
 ### asyncFetch {#async-fetch}
 
