@@ -4,4 +4,4 @@ weight: 10
 description: Configure OAuth2/OIDC authentication with a dedicated backend for JWKS fetching.
 ---
 
-{{< reuse "docs/pages/security/oauth/two-backends.md" >}}
+{{< reuse "kgw-docs/pages/security/oauth/two-backends.md" >}}
