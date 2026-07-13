@@ -1,4 +1,3 @@
-
 Use this guide to protect an HTTPRoute with Keycloak as an OIDC provider. kgateway handles the OAuth2 authorization code flow: unauthenticated browser requests get redirected to Keycloak, the code is exchanged for tokens, and those tokens are stored in session cookies. Your upstream service doesn't need to know any of this happened.
 
 You need three resources: a `Backend` pointing at your Keycloak host, a `GatewayExtension` to configure the OAuth2 provider, and a `TrafficPolicy` to attach it to a route.
@@ -7,16 +6,148 @@ You need three resources: a `Backend` pointing at your Keycloak host, a `Gateway
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
-4. A running Keycloak instance with a configured realm and OIDC client. At minimum, set the following on the Keycloak client:
+## Install Keycloak
 
-   | Setting | Value |
-   |---|---|
-   | **Client ID** | Any name, you will reference it in the `GatewayExtension` |
-   | **Client authentication** | On (this makes it a confidential client with a secret) |
-   | **Valid redirect URIs** | `https://GATEWAY_HOST/oauth2/redirect` |
-   | **Web origins** | `https://GATEWAY_HOST` |
+Deploy Keycloak in your cluster. The following example creates a Keycloak instance with admin credentials `admin/admin` for testing.
 
-   The redirect URI path is `/oauth2/redirect`, which is the default callback path that kgateway registers. You can override it with `redirectURI` in the `GatewayExtension` if needed.
+### Option A: Using YAML (recommended for testing)
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: keycloak
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  selector:
+    app: keycloak
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+        - name: keycloak
+          image: quay.io/keycloak/keycloak:22.0
+          args: ["start-dev"]
+          env:
+            - name: KEYCLOAK_ADMIN
+              value: "admin"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: "admin"
+          ports:
+            - name: http
+              containerPort: 8080
+EOF
+```
+
+### Option B: Using Helm (recommended for production)
+
+```sh
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm install keycloak bitnami/keycloak \
+  --namespace keycloak \
+  --create-namespace \
+  --set auth.adminUser=admin \
+  --set auth.adminPassword=admin \
+  --set service.type=ClusterIP \
+  --set service.ports.http=8080
+```
+
+Wait for Keycloak to be ready:
+
+```sh
+kubectl rollout status deployment/keycloak -n keycloak
+```
+
+## Configure Keycloak
+
+Access the Keycloak admin console:
+
+```sh
+kubectl port-forward svc/keycloak -n keycloak 8080:8080
+```
+
+1. Open `http://localhost:8080` in your browser
+
+2. Log in with username `admin` and password `admin`
+
+{{< reuse-image src="img/keycloak/keycloak-login.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/keycloak-login.png" >}}
+
+3. Create a new realm:
+   - Click **Add realm** from the realm dropdown (top-left)
+   - Enter a realm name (e.g., `myrealm`)
+   - Click **Create**
+
+{{< reuse-image src="img/keycloak/realm-creation.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/realm-creation.png" >}}
+
+4. Create a client:
+   - Click **Clients** in the left sidebar
+   - Click **Create client**
+   - Set **Client ID** (e.g., `kgateway-client`)
+
+{{< reuse-image src="img/keycloak/client-creation.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/client-creation.png" >}}
+
+   - Enable **Client authentication**
+   - Click **Next**
+   - In **Valid redirect URIs**, add `https://GATEWAY_HOST/oauth2/redirect`
+
+{{< reuse-image src="img/keycloak/client-redirect-uri.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/client-redirect-uri.png" >}}
+
+   - Click **Save**
+
+5. Note the client secret:
+   - Go to the **Credentials** tab of your client
+   - Copy the **Client secret** — you will need it for the `oauth2-client-secret` in the next section
+
+{{< reuse-image src="img/keycloak/client-secret.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/client-secret.png" >}}
+
+6. Create a test user:
+   - Click **Users** in the left sidebar
+   - Click **Add user**
+   - Set **Username** (e.g., `testuser`)
+   - Click **Create**
+   - Go to the **Credentials** tab
+   - Set a password (e.g., `password`)
+   - Turn **Temporary** off
+   - Click **Set Password**
+
+{{< reuse-image src="img/keycloak/user-password.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/user-password.png" >}}
+
+{{< reuse-image src="img/keycloak/user-created.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/user-created.png" >}}
+
+{{< callout type="info" >}}
+For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the default `master` realm for testing only.
+{{< /callout >}}
 
 ## Store the client secret {#store-credentials}
 
@@ -97,7 +228,9 @@ Field notes:
 
 Create a `TrafficPolicy` that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
 
-> **Note:** The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair the OAuth2 filter with a `CSRFPolicy` on the same route, especially for browser-facing apps.
+{{< callout type="warning" >}}
+The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair the OAuth2 filter with a `CSRFPolicy` on the same route, especially for browser-facing apps.
+{{< /callout >}}
 
 ```yaml
 kubectl apply -f- <<EOF
