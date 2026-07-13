@@ -41,8 +41,4 @@ The JWT signature is used to verify the token's integrity and authenticity. The 
 
 ### JWT processing order {#processing-order}
 
-In kgateway OSS, JWT validation runs **before** external authentication by default. The gateway validates the JWT signature and extracts claims before any external auth policy is applied. This order is fixed and not configurable in OSS.
-
-{{< callout type="info" >}}
-**Note:** The `beforeExtAuth` and `afterExtAuth` staging options are available only in [Enterprise kgateway](https://docs.solo.io/kgateway/2.1.x/security/jwt/staging/). In OSS, the order is fixed.
-{{< /callout >}}
+In kgateway, JWT validation runs **before** external authentication by default. The gateway validates the JWT signature and extracts claims before any external auth policy is applied. This order is fixed and not currently configurable.
