@@ -12,6 +12,8 @@ Deploy Keycloak in your cluster. The following example creates a Keycloak instan
 
 ### Option A: Using YAML (recommended for testing)
 
+This option deploys Keycloak using a single Kubernetes manifest that creates a Namespace, Service, and Deployment. It is ideal for testing and development because it's quick to apply and doesn't require Helm. However, it's not recommended for production because it uses the `start-dev` mode, which is not secure for production environments.
+
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: v1
@@ -63,6 +65,8 @@ EOF
 ```
 
 ### Option B: Using Helm (recommended for production)
+
+This option deploys Keycloak using the Bitnami Helm chart, which provides better configuration management, easier upgrades, and production-ready defaults. It is recommended for production environments because it supports advanced settings like persistent storage, TLS, and custom resource limits.
 
 ```sh
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -163,7 +167,8 @@ Grab `YOUR_CLIENT_SECRET` from the **Credentials** tab of your Keycloak client.
 
 ## Create a Backend for Keycloak {#create-backend}
 
-kgateway needs a `Backend` resource to reach the Keycloak host. This is what `backendRef` in the `GatewayExtension` points to.
+The following Backend resources defines how kgateway reaches the Cognito endpoints. The first Backend points to the token endpoint, and the second points to the JWKS endpoint. Both use the `Static` type with the host and port configured for Amazon Cognito.
+
 
 ```yaml
 kubectl apply -f- <<EOF
