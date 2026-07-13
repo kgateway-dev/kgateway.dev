@@ -19,6 +19,11 @@ brand   = "oss"
 builtRoot = "./public"
 baseURL   = "/"
 
+# Hugo build log for hugo-warnings.spec. The Makefile targets and the CI build
+# step write the Hugo build output here; the spec scans it for ERROR / WARN
+# lines (filtered by [allowlists].hugoWarnings).
+buildLog  = "./.build.log"
+
 # Source-tree roots for author-side lints (curl-quotes scans markdown
 # directly). Narrowed to docs content so the lint doesn't trip on blog
 # posts and marketing copy that follow looser conventions.

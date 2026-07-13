@@ -13,6 +13,11 @@ name: Framework tests
 on:
   pull_request:
     paths:
+      # Content — so the `content` scanners run on content-only PRs.
+      - 'content/**'
+      - 'assets/conrefs/**'
+      - 'assets/kgw-docs/**'
+      # Layout / build inputs.
       - 'layouts/**'
       - 'static/**'
       - 'assets/css/**'
@@ -26,7 +31,7 @@ on:
 
 jobs:
   framework-test-static:
-    name: Static checks
+    name: Static + content checks
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
@@ -92,18 +97,20 @@ jobs:
           # but isn't installed by default in this runner. Mirror the
           # install pattern from links.yml so Hugo can find it via npx.
           npm i -D postcss postcss-cli autoprefixer
-          hugo --gc --minify
+          # Capture the build log so hugo-warnings.spec can scan it for ERROR /
+          # WARN lines; surface it and fail if the build itself fails.
+          hugo --gc --minify > .build.log 2>&1 || { cat .build.log; exit 1; }
 
       - name: Install harness dependencies
         working-directory: docs-theme-extras
         run: npm ci
 
-      - name: Run static specs
+      - name: Run static + content specs
         working-directory: docs-theme-extras
         env:
           DOCS_TEST_CONFIG: ${{ github.workspace }}/.docs-test.toml
         run: |
-          npx playwright test --project=static --reporter=list,html 2>&1 | tee playwright-output.txt
+          npx playwright test --project=static --project=content --reporter=list,html 2>&1 | tee playwright-output.txt
 
       - name: Append summary to PR check
         if: always()
