@@ -4,7 +4,7 @@ The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate back
 
 ## Prerequisites
 
-Before using this feature, ensure you have completed the [OAuth2/OIDC integration guide]({{< versioned_link_path fromRoot="/security/extauth/oauth2/" >}}).
+Before using this feature, ensure you have completed the [OAuth2/OIDC integration guide](/docs/envoy/latest/security/extauth/oauth2/).
 
 ## When to use a separate JWKS backend
 
