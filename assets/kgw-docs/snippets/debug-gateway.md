@@ -1,6 +1,6 @@
 1. Make sure that the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane and gateway proxies are running. For any pod that is not running, describe the pod for more details.
    
-   ```she
+   ```sh
    kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
    

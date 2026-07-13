@@ -33,13 +33,6 @@ scanRoots = [
 versionFromPath = "^/docs/(?:envoy|agentgateway)/(?<version>[^/]+)/"
 versions        = ["main", "latest", "2.2.x", "2.1.x", "2.0.x"]
 
-# All checks default to enabled. Turn off the slow / opt-in projects.
-[checks]
-# Smoke is for cross-product runs (SMOKE_PRODUCT env); kgateway is a
-# single site, so skip.
-smoke        = false
-crossBrowser = false
-
 # Allowlists for known-benign noise that surfaces against real product
 # content (test fixture has none of this). Tighten as content is fixed.
 [allowlists]
