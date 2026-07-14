@@ -50,14 +50,15 @@ hugoWarnings = [
 # (as a RegExp) against the full error string; for uncaught exceptions the
 # string includes the stack, so a pattern can be scoped to the source file.
 consoleErrors = [
-  # Hextra's vendored js/main.min.<hash>.js wires the sidebar/hamburger on
-  # EVERY page at DOMContentLoaded and calls `.hextra-sidebar-container`
-  # .removeAttribute("aria-hidden") without a null guard. On the ~70 pages
-  # with no docs sidebar (homepage, /blog/ + posts, /docs/ landing, resources,
-  # learn, marketing) it throws "Cannot read properties of null (reading
-  # 'removeAttribute')". Not fixable in docs-theme-extras (it's the minified
-  # upstream bundle). Scoped to the message AND the Hextra bundle filename via
-  # the stack frame, so it cannot mask a removeAttribute error from our own or
-  # the theme's JS. Versioned docs pages have the sidebar and are unaffected.
-  "reading 'removeAttribute'\\)[\\s\\S]*main\\.min\\.[0-9a-f]+\\.js",
+  # NOTE: the former "reading 'removeAttribute' ... main.min.<hash>.js" entry is
+  # gone. It suppressed a Hextra core/menu.js null-deref on the non-sidebar pages
+  # (homepage, /blog/ + posts, /docs/ landing, marketing): menu.js queries
+  # `.hextra-sidebar-container` / `.hextra-hamburger-menu` at DOMContentLoaded
+  # with no null guard. docs-theme-extras' docs-init.js now runs a top-level
+  # guard (during deferred execution, before DOMContentLoaded) that injects
+  # hidden stand-ins when those elements are absent, so menu.js finds them and
+  # never throws. Verified by the browser console-errors crawl (all non-sidebar
+  # pages pass with no allowlist), so there is nothing left to suppress. The
+  # guard wins even though Hextra's main.min.js loads before docs-init.js in the
+  # <head>, because menu.js only touches the DOM in its DOMContentLoaded handler.
 ]
