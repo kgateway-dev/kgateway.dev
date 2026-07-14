@@ -38,3 +38,7 @@ JWT parts are structured as follows:
 ### JWT verification {#verification}
 
 The JWT signature is used to verify the token's integrity and authenticity. The signature is typically created by using asymmetric encryption with a private and public key. The JWT token is signed by using the private key. To verify the token, a public key is used. The public key can be shared and distributed because it cannot be used to sign new JWTs.
+
+### JWT processing order {#processing-order}
+
+In kgateway, JWT validation runs **before** external authentication by default. The gateway validates the JWT signature and extracts claims before any external auth policy is applied. This order is fixed and not currently configurable.
