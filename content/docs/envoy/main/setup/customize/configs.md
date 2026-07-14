@@ -1,7 +1,7 @@
 ---
-title: Overlay examples
+title: Advanced customization examples
 weight: 40
-description: Common overlay configuration examples for HPA, VPA, PDB, and extension overlays.
+description: Configure HPA, VPA, PDB, OpenShift security contexts, and advanced Deployment overlays.
 ---
 
 {{< reuse "kgw-docs/pages/setup/customize/configs.md" >}}
