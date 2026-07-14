@@ -79,6 +79,13 @@ kubectl apply -f cognito-jwks-backend.yaml
 
 ## Example: Amazon Cognito
 
+The following example shows how to configure `jwksBackendRef` for Amazon Cognito. For more information on setting up Cognito as an OIDC provider, see the [Amazon Cognito documentation](https://docs.aws.amazon.com/cognito/).
+
+The fields in the example come from your Cognito user pool configuration:
+- **jwksURI**: `https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json`
+- **tokenEndpoint**: `https://cognito-idp.<region>.amazonaws.com/oauth2/token`
+- **authorizationEndpoint**: `https://cognito-idp.<region>.amazonaws.com/oauth2/authorize`
+
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
@@ -109,7 +116,6 @@ spec:
         audiences:
           - your-client-id
 ```
-
 
 ### Backend Definitions
 
