@@ -274,6 +274,38 @@ For more information, see [Limit request header count]({{< link-hextra path="/tr
 You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
 
 For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
+
+#### Exclude ServiceEntries from discovery {#v23-serviceentry-exclusion}
+
+You can now exclude specific Istio `ServiceEntry` resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any `ServiceEntry` that matches a selector is ignored during the backend and endpoint discovery phase.
+
+A ServiceEntry is excluded if it matches any entry in the list (`OR` condition). Within each entry, all `matchLabels` and `matchExpressions` conditions must hold for the ServiceEntry to be excluded (`AND` condition). Empty entries are rejected to prevent excluding all ServiceEntries.
+
+The following example shows multiple `matchLabel` entries. ServiceEntries are excluded if they have both `example.io/source: generated` and `example.io/source-kind: ExternalService` labels (`AND` condition), or the `env: staging` label (`OR` condition).
+
+```yaml
+serviceEntriesExclusionLabelSelectors:
+  # Exclude entries that have both labels (AND within an entry)
+  - matchLabels:
+      example.io/source: generated
+      example.io/source-kind: ExternalService
+  # Also exclude entries in staging (OR across entries)
+  - matchLabels:
+      env: staging
+```
+
+#### xDS first-connect grace period {#v23-xds-first-connect-delay}
+
+By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This gives per-client translation time to converge and prevents newly started gateway pods from receiving incomplete configuration after a controller restart.
+
+You can adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller. The value is a Go duration string, for example `2s`. Set it to `0` to disable the grace period entirely.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_XDS_FIRST_CONNECT_DELAY: "2s"
+```
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

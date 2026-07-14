@@ -270,6 +270,59 @@ The following example uses Keycloak as the identity provider.
 
    For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
 
+{{< version include-if="2.4.x" >}}
+
+#### Async JWKS fetch {#async-fetch}
+
+By default, the gateway fetches the JWKS synchronously during request handling. If the JWKS server is slow or temporarily unavailable, JWT validation can fail. You can configure the gateway proxy to fetch and cache the JWKS asynchronously in the background instead by using the `asyncFetch` field.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    asyncFetch:
+      fastListener: true
+      failedRefetchDuration: 10s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `asyncFetch.fastListener` | If `true`, the listener starts serving traffic immediately without waiting for the first JWKS fetch to complete. If `false` or unset, the listener waits for the initial fetch before accepting requests, so tokens are never validated against an empty key set. |
+| `asyncFetch.failedRefetchDuration` | How long to wait before retrying after a failed JWKS fetch. Accepts Go duration strings such as `500ms` or `10s`. If unset, Envoy defaults to `1s`. |
+
+
+#### JWKS retry policy {#jwks-retry-policy}
+
+You can configure exponential backoff retries when the JWKS server is unavailable by using the `retryPolicy` field.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    retryPolicy:
+      numRetries: 3
+      backOff:
+        baseInterval: 1s
+        maxInterval: 30s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `retryPolicy.numRetries` | Number of retry attempts when the JWKS fetch fails. Must be at least `1`. Defaults to `1` if unset. |
+| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. |
+| `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
+
+{{< /version >}}
+
+
 ### JWT validation modes {#jwt-validation}
 
 The `validationMode` field in `spec.jwt` controls whether requests without a JWT are allowed. To change the mode, reapply the GatewayExtension that you created earlier with the updated `validationMode` value.

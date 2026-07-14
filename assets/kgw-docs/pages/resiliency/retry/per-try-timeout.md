@@ -231,7 +231,7 @@ Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try t
       curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
       ```
 
-   3. Open the config dump and find the route configuration for the `kube_default_reviews_9080` Envoy cluster on the `listener~8080~retry_example` virtual host. Verify that the retry policy is set as you configured it.
+   3. Open the config dump and find the route configuration for the `kube_httpbin_httpbin_8000` Envoy cluster on the `listener~8080~retry_example` virtual host. Verify that the retry policy is set as you configured it.
       
       Example `jq` command:
       ```sh
