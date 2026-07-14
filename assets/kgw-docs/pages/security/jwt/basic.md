@@ -532,7 +532,7 @@ In this example, any JWT policy applied at the Gateway level is disabled for the
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
+apiVersion: apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: jwt-disable
