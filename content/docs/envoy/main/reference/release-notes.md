@@ -126,6 +126,12 @@ You can now configure zone-aware routing for backend services by using the `load
 
 For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
 
+#### Cookie value retrieval functions in transformations {#v24-get-cookie}
+
+You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
+
+For more information, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
