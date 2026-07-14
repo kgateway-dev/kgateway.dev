@@ -30,7 +30,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  framework-test-static:
+  framework-test:
     name: Static + content checks
     runs-on: ubuntu-latest
     continue-on-error: true
@@ -128,6 +128,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7
         with:
-          name: framework-test-static-report
+          name: framework-test-report
           path: docs-theme-extras/playwright-report
           retention-days: 7
