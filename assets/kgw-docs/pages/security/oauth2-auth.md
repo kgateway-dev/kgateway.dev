@@ -37,129 +37,12 @@ sequenceDiagram
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
-This guide requires an OIDC IdP, such as Keycloak, deployed in-cluster and reachable, and an HTTPRoute for your app.
+## Set up an identity provider
 
-## Set up Keycloak as the identity provider
+For detailed instructions on setting up Keycloak as your identity provider, see the [Keycloak IdP guide]({{< link-hextra path="/security/oauth2/keycloak/" >}}).
 
-This guide uses Keycloak as the example IdP. Follow these steps to deploy and configure it.
+If you are using a different IdP (such as Auth0, Okta, or Google), you can adapt the steps from that guide to your provider's documentation.
 
-### 1. Create the Keycloak admin secret
-
-Store the admin credentials in a Kubernetes Secret:
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: v1
-kind: Secret
-metadata:
-  name: keycloak-admin
-  namespace: keycloak-system
-type: Opaque
-stringData:
-  admin-user: admin
-  admin-password: admin
-EOF
-```
-
-### 2. Deploy Keycloak
-
-Choose one of the following methods:
-
-**Option A: Using Helm (recommended for production):**
-
-```sh
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-helm install keycloak bitnami/keycloak \
-  --namespace keycloak-system \
-  --create-namespace \
-  --set auth.adminUser=admin \
-  --set auth.adminPassword=admin \
-  --set service.type=ClusterIP \
-  --set service.ports.http=8080
-```
-
-This deploys Keycloak with the admin credentials `admin/admin`.
-
-**Option B: Using YAML (for testing, no Helm required):**
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: keycloak
-  namespace: keycloak-system
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: keycloak
-  template:
-    metadata:
-      labels:
-        app: keycloak
-    spec:
-      containers:
-      - name: keycloak
-        image: quay.io/keycloak/keycloak:latest
-        args: ["start-dev", "--http-port=8080"]
-        env:
-        - name: KEYCLOAK_ADMIN
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-admin
-              key: admin-user
-        - name: KEYCLOAK_ADMIN_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: keycloak-admin
-              key: admin-password
-        ports:
-        - containerPort: 8080
-EOF
-```
-
-### 3. Expose Keycloak as a service
-
-If you used the YAML method in step 2, expose Keycloak as a service:
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak
-  namespace: keycloak-system
-spec:
-  selector:
-    app: keycloak
-  ports:
-  - port: 8080
-    targetPort: 8080
-EOF
-```
-
-If you used the Helm method, a service is automatically created. Skip this step.
-
-### 4. Port-forward Keycloak
-
-```sh
-kubectl port-forward svc/keycloak -n keycloak-system 8080:8080
-```
-
-### 5. Configure Keycloak
-
-1. Access the admin console at `http://localhost:8080`.
-2. Log in with:
-   - Username: `admin`
-   - Password: `admin`
-3. Create a new realm (e.g., `kgateway`).
-4. Create a confidential client:
-   - Set **Valid Redirect URIs** to `https://www.example.com/oauth2/redirect`.
-   - Note the client ID and client secret for the next section.
-
-For more details, see the [Keycloak documentation](https://www.keycloak.org/docs/latest/server_admin/).
 
 ## Set up OAuth2/OIDC authentication
 
@@ -516,6 +399,7 @@ EOF
 ## Advanced: Separate JWKS backend
 
 For scenarios where your JWKS endpoint is on a different domain than your token endpoint such as Amazon Cognito, see the [two-backends OAuth page](/docs/envoy/latest/security/oauth/two-backends/).
+
 
 ## Cleanup
 
