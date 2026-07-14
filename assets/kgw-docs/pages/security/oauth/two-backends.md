@@ -12,11 +12,20 @@ The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate back
 ## Before you begin
 
 1. {{< reuse "kgw-docs/snippets/prereq.md" >}}
-2. Complete the [OAuth2/OIDC guide](/docs/envoy/latest/security/extauth/oauth2/).
+2. Complete the [OAuth2/OIDC guide]({{< link-hextra path="/security/extauth/oauth2/" >}}).
 
 ## Configure separate backends
 
 To configure separate backends for the token endpoint and JWKS fetching, update your existing OAuth2 `GatewayExtension` with a `jwksBackendRef` field.
+
+### Step 0: Save your existing GatewayExtension
+
+Before making changes, save the current GatewayExtension YAML to a file:
+
+```sh
+kubectl get gatewayextension keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > gatewayextension-oauth2.yaml
+```
+This ensures you have a backup and can modify the saved file directly.
 
 ### Step 1: Verify your primary backend
 
@@ -32,10 +41,11 @@ Add the `jwksBackendRef` field to your `GatewayExtension` to specify a dedicated
 
 ```yaml
 jwksBackendRef:
-  kind: Backend
-  group: gateway.kgateway.dev
+  kind: {{< reuse "kgw-docs/snippets/backend.md" >}}
+  group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
   name: cognito-jwks
 ```
+
 {{< callout type="info" >}}
 If you don't set jwksBackendRef, the gateway uses the primary backendRef for JWKS requests, maintaining backward compatibility.
 {{< /callout >}}
@@ -45,8 +55,8 @@ If you don't set jwksBackendRef, the gateway uses the primary backendRef for JWK
 Create a Backend resource that points to your JWKS endpoint:
 
 ```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: Backend
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/backend.md" >}}
 metadata:
   name: cognito-jwks
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -172,7 +182,7 @@ The `jwksBackendRef` field is **optional**. If not specified, the gateway uses t
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-Delete the GatewayExtension, TrafficPolicy, and Backend resources that you created in this guide.
+Delete the GatewayExtension and Backend resources that you created in this guide.
 
 ```sh
 kubectl delete gatewayextension oauth-two-backends -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
