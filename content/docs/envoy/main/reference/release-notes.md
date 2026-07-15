@@ -172,7 +172,7 @@ For more information, see [Internal redirects]({{< link-hextra path="/traffic-ma
 You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) that is used for JWT validation by using the `asyncFetch` and `retryPolicy` fields on the `remoteJWKS` section of a GatewayExtension resource.
 
 - **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
-- **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy ]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
+- **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
 
 
 
