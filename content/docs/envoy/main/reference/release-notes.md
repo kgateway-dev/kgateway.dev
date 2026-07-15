@@ -134,6 +134,12 @@ You can now configure zone-aware routing for backend services by using the `load
 
 For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
 
+#### Cookie value retrieval functions in transformations {#v24-get-cookie}
+
+You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
+
+For more information, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
+
 #### Route source metadata {#v24-route-source-metadata}
 
 You can now enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route receives a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference this metadata in access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:name)%` command operator. Note that this metadata is not surfaced as OTel span attributes and does not appear in distributed traces.
