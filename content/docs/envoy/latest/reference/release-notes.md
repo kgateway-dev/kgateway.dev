@@ -133,7 +133,7 @@ The following overlays are supported:
 * Use `deploymentOverlay`, `serviceOverlay`, and `serviceAccountOverlay` to patch the generated Deployment, Service, and ServiceAccount.
 * Use `horizontalPodAutoscaler`, `verticalPodAutoscaler`, and `podDisruptionBudget` to automatically create and configure these resources targeting the proxy Deployment.
 
-For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Advanced customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
 #### Additional Envoy container arguments {#envoy-extra-args}
 

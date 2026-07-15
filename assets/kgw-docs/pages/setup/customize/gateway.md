@@ -134,7 +134,7 @@ You can use the built-in customization fields in the {{< reuse "kgw-docs/snippet
 
 You can define Kubernetes overlays in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to override default settings for the Deployment, Service, and ServiceAccount that are created for a gateway proxy. Overlays use [Kubernetes strategic merge patch](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/) semantics.
 
-1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with your custom overlay. The following example sets the minimum time that a new pod must be ready before the Deployment considers it available. `minReadySeconds` does not have a built-in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} field, so an overlay is appropriate. For other examples, see [Advanced customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
+1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with your custom overlay. The following example sets the minimum time that a new pod must be ready before the Deployment considers it available. `minReadySeconds` does not have a built-in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} field, so an overlay is appropriate. For other examples, see [Gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -191,7 +191,7 @@ You can define Kubernetes overlays in the {{< reuse "kgw-docs/snippets/gatewaypa
 
 ## Next
 
-[Explore advanced customization examples]({{< link-hextra path="/setup/customize/configs/" >}}), such as HPA, VPA, PDB, init containers, and sidecars.
+[Explore gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}), such as autoscaling, pod scheduling, security contexts, volumes, load-balancer settings, init containers, and sidecars.
 
 ## Cleanup
 
