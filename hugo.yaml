@@ -77,6 +77,14 @@ menu:
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
 
+  # Default social-share image for OpenGraph / Twitter cards (og:image),
+  # emitted by Hextra's opengraph.html and docs-theme-extras' twitter_cards.html.
+  # Requires a raster card committed at static/ogimage.png (agw-oss uses a
+  # 1280x720 PNG). Until that asset exists this points at a 404 and no card
+  # image is shown.
+  images:
+    - /ogimage.png
+
   # Tells docs-theme-extras which brand CSS layer + font stack to load
   # (see the module's layouts/partials/themeExtras/head-end.html). "oss"
   # loads brand-oss.css and Open Sans; "enterprise" loads brand-enterprise.css.
@@ -171,6 +179,10 @@ params:
       dropdown: "2.3 (latest)"
       linkVersion: "latest"
       url: "/latest"
+      # Keeps only this version indexable; docs-theme-extras'
+      # version-noindex partial emits noindex on all other versions
+      # (/main, /2.2.x, /2.1.x). Move this flag when the latest version bumps.
+      latest: true
     - version: "2.2.x"
       dropdown: "2.2"
       linkVersion: "2.2.x"
