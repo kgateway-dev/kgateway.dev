@@ -1,8 +1,10 @@
 Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
+{{< version exclude-if="2.0.x,2.1.x" >}}
 {{< callout >}}
 This guide covers gRPC-based external authorization services. For HTTP-based services, see the [HTTP guide]({{< link-hextra path="/security/extauth/byo-ext-auth-service/http/" >}}).
 {{< /callout >}}
+{{< /version >}}
 
 ## About external auth {#about}
 

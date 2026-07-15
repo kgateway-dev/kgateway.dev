@@ -59,6 +59,17 @@ framework-test-static:  ## Build, then run only the static (no-browser) specs â€
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=static; \
 		result=$$?; npx playwright show-report; exit $$result)
 
+# Build the site and run only the content specs â€” author-side lints and
+# rendered-HTML integrity against the built content tree (no browser).
+.PHONY: framework-test-content
+framework-test-content:  ## Build, then run only the content specs
+	@$(MAKE) _framework_test_preflight
+	rm -rf public
+	hugo160 --gc --minify > .build.log 2>&1
+	cd $(FRAMEWORK_EXTRAS_DIR) && \
+		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=content; \
+		result=$$?; npx playwright show-report; exit $$result)
+
 # Build the site and run chromium browser specs (tabs, mermaid, theme
 # toggle, copy-md, console errors, viewport, contrast).
 .PHONY: framework-test-browser

@@ -268,7 +268,7 @@ The following example uses Keycloak as the identity provider.
    | `jwks.remote.backendRef` | A reference to the Backend that fronts the JWKS server. The kgateway proxy uses this Backend to fetch the JWKS keys from Keycloak. Set `kind` to `Backend` and `group` to `gateway.kgateway.dev`. |
    | `jwks.remote.cacheDuration` | How long the gateway caches the fetched keys before it refreshes them. If omitted, the keys are cached for 5 minutes. |
 
-   For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
+   {{< version exclude-if="2.1.x" >}}For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).{{< /version >}}
 
 ### JWT validation modes {#jwt-validation}
 
