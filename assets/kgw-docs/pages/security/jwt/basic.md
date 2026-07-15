@@ -526,13 +526,37 @@ For claim-based access control with a CEL `rbac` policy, see [Restrict access wi
 
 The `disable` field lets you turn off JWT authentication at a higher policy level. This is useful when you want to override a JWT policy applied at the Gateway level for a specific HTTPRoute.
 
-In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+**1. Send a request without a JWT to verify it's blocked:**
 
-**Example:**
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
+
+**2. Disable JWT with the TrafficPolicy:**
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: jwt-disable
@@ -546,7 +570,10 @@ spec:
     disable: {}
 EOF
 ```
-**Send a request without a JWT to verify it's blocked:**
+
+In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+
+**3. Repeat the request, now verifying it succeeds because JWT authentication is disabled:**
 
 {{< tabs >}}
 {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -565,32 +592,7 @@ curl -vik localhost:8080/headers -H "host: www.example.com:8080"
 {{% /tab %}}
 {{< /tabs >}}
 
-Expected output (before disabling):
-
-```text
-< HTTP/1.1 401 Unauthorized
-Jwt is missing
-```
-
-After applying the disable policy, the same request returns 200 OK because JWT authentication is disabled for that route.
-
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-
-```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
-```
-
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-
-```sh
-curl -vik localhost:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{< /tabs >}}
-
-Expected output (after disabling):
+Expected output:
 
 ```text
 < HTTP/1.1 200 OK
