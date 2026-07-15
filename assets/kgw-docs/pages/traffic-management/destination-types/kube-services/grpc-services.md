@@ -237,39 +237,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
 
 ## Create a GRPCRoute {#create-grpcroute}
 
-1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcroute){{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
-   
-   ```yaml
-   kubectl apply -f - <<EOF
-   apiVersion: gateway.networking.k8s.io/v1
-   kind: GRPCRoute
-   metadata:
-     name: grpc-echo-route
-     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-     labels:
-       app: grpc-echo
-   spec:
-     parentRefs:
-     - name: grpc-gateway
-       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-       sectionName: https
-     hostnames:
-     - "grpc.example.com"
-     rules:
-     - matches:
-       - method:
-           service: "grpc.reflection.v1alpha.ServerReflection"
-       backendRefs:
-       - name: grpc-echo-svc
-         namespace: default
-         port: 3000
-     - backendRefs:
-       - name: grpc-echo-svc
-         namespace: default
-         port: 3000
-   EOF
-   ```
-   {{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+1. Create the GRPCRoute resource. Include the `grpc.reflection.v1alpha.ServerReflection` method to enable dynamic API exploration. For detailed information about GRPCRoute fields and configuration options, see the [Gateway API GRPCRoute documentation](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#grpcroute).
 
    ```yaml
    kubectl apply -f - <<EOF
@@ -284,7 +252,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
      parentRefs:
      - name: grpc-gateway
        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-       sectionName: http
+       sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
      hostnames:
      - "grpc.example.com"
      rules:
@@ -301,7 +269,6 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
          port: 3000
    EOF
    ```
-   {{< /version >}}
 
 2. Verify that the GRPCRoute is applied successfully.
 

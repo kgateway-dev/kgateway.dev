@@ -1,7 +1,0 @@
----
-title: Path rewrites
-weight: 462
-description: Rewrite path prefixes in requests. 
----
-
-{{< reuse "kgw-docs/pages/traffic-management/rewrite/path.md" >}}
