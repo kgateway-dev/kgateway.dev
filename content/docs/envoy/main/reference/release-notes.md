@@ -26,6 +26,14 @@ The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes th
 * **Memory management**: Replaced the custom timer-based tcmalloc memory release with tcmalloc's native `ProcessBackgroundActions` and `SetBackgroundReleaseRate` APIs. This provides more comprehensive background memory management, including per-CPU cache reclamation, cache shuffling, and size class resizing, in addition to memory release. The `tcmalloc.released_by_timer` stat is removed.
 * **RBAC header matching**: Fixed the RBAC header matcher to validate each header value individually instead of concatenating multiple header values into a single string. This prevents potential policy bypasses when requests contain multiple values for the same header. The new behavior is enabled by default and controlled by the runtime guard `envoy.reloadable_features.rbac_match_headers_individually`.
 
+#### Kubernetes Gateway API version 1.6.0 {#gw-api}
+
+The Kubernetes Gateway API dependency is updated to support version 1.6.0. This version introduces several changes, including:
+
+* **New `kgateway.dev/Programmed` condition on Routes**: Route programming issues, such as conflicts, dropped routes, or replaced routes, are now surfaced on the new `kgateway.dev/Programmed` condition instead of the `Accepted` condition. The `Accepted` condition now reflects semantic validity only. Update any tooling or automation that checks the `Accepted` condition to detect route programming failures.
+* **TCPRoute promoted to v1**: The TCPRoute resource is promoted from `gateway.networking.k8s.io/v1alpha2` to `gateway.networking.k8s.io/v1`. Update your TCPRoute manifests to use `apiVersion: gateway.networking.k8s.io/v1`.
+* **`disableStatsOnProxy` Helm value removed**: The `disableStatsOnProxy` Helm value and the `KGW_DISABLE_STATS_ON_PROXY` controller environment variable are removed. The dedicated Prometheus listener on port 9091 is now always included in the Envoy bootstrap config by default. To disable stats on the proxy, set `spec.kube.stats.enabled: false` in a `GatewayParameters` resource. Note that disabling proxy stats, only removes the Prometheus scrape listener and pod annotations from the proxy pod. However, Envoy continues to collect internal stats and they remain accessible via the admin interface on port 19000. For more information, see [Disable stats]({{< link-hextra path="/observability/gateway-metrics/#disable-stats" >}}).
+
 ### 🌟 New features {#v23-new-features}
 
 #### Configurable ExtProc filter stages {#v24-extproc-filter-stages}
@@ -126,6 +134,59 @@ You can now configure zone-aware routing for backend services by using the `load
 
 For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
 
+#### Route source metadata {#v24-route-source-metadata}
+
+You can now enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route receives a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference this metadata in access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:name)%` command operator. Note that this metadata is not surfaced as OTel span attributes and does not appear in distributed traces.
+
+To enable this feature, set `enableRouteSourceMetadata: true` in your Helm values or set the `KGW_ENABLE_ROUTE_SOURCE_METADATA=true` environment variable on the kgateway controller deployment. This feature is disabled by default.
+
+For more information, see [Access logging]({{< link-hextra path="/security/access-logging/" >}}).
+
+#### Exclude ServiceEntries from discovery {#v24-serviceentry-exclusion}
+
+You can now exclude specific Istio `ServiceEntry` resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any `ServiceEntry` that matches a selector is ignored during the backend and endpoint discovery phase.
+
+A ServiceEntry is excluded if it matches any entry in the list (`OR` condition). Within each entry, all `matchLabels` and `matchExpressions` conditions must hold for the ServiceEntry to be excluded (`AND` condition). Empty entries are rejected to prevent excluding all ServiceEntries.
+
+The following example shows multiple `matchLabel` entries. ServiceEntries are excluded if they have both `example.io/source: generated` and `example.io/source-kind: ExternalService` labels (`AND` condition), or the `env: staging` label (`OR` condition).
+
+```yaml
+serviceEntriesExclusionLabelSelectors:
+  # Exclude entries that have both labels (AND within an entry)
+  - matchLabels:
+      example.io/source: generated
+      example.io/source-kind: ExternalService
+  # Also exclude entries in staging (OR across entries)
+  - matchLabels:
+      env: staging
+```
+
+#### Internal redirects {#v24-internal-redirects}
+
+You can now configure the gateway proxy to follow upstream HTTP redirect responses (3xx) on behalf of the client. Instead of returning the redirect to the client, the proxy reads the `Location` header from the redirect response, sends a new request to that URL internally, and returns only the final response. The client never sees the intermediate redirect.
+
+For more information, see [Internal redirects]({{< link-hextra path="/traffic-management/redirect/internal/" >}}).
+
+#### Async fetch and retry support for remote JWKS {#v24-jwks-async-fetch}
+
+You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) that is used for JWT validation by using the `asyncFetch` and `retryPolicy` fields on the `remoteJWKS` section of a GatewayExtension resource.
+
+- **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
+- **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
+
+
+
+#### xDS first-connect grace period {#v24-xds-first-connect-delay}
+
+By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This gives per-client translation time to converge and prevents newly started gateway pods from receiving incomplete configuration after a controller restart.
+
+You can adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller. The value is a Go duration string, for example `2s`. Set it to `0` to disable the grace period entirely.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_XDS_FIRST_CONNECT_DELAY: "2s"
+```
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
