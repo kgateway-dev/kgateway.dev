@@ -21,7 +21,7 @@ Review the built-in configurations that are provided via the [{{< reuse "kgw-doc
 | `podTemplate` | Configure pod-level settings, including image pull secrets, labels, annotations, node selector, affinity, tolerations, topology spread constraints, and the pod security context. |
 | `service` | Configure the Kubernetes Service that exposes the proxy, including the type, ports, labels, annotations, and external traffic policy. |
 | `serviceAccount` | Configure the ServiceAccount for the proxy pods. |
-| `omitDefaultSecurityContext` | Prevent the control plane from adding its default pod and container security contexts. Enable this setting on platforms such as OpenShift that assign security contexts dynamically. |
+| `omitDefaultSecurityContext` | Prevent the control plane from adding its default pod and container security contexts. Enable this setting on platforms, such as OpenShift that assign security contexts dynamically. |
 | `istio` | Configure the Istio integration for the proxy. |
 | `stats` | Configure the stats server that exposes Prometheus metrics, including enabling the stats endpoint, rewriting the stats route prefix, and [filtering which stats Envoy emits]({{< link-hextra path="/observability/gateway-metrics/#filter-stats" >}}). |
 
@@ -65,7 +65,7 @@ You can also explicitly delete or replace values that the control plane generate
 
 **Delete a value with `null`**
 
-Set a field to `null` to remove it. You must use `kubectl apply --server-side` to preserve the `null` value. With client-side apply, `kubectl` silently drops the value before it reaches the API server. The following overlay removes an advanced Deployment setting that was added by an earlier overlay.
+Set a field to `null` to remove it. You must apply the change with the `kubectl apply --server-side` command to preserve the `null` value. Without the `--server-side` option, `kubectl` silently drops the value before it reaches the API server. The following overlay removes an advanced Deployment setting that was added by an earlier overlay.
 
 ```yaml
 
@@ -78,7 +78,7 @@ spec:
 
 **Delete a field or list item with `$patch: delete`**
 
-Use `$patch: delete` for consistent behavior with both client-side and server-side apply. The following overlay removes an init container named `wait-for-config` while preserving other init containers.
+Use `$patch: delete` to remove a field or list item. You can apply these types of changes by using the client-side and server-side apply. The following overlay removes an init container named `wait-for-config`. All other init containers are preserved.
 
 ```yaml
 
@@ -95,7 +95,7 @@ spec:
 
 **Replace a map with `$patch: replace`**
 
-Add `$patch: replace` within a map to discard all existing keys in that map before adding the specified keys. The following overlay replaces an advanced DNS configuration instead of merging with it.
+Add `$patch: replace` within a map to discard all existing keys in that map. Then, specify the keys that you want to add instead. The following overlay replaces an advanced DNS configuration instead of merging with it.
 
 ```yaml
 
@@ -131,9 +131,8 @@ spec:
                 command: ["sh", "-c", "echo initialization complete"]
 ```
 
-{{< callout type="warning" >}}
-Replacing a map or list discards values that the control plane generated. Verify the rendered resource to make sure that you did not remove configuration required by the gateway proxy.
-{{< /callout >}}
+> [!CAUTION]
+> Replacing a map or list discards values that the control plane generated. Verify the rendered resource to make sure that you did not remove configuration that is required by the gateway proxy.
 
 For a step-by-step guide, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
@@ -153,7 +152,6 @@ You can attach a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource
 Consider the following GatewayClass configuration:
 
 ```yaml
-
 spec:
   kube:
     deploymentOverlay:
@@ -169,7 +167,6 @@ spec:
 Consider the following Gateway configuration:
 
 ```yaml
-
 spec:
   kube:
     deploymentOverlay:
@@ -185,7 +182,6 @@ spec:
 The resulting configuration merges both configurations as follows:
 
 ```yaml
-
 spec:
   template:
     spec:
