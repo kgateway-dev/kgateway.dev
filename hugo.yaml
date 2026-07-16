@@ -186,12 +186,12 @@ params:
       url: "/main"
     - version: "2.3.x"
       dropdown: "2.3 (latest)"
+      # linkVersion "latest" marks this as the current version, so
+      # docs-theme-extras' version-noindex partial keeps only this version
+      # indexable and emits noindex on duplicate pages in the others
+      # (/main, /2.2.x, /2.1.x).
       linkVersion: "latest"
       url: "/latest"
-      # Keeps only this version indexable; docs-theme-extras'
-      # version-noindex partial emits noindex on all other versions
-      # (/main, /2.2.x, /2.1.x). Move this flag when the latest version bumps.
-      latest: true
     - version: "2.2.x"
       dropdown: "2.2"
       linkVersion: "2.2.x"
