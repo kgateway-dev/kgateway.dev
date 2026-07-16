@@ -1,5 +1,12 @@
 baseURL: "/"
 enableRobotsTXT: true
+# Derive each page's .Lastmod from its last git commit — no manually maintained
+# front-matter dates. Feeds the sitemap <lastmod> for SEO. Listing "lastmod"
+# before ":git" keeps an explicit front-matter date ahead of the commit date
+# where a page sets one.
+enableGitInfo: true
+frontmatter:
+  lastmod: ["lastmod", ":git", "date", "publishDate"]
 canonifyURLs: true
 title: "kgateway"
 
@@ -121,7 +128,9 @@ params:
     displayPoweredBy: false
     width: normal
 
-  displayUpdatedDate: true
+  # Suppress the visible "Last updated on <date>" footer. Page .Lastmod still
+  # feeds the sitemap <lastmod> (SEO); we just don't show the date in the footer.
+  displayUpdatedDate: false
   dateFormat: "January 2, 2006"
 
   # Search
