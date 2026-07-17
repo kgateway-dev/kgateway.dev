@@ -1,5 +1,12 @@
 baseURL: "/"
 enableRobotsTXT: true
+# Derive each page's .Lastmod from its last git commit — no manually maintained
+# front-matter dates. Feeds the sitemap <lastmod> for SEO. Listing "lastmod"
+# before ":git" keeps an explicit front-matter date ahead of the commit date
+# where a page sets one.
+enableGitInfo: true
+frontmatter:
+  lastmod: ["lastmod", ":git", "date", "publishDate"]
 canonifyURLs: true
 title: "kgateway"
 
@@ -77,6 +84,14 @@ menu:
 params:
   description: Kgateway is a feature-rich, fast, and flexible API gateway that is built on top of Envoy proxy and the Kubernetes Gateway API. It excels in function-level routing, supports legacy apps, microservices and serverless, offers robust discovery capabilities, integrates seamlessly with open-source projects, and is designed to support hybrid applications with various technologies, architectures, protocols, and clouds.
 
+  # Default social-share image for OpenGraph / Twitter cards (og:image),
+  # emitted by Hextra's opengraph.html and docs-theme-extras' twitter_cards.html.
+  # Requires a raster card committed at static/ogimage.png (agw-oss uses a
+  # 1280x720 PNG). Until that asset exists this points at a 404 and no card
+  # image is shown.
+  images:
+    - /ogimage.png
+
   # Tells docs-theme-extras which brand CSS layer + font stack to load
   # (see the module's layouts/partials/themeExtras/head-end.html). "oss"
   # loads brand-oss.css and Open Sans; "enterprise" loads brand-enterprise.css.
@@ -113,7 +128,9 @@ params:
     displayPoweredBy: false
     width: normal
 
-  displayUpdatedDate: true
+  # Suppress the visible "Last updated on <date>" footer. Page .Lastmod still
+  # feeds the sitemap <lastmod> (SEO); we just don't show the date in the footer.
+  displayUpdatedDate: false
   dateFormat: "January 2, 2006"
 
   # Search
@@ -169,6 +186,10 @@ params:
       url: "/main"
     - version: "2.3.x"
       dropdown: "2.3 (latest)"
+      # linkVersion "latest" marks this as the current version, so
+      # docs-theme-extras' version-noindex partial keeps only this version
+      # indexable and emits noindex on duplicate pages in the others
+      # (/main, /2.2.x, /2.1.x).
       linkVersion: "latest"
       url: "/latest"
     - version: "2.2.x"
