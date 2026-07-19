@@ -306,6 +306,16 @@ controller:
     KGW_XDS_FIRST_CONNECT_DELAY: "2s"
 ```
 
+#### ReferenceGrant enforcement modes {#v23-referencegrant-modes}
+
+You can now configure how strictly kgateway enforces Gateway API ReferenceGrant requirements for cross-namespace references by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. The following modes are available:
+
+- **`STRICT`**: Enforce ReferenceGrants for all cross-namespace references, including TrafficPolicy `extensionRef` references to GatewayExtensions in other namespaces. Recommended for new clusters.
+- **`PERMISSIVE`** (default): Enforce ReferenceGrants for `BackendRef` and `SecretRef` references, but not for cross-namespace `ExtensionRef` references. This preserves the behavior before enforcement modes were introduced and provides a migration path for existing clusters.
+- **`OFF`**: Disable all ReferenceGrant enforcement. Not recommended for multi-tenant or production environments.
+
+For more information, see [ReferenceGrant enforcement modes]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

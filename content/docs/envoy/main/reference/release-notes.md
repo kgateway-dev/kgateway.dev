@@ -36,31 +36,36 @@ The Kubernetes Gateway API dependency is updated to support version 1.6.0. This 
 
 ### 🌟 New features {#v23-new-features}
 
-#### Configurable ExtProc filter stages {#v24-extproc-filter-stages}
+#### Controller changes {#v24-controller-changes}
 
-You can now control where in the Envoy filter chain an ExtProc filter runs by setting the `filterStage` field in the GatewayExtension resource. You can also apply multiple ExtProc filters to the same route at different stages.
+The following controller configuration options are now available:
 
-For more information, see [Staged ExtProc filters]({{< link-hextra path="/traffic-management/extproc/filter-stages/" >}}).
+* **Customizable controller probes**: Override the readiness and startup probes for the kgateway controller container by using the `controller.readinessProbe` and `controller.startupProbe` Helm values. Settings are deep-merged with the defaults, so you only need to specify the fields you want to change. For more information, see [Controller probes]({{< link-hextra path="/install/advanced/#controller-probes" >}}).
+* **Configurable admin server bind address**: Configure the bind address for the kgateway controller's admin and debug server by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. The server listens on port 9095 and binds to `localhost` by default. Set `bindAddress` to `0.0.0.0` to expose the server outside the pod for profiling or diagnostics in trusted environments. For more information, see [Controller admin server bind address]({{< link-hextra path="/install/advanced/#controller-admin-server-bind-address" >}}).
+* **xDS first-connect grace period**: By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This prevents newly started gateway pods from receiving incomplete configuration after a controller restart. Adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller, or set it to `0` to disable the grace period entirely.
+* **ReferenceGrant enforcement modes**: Configure how strictly kgateway enforces Gateway API ReferenceGrant requirements for cross-namespace references by using the `KGW_REFERENCE_GRANT_MODE` environment variable. Choose between `STRICT` (all cross-namespace references require a ReferenceGrant), `PERMISSIVE` (default, enforces grants for `BackendRef` and `SecretRef` but not `ExtensionRef`), or `OFF` (disables all enforcement). For more information, see [ReferenceGrant enforcement modes]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
 
-#### Forward client certificate header {#v24-xfcc}
+#### ExtProc changes {#v24-extproc-changes}
 
-You can now configure how the gateway proxy handles the `x-forwarded-client-cert` (XFCC) header before forwarding requests to upstream backends by using the `forwardClientCertDetails` field in the ListenerPolicy. By default, Envoy strips the XFCC header from all requests. 
+The following ExtProc features are now available in the GatewayExtension resource:
 
-For more information, see [Forward client certificate header]({{< link-hextra path="/traffic-management/header-control/forward-xfcc/" >}}).
+* **Configurable filter stages**: Control where in the Envoy filter chain an ExtProc filter runs by setting the `filterStage` field. You can also apply multiple ExtProc filters to the same route at different stages. For more information, see [Staged ExtProc filters]({{< link-hextra path="/traffic-management/extproc/filter-stages/" >}}).
+* **Forward Envoy attributes**: Configure the `requestAttributes` field to forward connection-level Envoy attributes, such as `source.address` or `connection.requested_server_name`, to your ExtProc server. Envoy populates the `ProcessingRequest.attributes` map with the specified attribute values on every HTTP request. For more information, see [Request attributes]({{< link-hextra path="/traffic-management/extproc/header-manipulation/#request-attributes" >}}).
 
-#### Strip port from Host header {#v24-strip-host-port}
+#### Header control enhancements{#v24-header-control}
 
-Added the `stripHostPortMode` setting to the HTTP settings of the ListenerPolicy resource that allows you to configure the gateway proxy to strip the port information from the `Host` or `authority` header before forwarding requests to upstream backends. You can choose between two modes: 
-* `AnyPort`: Removes any port from the header.
-* `MatchingPort`: Removes the port only if it matches the listener's own port.  
+The following header control features are now available:
 
-For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
+* **Forward client certificate header**: Configure how the gateway proxy handles the `x-forwarded-client-cert` (XFCC) header before forwarding requests to upstream backends by using the `forwardClientCertDetails` field in the ListenerPolicy. By default, Envoy strips the XFCC header from all requests. For more information, see [Forward client certificate header]({{< link-hextra path="/traffic-management/header-control/forward-xfcc/" >}}).
+* **Strip port from Host header**: Use the `stripHostPortMode` setting in the HTTP settings of the ListenerPolicy resource to strip the port information from the `Host` or `authority` header before forwarding requests. Choose between `AnyPort` to remove any port, or `MatchingPort` to remove the port only if it matches the listener's own port. For more information, see [Strip port from Host header]({{< link-hextra path="/traffic-management/header-control/strip-port-host/" >}}).
+* **Limit request header count**: Use the `maxHeadersCount` field in the HTTP settings of the ListenerPolicy resource to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used. For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
+* **Inject header values from Kubernetes Secrets**: Source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime. For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
 
-#### Limit request header count {#v24-max-headers-count}
+#### AssumeRole authentication for AWS backends {#v24-aws-assume-role}
 
-Added the `maxHeadersCount` field to the HTTP settings of the ListenerPolicy resource. You can use this field to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used.
+You can now configure AWS Lambda and EC2 backends to use role chaining for authentication. The gateway proxy uses its ambient IRSA credentials to call `sts:AssumeRole` and obtain temporary credentials for the specified role, rather than relying on long-lived secrets.
 
-For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
+For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}) and [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 
 #### AWS EC2 backend {#v24-ec2-backend}
 
@@ -80,12 +85,6 @@ When a remote cluster's east-west gateway is annotated with `solo.io/draining-we
 | Partial | `solo.io/draining-weight: "40"` | 60% (100% minus the draining weight) |
 | Full | `solo.io/draining-weight: "100"` | 0% (cluster excluded from Envoy endpoint set) |
 
-#### Inject header values from Kubernetes Secrets {#v24-header-from-secret}
-
-You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
-
-For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
-
 #### Downstream HTTP/2 protocol options {#v24-http2-protocol-options}
 
 You can now configure the HTTP/2 connection behavior between downstream clients and the gateway proxy by setting the `http2ProtocolOptions` field in the ListenerPolicy resource. The new settings let you configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
@@ -97,18 +96,6 @@ For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-man
 You can now inject custom Envoy bootstrap configuration into a managed gateway proxy by overriding the bootstrap ConfigMap that the control plane generates with a `deploymentOverlay` in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. Use this method to configure bootstrap-level options that are not exposed as built-in fields, such as `stats_config.histogram_bucket_settings` to tune histogram bucket boundaries for your metrics.
 
 For more information, see [Custom Envoy bootstrap config]({{< link-hextra path="/setup/customize/envoy/custom-bootstrap/" >}}).
-
-#### Customizable controller probes {#v24-controller-probes}
-
-You can now override the readiness and startup probes for the kgateway controller container by using the `controller.readinessProbe` and `controller.startupProbe` Helm values. Settings are deep-merged with the defaults, so you only need to specify the fields you want to change. 
-
-For more information, see [Controller probes]({{< link-hextra path="/install/advanced/#controller-probes" >}}).
-
-#### Configurable admin server bind address {#v24-admin-bind-address}
-
-You can now configure the bind address for the kgateway controller's admin and debug server by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. The server listens on port 9095. By default, the server binds to `localhost` and is only accessible from within the pod. Set `bindAddress` to `0.0.0.0` to expose the server outside the pod for profiling or diagnostics in trusted environments.
-
-For more information, see [Controller admin server bind address]({{< link-hextra path="/install/advanced/#controller-admin-server-bind-address" >}}).
 
 #### Downstream TCP keepalive {#v24-downstream-tcp-keepalive}
 
@@ -182,17 +169,6 @@ You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) th
 
 
 
-#### xDS first-connect grace period {#v24-xds-first-connect-delay}
-
-By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This gives per-client translation time to converge and prevents newly started gateway pods from receiving incomplete configuration after a controller restart.
-
-You can adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller. The value is a Go duration string, for example `2s`. Set it to `0` to disable the grace period entirely.
-
-```yaml
-controller:
-  extraEnv:
-    KGW_XDS_FIRST_CONNECT_DELAY: "2s"
-```
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
