@@ -130,6 +130,8 @@ Note that in the following example, resources are created in the same namespace 
    | `requestTimeout` | Timeout for the authorization request. Defaults to 2 seconds. |
    | `authorizationRequest.headersToAdd` | Additional headers to add to every authorization request that is sent to the auth service. |
    | `authorizationResponse.headersToBackend` | Headers from the authorization response to forward to the upstream service when the request is allowed. |
+   | `authorizationResponse.headersToClient` | Headers from a denial response to forward to the downstream client. Use this field to pass redirect headers, such as `Location` and `Set-Cookie`, back to the client during redirect-based authentication flows (for example, oauth2-proxy). |
+   | `authorizationResponse.headersToClientOnSuccess` | Headers from a successful authorization response to forward to the downstream client. |
    | `headersToForward` | Client request headers to forward to the authorization service. HTTP services receive only `Host`, `Method`, `Path`, `Content-Length`, and `Authorization` by default. |
 
 ## Create external auth policy {#create-policy}

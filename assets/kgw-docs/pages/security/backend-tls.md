@@ -390,6 +390,41 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    ```
 
 
+{{< version include-if="2.4.x" >}}
+## Other configurations {#other}
+
+Review other configurations.
+
+### Signature algorithms {#signature-algorithms}
+
+Use the `tls.parameters.signatureAlgorithms` field in a BackendConfigPolicy resoruce to restrict which TLS signature algorithms the gateway proxy advertises when establishing upstream TLS connections. This setup is useful when your backend requires a specific set of algorithms for compliance or security reasons. If unset, Envoy's defaults apply.
+
+The following example restricts the upstream TLS connection to ECDSA and RSA-PSS signature algorithms.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: kgateway-base
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  tls:
+    sni: "example.com"
+    secretRef:
+      name: ca
+    parameters:
+      signatureAlgorithms:
+        - ecdsa_secp256r1_sha256
+        - rsa_pss_rsae_sha256
+EOF
+```
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

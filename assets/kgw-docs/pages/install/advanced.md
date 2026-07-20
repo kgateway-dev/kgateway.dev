@@ -219,3 +219,21 @@ The following table shows which cross-namespace references are checked in each m
    ```
 
 {{< /version >}}
+
+{{< version include-if="2.4.x" >}}
+
+## Disable automatic RBAC creation {#disable-rbac}
+
+By default, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart creates a `ClusterRole` and `ClusterRoleBinding` that grant the controller's service account the permissions it needs to watch and manage Kubernetes resources. In environments where RBAC resources are managed externally, such as by a platform or security team that controls all cluster-scoped permissions, you can disable the creation of these resources by setting `rbac.create: false`.
+
+> [!CAUTION]
+> If you disable the creation of ClusterRole and ClusterRoleBinding resources, you must create equivalent resources yourself before or alongside the {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation. Without these resources, the controller cannot watch and manage Gateways, HTTPRoutes, Secrets, or other resources. 
+
+To skip RBAC resource creation, set `rbac.create: false` in your Helm values:
+
+```yaml
+rbac:
+  create: false
+```
+
+{{< /version >}}

@@ -26,15 +26,19 @@ The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes th
 * **Memory management**: Replaced the custom timer-based tcmalloc memory release with tcmalloc's native `ProcessBackgroundActions` and `SetBackgroundReleaseRate` APIs. This provides more comprehensive background memory management, including per-CPU cache reclamation, cache shuffling, and size class resizing, in addition to memory release. The `tcmalloc.released_by_timer` stat is removed.
 * **RBAC header matching**: Fixed the RBAC header matcher to validate each header value individually instead of concatenating multiple header values into a single string. This prevents potential policy bypasses when requests contain multiple values for the same header. The new behavior is enabled by default and controlled by the runtime guard `envoy.reloadable_features.rbac_match_headers_individually`.
 
-#### Kubernetes Gateway API version 1.6.0 {#gw-api}
+#### Kubernetes Gateway API version 1.6.1 {#gw-api}
 
-The Kubernetes Gateway API dependency is updated to support version 1.6.0. This version introduces several changes, including:
+The Kubernetes Gateway API dependency is updated to support version 1.6.1. This version introduces several changes, including:
 
 * **New `kgateway.dev/Programmed` condition on Routes**: Route programming issues, such as conflicts, dropped routes, or replaced routes, are now surfaced on the new `kgateway.dev/Programmed` condition instead of the `Accepted` condition. The `Accepted` condition now reflects semantic validity only. Update any tooling or automation that checks the `Accepted` condition to detect route programming failures.
 * **TCPRoute promoted to v1**: The TCPRoute resource is promoted from `gateway.networking.k8s.io/v1alpha2` to `gateway.networking.k8s.io/v1`. Update your TCPRoute manifests to use `apiVersion: gateway.networking.k8s.io/v1`.
 * **`disableStatsOnProxy` Helm value removed**: The `disableStatsOnProxy` Helm value and the `KGW_DISABLE_STATS_ON_PROXY` controller environment variable are removed. The dedicated Prometheus listener on port 9091 is now always included in the Envoy bootstrap config by default. To disable stats on the proxy, set `spec.kube.stats.enabled: false` in a `GatewayParameters` resource. Note that disabling proxy stats, only removes the Prometheus scrape listener and pod annotations from the proxy pod. However, Envoy continues to collect internal stats and they remain accessible via the admin interface on port 19000. For more information, see [Disable stats]({{< link-hextra path="/observability/gateway-metrics/#disable-stats" >}}).
 
 ### 🌟 New features {#v24-new-features}
+
+#### Gateway API conformance {#v24-gateway-api-conformance}
+
+{{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} is conformant with the Gateway API v1.6.1 experimental channel and passes all conformance tests across the GATEWAY-HTTP, GATEWAY-TLS, and GATEWAY-GRPC profiles, with the exception of `GatewayHTTPSListenerDetectMisdirectedRequests`. For more information, see the [conformance report](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.1/kgateway/v2.4.0-beta.2-report.yaml). 
 
 #### Controller changes {#v24-controller-changes}
 
@@ -44,6 +48,26 @@ The following controller configuration options are now available:
 * **Configurable admin server bind address**: Configure the bind address for the kgateway controller's admin and debug server by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. The server listens on port 9095 and binds to `localhost` by default. Set `bindAddress` to `0.0.0.0` to expose the server outside the pod for profiling or diagnostics in trusted environments. For more information, see [Controller admin server bind address]({{< link-hextra path="/install/advanced/#controller-admin-server-bind-address" >}}).
 * **xDS first-connect grace period**: By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This prevents newly started gateway pods from receiving incomplete configuration after a controller restart. Adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller, or set it to `0` to disable the grace period entirely.
 * **ReferenceGrant enforcement modes**: Configure how strictly kgateway enforces Gateway API ReferenceGrant requirements for cross-namespace references by using the `KGW_REFERENCE_GRANT_MODE` environment variable. Choose between `STRICT` (all cross-namespace references require a ReferenceGrant), `PERMISSIVE` (default, enforces grants for `BackendRef` and `SecretRef` but not `ExtensionRef`), or `OFF` (disables all enforcement). For more information, see [ReferenceGrant enforcement modes]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+* **Optional RBAC creation**: Set `rbac.create: false` in your Helm values to skip the automatic creation of the ClusterRole and ClusterRoleBinding resources. Use this option when RBAC resources are managed externally. For more information, see [Disable automatic RBAC creation]({{< link-hextra path="/install/advanced/#disable-rbac" >}}).
+
+#### TLS handshake timeout {#v24-tls-handshake-timeout}
+
+You can now set a deadline for TLS handshake completion on a gateway listener by using the `transportSocketConnectTimeout` field in a ListenerPolicy resource. If a client opens a connection but never completes the handshake within the configured time, Envoy closes the connection. This protects the gateway from connections that hold resources open indefinitely. The timeout applies to every filter chain on the matched listener.
+
+For more information, see [TLS handshake timeout]({{< link-hextra path="/resiliency/timeouts/tls-handshake/" >}}).
+
+#### Per-commit release artifacts {#v24-per-commit-artifacts}
+
+Helm charts and Docker images are now published to GHCR for every commit that is merged to `main` and tagged with the commit SHA. Previously, only a single floating `vX.Y.Z-main` tag was maintained. You can now reference a specific commit SHA to get reproducible pre-release builds or test a particular change before an official release.
+
+#### HTTP ext auth response header forwarding {#v24-extauth-headers-to-client}
+
+Two new fields are available on `httpService.authorizationResponse` in the GatewayExtension resource for HTTP-based external authorization:
+
+* **`headersToClient`**: Forward headers from a denial response to the downstream client. Use this field to pass redirect headers such as `Location` and `Set-Cookie` back to the client during redirect-based authentication flows.
+* **`headersToClientOnSuccess`**: Forward headers from a successful authorization response to the downstream client.
+
+For more information, see [HTTP external authorization]({{< link-hextra path="/security/extauth/byo-ext-auth-service/http/" >}}).
 
 #### ExtProc changes {#v24-extproc-changes}
 
@@ -67,6 +91,17 @@ The following AWS backend features are now available:
 
 * **AssumeRole authentication**: You can now configure AWS Lambda and EC2 backends to use role chaining for authentication. The gateway proxy uses its ambient IRSA credentials to call `sts:AssumeRole` and obtain temporary credentials for the specified role, rather than relying on long-lived secrets. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}) and [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 * **AWS EC2 backend**: You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values. For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
+* **EC2 discovery metrics**: The following control plane metrics are now available to monitor EC2 backend endpoint discovery: 
+  - `kgateway_ec2_discovery_poll_total`: Ttotal discovery refresh attempts, labeled by `result` and `reason`. 
+  - `kgateway_ec2_discovery_endpoints_active`: Current active endpoint count after a successful poll
+  - `kgateway_ec2_discovery_error_state`: Poll status. 1 when the most recent poll failed, 0 on success
+  - `kgateway_ec2_discovery_poll_duration_seconds`: AWS `DescribeInstances` round-trip duration. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
+
+#### Priority groups backend {#v24-priority-groups}
+
+You can now configure active/passive failover between static Backends by using the new `priorityGroups` Backend type. A `priorityGroups` Backend holds an ordered list of groups, each referencing one or more static Backends in the same namespace. The gateway proxy sends all traffic to the highest-priority group (priority 0) by default, and automatically spills over to the next group when all endpoints in the current group fail their active health checks. Recovery to the higher-priority group is automatic and happens entirely in the data plane.
+
+For more information, see [Priority groups]({{< link-hextra path="/traffic-management/destination-types/backends/priority-groups/" >}}).
 
 #### Istio integration updates {#v24-istio}
 
@@ -101,15 +136,34 @@ To enable this feature, set `enableRouteSourceMetadata: true` in your Helm value
 
 For more information, see [Access logging]({{< link-hextra path="/security/access-logging/" >}}).
 
+#### Route replacement metric {#v24-route-replacement-metric}
+
+A new `kgateway_routing_replacements_total` counter metric is now available on the kgateway control plane. The metric is incremented once each time a route, virtual host, or gateway is replaced with a 500 direct response due to an invalid policy configuration. Use this metric to detect and alert on route replacement events without having to scrape Kubernetes status conditions. The metric is labeled with `gateway_namespace`, `gateway`, and `error_type`. The `error_type` label can have the following values:
+
+* `ref_not_found`: A referenced policy, ReferenceGrant, or GatewayExtension was not found.
+* `invalid_config`: The route, matcher, backend, or extension configuration is invalid.
+* `unknown`: The error does not match any of the above categories.
+
+For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
+
 #### Downstream TCP keepalive {#v24-downstream-tcp-keepalive}
 
 You can now configure TCP keepalive for downstream client connections on a gateway listener, such as the idle time before probes start, the interval between probes, and the maximum number of probes before a connection is considered stale, by using the `tcpKeepalive` field in the ListenerPolicy resource. 
 
-For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/tcp-keepalive/" >}}).
+For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/keepalive/tcp/" >}}).
+
+#### HTTP/2 upstream keepalive {#v24-http2-keepalive}
+
+You can now configure HTTP/2 PING-based keepalive for upstream HTTP/2 and gRPC connections by using the `http2ProtocolOptions.connectionKeepalive` field in a BackendConfigPolicy. Use this setting to detect connections that are TCP-alive but HTTP/2-dead, such as after NAT timeout or when an upstream process stops responding without closing the socket. If no PING response arrives within the configured timeout, Envoy closes the connection and records the event in the `http2.keepalive_timeout` cluster statistic.
+
+For more information, see [HTTP/2 keepalive]({{< link-hextra path="/resiliency/keepalive/http2/" >}}).
 
 #### Downstream HTTP/2 protocol options {#v24-http2-protocol-options}
 
-You can now configure the HTTP/2 connection behavior between downstream clients and the gateway proxy by setting the `http2ProtocolOptions` field in the ListenerPolicy resource. The new settings let you configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
+The following `http2ProtocolOptions` settings are now available in the ListenerPolicy resource:
+
+* **Flow-control and concurrency**: Configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
+* **WebSocket over HTTP/2**: Set `allowConnect: true` to enable RFC 8441 Extended CONNECT support. This allows clients such as Firefox that use WebSocket-over-HTTP/2 to establish WebSocket connections through the gateway. Envoy translates the Extended CONNECT request into an HTTP/1.1 Upgrade before forwarding it upstream.
 
 For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-management/http2-downstream/" >}}).
 
@@ -118,6 +172,19 @@ For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-man
 When multiple BackendConfigPolicy resources target the same backend, their fields are now merged. If two or more policy resources configure the same top-level fields, only the oldest policy fields are enforced. If a BackendConfigPolicy and a BackendTLSPolicy both target the same backend, the BackendTLSPolicy takes precedence for TLS configuration and an `Overridden` condition is set on the BackendConfigPolicy to inform you of the conflict.
 
 For more information, see [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/#policy-priority-and-merging-rules" >}}).
+
+#### TLS signature algorithms {#v24-tls-signature-algorithms}
+
+You can now restrict which TLS signature algorithms are used during TLS handshake negotiation, on both the downstream (listener) and upstream (backend) sides:
+
+* **Downstream**: Set the `kgateway.dev/signature-algorithms` annotation on a Gateway listener to control which algorithms Envoy advertises to connecting clients. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}).
+* **Upstream**: Set `spec.tls.parameters.signatureAlgorithms` in a BackendConfigPolicy to control which algorithms the gateway proxy uses when establishing TLS connections to backend services. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/#signature-algorithms" >}}).
+
+#### Gateway-level TrafficPolicy inheritance {#v24-gateway-trafficpolicy}
+
+TrafficPolicies that are attached to a Gateway now propagate to all child HTTPRoutes. You can set defaults, such as a request timeout, at the gateway level without having to configure each HTTPRoute individually. Route-level policies take precedence over gateway-level ones, so you can still override a gateway default on a specific route.
+
+For more information, see [Gateway attachment]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-gateway" >}}).
 
 #### Zone-aware routing {#v24-zone-aware-routing}
 
@@ -131,6 +198,12 @@ You can now configure the gateway proxy to follow upstream HTTP redirect respons
 
 For more information, see [Internal redirects]({{< link-hextra path="/traffic-management/redirect/internal/" >}}).
 
+#### Multi-codec response compression {#v24-multi-codec-compression}
+
+Response compression in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} now supports Brotli and Zstd in addition to Gzip. Use the new `compression.responseCompression.libraries` field to configure an ordered list of codecs. Envoy negotiates the codec with the client by using the `Accept-Encoding` header. 
+
+For more information, see [Response compression]({{< link-hextra path="/traffic-management/compression/#response-compression" >}}).
+
 #### Cookie value retrieval functions in transformations {#v24-get-cookie}
 
 You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
@@ -143,11 +216,6 @@ You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) th
 
 - **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
 - **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
-
-#### HTTP listener isolation {#v24-http-listener-isolation}
-
-{{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} now supports the Gateway API GatewayHTTPListenerIsolation conformance feature. When multiple HTTP listeners share the same port, routes on a less-specific listener no longer interfere with hostnames owned by a more-specific sibling listener. This ensures predictable, spec-compliant hostname ownership in multi-listener configurations.
-
 
 
 <!--
