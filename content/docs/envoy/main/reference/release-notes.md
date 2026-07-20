@@ -61,35 +61,25 @@ The following header control features are now available:
 * **Limit request header count**: Use the `maxHeadersCount` field in the HTTP settings of the ListenerPolicy resource to set the maximum number of headers that Envoy accepts on incoming requests. Requests that exceed the limit receive a `431 Request Header Fields Too Large` response for HTTP/1.x connections and a stream reset for HTTP/2 connections. If unset, Envoy's built-in default of 100 headers is used. For more information, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
 * **Inject header values from Kubernetes Secrets**: Source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime. For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
 
-#### AssumeRole authentication for AWS backends {#v24-aws-assume-role}
+#### AWS backend updates {#v24-aws}
 
-You can now configure AWS Lambda and EC2 backends to use role chaining for authentication. The gateway proxy uses its ambient IRSA credentials to call `sts:AssumeRole` and obtain temporary credentials for the specified role, rather than relying on long-lived secrets.
+The following AWS backend features are now available:
 
-For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}) and [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
+* **AssumeRole authentication**: You can now configure AWS Lambda and EC2 backends to use role chaining for authentication. The gateway proxy uses its ambient IRSA credentials to call `sts:AssumeRole` and obtain temporary credentials for the specified role, rather than relying on long-lived secrets. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}) and [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
+* **AWS EC2 backend**: You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values. For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 
-#### AWS EC2 backend {#v24-ec2-backend}
+#### Istio integration updates {#v24-istio}
 
-You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values.
+The following Istio integration features are now available:
 
-For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
+* **Exclude ServiceEntries from discovery**: You can now exclude specific Istio ServiceEntry resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any ServiceEntry that matches a selector is ignored during the backend and endpoint discovery phase. For more information, see [Exclude ServiceEntries from discovery]({{< link-hextra path="/integrations/istio/ambient/ambient-ingress/#exclude-serviceentries" >}}).
+* **Cluster draining weights**: The gateway proxy now honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but the proxy continued to send ingress traffic to a draining cluster, resulting in connection errors. For more information, see [Cluster draining weights]({{< link-hextra path="/integrations/istio/ambient/ambient-ingress/#cluster-draining" >}}).
 
-#### Solo Istio cluster draining weights {#v24-cluster-draining}
+#### Envoy local replies {#v24-local-replies}
 
-kgateway now honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but kgateway continued to send ingress traffic to a draining cluster, resulting in connection errors.
+You can now customize the format and content of error responses that Envoy generates directly, such as 404 no-route and 403 policy-denial replies, by configuring the `localReplies` field in a ListenerPolicy resource. You can set a default body format that applies to all local replies on a listener, or use mappers to intercept specific replies and override their status code, body, or response headers.
 
-When a remote cluster's east-west gateway is annotated with `solo.io/draining-weight`, kgateway adjusts the Envoy load balancing weights for that cluster's endpoints on the ingress path:
-
-| Draining mode | Annotation value | Traffic to remote cluster |
-|---|---|---|
-| Off (default) | `solo.io/draining-weight: "0"` or absent | 100% |
-| Partial | `solo.io/draining-weight: "40"` | 60% (100% minus the draining weight) |
-| Full | `solo.io/draining-weight: "100"` | 0% (cluster excluded from Envoy endpoint set) |
-
-#### Downstream HTTP/2 protocol options {#v24-http2-protocol-options}
-
-You can now configure the HTTP/2 connection behavior between downstream clients and the gateway proxy by setting the `http2ProtocolOptions` field in the ListenerPolicy resource. The new settings let you configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
-
-For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-management/http2-downstream/" >}}).
+For more information, see [Local replies]({{< link-hextra path="/traffic-management/local-replies/" >}}).
 
 #### Custom Envoy bootstrap config {#v24-custom-bootstrap}
 
@@ -97,17 +87,31 @@ You can now inject custom Envoy bootstrap configuration into a managed gateway p
 
 For more information, see [Custom Envoy bootstrap config]({{< link-hextra path="/setup/customize/envoy/custom-bootstrap/" >}}).
 
+#### PROXY protocol on the Envoy readiness listener {#v24-readiness-proxy-protocol}
+
+You can now enable the PROXY protocol listener filter on the Envoy readiness listener (port 8082) by setting `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. This configuration allows an external load balancer that prepends PROXY protocol headers, such as an AWS NLB with proxy protocol v2 enabled, to perform health checks against the readiness port. Kubelet probes continue to work because the filter accepts connections without a PROXY header.
+
+For more information, see [Readiness listener PROXY protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#readiness" >}}).
+
+#### Route source metadata {#v24-route-source-metadata}
+
+You can now enable the proxy to attach route source metadata to every Envoy route. When enabled, each Envoy route receives a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference this metadata in access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:name)%` command operator. Note that this metadata is not surfaced as OTel span attributes and does not appear in distributed traces.
+
+To enable this feature, set `enableRouteSourceMetadata: true` in your Helm values or set the `KGW_ENABLE_ROUTE_SOURCE_METADATA=true` environment variable on the kgateway controller deployment. This feature is disabled by default.
+
+For more information, see [Access logging]({{< link-hextra path="/security/access-logging/" >}}).
+
 #### Downstream TCP keepalive {#v24-downstream-tcp-keepalive}
 
 You can now configure TCP keepalive for downstream client connections on a gateway listener, such as the idle time before probes start, the interval between probes, and the maximum number of probes before a connection is considered stale, by using the `tcpKeepalive` field in the ListenerPolicy resource. 
 
 For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/tcp-keepalive/" >}}).
 
-#### PROXY protocol on the Envoy readiness listener {#v24-readiness-proxy-protocol}
+#### Downstream HTTP/2 protocol options {#v24-http2-protocol-options}
 
-You can now enable the PROXY protocol listener filter on the Envoy readiness listener (port 8082) by setting `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true` in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. This configuration allows an external load balancer that prepends PROXY protocol headers, such as an AWS NLB with proxy protocol v2 enabled, to perform health checks against the readiness port. Kubelet probes continue to work because the filter accepts connections without a PROXY header.
+You can now configure the HTTP/2 connection behavior between downstream clients and the gateway proxy by setting the `http2ProtocolOptions` field in the ListenerPolicy resource. The new settings let you configure the initial stream and connection flow-control window sizes and the maximum number of concurrent streams per connection.
 
-For more information, see [Readiness listener PROXY protocol]({{< link-hextra path="/traffic-management/proxy-protocol/#readiness" >}}).
+For more information, see [HTTP/2 downstream]({{< link-hextra path="/traffic-management/http2-downstream/" >}}).
 
 #### BackendConfigPolicy merge semantics {#v24-bcp-merge}
 
@@ -121,44 +125,17 @@ You can now configure zone-aware routing for backend services by using the `load
 
 For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
 
-#### Cookie value retrieval functions in transformations {#v24-get-cookie}
-
-You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
-
-For more information, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
-
-#### Route source metadata {#v24-route-source-metadata}
-
-You can now enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route receives a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference this metadata in access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:name)%` command operator. Note that this metadata is not surfaced as OTel span attributes and does not appear in distributed traces.
-
-To enable this feature, set `enableRouteSourceMetadata: true` in your Helm values or set the `KGW_ENABLE_ROUTE_SOURCE_METADATA=true` environment variable on the kgateway controller deployment. This feature is disabled by default.
-
-For more information, see [Access logging]({{< link-hextra path="/security/access-logging/" >}}).
-
-#### Exclude ServiceEntries from discovery {#v24-serviceentry-exclusion}
-
-You can now exclude specific Istio `ServiceEntry` resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any `ServiceEntry` that matches a selector is ignored during the backend and endpoint discovery phase.
-
-A ServiceEntry is excluded if it matches any entry in the list (`OR` condition). Within each entry, all `matchLabels` and `matchExpressions` conditions must hold for the ServiceEntry to be excluded (`AND` condition). Empty entries are rejected to prevent excluding all ServiceEntries.
-
-The following example shows multiple `matchLabel` entries. ServiceEntries are excluded if they have both `example.io/source: generated` and `example.io/source-kind: ExternalService` labels (`AND` condition), or the `env: staging` label (`OR` condition).
-
-```yaml
-serviceEntriesExclusionLabelSelectors:
-  # Exclude entries that have both labels (AND within an entry)
-  - matchLabels:
-      example.io/source: generated
-      example.io/source-kind: ExternalService
-  # Also exclude entries in staging (OR across entries)
-  - matchLabels:
-      env: staging
-```
-
 #### Internal redirects {#v24-internal-redirects}
 
 You can now configure the gateway proxy to follow upstream HTTP redirect responses (3xx) on behalf of the client. Instead of returning the redirect to the client, the proxy reads the `Location` header from the redirect response, sends a new request to that URL internally, and returns only the final response. The client never sees the intermediate redirect.
 
 For more information, see [Internal redirects]({{< link-hextra path="/traffic-management/redirect/internal/" >}}).
+
+#### Cookie value retrieval functions in transformations {#v24-get-cookie}
+
+You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
+
+For more information, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
 
 #### Async fetch and retry support for remote JWKS {#v24-jwks-async-fetch}
 
@@ -166,6 +143,8 @@ You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) th
 
 - **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
 - **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
+
+
 
 
 
