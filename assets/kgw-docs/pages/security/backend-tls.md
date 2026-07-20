@@ -122,7 +122,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [BackendConfigPolicy API docs](../../reference/api/#backendconfigpolicy).
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [BackendConfigPolicy API docs]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}).
 
    | Setting | Description |
    |---------|-------------|

@@ -177,7 +177,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    EOF
    ```
 
-   {{% reuse "kgw-docs/snippets/review-table.md" %}} For more information, see the [API docs](../../../reference/api/#ratelimitprovider).
+   {{% reuse "kgw-docs/snippets/review-table.md" %}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#ratelimitprovider" >}}).
 
    | Field | Description | Required |
    |-------|-------------|----------|
@@ -212,7 +212,7 @@ Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that applie
 
 The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} configures the descriptors that define the dimensions for rate limiting. Each descriptor consists of one or more entries that help categorize and count requests. The descriptor entries match on the descriptor keys that you defined previously in the Rate Limit Service.
 
-Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`, or `Generic`. You can combine different entry types so that they are applied together as a rate limit, such as `RemoteAddress` and `Generic` or `Header` and `Path`. The following table describes the different descriptor entry types. For more information, see the [API docs](../../../reference/api/#ratelimit).
+Entries can be of one of the following types: `RemoteAddress`, `Path`, `Header`, or `Generic`. You can combine different entry types so that they are applied together as a rate limit, such as `RemoteAddress` and `Generic` or `Header` and `Path`. The following table describes the different descriptor entry types. For more information, see the [API docs]({{< link-hextra path="/reference/api/#ratelimit" >}}).
 
 | Type | Description | Additional Fields |
 |------|-------------|-------------------|
