@@ -26,6 +26,16 @@ The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes th
 * **Memory management**: Replaced the custom timer-based tcmalloc memory release with tcmalloc's native `ProcessBackgroundActions` and `SetBackgroundReleaseRate` APIs. This provides more comprehensive background memory management, including per-CPU cache reclamation, cache shuffling, and size class resizing, in addition to memory release. The `tcmalloc.released_by_timer` stat is removed.
 * **RBAC header matching**: Fixed the RBAC header matcher to validate each header value individually instead of concatenating multiple header values into a single string. This prevents potential policy bypasses when requests contain multiple values for the same header. The new behavior is enabled by default and controlled by the runtime guard `envoy.reloadable_features.rbac_match_headers_individually`.
 
+#### Image tag and digest fields are mutually exclusive {#v24-image-tag-digest}
+
+Setting an image tag in a GatewayParameters resource now clears any previously configured digest, and setting a digest now clears any previously configured tag. Previously, setting a tag did not clear an existing digest, which caused Kubernetes to silently ignore the tag and continue using the digest.
+
+This change affects only users who have GatewayParameters resources that configure a non-empty `sha256` image digest. Default GatewayParameters use image tags only. If you need both a tag and a digest, set both fields explicitly in the same update.
+
+#### Removed `perConnectionBufferLimitBytes` gateway annotation {#v24-per-connection-buffer-limit}
+
+The deprecated `perConnectionBufferLimitBytes` Gateway annotation is removed. Use the `spec.default.perConnectionBufferLimitBytes` field in a ListenerPolicy resource instead. For more information, see [Connection buffer limits]({{< link-hextra path="/resiliency/connection/" >}}).
+
 #### Kubernetes Gateway API version 1.6.1 {#gw-api}
 
 The Kubernetes Gateway API dependency is updated to support version 1.6.1. This version introduces several changes, including:
@@ -50,12 +60,6 @@ The following controller configuration options are now available:
 * **ReferenceGrant enforcement modes**: Configure how strictly kgateway enforces Gateway API ReferenceGrant requirements for cross-namespace references by using the `KGW_REFERENCE_GRANT_MODE` environment variable. Choose between `STRICT` (all cross-namespace references require a ReferenceGrant), `PERMISSIVE` (default, enforces grants for `BackendRef` and `SecretRef` but not `ExtensionRef`), or `OFF` (disables all enforcement). For more information, see [ReferenceGrant enforcement modes]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
 * **Optional RBAC creation**: Set `rbac.create: false` in your Helm values to skip the automatic creation of the ClusterRole and ClusterRoleBinding resources. Use this option when RBAC resources are managed externally. For more information, see [Disable automatic RBAC creation]({{< link-hextra path="/install/advanced/#disable-rbac" >}}).
 
-#### TLS handshake timeout {#v24-tls-handshake-timeout}
-
-You can now set a deadline for TLS handshake completion on a gateway listener by using the `transportSocketConnectTimeout` field in a ListenerPolicy resource. If a client opens a connection but never completes the handshake within the configured time, Envoy closes the connection. This protects the gateway from connections that hold resources open indefinitely. The timeout applies to every filter chain on the matched listener.
-
-For more information, see [TLS handshake timeout]({{< link-hextra path="/resiliency/timeouts/tls-handshake/" >}}).
-
 #### Per-commit release artifacts {#v24-per-commit-artifacts}
 
 Helm charts and Docker images are now published to GHCR for every commit that is merged to `main` and tagged with the commit SHA. Previously, only a single floating `vX.Y.Z-main` tag was maintained. You can now reference a specific commit SHA to get reproducible pre-release builds or test a particular change before an official release.
@@ -76,7 +80,7 @@ The following ExtProc features are now available in the GatewayExtension resourc
 * **Configurable filter stages**: Control where in the Envoy filter chain an ExtProc filter runs by setting the `filterStage` field. You can also apply multiple ExtProc filters to the same route at different stages. For more information, see [Staged ExtProc filters]({{< link-hextra path="/traffic-management/extproc/filter-stages/" >}}).
 * **Forward Envoy attributes**: Configure the `requestAttributes` field to forward connection-level Envoy attributes, such as `source.address` or `connection.requested_server_name`, to your ExtProc server. Envoy populates the `ProcessingRequest.attributes` map with the specified attribute values on every HTTP request. For more information, see [Request attributes]({{< link-hextra path="/traffic-management/extproc/header-manipulation/#request-attributes" >}}).
 
-#### Header control enhancements{#v24-header-control}
+#### Header control enhancements {#v24-header-control}
 
 The following header control features are now available:
 
@@ -101,14 +105,18 @@ The following AWS backend features are now available:
 
 You can now configure active/passive failover between static Backends by using the new `priorityGroups` Backend type. A `priorityGroups` Backend holds an ordered list of groups, each referencing one or more static Backends in the same namespace. The gateway proxy sends all traffic to the highest-priority group (priority 0) by default, and automatically spills over to the next group when all endpoints in the current group fail their active health checks. Recovery to the higher-priority group is automatic and happens entirely in the data plane.
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
+
 For more information, see [Priority groups]({{< link-hextra path="/traffic-management/destination-types/backends/priority-groups/" >}}).
 
 #### Istio integration updates {#v24-istio}
 
 The following Istio integration features are now available:
 
-* **Exclude ServiceEntries from discovery**: You can now exclude specific Istio ServiceEntry resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any ServiceEntry that matches a selector is ignored during the backend and endpoint discovery phase. For more information, see [Exclude ServiceEntries from discovery]({{< link-hextra path="/integrations/istio/ambient/ambient-ingress/#exclude-serviceentries" >}}).
-* **Cluster draining weights**: The gateway proxy now honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but the proxy continued to send ingress traffic to a draining cluster, resulting in connection errors. For more information, see [Cluster draining weights]({{< link-hextra path="/integrations/istio/ambient/ambient-ingress/#cluster-draining" >}}).
+* **Exclude ServiceEntries from discovery**: You can now exclude specific Istio ServiceEntry resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any ServiceEntry that matches a selector is ignored during the backend and endpoint discovery phase. For more information, see [Exclude ServiceEntries from discovery]({{< link-hextra path="/integrations/istio/ambient/additional-settings/#exclude-serviceentries" >}}).
+* **Cluster draining weights**: The gateway proxy now honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but the proxy continued to send ingress traffic to a draining cluster, resulting in connection errors. For more information, see [Cluster draining weights]({{< link-hextra path="/integrations/istio/ambient/additional-settings/#cluster-draining" >}}).
 
 #### Envoy local replies {#v24-local-replies}
 
@@ -134,6 +142,9 @@ You can now enable the proxy to attach route source metadata to every Envoy rout
 
 To enable this feature, set `enableRouteSourceMetadata: true` in your Helm values or set the `KGW_ENABLE_ROUTE_SOURCE_METADATA=true` environment variable on the kgateway controller deployment. This feature is disabled by default.
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
 For more information, see [Access logging]({{< link-hextra path="/security/access-logging/" >}}).
 
 #### Route replacement metric {#v24-route-replacement-metric}
@@ -146,6 +157,12 @@ A new `kgateway_routing_replacements_total` counter metric is now available on t
 
 For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
 
+#### TLS handshake timeout {#v24-tls-handshake-timeout}
+
+You can now set a deadline for TLS handshake completion on a gateway listener by using the `transportSocketConnectTimeout` field in a ListenerPolicy resource. If a client opens a connection but never completes the handshake within the configured time, Envoy closes the connection. This protects the gateway from connections that hold resources open indefinitely. The timeout applies to every filter chain on the matched listener.
+
+For more information, see [TLS handshake timeout]({{< link-hextra path="/resiliency/timeouts/tls-handshake/" >}}).
+
 #### Downstream TCP keepalive {#v24-downstream-tcp-keepalive}
 
 You can now configure TCP keepalive for downstream client connections on a gateway listener, such as the idle time before probes start, the interval between probes, and the maximum number of probes before a connection is considered stale, by using the `tcpKeepalive` field in the ListenerPolicy resource. 
@@ -154,7 +171,7 @@ For more information, see [TCP keepalive]({{< link-hextra path="/resiliency/keep
 
 #### HTTP/2 upstream keepalive {#v24-http2-keepalive}
 
-You can now configure HTTP/2 PING-based keepalive for upstream HTTP/2 and gRPC connections by using the `http2ProtocolOptions.connectionKeepalive` field in a BackendConfigPolicy. Use this setting to detect connections that are TCP-alive but HTTP/2-dead, such as after NAT timeout or when an upstream process stops responding without closing the socket. If no PING response arrives within the configured timeout, Envoy closes the connection and records the event in the `http2.keepalive_timeout` cluster statistic.
+You can now configure HTTP/2 PING-based keepalive for upstream HTTP/2 and gRPC connections by using the `http2ProtocolOptions.connectionKeepalive` field in a BackendConfigPolicy. Use this setting to detect connections that remain open at the TCP level but are no longer functional at the HTTP/2 level, such as when a cloud load balancer silently drops a long-lived connection after its idle timeout expires. If no PING response arrives within the configured timeout, Envoy closes the connection and records the event in the `http2.keepalive_timeout` cluster statistic. This setting only applies to backends that are configured to use HTTP/2, for example by setting `appProtocol: kubernetes.io/h2c` on the Service port.
 
 For more information, see [HTTP/2 keepalive]({{< link-hextra path="/resiliency/keepalive/http2/" >}}).
 
@@ -190,6 +207,9 @@ For more information, see [Gateway attachment]({{< link-hextra path="/about/poli
 
 You can now configure zone-aware routing for backend services by using the `loadBalancer.zoneAware` field in a BackendConfigPolicy resource. Zone-aware routing instructs the gateway proxy to prefer endpoints in its own availability zone, reducing cross-zone latency and network costs. 
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
 For more information, see [Zone-aware routing]({{< link-hextra path="/traffic-management/zone-routing/" >}}).
 
 #### Internal redirects {#v24-internal-redirects}
@@ -209,6 +229,12 @@ For more information, see [Response compression]({{< link-hextra path="/traffic-
 You can now use the `get_cookie(cookie_name)` and `get_cookie_i(cookie_name)` functions in the rustformation templating language for transformations to retrieve the value of a `Cookie` request header. 
 
 For more information, see [Templating language]({{< link-hextra path="/traffic-management/transformations/templating-language/" >}}).
+
+#### Per-route statistics {#v24-per-route-stats}
+
+You can now set a per-route stat prefix on HTTPRoute and GRPCRoute resources by using the `statPrefix` field in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. When set, Envoy emits route-level metrics under a `vhost.<vhost_name>.route.<statPrefix>.*` prefix which gives you a direct link between your Kubernetes route resources and the Envoy metrics they generate. 
+
+For more information, see [Per-route statistics]({{< link-hextra path="/observability/gateway-metrics/#per-route-stats" >}}).
 
 #### Async fetch and retry support for remote JWKS {#v24-jwks-async-fetch}
 
