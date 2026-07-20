@@ -150,7 +150,7 @@ For more information about transformation engines, see [Transformation engines](
 
 In multi-tenant clusters, different teams typically own separate namespaces and share a gateway. The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted, ensuring that one team cannot silently access another team's resources. Without a ReferenceGrant in the target namespace, the reference is denied.
 
-In {{< reuse "kgw-docs/snippets/kgateway.md" >}}, you can configure how strictly you want ReferenceGrant requirements to be enforced by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. YOu can choose between the following modes: 
+In {{< reuse "kgw-docs/snippets/kgateway.md" >}}, you can configure how strictly you want ReferenceGrant requirements to be enforced by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. You can choose between the following modes: 
 
 - **`STRICT`**: Enforce ReferenceGrants for all cross-namespace references. This mode provides the strongest namespace isolation and is recommended for new clusters.
 - **`PERMISSIVE`** (default): Enforce ReferenceGrants for `BackendRef` and `SecretRef` references, but not for cross-namespace `ExtensionRef` references. Before reference grant modes were introduced, {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources were able to reference and access a GatewayExtension resource in another namespace without a ReferenceGrant. `PERMISSIVE` mode allows these setups to function as before. Over time, you can add the missing ReferenceGrant resources in the required namespaces and migrate your cluster to `STRICT` ReferenceGrant validation. 

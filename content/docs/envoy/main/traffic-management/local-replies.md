@@ -137,7 +137,7 @@ Choose the format based on the format that your clients expect in error response
 
 Use `mappers` to match specific local replies by filter criteria and override their status code, body, or headers.
 
-The following example adds a JSON body to every 404 reply where a route coul not be found. By default, Envoy generates a 404 error without a body when no route matches. The mapper intercepts that reply and returns a structured JSON response instead.
+The following example adds a JSON body to every 404 reply where a route could not be found. By default, Envoy generates a 404 error without a body when no route matches. The mapper intercepts that reply and returns a structured JSON response instead.
 
 1. Send a request to the httpbin app with a hostname that has no matching route. Verify that you get back a 404 HTTP response without a body. 
 
@@ -197,7 +197,7 @@ The following example adds a JSON body to every 404 reply where a route coul not
    | `filter` | Criteria for when this mapper applies. Supports `statusCodeFilter`, `durationFilter`, `headerFilter`, `responseFlagFilter`, `celFilter`, and compound `andFilter` / `orFilter`. |
    | `bodyFormatOverride` | JSON or text format that overrides `defaultBodyFormat` for matched replies. |
 
-2. Repeat the request. Verify that you now see the custom respomse body. 
+3. Repeat the request. Verify that you now see the custom response body. 
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
