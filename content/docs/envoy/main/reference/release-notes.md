@@ -144,7 +144,9 @@ You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) th
 - **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
 - **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
 
+#### HTTP listener isolation {#v24-http-listener-isolation}
 
+{{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} now supports the Gateway API GatewayHTTPListenerIsolation conformance feature. When multiple HTTP listeners share the same port, routes on a less-specific listener no longer interfere with hostnames owned by a more-specific sibling listener. This ensures predictable, spec-compliant hostname ownership in multi-listener configurations.
 
 
 
