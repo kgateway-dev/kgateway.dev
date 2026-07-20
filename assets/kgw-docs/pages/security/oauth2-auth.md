@@ -512,10 +512,10 @@ spec:
           value: XMLHttpRequest
 EOF
 ```
-
+{{< version exclude-if="2.2.x" >}}
 ## Advanced: Separate JWKS backend
 
-For scenarios where your JWKS endpoint is on a different domain than your token endpoint such as Amazon Cognito, see the [two-backends OAuth page]({{< link-hextra path="/security/oauth/two-backends/" >}}).
+For scenarios where your JWKS endpoint is on a different domain than your token endpoint such as Amazon Cognito, see the [two-backends OAuth page]({{< link-hextra path="/security/oauth/two-backends/" >}}).{{< /version >}}
 
 
 ## Cleanup
