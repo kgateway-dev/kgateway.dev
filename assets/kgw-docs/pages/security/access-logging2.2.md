@@ -433,7 +433,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
 
 1. Get the Helm values file for your current installation and save the values to a local file. 
    ```sh
-   helm get values kgateway -n kgateway-system -o yaml > values.yaml
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n kgateway-system -o yaml > values.yaml
    open values.yaml
    ```
 
@@ -449,7 +449,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
      --version {{< reuse "kgw-docs/versions/n-patch.md" >}} 
    ```
 
-4. Update your `ListenerPolicy` to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, and `namespace` of the originating route resource to the JSON access log output.
+4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, and `namespace` of the originating route resource to the JSON access log output.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

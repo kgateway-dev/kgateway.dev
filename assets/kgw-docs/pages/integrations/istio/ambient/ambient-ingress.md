@@ -138,10 +138,44 @@ To set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway 
       2025-03-19T17:32:46.810472Z	info	access	connection complete	src.addr=10.0.71.117:42468 src.workload="http-9db6c8995-l54dw" src.namespace="{{< reuse "kgw-docs/snippets/namespace.md" >}}" src.identity="spiffe://cluster.local/ns/{{< reuse "kgw-docs/snippets/namespace.md" >}}/sa/http" dst.addr=10.0.65.144:15008 dst.hbone_addr=10.0.65.144:8080 dst.service="httpbin.httpbin.svc.cluster.local" dst.workload="httpbin-577649ddb-7nc8p" dst.namespace="httpbin" dst.identity="spiffe://cluster.local/ns/httpbin/sa/httpbin" direction="inbound" bytes_sent=1290 bytes_recv=550 duration="6742ms"
       ```
 
-{{% version exclude-if="2.0.x" %}}
+{{< version include-if="2.4.x" >}}
+
+## Other configurations
+
+### Cluster draining weights {#cluster-draining}
+
+{{< reuse "/kgw-docs/snippets/kgateway.md" >}} honors the `solo.io/draining-weight` annotation on east-west and remote peering gateways when routing ingress traffic to a multicluster ambient mesh. Previously, the draining weight was respected by ztunnel and waypoints for east-west traffic, but {{< reuse "/kgw-docs/snippets/kgateway.md" >}} continued to send ingress traffic to a draining cluster, resulting in connection errors.
+
+When a remote cluster's east-west gateway is annotated with `solo.io/draining-weight`, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} adjusts the Envoy load balancing weights for that cluster's endpoints on the ingress path:
+
+| Draining mode | Annotation value | Traffic to remote cluster |
+|---|---|---|
+| Off (default) | `solo.io/draining-weight: "0"` or absent | 100% |
+| Partial | `solo.io/draining-weight: "40"` | 60% (100% minus the draining weight) |
+| Full | `solo.io/draining-weight: "100"` | 0% (cluster excluded from Envoy endpoint set) |
+
+### Exclude ServiceEntries from discovery {#exclude-serviceentries}
+
+You can exclude specific Istio ServiceEntry resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any ServiceEntry that matches a selector is ignored during the backend and endpoint discovery phase.
+
+A ServiceEntry is excluded if it matches any entry in the list (`OR` condition). Within each entry, all `matchLabels` and `matchExpressions` conditions must hold for the ServiceEntry to be excluded (`AND` condition). Empty entries are rejected to prevent excluding all ServiceEntries.
+
+The following example shows multiple `matchLabel` entries. ServiceEntries are excluded if they have both `example.io/source: generated` and `example.io/source-kind: ExternalService` labels (`AND` condition), or the `env: staging` label (`OR` condition).
+
+```yaml
+serviceEntriesExclusionLabelSelectors:
+  # Exclude entries that have both labels (AND within an entry)
+  - matchLabels:
+      example.io/source: generated
+      example.io/source-kind: ExternalService
+  # Also exclude entries in staging (OR across entries)
+  - matchLabels:
+      env: staging
+```
+
+{{< /version >}}
 
 ## Next
 
 Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}).
 
-{{% /version %}}

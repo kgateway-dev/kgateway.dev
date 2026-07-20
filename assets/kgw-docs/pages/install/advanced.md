@@ -144,57 +144,78 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
-{{< version exclude-if="2.2.x,2.1.x,2.0.x">}}
+{{< version exclude-if="2.2.x,2.1.x">}}
 
 ## ReferenceGrant enforcement modes
 
-The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted. {{< reuse "kgw-docs/snippets/kgateway.md" >}} supports three enforcement modes that you set with the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane, such as with the following example.
+In multi-tenant clusters, different teams typically own separate namespaces and share a gateway. The Gateway API [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) mechanism controls which cross-namespace references are permitted, ensuring that one team cannot silently access another team's resources. Without a ReferenceGrant in the target namespace, the reference is denied.
 
-```yaml
+In {{< reuse "kgw-docs/snippets/kgateway.md" >}}, you can configure how strictly you want ReferenceGrant requirements to be enforced by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. You can choose between the following modes: 
 
-controller:
-  extraEnv:
-    KGW_REFERENCE_GRANT_MODE: "PERMISSIVE"
-```
+- **`STRICT`**: Enforce ReferenceGrants for all cross-namespace references. This mode provides the strongest namespace isolation and is recommended for new clusters.
+- **`PERMISSIVE`** (default): Enforce ReferenceGrants for `BackendRef` and `SecretRef` references, but not for cross-namespace `ExtensionRef` references. Before reference grant modes were introduced, {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources were able to reference and access a GatewayExtension resource in another namespace without a ReferenceGrant. `PERMISSIVE` mode allows these setups to function as before. Over time, you can add the missing ReferenceGrant resources in the required namespaces and migrate your cluster to `STRICT` ReferenceGrant validation. 
+- **`OFF`**: Disable all ReferenceGrant validation. Not recommended for multi-tenant or production environments.
+  > [!CAUTION]
+  > Do not use `OFF` in multi-tenant or production environments. It breaks Gateway API compliance, bypasses namespace isolation, and lets any namespace access backends, secrets, and GatewayExtensions in other namespaces without restriction.
 
-The default mode is `PERMISSIVE` so that GatewayExtensions such as for external auth are permitted out of the box. The following table describes the three modes.
+### Reference validation by mode {#referencegrant-modes}
 
-| Mode | Behavior |
-|------|----------|
-| `OFF` | Disables all ReferenceGrant validation and permits unrestricted cross-namespace references. |
-| `PERMISSIVE` (default) | Enforces ReferenceGrant for `BackendRef` and `SecretRef` cross-namespace references. Cross-namespace `ExtensionRef` references (such as a TrafficPolicy that references a GatewayExtension) are not checked and are always permitted. |
-| `STRICT` | Enforces ReferenceGrant for all cross-namespace references, including `ExtensionRef`. References that are missing a grant are rejected, and the referencing policy reports a `RouteRuleReplaced` condition. |
+The following table shows which cross-namespace references are checked in each mode. Same-namespace references always pass, regardless of the mode. 
 
-The following table shows which reference types are checked in each mode. Same-namespace references always pass, regardless of the mode.
+| Source resource | Field | Referenced resource | `STRICT` | `PERMISSIVE` (default) | `OFF` |
+|---|---|---|---|---|---|
+| HTTPRoute / <br>GRPCRoute / <br>TCPRoute / <br>TLSRoute | `spec.rules[].backendRefs` | Service / Backend | checked | checked | allowed |
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.certificateRefs` | Secret | checked | checked | allowed |
+| TrafficPolicy | `spec.basicAuth.secretRef` / `spec.apiKeyAuth.secretRef` | Secret | checked | checked | allowed |
+| GatewayExtension (ExtAuth, ExtProc, RateLimit, OAuth2) | `spec.<type>.grpcService.backendRef` | Service | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
 
-| Reference | From | To | `OFF` | `PERMISSIVE` | `STRICT` |
-|-----------|------|----|-------|--------------|----------|
-| `BackendRef` | HTTPRoute / GRPCRoute | Service / Backend | allowed | checked | checked |
-| `SecretRef` | TrafficPolicy (BasicAuth, APIKeyAuth) | Secret | allowed | checked | checked |
-| `BackendRef` | GatewayExtension (ExtAuth, ExtProc, RateLimit, OAuth2) | Service | allowed | checked | checked |
-| `ExtensionRef` | TrafficPolicy | GatewayExtension (same namespace) | allowed | allowed | allowed |
-| `ExtensionRef` | TrafficPolicy | GatewayExtension (cross namespace) | allowed | allowed | checked |
+### Enable STRICT mode {#set-referencegrant-mode}
 
-{{< callout type="warning" >}}
-Avoid `OFF` mode in multi-tenant or production environments. It breaks Gateway API compliance, bypasses namespace isolation, and can allow any namespace to access backends, secrets, and GatewayExtensions in other namespaces, which introduces secret exfiltration risks.
-{{< /callout >}}
+1. Check which mode is currently active by inspecting the `KGW_REFERENCE_GRANT_MODE` environment variable on the controller deployment. If the variable is not set, the active mode is `PERMISSIVE`.
+   ```sh
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "kgw-docs/snippets/pod-name.md" >}} \
+     -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_REFERENCE_GRANT_MODE")].value}'
+   ```
 
-`STRICT` mode closes a transitive exposure gap: a TrafficPolicy that references a GatewayExtension gains indirect access to that extension's secrets. To allow a cross-namespace `ExtensionRef` in `STRICT` mode, create a ReferenceGrant in the target namespace. For example, the following ReferenceGrant permits a TrafficPolicy in the `app` namespace to reference a GatewayExtension in the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace.
+2. Make sure that any existing cross-namespace {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} → GatewayExtension references have a corresponding ReferenceGrant. 
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: ReferenceGrant
-metadata:
-  name: allow-trafficpolicy-to-gwext
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  from:
-    - group: gateway.kgateway.dev
-      kind: TrafficPolicy
-      namespace: app
-  to:
-    - group: gateway.kgateway.dev
-      kind: GatewayExtension
-```
+3. Get the current Helm values for your {{< reuse "kgw-docs/snippets/kgateway.md" >}} release and save them to a file.
+
+   ```sh
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   open values.yaml
+   ```
+
+4. Add the following values to enable `STRICT` ReferenceGrant validation. 
+
+   ```yaml
+   controller:
+     extraEnv:
+       KGW_REFERENCE_GRANT_MODE: "STRICT"
+   ```
+
+5. Apply the change by upgrading the Helm release.
+
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml
+   ```
+
+6. Confirm that the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane restarted and is running.
+
+   ```sh
+   kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
+7. Verify the active mode.
+
+   ```sh
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "kgw-docs/snippets/kgateway.md" >}}  \
+     -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_REFERENCE_GRANT_MODE")].value}'
+   ```
 
 {{< /version >}}
