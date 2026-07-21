@@ -44,6 +44,10 @@ The Kubernetes Gateway API dependency is updated to support version 1.6.1. This 
 * **TCPRoute promoted to v1**: The TCPRoute resource is promoted from `gateway.networking.k8s.io/v1alpha2` to `gateway.networking.k8s.io/v1`. Update your TCPRoute manifests to use `apiVersion: gateway.networking.k8s.io/v1`.
 * **`disableStatsOnProxy` Helm value removed**: The `disableStatsOnProxy` Helm value and the `KGW_DISABLE_STATS_ON_PROXY` controller environment variable are removed. The dedicated Prometheus listener on port 9091 is now always included in the Envoy bootstrap config by default. To disable stats on the proxy, set `spec.kube.stats.enabled: false` in a `GatewayParameters` resource. Note that disabling proxy stats, only removes the Prometheus scrape listener and pod annotations from the proxy pod. However, Envoy continues to collect internal stats and they remain accessible via the admin interface on port 19000. For more information, see [Disable stats]({{< link-hextra path="/observability/gateway-metrics/#disable-stats" >}}).
 
+#### `kgateway.dev/Programmed` condition on Routes {#v24-route-programmed-condition}
+
+Route programming issues, such as conflicts, dropped routes, and replaced routes, are now surfaced on the new `kgateway.dev/Programmed` condition instead of the `Accepted` condition. The `Accepted` condition now only shows whether the route is semantically valid. If you have tooling or automation that checks the `Accepted` condition to detect route programming failures, update it to check `kgateway.dev/Programmed` instead.
+
 ### 🌟 New features {#v24-new-features}
 
 #### Gateway API conformance {#v24-gateway-api-conformance}

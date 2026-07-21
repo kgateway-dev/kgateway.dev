@@ -218,7 +218,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
       from:
         - group: gateway.networking.k8s.io
           kind: HTTPRoute
-         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
       to:
         - group: ""
           kind: Service
