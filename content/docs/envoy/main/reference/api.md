@@ -778,19 +778,20 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `responseCompression` _[ResponseCompression](#responsecompression)_ | ResponseCompression controls response compression to the downstream.<br />If set, responses with a matching `Accept-Encoding` header and certain textual content types will be compressed.<br />The compression codecs default to gzip and can be selected via `responseCompression.libraries`,<br />which Envoy negotiates against the request's `Accept-Encoding` header.<br />The content-types that will be compressed are:<br />- `application/javascript`<br />- `application/json`<br />- `application/xhtml+xml`<br />- `image/svg+xml`<br />- `text/css`<br />- `text/html`<br />- `text/plain`<br />- `text/xml` |  |  |
-| `requestDecompression` _[RequestDecompression](#requestdecompression)_ | RequestDecompression controls request decompression.<br />If set, gzip requests will be decompressed. |  |  |
+| `requestDecompression` _[RequestDecompression](#requestdecompression)_ | RequestDecompression controls request decompression.<br />If set, request bodies in the configured codecs are decompressed before forwarding. |  |  |
 
 
 #### CompressionLibrary
 
 _Underlying type:_ _string_
 
-CompressionLibrary identifies the codec used to compress responses.
+CompressionLibrary identifies a compression codec used to compress responses or decompress requests.
 
 _Validation:_
 - Enum: [Gzip Brotli Zstd]
 
 _Appears in:_
+- [RequestDecompression](#requestdecompression)
 - [ResponseCompression](#responsecompression)
 
 | Field | Description |
@@ -3407,7 +3408,7 @@ _Appears in:_
 
 
 
-RequestDecompression enables request gzip decompression.
+RequestDecompression enables request decompression.
 
 
 
@@ -3416,6 +3417,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `libraries` _[CompressionLibrary](#compressionlibrary) array_ | Libraries lists the codecs to decompress on request bodies. Envoy selects the decompressor<br />by the request's `Content-Encoding` header, so the list order is not significant. Request<br />bodies encoded with a codec not in this list are passed through to the backend unchanged.<br />Defaults to [Gzip]. | [Gzip] | Enum: [Gzip Brotli Zstd] <br />MaxItems: 3 <br />MinItems: 1 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disables decompression. |  |  |
 
 
