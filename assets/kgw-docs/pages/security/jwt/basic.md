@@ -575,6 +575,166 @@ Example output:
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
 
+### Disable JWT filter {#disable-jwt}
+
+The `disable` field lets you turn off JWT authentication at a higher policy level. This is useful when you want to override a JWT policy applied at the Gateway level for a specific HTTPRoute.
+
+**1. Send a request without a JWT to verify it's blocked:**
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
+
+**2. Disable JWT with the TrafficPolicy:**
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: jwt-disable
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin
+  jwtAuth:
+    disable: {}
+EOF
+```
+
+In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+
+**3. Repeat the request, now verifying it succeeds because JWT authentication is disabled:**
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```text
+< HTTP/1.1 200 OK
+```
+
+### asyncFetch {#async-fetch}
+
+When using a remote JWKS, you can configure `asyncFetch` to control how the gateway fetches and caches the JWKS. This is useful for improving performance and controlling startup behavior.
+
+For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
+
+{{< callout type="info" >}}
+**Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
+{{< /callout >}}
+
+**Example:**
+
+The following example allows the listener to start even if the JWKS endpoint is temporarily unavailable (`fastListener: true`). If the fetch fails, it retries after 5 seconds (`failedRefetchDuration: 5s`).
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            asyncFetch:
+              fastListener: true   # Don't block startup on JWKS fetch
+              failedRefetchDuration: 5s  # Retry after 5 seconds on failure
+EOF
+```
+### retryPolicy {#retry-policy}
+
+Configure how the gateway retries JWKS fetch when the remote server is unavailable. This ensures that temporary network issues do not cause authentication failures.
+
+For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksretrypolicy" >}}).
+
+**Example:**
+
+The following example retries JWKS fetches up to three times (`numRetries: 3`) with exponential backoff starting at 2 seconds (`baseInterval: 2s`) and capping at 30 seconds (`maxInterval: 30s`). This is useful for handling transient network issues with an external JWKS endpoint.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            retryPolicy:
+              numRetries: 3  # Retry up to 3 times on failure
+              backOff:
+                baseInterval: 2s  # Start with 2-second delay
+                maxInterval: 30s  # Cap at 30 seconds to avoid long waits
+EOF
+```
+
+### When to use advanced settings {#recommendations}
+
+In most cases, you do not need to configure `retryPolicy` or `asyncFetch`. The defaults are intended to work for typical JWKS endpoints.
+
+Use the following guidelines to choose appropriate values:
+
+| Scenario | Recommended Configuration |
+| -------- | ------------------------- |
+| **JWKS endpoint is external or occasionally slow** | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures |
+| **Gateway startup should not be blocked by JWKS fetch failures** | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background |
+| **Authentication must fail closed until JWKS is available** | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched |
+| **Seeing frequent network failures** | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect |
+
+{{< callout type="warning" >}}
+**Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
+{{< /callout >}}
+
 ## Cleanup {#cleanup}
 
 ```sh
