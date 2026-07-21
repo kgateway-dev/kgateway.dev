@@ -2,7 +2,7 @@ Route traffic to a primary backend and automatically fail over to a secondary ba
 
 A `priorityGroups` Backend holds an ordered list of target groups that you can route traffic to. Each group references one or more static Backend resources in the same namespace. The gateway proxy sends traffic to the highest-priority group (group 0) by default. When all endpoints in that group fail their active health checks, traffic automatically shifts to the next group. Recovery happens automatically when the primary endpoints become healthy again.
 
->[!WARNING]
+> [!WARNING]
 > The `priorityGroups` Backend field is an experimental API and subject to breaking changes in future releases.
 
 
@@ -142,7 +142,7 @@ A `priorityGroups` Backend holds an ordered list of target groups that you can r
    EOF
    ```
 
-5. Create an HTTPRoute that routes traffic to the `priorityGroups` Backend.
+6. Create an HTTPRoute that routes traffic to the `priorityGroups` Backend.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -165,7 +165,7 @@ A `priorityGroups` Backend holds an ordered list of target groups that you can r
    EOF
    ```
 
-6. Send a request to the gateway proxy and verify that you get back a response from the httpbin app that is set as the primary target in your `priorityGroup` Backend. 
+7. Send a request to the gateway proxy and verify that you get back a response from the httpbin app that is set as the primary target in your `priorityGroups` Backend. 
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

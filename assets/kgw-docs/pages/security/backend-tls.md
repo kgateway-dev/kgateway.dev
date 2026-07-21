@@ -397,7 +397,7 @@ Review other configurations.
 
 ### Signature algorithms {#signature-algorithms}
 
-Use the `tls.parameters.signatureAlgorithms` field in a BackendConfigPolicy resoruce to restrict which TLS signature algorithms the gateway proxy advertises when establishing upstream TLS connections. This setup is useful when your backend requires a specific set of algorithms for compliance or security reasons. If unset, Envoy's defaults apply.
+Use the `tls.parameters.signatureAlgorithms` field in a BackendConfigPolicy resource to restrict which TLS signature algorithms the gateway proxy advertises when establishing upstream TLS connections. This setup is useful when your backend requires a specific set of algorithms for compliance or security reasons. If unset, Envoy's defaults apply.
 
 The following example restricts the upstream TLS connection to ECDSA and RSA-PSS signature algorithms.
 

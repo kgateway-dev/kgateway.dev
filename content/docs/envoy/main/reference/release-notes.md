@@ -96,9 +96,9 @@ The following AWS backend features are now available:
 * **AssumeRole authentication**: You can now configure AWS Lambda and EC2 backends to use role chaining for authentication. The gateway proxy uses its ambient IRSA credentials to call `sts:AssumeRole` and obtain temporary credentials for the specified role, rather than relying on long-lived secrets. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}) and [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 * **AWS EC2 backend**: You can now route traffic directly to AWS EC2 instances that are discovered dynamically by using tag-based filters. The gateway proxy periodically calls `ec2:DescribeInstances` to refresh the list of running instances that match your filters, and serves the endpoints to Envoy through EDS (Endpoint Discovery Service). To enable this feature, set `controller.enableAwsEc2Discovery=true` in your Helm values. For more information, see [AWS EC2]({{< link-hextra path="/traffic-management/destination-types/backends/ec2/" >}}).
 * **EC2 discovery metrics**: The following control plane metrics are now available to monitor EC2 backend endpoint discovery: 
-  - `kgateway_ec2_discovery_poll_total`: Ttotal discovery refresh attempts, labeled by `result` and `reason`. 
-  - `kgateway_ec2_discovery_endpoints_active`: Current active endpoint count after a successful poll
-  - `kgateway_ec2_discovery_error_state`: Poll status. 1 when the most recent poll failed, 0 on success
+  - `kgateway_ec2_discovery_poll_total`: Total discovery refresh attempts, labeled by `result` and `reason`. 
+  - `kgateway_ec2_discovery_endpoints_active`: Current active endpoint count after a successful poll.
+  - `kgateway_ec2_discovery_error_state`: Poll status. 1 when the most recent poll failed, 0 on success.
   - `kgateway_ec2_discovery_poll_duration_seconds`: AWS `DescribeInstances` round-trip duration. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
 
 #### Priority groups backend {#v24-priority-groups}

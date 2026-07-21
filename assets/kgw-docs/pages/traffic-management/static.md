@@ -324,9 +324,13 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ...
    ```
 
+{{< version include-if="2.4.x" >}}
+
 ## Next steps
 
 To route traffic across multiple static backends with automatic failover, see [Priority groups]({{< link-hextra path="/traffic-management/destination-types/backends/priority-groups/" >}}).
+
+{{< /version >}}
 
 ## Cleanup
 
