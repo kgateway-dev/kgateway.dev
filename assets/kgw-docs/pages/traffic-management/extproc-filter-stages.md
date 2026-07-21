@@ -45,6 +45,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 1. Optional: Get the values of your current Helm installation. 
    ```sh
    helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   open values.yaml
    ```
 
 2. Upgrade your Helm installation to enable deep merging for multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field. 
@@ -61,7 +62,13 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
-4. Set up the ExtProc server. This example uses a prebuilt ExtProc server that manipulates request and response headers based on instructions that are sent in an instructions header.
+4. Build the ExtProc server image and load it into your cluster. The image is not published to a public registry and must be built locally from the [kgateway](https://github.com/kgateway-dev/kgateway) repository. Run the following commands from the root of that repository. Replace `<cluster-name>` with the name of your kind cluster.
+   ```sh
+   make extproc-server-docker EXTPROC_SERVER_VERSION=0.0.2
+   make cluster-load-extproc-server CLUSTER_NAME=<cluster-name> EXTPROC_SERVER_VERSION=0.0.2
+   ```
+
+5. Deploy the ExtProc server. This example uses a prebuilt ExtProc server that manipulates request and response headers based on instructions that are sent in an instructions header.
    ```yaml
    kubectl apply -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -f- <<EOF
    apiVersion: apps/v1
@@ -80,7 +87,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
        spec:
          containers:
            - name: ext-proc-grpc
-             image: ghcr.io/kgateway-dev/extproc-server:0.0.1
+             image: ghcr.io/kgateway-dev/extproc-server:0.0.2
              imagePullPolicy: IfNotPresent
              command: ["./server", "--add-header", "x-extproc-processed:true"]
              ports:
@@ -101,12 +108,12 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    EOF
    ```
 
-5. Verify that the ExtProc server is running.
+6. Verify that the ExtProc server is running.
    ```sh
    kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}} | grep ext-proc-grpc
    ```
 
-6. Create two GatewayExtension resources with different `filterStage` settings, one that applies ExtProc before the `AuthN` stage and one that runs after the `Route` stage. You use the same ExtProc server for both stages. However, you can also point to different ExtProc servers for each stage. 
+7. Create two GatewayExtension resources with different `filterStage` settings, one that applies ExtProc before the `AuthN` stage and one that runs after the `Route` stage. You use the same ExtProc server for both stages. However, you can also point to different ExtProc servers for each stage. 
    ```yaml
    kubectl apply -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -139,7 +146,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    EOF
    ```
 
-7. Create a separate {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource for each GatewayExtension resource.
+8. Create a separate {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource for each GatewayExtension resource.
    ```yaml
    kubectl apply -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -162,7 +169,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    EOF
    ```
 
-8. Create an HTTPRoute resource that routes traffic along the `extproc.example` domain to the httpbin app and applies both {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources to the same route rule.
+9. Create an HTTPRoute resource that routes traffic along the `extproc.example` domain to the httpbin app and applies both {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources to the same route rule.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -199,45 +206,41 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
    EOF
    ```
 
-9. Create a ReferenceGrant resource to allow the HTTPRoute to forward traffic to the httpbin app. This resource is required because the HTTPRoute and the httpbin app are in different namespaces.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
-   kind: ReferenceGrant
-   metadata:
-     name: allow-httproute-mixed-stages-to-httpbin
-     namespace: httpbin
-   spec:
-     from:
-       - group: gateway.networking.k8s.io
-         kind: HTTPRoute
+10. Create a ReferenceGrant resource to allow the HTTPRoute to forward traffic to the httpbin app. This resource is required because the HTTPRoute and the httpbin app are in different namespaces.
+    ```yaml
+    kubectl apply -f- <<EOF
+    apiVersion: gateway.networking.k8s.io/v1beta1
+    kind: ReferenceGrant
+    metadata:
+      name: allow-httproute-mixed-stages-to-httpbin
+      namespace: httpbin
+    spec:
+      from:
+        - group: gateway.networking.k8s.io
+          kind: HTTPRoute
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-     to:
-       - group: ""
-         kind: Service
-   EOF
-   ```
+      to:
+        - group: ""
+          kind: Service
+    EOF
+    ```
 
-10. Send a request to the `/headers` path. The ExtProc server is invoked twice. Verify that you see the `x-extproc-processed: true` header in your response.
+11. Send a request to the `/headers` path. The ExtProc server is invoked twice. Verify that you see the `x-extproc-processed: true` header in your response.
 
     {{< tabs >}}
-
     {{% tab name="Cloud Provider LoadBalancer" %}}
-    ```sh
-    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: extproc.example"
-    ```
+```sh
+curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: extproc.example"
+```
     {{% /tab %}}
-
     {{% tab name="Port-forward for local testing" %}}
-    ```sh
-    curl -vi http://localhost:8080/headers -H "host: extproc.example"
-    ```
+```sh
+curl -vi http://localhost:8080/headers -H "host: extproc.example"
+```
     {{% /tab %}}
-
     {{< /tabs >}}
 
     Example output:
-
     ```console {hl_lines=[10,11]}
     < HTTP/1.1 200 OK
     HTTP/1.1 200 OK
@@ -257,7 +260,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
     ...
     ```
 
-11. Check the ExtProc server logs. Verify that you see two `Process` log entries, one for each stage. 
+12. Check the ExtProc server logs. Verify that you see two `Process` log entries, one for each stage. 
     ```sh
     kubectl logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app.kubernetes.io/name=ext-proc-grpc
     ```
