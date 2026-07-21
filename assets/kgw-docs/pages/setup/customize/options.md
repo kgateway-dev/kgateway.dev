@@ -21,6 +21,7 @@ Review the built-in configurations that are provided via the [{{< reuse "kgw-doc
 | `podTemplate` | Configure pod-level settings, including image pull secrets, labels, annotations, node selector, affinity, tolerations, topology spread constraints, and the pod security context. |
 | `service` | Configure the Kubernetes Service that exposes the proxy, including the type, ports, labels, annotations, and external traffic policy. |
 | `serviceAccount` | Configure the ServiceAccount for the proxy pods. |
+| `omitDefaultSecurityContext` | Prevent the control plane from adding its default pod and container security contexts. Enable this setting on platforms, such as OpenShift that assign security contexts dynamically. |
 | `istio` | Configure the Istio integration for the proxy. |
 | `stats` | Configure the stats server that exposes Prometheus metrics, including enabling the stats endpoint, rewriting the stats route prefix, and [filtering which stats Envoy emits]({{< link-hextra path="/observability/gateway-metrics/#filter-stats" >}}). |
 
@@ -36,9 +37,9 @@ Review the following table for the resource types that you can overlay in the `s
 
 | Field | Resource type | Description |
 | -- | -- | -- |
-| `deploymentOverlay` | Deployment | Modify the proxy Deployment after it is rendered. Common use cases include adding init containers or sidecars, configuring node scheduling settings, adding custom labels and annotations, and removing default security contexts. |
-| `serviceOverlay` | Service | Modify the proxy Service. A common use case is adding cloud provider-specific annotations. |
-| `serviceAccountOverlay` | ServiceAccount | Modify the proxy ServiceAccount. |
+| `deploymentOverlay` | Deployment | Modify Deployment settings that do not have built-in fields, such as adding an init container or a generic sidecar. |
+| `serviceOverlay` | Service | Modify Service settings that are not available in the built-in `service` field. |
+| `serviceAccountOverlay` | ServiceAccount | Modify ServiceAccount settings that are not available in the built-in `serviceAccount` field. |
 | `horizontalPodAutoscaler` | HorizontalPodAutoscaler | Create an HPA targeting the proxy Deployment. The HPA is created **only** when this field is present. |
 | `verticalPodAutoscaler` | VerticalPodAutoscaler | Create a VPA targeting the proxy Deployment. The VPA is created **only** when this field is present. Requires the [VPA controller](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler). |
 | `podDisruptionBudget` | PodDisruptionBudget | Create a PDB targeting the proxy Deployment. The PDB is created **only** when this field is present. |
@@ -56,15 +57,15 @@ Overlays are applied **after** the control plane renders the base Kubernetes res
 3. The control plane applies any overlays that you specified in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource.
 4. The control plane creates or updates the resources in the cluster.
 
-### Remove or replace config
+### Strategic merge patch behavior
 
-You can use overlays to remove configuration from the generated resources, such as the pod security context when working in OpenShift environments. The strategic merge patch supports the following methods:
+An overlay can replace scalar values, merge maps and lists, or remove generated configuration. Lists with a Kubernetes patch merge key are merged by that key. For example, `containers` and `initContainers` merge on `name`, so an item with a new name is appended and an item with an existing name updates that container. Maps merge by key, and values from an overlay replace conflicting generated values.
 
-**Set field value to null**
+You can also explicitly delete or replace values that the control plane generated or an earlier overlay added.
 
-Set a field to a `null` value to remove it. You must use `kubectl apply --server-side` to apply the change. Without `--server-side`, the `null` value is silently dropped.
+**Delete a value with `null`**
 
-The following example removes the container-level `securityContext`:
+Set a field to `null` to remove it. You must apply the change with the `kubectl apply --server-side` command to preserve the `null` value. Without the `--server-side` option, `kubectl` silently drops the value before it reaches the API server. The following overlay removes an advanced Deployment setting that was added by an earlier overlay.
 
 ```yaml
 
@@ -72,19 +73,12 @@ spec:
   kube:
     deploymentOverlay:
       spec:
-        template:
-          spec:
-            containers:
-              - name: kgateway
-                # Removes the container-level securityContext
-                securityContext: null
+        minReadySeconds: null
 ```
 
-**Remove an entire field**
+**Delete a field or list item with `$patch: delete`**
 
-To remove an entire field, use `$patch: delete` instead.
-
-The following example removes the pod-level `securityContext`:
+Use `$patch: delete` to remove a field or list item. You can apply these types of changes by using the client-side and server-side apply. The following overlay removes an init container named `wait-for-config`. All other init containers are preserved.
 
 ```yaml
 
@@ -94,12 +88,14 @@ spec:
       spec:
         template:
           spec:
-            # Removes the pod-level securityContext
-            securityContext:
-              $patch: delete
+            initContainers:
+              - name: wait-for-config
+                $patch: delete
 ```
 
-To replace a list rather than merging with it, add `$patch: replace` as a separate list item before your actual items:
+**Replace a map with `$patch: replace`**
+
+Add `$patch: replace` within a map to discard all existing keys in that map. Then, specify the keys that you want to add instead. The following overlay replaces an advanced DNS configuration instead of merging with it.
 
 ```yaml
 
@@ -109,12 +105,34 @@ spec:
       spec:
         template:
           spec:
-            volumes:
+            dnsConfig:
+              $patch: replace
+              options:
+                - name: ndots
+                  value: "1"
+```
+
+**Replace a list with `$patch: replace`**
+
+To replace a list rather than merging it, add `$patch: replace` as a separate list item before the actual items. The following overlay replaces all init containers.
+
+```yaml
+
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            initContainers:
               - $patch: replace
-              - name: custom-config
-                configMap:
-                  name: my-custom-config
+              - name: initialize-gateway
+                image: busybox:1.36
+                command: ["sh", "-c", "echo initialization complete"]
 ```
+
+> [!CAUTION]
+> Replacing a map or list discards values that the control plane generated. Verify the rendered resource to make sure that you did not remove configuration that is required by the gateway proxy.
 
 For a step-by-step guide, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
@@ -126,44 +144,51 @@ You can attach a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource
 2. **Built-in configuration on the Gateway overrides the GatewayClass** – If the same built-in field is set on both the Gateway and the GatewayClass, the Gateway value takes precedence.
 3. **Overlay configuration on the GatewayClass is applied** – After all built-in configuration is processed, the GatewayClass overlay fields are applied to the rendered resources.
 4. **Overlay configuration on the Gateway overrides the GatewayClass** – If conflicting overlay configuration is specified on the Gateway, the configuration in the GatewayClass is overridden by using strategic merge patch semantics. Consider the following examples:
-   - For scalar values, such as replicas, the Gateway configuration takes precedence.
-   - For maps, such as labels, the label keys are merged. If both the Gateway and GatewayClass specify the same label key, the label key on the Gateway takes precedence.
+   - For scalar values, such as `dnsPolicy` in a Deployment overlay, the Gateway configuration takes precedence.
+   - For maps, such as `dnsConfig`, keys from both levels are preserved unless the Gateway replaces the entire map.
 
 **Example**
 
 Consider the following GatewayClass configuration:
 
 ```yaml
-
 spec:
   kube:
     deploymentOverlay:
-      metadata:
-        labels:
-          level: gc
-          gc-only-label: from-gc
+      spec:
+        template:
+          spec:
+            dnsPolicy: Default
+            dnsConfig:
+              nameservers:
+                - 1.1.1.1
 ```
 
 Consider the following Gateway configuration:
 
 ```yaml
-
 spec:
   kube:
     deploymentOverlay:
-      metadata:
-        labels:
-          level: gw
-          gw-only-label: from-gw
+      spec:
+        template:
+          spec:
+            dnsPolicy: None
+            dnsConfig:
+              searches:
+                - gateway.example
 ```
 
 The resulting configuration merges both configurations as follows:
 
 ```yaml
-
-metadata:
-  labels:
-    level: gw          # Gateway wins on conflicting key
-    gc-only-label: from-gc   # GatewayClass key preserved
-    gw-only-label: from-gw   # Gateway key added
+spec:
+  template:
+    spec:
+      dnsPolicy: None # Gateway scalar wins
+      dnsConfig:
+        nameservers:  # GatewayClass map key is preserved
+          - 1.1.1.1
+        searches:     # Gateway map key is added
+          - gateway.example
 ```
