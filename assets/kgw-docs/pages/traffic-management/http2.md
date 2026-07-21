@@ -402,7 +402,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-{{< version include-if="2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.2.x,2.3.x,2.4.x,2.5.x" >}}
 ```sh
 kubectl delete listenerpolicy access-logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete httproute nginx

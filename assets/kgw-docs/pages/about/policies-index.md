@@ -14,7 +14,7 @@ Kgateway uses the following custom resources to attach policies to routes and ga
   {{< card link="../policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
 {{< /cards >}}
 {{< /version >}}
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 {{< cards >}}
   {{< card link="../../traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
   {{< card link="../policies/listenerpolicy/" title="ListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}

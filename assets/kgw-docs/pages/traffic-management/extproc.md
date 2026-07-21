@@ -439,7 +439,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    ```
 -->  
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 
 ## Other configurations
 

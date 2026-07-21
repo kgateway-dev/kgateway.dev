@@ -53,7 +53,7 @@ Tune how the gateway handles HTTP/2 connections from downstream clients by confi
    }
    ```
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 ## Other configurations {#other}
 
 ### WebSocket over HTTP/2 {#allow-connect}

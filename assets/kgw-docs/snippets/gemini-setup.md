@@ -77,7 +77,7 @@
          kind: {{< reuse "kgw-docs/snippets/backend.md" >}}
    EOF
    ```
-   {{< /version >}}{{< version include-if="2.2.x,2.3.x,2.4.x" >}}
+   {{< /version >}}{{< version include-if="2.2.x,2.3.x,2.4.x,2.5.x" >}}
 3. Create an {{< reuse "kgw-docs/snippets/backend.md" >}} resource to configure an LLM provider that references the AI API key secret.
    ```yaml
    kubectl apply -f- <<EOF

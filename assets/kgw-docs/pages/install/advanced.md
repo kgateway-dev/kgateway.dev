@@ -220,7 +220,7 @@ The following table shows which cross-namespace references are checked in each m
 
 {{< /version >}}
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 
 ## Disable automatic RBAC creation {#disable-rbac}
 

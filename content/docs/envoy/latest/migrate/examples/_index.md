@@ -14,5 +14,3 @@ Each example walks through the following steps:
 4. Applying them to your cluster.
 
 Pick the example that matches your use case, or work through them all to get familiar with the migration workflow.
-
-

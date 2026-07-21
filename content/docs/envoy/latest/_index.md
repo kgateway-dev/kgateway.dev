@@ -1,6 +1,6 @@
 ---
-linkTitle: "Kgateway 2.3.x"
-title: Kgateway 2.3.x
+linkTitle: "Kgateway 2.4.x"
+title: Kgateway 2.4.x
 description: Kgateway is a Kubernetes-native API gateway built on Envoy and the Gateway API.
 ---
 

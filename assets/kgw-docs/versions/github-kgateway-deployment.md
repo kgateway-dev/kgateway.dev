@@ -1,1 +1,1 @@
-{{< version include-if="2.4.x,2.3.x,2.2.x" >}}/pkg/kgateway/helm/envoy/templates/deployment.yaml{{< /version >}}{{< version include-if="2.0.x,2.1.x" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml{{< /version >}}
+{{< version include-if="2.5.x,2.4.x,2.3.x,2.2.x" >}}/pkg/kgateway/helm/envoy/templates/deployment.yaml{{< /version >}}{{< version include-if="2.0.x,2.1.x" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml{{< /version >}}

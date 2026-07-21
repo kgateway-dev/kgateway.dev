@@ -270,7 +270,7 @@ The following example uses Keycloak as the identity provider.
 
    {{< version exclude-if="2.1.x" >}}For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).{{< /version >}}
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 
 #### Async JWKS fetch {#async-fetch}
 

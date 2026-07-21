@@ -180,18 +180,22 @@ params:
   # section-specific list overrides). Keep these in sync with the
   # latest section list below.
   versions:
-    - version: "2.4.x"
+    - version: "2.5.x"
       dropdown: "main"
       linkVersion: "main"
       url: "/main"
+    - version: "2.4.x"
+      dropdown: "2.4 (latest)"
+      linkVersion: "latest"
+      url: "/latest"
     - version: "2.3.x"
-      dropdown: "2.3 (latest)"
+      dropdown: "2.3"
       # linkVersion "latest" marks this as the current version, so
       # docs-theme-extras' version-noindex partial keeps only this version
       # indexable and emits noindex on duplicate pages in the others
       # (/main, /2.2.x, /2.1.x).
-      linkVersion: "latest"
-      url: "/latest"
+      linkVersion: "2.3.x"
+      url: "/2.3.x"
     - version: "2.2.x"
       dropdown: "2.2"
       linkVersion: "2.2.x"
@@ -205,14 +209,18 @@ params:
   sections:
     envoy:
       versions:
-        - version: "2.4.x"
+        - version: "2.5.x"
           dropdown: "main"
           linkVersion: "main"
           url: "/main"
-        - version: "2.3.x"
-          dropdown: "2.3 (latest)"
+        - version: "2.4.x"
+          dropdown: "2.4 (latest)"
           linkVersion: "latest"
           url: "/latest"
+        - version: "2.3.x"
+          dropdown: "2.3"
+          linkVersion: "2.3.x"
+          url: "/2.3.x"
         - version: "2.2.x"
           dropdown: "2.2"
           linkVersion: "2.2.x"

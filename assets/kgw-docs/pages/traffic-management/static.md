@@ -324,7 +324,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ...
    ```
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 
 ## Next steps
 
