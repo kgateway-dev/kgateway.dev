@@ -429,6 +429,9 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 ### Route source metadata {#route-source-metadata}
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
 You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
 
 1. Get the Helm values file for your current installation and save the values to a local file. 

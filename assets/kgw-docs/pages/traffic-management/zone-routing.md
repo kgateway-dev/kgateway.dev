@@ -1,5 +1,8 @@
 Route traffic preferentially to backend endpoints in the same availability zone as the gateway proxy to reduce cross-zone latency and network costs.
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
 ## About zone-aware routing
 
 By default, the gateway proxy evenly distributes requests across all healthy endpoints regardless of their location. In multi-zone deployments, this can result in cross-zone traffic that adds latency and, on some cloud providers, incurs additional bandwidth costs.

@@ -6,7 +6,7 @@ Gzip is an HTTP option that enables your gateway proxy to compress response data
 
 Use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure gzip compression and decompression per route. Choose between the following options: 
 
-- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header. The following content types are compressed by default:
+- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header.{{< version include-if="2.4.x" >}} You can also configure [Brotli and Zstd](#multi-codec) as additional codecs by using the `libraries` field. Envoy negotiates the codec with the client with the `Accept-Encoding` header and uses the configured library order as a tiebreaker when the client accepts multiple codecs equally.{{< /version >}} The following content types are compressed by default:
   - `application/javascript`
   - `application/json`
   - `application/xhtml+xml`
@@ -220,6 +220,38 @@ Enable gzip decompression on a route so that {{< reuse "kgw-docs/snippets/kgatew
      }
    }
    ```
+
+{{< version include-if="2.4.x" >}}
+## Other configurations {#other}
+
+### Brotli and Zstd compression codecs {#multi-codec}
+
+By default, response compression uses Gzip only. You can offer additional codecs by setting the `responseCompression.libraries` field to an ordered list of codecs. Envoy negotiates the codec with the client by using the `Accept-Encoding` header. The configured order serves as a tiebreaker when the client accepts multiple codecs equally. Clients that do not accept any of the configured codecs receive an uncompressed response.
+
+Supported codec values: `Gzip`, `Brotli`, `Zstd`.
+
+The following example configures Brotli as the preferred codec with Gzip as a fallback.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: response-compression
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-compression
+  compression:
+    responseCompression:
+      libraries:
+        - Brotli
+        - Gzip
+EOF
+```
+{{< /version >}}
 
 ## Cleanup
 
