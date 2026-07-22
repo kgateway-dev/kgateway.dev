@@ -39,7 +39,7 @@ You can apply multiple ExtProc filters to the same route, each running at a diff
 A common use case is to observe how a request changes as it passes through the filter chain. For example, you can run one ExtProc filter before authentication to capture the raw incoming request, and another after the routing decision is made to capture the request before it leaves the gateway proxy.
 
 {{< callout type="info" >}}
-By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field results in a policy conflict error. To ensure that you can apply multiple ExtProc stages to the same route, enable deep merging for ExtProc policies by either setting `policyMerge.trafficPolicy.extProc=DeepMerge` in your Helm installation or using the `KGW_POLICY_MERGE={"trafficPolicy":{"extProc":"DeepMerge"}}` environment variable. 
+By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field results in a policy conflict error. To ensure that you can apply multiple ExtProc stages to the same route, enable deep merging for ExtProc policies by either setting `policyMerge.{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}.extProc=DeepMerge` in your Helm installation or using the `KGW_POLICY_MERGE={"{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}":{"extProc":"DeepMerge"}}` environment variable. 
 {{< /callout >}}
 
 1. Optional: Get the values of your current Helm installation. 
@@ -54,7 +54,7 @@ By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
      -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
      --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
      -f values.yaml \
-     --set policyMerge.trafficPolicy.extProc=DeepMerge
+     --set policyMerge.{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}.extProc=DeepMerge
    ```
 
 3. Verify that the control plane pods are up and running. 
