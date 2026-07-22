@@ -52,7 +52,7 @@ Route programming issues, such as conflicts, dropped routes, and replaced routes
 
 #### Gateway API conformance {#v24-gateway-api-conformance}
 
-{{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} is conformant with the Gateway API v1.6.1 experimental channel and passes all conformance tests across the GATEWAY-HTTP, GATEWAY-TLS, and GATEWAY-GRPC profiles, with the exception of `GatewayHTTPSListenerDetectMisdirectedRequests`. For more information, see the [conformance report](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6.1/kgateway/v2.4.0-beta.2-report.yaml). 
+{{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} is conformant with the Gateway API v1.6.1 experimental channel and passes all conformance tests across the GATEWAY-HTTP, GATEWAY-TLS, and GATEWAY-GRPC profiles, with the exception of `GatewayHTTPSListenerDetectMisdirectedRequests`. For more information, see the [conformance report](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.6/kgateway/). 
 
 #### Controller changes {#v24-controller-changes}
 
