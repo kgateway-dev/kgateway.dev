@@ -12,7 +12,15 @@ Deploy Keycloak in your cluster. The following example creates a Keycloak instan
 
 ### Option A: Using YAML (recommended for testing)
 
-This option deploys Keycloak using a single Kubernetes manifest that creates a Namespace, Service, and Deployment. It is ideal for testing and development because it's quick to apply and doesn't require Helm. However, it's not recommended for production because it uses the `start-dev` mode, which is not secure for production environments.
+This option deploys Keycloak using a single Kubernetes manifest. It uses a self-signed certificate for HTTPS, which is acceptable for testing and development. For production, use a dedicated Keycloak instance with proper TLS certificates.
+
+First, generate a self-signed certificate for Keycloak:
+
+```sh
+openssl req -x509 -newkey rsa:4096 -keyout tls.key -out tls.crt -days 365 -nodes -subj "/CN=keycloak.keycloak.svc.cluster.local"
+kubectl create secret tls keycloak-tls -n keycloak --cert=tls.crt --key=tls.key
+```
+Then deploy Keycloak:
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -30,9 +38,9 @@ spec:
   selector:
     app: keycloak
   ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
+    - name: https
+      port: 8443
+      targetPort: 8443
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -52,15 +60,26 @@ spec:
       containers:
         - name: keycloak
           image: quay.io/keycloak/keycloak:22.0
-          args: ["start-dev"]
+          args: ["start-dev", "--https-port=8443"]
           env:
             - name: KEYCLOAK_ADMIN
               value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               value: "admin"
+            - name: KC_HTTPS_CERTIFICATE_FILE
+              value: /opt/keycloak/conf/tls.crt
+            - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+              value: /opt/keycloak/conf/tls.key
           ports:
-            - name: http
-              containerPort: 8080
+            - name: https
+              containerPort: 8443
+          volumeMounts:
+            - name: keycloak-tls
+              mountPath: /opt/keycloak/conf
+      volumes:
+        - name: keycloak-tls
+          secret:
+            secretName: keycloak-tls
 EOF
 ```
 
@@ -91,10 +110,10 @@ kubectl rollout status deployment/keycloak -n keycloak
 Access the Keycloak admin console:
 
 ```sh
-kubectl port-forward svc/keycloak -n keycloak 8080:8080
+kubectl port-forward svc/keycloak -n keycloak 8443:8443
 ```
 
-1. Open `http://localhost:8080` in your browser
+1. Open `https://localhost:8443` in your browser
 
 2. Log in with username `admin` and password `admin`
 
@@ -150,7 +169,7 @@ kubectl port-forward svc/keycloak -n keycloak 8080:8080
 {{< reuse-image-dark srcDark="img/keycloak/user-created.png" >}}
 
 {{< callout type="info" >}}
-For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the default `master` realm for testing only.
+For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the `myrealm` realm for testing only.
 {{< /callout >}}
 
 ## Store the client secret {#store-credentials}
@@ -165,10 +184,32 @@ kubectl create secret generic keycloak-client-secret \
 
 Grab `YOUR_CLIENT_SECRET` from the **Credentials** tab of your Keycloak client.
 
+## Configure TLS for Keycloak {#configure-tls}
+
+Since Keycloak uses a self-signed certificate for HTTPS, you need to configure kgateway to skip TLS verification when communicating with the Keycloak backend.
+
+Create a `BackendConfigPolicy` that skips TLS verification for the Keycloak Backend:
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: keycloak-tls
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.kgateway.dev
+      kind: Backend
+      name: keycloak
+  tls:
+    insecureSkipVerify: true
+EOF
+```
+
 ## Create a Backend for Keycloak {#create-backend}
 
-The following Backend resources defines how kgateway reaches the Cognito endpoints. The first Backend points to the token endpoint, and the second points to the JWKS endpoint. Both use the `Static` type with the host and port configured for Amazon Cognito.
-
+Create a `Backend` resource that defines how kgateway reaches your Keycloak instance. This Backend uses the `Static` type with the host and port configured for Keycloak.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -186,7 +227,7 @@ spec:
 EOF
 ```
 
-Replace `keycloak.example.com` with your Keycloak hostname. The port must be `443` because kgateway communicates with Keycloak over HTTPS.
+Replace **keycloak.example.com** with your Keycloak hostname. The port must be **443** because kgateway communicates with Keycloak over HTTPS.
 
 ## Create the GatewayExtension {#create-extension}
 
@@ -202,6 +243,8 @@ metadata:
 spec:
   oauth2:
     backendRef:
+      group: gateway.kgateway.dev
+      kind: Backend
       name: keycloak
       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://keycloak.example.com/realms/myrealm
@@ -243,7 +286,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: keycloak-oauth2
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: kgateway-system
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
@@ -252,7 +295,7 @@ spec:
   oauth2:
     extensionRef:
       name: keycloak-oauth2
-      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+      namespace: kgateway-system
 EOF
 ```
 
@@ -328,6 +371,8 @@ metadata:
 spec:
   oauth2:
     backendRef:
+      group: gateway.kgateway.dev
+      kind: Backend
       name: keycloak
       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://keycloak.example.com/realms/myrealm
@@ -402,7 +447,7 @@ EOF
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} keycloak-oauth2 -n kgateway-system
 kubectl delete GatewayExtension keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete Backend keycloak -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete secret keycloak-client-secret -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
