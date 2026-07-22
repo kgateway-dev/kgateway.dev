@@ -42,7 +42,7 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Outlier detection](../../resiliency/outlier-detection)| BackendConfigPolicy | {{% /version %}}
 | [Rate limiting](../../security/ratelimit/) | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 | [Session affinity - Simple load balancing](../../traffic-management/session-affinity/loadbalancing/) | BackendConfigPolicy  | 
-| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version exclude-if="2.0.x" %}} 
+| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}} 
 | [TCP keepalive](../../resiliency/keepalive/tcp/) | BackendConfigPolicy | {{% /version %}}
 | [Transformations](../../traffic-management/transformations) | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 
