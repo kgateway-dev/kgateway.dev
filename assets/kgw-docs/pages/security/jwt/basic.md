@@ -80,33 +80,33 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    Jwt is missing
    ```
 
-   {{< callout type="warning" >}}
-   **Got a `200 OK` instead?** The controller silently ignores {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that target a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
-   ```sh
-   kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
-   kubectl get gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
-   ```
-   Both resources must show an `Accepted` condition. If either has no status at all, the resource could be in the wrong namespace.
-   {{< /callout >}}
+   > [!WARNING]
+   > **Got a `200 OK` instead?** The controller silently ignores {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that target a resource in a different namespace. Verify that both resources were created in the correct namespace and that the controller accepted them.
+   >
+   > ```sh
+   > kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
+   > kubectl get gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A10 status
+   > ```
+   >
+   > Both resources must show an `Accepted` condition. If either has no status at all, the resource could be in the wrong namespace.
 
 4. Save a sample JWT token and send it in the `Authorization` header. The token is signed by the same issuer and key that you configured in the GatewayExtension resource and can be successfully validated by the gateway proxy.
 
    <!-- Example token generated from https://jwt.io using RS256 with the following payload:
-{
-  "iss": "kgateway.dev",
-  "org": "kgateway.dev",
-  "sub": "alice",
-  "team": "dev",
-  "exp": 2074274884,
-  "llms": {
-    "openai": [
-      "gpt-3.5-turbo"
-    ]
-  }
-}
-
-To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"kgateway-public-key-001"}, paste the private key from private-key.pem, and encode.
--->
+   {
+     "iss": "kgateway.dev",
+     "org": "kgateway.dev",
+     "sub": "alice",
+     "team": "dev",
+     "exp": 2074274884,
+     "llms": {
+       "openai": [
+         "gpt-3.5-turbo"
+       ]
+     }
+   }
+   To generate: Select RS256, use the header {"alg":"RS256","typ":"JWT","kid":"kgateway-public-key-001"}, paste the private key from private-key.pem, and encode.
+   -->
 
    ```sh
    export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtnYXRld2F5LXB1YmxpYy1rZXktMDAxIn0.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.YCxMm0TmecXsbcbNp6_GXlq5hCFGMD7KhLdOrp3EqzOKl_NX5vm6sNCMNSq5LjbCSKGThn66fnI4P6rlXke7w5kj8khIXQwDn7R0Dy5QOpLAFyE7pk8QGAjkgEGu37bxht5VjbsORdmrfxep1MTy3UEqef60Zwxwt3UtG5KmnsyyedmsCeodPNiNfuhA43r4KahpYg9cIMAnU_Wg-52ztwtqbrVRGxmoj6Efply4FE0xSKhKJZhulViriXR5K2y4zSdxenKvprO46u2ZSka7nq9ehpw_Oqhcwezw7So3lV_xpohiFz_-PGX97TXR1zi0ATjjp7VFxhkbggk8nEEFkQ
@@ -268,7 +268,60 @@ The following example uses Keycloak as the identity provider.
    | `jwks.remote.backendRef` | A reference to the Backend that fronts the JWKS server. The kgateway proxy uses this Backend to fetch the JWKS keys from Keycloak. Set `kind` to `Backend` and `group` to `gateway.kgateway.dev`. |
    | `jwks.remote.cacheDuration` | How long the gateway caches the fetched keys before it refreshes them. If omitted, the keys are cached for 5 minutes. |
 
-   For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).
+   {{< version exclude-if="2.1.x" >}}For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).{{< /version >}}
+
+{{< version include-if="2.4.x" >}}
+
+#### Async JWKS fetch {#async-fetch}
+
+By default, the gateway fetches the JWKS synchronously during request handling. If the JWKS server is slow or temporarily unavailable, JWT validation can fail. You can configure the gateway proxy to fetch and cache the JWKS asynchronously in the background instead by using the `asyncFetch` field.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    asyncFetch:
+      fastListener: true
+      failedRefetchDuration: 10s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `asyncFetch.fastListener` | If `true`, the listener starts serving traffic immediately without waiting for the first JWKS fetch to complete. If `false` or unset, the listener waits for the initial fetch before accepting requests, so tokens are never validated against an empty key set. |
+| `asyncFetch.failedRefetchDuration` | How long to wait before retrying after a failed JWKS fetch. Accepts Go duration strings such as `500ms` or `10s`. If unset, Envoy defaults to `1s`. |
+
+
+#### JWKS retry policy {#jwks-retry-policy}
+
+You can configure exponential backoff retries when the JWKS server is unavailable by using the `retryPolicy` field.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    retryPolicy:
+      numRetries: 3
+      backOff:
+        baseInterval: 1s
+        maxInterval: 30s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `retryPolicy.numRetries` | Number of retry attempts when the JWKS fetch fails. Must be at least `1`. Defaults to `1` if unset. |
+| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. |
+| `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
+
+{{< /version >}}
+
 
 ### JWT validation modes {#jwt-validation}
 
@@ -521,6 +574,166 @@ Example output:
 ```
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
+
+### Disable JWT filter {#disable-jwt}
+
+The `disable` field lets you turn off JWT authentication at a higher policy level. This is useful when you want to override a JWT policy applied at the Gateway level for a specific HTTPRoute.
+
+**1. Send a request without a JWT to verify it's blocked:**
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```text
+< HTTP/1.1 401 Unauthorized
+Jwt is missing
+```
+
+**2. Disable JWT with the TrafficPolicy:**
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: jwt-disable
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin
+  jwtAuth:
+    disable: {}
+EOF
+```
+
+In this example, any JWT policy applied at the Gateway level is disabled for the httpbin HTTPRoute. Requests to this route can be made without a JWT.
+
+**3. Repeat the request, now verifying it succeeds because JWT authentication is disabled:**
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Expected output:
+
+```text
+< HTTP/1.1 200 OK
+```
+
+### asyncFetch {#async-fetch}
+
+When using a remote JWKS, you can configure `asyncFetch` to control how the gateway fetches and caches the JWKS. This is useful for improving performance and controlling startup behavior.
+
+For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
+
+{{< callout type="info" >}}
+**Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
+{{< /callout >}}
+
+**Example:**
+
+The following example allows the listener to start even if the JWKS endpoint is temporarily unavailable (`fastListener: true`). If the fetch fails, it retries after 5 seconds (`failedRefetchDuration: 5s`).
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            asyncFetch:
+              fastListener: true   # Don't block startup on JWKS fetch
+              failedRefetchDuration: 5s  # Retry after 5 seconds on failure
+EOF
+```
+### retryPolicy {#retry-policy}
+
+Configure how the gateway retries JWKS fetch when the remote server is unavailable. This ensures that temporary network issues do not cause authentication failures.
+
+For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksretrypolicy" >}}).
+
+**Example:**
+
+The following example retries JWKS fetches up to three times (`numRetries: 3`) with exponential backoff starting at 2 seconds (`baseInterval: 2s`) and capping at 30 seconds (`maxInterval: 30s`). This is useful for handling transient network issues with an external JWKS endpoint.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          remote:
+            url: https://auth.example.com/.well-known/jwks.json
+            retryPolicy:
+              numRetries: 3  # Retry up to 3 times on failure
+              backOff:
+                baseInterval: 2s  # Start with 2-second delay
+                maxInterval: 30s  # Cap at 30 seconds to avoid long waits
+EOF
+```
+
+### When to use advanced settings {#recommendations}
+
+In most cases, you do not need to configure `retryPolicy` or `asyncFetch`. The defaults are intended to work for typical JWKS endpoints.
+
+Use the following guidelines to choose appropriate values:
+
+| Scenario | Recommended Configuration |
+| -------- | ------------------------- |
+| **JWKS endpoint is external or occasionally slow** | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures |
+| **Gateway startup should not be blocked by JWKS fetch failures** | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background |
+| **Authentication must fail closed until JWKS is available** | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched |
+| **Seeing frequent network failures** | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect |
+
+{{< callout type="warning" >}}
+**Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
+{{< /callout >}}
 
 ## Cleanup {#cleanup}
 

@@ -425,6 +425,72 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 -->
 
+{{< version include-if="2.4.x" >}}
+
+### Route source metadata {#route-source-metadata}
+
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
+You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
+
+1. Get the Helm values file for your current installation and save the values to a local file. 
+   ```sh
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n kgateway-system -o yaml > values.yaml
+   open values.yaml
+   ```
+
+2. Add the following setting to your values file to enable route source metadata.
+   ```yaml
+   enableRouteSourceMetadata: true
+   ```
+
+3. Upgrade your installation to enable the feature.
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     -f values.yaml \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} 
+   ```
+
+4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, and `namespace` of the originating route resource to the JSON access log output.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: access-logs
+     namespace: kgateway-system
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     default:
+       httpSettings:
+         accessLog:
+           - fileSink:
+               path: /dev/stdout
+               jsonFormat:
+                 start_time: "%START_TIME%"
+                 method: "%REQ(X-ENVOY-ORIGINAL-METHOD?:METHOD)%"
+                 path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+                 response_code: "%RESPONSE_CODE%"
+                 route_kind: "%METADATA(ROUTE:dev.kgateway.route_source:kind)%"
+                 route_name: "%METADATA(ROUTE:dev.kgateway.route_source:name)%"
+                 route_namespace: "%METADATA(ROUTE:dev.kgateway.route_source:namespace)%"
+   EOF
+   ```
+
+   | Field | Description |
+   | ----- | ----------- |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:kind)%` | The kind of the Kubernetes route resource, such as `HTTPRoute`. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:name)%` | The name of the Kubernetes route resource. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:namespace)%` | The namespace of the Kubernetes route resource. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:group)%` | The API group of the Kubernetes route resource. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | The rule index within the route resource that matched the request. |
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

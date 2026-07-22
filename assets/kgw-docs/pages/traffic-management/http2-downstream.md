@@ -53,6 +53,37 @@ Tune how the gateway handles HTTP/2 connections from downstream clients by confi
    }
    ```
 
+{{< version include-if="2.4.x" >}}
+## Other configurations {#other}
+
+### WebSocket over HTTP/2 {#allow-connect}
+
+By default, Envoy rejects Extended CONNECT requests (RFC 8441), which are used by some clients, such as Firefox, to establish WebSocket connections over HTTP/2. To allow these connections, set `allowConnect: true` in the `http2ProtocolOptions` field of a ListenerPolicy.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: ListenerPolicy
+metadata:
+  name: http2-settings
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  default:
+    httpSettings:
+      http2ProtocolOptions:
+        allowConnect: true
+EOF
+```
+
+| Setting | Description |
+| -- | -- |
+| `allowConnect` | Enables RFC 8441 Extended CONNECT support on the HTTP/2 listener. Set to `true` to allow clients that use WebSocket-over-HTTP/2, such as Firefox, to establish WebSocket connections. Envoy translates the Extended CONNECT request into an HTTP/1.1 Upgrade before forwarding it to the upstream service. Defaults to `false`. |
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

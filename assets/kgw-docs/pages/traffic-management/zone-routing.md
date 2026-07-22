@@ -1,5 +1,8 @@
 Route traffic preferentially to backend endpoints in the same availability zone as the gateway proxy to reduce cross-zone latency and network costs.
 
+> [!WARNING]
+> This feature is an experimental API and subject to breaking changes in future releases.
+
 ## About zone-aware routing
 
 By default, the gateway proxy evenly distributes requests across all healthy endpoints regardless of their location. In multi-zone deployments, this can result in cross-zone traffic that adds latency and, on some cloud providers, incurs additional bandwidth costs.
@@ -27,8 +30,8 @@ Zone-aware routing is only applied when backend endpoints exist in at least two 
 
 The gateway proxy determines locality as follows: 
 
-- **Gateway proxy locality**: The proxy determines its locality from the `KGATEWAY_NODE_ZONE`, `KGATEWAY_NODE_REGION`, and `KGATEWAY_NODE_SUBZONE` environment variables. These environment variables are not populated automatically from Kubernetes node labels. Instead, you must explicitly set them on the proxy by using a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. The environment variables are added to the `node.locality` section of the Envoy configuration and automatically injected into the proxy during startup. 
-- **Endpoint locality**: Envoy does not discover backend endpoints on its own. Instead, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} controller watches Kubernetes Services and their backing pods, then pushes endpoint data to the gateway proxy over a gRPC connection by using the Endpoint Discovery Service (EDS) API. For each pod, the controller looks up the Kubernetes node it is running on and reads the `topology.kubernetes.io/zone` label from that node. This information is then included in the EDS snapshot and sent to the gateway proxy. 
+- **Gateway proxy locality**: On Kubernetes 1.35 and later, the proxy's zone is automatically derived from the `topology.kubernetes.io/zone` label on the node where the proxy pod is scheduled by using the `PodTopologyLabelsAdmission` feature. No manual configuration is required. On older Kubernetes versions, or when you need an explicit override, you can set the `KGATEWAY_NODE_ZONE`, `KGATEWAY_NODE_REGION`, and `KGATEWAY_NODE_SUBZONE` environment variables on the proxy by using a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. The environment variables are added to the `node.locality` section of the Envoy configuration and injected into the proxy during startup.
+- **Endpoint locality**: Envoy does not discover backend endpoints on its own. Instead, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} controller watches Kubernetes Services and their backing pods, then pushes endpoint data to the gateway proxy over a gRPC connection by using the Endpoint Discovery Service (EDS) API. For each pod, the controller looks up the Kubernetes node it is running on and reads the `topology.kubernetes.io/zone` label from that node. This information is then included in the EDS snapshot and sent to the gateway proxy.
 
 The gateway proxy compares its own `node.locality.zone` information against the `locality.zone` of each endpoint group. Endpoints where the zone matches the proxy's zone are added to the local endpoint pool.
 
@@ -39,6 +42,34 @@ The gateway proxy compares its own `node.locality.zone` information against the 
 ## Set the proxy's locality
 
 Configure the locality on the gateway proxy. The proxy must know which zone it is running in for zone-aware routing to take effect.
+
+{{< tabs >}}
+{{% tab name="Kubernetes 1.35+" %}}
+
+On Kubernetes 1.35 and later, zone locality is derived automatically from the `topology.kubernetes.io/zone` label on the node where the proxy pod is scheduled. No additional configuration is required.
+
+Verify that the zone label is present on your nodes:
+
+```sh
+kubectl get nodes -o custom-columns='NAME:.metadata.name,ZONE:.metadata.labels.topology\.kubernetes\.io/zone'
+```
+
+Example output:
+```console
+NAME                     ZONE
+node-1                   us-east-1a
+node-2                   us-east-1b
+node-3                   us-east-1a
+```
+
+{{< callout type="info" >}}
+If you need to override the automatically detected zone, you can still explicitly set the `KGATEWAY_NODE_*` environment variables by using a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. See the **Kubernetes 1.34 and earlier** tab for instructions.
+{{< /callout >}}
+
+{{% /tab %}}
+{{% tab name="Kubernetes 1.34 and earlier" %}}
+
+If you run Kubernetes version 1.34 or earlier, you must explicitly configure the proxy's zone by setting the `KGATEWAY_NODE_*` environment variables in a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource.
 
 1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource and set the proxy's locality information as environment variables. The following example pins the proxy to the `us-east-1a` zone.
 
@@ -96,6 +127,7 @@ Configure the locality on the gateway proxy. The proxy must know which zone it i
    ```
 
 3. Verify that the `KGATEWAY_NODE_*` environment variables are set on the proxy deployment.
+
    ```sh
    kubectl get deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml | grep -A 1 'KGATEWAY_NODE'
    ```
@@ -109,6 +141,9 @@ Configure the locality on the gateway proxy. The proxy must know which zone it i
    - name: KGATEWAY_NODE_SUBZONE
      value: rack-a
    ```
+
+{{% /tab %}}
+{{< /tabs >}}
 
 ## Set up zone-aware routing
 
@@ -211,5 +246,10 @@ You can optionally verify zone-aware routing by checking the `lb_zone_*` metrics
 
 ```sh
 kubectl delete BackendConfigPolicy httpbin-zone-aware -n httpbin
+```
+
+If you created a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource for manual zone configuration (Kubernetes < 1.35), also remove it:
+
+```sh
 kubectl delete {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} zone-aware-gw-params -n kgateway-system
 ```

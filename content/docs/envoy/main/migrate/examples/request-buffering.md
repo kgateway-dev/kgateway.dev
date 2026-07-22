@@ -43,7 +43,7 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
 
 ## After: TrafficPolicy with Buffer
 
-The `TrafficPolicy` enforces the body size limit. `buffer.maxRequestSize` accepts a Kubernetes [Quantity](https://kubernetes.io/docs/reference/kubernetes-api/common-definitions/quantity/) string.
+The `TrafficPolicy` enforces the body size limit. `buffer.maxRequestSize` accepts a Kubernetes [Quantity](https://kubernetes.io/docs/reference/kubernetes-api/definitions/quantity-resource/) string.
 
 {{< callout type="info" >}}
 NGINX's `m` suffix uses binary multipliers (1024 × 1024), so `proxy-body-size: 20m` is identical to the Quantity `20Mi`. If you copied a value with a decimal suffix (`20M`), keep in mind it is ~5% smaller (20 × 10^6 bytes).

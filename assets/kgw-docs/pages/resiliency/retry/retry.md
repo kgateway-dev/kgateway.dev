@@ -302,7 +302,6 @@ Set up retries to the reviews app.
       | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
       | `retry.backoffBaseInterval` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
       | `retry.retryOn` | The condition that must be met for the gateway proxy to retry the request. In this example, the request is retried if a 5xx HTTP response code is returned or if the upstream service is unavailable. |
-      | `timeouts.request` | The duration to wait before the request times out. This value is higher than the backoff value so that the request can be retried before it times out. In this example, you set the timeout to 20 seconds. |
    {{% /tab %}}
    {{< /tabs >}}
 
@@ -346,12 +345,8 @@ Set up retries to the reviews app.
               "retry_policy": {
                 "retry_on": "gateway-error,connect-failure,reset",
                 "num_retries": 3,
-                "per_try_timeout": "1s",
-                "retriable_status_codes": [
-                  404
-                ],
                 "retry_back_off": {
-                  "base_interval": "0.025s"
+                  "base_interval": "1s"
                 }
               },
               "cluster_not_found_response_code": "INTERNAL_SERVER_ERROR"

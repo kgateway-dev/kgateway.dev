@@ -53,7 +53,7 @@ Review the kgateway resources that you use to bootstrap, configure, and customiz
 
 A {{< gloss "Gateway Extension" >}}GatewayExtension{{< /gloss >}} is a {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Custom Resource that serves as a configuration bridge between {{< reuse "/kgw-docs/snippets/kgateway.md" >}} and external services that extend a Gateway's functionality. These external services provide additional capabilities like authentication (`extAuth`), rate limiting (`rateLimit`), and request processing (`extProc`). TrafficPolicies can then refer to the GatewayExtension with the external service that the policy needs to be enforced. For more information, see the [API docs]({{< link-hextra path="/reference/api/#gatewayextension" >}}).
 
-### {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+### {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} {#gatewayparameters}
 
 When you create a Gateway resource, a [default gateway proxy template](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "kgw-docs/versions/github-branch.md" >}}{{< reuse "kgw-docs/versions/github-kgateway-deployment.md" >}}) is used to automatically spin up and bootstrap a gateway proxy deployment and service in your cluster. The template includes Envoy configuration that binds the gateway proxy deployment to the Gateway resource that you created. In addition, the settings in the {{< gloss "GatewayParameters" >}}{{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}{{< /gloss >}} resource are used to configure the gateway proxy.
 
@@ -70,7 +70,7 @@ Kgateway uses the following custom resources to attach policies to routes and ga
 
 * {{< version include-if="2.1.x,2.0.x" >}}[**HTTPListenerPolicy**]({{< link-hextra path="/about/policies/httplistenerpolicy/" >}}){{< /version >}}{{< version include-if="2.2.x,2.3.x,2.4.x" >}}[**ListenerPolicy**]({{< link-hextra path="/about/policies/listenerpolicy/" >}}){{< /version >}}: Apply policies to all HTTP and HTTPS listeners. 
 
-### {{< reuse "kgw-docs/snippets/backend.md" >}}s
+### {{< reuse "kgw-docs/snippets/backend.md" >}}s {#backends}
 
 For workloads within your cluster, you can route incoming traffic to their Kubernetes Service. But what if you have external services such as static hostnames or AWS Lambda functions that you want to route traffic to?
 

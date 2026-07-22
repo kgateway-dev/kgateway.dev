@@ -34,8 +34,8 @@ The following example sets a custom `routePrefixRewrite` value on a {{< reuse "k
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayParameters
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
   name: gwp-stats-filter
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -79,8 +79,8 @@ The following example configures a {{< reuse "kgw-docs/snippets/gatewayparameter
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayParameters
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
   name: gwp-stats-filter
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -103,8 +103,8 @@ spec:
   gatewayClassName: kgateway
   infrastructure:
     parametersRef:
-      group: gateway.kgateway.dev
-      kind: GatewayParameters
+      group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
       name: gwp-stats-filter
   listeners:
     - protocol: HTTP
@@ -119,8 +119,8 @@ The following example suppresses a specific set of stats while allowing all othe
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayParameters
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
   name: gwp-stats-filter
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -143,8 +143,8 @@ spec:
   gatewayClassName: kgateway
   infrastructure:
     parametersRef:
-      group: gateway.kgateway.dev
-      kind: GatewayParameters
+      group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
       name: gwp-stats-filter
   listeners:
     - protocol: HTTP
@@ -152,6 +152,91 @@ spec:
       name: http
 EOF
 ```
+
+{{< version include-if="2.4.x" >}}
+
+## Per-route statistics {#per-route-stats}
+
+By default, Envoy groups route-level metrics under a shared virtual host label, making it hard to isolate traffic for a specific route. Use the `statPrefix` field in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to set a per-route stat prefix so that Envoy emits metrics under a distinct label:
+
+```
+vhost.<vhost_name>.route.<statPrefix>.*
+```
+
+The `statPrefix` value supports the following template variables that {{< reuse "kgw-docs/snippets/kgateway.md" >}} resolves at translation time from the targeted route's metadata:
+
+| Variable | Description |
+|---|---|
+| `{{route_name}}` | The name of the HTTPRoute or GRPCRoute resource. |
+| `{{route_namespace}}` | The namespace of the HTTPRoute or GRPCRoute resource. |
+| `{{rule_name}}` | The name of the matched route rule. Empty segments from unnamed rules are dropped automatically. |
+
+The field is only honored for **HTTPRoute** and **GRPCRoute** targets. Setting it on any other target type is rejected at admission.
+
+The following example sets a stat prefix that includes the route namespace, name, and rule name.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: httpbin-stat-prefix
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin
+  statPrefix: "{{route_namespace}}.{{route_name}}.{{rule_name}}"
+EOF
+```
+
+| Setting | Description |
+|---|---|
+| `spec.targetRefs` | The HTTPRoute or GRPCRoute to apply this policy to. |
+| `spec.statPrefix` | The stat prefix to set on the Envoy route. Supports `{{route_name}}`, `{{route_namespace}}`, and `{{rule_name}}` template variables. Maximum length is 256 characters. |
+
+## Disable stats {#disable-stats}
+
+To disable the Prometheus scrape endpoint on the gateway proxy, set `spec.kube.stats.enabled: false` in a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource and attach it to your Gateway. When disabled, the dedicated Prometheus listener on port 9091 is removed from the Envoy bootstrap config and Prometheus scrape annotations are not added to the proxy pod. Envoy continues to collect stats internally, and they remain accessible via the Envoy admin interface on port 19000.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gwp-stats-disabled
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    stats:
+      enabled: false
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: http
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  gatewayClassName: kgateway
+  infrastructure:
+    parametersRef:
+      group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+      name: gwp-stats-disabled
+  listeners:
+    - protocol: HTTP
+      port: 8080
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: All
+EOF
+```
+
+
+
+{{< /version >}}
 
 ## Gateway proxy metrics reference {#reference}
 

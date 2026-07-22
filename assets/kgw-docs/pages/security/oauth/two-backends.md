@@ -1,37 +1,90 @@
-By default, the OAuth2 provider uses the same `backendRef` for both the OAuth2 token endpoint and the JWKS endpoint. However, some identity providers (e.g., Amazon Cognito) host these endpoints on different domains.
+By default, the OAuth2 provider uses the same `backendRef` for both the OAuth2 token endpoint and the JWKS endpoint. However, some identity providers such as Amazon Cognito host these endpoints on different domains.
 
 The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate backend for fetching JWKS, enabling more flexible network routing and certificate management.
 
-## Prerequisites
-
-Before using this feature, ensure you have completed the [OAuth2/OIDC integration guide](/docs/envoy/latest/security/extauth/oauth2/).
 
 ## When to use a separate JWKS backend
 
-- When the JWKS endpoint is on a different domain than the token endpoint
-- When you need different network policies or TLS settings for JWKS fetching
-- When the JWKS endpoint requires different authentication or authorization
+- When the JWKS endpoint is on a different domain than the token endpoint.
+- When you need different network policies or TLS settings for JWKS fetching.
+- When the JWKS endpoint requires different authentication or authorization.
 
 ## Before you begin
 
-{{< reuse "kgw-docs/snippets/prereq.md" >}}
+1. {{< reuse "kgw-docs/snippets/prereq.md" >}}
+2. Complete the [OAuth2/OIDC guide]({{< link-hextra path="/security/extauth/oauth2/" >}}).
 
-## Configuration
+## Configure separate backends
 
-### BackendRef (primary)
+To configure separate backends for the token endpoint and JWKS fetching, update your existing OAuth2 `GatewayExtension` with a `jwksBackendRef` field.
 
-The `backendRef` field specifies the primary backend for the OAuth2 provider. This is used for:
+### Step 0: Save your existing GatewayExtension
+
+Before making changes, save the current GatewayExtension YAML to a file:
+
+```sh
+kubectl get gatewayextension keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > gatewayextension-oauth2.yaml
+```
+This ensures you have a backup and can modify the saved file directly.
+
+### Step 1: Verify your primary backend
+
+Your existing `GatewayExtension` already has a `backendRef` that points to your OAuth2 provider's token endpoint. This remains unchanged. The primary backend is used for:
+
 - Token endpoint
 - Authorization endpoint
 - End session endpoint
 
-### JWKSBackendRef (optional)
+### Step 2: Add a JWKS backend
 
-The `jwksBackendRef` field specifies a dedicated backend for fetching JWKS. When set, the gateway uses this backend instead of `backendRef` for JWKS requests.
+Add the `jwksBackendRef` field to your `GatewayExtension` to specify a dedicated backend for JWKS fetching:
 
-If not set, the gateway falls back to using `backendRef` for all requests.
+```yaml
+jwksBackendRef:
+  kind: {{< reuse "kgw-docs/snippets/backend.md" >}}
+  group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+  name: cognito-jwks
+```
+
+{{< callout type="info" >}}
+If you don't set jwksBackendRef, the gateway uses the primary backendRef for JWKS requests, maintaining backward compatibility.
+{{< /callout >}}
+
+### Step 3: Define the JWKS Backend resource
+
+Create a Backend resource that points to your JWKS endpoint:
+
+```yaml
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/backend.md" >}}
+metadata:
+  name: cognito-jwks
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  type: Static
+  static:
+    hosts:
+    - host: cognito-idp.us-east-1.amazonaws.com
+      port: 443
+```
+
+### Step 4: Apply the updated configuration
+
+Apply the GatewayExtension and Backend resources:
+
+```sh
+kubectl apply -f gatewayextension-oauth2.yaml
+kubectl apply -f cognito-jwks-backend.yaml
+```
 
 ## Example: Amazon Cognito
+
+The following example shows how to configure `jwksBackendRef` for Amazon Cognito. For more information on setting up Cognito as an OIDC provider, see the [Amazon Cognito documentation](https://docs.aws.amazon.com/cognito/).
+
+The fields in the example come from your Cognito user pool configuration:
+- **jwksURI**: `https://cognito-idp.<region>.amazonaws.com/<user-pool-id>/.well-known/jwks.json`
+- **tokenEndpoint**: `https://cognito-idp.<region>.amazonaws.com/oauth2/token`
+- **authorizationEndpoint**: `https://cognito-idp.<region>.amazonaws.com/oauth2/authorize`
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -63,7 +116,6 @@ spec:
         audiences:
           - your-client-id
 ```
-
 
 ### Backend Definitions
 
@@ -136,7 +188,7 @@ The `jwksBackendRef` field is **optional**. If not specified, the gateway uses t
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-Delete the GatewayExtension, TrafficPolicy, and Backend resources that you created in this guide.
+Delete the GatewayExtension and Backend resources that you created in this guide.
 
 ```sh
 kubectl delete gatewayextension oauth-two-backends -n {{< reuse "kgw-docs/snippets/namespace.md" >}}

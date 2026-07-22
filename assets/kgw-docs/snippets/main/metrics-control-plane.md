@@ -3,6 +3,10 @@ Name|Type|Labels|Help
 kgateway_controller_reconcile_duration_seconds|histogram|controller, name, namespace|Reconcile duration for controller
 kgateway_controller_reconciliations_running|gauge|controller, name, namespace|Number of reconciliations currently running
 kgateway_controller_reconciliations_total|counter|controller, name, namespace, result|Total number of controller reconciliations
+kgateway_ec2_discovery_endpoints_active|gauge|namespace, name|Current number of active Envoy endpoints discovered for an EC2 Backend
+kgateway_ec2_discovery_error_state|gauge|namespace, name|Whether the most recent EC2 discovery poll for a Backend failed (1) or succeeded (0)
+kgateway_ec2_discovery_poll_duration_seconds|histogram|namespace, name, result|Duration of EC2 endpoint discovery polls per Backend
+kgateway_ec2_discovery_poll_total|counter|namespace, name, result, reason|Total number of EC2 endpoint discovery refresh attempts per Backend
 kgateway_envoy_xds_rejects_active|gauge|gateway_namespace, gateway_name, type_url|Number of xDS responses currently rejected by envoy proxy
 kgateway_envoy_xds_rejects_total|counter|gateway_namespace, gateway_name, type_url|Total number of xDS responses rejected by envoy proxy
 kgateway_resources_managed|gauge|namespace, parent, resource|Current number of resources managed

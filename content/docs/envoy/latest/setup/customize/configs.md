@@ -1,7 +1,7 @@
 ---
-title: Overlay examples
+title: Gateway customization examples
 weight: 40
-description: Common overlay configuration examples for HPA, VPA, PDB, and extension overlays.
+description: Configure autoscaling, pod scheduling, security contexts, volumes, metadata, load balancers, and advanced Deployment overlays.
 ---
 
 {{< reuse "kgw-docs/pages/setup/customize/configs.md" >}}

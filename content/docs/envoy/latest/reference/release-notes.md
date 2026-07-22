@@ -133,7 +133,7 @@ The following overlays are supported:
 * Use `deploymentOverlay`, `serviceOverlay`, and `serviceAccountOverlay` to patch the generated Deployment, Service, and ServiceAccount.
 * Use `horizontalPodAutoscaler`, `verticalPodAutoscaler`, and `podDisruptionBudget` to automatically create and configure these resources targeting the proxy Deployment.
 
-For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
+For more information, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}) and [Gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
 #### Additional Envoy container arguments {#envoy-extra-args}
 
@@ -274,6 +274,48 @@ For more information, see [Limit request header count]({{< link-hextra path="/tr
 You can now source HTTP header values from Kubernetes Secrets instead of inlining them in your route configuration. Use the `secretRef` field on the `HTTPHeaderFilter` in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to reference a secret. The gateway proxy automatically injects the secret value as a request or response header at runtime.
 
 For more information, see [Add a header from a secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}).
+
+#### Exclude ServiceEntries from discovery {#v23-serviceentry-exclusion}
+
+You can now exclude specific Istio `ServiceEntry` resources from the gateway's backend and endpoint discovery by using Kubernetes label selectors. To enable this feature, set the `serviceEntriesExclusionLabelSelectors` Helm value to a list of selectors. Any `ServiceEntry` that matches a selector is ignored during the backend and endpoint discovery phase.
+
+A ServiceEntry is excluded if it matches any entry in the list (`OR` condition). Within each entry, all `matchLabels` and `matchExpressions` conditions must hold for the ServiceEntry to be excluded (`AND` condition). Empty entries are rejected to prevent excluding all ServiceEntries.
+
+The following example shows multiple `matchLabel` entries. ServiceEntries are excluded if they have both `example.io/source: generated` and `example.io/source-kind: ExternalService` labels (`AND` condition), or the `env: staging` label (`OR` condition).
+
+```yaml
+serviceEntriesExclusionLabelSelectors:
+  # Exclude entries that have both labels (AND within an entry)
+  - matchLabels:
+      example.io/source: generated
+      example.io/source-kind: ExternalService
+  # Also exclude entries in staging (OR across entries)
+  - matchLabels:
+      env: staging
+```
+
+#### xDS first-connect grace period {#v23-xds-first-connect-delay}
+
+By default, the control plane waits 1 second after a new proxy connects before sending its first xDS snapshot. This gives per-client translation time to converge and prevents newly started gateway pods from receiving incomplete configuration after a controller restart.
+
+You can adjust the grace period by using the `KGW_XDS_FIRST_CONNECT_DELAY` environment variable on the controller. The value is a Go duration string, for example `2s`. Set it to `0` to disable the grace period entirely.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_XDS_FIRST_CONNECT_DELAY: "2s"
+```
+
+#### ReferenceGrant enforcement modes {#v23-referencegrant-modes}
+
+You can now configure how strictly kgateway enforces Gateway API ReferenceGrant requirements for cross-namespace references by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. The following modes are available:
+
+- **`STRICT`**: Enforce ReferenceGrants for all cross-namespace references, including TrafficPolicy `extensionRef` references to GatewayExtensions in other namespaces. Recommended for new clusters.
+- **`PERMISSIVE`** (default): Enforce ReferenceGrants for `BackendRef` and `SecretRef` references, but not for cross-namespace `ExtensionRef` references. This preserves the behavior before enforcement modes were introduced and provides a migration path for existing clusters.
+- **`OFF`**: Disable all ReferenceGrant enforcement. Not recommended for multi-tenant or production environments.
+
+For more information, see [ReferenceGrant enforcement modes]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+
 <!-- TODO release 2.2
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
