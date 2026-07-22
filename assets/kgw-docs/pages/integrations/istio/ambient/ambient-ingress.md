@@ -138,10 +138,7 @@ To set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway 
       2025-03-19T17:32:46.810472Z	info	access	connection complete	src.addr=10.0.71.117:42468 src.workload="http-9db6c8995-l54dw" src.namespace="{{< reuse "kgw-docs/snippets/namespace.md" >}}" src.identity="spiffe://cluster.local/ns/{{< reuse "kgw-docs/snippets/namespace.md" >}}/sa/http" dst.addr=10.0.65.144:15008 dst.hbone_addr=10.0.65.144:8080 dst.service="httpbin.httpbin.svc.cluster.local" dst.workload="httpbin-577649ddb-7nc8p" dst.namespace="httpbin" dst.identity="spiffe://cluster.local/ns/httpbin/sa/httpbin" direction="inbound" bytes_sent=1290 bytes_recv=550 duration="6742ms"
       ```
 
-{{% version exclude-if="2.0.x" %}}
-
 ## Next
 
-Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}).
+Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}), or review [Additional ambient configurations]({{< link-hextra path="/integrations/istio/ambient/additional-settings/" >}}).
 
-{{% /version %}}

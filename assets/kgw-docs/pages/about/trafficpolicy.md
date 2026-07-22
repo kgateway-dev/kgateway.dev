@@ -190,9 +190,9 @@ EOF
 
 ### Gateway {#attach-to-gateway}
 
-Some policies, such as a local rate limiting policy, can be applied to all the routes that the Gateway serves. This way, you can apply gateway-level rules and do not have to keep track of new HTTPRoutes that are attached to the Gateway in your environment. 
+Policies can be applied to all HTTPRoutes that the Gateway serves. Gateway-level policies are inherited by all child HTTPRoutes, so you can set defaults once without having to configure each HTTPRoute individually. Route-level policies always take precedence over gateway-level ones. For example, you can set a default request timeout at the gateway level, and override it on a specific HTTPRoute when needed.
 
-To attach a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to a Gateway, you simply use the `targetRefs` section in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to reference the Gateway you want the policy to apply to as shown in the following example. 
+To attach a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to a Gateway, use the `targetRefs` section in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to reference the Gateway as shown in the following example. 
 
 ```yaml
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -301,7 +301,7 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 | 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple HTTPRoute rule policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
 
 {{< callout type="info" >}} 
-If you apply a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with the same top-level policy to a Gateway and an HTTPRoute, the policy on the HTTPRoute takes precedence and the one on the Gateway is ignored. For example, you might have two local rate limiting policies. One is applied to a Gateway and one is applied to the HTTPRoute. Because the same top-level policy is defined, the policy on the HTTPRoute is considered higher priority and therefore enforced. 
+Gateway-level {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} propagate to all child HTTPRoutes. If a child HTTPRoute has its own {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that defines the same top-level policy, the route-level policy takes precedence and the gateway-level one is ignored for that route. For example, if you set a 60-second request timeout at the gateway level, all HTTPRoutes inherit that timeout unless a route defines its own timeout, which overrides the gateway default.
 {{< /callout >}}
 
 ### Policy inheritance and overrides in delegation setups {#delegation}

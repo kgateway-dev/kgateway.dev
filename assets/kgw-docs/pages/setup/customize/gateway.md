@@ -134,7 +134,7 @@ You can use the built-in customization fields in the {{< reuse "kgw-docs/snippet
 
 You can define Kubernetes overlays in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to override default settings for the Deployment, Service, and ServiceAccount that are created for a gateway proxy. Overlays use [Kubernetes strategic merge patch](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/) semantics.
 
-1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with your custom overlay. The following example changes the default replica count from 1 to 3. For other examples, see [Overlay examples]({{< link-hextra path="/setup/customize/configs/" >}}).
+1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with your custom overlay. The following example sets the minimum time that a new pod must be ready before the Deployment considers it available. `minReadySeconds` does not have a built-in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} field, so an overlay is appropriate. For other examples, see [Gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}).
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -147,7 +147,7 @@ You can define Kubernetes overlays in the {{< reuse "kgw-docs/snippets/gatewaypa
      kube:
        deploymentOverlay:
          spec:
-           replicas: 3
+           minReadySeconds: 10
    EOF
    ```
 
@@ -177,24 +177,21 @@ You can define Kubernetes overlays in the {{< reuse "kgw-docs/snippets/gatewaypa
    EOF
    ```
 
-3. Check the number of gateway proxy pods that are created. Verify that you see 3 replicas.
+3. Check the generated Deployment. Verify that the minimum ready time is 10 seconds.
 
    ```sh
-   kubectl get pods -l app.kubernetes.io/name=custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl get deployment custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o jsonpath='{.spec.minReadySeconds}'
    ```
 
    Example output:
 
    ```
-   NAME                      READY   STATUS    RESTARTS   AGE
-   custom-54975d9598-qrh8v   1/1     Running   0          7s
-   custom-54975d9598-tb6qx   1/1     Running   0          7s
-   custom-54975d9598-w4cx2   1/1     Running   0          7s
+   10
    ```
 
 ## Next
 
-[Explore common overlay configurations]({{< link-hextra path="/setup/customize/configs/" >}}) such as deployment replicas, pod scheduling, security contexts, and cloud provider load balancer annotations.
+[Explore gateway customization examples]({{< link-hextra path="/setup/customize/configs/" >}}), such as autoscaling, pod scheduling, security contexts, volumes, load-balancer settings, init containers, and sidecars.
 
 ## Cleanup
 

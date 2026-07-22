@@ -1,12 +1,11 @@
-Review common proxy customizations that you might want to apply in your environment. For steps on how to apply these configurations, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}).
+Review common proxy customizations that you might want to apply in your environment. The examples use built-in API fields whenever they are available and reserve overlays for settings that have no built-in equivalent. For steps on how to apply these configurations, see [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
 ## Horizontal Pod Autoscaler (HPA) {#hpa}
 
 Use `horizontalPodAutoscaler` to automatically create an HPA that targets the gateway proxy Deployment. The HPA is only created when this field is present. The `scaleTargetRef` is automatically configured to point to the proxy Deployment.
 
-{{< callout type="info" >}}
-Do not set `kube.deployment.replicas` when using an HPA. If a fixed replica count is set, the HPA cannot scale the Deployment.
-{{< /callout >}}
+> [!NOTE]
+> Do not set `kube.deployment.replicas` when using an HPA. If a fixed replica count is set, the HPA cannot scale the Deployment.
 
 1. Install the Kubernetes `metrics-server` if it is not already running in your cluster.
 
@@ -85,9 +84,8 @@ Do not set `kube.deployment.replicas` when using an HPA. If a fixed replica coun
 
 Use `verticalPodAutoscaler` to automatically create a VPA that targets the gateway proxy Deployment. The VPA is only created when this field is present. The `targetRef` is automatically configured to point to the proxy Deployment.
 
-{{< callout type="info" >}}
-The VPA feature requires the [Kubernetes VPA controller](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) to be installed in your cluster.
-{{< /callout >}}
+> [!NOTE]
+> The VPA feature requires the [Kubernetes VPA controller](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) to be installed in your cluster.
 
 1. Install the VPA controller if it is not already running in your cluster. See the [VPA installation guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler#installation) for instructions.
 
@@ -184,16 +182,16 @@ spec:
 EOF
 ```
 
-## Deployment overlays
+## Deployment and pod configuration
 
-Use `deploymentOverlay` to apply a strategic merge patch to the generated proxy Deployment.
+Use the built-in `deployment`, `podTemplate`, and `envoyContainer` fields for common Deployment, pod, and proxy-container settings.
 
 ### Change deployment replicas {#deployment-replicas}
 
-Set a specific number of replicas for the gateway proxy Deployment.
+Set a specific number of replicas for the gateway proxy Deployment with the built-in `deployment.replicas` field.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -201,18 +199,20 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    deploymentOverlay:
-      spec:
-        replicas: 3
+    deployment:
+      replicas: 3
 EOF
 ```
+
+> [!NOTE]
+> Do not set `deployment.replicas` when you use an HPA, because the fixed value conflicts with autoscaling.
 
 ### Image pull secrets {#image-pull-secrets}
 
-Add image pull secrets to pull container images from private registries.
+Add image pull secrets to pull container images from private registries with the built-in `podTemplate.imagePullSecrets` field.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -220,18 +220,158 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            imagePullSecrets:
-              - name: my-registry-secret
+    podTemplate:
+      imagePullSecrets:
+        - name: my-registry-secret
 EOF
 ```
 
+### Pod and node affinity {#pod-scheduling}
+
+Use the built-in `podTemplate` fields to configure node selectors, affinities, tolerations, and topology spread constraints that control where gateway proxy pods are scheduled.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    podTemplate:
+      nodeSelector:
+        node-type: gateway
+        zone: us-west-1a
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - arm64
+      tolerations:
+        - key: dedicated
+          operator: Equal
+          value: gateway
+          effect: NoSchedule
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: kgateway
+EOF
+```
+
+### Custom pod security context {#security-context}
+
+Configure custom pod security settings with the built-in `podTemplate.securityContext` field. To customize the proxy container security context instead, use `envoyContainer.securityContext`.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    podTemplate:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 2000
+        fsGroup: 3000
+EOF
+```
+
+### Remove default security contexts for OpenShift {#openshift-security-context}
+
+OpenShift manages security contexts through Security Context Constraints (SCCs). Set the built-in `omitDefaultSecurityContext` field to prevent the control plane from adding default pod and container security contexts, so that OpenShift can assign appropriate values.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    omitDefaultSecurityContext: true
+EOF
+```
+
+### Custom labels and annotations {#labels-annotations}
+
+Use `Gateway.spec.infrastructure.labels` and `Gateway.spec.infrastructure.annotations` to add metadata to all managed resources for a Gateway, including the Deployment and pods. Use resource-specific `extraLabels` and `extraAnnotations` fields in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} when the metadata must apply to only the pods, Service, or ServiceAccount.
+
+```yaml
+kubectl apply -f- <<'EOF'
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
+metadata:
+  name: custom
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
+  infrastructure:
+    labels:
+      environment: production
+      team: platform
+    annotations:
+      description: "Production gateway proxy"
+    parametersRef:
+      name: gw-params
+      group: {{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+  listeners:
+    - protocol: HTTP
+      port: 80
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: All
+EOF
+```
+
+### Mount a ConfigMap as a volume {#configmap-volume}
+
+Use `podTemplate.extraVolumes` to add a ConfigMap-backed volume and `envoyContainer.extraVolumeMounts` to mount it in the proxy container.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    podTemplate:
+      extraVolumes:
+        - name: custom-config
+          configMap:
+            name: my-custom-config
+    envoyContainer:
+      extraVolumeMounts:
+        - name: custom-config
+          mountPath: /etc/custom-config
+          readOnly: true
+EOF
+```
+
+## Deployment overlays
+
+Use `deploymentOverlay` to apply a strategic merge patch only for Deployment settings that do not have built-in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} fields. For details about scalar replacement, map and list merging, deletion directives, and overlay precedence, see [Customization options]({{< link-hextra path="/setup/customize/options/#overlays" >}}).
+
 ### Add init containers {#init-containers}
 
-Add init containers that run before the main proxy container starts.
+Add init containers that run before the main proxy container starts. Because `initContainers` uses `name` as its strategic merge patch key, this item is appended without replacing any init containers that are already present.
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
@@ -247,18 +387,18 @@ spec:
         template:
           spec:
             initContainers:
-              - name: wait-for-config
+              - name: initialize-gateway
                 image: busybox:1.36
-                command: ['sh', '-c', 'until [ -f /config/ready ]; do sleep 1; done']
-                volumeMounts:
-                  - name: config-volume
-                    mountPath: /config
+                command: ["sh", "-c", "echo initialization complete"]
 EOF
 ```
 
 ### Add sidecar containers {#sidecar-containers}
 
-Add sidecar containers alongside the main proxy container.
+Add a sidecar container alongside the proxy container. Because `name` is the merge key for the `containers` list, your sidecar is added as a new entry without affecting the generated proxy container.
+
+> [!NOTE]
+> For TLS certificate handling, use the built-in `sdsContainer` field instead of adding a custom sidecar.
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
@@ -274,176 +414,15 @@ spec:
         template:
           spec:
             containers:
-              - name: kgateway
-                # Merges with the existing proxy container
-              - name: log-shipper
-                image: fluent/fluent-bit:latest
-                volumeMounts:
-                  - name: logs
-                    mountPath: /var/log/proxy
-EOF
-```
-
-### Pod and node affinity {#pod-scheduling}
-
-Configure node selectors, affinities, tolerations, and topology spread constraints to control where gateway proxy pods are scheduled.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            nodeSelector:
-              node-type: gateway
-              zone: us-west-1a
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: kubernetes.io/arch
-                          operator: In
-                          values:
-                            - amd64
-                            - arm64
-            tolerations:
-              - key: dedicated
-                operator: Equal
-                value: gateway
-                effect: NoSchedule
-            topologySpreadConstraints:
-              - maxSkew: 1
-                topologyKey: kubernetes.io/hostname
-                whenUnsatisfiable: DoNotSchedule
-                labelSelector:
-                  matchLabels:
-                    app: kgateway
-EOF
-```
-
-### Custom pod security context {#security-context}
-
-Configure custom security settings for the pod.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            securityContext:
-              runAsUser: 1000
-              runAsGroup: 2000
-              fsGroup: 3000
-EOF
-```
-
-### Remove security context for OpenShift {#openshift-security-context}
-
-OpenShift manages security contexts through Security Context Constraints (SCCs). Remove the default security context to allow OpenShift to assign appropriate values. Use `$patch: delete` to remove the pod-level security context, or set a container-level field to `null` to clear it.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            # Remove the pod-level securityContext
-            securityContext:
-              $patch: delete
-            containers:
-              - name: kgateway
-                # Remove the container-level securityContext
-                securityContext: null
-EOF
-```
-
-### Custom labels and annotations {#labels-annotations}
-
-Add custom labels and annotations to the proxy Deployment and pods.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      metadata:
-        labels:
-          environment: production
-          team: platform
-        annotations:
-          description: "Production gateway proxy"
-      spec:
-        template:
-          metadata:
-            labels:
-              environment: production
-            annotations:
-              prometheus.io/scrape: "true"
-              prometheus.io/port: "9091"
-EOF
-```
-
-### Mount a ConfigMap as a volume {#configmap-volume}
-
-Mount a custom ConfigMap to the proxy container.
-
-```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    deploymentOverlay:
-      spec:
-        template:
-          spec:
-            volumes:
-              - name: custom-config
-                configMap:
-                  name: my-custom-config
-            containers:
-              - name: kgateway
-                volumeMounts:
-                  - name: custom-config
-                    mountPath: /etc/custom-config
-                    readOnly: true
+              - name: custom-sidecar
+                image: busybox:1.36
+                command: ["sh", "-c", "tail -f /dev/null"]
 EOF
 ```
 
 ### Replace all volumes {#replace-volumes}
 
-Use `$patch: replace` to completely replace the list of volumes instead of merging with the default list. Place `$patch: replace` as a separate list item before your actual volumes.
+Use `$patch: replace` to take full control of the pod volume list instead of merging additional volumes with `podTemplate.extraVolumes`. Place `$patch: replace` as a separate list item before the actual volumes.
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
@@ -466,20 +445,19 @@ spec:
 EOF
 ```
 
-{{< callout type="warning" >}}
-Place `$patch: replace` as a separate list item **before** your actual items. If you include it in the same item as your configuration, you might end up with an empty list.
-{{< /callout >}}
+> [!CAUTION]
+> Replacing all volumes removes volumes that are generated by the control plane and can prevent the proxy from starting. A production replacement must re-declare every generated volume that the proxy requires. If you only need to add volumes, use `podTemplate.extraVolumes` instead.
 
-## Service overlays
+## Service configuration
 
-Use `serviceOverlay` to apply a strategic merge patch to the generated proxy Service.
+Use the built-in `service` fields for Service settings. Use `Gateway.spec.addresses` for a static load-balancer address.
 
 ### Add service annotations {#service-annotations}
 
-Add annotations to the proxy Service. A common use case is adding cloud provider-specific annotations for load balancer configuration.
+Add annotations to the proxy Service with `service.extraAnnotations`. A common use case is adding cloud provider-specific load-balancer configuration.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -487,38 +465,44 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service:
+      extraAnnotations:
+        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
 EOF
 ```
 
 ### Static IP for LoadBalancer {#static-ip}
 
-Assign a static IP address to the LoadBalancer Service.
+Assign a static IP address to the Service that exposes the gateway proxy with `Gateway.spec.addresses`.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+kubectl apply -f- <<'EOF'
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1
 metadata:
-  name: gw-params
+  name: custom
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  kube:
-    serviceOverlay:
-      spec:
-        loadBalancerIP: 203.0.113.10
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
+  addresses:
+    - type: IPAddress
+      value: 203.0.113.10
+  listeners:
+    - protocol: HTTP
+      port: 80
+      name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 EOF
 ```
 
-### LoadBalancer source IP ranges
+### LoadBalancer source IP ranges {#load-balancer-source-ranges}
 
-Set up an allowlist to restrict which source client IPs are allowed to connect to the LoadBalancer service that exposes the gateway proxy.
+Set up an allowlist with `service.loadBalancerSourceRanges` to restrict which source client IPs can connect to the LoadBalancer Service that exposes the gateway proxy.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -526,21 +510,20 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceOverlay:
-      spec: 
-        type: LoadBalancer
-        loadBalancerSourceRanges:
-          - 10.0.0.0/8
-          - 192.168.0.0/16
+    service:
+      type: LoadBalancer
+      loadBalancerSourceRanges:
+        - 10.0.0.0/8
+        - 192.168.0.0/16
 EOF
 ```
 
 ### AWS EKS load balancer annotations {#aws-eks-annotations}
 
-Configure AWS-specific load balancer features using Service annotations.
+Configure AWS-specific load-balancer features with `service.extraAnnotations`.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -548,26 +531,25 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Use Network Load Balancer instead of Classic
-          service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-          # Make it internal (no public IP)
-          service.beta.kubernetes.io/aws-load-balancer-internal: "true"
-          # Enable cross-zone load balancing
-          service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
-          # Specify subnets
-          service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-abc123,subnet-def456"
+    service:
+      extraAnnotations:
+        # Use Network Load Balancer instead of Classic
+        service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+        # Make it internal (no public IP)
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        # Enable cross-zone load balancing
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+        # Specify subnets
+        service.beta.kubernetes.io/aws-load-balancer-subnets: "subnet-abc123,subnet-def456"
 EOF
 ```
 
 ### GKE service annotations {#gke-annotations}
 
-Configure GKE-specific features like Regional Backend Services and static IPs using Service annotations.
+Configure GKE-specific features such as Regional Backend Services and reserved IP addresses with `service.extraAnnotations`.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -575,24 +557,23 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Enable Regional Backend Services for better load balancing
-          cloud.google.com/l4-rbs: "enabled"
-          # Use pre-reserved static IPs
-          networking.gke.io/load-balancer-ip-addresses: "my-v4-ip,my-v6-ip"
-          # Specify the subnet for internal load balancers
-          networking.gke.io/load-balancer-subnet: "my-subnet"
+    service:
+      extraAnnotations:
+        # Enable Regional Backend Services for better load balancing
+        cloud.google.com/l4-rbs: "enabled"
+        # Use pre-reserved static IPs
+        networking.gke.io/load-balancer-ip-addresses: "my-v4-ip,my-v6-ip"
+        # Specify the subnet for internal load balancers
+        networking.gke.io/load-balancer-subnet: "my-subnet"
 EOF
 ```
 
 ### Azure AKS load balancer annotations {#azure-aks-annotations}
 
-Configure Azure-specific load balancer features using Service annotations.
+Configure Azure-specific load-balancer features with `service.extraAnnotations`.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -600,26 +581,25 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceOverlay:
-      metadata:
-        annotations:
-          # Make it internal
-          service.beta.kubernetes.io/azure-load-balancer-internal: "true"
-          # Specify resource group for the load balancer
-          service.beta.kubernetes.io/azure-load-balancer-resource-group: "my-resource-group"
+    service:
+      extraAnnotations:
+        # Make it internal
+        service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+        # Specify resource group for the load balancer
+        service.beta.kubernetes.io/azure-load-balancer-resource-group: "my-resource-group"
 EOF
 ```
 
-## ServiceAccount overlays
+## ServiceAccount configuration
 
-Use `serviceAccountOverlay` to apply a strategic merge patch to the generated proxy ServiceAccount.
+Use the built-in `serviceAccount` field for ServiceAccount settings.
 
 ### ServiceAccount annotations for IAM {#sa-iam-annotations}
 
-Add annotations to the ServiceAccount for cloud provider IAM integration, such as AWS IRSA or GKE Workload Identity.
+Add annotations with `serviceAccount.extraAnnotations` for cloud provider IAM integrations such as AWS IRSA or GKE Workload Identity.
 
 ```yaml
-kubectl apply --server-side -f- <<'EOF'
+kubectl apply -f- <<'EOF'
 apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
@@ -627,12 +607,11 @@ metadata:
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
-    serviceAccountOverlay:
-      metadata:
-        annotations:
-          # AWS IRSA
-          eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/gateway-role"
-          # Or GKE Workload Identity
-          # iam.gke.io/gcp-service-account: "gateway@my-project.iam.gserviceaccount.com"
+    serviceAccount:
+      extraAnnotations:
+        # AWS IRSA
+        eks.amazonaws.com/role-arn: "arn:aws:iam::123456789012:role/gateway-role"
+        # Or GKE Workload Identity
+        # iam.gke.io/gcp-service-account: "gateway@my-project.iam.gserviceaccount.com"
 EOF
 ```

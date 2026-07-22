@@ -122,7 +122,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [BackendConfigPolicy API docs](../../reference/api/#backendconfigpolicy).
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [BackendConfigPolicy API docs]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}).
 
    | Setting | Description |
    |---------|-------------|
@@ -389,6 +389,41 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    }
    ```
 
+
+{{< version include-if="2.4.x" >}}
+## Other configurations {#other}
+
+Review other configurations.
+
+### Signature algorithms {#signature-algorithms}
+
+Use the `tls.parameters.signatureAlgorithms` field in a BackendConfigPolicy resource to restrict which TLS signature algorithms the gateway proxy advertises when establishing upstream TLS connections. This setup is useful when your backend requires a specific set of algorithms for compliance or security reasons. If unset, Envoy's defaults apply.
+
+The following example restricts the upstream TLS connection to ECDSA and RSA-PSS signature algorithms.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: kgateway-base
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  tls:
+    sni: "example.com"
+    secretRef:
+      name: ca
+    parameters:
+      signatureAlgorithms:
+        - ecdsa_secp256r1_sha256
+        - rsa_pss_rsae_sha256
+EOF
+```
+{{< /version >}}
 
 ## Cleanup
 

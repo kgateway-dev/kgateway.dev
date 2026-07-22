@@ -269,6 +269,16 @@ def _post_process_api_docs(api_file):
         '_Underlying type:_ _struct_',
         content
     )
+
+    # crd-ref-docs renders signed integer fields as plain `_integer_`, but leaves
+    # unsigned Go builtins (uint, uint8, uint16, uint32, uint64) as self-links to a
+    # `#uintNN` anchor that is never emitted, so the link checker flags a broken
+    # anchor. Render them as plain `_integer_` to match the signed-int convention.
+    content = re.sub(
+        r'_\[uint(?:8|16|32|64)?\]\(#uint(?:8|16|32|64)?\)_',
+        '_integer_',
+        content
+    )
     
     # Also handle cases without the link wrapper
     content = re.sub(

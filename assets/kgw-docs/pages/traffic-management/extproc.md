@@ -438,6 +438,42 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    ...
    ```
 -->  
+
+{{< version include-if="2.4.x" >}}
+
+## Other configurations
+
+Review other common configurations.
+
+### Request attributes {#request-attributes}
+
+By default, ExtProc servers only receive HTTP headers and body data. If your ExtProc server needs access to connection-level Envoy attributes that are not available as HTTP headers, such as the client IP address or the requested server name, you can configure the `requestAttributes` field on the GatewayExtension resource. Envoy then populates the `ProcessingRequest.attributes` map with the specified attribute values on every HTTP request.
+
+Update your GatewayExtension resource to include the `requestAttributes` field. Then, add one or multiple Envoy attribute expressions. For a full list of supported Envoy attribute expressions, see the [Envoy attribute documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/attributes).
+
+
+```yaml
+kubectl apply -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: ext-proc-extension
+spec:
+  type: ExtProc
+  extProc:
+    grpcService:
+      backendRef:
+        name: ext-proc-grpc
+        port: 4444
+    requestAttributes:
+      - source.address
+      - connection.requested_server_name
+EOF
+```
+
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

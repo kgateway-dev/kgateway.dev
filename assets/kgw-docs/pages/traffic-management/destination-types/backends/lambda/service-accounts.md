@@ -393,4 +393,3 @@ If you no longer need to access Lambda functions from {{< reuse "/kgw-docs/snipp
    aws iam delete-role --role-name lambda-role
    aws iam delete-policy --policy-arn=arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
    ```
-

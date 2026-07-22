@@ -778,19 +778,20 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `responseCompression` _[ResponseCompression](#responsecompression)_ | ResponseCompression controls response compression to the downstream.<br />If set, responses with a matching `Accept-Encoding` header and certain textual content types will be compressed.<br />The compression codecs default to gzip and can be selected via `responseCompression.libraries`,<br />which Envoy negotiates against the request's `Accept-Encoding` header.<br />The content-types that will be compressed are:<br />- `application/javascript`<br />- `application/json`<br />- `application/xhtml+xml`<br />- `image/svg+xml`<br />- `text/css`<br />- `text/html`<br />- `text/plain`<br />- `text/xml` |  |  |
-| `requestDecompression` _[RequestDecompression](#requestdecompression)_ | RequestDecompression controls request decompression.<br />If set, gzip requests will be decompressed. |  |  |
+| `requestDecompression` _[RequestDecompression](#requestdecompression)_ | RequestDecompression controls request decompression.<br />If set, request bodies in the configured codecs are decompressed before forwarding. |  |  |
 
 
 #### CompressionLibrary
 
 _Underlying type:_ _string_
 
-CompressionLibrary identifies the codec used to compress responses.
+CompressionLibrary identifies a compression codec used to compress responses or decompress requests.
 
 _Validation:_
 - Enum: [Gzip Brotli Zstd]
 
 _Appears in:_
+- [RequestDecompression](#requestdecompression)
 - [ResponseCompression](#responsecompression)
 
 | Field | Description |
@@ -1411,7 +1412,7 @@ _Appears in:_
 | `delay` _[FaultDelay](#faultdelay)_ | Delay injects latency into requests before forwarding upstream. |  |  |
 | `abort` _[FaultAbort](#faultabort)_ | Abort injects HTTP or gRPC errors to terminate requests early. |  |  |
 | `responseRateLimit` _[FaultResponseRateLimit](#faultresponseratelimit)_ | ResponseRateLimit limits the response body data rate to simulate<br />slow or degraded upstream connections. |  |  |
-| `maxActiveFaults` _[uint32](#uint32)_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
+| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the fault injection filter.<br />Can be used to disable fault injection policies applied at a higher level<br />in the config hierarchy. |  |  |
 
 
@@ -2184,7 +2185,7 @@ _Appears in:_
 | `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
 | `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
 | `responseHeadersToCopy` _[HTTPHeaderName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `maxRedirects` _[uint32](#uint32)_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
+| `maxRedirects` _integer_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
 
 
 #### InternalRedirectResponseCode
@@ -2729,7 +2730,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `filter` _[AccessLogFilter](#accesslogfilter)_ | A filter that determines if this mapper should apply. |  | MaxProperties: 1 <br />MinProperties: 1 <br /> |
-| `statusCode` _[uint32](#uint32)_ | New response status code for the reply if specified. |  | Maximum: 599 <br />Minimum: 100 <br /> |
+| `statusCode` _integer_ | New response status code for the reply if specified. |  | Maximum: 599 <br />Minimum: 100 <br /> |
 | `body` _string_ | New body text for the reply if specified.<br />Available as `%LOCAL_REPLY_BODY%` in substitution strings. |  |  |
 | `bodyFormatOverride` _[BodyFormat](#bodyformat)_ | Alternative body format for the reply if specified. Takes precedence over default body format. |  |  |
 | `headers` _[HTTPHeaderFilter](#httpheaderfilter)_ | Headers to add or set for the reply if specified. |  |  |
@@ -3407,7 +3408,7 @@ _Appears in:_
 
 
 
-RequestDecompression enables request gzip decompression.
+RequestDecompression enables request decompression.
 
 
 
@@ -3416,6 +3417,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
+| `libraries` _[CompressionLibrary](#compressionlibrary) array_ | Libraries lists the codecs to decompress on request bodies. Envoy selects the decompressor<br />by the request's `Content-Encoding` header, so the list order is not significant. Request<br />bodies encoded with a codec not in this list are passed through to the backend unchanged.<br />Defaults to [Gzip]. | [Gzip] | Enum: [Gzip Brotli Zstd] <br />MaxItems: 3 <br />MinItems: 1 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disables decompression. |  |  |
 
 
@@ -4248,7 +4250,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `minEndpointsInZoneThreshold` _[uint32](#uint32)_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Minimum: 1 <br /> |
+| `minEndpointsInZoneThreshold` _integer_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Minimum: 1 <br /> |
 
 
 #### ZoneAwareLoadBalancer

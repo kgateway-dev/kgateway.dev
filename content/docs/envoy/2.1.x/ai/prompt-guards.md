@@ -275,7 +275,7 @@ In the next step, you instruct the AI Gateway to mask credit card numbers that a
 
 Pass prompt data through external moderation endpoints by using the `moderation` prompt guard setting. Moderation allows you to connect AI Gateway to a moderation model endpoint, which compares the request prompt input to predefined content rules.
 
-You can add the `moderation` section of any TrafficPolicy resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://platform.openai.com/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
+You can add the `moderation` section of any TrafficPolicy resource, either as a standalone prompt guard setting or in addition to other request and response guard settings. The following example uses the [OpenAI moderation model `omni-moderation-latest`](https://developers.openai.com/api/docs/guides/moderation) to parse request input for potentially harmful content. Note that you must also include your auth secret to access the OpenAI API.
 
 1. Update the TrafficPolicy resource to use external moderation. Now, any requests that are routed through AI Gateway pass through the OpenAI `omni-moderation-latest` moderation model. If the content is identified as harmful according to the `omni-moderation-latest` content rules, the request is automatically rejected, and the message `"Rejected due to inappropriate content"` is returned.
    

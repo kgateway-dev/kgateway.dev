@@ -4,7 +4,7 @@ description: Tune TLS settings such as minimum version and cipher suites on a li
 weight: 20
 ---
 
-Annotate your Gateway listener to enable additional TLS settings, such as the minimum and maximum TLS version, cipher suites, or allowed certificate hashes. 
+Annotate your Gateway listener to enable additional TLS settings, such as the minimum and maximum TLS version, cipher suites, signature algorithms, or allowed certificate hashes. 
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -37,6 +37,7 @@ spec:
         kgateway.dev/ecdh-curves: "X25519,P-256"
         kgateway.dev/min-tls-version: "1.2"
         kgateway.dev/max-tls-version: "1.3"
+        kgateway.dev/signature-algorithms: "ecdsa_secp256r1_sha256,rsa_pss_rsae_sha256"
         kgateway.dev/verify-subject-alt-names: "example.com"
         kgateway.dev/verify-certificate-hash: "46:DB:0D:C2:E1:4F:0A:05:8C:4F:05:8D:77:B1:8D:7C:1A:BE:18:4F:AF:81:BF:E2:B1:CD:03:43:7F:D8:65:4B"
   - name: https-insecure-fallback
@@ -59,6 +60,7 @@ The following settings are supported:
 | `kgateway.dev/ecdh-curves` | A comma-delimited list of key exchange protocols. If unset, the Envoy default of `X25519` and `P-256` are used. When adding a new protocol to this list, ensure it is backwards compatible in the case that the client does not specifically support the new protocol. This example adds the Post-Quantum safe key exchange protocol `X25519MLKEM768`, but falls back to the classic `X25519` or `P-256` protocols if the client does not support it. If you want to allow only the Post-Quantum safe protocol, remove the safe protocols and specify `X25519MLKEM768` only. |
 | `kgateway.dev/min-tls-version` | Enforce a minimum TLS version for the listener to use. In this example, TLS version 1.2 is used. |
 | `kgateway.dev/max-tls-version` | Enforce a maximum TLS version for the Gateway to use. In this example, TLS version 1.3 is used. |
+| `kgateway.dev/signature-algorithms` | A comma-delimited list of TLS signature algorithms that the gateway advertises during the TLS handshake with downstream clients. Use this setting to restrict which signature algorithms are accepted, for example to enforce ECDSA-only or exclude legacy RSA schemes. If unset, Envoy's defaults apply. |
 | `kgateway.dev/verify-certificate-hash` | A comma-delimited list of the certificate hash (fingerprint) that must be present in the peer certificate that is presented during the TLS handshake. Use this setting for [mTLS listeners]({{< link-hextra path="/setup/listeners/mtls/" >}}) only.   | 
 | `kgateway.dev/verify-subject-alt-names` | A comma-delimited list of the Subject Alternative Names that must be present in the peer certificate that is presented during the TLS handshake. Use this setting for [mTLS listeners]({{< link-hextra path="/setup/listeners/mtls/" >}}) only.  |
 
