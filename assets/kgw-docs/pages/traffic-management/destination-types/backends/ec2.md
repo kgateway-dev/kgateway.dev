@@ -258,8 +258,8 @@ This method requires an EKS cluster with an OIDC provider. It does not work on l
    kubectl annotate serviceaccount {{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}  \
      eks.amazonaws.com/role-arn=${CONTROLLER_ROLE_ARN}
 
-   kubectl rollout restart deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-   kubectl rollout status deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout restart deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 {{% /tab %}}
