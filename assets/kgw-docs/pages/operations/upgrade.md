@@ -13,7 +13,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
 **Patch version upgrades**: <br>
 - You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "kgw-docs/versions/short.md" >}}.0 to {{< reuse "kgw-docs/versions/n-patch.md" >}} directly, and skip the patch versions in between.
 
-**Minor version upgrades**: </br>
+**Minor version upgrades**: <br>
 - Before you upgrade the minor version, always upgrade your _current_ minor version to the latest patch. This ensures that your current environment is up-to-date with any bug fixes or security patches before you begin the minor version upgrade process.
 - Always upgrade to the latest patch version of the target minor release. Do not upgrade to a lower patch version, such as {{< reuse "kgw-docs/versions/short.md" >}}.0, {{< reuse "kgw-docs/versions/short.md" >}}.1, and so on.
 - Do not skip minor versions during your upgrade. Upgrade minor release versions one at a time. 
