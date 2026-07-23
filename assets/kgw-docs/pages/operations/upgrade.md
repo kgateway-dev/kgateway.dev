@@ -10,7 +10,7 @@ During the upgrade, pods that run the new version of the control plane and proxi
 
 ### Patch and minor versions
 
-**Patch version upgrades**: </br>
+**Patch version upgrades**: <br>
 - You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "kgw-docs/versions/short.md" >}}.0 to {{< reuse "kgw-docs/versions/n-patch.md" >}} directly, and skip the patch versions in between.
 
 **Minor version upgrades**: </br>
