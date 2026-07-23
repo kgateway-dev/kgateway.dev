@@ -1,64 +1,20 @@
 You can use this guide to upgrade the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane and data plane components, or to apply changes to the components' configuration settings.
 
-<!-- TODO upgrade guide when we have a minor version
 ## Considerations
-Consider the following rules before you plan your kgateway upgrade.
+
+Consider the following rules before you plan your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} upgrade.
 
 ### Testing upgrades
 
 During the upgrade, pods that run the new version of the control plane and proxies are created. Then, the old pods are terminated. Because zero downtime is not guaranteed, try testing the upgrade in a staging environment before upgrading your production environment.
 
-### Patch and minor versions
+### Patch version upgrades
+You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "kgw-docs/versions/short.md" >}}.0 to {{< reuse "kgw-docs/versions/n-patch.md" >}} directly, and skip the patch versions in between.
 
-**Patch version upgrades**: </br>
-- You can skip patch versions within the same minor release. For example, you can upgrade from version {{< reuse "kgw-docs/versions/short.md" >}}.0 to {{< reuse "kgw-docs/versions/n-patch.md" >}} directly, and skip the patch versions in between.
-
-**Minor version upgrades**: </br>
+### Minor version upgrades
 - Before you upgrade the minor version, always upgrade your _current_ minor version to the latest patch. This ensures that your current environment is up-to-date with any bug fixes or security patches before you begin the minor version upgrade process.
 - Always upgrade to the latest patch version of the target minor release. Do not upgrade to a lower patch version, such as {{< reuse "kgw-docs/versions/short.md" >}}.0, {{< reuse "kgw-docs/versions/short.md" >}}.1, and so on.
 - Do not skip minor versions during your upgrade. Upgrade minor release versions one at a time. 
-
-## Step 1: Prepare to upgrade
-
-1. **Minor version upgrades**: Before you upgrade to a new minor version, first upgrade your _current_ minor version to the latest patch.
-   1. Find the latest patch of your minor version by checking the [release changelog](https://github.com/kgateway-dev/kgateway/releases).
-   2. Follow this upgrade guide to upgrade to the latest patch for your current minor version.
-   3. Then, you can repeat the steps in this guide to upgrade to the latest patch of the next minor version.
-
-2. Check that your underlying infrastructure platform, such as Kubernetes, and other dependencies run supported versions for the kgateway version that you want to upgrade to.
-   1. Review the [supported versions](../../reference/versions/) for dependencies such as Kubernetes, Istio, Helm, and more.
-   2. Compare the supported version against the versions that you currently use. 
-   3. If necessary, upgrade your dependencies, such as consulting your cluster infrastructure provider to upgrade the version of Kubernetes that your cluster runs.
-
-3. Set the version to upgrade kgateway to in an environment variable, such as the latest patch version (`{{< reuse "kgw-docs/versions/n-patch.md" >}}`) .
-   ```sh
-   export NEW_VERSION={{< reuse "kgw-docs/versions/n-patch.md" >}}
-   ```
-
-## Step 2: Upgrade the CLI
-
-1. Upgrade `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` to the new version. Note that this command only updates the CLI binary version, and does not upgrade your kgateway installation.
-   ```shell
-   {{< reuse "kgw-docs/snippets/cli-name.md" >}} upgrade --release v${NEW_VERSION}
-   ```
-
-2. Verify that the **client** version matches the version you installed.
-   ```shell
-   {{< reuse "kgw-docs/snippets/cli-name.md" >}} version
-   ```
-
-   Example output:
-   ```json
-   {
-   "client": {
-     "version": "{{< reuse "kgw-docs/versions/n-patch.md" >}}"
-   },
-   ```
-
-## Step 3: Upgrade kgateway
-
--->
-
 
 ## Prepare to upgrade {#prepare}
 
