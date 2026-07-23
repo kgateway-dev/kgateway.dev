@@ -2,7 +2,7 @@ You can use this guide to upgrade the {{< reuse "/kgw-docs/snippets/kgateway.md"
 
 ## Considerations
 
-Consider the following rules before you plan your kgateway upgrade.
+Consider the following rules before you plan your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} upgrade.
 
 ### Testing upgrades
 
