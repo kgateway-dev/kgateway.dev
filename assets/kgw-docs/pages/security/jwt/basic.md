@@ -270,7 +270,7 @@ The following example uses Keycloak as the identity provider.
 
    {{< version exclude-if="2.1.x" >}}For more information, see the [API docs]({{< link-hextra path="/reference/api/#remotejwks" >}}).{{< /version >}}
 
-{{< version include-if="2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 #### Async JWKS fetch {#async-fetch}
 
@@ -651,7 +651,9 @@ Expected output:
 < HTTP/1.1 200 OK
 ```
 
-### asyncFetch {#async-fetch}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
+
+### asyncFetch {#asyncFetch}
 
 When using a remote JWKS, you can configure `asyncFetch` to control how the gateway fetches and caches the JWKS. This is useful for improving performance and controlling startup behavior.
 
@@ -734,6 +736,8 @@ Use the following guidelines to choose appropriate values:
 {{< callout type="warning" >}}
 **Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
 {{< /callout >}}
+
+{{< /version >}}
 
 ## Cleanup {#cleanup}
 

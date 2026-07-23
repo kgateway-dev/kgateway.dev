@@ -14,7 +14,7 @@ Kgateway uses the following custom resources to attach policies to routes and ga
   {{< card link="../policies/trafficpolicy/" title="TrafficPolicy" subtitle="Attach policies to routes in an HTTPRoute or Gateway resource." >}}
 {{< /cards >}}
 {{< /version >}}
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 {{< cards >}}
   {{< card link="../../traffic-management/direct-response/" title="Direct response" subtitle="Directly respond to incoming requests with a custom HTTP response code and body." >}}
   {{< card link="../policies/listenerpolicy/" title="ListenerPolicy" subtitle="Apply policies to all HTTP and HTTPS listeners." >}}
@@ -42,7 +42,7 @@ Review the policies that you can configure in kgateway and the level at which yo
 | [Outlier detection](../../resiliency/outlier-detection)| BackendConfigPolicy | {{% /version %}}
 | [Rate limiting](../../security/ratelimit/) | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 | [Session affinity - Simple load balancing](../../traffic-management/session-affinity/loadbalancing/) | BackendConfigPolicy  | 
-| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version exclude-if="2.0.x" %}} 
+| [Session affinity - Consistent hashing](../../traffic-management/session-affinity/consistent-hashing/) | BackendConfigPolicy  | {{%  version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}} 
 | [TCP keepalive](../../resiliency/keepalive/tcp/) | BackendConfigPolicy | {{% /version %}}
 | [Transformations](../../traffic-management/transformations) | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 

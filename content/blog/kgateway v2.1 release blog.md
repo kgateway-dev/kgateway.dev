@@ -208,10 +208,10 @@ Disabling policies can be applied to CORS, extAuth, extProc, and rate limit poli
 
 ## See the new features in action!
 
-Explore some of the new features from the v2.1 release or follow along with the [demo](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/kgateway-agentgateway-2.1-key-features).
+Explore some of the new features from the v2.1 release or follow along with the [demo](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s).
 {{< youtube 95FRff2n1pk >}}
 
-You can also check out the agentgateway and kgateway integration in action routing to [Agent-to-Agent (A2A) workloads](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/a2a-k8s) and [Model Context Protocol (MCP) servers](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/mcp-connection-k8s-agentgateway):
+You can also check out the agentgateway and kgateway integration in action routing to [Agent-to-Agent (A2A) workloads](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s/a2a-k8s) and [Model Context Protocol (MCP) servers](https://github.com/AdminTurnedDevOps/agentic-demo-repo/tree/main/agentgateway-oss-k8s):
 {{< youtube i7gAWTQypn8 >}}
 
 ##  🗑️ Deprecated or removed features

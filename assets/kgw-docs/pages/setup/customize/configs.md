@@ -87,7 +87,7 @@ Use `verticalPodAutoscaler` to automatically create a VPA that targets the gatew
 > [!NOTE]
 > The VPA feature requires the [Kubernetes VPA controller](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler) to be installed in your cluster.
 
-1. Install the VPA controller if it is not already running in your cluster. See the [VPA installation guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler#installation) for instructions.
+1. Install the VPA controller if it is not already running in your cluster. See the [VPA installation guide](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler#getting-started) for instructions.
 
 2. Update your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to add a `verticalPodAutoscaler`. The following example configures the VPA to automatically adjust resource requests in `Auto` mode within defined bounds.
 

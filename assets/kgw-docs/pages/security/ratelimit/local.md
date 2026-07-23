@@ -392,7 +392,7 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    ...
    ```
 
-{{< version exclude-if="2.3.x,2.4.x" >}}
+{{< version exclude-if="2.3.x,2.4.x,2.5.x" >}}
 
 ## Cleanup
 

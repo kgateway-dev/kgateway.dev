@@ -140,5 +140,5 @@ To set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway 
 
 ## Next
 
-Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}), or review [Additional ambient configurations]({{< link-hextra path="/integrations/istio/ambient/additional-settings/" >}}).
+Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}){{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}, or review [Additional ambient configurations]({{< link-hextra path="/integrations/istio/ambient/additional-settings/" >}}){{< /version >}}.
 

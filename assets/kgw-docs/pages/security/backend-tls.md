@@ -390,7 +390,7 @@ If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS 
    ```
 
 
-{{< version include-if="2.4.x" >}}
+{{< version include-if="2.4.x,2.5.x" >}}
 ## Other configurations {#other}
 
 Review other configurations.
