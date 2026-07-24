@@ -1,6 +1,7 @@
 ---
 title: API reference
 weight: 10
+description: Reference documentation for the kgateway API custom resources.
 ---
 
 {{< reuse "/kgw-docs/snippets/api-ref-docs-intro.md" >}}
