@@ -16,9 +16,8 @@ For more information, refer to the following sources:
 * **Authorization**: JWTs can have custom claims that can define a user's scope, role, or other permissions. You can use these claims in combination with other policies to enforce fine-grained access control to your apps. By including the claim information within the JWT, the authorization process can happen faster and more scalably.
 * **Secure information exchange**: Because the token is in JSON format, many otherwise incompatible systems and services can use the token to exchange information. The authentication and authorization features built into the token help these systems validate and trust the information. 
 
-{{< callout type="warning" >}}
-Keep in mind that JWT data is encoded but not encrypted. As such, consider using JWT policies with no personally identifiable information (PII) or sensitive data, and only on HTTPS traffic.
-{{< /callout >}}
+> [!WARNING]
+> Keep in mind that JWT data is encoded but not encrypted. As such, consider using JWT policies with no personally identifiable information (PII) or sensitive data, and only on HTTPS traffic.
 
 ### JWT structure {#structure}
 

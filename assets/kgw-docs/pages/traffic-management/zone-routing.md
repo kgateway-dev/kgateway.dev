@@ -22,9 +22,8 @@ To configure how traffic is distributed within the local zone, you can also set 
 
 Zone-aware routing cannot be combined with `ringHash`, `maglev`, or `localityType`.
 
-{{< callout >}}
-Zone-aware routing is only applied when backend endpoints exist in at least two zones. If all endpoints are in the same zone as the proxy, the proxy routes traffic normally without applying zone-aware logic.
-{{< /callout >}}
+> [!NOTE]
+> Zone-aware routing is only applied when backend endpoints exist in at least two zones. If all endpoints are in the same zone as the proxy, the proxy routes traffic normally without applying zone-aware logic.
 
 ### How the proxy determines locality
 
@@ -62,9 +61,8 @@ node-2                   us-east-1b
 node-3                   us-east-1a
 ```
 
-{{< callout type="info" >}}
-If you need to override the automatically detected zone, you can still explicitly set the `KGATEWAY_NODE_*` environment variables by using a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. See the **Kubernetes 1.34 and earlier** tab for instructions.
-{{< /callout >}}
+> [!NOTE]
+> If you need to override the automatically detected zone, you can still explicitly set the `KGATEWAY_NODE_*` environment variables by using a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. See the **Kubernetes 1.34 and earlier** tab for instructions.
 
 {{% /tab %}}
 {{% tab name="Kubernetes 1.34 and earlier" %}}
@@ -73,9 +71,8 @@ If you run Kubernetes version 1.34 or earlier, you must explicitly configure the
 
 1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource and set the proxy's locality information as environment variables. The following example pins the proxy to the `us-east-1a` zone.
 
-   {{< callout type="info" >}}
-   Replace the example region, zone, and subzone values with values that match your cluster. To find the zone labels on your nodes, run `kubectl get nodes -o custom-columns='NAME:.metadata.name,ZONE:.metadata.labels.topology\.kubernetes\.io/zone'`. The `KGATEWAY_NODE_*` environment variables are static and set once when the proxy pod starts. The variables are not updated if the pod reschedules to a different node. You can use a `nodeSelector` to ensure that the proxy always runs on a node in the declared zone. If you remove the `nodeSelector` or change the zone without updating the environment variables, the proxy might use the wrong locality and zone-aware routing can behave incorrectly.
-   {{< /callout >}}
+   > [!NOTE]
+   > Replace the example region, zone, and subzone values with values that match your cluster. To find the zone labels on your nodes, run `kubectl get nodes -o custom-columns='NAME:.metadata.name,ZONE:.metadata.labels.topology\.kubernetes\.io/zone'`. The `KGATEWAY_NODE_*` environment variables are static and set once when the proxy pod starts. The variables are not updated if the pod reschedules to a different node. You can use a `nodeSelector` to ensure that the proxy always runs on a node in the declared zone. If you remove the `nodeSelector` or change the zone without updating the environment variables, the proxy might use the wrong locality and zone-aware routing can behave incorrectly.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -236,9 +233,8 @@ Example output:
 }
 ```
 
-{{< callout type="tip" >}}
-You can optionally verify zone-aware routing by checking the `lb_zone_*` metrics that the gateway proxy emits after sending traffic to the backend. For example, look for stats, such as `lb_zone_routing_sampled` for requests that went through zone-aware routing and `lb_zone_no_capacity_left` to see whether or not enough endpoints exist in the local zone that can handle incoming requests. 
-{{< /callout >}}
+> [!TIP]
+> You can optionally verify zone-aware routing by checking the `lb_zone_*` metrics that the gateway proxy emits after sending traffic to the backend. For example, look for stats, such as `lb_zone_routing_sampled` for requests that went through zone-aware routing and `lb_zone_no_capacity_left` to see whether or not enough endpoints exist in the local zone that can handle incoming requests.
 
 ## Cleanup
 

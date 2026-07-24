@@ -41,9 +41,9 @@ A [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/reference
 
 <!--
 
-{{< callout type="info" >}}
-Kgateway custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a TrafficPolicy resource in `namespace1` and a Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a kgateway resource from a {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant. 
-{{< /callout >}}-->
+> [!NOTE]
+> Kgateway custom resources do not follow the same cross-namespace restrictions as the resources in the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. For example, access between a TrafficPolicy resource in `namespace1` and a Backend resource in `namespace2` is allowed by default and does not require a ReferenceGrant. However, if you need to reference a kgateway resource from a {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} resource, you must create a ReferenceGrant.
+-->
 
 ## Kgateway resources {#kgateway}
 

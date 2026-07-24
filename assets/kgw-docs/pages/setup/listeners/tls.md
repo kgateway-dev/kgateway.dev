@@ -1,8 +1,7 @@
 The following guide sets up a TLS listener on your gateway proxy that terminates incoming TLS traffic at the gateway and forwards unencrypted TCP traffic to a sample TCP echo app. 
 
-{{< callout type="warning" >}}
-{{< reuse "agw-docs/versions/warn-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "agw-docs/versions/warn-experimental.md" >}}
 
 ## Before you begin
 

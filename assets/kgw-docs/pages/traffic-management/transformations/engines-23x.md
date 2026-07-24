@@ -1,10 +1,9 @@
 {{< reuse "kgw-docs/snippets/kgateway.md" >}} uses **rustformation** as the transformation engine. Rustformation is a Rust filter that is loaded into Envoy at runtime as a [dynamic module](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/advanced/dynamic_modules). Templates are powered by the [MiniJinja](https://github.com/mitsuhiko/minijinja) template engine.
 
-{{< callout type="warning" >}}
-The classic C++ transformation filter that was the default in 2.1.x and the fallback in 2.2.x is removed in 2.3.x and later. The `USE_RUST_FORMATIONS` setting and the `useRustFormations` Helm value have no effect.
-
-If you upgrade from 2.2.x with `USE_RUST_FORMATIONS=false`, plan to migrate your templates to rustformation syntax before you upgrade to 2.3.x. For migration help, see [Migrating from classic transformation](#migrating-classic).
-{{< /callout >}}
+> [!WARNING]
+> The classic C++ transformation filter that was the default in 2.1.x and the fallback in 2.2.x is removed in 2.3.x and later. The `USE_RUST_FORMATIONS` setting and the `useRustFormations` Helm value have no effect.
+>
+> If you upgrade from 2.2.x with `USE_RUST_FORMATIONS=false`, plan to migrate your templates to rustformation syntax before you upgrade to 2.3.x. For migration help, see [Migrating from classic transformation](#migrating-classic).
 
 ## Migrating classic transformations {#migrating-classic}
 

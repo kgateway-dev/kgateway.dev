@@ -416,9 +416,8 @@ Example output:
 
 Restrict access to tokens that include a specific audience claim. An incoming token must include an `aud` claim that matches at least one of the listed values. The following example restricts access to tokens that include a `my-api` audience.
 
-{{< callout type="warning" >}}
-The sample token in this guide has no `aud` claim, so using this configuration requires a different token that carries a matching `aud` claim.
-{{< /callout >}}
+> [!WARNING]
+> The sample token in this guide has no `aud` claim, so using this configuration requires a different token that carries a matching `aud` claim.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -469,9 +468,8 @@ Jwt validation failed: audience mismatch
 
 By default, the gateway reads the JWT from the `Authorization` header as a bearer token. Use `tokenSource` to read the token from a different header or from a URL query parameter. The following example reads the token from a custom `x-jwt` header with a `Bearer ` prefix.
 
-{{< callout type="warning" >}}
-Changing the `tokenSource` affects how clients must send requests. If you apply this example, send the token in the `x-jwt` header instead of the `Authorization` header.
-{{< /callout >}}
+> [!WARNING]
+> Changing the `tokenSource` affects how clients must send requests. If you apply this example, send the token in the `x-jwt` header instead of the `Authorization` header.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -659,9 +657,8 @@ When using a remote JWKS, you can configure `asyncFetch` to control how the gate
 
 For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
 
-{{< callout type="info" >}}
-**Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
-{{< /callout >}}
+> [!NOTE]
+> **Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
 
 **Example:**
 
@@ -733,9 +730,8 @@ Use the following guidelines to choose appropriate values:
 | **Authentication must fail closed until JWKS is available** | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched |
 | **Seeing frequent network failures** | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect |
 
-{{< callout type="warning" >}}
-**Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
-{{< /callout >}}
+> [!WARNING]
+> **Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
 
 {{< /version >}}
 

@@ -46,9 +46,8 @@ jwksBackendRef:
   name: cognito-jwks
 ```
 
-{{< callout type="info" >}}
-If you don't set jwksBackendRef, the gateway uses the primary backendRef for JWKS requests, maintaining backward compatibility.
-{{< /callout >}}
+> [!NOTE]
+> If you don't set jwksBackendRef, the gateway uses the primary backendRef for JWKS requests, maintaining backward compatibility.
 
 ### Step 3: Define the JWKS Backend resource
 

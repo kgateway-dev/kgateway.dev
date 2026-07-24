@@ -1,8 +1,7 @@
 Enforce client-site access controls with cross-origin resource sharing (CORS).
 
-{{< callout type="warning" >}} 
-{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 
 ## About CORS
 

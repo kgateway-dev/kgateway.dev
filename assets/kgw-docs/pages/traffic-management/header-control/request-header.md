@@ -534,9 +534,8 @@ curl -vi localhost:8080/headers -H "host: headers.example"
 
 If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text or send it as part of the request. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource. The gateway proxy resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, the proxy applies the changes automatically.
 
-{{< callout type="info" >}}
-This option is available only on the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource. The Gateway API `HTTPRoute` `RequestHeaderModifier` filter does not support the `secretRef` option.
-{{< /callout >}}
+> [!NOTE]
+> This option is available only on the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource. The Gateway API `HTTPRoute` `RequestHeaderModifier` filter does not support the `secretRef` option.
 
 1. Create a Secret that holds the values you want to inject. The data keys do not need to match the eventual header names.
    ```yaml

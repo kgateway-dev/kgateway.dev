@@ -2,9 +2,8 @@ Inject custom Envoy bootstrap configuration into a managed gateway proxy by over
 
 Use this technique to set bootstrap-level Envoy options that are not exposed as built-in fields on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource, such as the [`stats_config.histogram_bucket_settings`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/metrics/v3/stats.proto#envoy-v3-api-msg-config-metrics-v3-statsconfig) to tune histogram bucket boundaries for your metrics.
 
-{{< callout type="warning" >}}
-This is an advanced workaround. Prefer the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) whenever they cover your use case, because they are validated at apply time and updated automatically when you upgrade. A custom bootstrap ConfigMap is **not** validated by the control plane and is **not** updated automatically on upgrade. You must keep it in sync with the generated bootstrap format yourself. 
-{{< /callout >}}
+> [!WARNING]
+> This is an advanced workaround. Prefer the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) whenever they cover your use case, because they are validated at apply time and updated automatically when you upgrade. A custom bootstrap ConfigMap is **not** validated by the control plane and is **not** updated automatically on upgrade. You must keep it in sync with the generated bootstrap format yourself.
 
 ## How it works
 
@@ -18,9 +17,8 @@ To inject your own bootstrap configuration while the control plane continues to 
 
 Because you start from a copy of the generated bootstrap, the proxy keeps its control-plane–managed configuration, such as the `node` identity, `xds_cluster`, xDS token, and `dynamic_resources`, and continues to connect to the control plane.
 
-{{< callout type="warning" >}}
-Do not change the control-plane–managed sections of the bootstrap configuration, including the `node`, `dynamic_resources`, `xds_cluster`, and `xds_service_account_token.json` entries. Changing these sections breaks the connection between the gateway proxy and the control plane. Make sure to add or change only the fields that you need, such as `stats_config`.
-{{< /callout >}}
+> [!WARNING]
+> Do not change the control-plane–managed sections of the bootstrap configuration, including the `node`, `dynamic_resources`, `xds_cluster`, and `xds_service_account_token.json` entries. Changing these sections breaks the connection between the gateway proxy and the control plane. Make sure to add or change only the fields that you need, such as `stats_config`.
 
 ## Before you begin
 
@@ -80,15 +78,14 @@ Do not change the control-plane–managed sections of the bootstrap configuratio
           buckets: [1, 5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000]
       ```
 
-      {{< callout type="tip" >}}
-If you prefer to extract only the Envoy bootstrap configuration for easier updating, run the following command. Make sure to apply your customizations to the `envoy.yaml` section of your ConfigMap.  
-```sh
-kubectl get configmap custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
-  -o jsonpath='{.data.envoy\.yaml}' > envoy.yaml
-
-open envoy.yaml
-```
-      {{< /callout >}}
+      > [!TIP]
+      > If you prefer to extract only the Envoy bootstrap configuration for easier updating, run the following command. Make sure to apply your customizations to the `envoy.yaml` section of your ConfigMap.
+      > ```sh
+      > kubectl get configmap custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
+      > -o jsonpath='{.data.envoy\.yaml}' > envoy.yaml
+      >
+      > open envoy.yaml
+      > ```
   
    3. Apply the new ConfigMap. 
       ```sh

@@ -1,8 +1,9 @@
 You can use an HTTPListenerPolicy resource to attach policies to HTTP or HTTPS listeners on the gateway.
 
-{{< version exclude-if="2.0.x" >}}{{< callout type="info" >}}
-By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /callout >}}{{< /version >}}
+{{< version exclude-if="2.0.x" >}}
+> [!NOTE]
+> By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
+{{< /version >}}
 
 ## Policy attachment {#policy-attachment-listeneroption}
 
@@ -112,9 +113,8 @@ If you create multiple HTTPListenerPolicy resources that define the same type of
 
 <!--
 
-{{< callout type="info" >}}
-You cannot attach multiple HTTPListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same HTTPListenerPolicy resource.
-{{< /callout >}}
+> [!NOTE]
+> You cannot attach multiple HTTPListenerPolicy resources to the same listener, *even if* they define different top-level policies. To add multiple policies, define them in the same HTTPListenerPolicy resource.
 
 In the following image, you want to attach two HTTPListenerPolicy resources to the HTTP listener. One configures local rate limiting and the other one configures a CSRF policy. Because only one HTTPListenerPolicy can be attached to a gateway listener via `targetRefs` at any given time, only the policy that is created first is enforced (policy 1). 
 

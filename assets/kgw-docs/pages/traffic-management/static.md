@@ -27,9 +27,8 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    
 2. Create an HTTPRoute resource that routes traffic on the `static.example` domain and rewrites the traffic to the hostname of your Backend resource.
    
-   {{< callout type="warning" >}}
-   Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
-   {{< /callout >}}
+   > [!WARNING]
+   > Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -136,9 +135,8 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    
 3. Create an HTTPRoute resource that routes traffic on the `static.example` domain and rewrites the traffic to the hostname of your Backend resource.
    
-   {{< callout type="warning" >}}
-   Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
-   {{< /callout >}}
+   > [!WARNING]
+   > Do not specify a port in the `spec.backendRefs.port` field when referencing your Backend. The port is defined in your Backend resource and ignored if set on the HTTPRoute resource.
    
    ```yaml
    kubectl apply -f- <<EOF
@@ -167,9 +165,8 @@ You simply add the list of static hosts or DNS names to your Backend resource an
 
 4. Set up a BackendConfigPolicy or BackendTLSPolicy, such as the following examples. This way, the Gateway can initiate a TLS connection to the secured backend.{{< version exclude-if="2.0.x" >}} For more information, see the [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}) guide.{{< /version >}}
 
-   {{< callout type="info" >}}
-   If you generated a self-signed certificate when setting up the HTTPS listener, make sure the certificate contains Subject Alternative Name (SAN) entries for the hostname you configured (for example, both `example.com` and `*.example.com` for wildcard coverage) and install the root certificate into your local trust store of your system or pass it to your client. For example, for a `curl` client, add the `--cacert example_certs/root.crt` option (update the path to match where you stored the certificate).
-   {{< /callout >}}
+   > [!NOTE]
+   > If you generated a self-signed certificate when setting up the HTTPS listener, make sure the certificate contains Subject Alternative Name (SAN) entries for the hostname you configured (for example, both `example.com` and `*.example.com` for wildcard coverage) and install the root certificate into your local trust store of your system or pass it to your client. For example, for a `curl` client, add the `--cacert example_certs/root.crt` option (update the path to match where you stored the certificate).
 
    {{< tabs >}}
    {{% tab name="BackendConfigPolicy" %}}

@@ -36,9 +36,8 @@ When it's time to upgrade kgateway, make sure to update the `{{< reuse "kgw-docs
 
 You can use the `{{< reuse "kgw-docs/snippets/cli-name.md" >}} upgrade` command to upgrade or roll back the `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` version. For example, you might change versions during an upgrade process, or when you have multiple versions of kgateway across clusters that you manage from the same workstation. For more options, run `{{< reuse "kgw-docs/snippets/cli-name.md" >}} upgrade --help`.
 
-{{< callout type="info" >}}
-Upgrading the `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` CLI does _not_ upgrade the kgateway version that you run in your clusters.
-{{< /callout >}}
+> [!NOTE]
+> Upgrading the `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` CLI does _not_ upgrade the kgateway version that you run in your clusters.
 
 1. Set the version to upgrade `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` to in an environment variable. Include the patch version.
    ```sh

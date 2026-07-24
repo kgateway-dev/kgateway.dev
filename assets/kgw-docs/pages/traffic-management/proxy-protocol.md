@@ -62,9 +62,8 @@ Without proxy protocol, the proxy removes the source IP address on incoming requ
 
 3. Send a request to the httpbin app without a proxy protocol header. Verify that the request fails.
 
-   {{< callout type="info" >}}
-   PROXY protocol is enforced at the TCP listener level. Envoy closes the connection before any HTTP processing occurs. Because of that, no HTTP status code is returned in the response. Note that you must use the gateway proxy's load balancer IP address to send the request. If you port-forward the proxy on your local machine instead, you bypass Envoy's listener filters and cannot test the proxy protocol capability. To assign a load balancer IP address in local test setups, consider using [`cloud-provider-kind`](https://github.com/kubernetes-sigs/cloud-provider-kind).  
-   {{< /callout >}}
+   > [!NOTE]
+   > PROXY protocol is enforced at the TCP listener level. Envoy closes the connection before any HTTP processing occurs. Because of that, no HTTP status code is returned in the response. Note that you must use the gateway proxy's load balancer IP address to send the request. If you port-forward the proxy on your local machine instead, you bypass Envoy's listener filters and cannot test the proxy protocol capability. To assign a load balancer IP address in local test setups, consider using [`cloud-provider-kind`](https://github.com/kubernetes-sigs/cloud-provider-kind).
 
    ```sh
    curl -vik \

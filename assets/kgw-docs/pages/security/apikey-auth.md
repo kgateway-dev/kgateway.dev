@@ -2,9 +2,8 @@
 * You know the set of users that need access to your service. These users do not change often, or you have automation that easily generates or deletes the API key when the users do change. 
 * You want direct control over how the credentials are generated and expire.
 
-{{< callout type="warning" >}}
-When you use API keys, your services are only as secure as the API keys. Storing and rotating the API key securely is up to the user.
-{{< /callout >}}
+> [!WARNING]
+> When you use API keys, your services are only as secure as the API keys. Storing and rotating the API key securely is up to the user.
 
 ## API key auth in kgateway
 

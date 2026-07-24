@@ -3,9 +3,8 @@
 Grafana is a suite of open source tools that help you analyze, visualize, and monitor data in your cluster. For the OTel stack, you install the following Grafana components:
 
 * **Loki**: A log aggregation system that indexes metadata about your logs as a set of labels, not the actual log contents. This way, Loki is more cost-efficient and performant than traditional log aggregation systems.
-  {{< callout type="tip" >}}
-  Loki works best when you use structured logging in your applications, such as JSON format.
-  {{< /callout >}}
+  > [!TIP]
+  > Loki works best when you use structured logging in your applications, such as JSON format.
 * **Tempo**: A distributed tracing system that stores trace data in object storage (like Amazon S3) and integrates seamlessly with Grafana for visualization. Distributed tracing helps you see how requests move through a microservices environment, which helps you identify performance bottlenecks, debug issues, and otherwise monitor your system's health to ensure SLA compliance.
 
 Steps to install:
@@ -123,9 +122,8 @@ By using an OTel collector to aggregate metrics, you avoid having to configure e
 
 You can deploy three separate OTel collectors that are optimized for the three different types of telemetry data: metrics, logs, and traces. This way, you can scale and optimize each collector based on your telemetry needs.
 
-{{< callout type="warning" >}}
-The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
-{{< /callout >}}
+> [!WARNING]
+> The example pipelines in all three OTel collectors set up the `debug` exporter. This exporter is useful for testing and validation purposes. However, for production scenarios, remove this exporter to avoid performance impacts.
 
 1. Deploy the metrics collector to handle numerical measurements and time-series data. Note that you can also use the `promexporter` endpoint with Prometheus to scrape metrics from the collector pod, if you prefer the `pull` model to the `push` model.
 

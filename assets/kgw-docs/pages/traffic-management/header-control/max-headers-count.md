@@ -2,9 +2,8 @@ Set a maximum number of headers that Envoy accepts on incoming requests. Request
 
 By default, Envoy allows up to 100 headers per request. When the limit is exceeded, Envoy returns a `431 Request Header Fields Too Large` response for HTTP/1.x connections and resets the stream for HTTP/2 connections.
 
-{{< callout type="info" >}}
-Keep in mind that HTTP clients, such as curl, automatically include additional headers beyond the ones you explicitly set. For example, a basic curl request always sends `Host`, `User-Agent`, and `Accept`, which already counts as 3 headers before any custom headers are added. Set `maxHeadersCount` to a value that accounts for headers that clients send automatically.
-{{< /callout >}}
+> [!NOTE]
+> Keep in mind that HTTP clients, such as curl, automatically include additional headers beyond the ones you explicitly set. For example, a basic curl request always sends `Host`, `User-Agent`, and `Accept`, which already counts as 3 headers before any custom headers are added. Set `maxHeadersCount` to a value that accounts for headers that clients send automatically.
 
 ## Before you begin
 

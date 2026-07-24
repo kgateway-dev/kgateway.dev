@@ -4,9 +4,8 @@ If you no longer need your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} enviro
 
 Remove the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane and gateway proxies.
 
-{{< callout type="info" >}}
-Did you use Argo CD to install {{< reuse "/kgw-docs/snippets/kgateway.md" >}}? Skip to the [Argo CD steps](#argocd).
-{{< /callout >}}
+> [!NOTE]
+> Did you use Argo CD to install {{< reuse "/kgw-docs/snippets/kgateway.md" >}}? Skip to the [Argo CD steps](#argocd).
 
 1. Get all HTTP routes in your environment. 
    

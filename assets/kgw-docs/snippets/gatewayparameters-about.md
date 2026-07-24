@@ -2,8 +2,7 @@
 
 To spin up new gateway proxies, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} controller uses a [gateway proxy template](#gateway-proxy-template) and the configuration in the Helm chart. You can change the default configuration for your gateway proxies by creating a custom {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. You then use this {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to spin up different types of gateway proxies.
 
-{{< callout type="info" >}}
-To update the default values of your gateway proxy, change the values in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart so that they persist between upgrades, or create your own {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource that holds your custom values. Note that you are responsible to maintain any {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resources that you manually created.  
-{{< /callout >}} 
+> [!NOTE]
+> To update the default values of your gateway proxy, change the values in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart so that they persist between upgrades, or create your own {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource that holds your custom values. Note that you are responsible to maintain any {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resources that you manually created.
 
 For example, you might want to pair your gateway with a Network Load Balancer (NLB) instance in AWS. To properly pair and configure the gateway with an NLB, specific annotations on the gateway proxy are required. These annotations are not included in the default gateway proxy configuration. To add them, you can create a separate {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource where you add these annotations. For more customization options, see [Customize the gateway]({{< link-hextra path="/setup/customize/" >}}).

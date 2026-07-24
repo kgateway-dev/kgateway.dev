@@ -1,8 +1,7 @@
 Bring your own HTTP-based {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
-{{< callout >}}
-This guide covers HTTP-based external authorization services. For gRPC-based services, see the [gRPC guide]({{< link-hextra path="/security/extauth/byo-ext-auth-service/grpc/" >}}).
-{{< /callout >}}
+> [!NOTE]
+> This guide covers HTTP-based external authorization services. For gRPC-based services, see the [gRPC guide]({{< link-hextra path="/security/extauth/byo-ext-auth-service/grpc/" >}}).
 
 ## About external auth {#about}
 
@@ -44,9 +43,8 @@ sequenceDiagram
 
 Deploy your own HTTP-based external authorization service as a backend service that is accessible to your gateway proxy. Then, configure a GatewayExtension to point to the external auth server by using the `httpService` field.
 
-{{< callout type="info" >}}
-Note that in the following example, resources are created in the same namespace to simplify the setup. To create resources in different namespaces, set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service.
-{{< /callout >}}
+> [!NOTE]
+> Note that in the following example, resources are created in the same namespace to simplify the setup. To create resources in different namespaces, set up a [Kubernetes ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) from the GatewayExtension to the Services that back the external auth service.
 
 1. Deploy your external authorization service. The following example uses the [Istio external authorization service](https://github.com/istio/istio/tree/master/samples/extauthz) for quick testing purposes. This image exposes both a gRPC server on port 9000 and an HTTP server on port 8000. The HTTP server allows requests with the `x-ext-authz: allow` header.
 

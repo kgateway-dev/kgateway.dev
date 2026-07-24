@@ -23,9 +23,8 @@ The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest
 
 Learn about other load balancing options that you can set in the load balancer policy.
 
-{{< callout type="info" >}}
-All settings in this section can be set only in conjunction with a simple load balancing mode or consistent hash algorithm.
-{{< /callout >}}
+> [!NOTE]
+> All settings in this section can be set only in conjunction with a simple load balancing mode or consistent hash algorithm.
 
 ### Healthy panic threshold 
 

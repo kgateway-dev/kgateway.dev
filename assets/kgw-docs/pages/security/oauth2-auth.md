@@ -181,9 +181,8 @@ stringData:
   client-secret: my-super-secret-client-secret-key
 EOF
 ```
-{{< callout type="info" >}}
-Replace `my-super-secret-client-secret-key` with the OAuth/OIDC client secret from your identity provider. For example, in Keycloak, this is the secret generated for your confidential client when you create it in the Keycloak admin console.
-{{< /callout >}}
+> [!NOTE]
+> Replace `my-super-secret-client-secret-key` with the OAuth/OIDC client secret from your identity provider. For example, in Keycloak, this is the secret generated for your confidential client when you create it in the Keycloak admin console.
 
 ### 2. Create a GatewayExtension for OAuth2
 

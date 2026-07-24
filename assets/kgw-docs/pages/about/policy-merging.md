@@ -23,13 +23,12 @@ You can use the following values for the annotation:
 - `ShallowMergePreferChild` (default): Child policies take precedence over parent policies and the policies are shallow merged.
 - `ShallowMergePreferParent`: Parent policies take precedence over child policies and the policies are shallow merged.
 
-{{< callout type="warning" >}}
-**Authentication and authorization policies can be overridden by delegated child routes.**
-
-With the default `ShallowMergePreferChild` strategy, a delegated child route can override and effectively disable authentication and authorization policies inherited from the parent route. For example, a child route can set `extAuth.disable: {}` or `jwtAuth.disable: {}` in a TrafficPolicy to bypass the ext-authz or JWT authentication that the parent mandates. Because a tenant who owns a delegated child HTTPRoute can create TrafficPolicies in their own namespace without access to the parent route or platform namespace, this bypass requires no elevated permissions beyond the normal delegatee role.
-
-If you are a platform operator who must enforce mandatory authentication or authorization across all delegated routes, set the `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent` annotation on the parent HTTPRoute. This ensures that parent security policies take precedence and cannot be overridden by child routes.
-{{< /callout >}}
+> [!WARNING]
+> **Authentication and authorization policies can be overridden by delegated child routes.**
+>
+> With the default `ShallowMergePreferChild` strategy, a delegated child route can override and effectively disable authentication and authorization policies inherited from the parent route. For example, a child route can set `extAuth.disable: {}` or `jwtAuth.disable: {}` in a TrafficPolicy to bypass the ext-authz or JWT authentication that the parent mandates. Because a tenant who owns a delegated child HTTPRoute can create TrafficPolicies in their own namespace without access to the parent route or platform namespace, this bypass requires no elevated permissions beyond the normal delegatee role.
+>
+> If you are a platform operator who must enforce mandatory authentication or authorization across all delegated routes, set the `kgateway.dev/inherited-policy-priority: ShallowMergePreferParent` annotation on the parent HTTPRoute. This ensures that parent security policies take precedence and cannot be overridden by child routes.
 
 **Shallow merging** means that the policies are merged at the top level. Only the top-level fields of the policies are considered for merging. If a field is present in both parent and child policies, the value from the higher priority policy is used. Priority is typically determined by specificity and creation time. The more specific (such as HTTPRoute rule over all the routes in the HTTPRoute) and older (created-first) policy takes precedence. Consider the following shallow merge scenario:
 
