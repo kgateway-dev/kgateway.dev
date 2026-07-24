@@ -16,9 +16,8 @@ This release introduces major breaking changes to the agentgateway implementatio
 
 This release separated kgateway and agentgateway controllers and introduced several agentgateway-specific resources, Helm charts, and controllers. Kgateway-specific resources were not changed. 
 
-{{< callout type="info">}}
-Note: If you used agentgateway with kgateway, you **must update and migrate your agentgateway-specific configuration to the new resources**. Agentgateway-specific fields in kgateway resources, such as TrafficPolicy or GatewayParameters were deprecated. You cannot upgrade your environment without migrating your resources first!
-{{< /callout >}}
+> [!NOTE]
+> Note: If you used agentgateway with kgateway, you **must update and migrate your agentgateway-specific configuration to the new resources**. Agentgateway-specific fields in kgateway resources, such as TrafficPolicy or GatewayParameters were deprecated. You cannot upgrade your environment without migrating your resources first!
 
 The following table includes the new agentgateway-specific resources that were introduced in this release and compares them to kgateway. Make sure to migrate your agentgateway configuration to these new resources. 
 

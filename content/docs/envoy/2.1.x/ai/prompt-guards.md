@@ -53,9 +53,9 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
    EOF
    ```
 
-   {{< callout type="info" >}}
-   You can also reject requests that contain strings of inappropriate content itself, such as credit card numbers, by using the <code>promptGuard.request.regex.builtins</code> field. Besides <code>CREDIT_CARD</code> in this example, you can also specify <code>EMAIL</code>, <code>PHONE_NUMBER</code>, and <code>SSN</code>.
-   {{< /callout >}}
+   > [!NOTE]
+   > You can also reject requests that contain strings of inappropriate content itself, such as credit card numbers, by using the <code>promptGuard.request.regex.builtins</code> field. Besides <code>CREDIT_CARD</code> in this example, you can also specify <code>EMAIL</code>, <code>PHONE_NUMBER</code>, and <code>SSN</code>.
+   
    ```yaml
    ...
    promptGuard:
@@ -114,9 +114,8 @@ Use the TrafficPolicy resource and the `promptGuard` field to deny requests to t
 
 3. Send another request. This time, remove the word `credit` from the user prompt. Verify that the request now succeeds. 
 
-   {{< callout type="info" >}}
-   OpenAI is configured to not return any sensitive information, such as credit card or Social Security Numbers, even if they are fake. Because of that, the request does not return a list of credit card numbers.
-   {{< /callout >}}
+   > [!NOTE]
+   > OpenAI is configured to not return any sensitive information, such as credit card or Social Security Numbers, even if they are fake. Because of that, the request does not return a list of credit card numbers.
 
    {{< tabs >}}
 

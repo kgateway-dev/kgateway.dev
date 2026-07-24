@@ -67,14 +67,13 @@ If you apply both a BackendConfigPolicy and a [BackendTLSPolicy]({{< link-hextra
 * **Upstream proxy protocol**: If the BackendConfigPolicy sets `upstreamProxyProtocol`, both policies are enforced in combination. The BackendTLSPolicy's TLS socket is placed inside the proxy protocol wrapper, regardless of which policy was created first.
 * **All other BackendConfigPolicy fields** (`connectTimeout`, `tcpKeepalive`, `circuitBreakers`, `healthCheck`, `outlierDetection`, `dns`): These fields are not affected by the BackendTLSPolicy and are enforced unchanged.
 
-{{< callout type="info" >}}
-When the `spec.tls` field in a BackendConfigPolicy is overridden by a BackendTLSPolicy, an `Overridden` condition is set on the BackendConfigPolicy to inform you of the conflict. To check the condition, run `kubectl get backendconfigpolicy <name> -n <namespace> -o yaml` and look for the following in the status:
-
-```yaml
-conditions:
-- type: Overridden
-  status: "True"
-  reason: ConflictedWithBackendTLSPolicy
-```
-{{< /callout >}}
+> [!NOTE]
+> When the `spec.tls` field in a BackendConfigPolicy is overridden by a BackendTLSPolicy, an `Overridden` condition is set on the BackendConfigPolicy to inform you of the conflict. To check the condition, run `kubectl get backendconfigpolicy <name> -n <namespace> -o yaml` and look for the following in the status:
+>
+> ```yaml
+> conditions:
+> - type: Overridden
+>   status: "True"
+>   reason: ConflictedWithBackendTLSPolicy
+> ```
 

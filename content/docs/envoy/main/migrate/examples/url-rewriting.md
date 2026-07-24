@@ -71,9 +71,8 @@ spec:
       port: 80
 ```
 
-{{< callout type="info" >}}
-Edge case: a request to `/api/v1` (no trailing slash) matches the `PathPrefix` of `/api/v1`, and `ReplacePrefixMatch: /` leaves an empty replacement — the backend sees a request to an empty path. If clients can send a bare `/api/v1`, add a second match for `/api/v1/` or normalize on the backend.
-{{< /callout >}}
+> [!NOTE]
+> Edge case: a request to `/api/v1` (no trailing slash) matches the `PathPrefix` of `/api/v1`, and `ReplacePrefixMatch: /` leaves an empty replacement — the backend sees a request to an empty path. If clients can send a bare `/api/v1`, add a second match for `/api/v1/` or normalize on the backend.
 
 ## Apply and verify
 

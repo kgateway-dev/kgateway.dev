@@ -105,9 +105,8 @@ Create an API gateway with an HTTP listener by using the {{< reuse "kgw-docs/sni
    http-7dd94b74-k26j6   3/3     Running   0          18s
    ```
 
-   {{< callout type="info" >}}
-   Using Kind and getting a `CrashLoopBackOff` error with a `Failed to create temporary file` message in the logs? You might have a multi-arch platform issue on macOS. In your Docker Desktop settings, uncheck **Use Rosetta**, restart Docker, re-create your Kind cluster, and try again.
-   {{< /callout >}}
+   > [!NOTE]
+   > Using Kind and getting a `CrashLoopBackOff` error with a `Failed to create temporary file` message in the logs? You might have a multi-arch platform issue on macOS. In your Docker Desktop settings, uncheck **Use Rosetta**, restart Docker, re-create your Kind cluster, and try again.
 
 ## Expose the app on the gateway {#expose-app}
 

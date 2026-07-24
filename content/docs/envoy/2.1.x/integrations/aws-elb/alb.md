@@ -5,9 +5,8 @@ weight: 10
 
 {{< reuse "kgw-docs/pages/integrations/aws-elb/alb.md" >}} 
 
-{{< callout type="warning" >}}
-The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
-{{< /callout >}}
+> [!WARNING]
+> The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
 
 ## Before you begin
 
@@ -127,9 +126,8 @@ The AWS Load Balancer Controller only supports the creation of an ALB through an
    EOF
    ```
    
-   {{< callout type="info" >}}
-   If you later change your Ingress resource configuration, you might need to delete and re-create your Ingress resource for AWS to pick up the changes.
-   {{< /callout >}}
+   > [!NOTE]
+   > If you later change your Ingress resource configuration, you might need to delete and re-create your Ingress resource for AWS to pick up the changes.
 
 6. Review the load balancer in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 

@@ -65,13 +65,11 @@ controller:
 
 You can configure Horizontal Pod Autoscaler (HPA) or Vertical Pod Autoscaler (VPA) policies for the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. To set up these policies, you use the `horizontalPodAutoscaler` or `verticalPodAutoscaler` fields in the Helm chart.
 
-{{< callout type="info" >}}
-Note that {{< reuse "kgw-docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader. 
-{{< /callout >}}
+> [!NOTE]
+> Note that {{< reuse "kgw-docs/snippets/kgateway.md" >}} uses leader election if multiple replicas are present. The elected leader's workload is typically larger than the workload of non-leader replicas and therefore drives the overall infrastructure cost. Because of that, Vertical Pod Autoscaling can be a reasonable solution to ensure that the elected leader has the resources it needs to perform its work successfully. In cases where the leader has a large workload, Horizontal Pod Autoscaling might not be as effective, as it adds more replicas that do not reduce the workload of the elected leader.
 
-{{< callout type="warning" >}}
-If you plan to set up both VPA and HPA policies, make sure to closely monitor performance and cost during scale up events. Using both policies can lead to conflict or even destructive loops that impact the performance of your control plane. 
-{{< /callout >}}
+> [!WARNING]
+> If you plan to set up both VPA and HPA policies, make sure to closely monitor performance and cost during scale up events. Using both policies can lead to conflict or even destructive loops that impact the performance of your control plane.
 
 
 ### Vertical Pod Autoscaler (VPA)
@@ -190,9 +188,8 @@ kubectl port-forward deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}} -n
 
 If you need other pods in the cluster to reach the admin server directly, you can change the bind address by using the `controller.admin.bindAddress` Helm value or the `KGW_ADMIN_BIND_ADDRESS` environment variable. Setting `bindAddress` to `0.0.0.0` makes the server listen on all pod interfaces, so other pods can reach it at `http://<pod-ip>:9095`. To find the pod IP, run `kubectl get pod -l app.kubernetes.io/name={{< reuse "kgw-docs/snippets/pod-name.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o wide`.
 
-{{< callout type="warning" >}}
-The admin server exposes pprof profiling endpoints, logging controls, and internal config snapshots. Only expose it outside the pod in trusted environments, such as a local development cluster or a dedicated profiling setup.
-{{< /callout >}}
+> [!WARNING]
+> The admin server exposes pprof profiling endpoints, logging controls, and internal config snapshots. Only expose it outside the pod in trusted environments, such as a local development cluster or a dedicated profiling setup.
 
 ```yaml
 controller:

@@ -8,10 +8,9 @@ weight: 20
 * **NLB HTTP**: Create an HTTP listener on the NLB that exposes an HTTP endpoint on your gateway proxy. Traffic from the NLB to the proxy is not secured. 
 * **TLS passthrough**: Expose an HTTPS endpoint of your gateway with an NLB. The NLB passes through HTTPS traffic to the gateway proxy where the traffic is terminated. 
 
-{{< callout type="warning" >}}
-Keep in mind the following considerations when working with an NLB:
-* An AWS NLB has an idle timeout of 350 seconds that you cannot change. This limitation can increase the number of reset TCP connections.
-{{< /callout >}}
+> [!WARNING]
+> Keep in mind the following considerations when working with an NLB:
+> * An AWS NLB has an idle timeout of 350 seconds that you cannot change. This limitation can increase the number of reset TCP connections.
 
 ## Before you begin
 

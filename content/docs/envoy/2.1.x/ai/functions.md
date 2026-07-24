@@ -80,9 +80,8 @@ Each AI provider has a different way of handling function calling. For example, 
 
 Send a function call to an LLM through AI Gateway. In the following steps, you use an example `get_weather` function with an OpenAI LLM. 
 
-{{< callout type="info" >}}
-Keep in mind that for a real use case, you must develop your own app that is capable of sending requests to the LLM and executing a tool, such as to retrieve the latest weather information for a given location.
-{{< /callout >}}
+> [!NOTE]
+> Keep in mind that for a real use case, you must develop your own app that is capable of sending requests to the LLM and executing a tool, such as to retrieve the latest weather information for a given location.
 
 1. Send a request through the AI Gateway to the OpenAI LLM. In your request, include an example `get_weather` function call. Note that you can include other tools and functions that the app has access to. This way, your LLM can decide on the tool and the function that best answers the user's question. For more examples of creating a function, consult your [AI provider's documentation](#about-providers). The following example demonstrates a response that you might configure your app to send through the AI Gateway to the LLM.
 

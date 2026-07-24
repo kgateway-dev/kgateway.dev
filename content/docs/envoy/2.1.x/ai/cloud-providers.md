@@ -18,9 +18,8 @@ Set up cloud LLM providers with AI Gateway.
 
 The examples throughout the AI Gateway docs use OpenAI as the LLM provider, but you can use other providers that are supported by AI Gateway.
 
-{{< callout type="info" >}}
-The following sections in this guide provide examples that are tailored to the specific LLM provider. If the provider is not listed, you can adapt the examples to your own provider. Note that some differences might exist, such as different required fields in the Backend resource.
-{{< /callout >}}
+> [!NOTE]
+> The following sections in this guide provide examples that are tailored to the specific LLM provider. If the provider is not listed, you can adapt the examples to your own provider. Note that some differences might exist, such as different required fields in the Backend resource.
 
 {{< reuse "kgw-docs/snippets/llm-providers.md" >}}
 

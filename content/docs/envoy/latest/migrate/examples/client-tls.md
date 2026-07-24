@@ -6,9 +6,8 @@ weight: 40
 
 Mutual TLS (mTLS) allows the gateway to verify the identity of the client via a certificate. NGINX uses annotations like `auth-tls-verify-client`, whereas Gateway API handles this through `frontendValidation` on a Gateway listener.
 
-{{< callout type="warning" >}}
-`tls.frontendValidation` was added to Gateway API v1.3 and is still under the experimental channel in some builds. Make sure your cluster has the experimental Gateway API CRDs installed (`experimental-install.yaml`) before applying the manifest below.
-{{< /callout >}}
+> [!WARNING]
+> `tls.frontendValidation` was added to Gateway API v1.3 and is still under the experimental channel in some builds. Make sure your cluster has the experimental Gateway API CRDs installed (`experimental-install.yaml`) before applying the manifest below.
 
 ## Before: Ingress with Client Verification
 

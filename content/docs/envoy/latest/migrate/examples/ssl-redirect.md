@@ -69,9 +69,8 @@ spec:
         statusCode: 301
 ```
 
-{{% callout note %}}
-NGINX uses status code 308 by default, but Gateway API standardizes on 301.
-{{% /callout %}}
+> [!NOTE]
+> NGINX uses status code 308 by default, but Gateway API standardizes on 301.
 
 ## Apply
 
