@@ -4,9 +4,10 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to attach poli
 
 You can apply {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
-{{< version exclude-if="2.0.x" >}}{{< callout type="info" >}}
-By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /callout >}}{{< /version >}}
+{{< version exclude-if="2.0.x" >}}
+> [!NOTE]
+> By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
+{{< /version >}}
 
 ### All HTTPRoute routes {#attach-to-all-routes}
 
@@ -63,9 +64,8 @@ spec:
 
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
-{{< callout type="warning" >}}
-Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
-{{< /callout >}}
+> [!WARNING]
+> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 
 The following example shows a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRefs` field is not set. Because of that, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
@@ -122,9 +122,8 @@ spec:
 
 ### HTTPRoute rule {#attach-to-rule}
 
-{{< callout type="info" >}}
-To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
-{{< /callout >}}
+> [!NOTE]
+> To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 
 Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an HTTPRoute rule by using the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}'s `targetRefs.sectionName` option. 
 
@@ -300,9 +299,8 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 | 2 | [HTTPRoute rule policy](#attach-to-rule) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to an HTTPRoute rule by using the `targetRefs.sectionName` option has a lower priority. This policy can still augment any `extensionRef` policies by defining different top-level policies. Note that if you have multiple HTTPRoute rule policies and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
 | 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple HTTPRoute rule policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
 
-{{< callout type="info" >}} 
-Gateway-level {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} propagate to all child HTTPRoutes. If a child HTTPRoute has its own {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that defines the same top-level policy, the route-level policy takes precedence and the gateway-level one is ignored for that route. For example, if you set a 60-second request timeout at the gateway level, all HTTPRoutes inherit that timeout unless a route defines its own timeout, which overrides the gateway default.
-{{< /callout >}}
+> [!NOTE]
+> Gateway-level {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} propagate to all child HTTPRoutes. If a child HTTPRoute has its own {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that defines the same top-level policy, the route-level policy takes precedence and the gateway-level one is ignored for that route. For example, if you set a 60-second request timeout at the gateway level, all HTTPRoutes inherit that timeout unless a route defines its own timeout, which overrides the gateway default.
 
 ### Policy inheritance and overrides in delegation setups {#delegation}
 

@@ -12,9 +12,8 @@ Note that if you configured a global request timeout, the per-try timeout must b
 
 Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try timeouts on a Gateway listener level, use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} instead. 
 
-{{< callout type="warning" >}} 
-{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 
 ## Before you begin
 

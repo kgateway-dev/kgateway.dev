@@ -1,8 +1,7 @@
 Ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
 
-{{< callout type="warning" >}} 
-{{< reuse "kgw-docs/versions/warn-1-3-only-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "kgw-docs/versions/warn-1-3-only-experimental.md" >}}
 
 ## About
 
@@ -69,9 +68,8 @@ spec:
         idleTimeout: 10s
 ```
 
-{{< callout type="info" >}}
-Note that `sessionPersistence.idleTimeout` is currently not supported in Envoy-based gateway proxies. Setting this value has no effect on the gateway proxy. 
-{{< /callout >}}
+> [!NOTE]
+> Note that `sessionPersistence.idleTimeout` is currently not supported in Envoy-based gateway proxies. Setting this value has no effect on the gateway proxy.
 
 {{< reuse "/kgw-docs/snippets/review-table.md" >}}
 

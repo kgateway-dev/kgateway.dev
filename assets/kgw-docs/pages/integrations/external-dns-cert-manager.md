@@ -129,7 +129,8 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
       helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
       --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set installCRDs=true
       ```
-      {{< callout type="info" >}}To allow cert-manager to use the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.{{< /callout >}}
+      > [!NOTE]
+      > To allow cert-manager to use the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.
       
 2. Create an Issuer resource that represents the Certificate Authority (CA) that you want cert-manager to use to issue the TLS certificates for your domain.
    ```yaml

@@ -28,9 +28,8 @@ In this guide, you follow these steps:
 
 ## Before you begin
 
-{{< callout type="warning" >}}
-This guide requires you to enable IAM settings in your EKS cluster, such as the AWS Pod Identity Webhook, **before** you deploy {{< reuse "/kgw-docs/snippets/kgateway.md" >}} components that are created during installation, such as the Gateway CRD and the gateway proxy service account. You might use this guide with a fresh EKS test cluster to try out Lambda function invocation with {{< reuse "/kgw-docs/snippets/kgateway.md" >}} service accounts.
-{{< /callout >}}
+> [!WARNING]
+> This guide requires you to enable IAM settings in your EKS cluster, such as the AWS Pod Identity Webhook, **before** you deploy {{< reuse "/kgw-docs/snippets/kgateway.md" >}} components that are created during installation, such as the Gateway CRD and the gateway proxy service account. You might use this guide with a fresh EKS test cluster to try out Lambda function invocation with {{< reuse "/kgw-docs/snippets/kgateway.md" >}} service accounts.
 
 ## Configure AWS IAM resources {#iam}
 
@@ -159,9 +158,8 @@ Save your AWS details, and create the IAM roles and policies for the gateway pro
    * **Authentication**: In the account that you want to use to authenticate with AWS (the "authentication account"), create a role that the gateway proxy service account assumes to securely access the Lambda account. Annotate the gateway proxy service account so that it can assume this role via IRSA.
    * **Invocation**: In the account that contains the Lambda functions you want to route to (the "Lambda account"), create a role that the gateway's assumed authentication role can use to invoke Lambda functions. Reference this role in the Backend resource.
 
-   {{< callout type="tip" >}}
-   If your Lambda functions are in the same AWS account that you authenticate with, set both `AUTH_ACCOUNT_ID` and `LAMBDA_ACCOUNT_ID` to the same value.
-   {{< /callout >}}
+   > [!TIP]
+   > If your Lambda functions are in the same AWS account that you authenticate with, set both `AUTH_ACCOUNT_ID` and `LAMBDA_ACCOUNT_ID` to the same value.
 
    1. Save your authentication and Lambda account IDs.
       ```sh

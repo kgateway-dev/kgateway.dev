@@ -6,9 +6,8 @@ description:
 
 Originate a one-way TLS connection from the Gateway to a backend. 
 
-{{< callout type="warning" >}}
-{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 
 ## About one-way TLS
 
@@ -303,9 +302,8 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.
 
-   {{< callout type="warning" >}}
-   Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
-   {{< /callout >}}
+   > [!WARNING]
+   > Due to a [known issue](https://github.com/kgateway-dev/kgateway/issues/11146), if you don't restart the control plane, you might notice requests that fail with a `HTTP/1.1 400 Bad Request` error after creating the new BackendTLSPolicy.
 
    ```sh
    kubectl rollout restart -n kgateway-system deployment/{{< reuse "kgw-docs/snippets/pod-name.md" >}}

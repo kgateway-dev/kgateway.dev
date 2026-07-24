@@ -24,9 +24,8 @@ The following predicates are supported:
 | `During` | Run the ExtProc filter during the specified stage. This setting is the default when the `predicate` field is not set. |
 | `After` | Run the ExtProc filter after the specified stage. |
 
-{{< callout >}}
-When multiple ExtProc filters target the same route at the same stage and predicate, use the `filterStage.weight` field to control their relative order. A higher weight runs earlier in the chain. Filters with the same weight are sorted alphabetically by GatewayExtension name.
-{{< /callout >}}
+> [!NOTE]
+> When multiple ExtProc filters target the same route at the same stage and predicate, use the `filterStage.weight` field to control their relative order. A higher weight runs earlier in the chain. Filters with the same weight are sorted alphabetically by GatewayExtension name.
 
 ## Before you begin
 
@@ -38,9 +37,8 @@ You can apply multiple ExtProc filters to the same route, each running at a diff
 
 A common use case is to observe how a request changes as it passes through the filter chain. For example, you can run one ExtProc filter before authentication to capture the raw incoming request, and another after the routing decision is made to capture the request before it leaves the gateway proxy.
 
-{{< callout type="info" >}}
-By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field results in a policy conflict error. To ensure that you can apply multiple ExtProc stages to the same route, enable deep merging for ExtProc policies by either setting `policyMerge.{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}.extProc=DeepMerge` in your Helm installation or using the `KGW_POLICY_MERGE={"{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}":{"extProc":"DeepMerge"}}` environment variable. 
-{{< /callout >}}
+> [!NOTE]
+> By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field results in a policy conflict error. To ensure that you can apply multiple ExtProc stages to the same route, enable deep merging for ExtProc policies by either setting `policyMerge.{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}.extProc=DeepMerge` in your Helm installation or using the `KGW_POLICY_MERGE={"{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}":{"extProc":"DeepMerge"}}` environment variable.
 
 1. Optional: Get the values of your current Helm installation. 
    ```sh

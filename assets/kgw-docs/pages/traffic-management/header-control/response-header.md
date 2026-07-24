@@ -442,9 +442,8 @@ You can remove HTTP headers from a response before the response is sent back to 
 
 If a response header value is sensitive, such as an audit signing key or a service-to-service token destined for a trusted client, you might not want to commit it to a manifest in plain text. You can source a response header value from a Kubernetes Secret by replacing `value` with `secretRef` on a `set` or `add` entry in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. kgateway resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, kgateway re-translates the affected policies automatically.
 
-{{< callout type="info" >}}
-This option is available only on the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. The Gateway API `HTTPRoute` `ResponseHeaderModifier` filter does not support `secretRef`.
-{{< /callout >}}
+> [!NOTE]
+> This option is available only on the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. The Gateway API `HTTPRoute` `ResponseHeaderModifier` filter does not support `secretRef`.
 
 The same defaulting rules and cross-namespace `ReferenceGrant` requirement that apply to [request headers from a Secret]({{< link-hextra path="/traffic-management/header-control/request-header/#header-from-secret" >}}) also apply here. The following example shows the basic flow for responses.
 

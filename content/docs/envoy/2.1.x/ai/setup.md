@@ -18,9 +18,8 @@ Configure your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart install
 
 1. [Upgrade]({{< link-hextra path="/operations/upgrade/" >}}) {{< reuse "/kgw-docs/snippets/kgateway.md" >}} with the AI Gateway extension enabled. **Note**: For AI Gateway with agentgateway, see the [agentgateway documentation](https://agentgateway.dev/docs).
 
-   {{< callout type="warning" >}}
-   If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
-   {{< /callout >}}
+   > [!WARNING]
+   > If you use a different version or extra Helm settings such as in a `-f values.yaml` file, update the following command accordingly.
 
    ```shell
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \

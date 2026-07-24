@@ -20,9 +20,8 @@ In this guide, you follow these steps:
 
 ## Before you begin
 
-{{< callout type="warning" >}}
-This guide requires you to enable IAM settings in your EKS cluster, such as the AWS Pod Identity Webhook, **before** you deploy {{< reuse "/kgw-docs/snippets/kgateway.md" >}} components that are created during installation, such as the Gateway CRD and the gateway proxy service account. You might use this guide with a fresh EKS test cluster to try out Lambda function invocation with {{< reuse "/kgw-docs/snippets/kgateway.md" >}} service accounts.
-{{< /callout >}}
+> [!WARNING]
+> This guide requires you to enable IAM settings in your EKS cluster, such as the AWS Pod Identity Webhook, **before** you deploy {{< reuse "/kgw-docs/snippets/kgateway.md" >}} components that are created during installation, such as the Gateway CRD and the gateway proxy service account. You might use this guide with a fresh EKS test cluster to try out Lambda function invocation with {{< reuse "/kgw-docs/snippets/kgateway.md" >}} service accounts.
 
 ## Configure AWS IAM resources {#iam}
 

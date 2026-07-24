@@ -1,12 +1,10 @@
 {{< version exclude-if="2.0.x" >}}
-{{< callout type="warning" >}}
-The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs) instead.
-{{< /callout >}}
+> [!WARNING]
+> The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs) instead.
 {{< /version >}}
 {{< version include-if="2.0.x" >}}
-{{< callout type="warning" >}}
-The waypoint integration for Envoy-based gateway proxies is alpha. If you are interested in trying out waypoints with kgateway, reach out to the kgateway maintainers on [Slack](https://kgateway.dev/slack/).
-{{< /callout >}}
+> [!WARNING]
+> The waypoint integration for Envoy-based gateway proxies is alpha. If you are interested in trying out waypoints with kgateway, reach out to the kgateway maintainers on [Slack](https://kgateway.dev/slack/).
 {{< /version >}}
 
 Enforce Layer 7 policies for the apps in your ambient mesh by using {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as a waypoint proxy.
@@ -21,9 +19,8 @@ To learn more about ambient, see the [ambient mesh documentation](https://ambien
 
 In this guide, you learn how to set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as a waypoint proxy for multiple apps in your ambient mesh. To demonstrate the Layer 7 capabilities of the waypoint proxy, you deploy the three sample apps `client`, `httpbin2`, and `httpbin3` to your cluster. The `client` app sends in-mesh traffic to `httpbin2` and `httpbin3`. To apply Layer 7 policies, you create HTTPRoute resources for the `httpbin2` and `httpbin3` apps that define the policies that you want to apply to each app. Because the HTTPRoute is scoped to a particular service, when the `client` app sends a request to that service, only the policies that are defined for that service are enforced by the waypoint proxy. 
 
-{{< callout type="info" >}}
-You can create an HTTPRoute and scope it to the waypoint proxy by referencing the waypoint proxy in the `parentRef` section. This way, the policies that are defined in the HTTPRoute are automatically applied to all services in the waypoint proxy namespace.
-{{< /callout >}}
+> [!NOTE]
+> You can create an HTTPRoute and scope it to the waypoint proxy by referencing the waypoint proxy in the `parentRef` section. This way, the policies that are defined in the HTTPRoute are automatically applied to all services in the waypoint proxy namespace.
 
 {{< reuse-image src="img/waypoint.svg" width="600px" caption="Waypoint proxy for Layer 7 policy application in an ambient mesh" >}}
 {{< reuse-image-dark srcDark="img/waypoint.svg" width="600px" caption="Waypoint proxy for Layer 7 policy application in an ambient mesh" >}}
@@ -279,9 +276,8 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
 
 Enable the waypoint integration for Envoy-based kgateway proxies. 
 
-{{< callout type="warning" >}}
-Note that the waypoint integration is deprecated for kgateway proxies and is planned to be removed in version 2.2.
-{{< /callout >}}
+> [!WARNING]
+> Note that the waypoint integration is deprecated for kgateway proxies and is planned to be removed in version 2.2.
 
 1. Enable the waypoint integration in your kgateway Helm chart. 
    ```sh

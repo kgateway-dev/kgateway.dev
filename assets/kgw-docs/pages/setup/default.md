@@ -16,9 +16,8 @@ The resulting gateway proxy is managed for you and its configuration is automati
 
 You can change the default configuration of your gateway proxy by creating custom {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resources, or updating the default {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} values in your {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart. If you change the values in the Helm chart, {{< reuse "kgw-docs/snippets/kgateway.md" >}} automatically applies the changes to the default {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resources. 
 
-{{< callout type="info" >}}
-Do not edit or change the default {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource directly. Always update the values in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart so that they persist between upgrades.
-{{< /callout >}} 
+> [!NOTE]
+> Do not edit or change the default {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource directly. Always update the values in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart so that they persist between upgrades.
 
 {{< reuse "kgw-docs/snippets/byo-gateway.md" >}}
 

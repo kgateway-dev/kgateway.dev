@@ -6,9 +6,8 @@ weight: 34
 
 Many teams use `oauth2-proxy` as a sidecar or external service to handle OIDC/OAuth2 for NGINX. kgateway provides native support for OIDC via a `GatewayExtension` and `TrafficPolicy`.
 
-{{< callout type="info" >}}
-This is an architectural change, not a one-for-one annotation translation. The NGINX side delegates auth to an external `oauth2-proxy` deployment via `auth-url`. The kgateway side moves OIDC into the gateway itself, so you can decommission the proxy once the migration is verified. Because the `auth-url` annotation only points at an external service, `ingress2gateway` can't infer your OIDC provider settings; you author the resources below by hand.
-{{< /callout >}}
+> [!NOTE]
+> This is an architectural change, not a one-for-one annotation translation. The NGINX side delegates auth to an external `oauth2-proxy` deployment via `auth-url`. The kgateway side moves OIDC into the gateway itself, so you can decommission the proxy once the migration is verified. Because the `auth-url` annotation only points at an external service, `ingress2gateway` can't infer your OIDC provider settings; you author the resources below by hand.
 
 ## Before: Ingress with External Auth (OAuth2 Proxy)
 

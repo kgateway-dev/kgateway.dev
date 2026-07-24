@@ -6,9 +6,8 @@ weight: 10
 
 The following guide deploys a sample TCP echo app, sets up a TCP listener on the gateway, and creates a [TCPRoute](https://gateway-api.sigs.k8s.io/guides/user-guides/tcp/) to the sample app.
 
-{{< callout type="warning" >}}
-{{< reuse "kgw-docs/versions/warn-experimental.md" >}}
-{{< /callout >}}
+> [!WARNING]
+> {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 
 ## Before you begin
 

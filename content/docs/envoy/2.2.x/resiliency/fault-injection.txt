@@ -14,9 +14,8 @@ You can set the following two fault injection types in kgateway.
 
 Delays and aborts are independent of one another. When both values are set, your requests are either delayed only, delayed and aborted, or aborted only.
 
-{{< callout emoji="💡" >}}
-Faults can be configured for a route by using a TrafficPolicy resource. Gateway-level faults are not supported.
-{{< /callout >}}
+> [!TIP]
+> Faults can be configured for a route by using a TrafficPolicy resource. Gateway-level faults are not supported.
 
 For more information, see the [Fault API]({{< link-hextra path="/reference/api/fault/" >}}).
 

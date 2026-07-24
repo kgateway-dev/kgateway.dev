@@ -189,9 +189,8 @@ curl -sL https://run.solo.io/gloo/install | sh
 export PATH=$HOME/.gloo/bin:$PATH
 ```
 
-{{< callout type="info" >}}
-Make sure to use the version of `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` that matches your installed version.
-{{< /callout >}}
+> [!NOTE]
+> Make sure to use the version of `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` that matches your installed version.
 
 -->
 
@@ -220,7 +219,7 @@ Make sure to use the version of `{{< reuse "kgw-docs/snippets/cli-name.md" >}}` 
    | Component | Command |
    | ------------- | ------------- |
    | Gloo control plane | `kubectl logs -f -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l kgateway=kgateway` |
-   | kgateway proxy {{< callout type="info" >}}To view logs for incoming requests to your gateway proxy, be sure to <a href="/docs/security/access-logging/" >enable access logging</a> first.{{< /callout >}}| `kubectl logs -f -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gloo=kube-gateway` |
+   | kgateway proxy | `kubectl logs -f -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gloo=kube-gateway` |
    | Redis | `kubectl logs -f -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gloo=redis` |
 
 7. If you still cannot troubleshoot the issue, capture the logs and the state of kgateway in a file. 

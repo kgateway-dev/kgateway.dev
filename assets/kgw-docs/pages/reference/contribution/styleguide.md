@@ -52,7 +52,7 @@ Avoid "I" and "we" in your content contribution. Instead, phrase sentences in th
 
 ## Future statements
 
-Avoid making promises or giving hints about the future releases and features. If you want to talk about a feature that is still under development, mark it as experimental or beta and use proper callout shortcodes to draw the user's attention to that information.
+Avoid making promises or giving hints about the future releases and features. If you want to talk about a feature that is still under development, mark it as experimental or beta and use a callout to draw the user's attention to that information.
 
 | Do ✅ | Don't ❌ | 
 | -- | -- |

@@ -83,9 +83,8 @@ By default, Envoy does not emit metrics for how much capacity remains in each ci
 | `remaining_rq` | Remaining requests before the limit is reached. |
 | `remaining_retries` | Remaining retries before the limit is reached. |
 
-{{< callout type="warning" >}}
-Keep in mind that enabling these additional metrics leads to a small performance overhead. Only enable this capability if you need visibility into the remaining circuit breaker capacity.
-{{< /callout >}}
+> [!WARNING]
+> Keep in mind that enabling these additional metrics leads to a small performance overhead. Only enable this capability if you need visibility into the remaining circuit breaker capacity.
 
 1. Update your BackendConfigPolicy to enable `trackRemaining`.
 

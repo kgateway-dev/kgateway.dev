@@ -76,9 +76,8 @@ Configure a ListenerPolicy to accept PROXY protocol headers on incoming connecti
 
 3. Send a request to the httpbin app without a proxy protocol header. Verify that the request fails.
 
-   {{< callout type="info" >}}
-   PROXY protocol is enforced at the TCP listener level. Envoy closes the connection before any HTTP processing occurs. Because of that, no HTTP status code is returned in the response. Note that you must use the gateway proxy's load balancer IP address to send the request. If you port-forward the proxy on your local machine instead, you bypass Envoy's listener filters and cannot test the proxy protocol capability. To assign a load balancer IP address in local test setups, consider using [`cloud-provider-kind`](https://github.com/kubernetes-sigs/cloud-provider-kind).  
-   {{< /callout >}}
+   > [!NOTE]
+   > PROXY protocol is enforced at the TCP listener level. Envoy closes the connection before any HTTP processing occurs. Because of that, no HTTP status code is returned in the response. Note that you must use the gateway proxy's load balancer IP address to send the request. If you port-forward the proxy on your local machine instead, you bypass Envoy's listener filters and cannot test the proxy protocol capability. To assign a load balancer IP address in local test setups, consider using [`cloud-provider-kind`](https://github.com/kubernetes-sigs/cloud-provider-kind).
 
    ```sh
    curl -vik \
@@ -224,9 +223,8 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
    EOF
    ```
 
-   {{< callout type="info">}}
-   When both `upstreamProxyProtocol` and `tls` are configured on the same `BackendConfigPolicy`, the PROXY protocol layer wraps the TLS transport socket. The gateway proxy sends the PROXY header before the TLS handshake begins.
-   {{< /callout >}}
+   > [!NOTE]
+   > When both `upstreamProxyProtocol` and `tls` are configured on the same `BackendConfigPolicy`, the PROXY protocol layer wraps the TLS transport socket. The gateway proxy sends the PROXY header before the TLS handshake begins.
 
 3. Create an HTTPRoute that routes traffic to the echo service.
 
@@ -252,9 +250,8 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
 
 4. Send a request to the echo service through the gateway.
 
-   {{< callout type="info" >}}
-   Use the gateway's LoadBalancer address for this test, not `kubectl port-forward`. Envoy builds the PROXY header using the source IP of the incoming client connection. With port-forward, that source IP address is `127.0.0.1`, also referred to as a loopback. Envoy does not generate a standard PROXY header for loopback connections.
-   {{< /callout >}}
+   > [!NOTE]
+   > Use the gateway's LoadBalancer address for this test, not `kubectl port-forward`. Envoy builds the PROXY header using the source IP of the incoming client connection. With port-forward, that source IP address is `127.0.0.1`, also referred to as a loopback. Envoy does not generate a standard PROXY header for loopback connections.
 
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/ -H "host: echo.example.com"

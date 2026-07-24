@@ -76,9 +76,8 @@ You can access the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane 
 
 3. Search for the `kgateway_envoy_xds_rejects_total` and `kgateway_envoy_xds_rejects_active` metrics.
 
-   {{< callout type="info" >}}
-   The metrics only appear after at least one NACK has been reported. If no NACKs have occurred, these metrics are not present in the metrics output.
-   {{< /callout >}}
+   > [!NOTE]
+   > The metrics only appear after at least one NACK has been reported. If no NACKs have occurred, these metrics are not present in the metrics output.
 
    Example output:
 

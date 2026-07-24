@@ -3,9 +3,8 @@ The data plane proxy of your Gateway determines the templating language that you
 {{< icon "kgateway" >}} Transformation templates for Envoy-based kgateway proxies
 
 {{< version include-if="2.1.x,2.2.x" >}}
-{{< callout type="warning" >}}
-**Plan to migrate to rustformation before you upgrade past 2.2.x.** In 2.2.x, rustformation (MiniJinja) is the default engine, and classic transformation (Inja) remains as an opt-out fallback. In a future release, classic transformation is removed and rustformation is the only supported engine. The two engines are syntactically similar but not identical, so existing templates might need updates. {{< version include-if="2.2.x" >}}For the differences and a migration table, see the 2.2.x [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}) topic.{{< /version >}}
-{{< /callout >}}
+> [!WARNING]
+> **Plan to migrate to rustformation before you upgrade past 2.2.x.** In 2.2.x, rustformation (MiniJinja) is the default engine, and classic transformation (Inja) remains as an opt-out fallback. In a future release, classic transformation is removed and rustformation is the only supported engine. The two engines are syntactically similar but not identical, so existing templates might need updates. {{< version include-if="2.2.x" >}}For the differences and a migration table, see the 2.2.x [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}) topic.{{< /version >}}
 {{< /version >}}
 
 ## Transformation templates for Envoy-based kgateway proxies {#inja}
@@ -83,9 +82,8 @@ When specifying your transformation template, you can leverage custom functions 
 | `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/decode-base64-headers/" >}}). |
 
 {{< version exclude-if="2.0.x,2.1.x" >}}
-{{< callout type="warning" >}}
-**Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, MiniJinja evaluates `replace_with_random` at template compile time when its arguments are constants and stores the result in the compiled template, so every request returns the same generated value. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")` — a non-constant argument can't be folded at compile time, so MiniJinja re-evaluates the function on every render. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
-{{< /callout >}}
+> [!WARNING]
+> **Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, MiniJinja evaluates `replace_with_random` at template compile time when its arguments are constants and stores the result in the compiled template, so every request returns the same generated value. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")` — a non-constant argument can't be folded at compile time, so MiniJinja re-evaluates the function on every render. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
 {{< /version >}}
 
 **Other common functions**

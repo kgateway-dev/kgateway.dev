@@ -8,13 +8,11 @@ According to [OWASP](https://owasp.org/www-community/attacks/csrf), CSRF is defi
 
 To help prevent CSRF attacks, you can enable the CSRF filter on your gateway or a specific route. For each route that you apply the CSRF policy to, the filter checks to make sure that a request's origin matches its destination. If the origin and destination do not match, a 403 Forbidden error code is returned. 
 
-{{< callout type="info" >}}
-Note that because CSRF attacks specifically target state-changing requests, the filter only acts on HTTP requests that have a state-changing method such as `POST` or `PUT`.
-{{< /callout >}}
+> [!NOTE]
+> Note that because CSRF attacks specifically target state-changing requests, the filter only acts on HTTP requests that have a state-changing method such as `POST` or `PUT`.
 
-{{< callout type="info" >}}
-To learn more about CSRF, you can try out the [CSRF sandbox](https://www.envoyproxy.io/docs/envoy/latest/start/sandboxes/csrf) in Envoy. 
-{{< /callout >}}
+> [!NOTE]
+> To learn more about CSRF, you can try out the [CSRF sandbox](https://www.envoyproxy.io/docs/envoy/latest/start/sandboxes/csrf) in Envoy.
 
 ## Before you begin
 

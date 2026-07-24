@@ -25,9 +25,8 @@ Review the built-in configurations that are provided via the [{{< reuse "kgw-doc
 | `istio` | Configure the Istio integration for the proxy. |
 | `stats` | Configure the stats server that exposes Prometheus metrics, including enabling the stats endpoint, rewriting the stats route prefix, and [filtering which stats Envoy emits]({{< link-hextra path="/observability/gateway-metrics/#filter-stats" >}}). |
 
-{{< callout type="info" >}}
-Use the built-in fields where possible. Built-in fields are validated at apply time, are considered stable, and are updated automatically when you upgrade your gateway proxies.
-{{< /callout >}}
+> [!NOTE]
+> Use the built-in fields where possible. Built-in fields are validated at apply time, are considered stable, and are updated automatically when you upgrade your gateway proxies.
 
 ## Overlays {#overlays}
 
@@ -44,9 +43,8 @@ Review the following table for the resource types that you can overlay in the `s
 | `verticalPodAutoscaler` | VerticalPodAutoscaler | Create a VPA targeting the proxy Deployment. The VPA is created **only** when this field is present. Requires the [VPA controller](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler). |
 | `podDisruptionBudget` | PodDisruptionBudget | Create a PDB targeting the proxy Deployment. The PDB is created **only** when this field is present. |
 
-{{< callout type="warning" >}}
-Overlays are **not validated** by the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane at apply time. Configuration errors surface only when Kubernetes processes the resulting resource. The overlay schema reflects the underlying Kubernetes resource schema and is **not stable** between Kubernetes versions. Test overlay configurations after each cluster upgrade.
-{{< /callout >}}
+> [!WARNING]
+> Overlays are **not validated** by the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane at apply time. Configuration errors surface only when Kubernetes processes the resulting resource. The overlay schema reflects the underlying Kubernetes resource schema and is **not stable** between Kubernetes versions. Test overlay configurations after each cluster upgrade.
 
 ### How overlays work
 

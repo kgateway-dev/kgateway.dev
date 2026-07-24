@@ -174,9 +174,8 @@ Review other common configuration examples.
 
 Use `ForwardOnly` to pass the existing XFCC header from the client to the upstream without modification. 
 
-{{< callout >}}
-This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
-{{< /callout >}}
+> [!NOTE]
+> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -201,9 +200,8 @@ EOF
 
 Use `AppendForward` to keep any XFCC header that is already present in the request and append a new entry with details from the current downstream client certificate. This is useful in multi-hop proxy chains where you want each hop to add its own identity without discarding previous entries. 
 
-{{< callout >}}
-This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
-{{< /callout >}}
+> [!NOTE]
+> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -231,9 +229,8 @@ EOF
 
 Use `SanitizeSet` to remove any XFCC header that the client sent and replace it with a new one that the gateway proxy builds from the actual client certificate that is used in the mTLS handshake. The upstream receives a trustworthy header that the proxy generated, and not a header that the client might have forged. Use the `details` field to control the information that you want to include in the header. 
 
-{{< callout >}}
-This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
-{{< /callout >}}
+> [!NOTE]
+> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
 
 In the following example, you include the subject, DNS, and URI fields from the certificate.
 

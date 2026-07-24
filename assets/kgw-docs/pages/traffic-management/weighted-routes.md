@@ -217,9 +217,8 @@ Apply an annotation at the HTTPRoute level that sets a weight for the route, whi
 1. In descending order by weight, from highest to lowest.
 2. By [Gateway API route precedence](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httprouterule) for routes with the same weight.
 
-{{< callout type="info" >}}
-Using route delegation? Make sure to add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
-{{< /callout >}}
+> [!NOTE]
+> Using route delegation? Make sure to add the `kgateway.dev/route-weight` annotation to the child HTTPRoute that you want to weight. Children **do not** inherit the weight of their parent HTTPRoute.
 
 Steps to weight routes:
 

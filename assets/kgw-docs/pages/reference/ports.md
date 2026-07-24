@@ -4,9 +4,9 @@ Kgateway deploys containers that listen on certain ports for incoming traffic. I
 
 <!--
 
-{{< callout type="info" >}}
-This list of ports reflects the default values that are included in an unmodified installation of kgateway. You can optionally change some port settings by providing custom values in your kgateway Helm chart.
-{{< /callout >}} -->
+> [!NOTE]
+> This list of ports reflects the default values that are included in an unmodified installation of kgateway. You can optionally change some port settings by providing custom values in your kgateway Helm chart.
+-->
 
 
 ## Installation

@@ -90,14 +90,13 @@ For static credentials, the IAM user must have at least `ec2:DescribeInstances` 
 
 Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the gateway proxy uses those credentials as-is to discover EC2 instances.
 
-{{< callout type="info" >}}
-The steps in this example require a permanent IAM user with long-lived credentials. If you authenticate through AWS SSO (IAM Identity Center), `aws sts get-caller-identity` returns a role ARN rather than an IAM user ARN, and `aws iam create-access-key` fails with a `NoSuchEntity` error. In this case, create a dedicated IAM user first:
-```sh
-aws iam create-user --user-name kgateway-ec2-user
-export IAM_USERNAME=kgateway-ec2-user
-```
-Then, skip step 1 to export your `IAM_USERNAME` and continue with the remaining steps.
-{{< /callout >}}
+> [!NOTE]
+> The steps in this example require a permanent IAM user with long-lived credentials. If you authenticate through AWS SSO (IAM Identity Center), `aws sts get-caller-identity` returns a role ARN rather than an IAM user ARN, and `aws iam create-access-key` fails with a `NoSuchEntity` error. In this case, create a dedicated IAM user first:
+> ```sh
+> aws iam create-user --user-name kgateway-ec2-user
+> export IAM_USERNAME=kgateway-ec2-user
+> ```
+> Then, skip step 1 to export your `IAM_USERNAME` and continue with the remaining steps.
 
 1. Get your IAM username. If you are using AWS SSO, skip this command and use the `IAM_USERNAME` value you set earlier.
    ```sh
@@ -161,9 +160,8 @@ Then, skip step 1 to export your `IAM_USERNAME` and continue with the remaining 
 
 Use this method when you want EC2 discovery to use a least-privilege IAM role rather than long-lived user credentials. The kgateway controller uses its own ambient IAM identity (configured via [IRSA](https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html)) to call `sts:AssumeRole` and obtain temporary credentials for the role. No Kubernetes secret is required. The `ec2:DescribeInstances` permission is attached to the role, not the controller's identity directly.
 
-{{< callout type="warning" >}}
-This method requires an EKS cluster with an OIDC provider. It does not work on local clusters such as Kind or minikube. If you are using a local cluster, use the **Static AWS credentials** method instead.
-{{< /callout >}}
+> [!WARNING]
+> This method requires an EKS cluster with an OIDC provider. It does not work on local clusters such as Kind or minikube. If you are using a local cluster, use the **Static AWS credentials** method instead.
 
 1. Verify that your EKS cluster has an OIDC provider associated with it, and save the provider ID in an environment variable.
    ```sh

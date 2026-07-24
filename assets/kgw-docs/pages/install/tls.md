@@ -20,7 +20,8 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
    --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set installCRDs=true
    ```
-   {{< callout type="info" >}}To allow cert-manager to use the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.{{< /callout >}}
+   > [!NOTE]
+   > To allow cert-manager to use the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.
 
 3. Create a self-signed Certificate Authority (CA) that acts as the root of trust for the xDS gRPC server certificates. For production environments, replace the self-signed root issuer with your organization's CA issuer, such as Vault or a cloud CA service. For more information, see the [cert-manager CA issuer docs](https://cert-manager.io/docs/configuration/issuers/).
 
@@ -56,7 +57,8 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
 
 4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `{{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
 
-   {{< callout type="info" >}}The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.{{< /callout >}}
+   > [!NOTE]
+   > The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.
    
    ```yaml
    kubectl apply -f - <<EOF

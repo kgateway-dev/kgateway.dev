@@ -47,13 +47,11 @@ Deploy the Petstore sample app. This app is used alongside the httpbin app from 
 
 Create TLS certificates for the `httpbin.example.com` and `petstore.example.com` domains that are signed by a self-signed root CA.
 
-{{< callout type="warning" >}}
-Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trusted Certificate Authority.
-{{< /callout >}}
+> [!WARNING]
+> Self-signed certificates are used for demonstration purposes. Do not use self-signed certificates in production environments. Instead, use certificates that are issued from a trusted Certificate Authority.
 
-{{< callout type="info" >}}
-When generating your Envoy certificates, make sure to use encryption algorithms that are supported in Envoy. To learn more about supported algorithms that you can use for your certificates and keys, see the <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ssl#certificate-selection">Envoy documentation</a>. 
-{{< /callout >}}
+> [!NOTE]
+> When generating your Envoy certificates, make sure to use encryption algorithms that are supported in Envoy. To learn more about supported algorithms that you can use for your certificates and keys, see the <a href="https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/security/ssl#certificate-selection">Envoy documentation</a>.
    
 1. Create a root certificate and private key to sign the certificates for your services. 
    ```shell

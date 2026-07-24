@@ -42,9 +42,8 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
 
 2. Send a request to the httpbin app on the `rewrite.example` domain. Verify that you get back a 200 HTTP response code and that you see the `Host: www.example.com` header in your response. 
 
-   {{< callout type="info" >}}
-   The following request returns a 200 HTTP response code, because you set up an HTTPRoute for the httpbin app on the `www.example.com` domain as part of the getting started guide. If you chose a different domain for your example, make sure that you have an HTTPRoute that can be reached under the host you want to rewrite to. 
-   {{< /callout >}}
+   > [!NOTE]
+   > The following request returns a 200 HTTP response code, because you set up an HTTPRoute for the httpbin app on the `www.example.com` domain as part of the getting started guide. If you chose a different domain for your example, make sure that you have an HTTPRoute that can be reached under the host you want to rewrite to.
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

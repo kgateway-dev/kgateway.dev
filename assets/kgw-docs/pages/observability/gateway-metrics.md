@@ -47,17 +47,15 @@ spec:
 EOF
 ```
 
-{{< callout type="info" >}}
-Query-time filtering reduces the amount of stats that are scraped when a Prometheus scrape query is received. However, Envoy still tracks all stats in memory. To reduce memory and CPU overhead on the gateway proxy itself, use the `matcher` field instead. For more information, see [Filter Envoy stats](#filter-stats).
-{{< /callout >}}
+> [!NOTE]
+> Query-time filtering reduces the amount of stats that are scraped when a Prometheus scrape query is received. However, Envoy still tracks all stats in memory. To reduce memory and CPU overhead on the gateway proxy itself, use the `matcher` field instead. For more information, see [Filter Envoy stats](#filter-stats).
 
 ## Filter Envoy stats {#filter-stats}
 
 In high-scale environments, Envoy can emit thousands of individual stats. You can use the `spec.kube.stats.matcher` field in the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to control which stats Envoy emits at the source to reduce memory and CPU overhead on the gateway proxy.
 
-{{< callout type="info" >}}
-Stats filtering applies at bootstrap time in the Envoy proxy. This is different from [query-time filtering](#filter-query-time) using `routePrefixRewrite`, which only reduces scrape response size but still tracks all stats in memory.
-{{< /callout >}}
+> [!NOTE]
+> Stats filtering applies at bootstrap time in the Envoy proxy. This is different from [query-time filtering](#filter-query-time) using `routePrefixRewrite`, which only reduces scrape response size but still tracks all stats in memory.
 
 You can configure either an inclusion list (emit only matching stats) or an exclusion list (emit all stats except matching ones). Only one list can be set at a time, and each list supports up to 16 entries.
 

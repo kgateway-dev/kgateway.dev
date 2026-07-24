@@ -61,9 +61,8 @@ Upgrade your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} installation to enab
    helm upgrade -i --namespace {{< reuse "kgw-docs/snippets/namespace.md" >}} --version {{< reuse "/kgw-docs/versions/helm-version-flag.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -f {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
-   {{< callout type="warning" >}}
-   The `istio-proxy` container in the gateway proxy looks for a service that is named `istiod` in the `istio-system` namespace to obtain a valid certificate. Depending on how you installed Istio, you might have a revisioned istiod deployment, such as `istiod-main`, or custom names for the Istio meta cluster ID and meta mesh ID. If this is the case, the `istio-proxy` container cannot deploy successfully. Continue with [Revisioned istiod and custom Istio meta mesh settings](#custom-istio-settings) to configure the `istio-proxy` container to use your custom values. 
-   {{< /callout >}}
+   > [!WARNING]
+   > The `istio-proxy` container in the gateway proxy looks for a service that is named `istiod` in the `istio-system` namespace to obtain a valid certificate. Depending on how you installed Istio, you might have a revisioned istiod deployment, such as `istiod-main`, or custom names for the Istio meta cluster ID and meta mesh ID. If this is the case, the `istio-proxy` container cannot deploy successfully. Continue with [Revisioned istiod and custom Istio meta mesh settings](#custom-istio-settings) to configure the `istio-proxy` container to use your custom values.
 
 ## Step 3: Update the Istio proxy settings {#custom-istio-settings}
 
@@ -235,9 +234,8 @@ Create or update a Gateway that includes the Istio proxy.
    ```
 
 {{< version exclude-if="2.0.x" >}}
-{{< callout type="info">}}
-To exclude a service from using Istio mTLS or to configure your own TLS settings, you can create a static Backend resource for the service and add the `kgateway.dev/disable-istio-auto-mtls` annotation to the Backend. Then, you can apply custom TLS settings by using a BackendTLSPolicy or BackendConfigPolicy. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
-{{< /callout >}}
+> [!NOTE]
+> To exclude a service from using Istio mTLS or to configure your own TLS settings, you can create a static Backend resource for the service and add the `kgateway.dev/disable-istio-auto-mtls` annotation to the Backend. Then, you can apply custom TLS settings by using a BackendTLSPolicy or BackendConfigPolicy. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
 {{< /version >}}
 
 ## Cleanup

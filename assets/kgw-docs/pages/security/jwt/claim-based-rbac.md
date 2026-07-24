@@ -133,9 +133,8 @@ rbac:
       - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope'].split(' ')"
 ```
 
-{{< callout type="info" >}}
-The sample token in the [Basic JWT policy](../basic/) guide does not include a `scope` claim, so this example does not match that token. To try it out, use a token that carries a space-delimited `scope` claim. If your identity provider issues `scope` as a list instead of a string, drop the `.split(' ')` and match the list directly: `"'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope']"`.
-{{< /callout >}}
+> [!NOTE]
+> The sample token in the [Basic JWT policy](../basic/) guide does not include a `scope` claim, so this example does not match that token. To try it out, use a token that carries a space-delimited `scope` claim. If your identity provider issues `scope` as a list instead of a string, drop the `.split(' ')` and match the list directly: `"'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope']"`.
 
 ## Cleanup {#cleanup}
 
