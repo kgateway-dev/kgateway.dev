@@ -42,7 +42,7 @@ As with most APIs, the Astronomy Picture of the Day API also includes parameters
 
 ### What is an API gateway?
 
-An API gateway is a service that provides centralized gateway functionality for API traffic. The concept that took off as microservices architectures were growing in popularity in the 2005-2015 era, with early vendors such as 3scale, WSO2 and Apigee targeting backends that were run on Java. As Kubernetes became popular, the need arose to offer API gateway functionality that integrated with it. This led to the launch of Gloo, which is the original name of kgateway.
+An API gateway is a service that provides centralized gateway functionality for API traffic. The concept took off as microservices architectures were growing in popularity in the 2005-2015 era, with early vendors such as 3scale, WSO2 and Apigee targeting backends that were run on Java. As Kubernetes became popular, the need arose to offer API gateway functionality that integrated with it. This led to the launch of Gloo, which is the original name of kgateway.
 
 In the NASA example, recall that you had to provide an API key to access the service. This is a way of identifying you to the API, which can then be used to enable decision-making.
 
