@@ -110,6 +110,11 @@ jobs:
         env:
           DOCS_TEST_CONFIG: ${{ github.workspace }}/.docs-test.toml
         run: |
+          # pipefail required: bare `run:` steps run as `bash -e {0}` without
+          # pipefail here, so `tee`'s exit (0) would mask a failing test suite and
+          # the step would go green. The `if: always()` summary/upload steps below
+          # already assume this step can fail.
+          set -o pipefail
           npx playwright test --project=static --project=content --reporter=list,html 2>&1 | tee playwright-output.txt
 
       - name: Append summary to PR check

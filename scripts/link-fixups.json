@@ -30,8 +30,8 @@
     },
     {
       "old": "https://kgateway.dev/docs/integrations/inference-extension/",
-      "new": "https://kgateway.dev/docs/envoy/2.0.x/integrations/inference-extension/",
-      "reason": "Helm inferenceExtension doc link; docs are served under /docs/envoy/{version}/."
+      "new": "https://gateway-api-inference-extension.sigs.k8s.io/",
+      "reason": "Gateway API Inference Extension"
     },
     {
       "old": "https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
