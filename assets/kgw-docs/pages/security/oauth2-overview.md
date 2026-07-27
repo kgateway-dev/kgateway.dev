@@ -26,7 +26,7 @@ Because authentication is centralized at the gateway, backend services do not ne
 
 ## Supported OAuth2 flows
 
-kgateway supports two types of OAuth 2.0 flows:
+Kgateway supports the following two types of OAuth 2.0 flows:
 
 | Flow | Typical clients | Gateway behavior |
 |------|----------------|------------------|
