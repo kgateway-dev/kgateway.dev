@@ -66,10 +66,7 @@ Upgrade your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} installation to enab
 
 ## Step 3: Update the Istio proxy settings {#custom-istio-settings}
 
-Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository. The steps vary depending on the following scenarios:
-
-* Revisioned istiod deployment, such as `istiod-main`; **or** custom cluster or mesh IDs.
-* Revisionless Istio without custom cluster or mesh IDs.
+If you installed Istio with a revision or configured custom cluster or mesh IDs, create a GatewayParameters resource to configure the Istio proxy settings. Otherwise, skip to [Step 4](#create-gateway-proxy).
 
 {{< tabs >}}
 {{% tab name="Revisioned Istio or custom cluster and mesh IDs" %}}
@@ -104,32 +101,11 @@ Create a GatewayParameters resource to configure the revisioned istiod service a
            istioDiscoveryAddress: <istiod-service-address> # such as istiod-main.istio-system.svc:15012
            istioMetaClusterId: <cluster-ID> ## such as the cluster name
            istioMetaMeshId: <meta-mesh-ID> ## such as the cluster name
-       sdsContainer:
-         image:
-           registry: cr.kgateway.dev/kgateway-dev
-           repository: sds
-           tag: v{{< reuse "kgw-docs/versions/n-patch.md" >}} 
    EOF
    ```  
 {{% /tab %}}
 {{% tab name="Revisionless Istio without custom IDs" %}}
-Create a GatewayParameters resource to configure the Istio SDS container to pull the image from the kgateway repository.
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayParameters
-metadata:
-  name: custom-gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    sdsContainer:
-      image:
-        registry: cr.kgateway.dev/kgateway-dev
-        repository: sds
-        tag: v{{< reuse "kgw-docs/versions/n-patch.md" >}} 
-EOF
-```
+No additional configuration is needed. {{< reuse "/kgw-docs/snippets/kgateway.md" >}} automatically uses the correct SDS image. Skip to [Step 4](#create-gateway-proxy).
 {{% /tab %}}
 {{< /tabs >}}
 
