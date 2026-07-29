@@ -1,4 +1,5 @@
-Use this guide to protect an HTTPRoute with Keycloak as an OIDC provider. kgateway handles the OAuth2 authorization code flow: unauthenticated browser requests get redirected to Keycloak, the code is exchanged for tokens, and those tokens are stored in session cookies. Your upstream service doesn't need to know any of this happened.
+
+Use this guide to protect an HTTPRoute with Keycloak as an OIDC provider. kgateway handles the OAuth2 authorization code flow. unauthenticated browser requests get redirected to Keycloak, the code is exchanged for tokens, and those tokens are stored in session cookies. Your upstream service does not need to know any of this happened.
 
 You need three resources: a `Backend` pointing at your Keycloak host, a `GatewayExtension` to configure the OAuth2 provider, and a `TrafficPolicy` to attach it to a route.
 
@@ -20,6 +21,7 @@ First, generate a self-signed certificate for Keycloak:
 openssl req -x509 -newkey rsa:4096 -keyout tls.key -out tls.crt -days 365 -nodes -subj "/CN=keycloak.keycloak.svc.cluster.local"
 kubectl create secret tls keycloak-tls -n keycloak --cert=tls.crt --key=tls.key
 ```
+
 Then deploy Keycloak:
 
 ```yaml
@@ -115,80 +117,92 @@ Access the Keycloak admin console:
 kubectl port-forward svc/keycloak -n keycloak 8443:8443
 ```
 
-1. Open `https://localhost:8443` in your browser
+Open `https://localhost:8443` in your browser.
 
-2. Log in with username `admin` and password `admin`
+Log in with username `admin` and password `admin`.
 
 {{< reuse-image src="img/keycloak/keycloak-login.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/keycloak-login.png" >}}
 
-3. Create a new realm:
-   - Click **Add realm** from the realm dropdown (top-left)
-   - Enter a realm name (e.g., `myrealm`)
-   - Click **Create**
+Create a new realm.
+
+1. Click **Add realm** from the realm dropdown (top-left).
+2. Enter a realm name (such as, `myrealm`).
+3. Click **Create**.
 
 {{< reuse-image src="img/keycloak/realm-creation.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/realm-creation.png" >}}
 
-4. Create a client:
-   - Click **Clients** in the left sidebar
-   - Click **Create client**
-   - Set **Client ID** (e.g., `kgateway-client`)
+Create a client.
+
+1. Click **Clients** in the left sidebar.
+2. Click **Create client**.
+3. Set **Client ID** (such as, `kgateway-client`).
+4. Enable **Client authentication**.
 
 {{< reuse-image src="img/keycloak/client-creation.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/client-creation.png" >}}
 
-   - Enable **Client authentication**
-   - Click **Next**
-   - In **Valid redirect URIs**, add `https://GATEWAY_HOST/oauth2/redirect`
+5. Click **Next**.
+6. In **Valid redirect URIs**, add:
+
+```text
+https://GATEWAY_HOST/oauth2/redirect
+```
 
 {{< reuse-image src="img/keycloak/client-redirect-uri.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/client-redirect-uri.png" >}}
 
-   - Click **Save**
+7. Click **Save**.
 
-5. Note the client secret:
-   - Go to the **Credentials** tab of your client
-   - Copy the **Client secret** — you will need it for the `oauth2-client-secret` in the next section
+Note the client secret.
+
+1. Go to the **Credentials** tab of your client.
+2. Copy the **Client secret** — you need it for the `oauth2-client-secret` in the next section.
 
 {{< reuse-image src="img/keycloak/client-secret.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/client-secret.png" >}}
 
-6. Create a test user:
-   - Click **Users** in the left sidebar
-   - Click **Add user**
-   - Set **Username** (e.g., `testuser`)
-   - Click **Create**
-   - Go to the **Credentials** tab
-   - Set a password (e.g., `password`)
-   - Turn **Temporary** off
-   - Click **Set Password**
+Create a test user.
+
+1. Click **Users** in the left sidebar.
+2. Click **Add user**.
+3. Set **Username** (such as, `testuser`).
+4. Click **Create**.
+
+{{< reuse-image src="img/keycloak/user-created.png" >}}
+{{< reuse-image-dark srcDark="img/keycloak/user-created.png" >}}
+
+5. Go to the **Credentials** tab.
+6. Set a password (such as, `password`).
+7. Turn **Temporary** off.
+8. Click **Set Password**.
 
 {{< reuse-image src="img/keycloak/user-password.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/user-password.png" >}}
 
-{{< reuse-image src="img/keycloak/user-created.png" >}}
-{{< reuse-image-dark srcDark="img/keycloak/user-created.png" >}}
 
 {{< callout type="info" >}}
 For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the `myrealm` realm for testing only.
 {{< /callout >}}
 
-## Store the client secret {#store-credentials}
+## Configure the OAuth Policy
+
+### Store the client secret {#store-credentials}
 
 Create a Kubernetes Secret with the Keycloak client secret. kgateway reads the value from the `client-secret` key specifically, so the key name matters.
 
-```shell
+```sh
 kubectl create secret generic keycloak-client-secret \
   --from-literal=client-secret=YOUR_CLIENT_SECRET \
   -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
-Grab `YOUR_CLIENT_SECRET` from the **Credentials** tab of your Keycloak client.
+Replace `YOUR_CLIENT_SECRET` with the value you copied from the Credentials tab of your Keycloak client in the previous section.
 
-## Configure TLS for Keycloak {#configure-tls}
+### Configure TLS for Keycloak {#configure-tls}
 
-Since Keycloak uses a self-signed certificate for HTTPS, you need to configure kgateway to skip TLS verification when communicating with the Keycloak backend.
+Since Keycloak uses a self-signed certificate for HTTPS, configure kgateway to skip TLS verification when communicating with the Keycloak backend.
 
 Create a `BackendConfigPolicy` that skips TLS verification for the Keycloak Backend:
 
@@ -209,7 +223,7 @@ spec:
 EOF
 ```
 
-## Create a Backend for Keycloak {#create-backend}
+### Create a Backend for Keycloak {#create-backend}
 
 Create a `Backend` resource that defines how kgateway reaches your Keycloak instance. This Backend uses the `Static` type with the host and port configured for Keycloak.
 
@@ -229,11 +243,11 @@ spec:
 EOF
 ```
 
-Replace **keycloak.example.com** with your Keycloak hostname. The port must be **443** because kgateway communicates with Keycloak over HTTPS.
+Replace `keycloak.example.com` with your Keycloak hostname (such as, `keycloak.keycloak.svc.cluster.local`). The port must be `443` because kgateway communicates with Keycloak over HTTPS.
 
-## Create the GatewayExtension {#create-extension}
+### Create the GatewayExtension {#create-extension}
 
-The `GatewayExtension` holds everything the gateway needs to talk to Keycloak. The `GatewayExtension` is independent of routing, so you can reuse the same extension across multiple `TrafficPolicy` resources.
+The `GatewayExtension` holds everything the gateway needs to talk to Keycloak. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple `TrafficPolicy` resources.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -264,22 +278,28 @@ spec:
 EOF
 ```
 
-Replace `keycloak.example.com` and `myrealm` with your Keycloak host and realm.
+Replace the following values:
 
-Field notes:
+* `keycloak.example.com` with your Keycloak hostname (same as above).
+* `myrealm` with the realm name you created (such as, `myrealm`).
+* `kgateway-client` with your Client ID (if you used a different name).
 
-- `backendRef` points to the `Backend` created in the previous step. kgateway uses it to reach Keycloak for token exchange and OIDC discovery.
-- `issuerURI` triggers OIDC discovery. kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery.
-- `scopes` defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims.
-- `endSessionEndpoint` handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Keycloak ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if your realm has that feature enabled and `openid` is in your scopes.
-- `clientSecretRef.name` must match the Secret name from the previous step. kgateway reads the `client-secret` key inside that Secret.
+**Field notes:**
 
-## Attach the policy {#attach-policy}
+| Field | Description |
+|-------|-------------|
+| `backendRef` | Points to the `Backend` created in the previous step. kgateway uses it to reach Keycloak for token exchange and OIDC discovery. |
+| `issuerURI` | Triggers OIDC discovery. kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
+| `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
+| `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Keycloak ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if your realm has that feature enabled and `openid` is in your scopes. |
+| `clientSecretRef.name` | Must match the Secret name from the previous step. kgateway reads the `client-secret` key inside that Secret. |
+
+### Attach the policy {#attach-policy}
 
 Create a `TrafficPolicy` that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
 
 {{< callout type="warning" >}}
-The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair the OAuth2 filter with a `CSRFPolicy` on the same route, especially for browser-facing apps.
+The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair the OAuth2 filter with a CSRFPolicy on the same route, especially for browser-facing apps.
 {{< /callout >}}
 
 ```yaml
@@ -301,11 +321,11 @@ spec:
 EOF
 ```
 
-`targetRefs` can point to a specific `HTTPRoute` or all routes in a `Gateway`. This example locks down a single route named `httpbin`.
+Note: `targetRefs` can point to a specific HTTPRoute or all routes in a Gateway. This example locks down a single route named `httpbin`.
 
-## Configure cookie settings {#cookie-config}
+### Configure cookie settings {#cookie-config}
 
-kgateway stores the access and ID tokens in session cookies. The default `SameSite` policy is `Lax`. If you need custom cookie names (for example, to read them in downstream services or share across subdomains), set them explicitly under `cookies` on the `GatewayExtension`.
+kgateway stores the access and ID tokens in session cookies. The default SameSite policy is `Lax`. If you need custom cookie names (for example, to read them in downstream services or share across subdomains), set them explicitly under `cookies` on the GatewayExtension.
 
 ```yaml
 spec:
@@ -318,13 +338,13 @@ spec:
         idToken: kgw-id
 ```
 
-`Strict` means the browser won't send cookies on any cross-site request, including top-level navigations. Use `Lax`, which is the default, if users arrive at your app through links from other origins, like an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing.
+`Strict` means the browser does not send cookies on any cross-site request, including top-level navigations. Use `Lax`, which is the default, if users arrive at your app through links from other origins, like an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing.
 
-Add this block to the `GatewayExtension` manifest from the previous step and re-apply.
+Add this block to the GatewayExtension manifest from the previous step and re-apply.
 
-## Stop redirecting API clients {#deny-redirect}
+### Stop redirecting API clients {#deny-redirect}
 
-By default, any unauthenticated request gets a `302` redirect to the Keycloak login page. That response is what you want for a browser, but not for API clients. `curl`, mobile apps, and AJAX calls that hit an unauthenticated route will silently follow the redirect, land on the Keycloak login HTML, and fail.
+By default, any unauthenticated request gets a `302` redirect to the Keycloak login page. That response works for a browser, but not for API clients. `curl`, mobile apps, and AJAX calls that hit an unauthenticated route silently follow the redirect, land on the Keycloak login HTML, and fail.
 
 The `denyRedirect` field on `OAuth2Provider` lets you match specific requests and return `401` instead of redirecting them. It takes a list of `HTTPHeaderMatch` entries, and a request matches if it satisfies all of them.
 
@@ -341,27 +361,27 @@ spec:
           value: application/json
 ```
 
-For requests that might send `Accept: application/json; charset=utf-8` or similar variations, you can use `RegularExpression`:
+For requests that might send `Accept: application/json; charset=utf-8` or similar variations, use `RegularExpression`:
 
 ```yaml
-    denyRedirect:
-      headers:
-        - name: Accept
-          type: RegularExpression
-          value: "application/json.*"
+denyRedirect:
+  headers:
+    - name: Accept
+      type: RegularExpression
+      value: "application/json.*"
 ```
 
 For AJAX requests from browser JavaScript:
 
 ```yaml
-    denyRedirect:
-      headers:
-        - name: X-Requested-With
-          type: Exact
-          value: XMLHttpRequest
+denyRedirect:
+  headers:
+    - name: X-Requested-With
+      type: Exact
+      value: XMLHttpRequest
 ```
 
-The full `GatewayExtension` with `denyRedirect` included:
+The full GatewayExtension with `denyRedirect` included:
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -399,50 +419,141 @@ EOF
 
 ## Verify {#verify}
 
-1. Send a request without a session cookie. The gateway should redirect to Keycloak.
+### Option A: Authorization Code Flow (Browser)
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+Send a request without a session cookie. The gateway redirects to Keycloak.
 
-   Example output:
-   ```
-   < HTTP/1.1 302 Found
-   < location: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth?client_id=kgateway-client&...
-   ```
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
 
-2. Send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
+```sh
+curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
+```
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
-   ```sh
-   curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" \
-     -H "host: www.example.com" \
-     -H "Accept: application/json"
-   ```
-   {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
-   ```sh
-   curl -vi "http://localhost:8080/headers" \
-     -H "host: www.example.com" \
-     -H "Accept: application/json"
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
 
-   Example output:
-   ```
-   < HTTP/1.1 401 Unauthorized
-   ```
+```sh
+curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```text
+< HTTP/1.1 302 Found
+< location: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth?client_id=kgateway-client&...
+```
+
+Send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
+
+{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" \
+  -H "host: www.example.com" \
+  -H "Accept: application/json"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vi "http://localhost:8080/headers" \
+  -H "host: www.example.com" \
+  -H "Accept: application/json"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```text
+< HTTP/1.1 401 Unauthorized
+```
+
+### Option B: Access Token Validation (API)
+
+For API clients, you can validate access tokens directly without the browser redirect flow.
+
+Get the JWKS URI from Keycloak:
+
+1. In the Keycloak admin console, go to **Realm Settings → General** tab.
+2. Scroll down to the **Endpoints** section.
+3. Open the **OpenID Endpoint Configuration** link in a new tab.
+4. In the OpenID configuration, search for the `jwks_uri` field.
+5. Copy the value, for example:
+
+```text
+https://keycloak.example.com/realms/myrealm/protocol/openid-connect/certs
+```
+
+Create a GatewayExtension for JWT validation:
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: keycloak-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - issuer: https://keycloak.example.com/realms/myrealm
+        jwks:
+          remote:
+            url: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/certs
+        audiences:
+          - kgateway-client
+EOF
+```
+
+Replace the following values:
+
+* `keycloak.example.com` with your Keycloak hostname.
+* `myrealm` with your realm name.
+* `kgateway-client` with your Client ID.
+
+Attach the JWT policy:
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: keycloak-jwt-policy
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: httpbin
+  jwtAuth:
+    extensionRef:
+      name: keycloak-jwt
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+EOF
+```
+
+Get a token from Keycloak and test:
+
+```bash
+export TOKEN=$(curl -d "client_id=kgateway-client" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "grant_type=client_credentials" \
+  "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token" \
+  | jq -r .access_token)
+
+curl -v "http://localhost:8080/headers" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+A successful response shows the headers from the upstream service.
 
 ## Cleanup {#cleanup}
 
