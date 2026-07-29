@@ -16,7 +16,7 @@
     --approve
 
    # Fetch the IAM policy that is required for the Kubernetes service account
-   curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.3/docs/install/iam_policy.json
+   curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.4.3/docs/install/iam_policy.json
 
    # Create the IAM policy
    aws iam create-policy \
@@ -39,9 +39,10 @@
    kubectl -n kube-system get sa aws-load-balancer-controller -o yaml
    ```
 
-4. Deploy the AWS Load Balancer Controller. 
+4. Deploy the AWS Load Balancer Controller. The controller's CRDs are installed in two bundles: the Helm chart's CRDs, and the CRDs that the controller uses to configure the load balancers that it creates for {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} resources, such as LoadBalancerConfiguration and TargetGroupConfiguration. The controller detects these CRDs and enables its {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} controllers automatically.
    ```sh
    kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v3.4.3/config/crd/gateway/gateway-crds.yaml
 
    helm repo add eks https://aws.github.io/eks-charts
    helm repo update
