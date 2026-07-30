@@ -28,7 +28,7 @@ See the following links to get started:
 Ringhash allows you to tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoints. However, this configurability might come at a performance cost, depending on your setup. To learn more about Ringhash, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html).
 
 > [!NOTE]
-> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. Note that this setting is only supported for static backends and has no effect on Kubernetes service backends.
+> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
 
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
    {{< tabs >}}
