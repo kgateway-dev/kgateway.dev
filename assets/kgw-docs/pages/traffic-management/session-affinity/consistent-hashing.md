@@ -166,7 +166,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 With Maglev, you use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
 
 > [!NOTE]
-> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. Note that this setting is only supported for static backends and has no effect on Kubernetes service backends.
+> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
 
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
    {{< tabs >}}
