@@ -109,7 +109,7 @@ spec:
 
 ## Conflicting policies
 
-If you create multiple HTTPListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the HTTPListenerPolicy that was last applied is enforced. 
+If you create multiple HTTPListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the HTTPListenerPolicy that was first applied is enforced. Any subsequent HTTPListenerPolicy resources are ignored.
 
 <!--
 
