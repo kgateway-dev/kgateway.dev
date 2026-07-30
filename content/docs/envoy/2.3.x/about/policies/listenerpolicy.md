@@ -92,7 +92,7 @@ spec:
 
 ## Conflicting policies
 
-If you create multiple ListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the ListenerPolicy that was first applied is enforced. Any subsequent ListenerPolicy resources are ignored.
+If you create multiple ListenerPolicy resources that define the same type of top-level policy, and attach them to the same gateway by using the `targetRefs` option, only the ListenerPolicy that was first created is enforced. Any subsequent ListenerPolicy resources are ignored.
 
 <!--
 
