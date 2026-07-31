@@ -16,7 +16,7 @@ Use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure
   - `text/plain`
   - `text/xml`
 
-- **Request decompression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} decompresses gzip-encoded request bodies before forwarding them to the backend service.
+- **Request decompression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} decompresses gzip-encoded request bodies before forwarding them to the backend service.{{< version include-if="2.4.x,2.5.x" >}} You can also configure [Brotli and Zstd](#multi-codec-decompression) as additional codecs by using the `libraries` field. The codec is selected based on the `Content-Encoding` header of the incoming request.{{< /version >}}
 
 For more information about how Envoy handles compression, see the [Envoy compressor filter docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/compressor_filter).
 
@@ -249,6 +249,35 @@ spec:
       libraries:
         - Brotli
         - Gzip
+        - Zstd
+EOF
+```
+### Brotli and Zstd request decompression {#multi-codec-decompression}
+
+By default, request decompression handles only Gzip-encoded request bodies. You can add support for additional codecs by setting the `requestDecompression.libraries` field to an ordered list of codecs. {{< reuse "kgw-docs/snippets/kgateway.md" >}} installs one Envoy decompressor filter per codec and selects the appropriate one based on the `Content-Encoding` header of the incoming request.
+
+Supported codec values: `Gzip`, `Brotli`, `Zstd`.
+
+The following example configures Brotli and Zstd in addition to Gzip for request decompression.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: request-decompression
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-decompression
+  compression:
+    requestDecompression:
+      libraries:
+        - Brotli
+        - Gzip
+        - Zstd
 EOF
 ```
 {{< /version >}}
