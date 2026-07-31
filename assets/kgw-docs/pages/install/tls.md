@@ -1,6 +1,6 @@
 Enable server-side TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. For more information about the server, see the [Architecture]({{< link-hextra path="/about/architecture" >}}) docs.
 
-TLS encryption is disabled by default. When enabled, the control plane mounts a `{{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-cert` TLS secret that you create and propagates the CA bundle to any {{< reuse "kgw-docs/snippets/pod-name.md" >}} data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
+TLS encryption is disabled by default. When enabled, the control plane mounts a `kgateway-xds-cert` TLS secret that you create and propagates the CA bundle to any {{< reuse "kgw-docs/snippets/pod-name.md" >}} data plane proxies to establish a secure connection. You might integrate your secret with a provider such as [cert-manager](https://cert-manager.io/docs/) to automate certificate management and rotation.
 
 ## Before you begin
 
@@ -55,7 +55,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    EOF
    ```
 
-4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `{{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
+4. Use the CA to sign a TLS certificate for the xDS gRPC server. This two-tiered approach keeps the root CA separate from the server certificate, and lets the server certificate be rotated independently of the CA. cert-manager automatically creates a Kubernetes secret with the required name `kgateway-xds-cert`, type `kubernetes.io/tls`, and the server certificate and private key in the `tls.crt` and `tls.key` keys.
 
    > [!NOTE]
    > The DNS names in the server certificate must match the service endpoints of the control plane. If you install the control plane in a different namespace, you must update the DNS names to match the actual service endpoints.
@@ -74,10 +74,10 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
    apiVersion: cert-manager.io/v1
    kind: Certificate
    metadata:
-     name: {{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-cert
+     name: kgateway-xds-cert
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    spec:
-     secretName: {{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-cert
+     secretName: kgateway-xds-cert
      issuerRef:
        name: {{< reuse "kgw-docs/snippets/pod-name.md" >}}-xds-ca-issuer
        kind: Issuer
