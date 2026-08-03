@@ -221,7 +221,7 @@ Enable gzip decompression on a route so that {{< reuse "kgw-docs/snippets/kgatew
    }
    ```
 
-{{< version include-if="2.3.x,2.2.x,2.1x" >}}
+{{< version exclude-if="2.3.x,2.2.x,2.1x" >}}
 
 ## Other configurations {#other}
 
