@@ -221,7 +221,8 @@ Enable gzip decompression on a route so that {{< reuse "kgw-docs/snippets/kgatew
    }
    ```
 
-{{< version include-if="2.4.x,2.5.x" >}}
+{{< version include-if="2.3.x,2.2.x,2.1x" >}}
+
 ## Other configurations {#other}
 
 ### Brotli and Zstd compression codecs {#multi-codec}
@@ -254,7 +255,7 @@ EOF
 ```
 ### Brotli and Zstd request decompression {#multi-codec-decompression}
 
-By default, request decompression handles only Gzip-encoded request bodies. You can add support for additional codecs by setting the `requestDecompression.libraries` field to an ordered list of codecs. {{< reuse "kgw-docs/snippets/kgateway.md" >}} installs one Envoy decompressor filter per codec and selects the appropriate one based on the `Content-Encoding` header of the incoming request.
+By default, request decompression handles only Gzip-encoded request bodies. You can add support for additional codecs by setting the `requestDecompression.libraries` field to an ordered list of codecs. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} installs one Envoy decompressor filter per codec and selects the appropriate one based on the `Content-Encoding` header of the incoming request.
 
 Supported codec values: `Gzip`, `Brotli`, `Zstd`.
 
