@@ -64,6 +64,23 @@ def _apply_link_fixups(content):
     return content
 
 
+def _apply_link_fixups_to_file(path):
+    '''Rewrite known-broken links in an already-written file.
+
+    Called after generate-shared-types.py appends to the API reference. That
+    appended section is read straight from Go doc comments, so it never went
+    through the fix-up pass in _post_process_api_docs.
+    '''
+    if not os.path.exists(path):
+        return
+    with open(path) as f:
+        content = f.read()
+    fixed = _apply_link_fixups(content)
+    if fixed != content:
+        with open(path, 'w') as f:
+            f.write(fixed)
+
+
 def safe_rmtree(path):
     '''Safely remove a directory tree, handling read-only permissions on Windows'''
     def _remove_readonly(func, p, excinfo):
@@ -583,7 +600,11 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             
             # Generate shared types documentation (e.g. CELExpression, PolicyStatus, HeaderModifiers)
             _generate_shared_types(api_file, kgateway_dir)
-            
+
+            # The appended shared types come straight from Go doc comments, so
+            # re-run the link fix-ups over the finished file.
+            _apply_link_fixups_to_file(api_file)
+
             print(f'    ✓ Generated envoy API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
@@ -614,7 +635,11 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
             
             # Generate shared types documentation (e.g. CELExpression, PolicyStatus, HeaderModifiers)
             _generate_shared_types(api_file, kgateway_dir)
-            
+
+            # The appended shared types come straight from Go doc comments, so
+            # re-run the link fix-ups over the finished file.
+            _apply_link_fixups_to_file(api_file)
+
             print(f'    ✓ Generated API docs in {api_file}')
         
         return True
