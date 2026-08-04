@@ -25,7 +25,10 @@ See the following links to get started:
 
 ### Ringhash
 
-Ringhash allows you to tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoint. However, this configurability might come at a performance cost, depending on your setup. To learn more about Ringhash, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html). 
+Ringhash allows you to tune the ring size to balance memory usage vs load distribution precision. This way, you get more fine-grained control over how traffic is distributed across endpoints. However, this configurability might come at a performance cost, depending on your setup. To learn more about Ringhash, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/load_balancing_policies/ring_hash/v3/ring_hash.proto.html).
+
+> [!NOTE]
+> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
 
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
    {{< tabs >}}
@@ -56,7 +59,6 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
          - header:
              name: "x-session-id"
            terminal: false
-         useHostnameForHashing: true
        closeConnectionsOnHostSetChange: true
    EOF
    ``` 
@@ -67,7 +69,6 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
    | -- | -- | 
    | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
    | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
-   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
    | `header.name` | The expected header name to create the hash with. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
    | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
@@ -164,6 +165,9 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
 With Maglev, you use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
 
+> [!NOTE]
+> If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
+
 1. Create a BackendConfigPolicy that uses the request property of your choice. 
    {{< tabs >}}
    {{% tab name="Headers" %}}
@@ -189,7 +193,6 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
          - header:
              name: "x-session-id"
            terminal: false
-         useHostnameForHashing: true
        closeConnectionsOnHostSetChange: true
    EOF
    ``` 
@@ -200,7 +203,6 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | -- | -- | 
    | `header.name` | The expected header name to create the hash with. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
-   | `useHostnameForHashing` | If set to true, the gateway proxy uses the hostname as the key to consistently hash to a backend host. If not set, defaults to using the resolved address of the hostname as the key. | 
    | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
 
    {{% /tab %}}
