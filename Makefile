@@ -27,6 +27,13 @@ FRAMEWORK_EXTRAS_DIR ?= ../docs-theme-extras
 # One-time install: npm packages and Playwright browser binaries
 # (chromium, firefox, webkit) inside the docs-theme-extras checkout.
 # ~120-180 MB of downloads, ~1-3 minutes.
+# Serving the HTML report binds a port and BLOCKS until interrupted, so it must
+# never run unattended: in CI it hangs the job, and in any scripted/non-tty run
+# it hangs the caller. Gate it on an interactive terminal AND the absence of CI.
+# The report is still written to playwright-report/ either way — view it with
+# `make framework-test-report`.
+SHOW_REPORT = if [ -t 1 ] && [ -z "$$CI" ]; then npx playwright show-report; fi
+
 .PHONY: framework-test-install
 framework-test-install:  ## Install Playwright + browsers in the extras checkout (one-time)
 	@if [ ! -d "$(FRAMEWORK_EXTRAS_DIR)" ]; then \
@@ -46,7 +53,7 @@ framework-test:  ## Build, then run the full Playwright harness (static + browse
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test; \
-		result=$$?; npx playwright show-report; exit $$result)
+		result=$$?; $(SHOW_REPORT); exit $$result)
 
 # Build the site and run only the static specs. Fastest iteration loop —
 # no browser launch.
@@ -57,7 +64,7 @@ framework-test-static:  ## Build, then run only the static (no-browser) specs �
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=static; \
-		result=$$?; npx playwright show-report; exit $$result)
+		result=$$?; $(SHOW_REPORT); exit $$result)
 
 # Build the site and run only the content specs — author-side lints and
 # rendered-HTML integrity against the built content tree (no browser).
@@ -68,7 +75,7 @@ framework-test-content:  ## Build, then run only the content specs
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=content; \
-		result=$$?; npx playwright show-report; exit $$result)
+		result=$$?; $(SHOW_REPORT); exit $$result)
 
 # Build the site and run chromium browser specs (tabs, mermaid, theme
 # toggle, copy-md, console errors, viewport, contrast).
@@ -79,7 +86,7 @@ framework-test-browser:  ## Build, then run the chromium browser specs
 	hugo160 --gc --minify > .build.log 2>&1
 	cd $(FRAMEWORK_EXTRAS_DIR) && \
 		(DOCS_TEST_CONFIG=$(abspath ./.docs-test.toml) npx playwright test --project=browser; \
-		result=$$?; npx playwright show-report; exit $$result)
+		result=$$?; $(SHOW_REPORT); exit $$result)
 
 # Build the site and run cross-browser desktop specs across chromium,
 # firefox, and webkit.
@@ -93,7 +100,7 @@ framework-test-cross-browser:  ## Build, then run cross-browser specs (chromium 
 			--project=cross-browser-chromium \
 			--project=cross-browser-firefox \
 			--project=cross-browser-webkit; \
-		result=$$?; npx playwright show-report; exit $$result)
+		result=$$?; $(SHOW_REPORT); exit $$result)
 
 # Open the most recent Playwright HTML report. Handy when an earlier
 # framework-test target was interrupted before reaching the report step.
