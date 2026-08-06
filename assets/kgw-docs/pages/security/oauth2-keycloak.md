@@ -506,14 +506,15 @@ Replace the following values:
 
 - `kgateway-client` with your Client ID.
 
-Keycloak tokens obtained with the `password` grant often include the audience `"account"` (the default client for the realm) even when you specify a different `audience` parameter. To ensure the JWT filter accepts the token, add `"account"` to the `audiences` list. You can check the token's `aud` claim by decoding it at [jwt.io](https://jwt.io).
+Keycloak tokens obtained with the `password` grant often include the audience `"account"` (the default client for the realm) even when you specify a different `audience` parameter. To ensure the JWT filter accepts the token, add `"account"` to the `audiences` list. You can check the token's `aud` claim by decoding it at  [jwt.io](https://jwt.io).
 
-{{< callout type="warning" >}}
 Ensure the following fields match the claims in your Keycloak-issued tokens:
 
-- The `issuer` value must match the `iss` claim. For local testing with port-forwarding, this is typically `https://localhost:8443/realms/myrealm`. For production, use your public Keycloak URL.
+- The `issuer` value must match the `iss` claim. For local testing with port-forwarding, this is typically `https://localhost:8443/realms/myrealm`. 
+
+- For production, use your public Keycloak URL.
+
 - The `audiences` list must include the `aud` claim value. If your token uses a different audience, add it to the list.
-{{< /callout >}}
 
 #### Attach the JWT Policy {#attach-jwt-policy}
 
