@@ -166,15 +166,15 @@ The following examples show how to test the OAuth2/OIDC flow using curl. The fir
 
 **Send a request without authentication (browser flow):**
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
 ```
 
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 
 ```sh
 curl -vik localhost:8080/headers -H "host: www.example.com:8080"
@@ -194,8 +194,8 @@ curl -vik localhost:8080/headers -H "host: www.example.com:8080"
 
 After completing the browser login flow, copy the session cookie from your browser's developer tools (Application → Cookies) and replace `session-cookie=...` with the actual cookie value.
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
@@ -204,7 +204,7 @@ curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
 ```
 
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 
 ```sh
 curl -vik localhost:8080/headers \
@@ -225,8 +225,8 @@ curl -vik localhost:8080/headers \
 
 If you want to test with a bearer token (for API clients), you can use:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
@@ -235,7 +235,7 @@ curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
 ```
 
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 
 ```sh
 curl -vik localhost:8080/headers \

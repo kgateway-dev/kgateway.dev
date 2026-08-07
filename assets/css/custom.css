@@ -146,3 +146,19 @@ nav.hextra-toc > div.hextra-scrollbar {
 .dark .content a:hover {
   color: hsl(212, 100%, 72%);
 }
+
+/* Hide the top-layer "Docs" link from docs breadcrumbs.
+
+   Moved here from an inline <style> block that used to live inside forked
+   copies of layouts/docs/single.html and layouts/docs/list.html. Those forks
+   were deleted once docs-theme-extras grew the partials/docs/* extension slots
+   (v0.2.0-beta.3); this rule was the only styling they carried, and a
+   stylesheet is where it belonged all along.
+
+   Scoped to #content so it cannot reach the blog/resources/learn layouts,
+   which also render a `main > div:first-child`. The inline version was NOT
+   scoped, but it only ever loaded on docs pages, so the narrower selector
+   preserves the original blast radius rather than widening it. */
+#content > div:first-child > *:nth-child(-n + 2) {
+  display: none;
+}

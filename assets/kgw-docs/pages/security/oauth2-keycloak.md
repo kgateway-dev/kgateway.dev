@@ -401,13 +401,13 @@ EOF
 
 1. Send a request without a session cookie. The gateway should redirect to Keycloak.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
    ```
@@ -422,15 +422,15 @@ EOF
 
 2. Send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi "http://${INGRESS_GW_ADDRESS}:8080/headers" \
      -H "host: www.example.com" \
      -H "Accept: application/json"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -vi "http://localhost:8080/headers" \
      -H "host: www.example.com" \
