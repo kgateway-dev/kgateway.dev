@@ -1,0 +1,14 @@
+{{- /*
+  Extension slot from docs-theme-extras (partials/docs/width-class.html).
+
+  This site sets `params.page.width: wide` in hugo.yaml and expects the docs
+  layout to honour it. The module's default hardcodes `hextra-max-page-width`
+  (100%) for the docs hub's full-width look, so this override routes the class
+  back through the shared helper.
+
+  Replaces one line of what used to be a full fork of
+  layouts/docs/{single,list}.html. Do not reinstate those forks — a forked
+  layout stops receiving module features, which is how this site lost
+  `page-description` on 933 pages.
+*/ -}}
+{{- return partial "utils/page-width" . -}}
