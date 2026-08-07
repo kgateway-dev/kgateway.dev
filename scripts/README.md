@@ -11,7 +11,12 @@ This directory contains scripts and tools that help build the kgateway website a
 1. Append an entry to `scripts/link-fixups.json` with the broken URL (`old`), the working URL (`new`), and a short `reason`.
 2. Also fix the link in the kgateway source so new releases ship the correct URL; this file only patches docs generated from older, frozen releases.
 
-Matching is plain substring replacement, not regex.
+Matching is plain substring replacement, not regex. Two consequences to keep in mind:
+
+- **Order matters.** Entries are applied top to bottom, so when one `old` URL is a prefix of another, list the longer, more specific URL first. Otherwise the shorter entry rewrites the prefix and the specific entry never matches. A unit test in `scripts/tests/test_link_fixups.py` enforces this ordering.
+- **An empty `new` deletes the `old` string** instead of replacing it. Use that for text in a source comment that shouldn't be published at all, such as a developer-facing note that links to an upstream issue.
+
+The fix-ups run twice over the API reference: once in `_post_process_api_docs`, and again over the finished file after `generate-shared-types.py` appends the shared type documentation. The second pass is needed because that appended section is read straight from Go doc comments and never goes through the first pass.
 
 ## Unit tests
 
