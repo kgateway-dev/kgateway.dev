@@ -2,7 +2,7 @@ Protect a route with the OAuth2 authorization code flow. Unauthenticated browser
 
 ## Before you begin
 
-1. Complete the [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/" >}}) page. This flow needs the realm, the confidential client, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates.
+1. Complete the [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/" >}}) page. This flow needs the realm, the confidential client, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates.
 
 2. Make sure your gateway has an **HTTPS listener**. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
 
@@ -20,7 +20,7 @@ kubectl create secret generic keycloak-client-secret \
   -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
-Replace `YOUR_CLIENT_SECRET` with the value that you copied from the **Credentials** tab of your Keycloak client during [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/" >}}).
+Replace `YOUR_CLIENT_SECRET` with the value that you copied from the **Credentials** tab of your Keycloak client during [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/" >}}).
 
 ### Create the OAuth2 GatewayExtension {#create-oauth2-extension}
 
@@ -73,7 +73,7 @@ Replace the following values:
 
 | Field | Description |
 |-------|-------------|
-| `backendRef` | Points to the `Backend` from [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/#create-backend" >}}). Kgateway uses it to reach Keycloak for token exchange and OIDC discovery. |
+| `backendRef` | Points to the `Backend` from [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/#create-backend" >}}). Kgateway uses it to reach Keycloak for token exchange and OIDC discovery. |
 | `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
 | `redirectURI` | The callback URL that kgateway sends to Keycloak as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Keycloak. Set it explicitly. |
 | `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
@@ -330,4 +330,4 @@ kubectl delete GatewayExtension keycloak-oauth2 -n {{< reuse "kgw-docs/snippets/
 kubectl delete secret keycloak-client-secret -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
-To remove Keycloak and the shared resources, see the Cleanup section of the [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/#cleanup" >}}) page.
+To remove Keycloak and the shared resources, see the Cleanup section of the [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/#cleanup" >}}) page.
