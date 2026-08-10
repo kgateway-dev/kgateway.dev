@@ -737,7 +737,7 @@ Use the verification steps below to confirm that the Access Token Validation flo
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
    ```sh
-   echo $TOKEN | cut -d. -f2 | base64 -d 2>/dev/null | jq '{iss, aud}'
+   echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
    ```
 
    Example output. If `aud` does not include your client ID, add the [audience mapper](#audience-mapper) to the Keycloak client.
