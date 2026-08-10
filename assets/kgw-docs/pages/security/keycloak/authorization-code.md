@@ -161,15 +161,51 @@ spec:
   oauth2:
     # ... rest of the provider config ...
     cookies:
+      domain: example.com
       sameSite: Strict
       names:
         accessToken: kgw-access
         idToken: kgw-id
 ```
 
-`Strict` means the browser does not send cookies on any cross-site request, including top-level navigations. Use `Lax`, which is the default, if users arrive at your app through links from other origins, like an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing.
+| Field | Description |
+|-------|-------------|
+| `domain` | Sets the cookie domain, which makes the session cookies valid for that domain and all of its subdomains. Set it if your app spans subdomains. If you omit it, the cookies apply only to the host that set them. |
+| `sameSite` | `Strict` means the browser does not send cookies on any cross-site request, including top-level navigations. Use `Lax`, the default, if users arrive at your app through links from other origins, such as an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing. |
+| `names` | Overrides the generated cookie names, which is useful if a downstream service reads them. |
 
 Add this block to the `GatewayExtension` manifest from the previous step and re-apply it. Because the manifest replaces the resource, keep the other fields that you already set, including `redirectURI`.
+
+### Forward the access token to your app {#forward-access-token}
+
+By default the gateway keeps the tokens in cookies and does not pass them upstream. Set `forwardAccessToken` if your app needs the access token itself, for example to call another API on the user's behalf. The token is forwarded in the `Authorization` header and in a cookie named `BearerToken`.
+
+```yaml
+spec:
+  oauth2:
+    # ... rest of the provider config ...
+    forwardAccessToken: true
+```
+
+### Copy token claims into request headers {#claims-to-headers}
+
+Kgateway can verify the token signature and copy individual claims into headers that your app reads, which saves the app from parsing the token. Set `jwksURI` so the gateway can fetch the signing keys, then map each claim to a header.
+
+```yaml
+spec:
+  oauth2:
+    # ... rest of the provider config ...
+    jwt:
+      jwksURI: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/certs
+      idToken:
+        claimsToHeaders:
+          - name: sub
+            header: x-user-id
+          - name: email
+            header: x-user-email
+```
+
+Use `accessToken` in place of `idToken` to map claims from the access token instead. Both take the same `claimsToHeaders` list, where `name` is the JWT claim and `header` is the header to copy it to.
 
 ### Stop redirecting API clients {#deny-redirect}
 
