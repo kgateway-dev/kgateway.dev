@@ -144,8 +144,8 @@ Create a realm, register kgateway as a confidential client, and add a test user.
 
 ### Create a new realm
 
-1. Click **Add realm** from the realm dropdown (top-left).
-2. Enter a realm name (such as, `myrealm`).
+1. Open the realm dropdown in the upper-left corner and click **Create realm**.
+2. Enter a realm name, such as `myrealm`.
 3. Click **Create**.
 
 {{< reuse-image src="img/keycloak/realm-creation.png" >}}
@@ -231,9 +231,8 @@ Add an audience mapper so that tokens carry your client ID, which lets the JWT p
 
 Tokens for this client now include `"aud": ["kgateway-client", "account"]`.
 
-{{< callout type="info" >}}
-For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the `myrealm` realm for testing only.
-{{< /callout >}}
+> [!NOTE]
+> The steps above create the `myrealm` realm for testing only. For production, use a dedicated Keycloak instance with a certificate from a CA that the gateway trusts, and a realm that your organization manages.
 
 ## Connect kgateway to Keycloak
 
@@ -296,7 +295,7 @@ EOF
 
 Choose the flow that matches how clients reach your app, then create a `GatewayExtension` that configures it and a `TrafficPolicy` that attaches it to a route. Use the authorization code flow for browser traffic, where kgateway runs the login redirect and stores tokens in session cookies. Use access token validation for API clients that already hold a token. The two are independent, so you can skip the one you do not need.
 
-### Option A: Authorization Code Flow (Browser)
+### Option A: Authorization code flow (browser)
 
 Use this option for browser-based applications where users log in through Keycloak. Unauthenticated requests are redirected to Keycloak, the gateway exchanges the returned authorization code for tokens, and it stores those tokens in session cookies.
 
@@ -372,13 +371,12 @@ Replace the following values:
 | `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Keycloak ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if your realm has that feature enabled and `openid` is in your scopes. |
 | `clientSecretRef.name` | Must match the Secret name from the previous step. kgateway reads the `client-secret` key inside that Secret. |
 
-#### Attach the OAuth2 Policy {#attach-oauth2-policy}
+#### Attach the OAuth2 policy {#attach-oauth2-policy}
 
 Create a `TrafficPolicy` that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
 
-{{< callout type="warning" >}}
-The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair the OAuth2 filter with a CSRFPolicy on the same route, especially for browser-facing apps.
-{{< /callout >}}
+> [!WARNING]
+> The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route, especially for browser-facing apps.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -539,7 +537,7 @@ spec:
 EOF
 ```
 
-### Option B: Access Token Validation (API)
+### Option B: Access token validation (API)
 
 Use this option for API clients that present a token directly without browser interaction. Kgateway validates the token signature against the Keycloak signing keys and rejects requests that do not carry a valid token, instead of redirecting them to a login page.
 
@@ -593,7 +591,7 @@ Replace the following values:
 > [!WARNING]
 > Do not add `account` to `audiences` as a way to make token validation pass. `account` is the realm's built-in client, and every token that the realm issues carries it, so accepting it lets a token minted for **any** client in the realm through this policy. If your tokens do not contain your client ID, add the [audience mapper](#audience-mapper) to the Keycloak client instead. You can decode a token and check its `aud` claim at [jwt.io](https://jwt.io).
 
-#### Attach the JWT Policy {#attach-jwt-policy}
+#### Attach the JWT policy {#attach-jwt-policy}
 
 Create a `TrafficPolicy` that references the JWT GatewayExtension.
 
@@ -626,7 +624,7 @@ kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} keycloak-jwt-poli
 
 Confirm that the policy you configured is enforced. Follow the steps for the flow that you set up. In both cases, an unauthenticated request must be rejected before you consider the setup working, because a policy that fails to attach lets requests through unchallenged.
 
-### Option A: Authorization Code Flow (Browser)
+### Verify the authorization code flow {#verify-oauth2}
 
 Use the verification steps below to confirm that the Authorization Code flow works. Send these requests to the HTTPS listener, because the session cookies that this flow relies on are set with the `Secure` attribute.
 
@@ -696,7 +694,7 @@ curl -vik "https://localhost:8443/headers" \
    < HTTP/2 401
    ```
 
-### Option B: Access Token Validation (API)
+### Verify access token validation {#verify-jwt}
 
 Use the verification steps below to confirm that the Access Token Validation flow works.
 
