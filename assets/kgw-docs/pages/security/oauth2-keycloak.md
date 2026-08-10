@@ -1,7 +1,12 @@
 
-Use this guide to protect an HTTPRoute with Keycloak as an OIDC provider. Kgateway handles the OAuth2 authorization code flow. Unauthenticated browser requests get redirected to Keycloak, the code is exchanged for tokens, and those tokens are stored in session cookies. Your upstream service does not need to know any of this happened.
+Use this guide to protect an HTTPRoute with Keycloak as an OIDC provider. Your upstream service does not need to know that authentication happened.
 
-You need three resources: a `Backend` pointing at your Keycloak host, a `GatewayExtension` to configure the OAuth2 provider, and a `TrafficPolicy` to attach it to a route.
+The guide covers two ways to authenticate, and you can set up either one on its own:
+
+* **Authorization code flow**, for browser traffic. Unauthenticated requests are redirected to Keycloak, the gateway exchanges the authorization code for tokens, and it stores those tokens in session cookies.
+* **Access token validation**, for API clients that already hold a token. The gateway validates the token signature and claims, and returns an error rather than redirecting.
+
+Both flows use a `Backend` that points at Keycloak, a `GatewayExtension` that configures the provider, and a `TrafficPolicy` that attaches it to a route.
 
 ## Before you begin
 
@@ -230,50 +235,11 @@ Tokens for this client now include `"aud": ["kgateway-client", "account"]`.
 For production, use a dedicated Keycloak instance with proper TLS and a real realm. The steps above use the `myrealm` realm for testing only.
 {{< /callout >}}
 
-## Configure the OAuth Policy
+## Connect kgateway to Keycloak
 
-This section covers the kgateway resources needed to configure OAuth2 authentication with Keycloak. The configuration differs depending on whether you need browser-based login or API token validation.
+Both authentication flows need a network path from the gateway to Keycloak. Create these two resources first, whichever flow you use.
 
-### Option A: Authorization Code Flow (Browser)
-
-Use this option for browser-based applications where users log in through Keycloak.
-
-#### Store the client secret {#store-credentials}
-
-Create a Kubernetes Secret with the Keycloak client secret. Kgateway reads the value from the `client-secret` key specifically, so the key name matters.
-
-```sh
-kubectl create secret generic keycloak-client-secret \
-  --from-literal=client-secret=YOUR_CLIENT_SECRET \
-  -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-```
-
-Replace `YOUR_CLIENT_SECRET` with the value you copied from the Credentials tab of your Keycloak client in the previous section.
-
-#### Configure TLS for Keycloak {#configure-tls}
-
-Since Keycloak uses a self-signed certificate for HTTPS, configure kgateway to skip TLS verification when communicating with the Keycloak backend.
-
-Create a `BackendConfigPolicy` that skips TLS verification for the Keycloak Backend:
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: BackendConfigPolicy
-metadata:
-  name: keycloak-tls
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  targetRefs:
-    - group: gateway.kgateway.dev
-      kind: Backend
-      name: keycloak
-  tls:
-    insecureSkipVerify: true
-EOF
-```
-
-#### Create a Backend for Keycloak {#create-backend}
+### Create a Backend for Keycloak {#create-backend}
 
 Create a `Backend` resource that defines how kgateway reaches your Keycloak instance. This Backend uses the `Static` type with the host and port configured for Keycloak.
 
@@ -301,6 +267,52 @@ kubectl get svc keycloak -n keycloak
 
 > [!NOTE]
 > This address is separate from the public Keycloak URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
+
+### Configure TLS for the Keycloak Backend {#configure-tls}
+
+The Keycloak instance in this guide serves HTTPS with a self-signed certificate, which the gateway does not trust. Create a `BackendConfigPolicy` that skips TLS verification for the Keycloak `Backend`.
+
+> [!WARNING]
+> `insecureSkipVerify` disables certificate verification for traffic to Keycloak, which means the gateway cannot detect a man-in-the-middle on that connection. Use it only with the self-signed test instance. For production, give Keycloak a certificate from a CA that the gateway trusts.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: keycloak-tls
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - group: gateway.kgateway.dev
+      kind: Backend
+      name: keycloak
+  tls:
+    insecureSkipVerify: true
+EOF
+```
+
+## Protect a route
+
+Choose the flow that matches how clients reach your app, then create a `GatewayExtension` that configures it and a `TrafficPolicy` that attaches it to a route. Use the authorization code flow for browser traffic, where kgateway runs the login redirect and stores tokens in session cookies. Use access token validation for API clients that already hold a token. The two are independent, so you can skip the one you do not need.
+
+### Option A: Authorization Code Flow (Browser)
+
+Use this option for browser-based applications where users log in through Keycloak. Unauthenticated requests are redirected to Keycloak, the gateway exchanges the returned authorization code for tokens, and it stores those tokens in session cookies.
+
+This flow requires an HTTPS listener, as described in [Before you begin](#before-you-begin).
+
+#### Store the client secret {#store-credentials}
+
+Create a Kubernetes Secret with the Keycloak client secret. Kgateway reads the value from the `client-secret` key specifically, so the key name matters.
+
+```sh
+kubectl create secret generic keycloak-client-secret \
+  --from-literal=client-secret=YOUR_CLIENT_SECRET \
+  -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+```
+
+Replace `YOUR_CLIENT_SECRET` with the value you copied from the Credentials tab of your Keycloak client in the previous section.
 
 #### Create the OAuth2 GatewayExtension {#create-oauth2-extension}
 
@@ -529,11 +541,9 @@ EOF
 
 ### Option B: Access Token Validation (API)
 
-Use this option for API clients that present a token directly without browser interaction.
+Use this option for API clients that present a token directly without browser interaction. Kgateway validates the token signature against the Keycloak signing keys and rejects requests that do not carry a valid token, instead of redirecting them to a login page.
 
-{{< callout type="info" >}}
-For this flow, the Keycloak Backend and TLS configuration from Option A are reused. Only the GatewayExtension and TrafficPolicy differ.
-{{< /callout >}}
+This flow needs the `Backend` and `BackendConfigPolicy` from [Connect kgateway to Keycloak](#connect-kgateway-to-keycloak), and the [audience mapper](#audience-mapper) on the Keycloak client. It does not need the client secret Secret, because the gateway never exchanges an authorization code.
 
 #### Create the JWT GatewayExtension {#create-jwt-extension}
 
