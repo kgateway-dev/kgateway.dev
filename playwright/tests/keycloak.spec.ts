@@ -2,7 +2,7 @@ import { test, expect, login, gotoConsole, settle, maskClientSecret } from '../f
 
 /**
  * Captures for the OAuth2 with Keycloak guide —
- * assets/kgw-docs/pages/security/oauth2-keycloak.md § "Configure Keycloak".
+ * assets/kgw-docs/pages/security/keycloak/setup.md § "Configure Keycloak".
  *
  * Run with `npm run test:keycloak`, or `npm run update:keycloak` to regenerate baselines. The
  * webServer launcher (scripts/serve-keycloak.sh) starts Keycloak and seeds the realm, the
