@@ -441,8 +441,6 @@ rules:
 
 #### Configure cookie settings {#cookie-config}
 
-This section applies only to the Authorization Code flow. For Access Token Validation, cookie settings are not required.
-
 kgateway stores the access and ID tokens in session cookies. The default SameSite policy is `Lax`. If you need custom cookie names (for example, to read them in downstream services or share across subdomains), set them explicitly under `cookies` on the GatewayExtension.
 
 ```yaml
@@ -458,13 +456,11 @@ spec:
 
 `Strict` means the browser does not send cookies on any cross-site request, including top-level navigations. Use `Lax`, which is the default, if users arrive at your app through links from other origins, like an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing.
 
-Add this block to the GatewayExtension manifest from the previous step and re-apply.
+Add this block to the `GatewayExtension` manifest from the previous step and re-apply it. Because the manifest replaces the resource, keep the other fields that you already set, including `redirectURI`.
 
 #### Stop redirecting API clients {#deny-redirect}
 
-This section applies only to the Authorization Code flow. For Access Token Validation, the JWT filter returns `401` for invalid or missing tokens without a redirect.
-
-By default, any unauthenticated request gets a `302` redirect to the Keycloak login page. That response works for a browser, but not for API clients. curl, mobile apps, and AJAX calls that hit an unauthenticated route silently follow the redirect, land on the Keycloak login HTML, and fail.
+This step is optional. By default, any unauthenticated request gets a `302` redirect to the Keycloak login page. That response works for a browser, but not for API clients. curl, mobile apps, and AJAX calls that hit an unauthenticated route silently follow the redirect, land on the Keycloak login HTML, and fail.
 
 The `denyRedirect` field on `OAuth2Provider` lets you match specific requests and return `401` instead of redirecting them. It takes a list of `HTTPHeaderMatch` entries, and a request matches if it satisfies all of them.
 
@@ -521,6 +517,7 @@ spec:
     authorizationEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth
     tokenEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token
     endSessionEndpoint: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/logout
+    redirectURI: https://www.example.com/oauth2/redirect
     scopes:
       - openid
       - email
@@ -536,6 +533,9 @@ spec:
           value: application/json
 EOF
 ```
+
+> [!IMPORTANT]
+> This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Keycloak, and the login fails with `Invalid parameter: redirect_uri`.
 
 ### Option B: Access token validation (API)
 
