@@ -2,7 +2,7 @@ Protect a route by validating an access token that the client already holds. Kga
 
 ## Before you begin
 
-Complete the [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/" >}}) page. This flow needs the realm, the client, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates, and it needs the [audience mapper]({{< link-hextra path="/security/oauth2/keycloak/setup/#audience-mapper" >}}) so that tokens carry your client ID in the `aud` claim.
+Complete the [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/" >}}) page. This flow needs the realm, the client, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates, and it needs the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) so that tokens carry your client ID in the `aud` claim.
 
 Unlike the authorization code flow, this flow does not need the client secret in a Kubernetes Secret, because the gateway never exchanges an authorization code. It also works over plain HTTP, because it does not use cookies.
 
@@ -56,7 +56,7 @@ Replace the following values:
 | `audiences` | The accepted values of the `aud` claim. A token is rejected with a `403` response if none of its audiences match. |
 
 > [!WARNING]
-> Do not add `account` to `audiences` as a way to make token validation pass. `account` is the realm's built-in client, and every token that the realm issues carries it, so accepting it lets a token minted for **any** client in the realm through this policy. If your tokens do not contain your client ID, add the [audience mapper](#audience-mapper) to the Keycloak client instead. You can decode a token and check its `aud` claim at [jwt.io](https://jwt.io).
+> Do not add `account` to `audiences` as a way to make token validation pass. `account` is the realm's built-in client, and every token that the realm issues carries it, so accepting it lets a token minted for **any** client in the realm through this policy. If your tokens do not contain your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client instead. You can decode a token and check its `aud` claim at [jwt.io](https://jwt.io).
 
 ### Attach the JWT policy {#attach-jwt-policy}
 
@@ -105,9 +105,22 @@ Use the verification steps below to confirm that the Access Token Validation flo
 
 2. Verify that a request without a token is rejected.
 
-   ```sh
-   curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
-   ```
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```sh
+curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" -H "host: www.example.com"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```sh
+curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
 
    Example output:
 
@@ -115,17 +128,44 @@ Use the verification steps below to confirm that the Access Token Validation flo
    < HTTP/1.1 401 Unauthorized
    ```
 
-3. Obtain a token from Keycloak with the `password` grant. Add `-k` if Keycloak uses a self-signed certificate.
+3. Obtain a token from Keycloak with the `password` grant. The `-k` option accepts the self-signed certificate that the setup steps create.
 
-   ```bash
-   export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
-     -d "client_secret=YOUR_CLIENT_SECRET" \
-     -d "username=testuser" \
-     -d "password=password" \
-     -d "grant_type=password" \
-     "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token" \
-     | jq -r .access_token)
-   ```
+   Request the token from the same Keycloak address that you set as the `issuer` on the `GatewayExtension`. Keycloak derives the `iss` claim from the address the request arrives on, so fetching a token from a different address produces a token that the gateway rejects.
+
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```bash
+export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "username=testuser" \
+  -d "password=password" \
+  -d "grant_type=password" \
+  "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token" \
+  | jq -r .access_token)
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+Port-forward Keycloak in a separate terminal, then request the token from that address. Set the `issuer` on your `GatewayExtension` to `https://localhost:9443/realms/myrealm` to match.
+
+```sh
+kubectl port-forward svc/keycloak -n keycloak 9443:8443
+```
+
+```bash
+export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
+  -d "client_secret=YOUR_CLIENT_SECRET" \
+  -d "username=testuser" \
+  -d "password=password" \
+  -d "grant_type=password" \
+  "https://localhost:9443/realms/myrealm/protocol/openid-connect/token" \
+  | jq -r .access_token)
+```
+
+{{% /tab %}}
+{{< /tabs >}}
 
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
@@ -144,11 +184,26 @@ Use the verification steps below to confirm that the Access Token Validation flo
 
 5. Send a request with the token in the `Authorization` header.
 
-   ```bash
-   curl -vi "http://localhost:8080/headers" \
-     -H "host: www.example.com" \
-     -H "Authorization: Bearer $TOKEN"
-   ```
+   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
+{{% tab tabName="Cloud Provider LoadBalancer" %}}
+
+```bash
+curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" \
+  -H "host: www.example.com" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{% tab tabName="Port-forward for local testing" %}}
+
+```bash
+curl -vi "http://localhost:8080/headers" \
+  -H "host: www.example.com" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+{{% /tab %}}
+{{< /tabs >}}
 
    A successful response shows the headers from the httpbin app.
 
@@ -167,4 +222,4 @@ kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} keycloak-jwt-p
 kubectl delete GatewayExtension keycloak-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
-To remove Keycloak and the shared resources, see the Cleanup section of the [Keycloak setup]({{< link-hextra path="/security/oauth2/keycloak/setup/#cleanup" >}}) page.
+To remove Keycloak and the shared resources, see the Cleanup section of the [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/#cleanup" >}}) page.
