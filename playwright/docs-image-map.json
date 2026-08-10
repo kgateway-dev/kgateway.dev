@@ -1,0 +1,14 @@
+{
+  "$comment": "Maps a Playwright screenshot name (from toHaveScreenshot('NAME.png')) to its destination under assets/img/. `npm run sync-docs` copies each captured baseline to its destination. Unlike the agentgateway harness, destinations here are a single path rather than a light/dark pair: the Keycloak 22 admin console has no dark theme, so the guides point both reuse-image shortcodes at the one asset. If a future Keycloak gains a dark console, widen this to {\"light\": ..., \"dark\": ...} and add the theme dimension to playwright.config.ts in the same change. A capture with no entry here is still diffed for regression but never reaches the docs.",
+  "project": "keycloak-latest",
+  "images": {
+    "keycloak-login.png": "assets/img/keycloak/keycloak-login.png",
+    "realm-creation.png": "assets/img/keycloak/realm-creation.png",
+    "client-creation.png": "assets/img/keycloak/client-creation.png",
+    "client-capability-config.png": "assets/img/keycloak/client-capability-config.png",
+    "client-redirect-uri.png": "assets/img/keycloak/client-redirect-uri.png",
+    "client-secret.png": "assets/img/keycloak/client-secret.png",
+    "user-created.png": "assets/img/keycloak/user-created.png",
+    "user-password.png": "assets/img/keycloak/user-password.png"
+  }
+}
