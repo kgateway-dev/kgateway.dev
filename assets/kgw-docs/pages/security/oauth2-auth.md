@@ -39,7 +39,7 @@ sequenceDiagram
 
 ## Set up an identity provider
 
-For detailed instructions on setting up Keycloak as your identity provider, see the [Keycloak IdP guide]({{< link-hextra path="/security/oauth2/keycloak/" >}}).
+For detailed instructions on setting up Keycloak as your identity provider, see the [Keycloak IdP guide]({{< link-hextra path="/security/oauth/keycloak/" >}}).
 
 If you are using a different IdP (such as Auth0, Okta, or Google), you can adapt the steps from that guide to your provider's documentation.
 

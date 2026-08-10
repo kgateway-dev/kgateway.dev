@@ -2,8 +2,8 @@ Set up a Keycloak instance, register kgateway as an OAuth2 client, and give the 
 
 When you finish, you choose an authentication flow:
 
-* [Authorization code flow]({{< link-hextra path="/security/oauth2/keycloak/authorization-code/" >}}) for browser traffic.
-* [Access token validation]({{< link-hextra path="/security/oauth2/keycloak/access-token/" >}}) for API clients that already hold a token.
+* [Authorization code flow]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}) for browser traffic.
+* [Access token validation]({{< link-hextra path="/security/oauth/keycloak/access-token/" >}}) for API clients that already hold a token.
 
 ## Before you begin
 
@@ -141,7 +141,7 @@ Create a realm, register kgateway as a confidential client, and add a test user.
 
 ### Configure redirect URIs
 
-Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless the value that kgateway sends is registered on the client. You set that value explicitly in the `redirectURI` field of the `GatewayExtension` later in this guide, so register the identical string here.
+Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless the value that kgateway sends is registered on the client. You set that value explicitly in the `redirectURI` field of the `GatewayExtension` in the [authorization code flow]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}) guide, so register the identical string here.
 
 1. In **Valid redirect URIs**, add the callback URL for your gateway, where the host is the hostname that the browser uses to reach your route.
 
