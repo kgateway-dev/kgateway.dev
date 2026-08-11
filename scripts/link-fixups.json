@@ -15,7 +15,14 @@
     "",
     "To add a fix-up: append an entry with the broken URL ('old'), the working URL",
     "('new'), and a short 'reason'. Also fix the source in the kgateway repo so new",
-    "releases ship the correct link; this file is the safety net for older releases."
+    "releases ship the correct link; this file is the safety net for older releases.",
+    "",
+    "Order matters. Entries are applied top to bottom, so when one 'old' URL is a",
+    "prefix of another, list the longer, more specific URL first. Otherwise the",
+    "shorter entry rewrites the prefix and the specific entry never matches.",
+    "",
+    "An empty 'new' deletes the 'old' string instead of replacing it. Use that for",
+    "source comments that shouldn't be published at all."
   ],
   "replacements": [
     {
@@ -52,6 +59,56 @@
       "old": "https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md",
       "new": "https://github.com/kubernetes/community/blob/main/contributors/devel/sig-api-machinery/strategic-merge-patch.md",
       "reason": "kubernetes/community renamed its default branch from master to main."
+    },
+    {
+      "old": "do not use slice of pointers: https://github.com/kubernetes/code-generator/issues/166<br />",
+      "new": "",
+      "reason": "Go doc comment aimed at kgateway developers, not docs readers, and the linked issue no longer resolves. Removed upstream in main; this deletes it from released versions too."
+    },
+    {
+      "old": "https://docs.anthropic.com/en/release-notes/api",
+      "new": "https://platform.claude.com/docs/en/release-notes/overview",
+      "reason": "Anthropic moved its API docs to platform.claude.com and folded the API release notes into an overview page."
+    },
+    {
+      "old": "https://docs.anthropic.com/en/api/versioning",
+      "new": "https://platform.claude.com/docs/en/api/versioning",
+      "reason": "Anthropic moved its API docs to platform.claude.com."
+    },
+    {
+      "old": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+      "new": "https://learn.microsoft.com/en-us/azure/foundry/foundry-models/concepts/models-sold-directly-by-azure",
+      "reason": "Azure OpenAI docs moved under Azure AI Foundry; the model list is now the models-sold-directly-by-azure page."
+    },
+    {
+      "old": "https://learn.microsoft.com/en-us/azure/ai-services/openai/reference",
+      "new": "https://learn.microsoft.com/en-us/azure/foundry/openai/reference",
+      "reason": "Azure OpenAI API reference moved under Azure AI Foundry. Listed before the /openai/ entry below, which would otherwise rewrite this prefix to a 404."
+    },
+    {
+      "old": "https://learn.microsoft.com/en-us/azure/ai-services/openai/",
+      "new": "https://learn.microsoft.com/en-us/azure/foundry/",
+      "reason": "Azure OpenAI docs landing page moved under Azure AI Foundry."
+    },
+    {
+      "old": "https://ai.google.dev/gemini-api/docs/models/gemini",
+      "new": "https://ai.google.dev/gemini-api/docs/models",
+      "reason": "Google dropped the /gemini suffix from the Gemini models page."
+    },
+    {
+      "old": "https://cloud.google.com/vertex-ai/docs/reference#versions",
+      "new": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/apis",
+      "reason": "Vertex AI reference moved to the Gemini Enterprise agent platform docs, which have no 'versions' anchor. Listed before the /vertex-ai/docs entry below, which would otherwise rewrite this prefix and keep the dead anchor."
+    },
+    {
+      "old": "https://cloud.google.com/vertex-ai/generative-ai/docs/learn/models",
+      "new": "https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/google-models",
+      "reason": "Vertex AI generative model list moved to the Gemini Enterprise agent platform docs."
+    },
+    {
+      "old": "https://cloud.google.com/vertex-ai/docs",
+      "new": "https://docs.cloud.google.com/gemini-enterprise-agent-platform",
+      "reason": "Vertex AI docs landing page moved to the Gemini Enterprise agent platform docs."
     }
   ]
 }

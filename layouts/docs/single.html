@@ -9,7 +9,16 @@
   <div class="w-full z-10">
     {{ partial "announcement.html" .}}
   </div>
-  <div class='hx:mx-auto hx:flex {{ partial "utils/page-width" . }}'>
+  {{/* Tab-navigation band (docs-theme-extras, issue solo-io/docs#3164). Must run
+       before sidebar.html so it can record the active tab on the page store. No
+       band renders unless the version defines >=2 tab directories, so this is a
+       no-op until docTabs is configured. */}}
+  {{ partial "docs-tabs.html" . }}
+  {{/* When the band is present it supplies its own spacing, so the wrapper stays
+       tight (0.75rem); when absent the wrapper carries no extra padding, so kgw's
+       current no-tab rendering is unchanged. */}}
+  {{ $docTabs := .Store.Get "docTabs" }}
+  <div class='hx:mx-auto hx:flex {{ partial "utils/page-width" . }}' style="padding-top: {{ cond (and $docTabs $docTabs.enabled) "0.75rem" "0" }};">
     {{ partial "sidebar.html" (dict "context" .) }}
     {{ partial "toc.html" . }}
     <article class="hx:w-full hx:break-words hx:flex hx:min-h-[calc(100vh-var(--navbar-height))] hx:min-w-0 hx:justify-center hx:pb-8 hx:pr-[calc(env(safe-area-inset-right)-1.5rem)]">
