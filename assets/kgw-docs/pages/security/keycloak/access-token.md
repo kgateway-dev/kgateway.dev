@@ -90,22 +90,18 @@ Use the verification steps below to confirm that the Access Token Validation flo
 
 2. Verify that a request without a token is rejected.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-
-```sh
-curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" -H "host: www.example.com"
-```
-
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-
-```sh
-curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
-```
-
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    Example output:
 
@@ -117,40 +113,36 @@ curl -vi "http://localhost:8080/headers" -H "host: www.example.com"
 
    Request the token from the same Keycloak address that you set as the `issuer` on the `GatewayExtension`. Keycloak derives the `iss` claim from the address the request arrives on, so fetching a token from a different address produces a token that the gateway rejects.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```bash
+   export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
+     -d "client_secret=YOUR_CLIENT_SECRET" \
+     -d "username=testuser" \
+     -d "password=password" \
+     -d "grant_type=password" \
+     "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token" \
+     | jq -r .access_token)
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   Port-forward Keycloak in a separate terminal, then request the token from that address. Set the `issuer` on your `GatewayExtension` to `https://localhost:9443/realms/myrealm` to match.
 
-```bash
-export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "username=testuser" \
-  -d "password=password" \
-  -d "grant_type=password" \
-  "https://keycloak.example.com/realms/myrealm/protocol/openid-connect/token" \
-  | jq -r .access_token)
-```
+   ```sh
+   kubectl port-forward svc/keycloak -n keycloak 9443:8443
+   ```
 
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-
-Port-forward Keycloak in a separate terminal, then request the token from that address. Set the `issuer` on your `GatewayExtension` to `https://localhost:9443/realms/myrealm` to match.
-
-```sh
-kubectl port-forward svc/keycloak -n keycloak 9443:8443
-```
-
-```bash
-export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "username=testuser" \
-  -d "password=password" \
-  -d "grant_type=password" \
-  "https://localhost:9443/realms/myrealm/protocol/openid-connect/token" \
-  | jq -r .access_token)
-```
-
-{{% /tab %}}
-{{< /tabs >}}
+   ```bash
+   export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
+     -d "client_secret=YOUR_CLIENT_SECRET" \
+     -d "username=testuser" \
+     -d "password=password" \
+     -d "grant_type=password" \
+     "https://localhost:9443/realms/myrealm/protocol/openid-connect/token" \
+     | jq -r .access_token)
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
@@ -169,26 +161,22 @@ export TOKEN=$(curl -sk -d "client_id=kgateway-client" \
 
 5. Send a request with the token in the `Authorization` header.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-
-```bash
-curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" \
-  -H "host: www.example.com" \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-
-```bash
-curl -vi "http://localhost:8080/headers" \
-  -H "host: www.example.com" \
-  -H "Authorization: Bearer $TOKEN"
-```
-
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```bash
+   curl -vi "http://$INGRESS_GW_ADDRESS:8080/headers" \
+     -H "host: www.example.com" \
+     -H "Authorization: Bearer $TOKEN"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```bash
+   curl -vi "http://localhost:8080/headers" \
+     -H "host: www.example.com" \
+     -H "Authorization: Bearer $TOKEN"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    A successful response shows the headers from the httpbin app.
 

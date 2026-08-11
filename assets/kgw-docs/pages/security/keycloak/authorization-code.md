@@ -59,7 +59,7 @@ Create the Kubernetes Secret that holds the Keycloak client secret, a `GatewayEx
    | `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
    | `redirectURI` | The callback URL that kgateway sends to Keycloak as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Keycloak. Set it explicitly. |
    | `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
-   | `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Keycloak ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if your realm has that feature enabled and `openid` is in your scopes. |
+   | `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Keycloak ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. RP-initiated logout is enabled by default in Keycloak version 18.0 and later. |
    | `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
 
 3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
@@ -134,22 +134,18 @@ Use the verification steps below to confirm that the Authorization Code flow wor
 
 1. Send a request without a session cookie. The gateway redirects to Keycloak.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-
-```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
-```
-
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-
-```sh
-curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
-```
-
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Keycloak client.
 
@@ -169,28 +165,24 @@ curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
 
    If Keycloak shows `Invalid parameter: redirect_uri`, the `redirectURI` on the `GatewayExtension` does not match a redirect URI that is registered on the Keycloak client.
 
-5. If you configured `denyRedirect`, send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
+5. Optional: If you added the [`denyRedirect` setting](#deny-redirect) to your GatewayExtension, send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
 
-   {{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
-
-```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
-  -H "host: www.example.com" \
-  -H "Accept: application/json"
-```
-
-{{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
-
-```sh
-curl -vik "https://localhost:8443/headers" \
-  -H "host: www.example.com" \
-  -H "Accept: application/json"
-```
-
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
+     -H "host: www.example.com" \
+     -H "Accept: application/json"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik "https://localhost:8443/headers" \
+     -H "host: www.example.com" \
+     -H "Accept: application/json"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    Example output:
 
