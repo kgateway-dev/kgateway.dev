@@ -284,15 +284,15 @@ Keycloak is configured and the gateway can reach it. Now protect a route with th
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-Remove the resources from this page only after you have cleaned up whichever flow you configured.
+1. Remove the resources from this page only after you have cleaned up whichever flow you configured.
 
-```sh
-kubectl delete BackendConfigPolicy keycloak-tls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-kubectl delete Backend keycloak -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-```
+   ```sh
+   kubectl delete BackendConfigPolicy keycloak-tls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl delete Backend keycloak -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
 
-To remove Keycloak, delete its namespace.
+2. To remove Keycloak, delete its namespace.
 
-```sh
-kubectl delete namespace keycloak
-```
+   ```sh
+   kubectl delete namespace keycloak
+   ```
