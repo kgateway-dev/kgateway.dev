@@ -1,0 +1,18 @@
+{
+  "name": "kgateway-docs-screenshots",
+  "private": true,
+  "type": "module",
+  "description": "Playwright screenshot automation for third-party UIs shown in kgateway docs (docs assets + visual regression)",
+  "scripts": {
+    "test:keycloak": "CAPTURE_MODE=keycloak playwright test tests/keycloak.spec.ts",
+    "update:keycloak": "CAPTURE_MODE=keycloak playwright test tests/keycloak.spec.ts --update-snapshots",
+    "capture:all": "npm run clean && npm run test:keycloak && npm run clean",
+    "update:all": "npm run clean && npm run update:keycloak && npm run clean",
+    "clean": "docker ps -aq --filter name=kgw-docs-keycloak | xargs -I{} docker rm -f {}",
+    "sync-docs": "node scripts/sync-docs-images.mjs",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.0"
+  }
+}
