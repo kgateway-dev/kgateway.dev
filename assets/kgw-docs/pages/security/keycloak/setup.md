@@ -9,7 +9,7 @@ When you finish, you choose an authentication flow:
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
-The authorization code flow additionally requires an **HTTPS listener** on your gateway. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+If you plan to use the authorization code flow, that guide also requires an HTTPS listener on your gateway. Nothing on this page depends on it.
 
 ## Install Keycloak
 
@@ -65,7 +65,7 @@ Deploy a Keycloak instance to test this guide against. The following steps creat
        spec:
          containers:
            - name: keycloak
-             image: quay.io/keycloak/keycloak:22.0
+             image: quay.io/keycloak/keycloak:{{< reuse "kgw-docs/versions/keycloak-version.md" >}}
              args: ["start-dev", "--https-port=8443"]
              env:
                - name: KEYCLOAK_ADMIN
@@ -125,25 +125,33 @@ Create a realm, register kgateway as a confidential client, and add a test user.
 
 ### Create a client
 
+The **Create client** wizard has three pages, and the settings that these guides need are spread across all three. The page numbers appear down the left side of the wizard.
+
 1. Click **Clients** in the left sidebar.
 2. Click **Create client**.
-3. Set **Client ID** (such as, `kgateway-client`).
-4. Enable **Client authentication**.
+3. On the **General settings** page, set **Client ID** to `kgateway-client`.
 
-{{< reuse-image src="img/keycloak/client-creation.png" >}}
-{{< reuse-image-dark srcDark="img/keycloak/client-creation.png" >}}
+   {{< reuse-image src="img/keycloak/client-creation.png" >}}
+   {{< reuse-image-dark srcDark="img/keycloak/client-creation.png" >}}
 
-5. Click **Next**.
-6. On the **Capability config** page, verify that the authentication flows that you need are enabled. Both are enabled by default.
+4. Click **Next**.
+5. On the **Capability config** page, turn **Client authentication** on. This makes the client confidential, which is what gives it the client secret that you copy in a later section.
+
+   Leave the following authentication flows enabled. Both are on by default.
+
    * **Standard flow** issues authorization codes, which the authorization code flow requires.
-   * **Direct access grants** enables the `password` grant, which the access token validation steps use to fetch a token for testing.
-7. Click **Next**.
+   * **Direct access grants** enables the `password` grant, which the access token validation guide uses to fetch a token for testing.
+
+   {{< reuse-image src="img/keycloak/client-capability-config.png" >}}
+   {{< reuse-image-dark srcDark="img/keycloak/client-capability-config.png" >}}
+
+6. Click **Next** to reach the **Login settings** page, then follow the next section to fill it in.
 
 ### Configure redirect URIs
 
 Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless the value that kgateway sends is registered on the client. You set that value explicitly in the `redirectURI` field of the `GatewayExtension` in the [authorization code flow]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}) guide, so register the identical string here.
 
-1. In **Valid redirect URIs**, add the callback URL for your gateway, where the host is the hostname that the browser uses to reach your route.
+1. On the **Login settings** page, in **Valid redirect URIs**, add the callback URL for your gateway, where the host is the hostname that the browser uses to reach your route.
 
    ```text
    https://www.example.com/oauth2/redirect
@@ -152,7 +160,7 @@ Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless
    {{< reuse-image src="img/keycloak/client-redirect-uri.png" >}}
    {{< reuse-image-dark srcDark="img/keycloak/client-redirect-uri.png" >}}
 
-2. Click **Save**.
+2. Click **Save**. This finishes the wizard and creates the client.
 
 > [!WARNING]
 > Do not register a wildcard redirect URI such as `https://www.example.com/*`. A wildcard lets an attacker who can influence the `redirect_uri` parameter send the authorization code to a path that you do not control. Register the exact callback path instead.
