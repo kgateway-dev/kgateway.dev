@@ -1,8 +1,5 @@
 In this guide you explore how to expose the kgateway proxy with an AWS application load balancer (ALB). 
 
-> [!WARNING]
-> The AWS Load Balancer Controller only supports the creation of an ALB through an Ingress Controller and not through the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}. Because of this, you must create the ALB separately through an Ingress resource that connects it to the service that exposes your gateway proxy.
-
 ## Before you begin
 
 1. Create or use an existing AWS account. 
@@ -91,43 +88,98 @@ In this guide you explore how to expose the kgateway proxy with an AWS applicati
 
 ## Step 2: Create an ALB with the AWS Load Balancer controller
 
+> [!NOTE]
+> Creating an ALB with {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} resources requires AWS Load Balancer Controller version 2.14.0 or later. Earlier versions can create an ALB only through an Ingress resource.
+
 {{< reuse "kgw-docs/snippets/aws-elb-controller-install.md" >}}
 
-5. Use an Ingress resource to define your ALB. When you apply this resource, the AWS Load Balancer Controller creates the ALB in your account.
+5. Use another Gateway resource to define your ALB. When you apply these resources, the AWS Load Balancer Controller creates the ALB in your account.
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: networking.k8s.io/v1
-   kind: Ingress
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: GatewayClass
+   metadata:
+     name: aws-alb-gateway-class
+   spec:
+     controllerName: gateway.k8s.aws/alb
+   ---
+   apiVersion: gateway.k8s.aws/v1beta1
+   kind: LoadBalancerConfiguration
    metadata:
      namespace: kgateway-system
-     name: alb
-     annotations:
-       alb.ingress.kubernetes.io/scheme: internet-facing
-       alb.ingress.kubernetes.io/target-type: instance
-       alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
-       alb.ingress.kubernetes.io/healthcheck-path: "/healthz"
+     name: aws-alb-config
    spec:
-     ingressClassName: alb
+     loadBalancerName: kgateway-alb
+     scheme: internet-facing
+   ---
+   apiVersion: gateway.k8s.aws/v1beta1
+   kind: TargetGroupConfiguration
+   metadata:
+     namespace: kgateway-system
+     name: aws-alb-target-group-config
+   spec:
+     targetReference:
+       kind: Service
+       name: alb
+     defaultConfiguration:
+       targetType: instance
+       healthCheckConfig:
+         healthCheckProtocol: HTTP
+         healthCheckPath: /healthz
+   ---
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     namespace: kgateway-system
+     name: aws-alb
+   spec:
+     gatewayClassName: aws-alb-gateway-class
+     infrastructure:
+       parametersRef:
+         group: gateway.k8s.aws
+         kind: LoadBalancerConfiguration
+         name: aws-alb-config
+     listeners:
+     - name: http
+       protocol: HTTP
+       port: 80
+       allowedRoutes:
+         namespaces:
+           from: Same
+   ---
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     namespace: kgateway-system
+     name: aws-alb-to-proxy
+   spec:
+     parentRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: aws-alb
+       sectionName: http
      rules:
-       - http:
-           paths:
-           - path: /
-             pathType: Prefix
-             backend:
-               service:
-                 name: alb
-                 port:
-                   number: 8080
+     - backendRefs:
+       - name: alb
+         port: 8080
    EOF
    ```
    
+   | Setting | Description |
+   | -- | -- |
+   | `GatewayClass` with `controllerName: gateway.k8s.aws/alb` | Instruct the AWS Load Balancer Controller to provision an ALB for each Gateway in this GatewayClass. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/l7gateway/). |
+   | `LoadBalancerConfiguration` with `loadBalancerName: kgateway-alb` | Give the ALB a predictable name in your AWS account. If you omit this field, the controller generates a name for you. |
+   | `LoadBalancerConfiguration` with `scheme: internet-facing` | Create the ALB with public IP addresses that are accessible from the internet. Because the ALB uses the `internal` scheme by default, you must set this field and attach the LoadBalancerConfiguration to the Gateway with the `spec.infrastructure.parametersRef` field. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/loadbalancerconfig/). |
+   | `TargetGroupConfiguration` with `targetType: instance` | Use the instance IDs of your cluster nodes to register the gateway proxy's node ports as targets with the ALB. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/guide/gateway/targetgroupconfig/). |
+   | `TargetGroupConfiguration` with `healthCheckPath: /healthz` | Perform the ALB health check against the `/healthz` path that you exposed on the gateway proxy earlier. Without this setting, the ALB checks the `/` path, which the gateway proxy does not serve, and the targets remain unhealthy. |
+
    > [!NOTE]
-   > If you later change your Ingress resource configuration, you might need to delete and re-create your Ingress resource for AWS to pick up the changes.
+   > The `aws-alb` Gateway serves HTTP traffic on port 80 only. To serve HTTPS traffic, add an HTTPS listener to the Gateway and a matching `listenerConfigurations` entry with a `defaultCertificate` certificate ARN to the LoadBalancerConfiguration. The ALB does not support certificates in the Gateway's `spec.listeners.tls.certificateRefs` field.
 
 6. Review the load balancer in the AWS EC2 dashboard. 
    1. Go to the [AWS EC2 dashboard](https://console.aws.amazon.com/ec2). 
    2. In the left navigation, go to **Load Balancing > Load Balancers**.
-   3. Find and open the ALB that was created for you, with a name such as `k8s-gateway-alb-<hash>`. Note that it might take a few minutes for the ALB to provision.
+   3. Find and open the `kgateway-alb` ALB that was created for you. Note that it might take a few minutes for the ALB to provision.
    4. On the **Resource map** tab, verify that the load balancer points to healthy EC2 targets in your cluster. For example, you can click on the target EC2 name to verify that the instance summary lists your cluster name.
       {{< reuse-image src="img/alb.png" >}}
       {{< reuse-image-dark srcDark="img/alb.png" >}}
@@ -155,13 +207,16 @@ In this guide you explore how to expose the kgateway proxy with an AWS applicati
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-1. Delete the Ingress, HTTPRoute, DirectResponse, and Gateway resources.
+1. Delete the HTTPRoute, DirectResponse, Gateway, GatewayClass, and AWS Load Balancer Controller resources.
    ```sh
-   kubectl delete ingress alb -n kgateway-system
    kubectl delete httproute httpbin-alb -n httpbin
    kubectl delete httproute httpbin-healthcheck -n httpbin
    kubectl delete directresponse httpbin-healthcheck-dr -n httpbin
-   kubectl delete gateway alb -n kgateway-system
+   kubectl delete httproute aws-alb-to-proxy -n kgateway-system
+   kubectl delete gateway alb aws-alb -n kgateway-system
+   kubectl delete gatewayclass aws-alb-gateway-class
+   kubectl delete loadbalancerconfiguration aws-alb-config -n kgateway-system
+   kubectl delete targetgroupconfiguration aws-alb-target-group-config -n kgateway-system
    ```
 
 2. Delete the AWS IAM resources that you created.
