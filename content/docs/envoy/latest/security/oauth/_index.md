@@ -1,6 +1,8 @@
 ---
+aliases:
+  - /docs/envoy/latest/security/oauth2/
+  - /docs/envoy/latest/security/extauth/oauth2/
 title: OAuth
-icon: security
-weight: 60
-description: Configure OAuth2/OIDC authentication with advanced features.
+weight: 15
+description: Protect routes with OAuth2 and OIDC, using browser login or API token validation against your identity provider.
 ---
