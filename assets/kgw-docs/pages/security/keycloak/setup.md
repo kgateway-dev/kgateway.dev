@@ -271,6 +271,175 @@ spec:
 EOF
 ```
 
+## Alternative: ConfigMap-based setup (production-friendly)
+
+Instead of manually configuring Keycloak through the admin console, you can define the realm, client, and user declaratively in a ConfigMap. Keycloak imports the configuration on startup, which is more repeatable and GitOps‑friendly.
+
+> [!NOTE]
+> This approach is recommended for production and CI/CD environments. For learning and debugging, the manual UI setup is still available.
+
+### 1. Create the ConfigMap
+
+Apply the following ConfigMap that defines the realm, client, and test user:
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-kgateway-realm
+  namespace: keycloak
+data:
+  myrealm.json: |
+    {
+      "realm": "myrealm",
+      "enabled": true,
+      "displayName": "myrealm",
+      "clients": [
+        {
+          "clientId": "kgateway-client",
+          "enabled": true,
+          "publicClient": false,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": true,
+          "redirectUris": [
+            "https://www.example.com/oauth2/redirect",
+            "http://localhost:8080/oauth2/redirect"
+          ],
+          "webOrigins": [],
+          "protocolMappers": [
+            {
+              "name": "kgateway-audience",
+              "protocol": "openid-connect",
+              "protocolMapper": "oidc-audience-mapper",
+              "config": {
+                "included.client.audience": "kgateway-client",
+                "id.token.claim": "false",
+                "access.token.claim": "true"
+              }
+            }
+          ]
+        }
+      ],
+      "users": [
+        {
+          "username": "testuser",
+          "enabled": true,
+          "email": "testuser@example.com",
+          "firstName": "Test",
+          "lastName": "User",
+          "credentials": [
+            {
+              "type": "password",
+              "value": "password",
+              "temporary": false
+            }
+          ]
+        }
+      ]
+    }
+EOF
+```
+
+
+### 2. Update the Keycloak Deployment
+
+If you already applied the deployment from the [Install Keycloak](#install-keycloak) section, update it to mount the ConfigMap and import the realm on startup. Add the `--import-realm` flag to the `args` and the volume mounts for the ConfigMap.
+
+Apply the following YAML (this replaces the existing deployment with the required additions):
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak
+  template:
+    metadata:
+      labels:
+        app: keycloak
+    spec:
+      containers:
+      - name: keycloak
+        image: quay.io/keycloak/keycloak:22.0
+        args: ["start-dev", "--import-realm", "--https-port=8443"]
+        env:
+        - name: KEYCLOAK_ADMIN
+          value: "admin"
+        - name: KEYCLOAK_ADMIN_PASSWORD
+          value: "admin"
+        - name: KC_HTTPS_CERTIFICATE_FILE
+          value: /opt/keycloak/conf/tls.crt
+        - name: KC_HTTPS_CERTIFICATE_KEY_FILE
+          value: /opt/keycloak/conf/tls.key
+        ports:
+        - name: https
+          containerPort: 8443
+        volumeMounts:
+        - name: keycloak-tls
+          mountPath: /opt/keycloak/conf
+        - name: realm-config
+          mountPath: /opt/keycloak/data/import
+      volumes:
+      - name: keycloak-tls
+        secret:
+          secretName: keycloak-tls
+      - name: realm-config
+        configMap:
+          name: keycloak-kgateway-realm
+EOF
+```
+
+{{< callout type="note" >}}
+This ConfigMap approach automates the realm, client, and user configuration. You still need to configure the `Backend` and TLS `BackendConfigPolicy` as described in the next section. The `Backend` still points to Keycloak on port `8443` with `insecureSkipVerify: true`.
+{{< /callout >}}
+
+
+### 3. Verify the realm was imported
+
+Check the Keycloak logs for the import message:
+
+```sh
+kubectl logs deployment/keycloak -n keycloak | grep -i import
+```
+
+On Windows (PowerShell), use:
+
+```powershell
+kubectl logs deployment/keycloak -n keycloak | Select-String -Pattern "import"
+```
+
+You should see output similar to:
+
+```text
+Realm 'myrealm' imported
+Import finished successfully
+```
+
+Then, port‑forward Keycloak and verify the realm appears in the admin console:
+
+```sh
+kubectl port-forward svc/keycloak -n keycloak 8443:8443
+```
+
+Open `https://localhost:8443` in your browser, accept the self‑signed certificate warning, and log in with `admin / admin`. Confirm that `myrealm` is present in the realm dropdown.
+
+{{< callout type="note" >}}
+If you're using the ConfigMap approach, the realm is created automatically on startup. You do not need to manually create it through the admin console.
+{{< /callout >}}
+
+
+### 4. Test the authentication flows
+
+Follow the verification steps in the [Authorization code flow]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}) and [Access token validation]({{< link-hextra path="/security/oauth/keycloak/access-token/" >}}) guides to confirm both flows work with the ConfigMap setup.
+
+
 ## Next steps
 
 Keycloak is configured and the gateway can reach it. Now protect a route with the flow that matches how your clients arrive.
