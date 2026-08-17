@@ -87,7 +87,7 @@ Use the `AnyPort` setting to strip any port from the `Host` header, regardless o
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the [API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}).
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#listenerpolicyspec" >}}){{< /version >}}.
 
    | Setting | Description |
    |---|---|
@@ -191,7 +191,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the [API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}).
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#listenerpolicyspec" >}}){{< /version >}}.
 
    | Setting | Description |
    |---|---|
