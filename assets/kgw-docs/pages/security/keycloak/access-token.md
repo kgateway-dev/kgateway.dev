@@ -150,7 +150,7 @@ Use the verification steps below to confirm that the Access Token Validation flo
    echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
    ```
 
-   Example output. If `aud` does not include your client ID, add the [audience mapper](#audience-mapper) to the Keycloak client.
+   Example output. If `aud` does not include your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client.
 
    ```json
    {
