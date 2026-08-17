@@ -91,7 +91,7 @@ Remove a header that is reserved for use by another service, such as an external
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the [API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}).
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#listenerpolicyspec" >}}){{< /version >}}.
 
    | Setting                    | Description                                              |
    |----------------------------|----------------------------------------------------------|
