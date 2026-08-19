@@ -25,7 +25,7 @@ When you finish, you choose an authentication flow:
 
 2. A test user created in your Auth0 database connection.
 
-The authorization code flow additionally requires an **HTTPS listener** on your gateway. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+The authorization code flow requires an **HTTPS listener** on your gateway **for production**. For local testing, HTTP is sufficient. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
 
 ## Configure Auth0
 
@@ -52,6 +52,13 @@ In the **Settings** tab, configure the following:
 
 {{< reuse-image src="img/auth0/redirect-uri.png" >}}
 
+### Copy the Client ID and Client Secret
+
+1. In the **Settings** tab, copy the **Client ID** and **Client Secret** – you'll need these for the kgateway GatewayExtension.
+
+> [!NOTE]
+> The Client Secret is only shown once after creation. If you lose it, you can regenerate it, but this will invalidate any existing tokens.
+
 ### Configure Advanced Settings
 
 1. Scroll to **Advanced Settings** → **OAuth**:
@@ -59,15 +66,30 @@ In the **Settings** tab, configure the following:
    - **OIDC Conformant**: Enable
 
 2. In **Advanced Settings** → **Grant Types**:
-   - Ensure **Authorization Code** is enabled
-
-{{< callout type="note" >}}
-If you plan to use the **Access Token Validation (JWT)** flow, you must enable the **Password** grant in **Advanced Settings → Grant Types**. This allows the `password` grant type for obtaining tokens programmatically.
-{{< /callout >}}
+   - Ensure **Authorization Code** is enabled.
+   - If you plan to use the **Access Token Validation (JWT)** flow, also enable the **Password** grant.
 
 {{< reuse-image src="img/auth0/advanced-settings-grant-types.png" >}}
 
-3. Click **Save Changes**.
+3. In **Advanced Settings** → **OAuth**, set the **Default Directory** to `Username-Password-Authentication` (this ensures the password grant uses the correct connection).
+
+{{< reuse-image src="img/auth0/default-directory.png" >}}
+
+4. Click **Save Changes**.
+
+### Create an Auth0 API (for Access Token Validation)
+
+1. In the Auth0 Dashboard, go to **Applications** → **APIs**.
+2. Click **Create API**.
+3. Enter a **Name** (such as, `kgateway-api`) and an **Identifier** (such as, `https://my-api.example.com`).
+4. Click **Create**.
+5. Use the **Identifier** as the `YOUR_API_AUDIENCE` in the Access Token Validation guide.
+
+{{< reuse-image src="img/auth0/create-api.png" >}}
+
+
+> [!NOTE]
+> If you already have an Auth0 API, you can use its Identifier instead of creating a new one. The Identifier is the audience you'll use in the JWT GatewayExtension.
 
 ### Create a test user {#create-test-user}
 
@@ -86,10 +108,8 @@ If you plan to use the **Access Token Validation (JWT)** flow, you must enable t
 
 {{< reuse-image src="img/auth0/user-created.png" >}}
 
-{{< callout type="note" >}}
-The steps above create a test user for this guide. For production, use a dedicated Auth0 tenant and follow Auth0's [production best practices](https://auth0.com/docs/best-practices).
-{{< /callout >}}
-
+> [!NOTE]
+> The steps above create a test user for this guide. For production, use a dedicated Auth0 tenant and follow Auth0's [production best practices](https://auth0.com/docs/best-practices).
 
 ## Connect kgateway to Auth0
 
@@ -117,9 +137,8 @@ EOF
 
 Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.com`). The port must be `443` because kgateway communicates with Auth0 over HTTPS.
 
-{{< callout type="note" >}}
-This address is separate from the public Auth0 URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
-{{< /callout >}}
+> [!NOTE]
+> This address is separate from the public Auth0 URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
 
 
 ## Configure TLS for the Auth0 Backend {#configure-tls}

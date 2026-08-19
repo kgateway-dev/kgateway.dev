@@ -14,11 +14,3 @@ You need three resources: a `Backend` pointing at your Auth0 host, a `GatewayExt
 
 1. An Auth0 account with a configured Regular Web Application.
 2. A test user created in your Auth0 database connection.
-
-## Guides
-
-{{< cards >}}
-  {{< card link="setup" title="Setup Auth0" subtitle="Configure Auth0, create a test user, and set up the kgateway Backend and TLS." >}}
-  {{< card link="authorization-code" title="Authorization code flow" subtitle="Protect browser traffic by redirecting users to Auth0 to log in." >}}
-  {{< card link="access-token" title="Access token validation" subtitle="Validate tokens that API clients already hold." >}}
-{{< /cards >}}

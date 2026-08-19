@@ -13,30 +13,30 @@ Create a `GatewayExtension` that tells the gateway how to validate tokens, and a
 
 1. Create a GatewayExtension for JWT validation. The `issuer` must match the token's `iss` claim from Auth0.
 
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: GatewayExtension
-   metadata:
-     name: auth0-jwt
-     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-   spec:
-     jwt:
-       providers:
-         - name: auth0
-           issuer: https://YOUR_AUTH0_DOMAIN/
-           jwks:
-             remote:
-               backendRef:
-                 group: gateway.kgateway.dev
-                 kind: Backend
-                 name: auth0
-                 namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-               url: https://YOUR_AUTH0_DOMAIN/.well-known/jwks.json
-           audiences:
-             - https://YOUR_AUTH0_DOMAIN/api/v2/
-   EOF
-   ```
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: GatewayExtension
+metadata:
+  name: auth0-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    providers:
+      - name: auth0
+        issuer: https://YOUR_AUTH0_DOMAIN/
+        jwks:
+          remote:
+            backendRef:
+              group: gateway.kgateway.dev
+              kind: Backend
+              name: auth0
+              namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+            url: https://YOUR_AUTH0_DOMAIN/.well-known/jwks.json
+        audiences:
+          - YOUR_API_AUDIENCE
+EOF
+```
 
 | **Field** | **Description** |
 | --- | --- |
@@ -44,7 +44,7 @@ Create a `GatewayExtension` that tells the gateway how to validate tokens, and a
 | `issuer` | Must match the `iss` claim in your tokens exactly. Auth0's `iss` claim is derived from your Auth0 domain. Decode a real token and read its `iss` claim rather than assuming. |
 | `jwks.remote.backendRef` | The network path that the gateway uses to fetch the signing keys. This is the `Backend` for Auth0, so the JWKS endpoint does not have to be reachable from outside the cluster. |
 | `jwks.remote.url` | The JWKS URL. Kgateway connects through `backendRef`, and uses this value for the request path and `Host` header. |
-| `audiences` | The accepted values of the `aud` claim. A token is rejected with a `403` response if none of its audiences match. The audience is typically your Auth0 API identifier (e.g., `https://YOUR_AUTH0_DOMAIN/api/v2/`). You can decode a token and check its `aud` claim at [jwt.io](https://jwt.io). |
+| `audiences` | The accepted values of the `aud` claim. A token is rejected with a `403` response if none of its audiences match. The audience must be the **Identifier** of your Auth0 API. You can create an API in the Auth0 Dashboard under **Applications → APIs**, and use its **Identifier** as `YOUR_API_AUDIENCE`. You can decode a token and check its `aud` claim at [jwt.io](https://jwt.io). |
 
 > [!NOTE]
 > Auth0 tokens use the audience you specify when requesting the token. The audience must match the API identifier you configured in Auth0. If your token does not contain the expected audience, update the `audiences` list accordingly.
@@ -128,11 +128,6 @@ Example output:
 
 Request the token from the same Auth0 address that you set as the `issuer` on the `GatewayExtension`.
 
-
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-
-
 ```bash
 export TOKEN=$(curl -sk -X POST "https://YOUR_AUTH0_DOMAIN/oauth/token" \
   -d "client_id=YOUR_CLIENT_ID" \
@@ -140,27 +135,10 @@ export TOKEN=$(curl -sk -X POST "https://YOUR_AUTH0_DOMAIN/oauth/token" \
   -d "username=testuser@example.com" \
   -d "password=your-password" \
   -d "grant_type=password" \
-  -d "audience=https://YOUR_AUTH0_DOMAIN/api/v2/" \
+  -d "audience=YOUR_API_AUDIENCE" \
   | jq -r .access_token)
 ```
 
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-
-
-```bash
-export TOKEN=$(curl -sk -X POST "https://YOUR_AUTH0_DOMAIN/oauth/token" \
-  -d "client_id=YOUR_CLIENT_ID" \
-  -d "client_secret=YOUR_CLIENT_SECRET" \
-  -d "username=testuser@example.com" \
-  -d "password=your-password" \
-  -d "grant_type=password" \
-  -d "audience=https://YOUR_AUTH0_DOMAIN/api/v2/" \
-  | jq -r .access_token)
-```
-
-{{% /tab %}}
-{{< /tabs >}}
 
 > [!NOTE]
 > When obtaining a token from Auth0:
