@@ -1,4 +1,21 @@
 baseURL: "/"
+
+# Paged.js PDF-export book pipeline (docs-theme-extras: layouts/docs/list.book.html).
+# Opt in per page via `outputs: ["html", "book"]` front matter — see
+# content/docs/envoy/latest/_index.md for the one page trying this so far.
+# Experimental on a versioned site: this output format stitches whichever
+# page opts in plus its own .Pages subtree, so it naturally scopes to one
+# version as long as only ONE version's root page opts in at a time. What is
+# NOT scoped per-version is the cover/footer version label in list.book.html
+# itself, which reads site.Params.versions' globally-flagged "latest" entry
+# regardless of which version tree this particular book actually walks.
+outputFormats:
+  book:
+    mediaType: "text/html"
+    baseName: "book"
+    isHTML: true
+    noUgly: true
+
 enableRobotsTXT: true
 # Derive each page's .Lastmod from its last git commit — no manually maintained
 # front-matter dates. Feeds the sitemap <lastmod> for SEO. Listing "lastmod"

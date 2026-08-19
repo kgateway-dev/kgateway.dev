@@ -8,6 +8,39 @@ init-git-hooks:  ## Use the tracked version of Git hooks from this repo
 
 
 #----------------------------------------------------------------------------------
+# Hugo
+#----------------------------------------------------------------------------------
+
+# Production build (GC, minify), plus the docs-section PDF (see `pdf` target
+# below) so a build always ships a current /downloads/kgateway-envoy-latest.pdf
+# alongside the site. Requires `npm install` once beforehand (playwright/pdf-lib).
+.PHONY: build
+build: pdf
+
+# Local dev server. Hugo's dev server renders entirely in memory, so it never
+# sees a `public/` build to pull the PDF from — this does one disk build + PDF
+# render up front, written to static/ (which the live server serves verbatim
+# regardless of renderToDisk), then hands off to the normal live server. That
+# download link is therefore a snapshot as of server startup: edits made
+# during the session won't appear in it until you rerun `make pdf` (or
+# restart `make serve`).
+.PHONY: serve
+serve:
+	hugo160 --gc --minify
+	PDF_OUTPUT=static/downloads/kgateway-envoy-latest.pdf $(MAKE) render-pdf
+	hugo160 server
+
+# Alias
+.PHONY: server
+server: serve
+
+# Remove Hugo output and cache.
+.PHONY: clean
+clean:
+	rm -rf public public-* resources static/downloads .pdf-tools
+
+
+#----------------------------------------------------------------------------------
 # Playwright HTML harness from github.com/solo-io/docs-theme-extras.
 #
 # The harness checks structural quality of the built HTML (no leaked
@@ -123,3 +156,55 @@ _framework_test_preflight:
 	@if [ ! -d "$(FRAMEWORK_EXTRAS_DIR)/node_modules" ]; then \
 		echo "Run 'make framework-test-install' first." >&2; exit 1; \
 	fi
+
+#----------------------------------------------------------------------------------
+# PDF export for the "latest" version of the envoy docs tree.
+#
+# The whole tree (253 pages, 7.3MB stitched HTML) is past Paged.js's real
+# pagination ceiling (~150-200 pages) — confirmed by hand, pagination never
+# completed even given 5 minutes. Chunked by top-level SECTION instead: each
+# direct child of content/docs/envoy/latest/_index.md opts into the `book`
+# output format (outputs: ["html", "book"] + bookChunkRoot: true) via that
+# page's own `cascade` front matter (target.path: "/docs/envoy/latest/*",
+# a SINGLE-segment glob — matches direct children only, not grandchildren
+# like setup/listeners/), not hand-edited into each section's own _index.md.
+# render-pdf.mjs merges all of them into one PDF with a continuous,
+# per-section bookmark tree. See docs-theme-extras CHANGELOG.md for the full
+# design and its trade-offs (no cross-chunk in-PDF jumps; no continuous page
+# numbers in each chunk's own printed footer).
+#
+# PDF_CHUNKS still has to list one path per section BY HAND, in the order
+# they should appear in the merged PDF — the cascade above controls which
+# pages GET a book.html, not which of them render-pdf.mjs actually fetches
+# and merges (that has to be an explicit, ordered list; Hugo has no "list
+# every section that opted into an output format" query to generate it
+# from). A new top-level section under content/docs/envoy/latest/ picks up
+# outputs/bookChunkRoot automatically from the cascade, but still needs a
+# manual entry here to actually appear in the PDF.
+#
+# render-pdf.mjs isn't vendored here — docs-theme-extras' module.mounts only
+# covers layouts/assets/data, so a Node script can't ride in as a Hugo
+# import. Instead this curls it straight from GitHub, pinned to the exact
+# version already in go.mod, so that file is the ONLY version pin; bumping it
+# (`hugo160 mod get github.com/solo-io/docs-theme-extras@<version>`) is what
+# invalidates the cache below and pulls the matching render-pdf.mjs.
+#
+# PDF_PROD_HOST reads hugo.yaml's own params.themeExtras.prodHost (requires
+# yq) instead of a hardcoded literal, same as ambientmesh.io's Makefile.
+#----------------------------------------------------------------------------------
+RENDER_PDF_VERSION := $(shell awk '/solo-io\/docs-theme-extras/ {print $$3}' go.mod)
+RENDER_PDF_SCRIPT  := .pdf-tools/render-pdf-$(RENDER_PDF_VERSION).mjs
+PDF_PROD_HOST       := $(shell yq '.params.themeExtras.prodHost' hugo.yaml)
+PDF_CHUNKS := quickstart about install setup traffic-management resiliency security observability operations reference integrations migrate faqs ai
+PDF_BOOK_PATHS := $(shell echo "$(PDF_CHUNKS)" | tr ' ' '\n' | sed 's|^|/docs/envoy/latest/|; s|$$|/book.html|' | paste -sd, -)
+
+.PHONY: render-pdf
+render-pdf:
+	mkdir -p .pdf-tools
+	test -f $(RENDER_PDF_SCRIPT) || curl -fsSL https://raw.githubusercontent.com/solo-io/docs-theme-extras/$(RENDER_PDF_VERSION)/scripts/render-pdf.mjs -o $(RENDER_PDF_SCRIPT)
+	PDF_PROD_HOST=$(PDF_PROD_HOST) PDF_BOOK_PATHS=$(PDF_BOOK_PATHS) PDF_OUTPUT=public/downloads/kgateway-envoy-latest.pdf node $(RENDER_PDF_SCRIPT)
+
+.PHONY: pdf
+pdf:
+	hugo160 --gc --minify
+	$(MAKE) render-pdf
