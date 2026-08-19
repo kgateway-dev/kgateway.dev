@@ -34,6 +34,10 @@ jobs:
     name: Static + content checks
     runs-on: ubuntu-latest
     continue-on-error: true
+    # Bounds a hung `Install chromium` / apt-get step (observed stuck 30+ min
+    # with no failure — GitHub's default job timeout is 6 hours) so the run
+    # fails fast instead of sitting until that default kicks in.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
