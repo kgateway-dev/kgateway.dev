@@ -5,7 +5,7 @@ Protect a route with the OAuth2 authorization code flow. Unauthenticated browser
 
 1. Complete the [Auth0 setup]({{< link-hextra path="/security/oauth/auth0/setup/" >}}) page. This flow needs the Auth0 application, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates.
 
-2. Make sure your gateway has an **HTTPS listener**. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
+2. The authorization code flow requires an **HTTPS listener** on your gateway **for production**. For local testing, HTTP is sufficient. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
 
 ## Configure the authorization code flow
 
@@ -21,9 +21,8 @@ Create the Kubernetes Secret that holds the Auth0 client secret, a `GatewayExten
 
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Auth0. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources.
 
-{{< callout type="note" >}}
-Auth0's `iss` claim is derived from your Auth0 domain. Use the same domain consistently across `issuerURI` and the endpoint fields. For local testing, use `http://localhost:8080/oauth2/redirect` as the `redirectURI`. The gateway still reaches Auth0 through `backendRef`, so the two do not have to be the same address.
-{{< /callout >}}
+> [!NOTE]
+> Auth0's `iss` claim is derived from your Auth0 domain. Use the same domain consistently across `issuerURI` and the endpoint fields. For local testing, use `http://localhost:8080/oauth2/redirect` as the `redirectURI`. The gateway still reaches Auth0 through `backendRef`, so the two do not have to be the same address.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -67,9 +66,8 @@ EOF
 
 3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
 
-{{< callout type="warning" >}}
-The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route, especially for browser-facing apps.
-{{< /callout >}}
+> [!WARNING]
+> The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route, especially for browser-facing apps.
 
 
 ```yaml
@@ -138,25 +136,23 @@ The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-
 
 ## Verify {#verify}
 
-Use the verification steps below to confirm that the Authorization Code flow works. Send these requests to the HTTPS listener, because the session cookies that this flow relies on are set with the `Secure` attribute.
+Use the verification steps below to confirm that the Authorization Code flow works.
 
 1. Send a request without a session cookie. The gateway redirects to Auth0.
 
 {{< tabs >}}
 {{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
+curl -vik "http://${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
 ```
-
 {{% /tab %}}
 {{% tab name="Port-forward for local testing" %}}
 ```sh
-curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
+curl -vik "http://localhost:8080/headers" -H "host: www.example.com"
 ```
 
 {{% /tab %}}
 {{< /tabs >}}
-
 
 Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Auth0 application.
 
@@ -181,7 +177,7 @@ If Auth0 shows `Invalid parameter: redirect_uri`, the `redirectURI` on the `Gate
 {{< tabs >}}
 {{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
+curl -vik "http://${INGRESS_GW_ADDRESS}:8080/headers" \
   -H "host: www.example.com" \
   -H "Accept: application/json"
 ```
@@ -189,11 +185,10 @@ curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
 {{% /tab %}}
 {{% tab name="Port-forward for local testing" %}}
 ```sh
-curl -vik "https://localhost:8443/headers" \
+curl -vik "http://localhost:8080/headers" \
   -H "host: www.example.com" \
   -H "Accept: application/json"
 ```
-
 
 {{% /tab %}}
 {{< /tabs >}}
@@ -351,9 +346,8 @@ spec:
 EOF
 ```
 
-{{< callout type="important" >}}
-This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Auth0, and the login fails with `Invalid parameter: redirect_uri`.
-{{< /callout >}}
+> [!IMPORTANT]
+> This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Auth0, and the login fails with `Invalid parameter: redirect_uri`.
 
 
 
