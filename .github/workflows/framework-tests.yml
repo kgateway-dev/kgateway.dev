@@ -109,6 +109,19 @@ jobs:
         working-directory: docs-theme-extras
         run: npm ci
 
+      # ubuntu-latest resolves apt's default mirror to a region-specific
+      # azure.archive.ubuntu.com endpoint that has repeatedly gone unreachable
+      # outright (apt-get update stalls on endless "Ign:" retries instead of
+      # failing) — same root cause as the timeout guard above. Point apt at
+      # the direct global mirror before Playwright's installer shells out to
+      # apt-get, instead of just waiting longer.
+      - name: Work around flaky azure.archive.ubuntu.com apt mirror
+        run: |
+          sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' \
+            /etc/apt/sources.list \
+            /etc/apt/sources.list.d/*.sources \
+            /etc/apt/apt-mirrors.txt 2>/dev/null || true
+
       - name: Install chromium
         working-directory: docs-theme-extras
         run: npx playwright install --with-deps chromium
