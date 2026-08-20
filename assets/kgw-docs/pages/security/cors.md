@@ -79,7 +79,7 @@ spec:
 EOF
 ```
 
-### CORS in {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+### CORS in {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} {#cors-in-trafficpolicy}
 
 1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
 

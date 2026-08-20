@@ -40,13 +40,13 @@ By default, Envoy allows up to 100 headers per request. When the limit is exceed
 
 2. Send a request to the httpbin app without extra headers. The curl automatically sends `Host`, `User-Agent`, and `Accept` (3 headers), which is under the limit of 5. Verify that you get back a 200 HTTP response code.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers -H "host: www.example.com:8080"
    ```
@@ -60,15 +60,15 @@ By default, Envoy allows up to 100 headers per request. When the limit is exceed
 
 3. Send another request with 3 extra custom headers so that the total number of headers exceeds the limit of 5. Verify that Envoy rejects the request with a 431 Request Header Fields Too Large response.
 
-   {{< tabs items="Cloud Provider LoadBalancer,Port-forward for local testing" tabTotal="2" >}}
-   {{% tab tabName="Cloud Provider LoadBalancer" %}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -v http://$INGRESS_GW_ADDRESS:8080/headers \
      -H "host: www.example.com:8080" \
      -H "x-custom-1: a" -H "x-custom-2: b" -H "x-custom-3: c"
    ```
    {{% /tab %}}
-   {{% tab tabName="Port-forward for local testing" %}}
+   {{% tab name="Port-forward for local testing" %}}
    ```sh
    curl -v localhost:8080/headers \
      -H "host: www.example.com:8080" \
