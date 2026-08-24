@@ -8,11 +8,11 @@
   {{- $currentVersion = index $segments 3 -}}
 {{- end -}}
 
-{{- /* Get versions for current section */ -}}
-{{- $versions := site.Params.versions -}}
-{{- if and $subSection (isset site.Params.sections $subSection) -}}
-  {{- $versions = (index site.Params.sections $subSection).versions -}}
-{{- end -}}
+{{- /* Get versions for current section — utils/resolve-section-versions.html,
+       shared with docs-theme-extras' navbar.html/sidebar.html and
+       agentgateway-oss-website's own navbar-version.html, instead of
+       reimplementing the same isset/fallback check independently. */ -}}
+{{- $versions := partial "utils/resolve-section-versions.html" $subSection -}}
 
 {{- /* Build path without version but with section */ -}}
 {{- /* Skip first 4 segments: "", "docs", "envoy", "latest" - take everything after version */ -}}

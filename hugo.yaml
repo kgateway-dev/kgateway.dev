@@ -192,60 +192,54 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
-  # Global versions (consumed by local partials 404.html, navbar.html,
-  # navbar-version.html, breadcrumb.html as a default before the
-  # section-specific list overrides). Keep these in sync with the
-  # latest section list below.
+  # THE version list — the only one (docs-theme-extras CHANGELOG [0.2.2]).
+  # Consumed by the local partials (404.html, navbar.html, navbar-version.html,
+  # breadcrumb.html) and by every part of the theme that needs to know which
+  # versions exist.
+  #
+  # These entries carry no `sections` field, which means "every section". That
+  # is accurate: envoy used to repeat this exact list under
+  # `sections.envoy.versions`, and agentgateway had no list and fell back here.
+  # The old preamble said "keep these in sync with the section list below",
+  # which is precisely the hand-synchronization the single tagged list removes.
+  # Tag an entry only when a version does NOT apply to every section:
+  #
+  #   - version: "2.6.x"
+  #     linkVersion: "2.6.x"
+  #     sections: ["envoy"]
   versions:
     - version: "2.5.x"
       dropdown: "main"
       linkVersion: "main"
-      url: "/main"
     - version: "2.4.x"
       dropdown: "2.4 (latest)"
       linkVersion: "latest"
-      url: "/latest"
     - version: "2.3.x"
       dropdown: "2.3"
-      # linkVersion "latest" marks this as the current version, so
-      # docs-theme-extras' version-noindex partial keeps only this version
-      # indexable and emits noindex on duplicate pages in the others
-      # (/main, /2.2.x, /2.1.x).
+      # NOTE: this says linkVersion "2.3.x", so it is NOT the entry
+      # version-noindex treats as current — that is the 2.4.x entry above,
+      # whose linkVersion IS "latest". So /latest/ stays indexable and
+      # duplicate pages under /main/, /2.3.x/, /2.2.x/ and /2.1.x/ are
+      # noindexed. An earlier comment here claimed the opposite; left as-is
+      # behaviorally, since which version should be canonical is a kgateway
+      # release decision rather than a config typo.
       linkVersion: "2.3.x"
-      url: "/2.3.x"
     - version: "2.2.x"
       dropdown: "2.2"
       linkVersion: "2.2.x"
-      url: "/2.2.x"
     - version: "2.1.x"
       dropdown: "2.1"
       linkVersion: "2.1.x"
-      url: "/2.1.x"
 
   # Section-specific configurations
+  # Section registry. A section exists because it is a key here — that is how
+  # utils/section-segment.html recognizes a section segment in a URL. Which
+  # versions a section has is expressed on the entries above.
   sections:
-    envoy:
-      versions:
-        - version: "2.5.x"
-          dropdown: "main"
-          linkVersion: "main"
-          url: "/main"
-        - version: "2.4.x"
-          dropdown: "2.4 (latest)"
-          linkVersion: "latest"
-          url: "/latest"
-        - version: "2.3.x"
-          dropdown: "2.3"
-          linkVersion: "2.3.x"
-          url: "/2.3.x"
-        - version: "2.2.x"
-          dropdown: "2.2"
-          linkVersion: "2.2.x"
-          url: "/2.2.x"
-        - version: "2.1.x"
-          dropdown: "2.1"
-          linkVersion: "2.1.x"
-          url: "/2.1.x"
+    # envoy carried a byte-for-byte copy of the version list above, kept in step
+    # by hand. Nothing enforced that, and anything reading the top-level list
+    # was blind to a version added only to the copy.
+    envoy: {}
 
     agentgateway:
       # This section has no internal landing page in kgw — the section key
@@ -253,6 +247,7 @@ params:
       # on a shared path like /docs/agentgateway/latest/reference/api/. The
       # centralized sidebar's section-chip row reads `externalURL` and points
       # the chip off-site rather than to a stub /docs/agentgateway/latest/.
-      # No `versions:` override here — consumers (navbar, navbar-version,
-      # extras sidebar) fall back to the top-level `params.versions` list.
+      # No `sections` tag names agentgateway on any entry above, and untagged
+      # means "every section", so this section offers the same version list as
+      # envoy — the same result the old no-override fallback produced.
       externalURL: "https://agentgateway.dev/docs/kubernetes/latest/"
