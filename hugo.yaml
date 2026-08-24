@@ -192,29 +192,23 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
-  # THE version list — the only one (docs-theme-extras CHANGELOG [0.2.2]).
-  # Consumed by the local partials (404.html, navbar.html, navbar-version.html,
-  # breadcrumb.html) and by every part of the theme that needs to know which
-  # versions exist.
+  # THE version list — the only one. Newest first. Every entry names the
+  # sections it applies to. The contract, in full, with a TOML and a YAML
+  # template: docs-theme-extras USAGE.md, "Versions and sections".
   #
-  # These entries carry no `sections` field, which means "every section". That
-  # is accurate: envoy used to repeat this exact list under
-  # `sections.envoy.versions`, and agentgateway had no list and fell back here.
-  # The old preamble said "keep these in sync with the section list below",
-  # which is precisely the hand-synchronization the single tagged list removes.
-  # Tag an entry only when a version does NOT apply to every section:
-  #
-  #   - version: "2.6.x"
-  #     linkVersion: "2.6.x"
-  #     sections: ["envoy"]
+  # Also consumed by this repo's local partials (404.html, navbar.html,
+  # navbar-version.html, breadcrumb.html).
   versions:
     - version: "2.5.x"
+      sections: ["envoy"]
       dropdown: "main"
       linkVersion: "main"
     - version: "2.4.x"
+      sections: ["envoy"]
       dropdown: "2.4 (latest)"
       linkVersion: "latest"
     - version: "2.3.x"
+      sections: ["envoy"]
       dropdown: "2.3"
       # NOTE: this says linkVersion "2.3.x", so it is NOT the entry
       # version-noindex treats as current — that is the 2.4.x entry above,
@@ -225,29 +219,23 @@ params:
       # release decision rather than a config typo.
       linkVersion: "2.3.x"
     - version: "2.2.x"
+      sections: ["envoy"]
       dropdown: "2.2"
       linkVersion: "2.2.x"
     - version: "2.1.x"
+      sections: ["envoy"]
       dropdown: "2.1"
       linkVersion: "2.1.x"
 
-  # Section-specific configurations
-  # Section registry. A section exists because it is a key here — that is how
-  # utils/section-segment.html recognizes a section segment in a URL. Which
-  # versions a section has is expressed on the entries above.
+  # Section registry, alphabetical. A section exists because it is a key here.
+  # See docs-theme-extras USAGE.md, "Versions and sections".
   sections:
-    # envoy carried a byte-for-byte copy of the version list above, kept in step
-    # by hand. Nothing enforced that, and anything reading the top-level list
-    # was blind to a version added only to the copy.
-    envoy: {}
-
+    # No content anywhere in this repo — there is no /docs/agentgateway/ tree,
+    # so `externalURL` is what the section selector points at. That is the
+    # documented shape for a section that exists only to send readers to
+    # another product. It is tagged on no version entry above, so it offers no
+    # versions of its own, which is correct: it has no version trees.
     agentgateway:
-      # This section has no internal landing page in kgw — the section key
-      # exists only so the version dropdown scopes correctly when users land
-      # on a shared path like /docs/agentgateway/latest/reference/api/. The
-      # centralized sidebar's section-chip row reads `externalURL` and points
-      # the chip off-site rather than to a stub /docs/agentgateway/latest/.
-      # No `sections` tag names agentgateway on any entry above, and untagged
-      # means "every section", so this section offers the same version list as
-      # envoy — the same result the old no-override fallback produced.
       externalURL: "https://agentgateway.dev/docs/kubernetes/latest/"
+
+    envoy: {}
