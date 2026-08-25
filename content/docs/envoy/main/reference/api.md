@@ -1701,6 +1701,29 @@ _Appears in:_
 | `sleepTimeSeconds` _integer_ | Time (in seconds) for the preStop hook to wait before allowing Envoy to terminate |  | Maximum: 3.1536e+07 <br />Minimum: 0 <br /> |
 
 
+#### GrpcStats
+
+
+
+GrpcStats configures Envoy's gRPC statistics HTTP filter
+(envoy.filters.http.grpc_stats), emitting per-service/method gRPC metrics
+that upstream_rq_xx cannot express (gRPC is HTTP 200 regardless of grpc-status).
+
+
+Exactly one of statsForAllMethods or methodAllowlist must be set.
+
+
+
+_Appears in:_
+- [HTTPSettings](#httpsettings)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `statsForAllMethods` _boolean_ | StatsForAllMethods enables emitting stats for every gRPC method seen on the<br />listener. Mutually exclusive with methodAllowlist. |  |  |
+| `methodAllowlist` _string array_ | MethodAllowlist entries are fully-qualified gRPC methods, e.g. "/pkg.Service/Method".<br />Only methods in this list get per-method stats. Mutually exclusive with statsForAllMethods. |  | MaxItems: 128 <br />MinItems: 1 <br /> |
+| `enableUpstreamStats` _boolean_ | EnableUpstreamStats emits a histogram for the upstream (wire) latency of each request. |  |  |
+
+
 #### GrpcStatus
 
 _Underlying type:_ _string_
@@ -1785,6 +1808,7 @@ _Appears in:_
 | `maxHeadersCount` _integer_ | MaxHeadersCount sets the maximum number of headers allowed in a request.<br />Downstream requests that exceed this limit will receive a 431 response for HTTP/1.x and a<br />stream reset for HTTP/2. If unset, defaults to Envoy's built-in default of 100.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-headers-count |  | Minimum: 1 <br /> |
 | `http2ProtocolOptions` _[ListenerHTTP2ProtocolOptions](#listenerhttp2protocoloptions)_ | Http2ProtocolOptions configures downstream HTTP/2 behavior on the listener's<br />HttpConnectionManager.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http2protocoloptions |  |  |
 | `healthCheck` _[EnvoyHealthCheck](#envoyhealthcheck)_ | HealthCheck configures [Envoy health checks](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/health_check/v3/health_check.proto) |  |  |
+| `grpcStats` _[GrpcStats](#grpcstats)_ | GrpcStats configures Envoy's gRPC statistics filter for per-service/method<br />gRPC metrics (including grpc-status) on this listener. |  |  |
 | `preserveHttp1HeaderCase` _boolean_ | PreserveHttp1HeaderCase determines whether to preserve the case of HTTP1 request headers.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/header_casing |  |  |
 | `acceptHttp10` _boolean_ | AcceptHTTP10 determines whether to accept incoming HTTP/1.0 and HTTP 0.9 requests.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  |  |
 | `defaultHostForHttp10` _string_ | DefaultHostForHttp10 specifies a default host for HTTP/1.0 requests. This is highly suggested if acceptHttp10 is true and a no-op if acceptHttp10 is false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#config-core-v3-http1protocoloptions |  | MinLength: 1 <br /> |
