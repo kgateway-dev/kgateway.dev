@@ -5,7 +5,8 @@ Protect a route with the OAuth2 authorization code flow. Unauthenticated browser
 
 1. Complete the [Auth0 setup]({{< link-hextra path="/security/oauth/auth0/setup/" >}}) page. This flow needs the Auth0 application, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates.
 
-2. The authorization code flow requires an **HTTPS listener** on your gateway **for production**. For local testing, HTTP is sufficient. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+2. Make sure your gateway has an **HTTPS listener**. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+
 
 ## Configure the authorization code flow
 
@@ -22,7 +23,7 @@ Create the Kubernetes Secret that holds the Auth0 client secret, a `GatewayExten
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Auth0. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources.
 
 > [!NOTE]
-> Auth0's `iss` claim is derived from your Auth0 domain. Use the same domain consistently across `issuerURI` and the endpoint fields. For local testing, use `http://localhost:8080/oauth2/redirect` as the `redirectURI`. The gateway still reaches Auth0 through `backendRef`, so the two do not have to be the same address.
+> Auth0's `iss` claim is derived from your Auth0 domain. Use the same domain consistently across `issuerURI` and the endpoint fields. The `redirectURI` must match the exact value you register in Auth0's **Allowed Callback URLs**. The gateway still reaches Auth0 through `backendRef`, so the two do not have to be the same address.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -42,7 +43,7 @@ spec:
     authorizationEndpoint: https://YOUR_AUTH0_DOMAIN/authorize
     tokenEndpoint: https://YOUR_AUTH0_DOMAIN/oauth/token
     endSessionEndpoint: https://YOUR_AUTH0_DOMAIN/v2/logout
-    redirectURI: http://localhost:8080/oauth2/redirect
+    redirectURI: https://www.example.com/oauth2/redirect
     scopes:
       - openid
       - email
@@ -143,12 +144,12 @@ Use the verification steps below to confirm that the Authorization Code flow wor
 {{< tabs >}}
 {{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
-curl -vik "http://${INGRESS_GW_ADDRESS}:8080/headers" -H "host: www.example.com"
+curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
 ```
 {{% /tab %}}
 {{% tab name="Port-forward for local testing" %}}
 ```sh
-curl -vik "http://localhost:8080/headers" -H "host: www.example.com"
+curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
 ```
 
 {{% /tab %}}
@@ -158,7 +159,7 @@ Example output. Note that the `redirect_uri` parameter matches the value that yo
 
 ```text
 < HTTP/2 302
-< location: https://YOUR_AUTH0_DOMAIN/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Foauth2%2Fredirect
+< location: https://YOUR_AUTH0_DOMAIN/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
 < set-cookie: OauthNonce-...;path=/;Max-Age=600;secure;HttpOnly
 ```
 
@@ -177,7 +178,7 @@ If Auth0 shows `Invalid parameter: redirect_uri`, the `redirectURI` on the `Gate
 {{< tabs >}}
 {{% tab name="Cloud Provider LoadBalancer" %}}
 ```sh
-curl -vik "http://${INGRESS_GW_ADDRESS}:8080/headers" \
+curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
   -H "host: www.example.com" \
   -H "Accept: application/json"
 ```
@@ -185,7 +186,7 @@ curl -vik "http://${INGRESS_GW_ADDRESS}:8080/headers" \
 {{% /tab %}}
 {{% tab name="Port-forward for local testing" %}}
 ```sh
-curl -vik "http://localhost:8080/headers" \
+curl -vik "https://localhost:8443/headers" \
   -H "host: www.example.com" \
   -H "Accept: application/json"
 ```
@@ -329,7 +330,7 @@ spec:
     authorizationEndpoint: https://YOUR_AUTH0_DOMAIN/authorize
     tokenEndpoint: https://YOUR_AUTH0_DOMAIN/oauth/token
     endSessionEndpoint: https://YOUR_AUTH0_DOMAIN/v2/logout
-    redirectURI: http://localhost:8080/oauth2/redirect
+    redirectURI: https://www.example.com/oauth2/redirect
     scopes:
       - openid
       - email

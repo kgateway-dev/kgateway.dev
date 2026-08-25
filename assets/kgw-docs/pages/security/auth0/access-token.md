@@ -124,12 +124,12 @@ Example output:
 < HTTP/1.1 401 Unauthorized
 ```
 
-3. Obtain a token from Auth0 with the `password` grant. Use the `-k` option to accept the self-signed certificate for local testing.
+3. Obtain a token from Auth0 with the `password` grant.
 
 Request the token from the same Auth0 address that you set as the `issuer` on the `GatewayExtension`.
 
 ```bash
-export TOKEN=$(curl -sk -X POST "https://YOUR_AUTH0_DOMAIN/oauth/token" \
+export TOKEN=$(curl -s -X POST "https://YOUR_AUTH0_DOMAIN/oauth/token" \
   -d "client_id=YOUR_CLIENT_ID" \
   -d "client_secret=YOUR_CLIENT_SECRET" \
   -d "username=testuser@example.com" \
@@ -157,7 +157,7 @@ Example output. If `aud` does not include your expected audience, update the `au
 ```json
 {
   "iss": "https://YOUR_AUTH0_DOMAIN/",
-  "aud": ["https://YOUR_AUTH0_DOMAIN/api/v2/"]
+  "aud": ["https://my-api.example.com"]
 }
 ```
 

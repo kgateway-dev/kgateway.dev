@@ -1,4 +1,3 @@
-
 Set up an Auth0 account, register kgateway as an OAuth2 client, and give the gateway a network path to reach Auth0. Every Auth0 guide in this section starts here.
 
 When you finish, you choose an authentication flow:
@@ -15,9 +14,9 @@ When you finish, you choose an authentication flow:
    | Setting | Value |
    |---|---|
    | **Application Type** | Regular Web Application |
-   | **Allowed Callback URLs** | `http://localhost:8080/oauth2/redirect` |
-   | **Allowed Logout URLs** | `http://localhost:8080` |
-   | **Allowed Web Origins** | `http://localhost:8080` |
+   | **Allowed Callback URLs** | `https://www.example.com/oauth2/redirect` |
+   | **Allowed Logout URLs** | `https://www.example.com` |
+   | **Allowed Web Origins** | `https://www.example.com` |
    | **JWT Signature Algorithm** | RS256 |
    | **OIDC Conformant** | Enabled |
 
@@ -25,7 +24,7 @@ When you finish, you choose an authentication flow:
 
 2. A test user created in your Auth0 database connection.
 
-The authorization code flow requires an **HTTPS listener** on your gateway **for production**. For local testing, HTTP is sufficient. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+The authorization code flow requires an **HTTPS listener** on your gateway. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
 
 ## Configure Auth0
 
@@ -34,9 +33,6 @@ Create an Auth0 application, configure the required settings, and add a test use
 ### Access the Auth0 Dashboard
 
 1. Go to [Auth0 Dashboard](https://manage.auth0.com/).
-
-{{< reuse-image src="img/auth0/auth0-dashboard.png" >}}
-
 2. Navigate to **Applications** → **Applications**.
 3. Click on your Regular Web Application.
 
@@ -46,9 +42,9 @@ Create an Auth0 application, configure the required settings, and add a test use
 
 In the **Settings** tab, configure the following:
 
-- **Allowed Callback URLs**: Add `http://localhost:8080/oauth2/redirect`
-- **Allowed Logout URLs**: Add `http://localhost:8080`
-- **Allowed Web Origins**: Add `http://localhost:8080`
+- **Allowed Callback URLs**: Add `https://www.example.com/oauth2/redirect`
+- **Allowed Logout URLs**: Add `https://www.example.com`
+- **Allowed Web Origins**: Add `https://www.example.com`
 
 {{< reuse-image src="img/auth0/redirect-uri.png" >}}
 
@@ -73,8 +69,6 @@ In the **Settings** tab, configure the following:
 
 3. In **Advanced Settings** → **OAuth**, set the **Default Directory** to `Username-Password-Authentication` (this ensures the password grant uses the correct connection).
 
-{{< reuse-image src="img/auth0/default-directory.png" >}}
-
 4. Click **Save Changes**.
 
 ### Create an Auth0 API (for Access Token Validation)
@@ -86,7 +80,6 @@ In the **Settings** tab, configure the following:
 5. Use the **Identifier** as the `YOUR_API_AUDIENCE` in the Access Token Validation guide.
 
 {{< reuse-image src="img/auth0/create-api.png" >}}
-
 
 > [!NOTE]
 > If you already have an Auth0 API, you can use its Identifier instead of creating a new one. The Identifier is the audience you'll use in the JWT GatewayExtension.
@@ -140,7 +133,6 @@ Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.c
 > [!NOTE]
 > This address is separate from the public Auth0 URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
 
-
 ## Configure TLS for the Auth0 Backend {#configure-tls}
 
 Since Auth0 uses a public, trusted certificate, you can use the system's trusted CA certificates. Create a `BackendConfigPolicy` to configure TLS.
@@ -163,8 +155,7 @@ spec:
 EOF
 ```
 
-Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.com`). The `wellKnownCACertificates: System` setting tells Envoy to use the system's trusted CA certificates, which include the Certificate Authorities that signed
-Auth0's certificate.
+Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.com`). The `wellKnownCACertificates: System` setting tells Envoy to use the system's trusted CA certificates, which include the Certificate Authorities that signed Auth0's certificate.
 
 ## Next steps
 
