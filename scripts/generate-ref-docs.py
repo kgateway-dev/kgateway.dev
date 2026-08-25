@@ -251,6 +251,97 @@ def extract_package_section(content, package_name):
     return result
 
 
+def _iter_code_spans(line):
+    '''Yield (start, end, content) for every inline code span in one line.
+
+    CommonMark rule: a span opens on a run of N backticks and closes on the next
+    run of EXACTLY N backticks, so ``a ` b`` is one span containing a lone
+    backtick. A naive `` `[^`]*` `` regex gets this wrong in the direction that
+    matters here — it happily matches from one span's closing backtick, across
+    text that is OUTSIDE any span, to the next span's opener. Measured on the
+    generated API reference, that mistake inflated a count of 11 affected spans
+    to 188 and wrongly reported that most of them held markdown-significant
+    characters. Walk the line instead.
+
+    `start` is the index of the opening backtick run, `end` the index of the
+    closing run, so line[start:end+N] is the whole span including delimiters.
+    '''
+    i, n = 0, len(line)
+    while i < n:
+        if line[i] == '`':
+            j = i
+            while j < n and line[j] == '`':
+                j += 1
+            run = j - i
+            close = line.find('`' * run, j)
+            # Skip closing candidates that are part of a LONGER backtick run.
+            while close != -1:
+                k = close
+                while k < n and line[k] == '`':
+                    k += 1
+                if k - close == run:
+                    break
+                close = line.find('`' * run, k)
+            if close != -1:
+                yield i, close, line[j:close]
+                i = close + run
+                continue
+        i += 1
+
+
+def _flatten_br_inside_code_spans(content):
+    '''Collapse `<br />` that crd-ref-docs left INSIDE an inline code span.
+
+    A Go doc comment that embeds a fenced YAML example reaches crd-ref-docs as
+    one field description. To keep the description on a single table row it
+    rewrites the newlines as `<br />`, which is correct for the prose around the
+    example but wrong inside the backticks: markdown does not interpret HTML in a
+    code span, so the reader is shown the characters `<br />` verbatim. Measured
+    on kgateway 2.2.x `componentLogLevels`, the cell rendered as
+
+        yaml<br /> componentLogLevels:<br /> upstream: debug<br /> connection: trace<br />
+
+    Only spans are touched. The same file legitimately contains ~30,000 `<br />`
+    tags in ordinary table cells, where they are the only way to get a line
+    break, so rewriting them globally would wreck the reference docs.
+
+    A cell cannot hold a fenced block, so the line breaks cannot be preserved as
+    breaks: converting the span to raw `<code>` was tried and rejected, because
+    Goldmark keeps parsing inline markdown inside raw inline HTML and the
+    typographer curls the `"` in `value: "/foo"` into `“/foo”`, which silently
+    corrupts a YAML snippet the reader is meant to copy. Collapsing to one space
+    keeps the text honest and copy-safe.
+
+    Also drops the leading `yaml`/`json` info string, which is a leftover of the
+    fence that no longer exists, and unescapes `\\{` / `\\}` — inside a code span
+    a backslash escape is not processed, so `\\{\\{inja\\}\\}` reaches the reader
+    with its backslashes showing.
+    '''
+    out = []
+    for line in content.split('\n'):
+        if '<br' not in line or '`' not in line:
+            out.append(line)
+            continue
+        rebuilt, cursor = [], 0
+        for start, end, body in _iter_code_spans(line):
+            if '<br' not in body:
+                continue
+            ticks = start
+            while ticks < len(line) and line[ticks] == '`':
+                ticks += 1
+            delim = line[start:ticks]
+            fixed = re.sub(r'\s*<br\s*/?>\s*', ' ', body)
+            fixed = re.sub(r'^\s*(?:yaml|json|sh|bash|yml)\s+', '', fixed)
+            fixed = fixed.replace('\\{', '{').replace('\\}', '}')
+            fixed = re.sub(r'\s+', ' ', fixed).strip()
+            rebuilt.append(line[cursor:start])
+            rebuilt.append(f'{delim}{fixed}{delim}')
+            cursor = end + len(delim)
+        rebuilt.append(line[cursor:])
+        out.append(''.join(rebuilt))
+    return '\n'.join(out)
+
+
 def _post_process_api_docs(api_file):
     '''Apply post-processing to API docs file'''
     # Format the generated docs with sed commands
@@ -525,6 +616,12 @@ def _post_process_api_docs(api_file):
     # 2. A backslash-escaped "\<br />" renders as the literal text "<br />"
     #    (Goldmark turns "\<" into a literal "<"). Unescape it to a real break.
     content = re.sub(r'\\(<br\s*/?>)', r'\1', content)
+
+    # 3. A "<br />" left INSIDE an inline code span is shown to the reader as the
+    #    characters "<br />", because markdown does not interpret HTML in a code
+    #    span. Must run AFTER step 2, so that an escaped break is normalized to a
+    #    real one first and this pass sees a single shape.
+    content = _flatten_br_inside_code_spans(content)
 
     # Rewrite any known-broken links restored from upstream source comments.
     content = _apply_link_fixups(content)

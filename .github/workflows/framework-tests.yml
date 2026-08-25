@@ -34,6 +34,10 @@ jobs:
     name: Static + content checks
     runs-on: ubuntu-latest
     continue-on-error: true
+    # Bounds a hung `Install chromium` / apt-get step (observed stuck 30+ min
+    # with no failure — GitHub's default job timeout is 6 hours) so the run
+    # fails fast instead of sitting until that default kicks in.
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
@@ -104,6 +108,23 @@ jobs:
       - name: Install harness dependencies
         working-directory: docs-theme-extras
         run: npm ci
+
+      # ubuntu-latest resolves apt's default mirror to a region-specific
+      # azure.archive.ubuntu.com endpoint that has repeatedly gone unreachable
+      # outright (apt-get update stalls on endless "Ign:" retries instead of
+      # failing) — same root cause as the timeout guard above. Point apt at
+      # the direct global mirror before Playwright's installer shells out to
+      # apt-get, instead of just waiting longer.
+      - name: Work around flaky azure.archive.ubuntu.com apt mirror
+        run: |
+          sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' \
+            /etc/apt/sources.list \
+            /etc/apt/sources.list.d/*.sources \
+            /etc/apt/apt-mirrors.txt 2>/dev/null || true
+
+      - name: Install chromium
+        working-directory: docs-theme-extras
+        run: npx playwright install --with-deps chromium
 
       - name: Run static + content specs
         working-directory: docs-theme-extras

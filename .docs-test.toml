@@ -29,6 +29,14 @@ buildLog  = "./.build.log"
 # posts and marketing copy that follow looser conventions.
 scanRoots = [
   "./content/docs",
+  # assets/ holds the conref/snippet corpus that gets reused into those pages.
+  # It was NOT scanned until 2026-08-07, so every author-side lint skipped it.
+  # That is how a page shipped to production with tabs labelled "Tab 0" /
+  # "Tab 1": Hextra 0.12 takes labels from `name=`, the source used the
+  # pre-0.12 `tabName=`, and the fallback is silent.
+  # See docs-theme-extras tests/scan-roots.spec.ts for why a scan root that
+  # reads nothing is treated as an error rather than a pass.
+  "./assets",
 ]
 
 # URL versioning. kgateway versions are under /docs/envoy/<version>/...

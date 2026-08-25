@@ -150,8 +150,8 @@ After deploying the GatewayExtension, verify that the JWKS is fetched from the c
 
 **Send a request with a valid token**:
 
-{{< tabs tabTotal="2" items="Cloud Provider LoadBalancer,Port-forward for local testing" >}}
-{{% tab tabName="Cloud Provider LoadBalancer" %}}
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
 
 ```sh
 curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
@@ -160,7 +160,7 @@ curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
 ```
 
 {{% /tab %}}
-{{% tab tabName="Port-forward for local testing" %}}
+{{% tab name="Port-forward for local testing" %}}
 
 ```sh
 curl -vik localhost:8080/headers \
