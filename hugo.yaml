@@ -192,67 +192,50 @@ params:
       websites: https://searchbot.tryhelix.ai/
       bots: https://searchbot.tryhelix.ai/bots
   
-  # Global versions (consumed by local partials 404.html, navbar.html,
-  # navbar-version.html, breadcrumb.html as a default before the
-  # section-specific list overrides). Keep these in sync with the
-  # latest section list below.
+  # THE version list — the only one. Newest first. Every entry names the
+  # sections it applies to. The contract, in full, with a TOML and a YAML
+  # template: docs-theme-extras USAGE.md, "Versions and sections".
+  #
+  # Also consumed by this repo's local partials (404.html, navbar.html,
+  # navbar-version.html, breadcrumb.html).
   versions:
     - version: "2.5.x"
+      sections: ["envoy"]
       dropdown: "main"
       linkVersion: "main"
-      url: "/main"
     - version: "2.4.x"
+      sections: ["envoy"]
       dropdown: "2.4 (latest)"
       linkVersion: "latest"
-      url: "/latest"
     - version: "2.3.x"
+      sections: ["envoy"]
       dropdown: "2.3"
-      # linkVersion "latest" marks this as the current version, so
-      # docs-theme-extras' version-noindex partial keeps only this version
-      # indexable and emits noindex on duplicate pages in the others
-      # (/main, /2.2.x, /2.1.x).
+      # NOTE: this says linkVersion "2.3.x", so it is NOT the entry
+      # version-noindex treats as current — that is the 2.4.x entry above,
+      # whose linkVersion IS "latest". So /latest/ stays indexable and
+      # duplicate pages under /main/, /2.3.x/, /2.2.x/ and /2.1.x/ are
+      # noindexed. An earlier comment here claimed the opposite; left as-is
+      # behaviorally, since which version should be canonical is a kgateway
+      # release decision rather than a config typo.
       linkVersion: "2.3.x"
-      url: "/2.3.x"
     - version: "2.2.x"
+      sections: ["envoy"]
       dropdown: "2.2"
       linkVersion: "2.2.x"
-      url: "/2.2.x"
     - version: "2.1.x"
+      sections: ["envoy"]
       dropdown: "2.1"
       linkVersion: "2.1.x"
-      url: "/2.1.x"
 
-  # Section-specific configurations
+  # Section registry, alphabetical. A section exists because it is a key here.
+  # See docs-theme-extras USAGE.md, "Versions and sections".
   sections:
-    envoy:
-      versions:
-        - version: "2.5.x"
-          dropdown: "main"
-          linkVersion: "main"
-          url: "/main"
-        - version: "2.4.x"
-          dropdown: "2.4 (latest)"
-          linkVersion: "latest"
-          url: "/latest"
-        - version: "2.3.x"
-          dropdown: "2.3"
-          linkVersion: "2.3.x"
-          url: "/2.3.x"
-        - version: "2.2.x"
-          dropdown: "2.2"
-          linkVersion: "2.2.x"
-          url: "/2.2.x"
-        - version: "2.1.x"
-          dropdown: "2.1"
-          linkVersion: "2.1.x"
-          url: "/2.1.x"
-
+    # No content anywhere in this repo — there is no /docs/agentgateway/ tree,
+    # so `externalURL` is what the section selector points at. That is the
+    # documented shape for a section that exists only to send readers to
+    # another product. It is tagged on no version entry above, so it offers no
+    # versions of its own, which is correct: it has no version trees.
     agentgateway:
-      # This section has no internal landing page in kgw — the section key
-      # exists only so the version dropdown scopes correctly when users land
-      # on a shared path like /docs/agentgateway/latest/reference/api/. The
-      # centralized sidebar's section-chip row reads `externalURL` and points
-      # the chip off-site rather than to a stub /docs/agentgateway/latest/.
-      # No `versions:` override here — consumers (navbar, navbar-version,
-      # extras sidebar) fall back to the top-level `params.versions` list.
       externalURL: "https://agentgateway.dev/docs/kubernetes/latest/"
+
+    envoy: {}
