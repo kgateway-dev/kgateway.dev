@@ -54,21 +54,29 @@ jobs:
           python3 -c "
           import yaml
           import json
-          
+          import sys
+
           with open('hugo.yaml', 'r') as f:
               config = yaml.safe_load(f)
-          
+
           versions = config.get('params', {}).get('versions', [])
           version_data = []
-          
+
+          # linkVersion is the version's URL path segment, so it is also the
+          # directory segment generate-ref-docs.py writes API docs into
+          # (content/docs/envoy/<linkVersion>/reference/). There is no separate
+          # 'url' field: it used to duplicate linkVersion, and dropping it from
+          # hugo.yaml silently emptied the path segment here.
           for version in versions:
-              version_info = {
+              link_version = (version.get('linkVersion') or '').strip('/')
+              if not link_version:
+                  print(f'Error: entry {version.get(\"version\")!r} in hugo.yaml has no linkVersion', file=sys.stderr)
+                  sys.exit(1)
+              version_data.append({
                   'version': version.get('version'),
-                  'linkVersion': version.get('linkVersion'),
-                  'url': version.get('url', '').lstrip('/')
-              }
-              version_data.append(version_info)
-          
+                  'linkVersion': link_version,
+              })
+
           print(json.dumps(version_data))
           " > versions.json
           
@@ -119,10 +127,10 @@ jobs:
             - Control plane metrics documentation
             - Each version uses the latest corresponding tag from the kgateway repository
 
-            **File locations:**
-            - API docs: `content/docs/envoy/{VERSION}/reference/api.md`
+            **File locations:** `{LINK_VERSION}` is the URL path segment (`main`, `latest`, `2.3.x`), `{VERSION}` is the version family (`2.5.x`, `2.4.x`).
+            - API docs: `content/docs/envoy/{LINK_VERSION}/reference/api.md`
             - Helm docs: `assets/kgw-docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
-            - Metrics docs: `assets/kgw-docs/snippets/{VERSION}/metrics-control-plane.md`
+            - Metrics docs: `assets/kgw-docs/snippets/{LINK_VERSION}/metrics-control-plane.md`
           branch: api-gen-update
           delete-branch: true
           base: main
