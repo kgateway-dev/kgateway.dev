@@ -1,21 +1,20 @@
 baseURL: "/"
 
-# Paged.js PDF-export book pipeline (docs-theme-extras: layouts/docs/list.book.html).
-# Opt in per page via `outputs: ["html", "book"]` front matter — see
-# content/docs/envoy/latest/_index.md for the one page trying this so far.
-# Experimental on a versioned site: this output format stitches whichever
-# page opts in plus its own .Pages subtree, so it naturally scopes to one
-# version as long as only ONE version's root page opts in at a time. What is
-# NOT scoped per-version is the cover/footer version label in list.book.html
-# itself, which reads site.Params.versions' globally-flagged "latest" entry
-# regardless of which version tree this particular book actually walks.
-outputFormats:
-  book:
-    mediaType: "text/html"
-    baseName: "book"
-    isHTML: true
-    noUgly: true
-
+# The `book` output format that drives the PDF export is NOT declared here.
+# docs-theme-extras declares it in its own hugo.toml and Hugo merges a module's
+# top-level `outputFormats` into the importing project, so importing the module
+# is enough. This file used to carry a copy; it was removed once the module
+# owned it, so there is one place to change it rather than one per consumer.
+#
+# That merge only happens on the default config lookup, which is what this repo
+# uses. A build that passes `--config` replaces the lookup and would need its own
+# copy — this repo has no such build.
+#
+# The version label on the cover and in the running footer is resolved per tree
+# by the module's utils/book-version.html, from the `params.versions` entry whose
+# `linkVersion` matches the tree the book walked. An earlier comment here warned
+# that the label was global and therefore wrong on a versioned site; that is no
+# longer true.
 enableRobotsTXT: true
 # Derive each page's .Lastmod from its last git commit — no manually maintained
 # front-matter dates. Feeds the sitemap <lastmod> for SEO. Listing "lastmod"
@@ -121,6 +120,36 @@ params:
     # preview URL. Set explicitly here because kgw-oss's prod baseURL doesn't
     # include the host.
     prodHost: "https://kgateway.dev"
+
+  # "Download all docs (PDF)" in the Copy-as-Markdown menu, added by the module's
+  # copy-markdown.html. Setting `distribution` is what turns the item on and
+  # selects the solo-io/docs-pdfs release-asset URL shape, which the module
+  # supplies so it is not repeated per consumer:
+  #
+  #   .../releases/download/{product}-{distribution}-{version}/{product}-{distribution}-{version}.pdf
+  #
+  # `oss` is the segment that keeps this asset off the enterprise kgateway docs'
+  # asset of the same product name. The tags differ in both segments today
+  # (kgateway-oss-envoy-latest vs kgateway-enterprise-2.3.x), but publishing uses
+  # --clobber, so a collision would overwrite rather than fail — the distribution
+  # segment is the thing that makes a collision impossible rather than unlikely.
+  #
+  # `product` is set explicitly because it is otherwise read from
+  # `params.currentProduct` or `params.folder`, and this site sets neither: the
+  # resolved name would be empty and the URL would come out as `-oss-envoy-latest`.
+  #
+  # `{version}` resolves to `envoy-latest` rather than `latest`, because `envoy` is
+  # a registered key in `params.sections` below and the module prefixes the version
+  # segment with the section segment when one applies. solo-io/docs's pdf-export.yml
+  # derives its release tag from the same `envoy/latest` path, so the link and the
+  # published asset agree by construction rather than by being kept in step.
+  #
+  # The item renders only on a version tree that builds a book, because it asks the
+  # version root for its output formats — so /2.3.x/ and /main/ do not show it.
+  pdfDownload:
+    distribution: oss
+    product: kgateway
+
   navbar:
     displayTitle: false
     displayLogo: true
