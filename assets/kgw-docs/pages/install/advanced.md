@@ -171,10 +171,10 @@ The following table shows which cross-namespace references are checked in each m
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
-| GatewayExtension | `spec.oauth2.backendRef`{{< version include-if="2.4.x,2.5.x" >}} / `spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / `spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / `spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
-| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version include-if="2.4.x,2.5.x" %}}
+| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
 | ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / `spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.headerModifiers.request.set[].secretRef` / `spec.headerModifiers.request.add[].secretRef`, and the same fields under `spec.headerModifiers.response` | Secret | checked | checked | allowed |{{% /version %}}
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.basicAuth.secretRef` / `spec.apiKeyAuth.secretRef` / `spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
@@ -277,7 +277,7 @@ To restrict the grant to a single Secret, add `name` to the `to` entry. When you
 
 {{< /version >}}
 
-{{< version include-if="2.4.x,2.5.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 
 ## Disable automatic RBAC creation {#disable-rbac}
 
