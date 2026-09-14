@@ -325,7 +325,7 @@ jwks:
 
 ### JWT validation modes {#jwt-validation}
 
-The `validationMode` field in `spec.jwt` controls whether requests without a JWT are allowed. To change the mode, reapply the GatewayExtension that you created earlier with the updated `validationMode` value.
+The `validationMode` field in `spec.jwt` controls how strictly the gateway enforces JWT validation, including whether requests without a JWT are allowed. To change the mode, reapply the GatewayExtension that you created earlier with the updated `validationMode` value.
 
 **Strict** (default): Requests without a valid JWT are rejected with a `401 Unauthorized` response.
 
@@ -411,6 +411,63 @@ Example output:
 ```
 < HTTP/1.1 200 OK
 ```
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+**AllowMissingOrFailed**: No request is ever rejected by the JWT filter. Requests with a missing, expired, malformed, or otherwise invalid token are all allowed through. Every JWT is still verified, so a valid token still populates `claimsToHeaders` and the JWT dynamic metadata, and a verification failure is recorded in the dynamic metadata for observability.
+
+Use this mode to evaluate a JWT policy against live traffic before you enforce it. You can confirm that real tokens validate as expected without risking a 401 for clients that are not sending a token yet.
+
+> [!WARNING]
+> This mode provides no authentication. It is weaker than `AllowMissing`, which still rejects an invalid token. An `RBAC` policy that matches on JWT claims sees the same empty metadata for an invalid token as it does for a request with no token at all, so a claim-based authorization rule cannot distinguish the two.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    validationMode: AllowMissingOrFailed
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+EOF
+```
+Send a request with an invalid token. Unlike `AllowMissing`, this mode allows the request through:
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer not.a.token"
+```
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer not.a.token"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```
+< HTTP/1.1 200 OK
+```
+
+The following table compares how each mode responds to the same three requests.
+
+| Request | `Strict` | `AllowMissing` | `AllowMissingOrFailed` |
+| ----- | ----- | ----- | ----- |
+| Valid token | `200` | `200` | `200` |
+| No token | `401` | `200` | `200` |
+| Invalid token | `401` | `401` | `200` |
+{{< /version >}}
 
 ### Configure audiences {#audiences}
 
@@ -572,6 +629,64 @@ Example output:
 ```
 
 For claim-based access control with a CEL `rbac` policy, see [Restrict access with claim-based rules](../claim-based-rbac/).
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Allow for clock skew {#clock-skew}
+
+A JWT carries an expiry time (`exp`) and an optional not-before time (`nbf`). Both are absolute timestamps set by the issuer. If the clock on the issuing system runs slightly ahead of or behind the clock on the gateway, a token can look expired or not yet valid even though it is neither. To absorb that difference, the gateway applies a tolerance when it checks those two claims.
+
+By default, the tolerance is 60 seconds. Set `clockSkew` on a provider to change it. A larger tolerance reduces spurious rejections when clocks drift, but it also means an expired token stays usable for longer, so keep the value only as large as your environment needs.
+
+Note the following constraints on the value:
+
+* Only whole seconds are supported, so a value such as `300ms` is rejected.
+* The minimum is `1s`. A value of `0s` is rejected, because the gateway cannot distinguish it from an unset field and would fall back to the 60 second default.
+* The maximum is `87600h`.
+
+1. Update the GatewayExtension to allow for 5 minutes of clock skew.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayExtension
+   metadata:
+     name: selfminted-jwt
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     jwt:
+       providers:
+         - name: selfminted
+           issuer: kgateway.dev
+           clockSkew: 300s
+           jwks:
+             local:
+               inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+   EOF
+   ```
+
+2. Port-forward the gateway proxy on port 19000.
+
+   ```sh
+   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
+   ```
+
+3. Query the config dump and verify that the provider carries the tolerance that you set, in seconds.
+
+   ```sh
+   curl -s 127.0.0.1:19000/config_dump | grep -o '"clock_skew_seconds": [0-9]*'
+   ```
+
+   Example output:
+
+   ```console
+   "clock_skew_seconds": 300
+   ```
+
+If you set a value that breaks one of the preceding constraints, the API server rejects the resource and reports the reason. For example, applying `clockSkew: 300ms` returns the following error.
+
+```console
+spec.jwt.providers[0].clockSkew: Invalid value: "300ms": clockSkew must be at least 1s.
+```
+{{< /version >}}
 
 ### Disable JWT filter {#disable-jwt}
 
