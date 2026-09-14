@@ -12,7 +12,7 @@ For more information about local rate limiting, see the [Envoy documentation](ht
 
 ### Architecture
 
-The following image shows how local rate limiting works in {{< reuse "/kgw-docs/snippets/kgateway.md" >}}. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. Note that limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5 x 10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. 
+The following image shows how local rate limiting works in {{< reuse "/kgw-docs/snippets/kgateway.md" >}}. As clients send requests to a backend destination, they first reach the Envoy instance that represents your gateway. Local rate limiting settings are applied to an Envoy pod or process. By default, limits are applied to each pod or process. For example, if you have 5 Envoy instances that are configured with a local rate limit of 10 requests per second, the total number of allowed requests per second is 50 (5 x 10). In a global rate limiting setup, this limit is shared between all Envoy instances, so the total number of allowed requests per second is 10. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To apply a single limit across all replicas of a gateway without running a rate limit server, see [Share a limit across gateway replicas](#share-across-gateway).{{< /version >}}
 
 Depending on your setup, each Envoy instance or pod is configured with a number of tokens in a token bucket. To allow a request, a token must be available in the bucket so that it can be assigned to a downstream connection. Token buckets are refilled occasionally as defined in the refill setting of the local rate limiting configuration. If no token is available, the connection is closed immediately, and a 429 HTTP response code is returned to the client. 
 
@@ -391,6 +391,122 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    HTTP/1.1 200 OK   
    ...
    ```
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+
+## Share a limit across gateway replicas {#share-across-gateway}
+
+By default, every replica of a gateway enforces the token bucket independently, so the effective limit scales with the number of replicas. A bucket of 100 requests per second across 4 replicas admits up to 400 requests per second. That behavior is fine as a safety valve, but it makes the real limit depend on how many replicas happen to be running, which changes whenever the gateway scales.
+
+Set `shareAcrossGateway: true` to treat the token bucket as the limit for the gateway as a whole. Each replica receives an even share of the bucket based on the current replica count, so the configured rate becomes the total rate that all replicas admit together. With `tokensPerFill: 100` and `fillInterval: 1s`, a gateway with 4 replicas admits 100 requests per second in total rather than 100 per replica.
+
+This setting gives you a gateway-wide limit without deploying a rate limit server. Unlike [global rate limiting]({{< link-hextra path="/security/ratelimit/global/" >}}), the replicas do not coordinate with each other or share a counter. Each one simply enforces its own fraction of the bucket, so a client whose requests are unevenly distributed across replicas can still be limited earlier than the total suggests.
+
+Keep the following in mind when you use this setting:
+
+* `shareAcrossGateway` requires `tokenBucket` to be set. The gateway rejects the policy otherwise.
+* Set `maxTokens` to at least the number of replicas. Because the bucket is divided, a `maxTokens` value lower than the replica count leaves some replicas with no tokens at all, and requests that reach those replicas are rate limited immediately.
+
+1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that applies a gateway-wide limit. This example allows 4 requests per 300 seconds across the entire gateway.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: local-ratelimit
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     rateLimit:
+       local:
+         shareAcrossGateway: true
+         tokenBucket:
+           maxTokens: 4
+           tokensPerFill: 4
+           fillInterval: 300s
+   EOF
+   ```
+
+   | Setting | Description |
+   | ------- | ----------- |
+   | `shareAcrossGateway` | Applies the token bucket to the gateway as a whole instead of to each replica. Defaults to `false`. |
+   | `maxTokens` | The maximum number of tokens that are available to use, across all replicas of the gateway. |
+   | `tokensPerFill` | The number of tokens that are added during a refill, across all replicas of the gateway. |
+   | `fillInterval` | The number of seconds, after which the token bucket is refilled. |
+
+2. Scale the gateway proxy to 4 replicas so that the bucket is divided.
+   ```sh
+   kubectl scale deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --replicas=4
+   ```
+
+3. Verify that the gateway proxy is configured to divide the bucket. Port-forward the gateway proxy on port 19000 and check the rate limit filter configuration.
+   ```sh
+   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
+   ```
+
+   ```sh
+   curl -s 127.0.0.1:19000/config_dump | jq '.. | objects
+     | select(."@type"? == "type.googleapis.com/envoy.extensions.filters.http.local_ratelimit.v3.LocalRateLimit")
+     | {token_bucket, local_cluster_rate_limit}'
+   ```
+
+   Example output: Note that the token bucket still reports the values that you configured. The `local_cluster_rate_limit` field is what instructs each proxy to enforce only its own share of that bucket at runtime, so you do not see pre-divided numbers in the config dump.
+   ```console
+   {
+     "token_bucket": {
+       "max_tokens": 4,
+       "tokens_per_fill": 4,
+       "fill_interval": "300s"
+     },
+     "local_cluster_rate_limit": {}
+   }
+   ```
+
+4. Port-forward a single gateway proxy pod so that all of your requests reach the same replica.
+   ```sh
+   kubectl port-forward $(kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l app.kubernetes.io/name=http -o jsonpath='{.items[0].metadata.name}') -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8080:8080
+   ```
+
+5. Send 6 requests to that replica. Verify that only the first request succeeds. The 4-token bucket is divided across the 4 replicas, so this replica holds a single token.
+   ```sh
+   for i in {1..6}; do curl -s -o /dev/null -w '%{http_code}\n' localhost:8080/status/200 -H "host: www.example.com"; done
+   ```
+
+   Example output:
+   ```console
+   200
+   429
+   429
+   429
+   429
+   429
+   ```
+
+6. To see the difference, set `shareAcrossGateway` to `false` and repeat the requests.
+   ```sh
+   kubectl patch {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} local-ratelimit -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
+     --type=merge -p '{"spec":{"rateLimit":{"local":{"shareAcrossGateway":false}}}}'
+   ```
+
+   Example output: This time, 4 requests succeed, because the replica holds the full bucket rather than a quarter of it.
+   ```console
+   200
+   200
+   200
+   200
+   429
+   429
+   ```
+
+7. Scale the gateway proxy back down.
+   ```sh
+   kubectl scale deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --replicas=1
+   ```
+
+{{< /version >}}
 
 {{< version exclude-if="2.3.x,2.4.x,2.5.x" >}}
 
