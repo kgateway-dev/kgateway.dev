@@ -211,7 +211,7 @@ Added multi-arch support for kgateway. `x86_64` builds continue to use the `envo
 If you are currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, the [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) tool can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for kgateway (Envoy) or Agentgateway. Choose your migration guide to learn more:
 
 * [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
-* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
+* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/documentation/migrate/)
 
 #### xDS first-connect grace period {#v22-xds-first-connect-delay}
 

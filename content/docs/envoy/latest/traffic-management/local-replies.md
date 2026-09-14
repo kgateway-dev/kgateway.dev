@@ -292,7 +292,7 @@ EOF
 
 ### Match by response flag {#match-response-flag}
 
-Use the `responseFlagFilter` to match replies with a specific [Envoy response flag](https://www.envoyproxy.io/docs/envoy/latest/configuration/observability/access_log/usage#config-access-log-format-response-flags). For example, match `UO` (upstream overflow) to intercept circuit-breaker rejections and return a custom body.
+Use the `responseFlagFilter` to match replies with a specific [Envoy response flag](https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/substitution_formatter#config-access-log-format-response-flags). For example, match `UO` (upstream overflow) to intercept circuit-breaker rejections and return a custom body.
 
 ```yaml
 kubectl apply -f- <<EOF

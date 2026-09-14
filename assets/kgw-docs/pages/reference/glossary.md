@@ -68,7 +68,7 @@ In kgateway, the control plane distributes routing rules, policies, and extensio
 ### CRDs (Custom Resource Definitions)
 Extend the Kubernetes API with custom resource types.
 
-🔗 *See official documentation*: https://kubernetes.io/docs/reference/glossary/?all=true#term-custom-resource-definition
+🔗 *See official documentation*: https://kubernetes.io/docs/reference/glossary/?all=true#term-CustomResourceDefinition
 
 ## D–F
 
