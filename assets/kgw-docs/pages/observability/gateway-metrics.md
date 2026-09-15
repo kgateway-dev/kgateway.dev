@@ -151,7 +151,7 @@ spec:
 EOF
 ```
 
-{{< version include-if="2.4.x,2.5.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 
 ## Per-route statistics {#per-route-stats}
 
