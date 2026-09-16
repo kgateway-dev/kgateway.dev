@@ -250,6 +250,49 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
    }
    ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+
+## Move the buffer filter before body-reading filters
+
+By default, the buffer filter runs late in the HTTP filter chain, after authentication, authorization, and rate limiting. Another filter can read or hold the body first, such as ExtAuth with request-body checks, ExtProc, or a body transformation. In that case, `buffer.maxRequestSize` might not reject an oversized request. Set `buffer.filterStage` to move the buffer filter earlier for the listener that serves the route.
+
+Because {{< reuse "/kgw-docs/snippets/kgateway.md" >}} installs one buffer filter per filter chain, this placement applies to every route on the listener. If {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} resources on the same filter chain ask for different stages, the earliest requested stage is used for the whole filter chain.
+
+1. Update the route-level {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} to place the buffer filter before the `AuthN` stage.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation-buffer-limit
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     buffer:
+       maxRequestSize: "1024"
+       filterStage:
+         stage: AuthN
+         predicate: Before
+   EOF
+   ```
+
+   | Field | Description |
+   | --- | --- |
+   | `buffer.maxRequestSize` | Sets the maximum request body size that the buffer filter allows. Requests that exceed this value receive a 413 HTTP response code when the buffer filter processes the body first. |
+   | `buffer.filterStage.stage` | Selects the HTTP filter-chain stage for the buffer filter. Valid values are `Fault`, `AuthN`, `AuthZ`, `RateLimit`, and `Route`. |
+   | `buffer.filterStage.predicate` | Places the buffer filter before, during, or after the selected stage. Valid values are `Before`, `During`, and `After`. |
+
+2. Keep the buffer stage consistent across routes on the same listener. To use different buffer-filter placements for different routes, serve those routes from different listeners.
+
+3. Do not set `buffer.filterStage` on a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} that uses `buffer.disable`. The API rejects a buffer policy that sets both fields.
+
+4. Do not set `buffer.filterStage.weight` to a nonzero value. Because a filter chain has only one buffer filter, the API rejects a nonzero `weight`.
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
