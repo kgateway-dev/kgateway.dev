@@ -1,4 +1,31 @@
-Use a BackendConfigPolicy resource to configure connection settings for a backend.  
+Use a BackendConfigPolicy resource to configure connection settings for a backend.
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+## Maximum connection duration {#maximum-connection-duration}
+
+Use `spec.commonHttpProtocolOptions.maxConnectionDuration` to set a limit for upstream HTTP connections. When the limit is reached, Envoy starts draining the connection. Omit this field when the backend should not have a maximum connection duration.
+
+The following example BackendConfigPolicy resource limits upstream HTTP connections to 10 minutes.
+
+```yaml
+kind: BackendConfigPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+metadata:
+  name: httpbin-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: ""
+      kind: Service
+  commonHttpProtocolOptions:
+    maxConnectionDuration: 10m
+```
+
+| Field | Description |
+| --- | --- |
+| `spec.commonHttpProtocolOptions.maxConnectionDuration` | The maximum duration of an upstream HTTP connection. The value must use a duration string, such as `10m`. |
+{{< /version >}}
 
 ## Policy attachment {#policy-attachment-backendconfigpolicy}
 
@@ -79,4 +106,3 @@ spec:
     maxHeadersCount: 15
     maxRequestsPerConnection: 100
 ```
-
