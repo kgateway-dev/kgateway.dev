@@ -2,6 +2,8 @@
 .hugo_build.lock
 hugo_stats.json
 .build.log
+__pycache__/
+*.py[cod]
 
 # Node dependencies
 node_modules/
