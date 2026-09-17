@@ -45,7 +45,7 @@ For programmatic access, you can set up external auth to use access token valida
 
 {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
-When access token validation uses a JWT provider, the gateway checks the `exp` and `nbf` claims against the proxy clock. Set `clockSkew` on a `GatewayExtension` JWT provider to allow clock drift between the identity provider, the gateway, and the backend service. Omit `clockSkew` to use Envoy's default 60-second tolerance.
+When access token validation uses a JWT provider, the gateway checks the `exp` and `nbf` claims against the proxy clock. Set `clockSkew` on a GatewayExtension JWT provider to allow clock drift between the identity provider, the gateway, and the backend service. Omit `clockSkew` to use Envoy's default 60-second tolerance.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
