@@ -39,6 +39,10 @@ The components are instantiated by using pods and services. The following table 
 
 ### Gateway proxy ports
 
+{{< version exclude-if="2.1.x,2.2.x" >}}
+The gateway proxy pod can also include a Secret Discovery Service (SDS) sidecar for TLS certificate handling. By default, the SDS sidecar listens on `127.0.0.1:8234`, so only containers in the same pod can reach the endpoint. To restore the previous cluster-network listener, set `SDS_SERVER_ADDRESS=0.0.0.0:8234` on the SDS container.
+
+{{< /version >}}
 {{< reuse "kgw-docs/snippets/reserved-ports.md" >}}
 {{< /version >}}
 {{< version include-if="2.0.x" >}}
@@ -68,4 +72,3 @@ The additional Envoy sidecar has an admin port listening on 8081 for each pod.
 
 The Envoy sidecar on the kgateway intercepts the inbound traffic for each pod and performs the TLS decryption before passing the traffic to the main container. This process does not alter the ports that are used by the pods and services, but it does create additional ports that are used for internal communication within the pod. For instance, the kgateway pod continues to listen on 9977 as the xDS server. Internally, the kgateway container listens on 127.0.0.1:9999 for xDS requests. The Envoy sidecar in the pod accepts requests on 9977, decrypts the request, and sends it to port 9999 on the localhost for processing.
 -->
-
