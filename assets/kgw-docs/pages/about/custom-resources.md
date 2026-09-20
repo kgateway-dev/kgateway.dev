@@ -75,3 +75,7 @@ Kgateway uses the following custom resources to attach policies to routes and ga
 For workloads within your cluster, you can route incoming traffic to their Kubernetes Service. But what if you have external services such as static hostnames or AWS Lambda functions that you want to route traffic to?
 
 You can use a {{< reuse "kgw-docs/snippets/backend.md" >}} resource to accomplish this task. Similar to using Kubernetes Services, you reference the {{< reuse "kgw-docs/snippets/backend.md" >}} in your HTTPRoute resource. For more information, see [{{< reuse "kgw-docs/snippets/backend.md" >}}s]({{< link-hextra path="/traffic-management/destination-types/backends/" >}}).
+
+{{< version exclude-if="2.3.x,2.2.x,2.1.x" >}}
+For AWS Lambda Backends that set `spec.aws.auth.type: AssumeRole`, kgateway calls `sts:AssumeRole` with the gateway proxy's ambient credentials. These credentials can come from AWS Identity and Access Management (IAM) Roles for Service Accounts (IRSA), Amazon EKS Pod Identity, or environment variables. Kgateway then signs Lambda requests with temporary credentials from the assumed role.
+{{< /version >}}
