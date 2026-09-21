@@ -10,6 +10,12 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v24-breaking-changes}
 
+#### SDS sidecar binds to loopback by default {#v24-sds-loopback-bind}
+
+Starting in v2.4.4, the SDS (Secret Discovery Service) sidecar binds to `127.0.0.1:8234` (loopback) by default instead of `0.0.0.0:8234`. Previously, any pod on the cluster network could reach the SDS endpoint. Because all consumers of SDS run in the same pod as the sidecar, restricting the bind address to loopback closes this unintended exposure.
+
+If you need to reach the SDS sidecar from outside its pod in a trusted environment, set the `SDS_SERVER_ADDRESS=0.0.0.0:8234` environment variable on the `sds` container. For an example, see [Restore the SDS sidecar's pod-network bind address]({{< link-hextra path="/setup/customize/configs/#sds-bind-address" >}}). If you use a custom deployment overlay or manifest that overrides the SDS container's readiness probe, note that the default probe also changed, from a `tcpSocket` check on port 8234 to an `exec` probe that runs `sds healthcheck`, because a TCP probe against the pod IP no longer succeeds against a loopback-only listener.
+
 #### Envoy 1.38
 
 The Envoy dependency in kgateway was upgraded to 1.38.x. This change includes the following upstream breaking changes.
