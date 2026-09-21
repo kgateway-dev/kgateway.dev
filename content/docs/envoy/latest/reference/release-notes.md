@@ -247,6 +247,12 @@ You can now configure how kgateway fetches the remote JSON Web Key Set (JWKS) th
 - **`asyncFetch`**: Fetches and caches the JWKS asynchronously on a background timer instead of synchronously during request handling. This setting prevents JWT validation failures when the JWKS server is slow or temporarily unavailable. For more information, see [Async JWKS fetch]({{< link-hextra path="/security/jwt/simple/basic/#async-fetch" >}}). 
 - **`retryPolicy`**: Configures exponential backoff retries when the JWKS server is unavailable. For more information, see [JWKS retry policy]({{< link-hextra path="/security/jwt/simple/basic/#jwks-retry-policy" >}}). 
 
+#### Preserve request paths {#v24-preserve-request-paths}
+
+You can now disable Envoy's default path normalization and slash merging on a listener by using the `normalizePath` and `mergeSlashes` fields in the HTTP settings of a ListenerPolicy resource. Disable these settings for backends that depend on the original, unmodified request path, such as S3-compatible object stores that use object keys containing repeated slashes.
+
+For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
+
 
 <!--
 

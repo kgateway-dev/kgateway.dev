@@ -14,7 +14,11 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🌟 New features {#v24-new-features}
 
+#### Preserve request paths {#v25-preserve-request-paths}
 
+You can now disable Envoy's default path normalization and slash merging on a listener by using the `normalizePath` and `mergeSlashes` fields in the HTTP settings of a ListenerPolicy resource. Disable these settings for backends that depend on the original, unmodified request path, such as S3-compatible object stores that use object keys containing repeated slashes.
+
+For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
 
 <!--

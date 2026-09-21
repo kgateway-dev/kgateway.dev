@@ -50,39 +50,6 @@ Both protocol versions are rarely used nowadays. However, some applications migh
       }
    ```
 
-{{< version exclude-if="2.3.x,2.2.x,2.1.x" >}}
-## Preserve request paths
-
-By default, Envoy normalizes request paths and merges adjacent slashes before it routes a request. These defaults preserve earlier {{< reuse "kgw-docs/snippets/kgateway.md" >}} behavior. Some backends, such as S3-compatible object stores, need the original path because object keys can contain repeated slashes.
-
-Create a ListenerPolicy that disables path normalization, slash merging, or both. In `targetRefs`, attach the policy to the Gateway. The policy applies to the Gateway's HTTP and HTTPS listeners.
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: ListenerPolicy
-metadata:
-  name: preserve-path-handling
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: http
-  default:
-    httpSettings:
-      normalizePath: false
-      mergeSlashes: false
-```
-
-{{< reuse "kgw-docs/snippets/review-table.md" >}}
-
-| Setting | Description |
-| --- | --- |
-| `spec.default.httpSettings.normalizePath` | Set to `false` to keep Envoy from normalizing paths before routing, such as collapsing `.` and `..` segments or decoding percent-encoded characters. Defaults to `true`. |
-| `spec.default.httpSettings.mergeSlashes` | Set to `false` to keep Envoy from merging adjacent `/` characters in request paths. Defaults to `true`. |
-
-{{< /version >}}
-
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
