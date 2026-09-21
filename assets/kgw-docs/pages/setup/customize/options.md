@@ -17,7 +17,7 @@ Review the built-in configurations that are provided via the [{{< reuse "kgw-doc
 | -- | -- |
 | `deployment` | Set the number of replicas and the update strategy for the proxy Deployment. If you use an HPA, do not set `replicas` here. |
 | `envoyContainer` | Configure the Envoy container, including the image, application log format, bootstrap log level, component log levels, environment variables, resource requests and limits, and security context. |
-| `sdsContainer` | Configure the Secret Discovery Service (SDS) sidecar container.{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} In v2.4.4 and later, the sidecar binds to `127.0.0.1:8234` by default. To restore the previous pod-network binding in a trusted environment, set `SDS_SERVER_ADDRESS=0.0.0.0:8234` on the `sds` container with `deploymentOverlay`.{{< /version >}} |
+| `sdsContainer` | Configure the Secret Discovery Service (SDS) sidecar container.{{< version exclude-if="2.1.x,2.2.x" >}} As of v2.4.4 and v2.3.8, the sidecar binds to `127.0.0.1:8234` by default. To restore the previous pod-network binding in a trusted environment, set `SDS_SERVER_ADDRESS=0.0.0.0:8234` on the `sds` container with a `deploymentOverlay`. For an example, see [Change the SDS sidecar's pod-network bind address]({{< link-hextra path="/setup/customize/configs/#sds-bind-address" >}}).{{< /version >}} |
 | `podTemplate` | Configure pod-level settings, including image pull secrets, labels, annotations, node selector, affinity, tolerations, topology spread constraints, and the pod security context. |
 | `service` | Configure the Kubernetes Service that exposes the proxy, including the type, ports, labels, annotations, and external traffic policy. |
 | `serviceAccount` | Configure the ServiceAccount for the proxy pods. |
