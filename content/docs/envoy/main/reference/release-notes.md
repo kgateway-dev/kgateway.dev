@@ -14,6 +14,9 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🌟 New features {#v24-new-features}
 
+#### JWT verified token caching {#v25-jwt-cache}
+
+You can now enable Envoy's in-memory cache of successfully verified JWTs by using the `cache` field on a JWT provider in a GatewayExtension resource. For a successfully verified token that is presented more than once, the gateway proxy does not parse the token again, or perform a JWKS lookup and signature verification. Expired tokens are automatically removed from the cache. For more information, see [JWT caching]({{< link-hextra path="/security/jwt/simple/basic/#jwt-caching" >}}).
 
 
 

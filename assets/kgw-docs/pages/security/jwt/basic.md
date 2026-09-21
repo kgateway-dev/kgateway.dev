@@ -336,7 +336,7 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
-### JWT caching
+### JWT caching {#jwt-caching}
 
 You can enable Envoy JWT caching for verified tokens in a JWT provider configuration. The cache stores tokens that already passed signature verification, so repeated requests with the same token do not repeat the parse, JWKS lookup, and signature verification work.
 
