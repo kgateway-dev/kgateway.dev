@@ -22,6 +22,10 @@ If you need to reach the SDS sidecar from outside its pod in a trusted environme
 
 You can now enable Envoy's in-memory cache of successfully verified JWTs by using the `cache` field on a JWT provider in a GatewayExtension resource. For a successfully verified token that is presented more than once, the gateway proxy does not parse the token again, or perform a JWKS lookup and signature verification. Expired tokens are automatically removed from the cache. For more information, see [JWT caching]({{< link-hextra path="/security/jwt/simple/basic/#jwt-caching" >}}).
 
+#### Preserve request paths {#v25-preserve-request-paths}
+You can now disable Envoy's default path normalization and slash merging on a listener by using the `normalizePath` and `mergeSlashes` fields in the HTTP settings of a ListenerPolicy resource. Disable these settings for backends that depend on the original, unmodified request path, such as S3-compatible object stores that use object keys containing repeated slashes.
+
+For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
 
 <!--
