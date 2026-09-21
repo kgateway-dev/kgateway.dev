@@ -320,7 +320,81 @@ jwks:
 | `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. |
 | `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
 
+In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` policy. The defaults are intended to work for typical JWKS endpoints. Use the following guidelines to choose appropriate values.
+
+| Scenario | Recommended configuration |
+| -------- | ------------------------- |
+| JWKS endpoint is external or occasionally slow | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures. |
+| Gateway startup should not be blocked by JWKS fetch failures | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background. |
+| Authentication must fail closed until JWKS is available | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched. |
+| Seeing frequent network failures | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect. |
+
+> [!WARNING]
+> **Important:** Setting `fastListener: true` means that requests might be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
+
 {{< /version >}}
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
+### JWT caching
+
+You can enable Envoy JWT caching for verified tokens in a JWT provider configuration. The cache stores tokens that already passed signature verification, so repeated requests with the same token do not repeat the parse, JWKS lookup, and signature verification work.
+
+Set the `spec.jwt.providers[].cache` block on the GatewayExtension resource to turn on caching for a provider. Caching supports three configurations:
+
+- Omit the `cache` block to keep caching disabled.
+- Set `cache: {}` (an empty object) to enable caching with Envoy's default settings, which include `100` tokens per worker thread and a `4096`-byte max token size.
+- Set `cache.size` and/or `cache.maxTokenSize` to override the Envoy default value. If you omit a field, the Envoy default setting is applied. 
+
+The following example sets the custom cache size and max token size values:
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        cache:
+          size: 1024
+          maxTokenSize: 8192
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+```
+
+To enable caching with Envoy's defaults instead of overriding them, set `cache` to an empty object:
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        cache: {}
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+```
+
+| Field | Description |
+| ----- | ----------- |
+| `cache` | Enables Envoy JWT caching for this provider. An empty object turns on caching with Envoy defaults. |
+| `cache.size` | The number of verified tokens to cache per Envoy worker thread. Must be at least `1` if set. If unset, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
+| `cache.maxTokenSize` | The maximum size of one cached token in bytes. Must be at least `1` if set. If unset, Envoy uses `4096`. |
+
+Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
+
+By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. o make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
+
+{{< /version>}}
 
 
 ### JWT validation modes {#jwt-validation}
@@ -648,92 +722,6 @@ Expected output:
 ```text
 < HTTP/1.1 200 OK
 ```
-
-{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
-
-### asyncFetch {#asyncFetch}
-
-When using a remote JWKS, you can configure `asyncFetch` to control how the gateway fetches and caches the JWKS. This is useful for improving performance and controlling startup behavior.
-
-For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksasyncfetch" >}}).
-
-> [!NOTE]
-> **Note:** `failedRefetchDuration` controls how long to wait before retrying a failed fetch, while `retryPolicy` controls how many times to retry and the backoff intervals. Use `failedRefetchDuration` for quick retries after transient failures, and `retryPolicy` for more robust retry handling with exponential backoff.
-
-**Example:**
-
-The following example allows the listener to start even if the JWKS endpoint is temporarily unavailable (`fastListener: true`). If the fetch fails, it retries after 5 seconds (`failedRefetchDuration: 5s`).
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayExtension
-metadata:
-  name: selfminted-jwt
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  jwt:
-    providers:
-      - name: selfminted
-        issuer: kgateway.dev
-        jwks:
-          remote:
-            url: https://auth.example.com/.well-known/jwks.json
-            asyncFetch:
-              fastListener: true   # Don't block startup on JWKS fetch
-              failedRefetchDuration: 5s  # Retry after 5 seconds on failure
-EOF
-```
-### retryPolicy {#retry-policy}
-
-Configure how the gateway retries JWKS fetch when the remote server is unavailable. This ensures that temporary network issues do not cause authentication failures.
-
-For detailed field descriptions, see the [API docs]({{< link-hextra path="/reference/api/#jwksretrypolicy" >}}).
-
-**Example:**
-
-The following example retries JWKS fetches up to three times (`numRetries: 3`) with exponential backoff starting at 2 seconds (`baseInterval: 2s`) and capping at 30 seconds (`maxInterval: 30s`). This is useful for handling transient network issues with an external JWKS endpoint.
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayExtension
-metadata:
-  name: selfminted-jwt
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  jwt:
-    providers:
-      - name: selfminted
-        issuer: kgateway.dev
-        jwks:
-          remote:
-            url: https://auth.example.com/.well-known/jwks.json
-            retryPolicy:
-              numRetries: 3  # Retry up to 3 times on failure
-              backOff:
-                baseInterval: 2s  # Start with 2-second delay
-                maxInterval: 30s  # Cap at 30 seconds to avoid long waits
-EOF
-```
-
-### When to use advanced settings {#recommendations}
-
-In most cases, you do not need to configure `retryPolicy` or `asyncFetch`. The defaults are intended to work for typical JWKS endpoints.
-
-Use the following guidelines to choose appropriate values:
-
-| Scenario | Recommended Configuration |
-| -------- | ------------------------- |
-| **JWKS endpoint is external or occasionally slow** | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures |
-| **Gateway startup should not be blocked by JWKS fetch failures** | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background |
-| **Authentication must fail closed until JWKS is available** | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched |
-| **Seeing frequent network failures** | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect |
-
-> [!WARNING]
-> **Important:** Setting `fastListener: true` means that requests may be rejected if the JWKS fetch fails before it completes, because the gateway cannot validate tokens without the JWKS. Consider your application's availability requirements when choosing this setting.
-
-{{< /version >}}
 
 ## Cleanup {#cleanup}
 
