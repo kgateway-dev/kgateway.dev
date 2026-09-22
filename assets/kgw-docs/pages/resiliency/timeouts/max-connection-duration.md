@@ -2,7 +2,7 @@
 
 By default, a connection has no maximum lifetime and stays open until it goes idle, or until one side closes it. This applies whether the connection is from a downstream client to the gateway proxy, or from the gateway proxy to a backend. You can use a ListenerPolicy or BackendConfigPolicy resource to set an upper limit on these connections. The policy updates the [`max_connection_duration` setting in Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-connection-duration).
 
-The connection duration is measured from when the connection was established until the configured duration elapses, not from the last activity on it. When the limit is reached, Envoy starts a drain sequence to allow in-flighth requests to finish. To configure the maximum time an existing connection can stay idle without any activity before it is closed, see [idle timeout]({{< link-hextra path="/resiliency/timeouts/idle/" >}}). 
+The connection duration is measured from when the connection was established until the configured duration elapses, not from the last activity on it. When the limit is reached, Envoy starts a drain sequence to allow in-flight requests to finish. To configure the maximum time an existing connection can stay idle without any activity before it is closed, see [idle timeout]({{< link-hextra path="/resiliency/timeouts/idle/" >}}).
 
 Setting a maximum connection duration is useful in cases where clients must reconnect periodically to pick up DNS changes and redistribute across gateway proxy replicas after a scale-up. It is also useful for connections to a backend, where it lets the gateway proxy rotate the connection before the backend closes it first, which otherwise results in `503 upstream_reset_before_response_started{connection_termination}` errors.
 
@@ -12,7 +12,7 @@ Setting a maximum connection duration is useful in cases where clients must reco
 
 ## Set up a maximum connection duration
 
-You can set a maximum connection duration on connections from a client to the gateway proxy (downstream), or on connections from the gateway proxy to a backend (upstream). 
+You can set a maximum connection duration on connections from a client to the gateway proxy (downstream), or on connections from the gateway proxy to a backend (upstream).
 
 ### Downstream connections
 
