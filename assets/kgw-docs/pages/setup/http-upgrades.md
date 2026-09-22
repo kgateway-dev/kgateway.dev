@@ -70,7 +70,7 @@ Gateway proxies reject upgrade requests unless the upgrade token is enabled, so 
 
 ## Configure upgrades for a route {#traffic-policy}
 
-Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} when an upgrade applies to particular routes rather than to the whole listener, or when you need to terminate `CONNECT`.
+Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} when an upgrade applies to particular routes rather than to the whole listener or when you need to terminate `CONNECT`.
 
 1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with the `httpUpgrade` list.
 
