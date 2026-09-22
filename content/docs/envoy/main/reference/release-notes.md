@@ -27,6 +27,11 @@ You can now disable Envoy's default path normalization and slash merging on a li
 
 For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
+#### Maximum connection duration {#v25-max-connection-duration}
+You can now use the `maxConnectionDuration` field to set a maximum connection duration for downstream or upstream connections. 
+
+For more information, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
+
 
 <!--
 
