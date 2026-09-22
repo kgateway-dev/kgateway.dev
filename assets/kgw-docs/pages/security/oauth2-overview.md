@@ -43,32 +43,6 @@ Before a request is forwarded to a protected API, the gateway intercepts and red
 
 For programmatic access, you can set up external auth to use access token validation. The user gets the access token from the OIDC provider first. Then, the user provides the access token in requests to your APIs. The gateway validates the token and, if valid, forwards the request to the upstream service.
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
-
-When access token validation uses a JWT provider, the gateway checks the `exp` and `nbf` claims against the proxy clock. Set `clockSkew` on a `GatewayExtension` JWT provider to allow clock drift between the identity provider, the gateway, and the backend service. Omit `clockSkew` to use Envoy's default 60-second tolerance.
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: GatewayExtension
-metadata:
-  name: example-jwt
-spec:
-  jwt:
-    providers:
-      - name: example
-        issuer: https://example.com
-        clockSkew: 1h
-        jwks:
-          local:
-            inline: '{"keys":[...]}'
-```
-
-| Field | Description |
-| ----- | ----------- |
-| `spec.jwt.providers[].clockSkew` | Optional duration for the tolerance that Envoy applies when it verifies the `exp` and `nbf` claims. Omit the field to use Envoy's default 60-second tolerance. Use whole-second values from `1s` through `87600h`, such as `30s`, `90s`, or `1h30m`. Values such as `500ms`, `0s`, and `87601h` are rejected. |
-
-{{< /version >}}
-
 ## OAuth2 backends
 
 OAuth2 provider configuration is defined separately from the gateway policy by using OAuth2 backends. An OAuth2 backend contains provider-specific configuration such as:

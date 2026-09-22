@@ -396,6 +396,35 @@ By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads`
 
 {{< /version>}}
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
+### Clock skew tolerance {#clock-skew}
+
+The gateway checks a token's `exp` and `nbf` claims against the proxy's own clock. When the identity provider's clock and the proxy's clock differ, a token that is valid at the issuer can arrive expired or not-yet-valid. Set `clockSkew` on the provider to widen the tolerance.
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        clockSkew: 90s
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+```
+
+| Field | Description |
+| ----- | ----- |
+| `clockSkew` | How much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims. Accepts whole seconds from `1s` through `87600h`, such as `30s`, `90s`, or `1h30m`. Sub-second values such as `500ms`, a value of `0s`, and anything above `87600h` are rejected. If unset, the gateway tolerates `60s`. |
+
+A wider tolerance accepts tokens for longer after they expire, so raise it only as far as the clock drift you actually observe. Synchronizing clocks with NTP is the better fix where you control both ends.
+
+{{< /version >}}
 
 ### JWT validation modes {#jwt-validation}
 
