@@ -289,6 +289,17 @@ spec:
 EOF
 ```
 
+#### How security context settings merge {#security-context-merge}
+
+You can set `podTemplate.securityContext` on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} that the GatewayClass references, and again on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} that an individual Gateway references. When both set it, the two are merged **field by field** rather than the Gateway's copy replacing the GatewayClass's.
+
+For each field, the Gateway-level value wins when it is set, and the GatewayClass-level value is kept when the Gateway leaves that field unset. So a Gateway can override `runAsUser` on its own and still inherit `fsGroup` from the class default, without restating it.
+
+Fields merge independently of each other, including the Windows options. `windowsOptions.gmsaCredentialSpecName` names a GMSA credential spec, while `windowsOptions.gmsaCredentialSpec` holds the spec contents inline, and setting one at the Gateway level leaves the other's inherited value alone.
+
+> [!NOTE]
+> **Note:** Merging applies to the built-in fields. A `deploymentOverlay` is applied afterward, so an overlay that sets a security context field takes precedence over the merged result. For more information, see [Overlays]({{< link-hextra path="/setup/customize/gateway/#overlays" >}}).
+
 ### Remove default security contexts for OpenShift {#openshift-security-context}
 
 OpenShift manages security contexts through Security Context Constraints (SCCs). Set the built-in `omitDefaultSecurityContext` field to prevent the control plane from adding default pod and container security contexts, so that OpenShift can assign appropriate values.
