@@ -1,9 +1,5 @@
 Use a BackendConfigPolicy resource to configure connection settings for a backend.
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
-To set a maximum duration for upstream HTTP connections to a backend, use `spec.commonHttpProtocolOptions.maxConnectionDuration`. For setup steps and verification, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
-{{< /version >}}
-
 ## Policy attachment {#policy-attachment-backendconfigpolicy}
 
 You can apply BackendConfigPolicies to individual Kubernetes services, any backend that matches a specific label, or a global service in your ambient mesh.
