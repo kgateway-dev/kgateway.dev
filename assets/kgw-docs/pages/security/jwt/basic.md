@@ -400,7 +400,7 @@ By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads`
 
 ### Clock skew tolerance {#clock-skew}
 
-The gateway checks a token's `exp` and `nbf` claims against the proxy's own clock. When the identity provider's clock and the proxy's clock differ, a token that is valid at the issuer can arrive expired or not-yet-valid. Set `clockSkew` on the provider to widen the tolerance.
+Use `clockSkew` to set how much drift to tolerate between the proxy's clock and the identity provider's clock when the `exp` and `nbf` claims are verified. Use when a token that is still valid at the issuer arrives at the proxy as expired or not-yet-valid, such as when the identity provider runs outside the cluster or on a host with an unsynchronized clock.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
