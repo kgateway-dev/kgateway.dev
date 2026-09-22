@@ -392,9 +392,9 @@ spec:
 
 Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
 
-By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. o make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
+By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. To make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
-{{< /version>}}
+{{< /version >}}
 
 {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
