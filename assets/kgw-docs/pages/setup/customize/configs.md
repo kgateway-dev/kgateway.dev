@@ -289,16 +289,47 @@ spec:
 EOF
 ```
 
-#### How security context settings merge {#security-context-merge}
+### How security context settings merge {#security-context-merge}
 
-You can set `podTemplate.securityContext` on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} that the GatewayClass references, and again on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} that an individual Gateway references. When both set it, the two are merged **field by field** rather than the Gateway's copy replacing the GatewayClass's.
+When a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is attached to both the GatewayClass and the Gateway, the `podTemplate.securityContext` settings are merged field by field instead of the Gateway replacing the block. Each field that the Gateway sets wins, and each field that the Gateway leaves unset keeps the GatewayClass value. Nested settings such as `windowsOptions` merge the same way, so a Gateway that sets `windowsOptions.gmsaCredentialSpecName` to name a GMSA credential spec does not clear the inline `windowsOptions.gmsaCredentialSpec` contents that the GatewayClass supplies.
 
-For each field, the Gateway-level value wins when it is set, and the GatewayClass-level value is kept when the Gateway leaves that field unset. So a Gateway can override `runAsUser` on its own and still inherit `fsGroup` from the class default, without restating it.
+Consider the following GatewayClass configuration:
 
-Fields merge independently of each other, including the Windows options. `windowsOptions.gmsaCredentialSpecName` names a GMSA credential spec, while `windowsOptions.gmsaCredentialSpec` holds the spec contents inline, and setting one at the Gateway level leaves the other's inherited value alone.
+```yaml
+spec:
+  kube:
+    podTemplate:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 3000
+        windowsOptions:
+          gmsaCredentialSpec: '{"CmsPlugins":["ActiveDirectory"]}'
+```
 
-> [!NOTE]
-> **Note:** Merging applies to the built-in fields. A `deploymentOverlay` is applied afterward, so an overlay that sets a security context field takes precedence over the merged result. For more information, see [Overlays]({{< link-hextra path="/setup/customize/gateway/#overlays" >}}).
+Consider the following Gateway configuration:
+
+```yaml
+spec:
+  kube:
+    podTemplate:
+      securityContext:
+        runAsUser: 2000
+        windowsOptions:
+          gmsaCredentialSpecName: gmsa-webapp
+```
+
+The resulting security context merges both configurations as follows:
+
+```yaml
+securityContext:
+  runAsUser: 2000                                            # Gateway value wins
+  fsGroup: 3000                                              # GatewayClass value is kept
+  windowsOptions:
+    gmsaCredentialSpec: '{"CmsPlugins":["ActiveDirectory"]}' # GatewayClass value is kept
+    gmsaCredentialSpecName: gmsa-webapp                      # Gateway value is added
+```
+
+For the full order in which built-in fields and overlays are applied, see [Configuration priority and precedence]({{< link-hextra path="/setup/customize/options/#precedence" >}}).
 
 ### Remove default security contexts for OpenShift {#openshift-security-context}
 
