@@ -32,77 +32,76 @@ Create an Auth0 application, configure the required settings, and add a test use
 
 ### Access the Auth0 Dashboard
 
-1. Go to [Auth0 Dashboard](https://manage.auth0.com/).
-2. Navigate to **Applications** → **Applications**.
-3. Click on your Regular Web Application.
+1. Go to the [Auth0 Dashboard](https://manage.auth0.com/).
+2. Go to **Applications** > **Applications**.
+3. Click your Regular Web Application.
 
-{{< reuse-image src="img/auth0/create-application.png" >}}
+   {{< reuse-image src="img/auth0/create-application.png" >}}
 
 ### Configure application settings
 
-In the **Settings** tab, configure the following:
+1. On the **Settings** tab, set the following fields.
 
-- **Allowed Callback URLs**: Add `https://www.example.com/oauth2/redirect`
-- **Allowed Logout URLs**: Add `https://www.example.com`
-- **Allowed Web Origins**: Add `https://www.example.com`
+   * **Allowed Callback URLs**: `https://www.example.com/oauth2/redirect`
+   * **Allowed Logout URLs**: `https://www.example.com`
+   * **Allowed Web Origins**: `https://www.example.com`
 
-{{< reuse-image src="img/auth0/redirect-uri.png" >}}
+   {{< reuse-image src="img/auth0/redirect-uri.png" >}}
 
-### Copy the Client ID and Client Secret
+2. Still on the **Settings** tab, copy the **Client ID** and the **Client Secret**. You need both for the `GatewayExtension` that you create in the flow guides.
 
-1. In the **Settings** tab, copy the **Client ID** and **Client Secret** – you'll need these for the kgateway GatewayExtension.
+   > [!NOTE]
+   > The Client Secret is shown only once after creation. If you lose it, you can regenerate it, but regenerating invalidates any existing tokens.
 
-> [!NOTE]
-> The Client Secret is only shown once after creation. If you lose it, you can regenerate it, but this will invalidate any existing tokens.
+3. Scroll to **Advanced Settings** > **OAuth** and set the following fields.
 
-### Configure Advanced Settings
+   * **JsonWebToken Signature Algorithm**: `RS256`
+   * **OIDC Conformant**: Enabled
+   * **Default Directory**: `Username-Password-Authentication`, so that the password grant uses the correct connection.
 
-1. Scroll to **Advanced Settings** → **OAuth**:
-   - **JsonWebToken Signature Algorithm**: Set to `RS256`
-   - **OIDC Conformant**: Enable
+4. Go to **Advanced Settings** > **Grant Types** and select the grants that you need.
 
-2. In **Advanced Settings** → **Grant Types**:
-   - Ensure **Authorization Code** is enabled.
-   - If you plan to use the **Access Token Validation (JWT)** flow, also enable the **Password** grant.
+   * **Authorization Code** is required for the authorization code flow.
+   * **Password** is required only for the [access token validation]({{< link-hextra path="/security/oauth/auth0/access-token/" >}}) flow, which uses the password grant to fetch a token for testing.
 
-{{< reuse-image src="img/auth0/advanced-settings-grant-types.png" >}}
+   {{< reuse-image src="img/auth0/advanced-settings-grant-types.png" >}}
 
-3. In **Advanced Settings** → **OAuth**, set the **Default Directory** to `Username-Password-Authentication` (this ensures the password grant uses the correct connection).
+5. Click **Save Changes**.
 
-4. Click **Save Changes**.
+### Create an Auth0 API {#create-api}
 
-### Create an Auth0 API (for Access Token Validation)
+Complete this step only if you plan to use the access token validation flow. The API **Identifier** is the audience that kgateway validates the `aud` claim against.
 
-1. In the Auth0 Dashboard, go to **Applications** → **APIs**.
+1. In the Auth0 Dashboard, go to **Applications** > **APIs**.
 2. Click **Create API**.
-3. Enter a **Name** (such as, `kgateway-api`) and an **Identifier** (such as, `https://my-api.example.com`).
+3. Enter a **Name**, such as `kgateway-api`, and an **Identifier**, such as `https://my-api.example.com`.
 4. Click **Create**.
-5. Use the **Identifier** as the `YOUR_API_AUDIENCE` in the Access Token Validation guide.
+5. Copy the **Identifier**. You use it as `YOUR_API_AUDIENCE` in the [access token validation]({{< link-hextra path="/security/oauth/auth0/access-token/" >}}) guide.
 
-{{< reuse-image src="img/auth0/create-api.png" >}}
+   {{< reuse-image src="img/auth0/create-api.png" >}}
 
 > [!NOTE]
-> If you already have an Auth0 API, you can use its Identifier instead of creating a new one. The Identifier is the audience you'll use in the JWT GatewayExtension.
+> If you already have an Auth0 API, use its Identifier instead of creating a new one.
 
 ### Create a test user {#create-test-user}
 
-1. In the Auth0 Dashboard, navigate to **User Management** → **Users**.
+1. In the Auth0 Dashboard, go to **User Management** > **Users**.
 2. Click **Create User**.
 
-{{< reuse-image src="img/auth0/users-list.png" >}}
+   {{< reuse-image src="img/auth0/users-list.png" >}}
 
-3. Enter user details:
-   - **Email**: `testuser@example.com`
-   - **Password**: `your-password`
-   - **Connection**: `Username-Password-Authentication`
-4. Click **Create**.
+3. Enter the user details.
 
-5. Verify the user is created.
+   * **Email**: `testuser@example.com`
+   * **Password**: a password of your choice
+   * **Connection**: `Username-Password-Authentication`
 
-{{< reuse-image src="img/auth0/user-created.png" >}}
+4. Click **Create**, and verify that the user is created.
+
+   {{< reuse-image src="img/auth0/user-created.png" >}}
 
 > [!NOTE]
-> The steps above create a test user for this guide. For production, use a dedicated Auth0 tenant and follow Auth0's [production best practices](https://auth0.com/docs/best-practices).
+> The steps above create a test user for this guide only. For production, use a dedicated Auth0 tenant and follow the Auth0 [production best practices](https://auth0.com/docs/best-practices).
 
 ## Connect kgateway to Auth0
 
@@ -110,7 +109,7 @@ Both authentication flows need a network path from the gateway to Auth0. Create 
 
 ### Create a Backend for Auth0 {#create-backend}
 
-Create a `Backend` resource that defines how kgateway reaches your Auth0 instance. This Backend uses the `Static` type with the host and port configured for Auth0.
+Create a `Backend` resource that defines how kgateway reaches your Auth0 tenant. This Backend uses the `Static` type with the host and port configured for Auth0.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -128,14 +127,14 @@ spec:
 EOF
 ```
 
-Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.com`). The port must be `443` because kgateway communicates with Auth0 over HTTPS.
+Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain, such as `dev-xxx.us.auth0.com`. The port must be `443` because kgateway reaches Auth0 over HTTPS.
 
 > [!NOTE]
 > This address is separate from the public Auth0 URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
 
-## Configure TLS for the Auth0 Backend {#configure-tls}
+### Configure TLS for the Auth0 Backend {#configure-tls}
 
-Since Auth0 uses a public, trusted certificate, you can use the system's trusted CA certificates. Create a `BackendConfigPolicy` to configure TLS.
+Auth0 serves HTTPS with a certificate from a public CA, so the gateway can verify it against the system trust store. Create a `BackendConfigPolicy` that configures TLS for the Auth0 `Backend`.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -155,15 +154,15 @@ spec:
 EOF
 ```
 
-Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain (such as, `dev-xxx.us.auth0.com`). The `wellKnownCACertificates: System` setting tells Envoy to use the system's trusted CA certificates, which include the Certificate Authorities that signed Auth0's certificate.
+Replace `YOUR_AUTH0_DOMAIN` with your Auth0 domain, such as `dev-xxx.us.auth0.com`. The `wellKnownCACertificates: System` setting tells the gateway to use the system trusted CA certificates, which include the Certificate Authority that signed the Auth0 certificate.
 
 ## Next steps
 
 Auth0 is configured and the gateway can reach it. Now protect a route with the flow that matches how your clients arrive.
 
 {{< cards >}}
-{{< card link="../authorization-code" title="Authorization code flow" subtitle="Redirect browser users to Auth0 to log in, and store their tokens in session cookies." >}}
-{{< card link="../access-token" title="Access token validation" subtitle="Validate a token that an API client already holds, and reject requests without one." >}}
+  {{< card link="../authorization-code" title="Authorization code flow" subtitle="Redirect browser users to Auth0 to log in, and store their tokens in session cookies." >}}
+  {{< card link="../access-token" title="Access token validation" subtitle="Validate a token that an API client already holds, and reject requests without one." >}}
 {{< /cards >}}
 
 ## Cleanup {#cleanup}
