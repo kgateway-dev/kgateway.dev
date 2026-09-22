@@ -392,10 +392,39 @@ spec:
 
 Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
 
-By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. o make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
+By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. To make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
-{{< /version>}}
+{{< /version >}}
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
+### Clock skew tolerance {#clock-skew}
+
+Use `clockSkew` to set how much drift to tolerate between the proxy's clock and the identity provider's clock when the `exp` and `nbf` claims are verified. Use when a token that is still valid at the issuer arrives at the proxy as expired or not-yet-valid, such as when the identity provider runs outside the cluster or on a host with an unsynchronized clock.
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+spec:
+  jwt:
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        clockSkew: 90s
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+```
+
+| Field | Description |
+| ----- | ----- |
+| `clockSkew` | How much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims. Accepts a duration with no sub-second component, from `1s` up to `87600h` (10 years), such as `30s`, `90s`, or `1h30m`. Sub-second values such as `500ms`, a value of `0s`, and anything above `87600h` are rejected. If unset, the gateway tolerates `60s`, meaning it still accepts a token up to 60 seconds after its `exp` or up to 60 seconds before its `nbf`. |
+
+Set `clockSkew` only as wide as the clock drift you actually observe, because a wider tolerance also accepts tokens for longer after they expire. Where you control both the proxy and the identity provider, synchronize their clocks with NTP instead of widening the tolerance.
+
+{{< /version >}}
 
 ### JWT validation modes {#jwt-validation}
 
