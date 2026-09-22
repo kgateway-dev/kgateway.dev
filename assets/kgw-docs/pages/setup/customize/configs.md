@@ -420,6 +420,34 @@ spec:
 EOF
 ```
 
+### Change the SDS sidecar's pod-network bind address {#sds-bind-address}
+
+The SDS sidecar binds to `127.0.0.1:8234` by default so the endpoint is reachable only from within its own pod. If you need to reach the SDS sidecar from outside its pod in a trusted environment, override the `SDS_SERVER_ADDRESS` environment variable on the `sds` container to bind to all interfaces instead (`0.0.0.0:8234`). 
+
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            containers:
+              - name: sds
+                env:
+                  - name: SDS_SERVER_ADDRESS
+                    value: "0.0.0.0:8234"
+EOF
+```
+
+> [!CAUTION]
+> Changing the pod-network bind address to all interfaces exposes the SDS endpoint to any pod on the cluster network. Enable this feature only in a trusted environment.
+
 ### Replace all volumes {#replace-volumes}
 
 Use `$patch: replace` to take full control of the pod volume list instead of merging additional volumes with `podTemplate.extraVolumes`. Place `$patch: replace` as a separate list item before the actual volumes.
