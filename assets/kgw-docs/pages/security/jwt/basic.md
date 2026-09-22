@@ -420,9 +420,9 @@ spec:
 
 | Field | Description |
 | ----- | ----- |
-| `clockSkew` | How much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims. Accepts whole seconds from `1s` through `87600h`, such as `30s`, `90s`, or `1h30m`. Sub-second values such as `500ms`, a value of `0s`, and anything above `87600h` are rejected. If unset, the gateway tolerates `60s`. |
+| `clockSkew` | How much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims. Accepts a duration with no sub-second component, from `1s` up to `87600h` (10 years), such as `30s`, `90s`, or `1h30m`. Sub-second values such as `500ms`, a value of `0s`, and anything above `87600h` are rejected. If unset, the gateway tolerates `60s`, meaning it still accepts a token up to 60 seconds after its `exp` or up to 60 seconds before its `nbf`. |
 
-A wider tolerance accepts tokens for longer after they expire, so raise it only as far as the clock drift you actually observe. Synchronizing clocks with NTP is the better fix where you control both ends.
+Set `clockSkew` only as wide as the clock drift you actually observe, because a wider tolerance also accepts tokens for longer after they expire. Where you control both the proxy and the identity provider, synchronize their clocks with NTP instead of widening the tolerance.
 
 {{< /version >}}
 
