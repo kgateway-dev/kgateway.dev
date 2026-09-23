@@ -45,6 +45,15 @@ If you need to reach the SDS sidecar from outside its pod in a trusted environme
 
 ### 🌟 New features {#v25-new-features}
 
+#### Control the Host header of mirrored requests {#v25-request-mirror-host}
+
+The `requestMirror` section of a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} now supports two new fields for controlling the `Host`/`:authority` header of requests that an HTTPRoute or GRPCRoute `RequestMirror` filter mirrors.
+
+* **`disableShadowHostSuffixAppend`**: By default, Envoy appends `-shadow` to the `Host`/`:authority` header of mirrored requests. Set this field to `true` to send the original header unchanged. This is useful when the shadow destination has strict host-based routing rules that reject the modified header.
+* **`hostRewriteLiteral`**: Replaces the `Host`/`:authority` header of mirrored requests with the specified value. Include a port if the shadow destination needs one, as the port from the original request is not carried over.
+
+For more information, see [Mirroring]({{< link-hextra path="/resiliency/mirroring/#request-mirror" >}}).
+
 #### JWT verified token caching {#v25-jwt-cache}
 
 You can now enable Envoy's in-memory cache of successfully verified JWTs by using the `cache` field on a JWT provider in a GatewayExtension resource. For a successfully verified token that is presented more than once, the gateway proxy does not parse the token again, or perform a JWKS lookup and signature verification. Expired tokens are automatically removed from the cache. For more information, see [JWT caching]({{< link-hextra path="/security/jwt/simple/basic/#jwt-caching" >}}).
