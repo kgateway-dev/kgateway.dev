@@ -206,7 +206,7 @@ EOF
 
 ### Rewrite the Host header for mirrored requests
 
-If your shadow destination requires a specific Host/:authority value, such as a different hostname or a hostname with a port, you can use the hostRewriteLiteral field to replace the header entirely. The full header value is replaced, so include a port if the shadow destination needs one. The port from the original request is not carried over automatically.
+If your shadow destination requires a specific `Host`/`:authority` value, such as a different hostname or a hostname with a port, you can use the `hostRewriteLiteral` field to replace the header entirely. The full header value is replaced, so include a port if the shadow destination needs one. The port from the original request is not carried over automatically.
 
 > [!NOTE]
 > Setting `hostRewriteLiteral` suppresses the `-shadow` suffix, independent of what is set in the `disableShadowHostSuffixAppend` field.
