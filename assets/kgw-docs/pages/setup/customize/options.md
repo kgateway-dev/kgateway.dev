@@ -134,7 +134,7 @@ spec:
 
 For a step-by-step guide, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
-## Configuration priority and precedence
+## Configuration priority and precedence {#precedence}
 
 You can attach a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to a GatewayClass that is shared by all Gateways that use that class or to an individual Gateway. When resources are attached at both levels, they are processed in the following order:
 

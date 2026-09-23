@@ -289,6 +289,48 @@ spec:
 EOF
 ```
 
+### How security context settings merge {#security-context-merge}
+
+When a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is attached to both the GatewayClass and the Gateway, the `podTemplate.securityContext` settings are merged field by field instead of the Gateway replacing the block. Each field that the Gateway sets wins, and each field that the Gateway leaves unset keeps the GatewayClass value. Nested settings such as `windowsOptions` merge the same way, so a Gateway that sets `windowsOptions.gmsaCredentialSpecName` to name a GMSA credential spec does not clear the inline `windowsOptions.gmsaCredentialSpec` contents that the GatewayClass supplies.
+
+Consider the following GatewayClass configuration:
+
+```yaml
+spec:
+  kube:
+    podTemplate:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 3000
+        windowsOptions:
+          gmsaCredentialSpec: '{"CmsPlugins":["ActiveDirectory"]}'
+```
+
+Consider the following Gateway configuration:
+
+```yaml
+spec:
+  kube:
+    podTemplate:
+      securityContext:
+        runAsUser: 2000
+        windowsOptions:
+          gmsaCredentialSpecName: gmsa-webapp
+```
+
+The resulting security context merges both configurations as follows:
+
+```yaml
+securityContext:
+  runAsUser: 2000                                            # Gateway value wins
+  fsGroup: 3000                                              # GatewayClass value is kept
+  windowsOptions:
+    gmsaCredentialSpec: '{"CmsPlugins":["ActiveDirectory"]}' # GatewayClass value is kept
+    gmsaCredentialSpecName: gmsa-webapp                      # Gateway value is added
+```
+
+For the full order in which built-in fields and overlays are applied, see [Configuration priority and precedence]({{< link-hextra path="/setup/customize/options/#precedence" >}}).
+
 ### Remove default security contexts for OpenShift {#openshift-security-context}
 
 OpenShift manages security contexts through Security Context Constraints (SCCs). Set the built-in `omitDefaultSecurityContext` field to prevent the control plane from adding default pod and container security contexts, so that OpenShift can assign appropriate values.
