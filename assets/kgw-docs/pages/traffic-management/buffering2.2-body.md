@@ -209,7 +209,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
    {{% /tab %}}
    {{< /tabs >}}
 
-5. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
+6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

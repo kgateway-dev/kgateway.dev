@@ -10,25 +10,26 @@ prev: /docs/traffic-management/route-delegation
 
 ## Move the buffer filter before body-reading filters
 
-By default, the buffer filter runs at a fixed position after authentication, authorization, and rate limiting, but before routing. This default position is not one of the values that you can set in the `buffer.filterStage.stage` and `buffer.filterStage.predicate` fields. 
+By default, the buffer filter runs at a fixed position after authentication, authorization, and rate limiting, but before routing. This default position is not one of the values that you can set in the `buffer.filterStage.stage` and `buffer.filterStage.predicate` fields. To keep the buffer filter at the default position, omit the `buffer.filterStage` block entirely.
 
-The following stages and predicates are supported to determine the position of the buffering filter in the Envoy filter chain.
-
-> [!NOTE]
-> To keep the buffering filter at the default position, omit the `buffer.filterStage` block entirely.
-
+The following stages and predicates are supported to determine the position of the buffer filter in the Envoy filter chain.
 
 | `buffer.filterStage.stage` | `buffer.filterStage.predicate`  |
 | --- | --- |
-| <ul><li>`Fault`: Earliest stage. The buffer filter runs before fault injection.</li><li>`AuthN`: Authentication stage.</li><li>`AuthZ`: Authorization stage.</li><li>`RateLimit`: Rate limiting stage.</li><li>`Route`: Final processing stage before the request leaves the gateway proxy. </li></ul> | <ul><li>`Before`: Runs the buffer filter before the selected stage. </li><li>`During`: Runs the buffer filter during the selected stage. This setting is the default when the `predicate` field is not set. </li><li>`After`: Runs the buffer filter after the selected stage. </li></ul> |
+| <ul><li>`Fault`: Earliest stage. The buffer filter runs before fault injection. Placing the buffer filter here also moves request decompression ahead of fault injection, CORS, and any ExtProc filter staged at `Fault`, for every route on the listener.</li><li>`AuthN`: Authentication stage.</li><li>`AuthZ`: Authorization stage.</li><li>`RateLimit`: Rate limiting stage.</li><li>`Route`: Final processing stage before the request leaves the gateway proxy. </li></ul> | <ul><li>`Before`: Runs the buffer filter before the selected stage. </li><li>`During`: Runs the buffer filter during the selected stage. This setting is the default when the `predicate` field is not set. </li><li>`After`: Runs the buffer filter after the selected stage. </li></ul> |
+
+> [!NOTE]
+> Do not set `buffer.filterStage` together with `buffer.disable`. The API rejects a buffer policy that sets both fields.
+>
+> Do not set `buffer.filterStage.weight` to a nonzero value. The field defaults to `0`. A filter chain has only one buffer filter. If you have multiple {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} resources that request different stages, the earliest stage is configured in the buffer filter. All other stages are ignored. Because the `weight` field cannot break a tie in such cases, the API rejects a nonzero value.
 
 Some filters in the filter chain read or hold the request body before the buffer filter ever sees it, such as external auth with request body checks, ExtProc, or a request transformation. When one of these filters reads the body, the `maxRequestSize` setting on the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} resource cannot be enforced, because the buffer filter never receives the body to measure it. You can set the `buffer.filterStage` field to move the buffer filter to an earlier position in the filter chain to place it ahead of the filter that reads the body. This way, you can reject oversized messages before they reach the extauth service. 
 
-Because {{< reuse "/kgw-docs/snippets/kgateway.md" >}} installs one buffer filter per filter chain, this placement applies to every route on the listener that the {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} targets, not only the route that is named in the `targetRefs` block. If {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} resources on the same filter chain ask for different stages, the earliest requested stage wins for the whole chain. 
+Because {{< reuse "/kgw-docs/snippets/kgateway.md" >}} installs one buffer filter per filter chain, this placement applies to every route on the listener that the {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} targets, not only the route that is named in the `targetRefs` block. If {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} resources on the same filter chain ask for different stages, the earliest requested stage wins for the whole chain. If routes on the same listener need different buffer filter placements, serve them from separate listeners.
 
 The following example uses a separate route and hostname so that the buffer and transformation policies from the earlier sections do not interfere with it.
 
-1. Deploy an external authorization service, a Service, and a GatewayExtension in the `httpbin` namespace, so that no cross-namespace [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) is required. This example reuses the sample service from [Bring your own external authorization service]({{< link-hextra path="/security/external-auth/" >}}#byo-ext-auth), which allows any request that carries the `x-ext-authz: allow` header.
+1. Deploy an external authorization service, a Service, and a GatewayExtension in the `httpbin` namespace, so that no cross-namespace [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) is required. This example reuses the sample service from [Bring your own external authorization service]({{< link-hextra path="/security/extauth/byo-ext-auth-service/grpc/" >}}#byo-ext-auth), which allows any request that carries the `x-ext-authz: allow` header.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: apps/v1
@@ -234,15 +235,6 @@ The following example uses a separate route and hostname so that the buffer and 
        "payload": "hello world"
      }
    ```
-
-
-
-> [!NOTE]
-> This placement applies to every route on the listener that the policy targets. If routes on the same listener need different buffer-filter placements, serve them from separate listeners.
->
-> Do not set `buffer.filterStage` together with `buffer.disable`. The API rejects a buffer policy that sets both fields.
->
-> Do not set `buffer.filterStage.weight` to a nonzero value. The field defaults to `0`. A filter chain has only one buffer filter. If you have multiple {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} resources that request different stages, the earliest stage is configured in the buffer filter. All other stages are ignored. Because the `weight` field cannot break a tie in such cases, tthe API rejects a nonzero value.
 
 ## Cleanup
 
