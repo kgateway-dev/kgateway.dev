@@ -77,7 +77,7 @@ For more information, see [Move the buffer filter before body-reading filters]({
 
 #### Add a non-enforcing JWT validation mode
 
-Set `spec.jwt.validationMode` to `AllowMissingOrFailed` on a JWT GatewayExtension to verify tokens without rejecting requests that have missing or invalid tokens. The proxy also records verification failures in `envoy.filters.http.jwt_authn:failed_status` dynamic metadata, so you can compare live traffic before switching to `Strict`. Previously, `Strict` rejected missing or invalid tokens, and `AllowMissing` still rejected invalid tokens. For more information, see [JWT validation modes](/docs/envoy/main/security/jwt/simple/basic/#jwt-validation).
+Set `spec.jwt.validationMode` to `AllowMissingOrFailed` on a JWT GatewayExtension to verify tokens without rejecting requests that have missing or invalid tokens. The proxy also records verification failures in `envoy.filters.http.jwt_authn:failed_status` dynamic metadata, so you can compare live traffic before switching to `Strict`. Previously, `Strict` rejected missing or invalid tokens, and `AllowMissing` still rejected invalid tokens. For more information, see [JWT validation modes]({{< link-hextra path="/security/jwt/simple/basic/#jwt-validation" >}}).
 
 <!--
 
