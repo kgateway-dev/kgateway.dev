@@ -64,16 +64,6 @@
 /docs/2.0.x/setup/customize/selfmanaged /docs/envoy/latest/setup/customize/envoy/selfmanaged 301
 /docs/2.0.x/setup/customize/selfmanaged/ /docs/envoy/latest/setup/customize/envoy/selfmanaged/ 301
 
-# JWT docs restructured under simple/ (kkb-jwt-update)
-/docs/envoy/2.1.x/security/jwt/basic /docs/envoy/2.1.x/security/jwt/simple/basic 301
-/docs/envoy/2.1.x/security/jwt/basic/ /docs/envoy/2.1.x/security/jwt/simple/basic/ 301
-/docs/envoy/2.2.x/security/jwt/basic /docs/envoy/2.2.x/security/jwt/simple/basic 301
-/docs/envoy/2.2.x/security/jwt/basic/ /docs/envoy/2.2.x/security/jwt/simple/basic/ 301
-/docs/envoy/latest/security/jwt/basic /docs/envoy/latest/security/jwt/simple/basic 301
-/docs/envoy/latest/security/jwt/basic/ /docs/envoy/latest/security/jwt/simple/basic/ 301
-/docs/envoy/main/security/jwt/basic /docs/envoy/main/security/jwt/simple/basic 301
-/docs/envoy/main/security/jwt/basic/ /docs/envoy/main/security/jwt/simple/basic/ 301
-
 # Bare version roots must be explicit because a splat does not match them.
 /docs/latest /docs/envoy/latest/ 301
 /docs/latest/ /docs/envoy/latest/ 301
@@ -84,6 +74,8 @@
 
 # Wildcard redirects. Keep all dynamic rules after static rules as required by
 # Cloudflare Pages, and keep specific AI sections above the version catch-alls.
+# agentgateway.dev has no 2.0.x tree, so send the old 2.0.x pages to latest.
+/docs/agentgateway/2.0.x/* https://agentgateway.dev/docs/kubernetes/latest/:splat 301
 /docs/agentgateway/* https://agentgateway.dev/docs/kubernetes/:splat 301
 /docs/latest/ai/about* https://agentgateway.dev/docs/kubernetes/latest/documentation/about/ 301
 /docs/latest/ai/auth* https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/providers/ 301
@@ -107,6 +99,26 @@
 /docs/main/ai/prompt-enrichment* https://agentgateway.dev/docs/kubernetes/main/documentation/llm/prompt-enrichment/ 301
 /docs/main/ai/prompt-guards* https://agentgateway.dev/docs/kubernetes/main/documentation/llm/guardrails/ 301
 /docs/main/ai/setup* https://agentgateway.dev/docs/kubernetes/main/documentation/quickstart/ 301
+# Any other old AI section lands on the agentgateway.dev docs home.
+/docs/latest/ai/* https://agentgateway.dev/docs/kubernetes/latest/documentation/ 301
+/docs/main/ai/* https://agentgateway.dev/docs/kubernetes/main/documentation/ 301
+
+# Page moves. A trailing * covers both the slash and no-slash form in one rule,
+# which keeps the file under the cap. Keep these above the version catch-alls.
+/docs/latest/glossary* /docs/envoy/latest/reference/glossary/ 301
+/docs/latest/resiliency/tcp-keepalive* /docs/envoy/latest/resiliency/keepalive/tcp/ 301
+/docs/latest/setup/hpa* /docs/envoy/latest/setup/customize/configs/ 301
+/docs/latest/setup/selfmanaged* /docs/envoy/latest/setup/customize/envoy/selfmanaged/ 301
+/docs/main/resiliency/tcp-keepalive* /docs/envoy/main/resiliency/keepalive/tcp/ 301
+/docs/main/setup/hpa* /docs/envoy/main/setup/customize/configs/ 301
+/docs/main/setup/selfmanaged* /docs/envoy/main/setup/customize/envoy/selfmanaged/ 301
+
+# JWT docs restructured under simple/
+/docs/envoy/2.1.x/security/jwt/basic* /docs/envoy/2.1.x/security/jwt/simple/basic/ 301
+/docs/envoy/2.2.x/security/jwt/basic* /docs/envoy/2.2.x/security/jwt/simple/basic/ 301
+/docs/envoy/2.3.x/security/jwt/basic* /docs/envoy/2.3.x/security/jwt/simple/basic/ 301
+/docs/envoy/latest/security/jwt/basic* /docs/envoy/latest/security/jwt/simple/basic/ 301
+/docs/envoy/main/security/jwt/basic* /docs/envoy/main/security/jwt/simple/basic/ 301
 
 # Catch-all redirects for old URL structure (/docs/{version}/* -> /docs/envoy/{version}/:splat)
 /docs/latest/* /docs/envoy/latest/:splat 301

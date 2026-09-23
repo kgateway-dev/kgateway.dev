@@ -64,6 +64,10 @@ def test_maintainer_requested_redirects():
         "/docs/main/ai/about": "https://agentgateway.dev/docs/kubernetes/main/documentation/about/",
         "/docs/latest/ai/prompt-guards": "https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/guardrails/",
         "/docs/main/ai/prompt-guards": "https://agentgateway.dev/docs/kubernetes/main/documentation/llm/guardrails/",
+        "/docs/latest/ai/tracing/": "https://agentgateway.dev/docs/kubernetes/latest/documentation/",
+        "/docs/main/ai/tracing/": "https://agentgateway.dev/docs/kubernetes/main/documentation/",
+        "/docs/agentgateway/2.0.x/reference/api/": "https://agentgateway.dev/docs/kubernetes/latest/reference/api/",
+        "/docs/agentgateway/latest/about/": "https://agentgateway.dev/docs/kubernetes/latest/about/",
     }
 
     for source, destination in expected.items():
@@ -74,15 +78,26 @@ def test_maintainer_requested_redirects():
         )
 
 
-def test_jwt_redirects_are_before_version_catchalls():
+def test_page_moves_resolve_with_and_without_trailing_slash():
     rules = _rules()
-    for source in (
-        "/docs/envoy/2.1.x/security/jwt/basic",
-        "/docs/envoy/2.2.x/security/jwt/basic",
-        "/docs/envoy/latest/security/jwt/basic",
-        "/docs/envoy/main/security/jwt/basic",
-    ):
-        resolved = _resolve(source, rules)
-        assert resolved is not None
-        assert "/simple/basic" in resolved[0]
+    expected = {
+        "/docs/latest/glossary": "/docs/envoy/latest/reference/glossary/",
+        "/docs/latest/resiliency/tcp-keepalive": "/docs/envoy/latest/resiliency/keepalive/tcp/",
+        "/docs/latest/setup/hpa": "/docs/envoy/latest/setup/customize/configs/",
+        "/docs/latest/setup/selfmanaged": "/docs/envoy/latest/setup/customize/envoy/selfmanaged/",
+        "/docs/main/resiliency/tcp-keepalive": "/docs/envoy/main/resiliency/keepalive/tcp/",
+        "/docs/main/setup/hpa": "/docs/envoy/main/setup/customize/configs/",
+        "/docs/main/setup/selfmanaged": "/docs/envoy/main/setup/customize/envoy/selfmanaged/",
+    }
+    for version in ("2.1.x", "2.2.x", "2.3.x", "latest", "main"):
+        expected[f"/docs/envoy/{version}/security/jwt/basic"] = (
+            f"/docs/envoy/{version}/security/jwt/simple/basic/"
+        )
 
+    for source, destination in expected.items():
+        for path in (source, source + "/"):
+            resolved = _resolve(path, rules)
+            assert resolved is not None, f"no redirect for {path}"
+            assert resolved[:2] == (destination, "301"), (
+                f"unexpected redirect for {path}: {resolved}"
+            )
