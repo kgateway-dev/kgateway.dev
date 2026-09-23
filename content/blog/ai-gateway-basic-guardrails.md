@@ -199,5 +199,3 @@ Now, when a user sends a request that is rejected by the moderation endpoint, we
 ## Conclusion
 
 Today we covered another example of how kgateway serves as one of the most mature and widely deployed Envoy-based gateway, now serving AI workloads and their unique requirements.
-
-Why not try this feature out in kgateway with a free a hands-on technical lab on [prompt guards in kgateway](https://www.solo.io/resources/lab/kgateway-ai-lab-prompt-guards).

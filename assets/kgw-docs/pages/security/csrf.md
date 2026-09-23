@@ -2,7 +2,7 @@ Apply a CSRF filter to the gateway to help prevent cross-site request forgery at
 
 ## About CSRF
 
-According to [OWASP](https://owasp.org/www-community/attacks/csrf), CSRF is defined as follows:
+According to [OWASP](https://community.owasp.org/attacks/csrf), CSRF is defined as follows:
 
 > Cross-Site Request Forgery (CSRF) is an attack that forces an end user to execute unwanted actions on a web application in which they're currently authenticated. With a little help of social engineering (such as sending a link via email or chat), an attacker may trick the users of a web application into executing actions of the attacker's choosing. If the victim is a normal user, a successful CSRF attack can force the user to perform state changing requests like transferring funds, changing their email address, and so forth. If the victim is an administrative account, CSRF can compromise the entire web application.
 

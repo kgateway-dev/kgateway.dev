@@ -173,6 +173,68 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
    time="2025-03-14T19:43:03.6858" status=200 method="GET" uri="/headers" size_bytes=508 duration_ms=0.05 user_agent="curl/8.7.1" client_ip=10.0.6.27
    ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+
+## Other configurations {#request-mirror}
+
+Review other common configurations. 
+
+### Disable the `-shadow` host suffix
+
+By default, Envoy appends `-shadow` to the `Host`/`:authority` header of mirrored requests so the shadow destination can identify shadowed traffic. If your shadow destination has strict host-based routing rules that reject the modified header, set `disableShadowHostSuffixAppend: true` in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to send the original Host header unchanged.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: httpbin-mirror
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-mirror
+  requestMirror:
+    disableShadowHostSuffixAppend: true
+EOF
+```
+
+| Setting | Description |
+| ------- | ----------- |
+| `requestMirror.disableShadowHostSuffixAppend` | If `true`, the `-shadow` suffix is not appended to the `Host`/`:authority` header of mirrored requests. Defaults to `false`. |
+
+### Rewrite the Host header for mirrored requests
+
+If your shadow destination requires a specific `Host`/`:authority` value, such as a different hostname or a hostname with a port, you can use the `hostRewriteLiteral` field to replace the header entirely. The full header value is replaced, so include a port if the shadow destination needs one. The port from the original request is not carried over automatically.
+
+> [!NOTE]
+> Setting `hostRewriteLiteral` suppresses the `-shadow` suffix, independent of what is set in the `disableShadowHostSuffixAppend` field.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: httpbin-mirror
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-mirror
+  requestMirror:
+    hostRewriteLiteral: shadow.example:8080
+EOF
+```
+
+| Setting | Description |
+| ------- | ----------- |
+| `requestMirror.hostRewriteLiteral` | Replaces the `Host`/`:authority` header of mirrored requests with this value. Include a port if the shadow destination needs one. |
+
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
@@ -182,5 +244,6 @@ kubectl delete service httpbin2 -n httpbin
 kubectl delete deployment httpbin2 -n httpbin
 kubectl delete httproute httpbin-mirror -n httpbin
 ```
+
 
 
