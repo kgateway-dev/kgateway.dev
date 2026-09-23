@@ -101,6 +101,13 @@ export default defineConfig({
     // labels stable regardless of the CI runner's environment.
     locale: 'en-US',
     timezoneId: 'UTC',
+    // Force the light console. Keycloak 24 gave the admin console a dark stylesheet that follows
+    // prefers-color-scheme, so from 26 onward the captured pixels would otherwise depend on the
+    // runner's theme. Playwright already defaults to light, but leaving that implicit means a
+    // Playwright default change would silently re-theme every baseline. The guides publish one
+    // asset per screen and point both reuse-image shortcodes at it, so light is the committed
+    // choice; see docs-image-map.json for what widening to a light/dark pair would involve.
+    colorScheme: 'light',
   },
 
   expect: {
@@ -110,11 +117,14 @@ export default defineConfig({
     },
   },
 
-  // Projects are keyed by UI and docs version — `keycloak-latest` — and NOT by theme. The
-  // Keycloak 22 admin console has no theme control and no dark stylesheet (verified against
-  // the keycloak-admin-ui message bundle and the shipped PatternFly assets), so a dark project
-  // would capture the same pixels twice. Guides therefore point both reuse-image shortcodes at
-  // the one asset. If a future Keycloak gains a dark console, add the theme dimension here and
-  // widen docs-image-map.json to the light/dark schema at the same time.
+  // Projects are keyed by UI and docs version — `keycloak-latest` — and NOT by theme.
+  //
+  // That used to be because Keycloak 22 had no dark console at all. Since 24 it does, and it
+  // follows prefers-color-scheme, so the reason is now a choice rather than a constraint: the
+  // guides publish one asset per screen, `use.colorScheme` above pins the capture to light, and
+  // both reuse-image shortcodes point at that asset. Adding the theme dimension here would mean
+  // 16 baselines instead of 8, widening docs-image-map.json to the light/dark schema, and
+  // repointing the 8 reuse-image-dark calls in the guide. Worth doing on its own, not as part of
+  // a version bump.
   projects: [{ name: `${MODE}-${VERSION}`, use: { ...devices['Desktop Chrome'] } }],
 });

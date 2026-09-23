@@ -14,6 +14,7 @@ Both protocol versions are rarely used nowadays. However, some applications migh
 
 
 1. Create a ListenerPolicy with the `acceptHttp10` field. In the `targetRefs`, attach the policy to the Gateway that you want to support the HTTP/1.0 protocol.
+
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1

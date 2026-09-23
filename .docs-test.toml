@@ -44,7 +44,7 @@ scanRoots = [
 # that don't match the regex.
 [versioning]
 versionFromPath = "^/docs/(?:envoy|agentgateway)/(?<version>[^/]+)/"
-versions        = ["main", "latest", "2.2.x", "2.1.x", "2.0.x"]
+versions        = ["main", "latest", "2.3.x", "2.2.x", "2.1.x"]
 
 # Allowlists for known-benign noise that surfaces against real product
 # content (test fixture has none of this). Tighten as content is fixed.

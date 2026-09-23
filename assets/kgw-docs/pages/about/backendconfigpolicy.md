@@ -1,4 +1,4 @@
-Use a BackendConfigPolicy resource to configure connection settings for a backend.  
+Use a BackendConfigPolicy resource to configure connection settings for a backend.
 
 ## Policy attachment {#policy-attachment-backendconfigpolicy}
 
@@ -79,4 +79,3 @@ spec:
     maxHeadersCount: 15
     maxRequestsPerConnection: 100
 ```
-

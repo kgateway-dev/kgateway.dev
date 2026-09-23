@@ -424,7 +424,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 -->
 
-{{< version include-if="2.4.x,2.5.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 
 ### Route source metadata {#route-source-metadata}
 

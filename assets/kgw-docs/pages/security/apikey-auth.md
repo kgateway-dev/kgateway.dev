@@ -57,7 +57,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
 
 1. From your API management tool, generate an API key. The examples in this guide use `N2YwMDIxZTEtNGUzNS1jNzgzLTRkYjAtYjE2YzRkZGVmNjcy`.
 
-2. Create a Kubernetes secret to store your API key. 
+2. Create a Kubernetes secret to store your API key. Each entry in the secret's data is one API key, where the entry name identifies the client and the value is the key itself. To store keys for several clients, add one entry per client.
 
    ```yaml 
    kubectl apply -f - <<EOF
@@ -225,6 +225,19 @@ spec:
         app: httpbin
 EOF
 ```
+
+A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} If the same key value is stored under two different entry names, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports a `duplicate API key value` error in its status and API key auth is not applied. If the same key value is stored under the same entry name in more than one secret, the extra copies are ignored and no error is reported.{{< /version >}}
+
+### Secrets in another namespace
+
+The secrets that you refer to in `secretRef`, or match with `secretSelector`, do not need to be in the same namespace as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. A cross-namespace reference requires a [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) in the namespace that holds the secret. In the ReferenceGrant, the `from` section must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind.{{< version exclude-if="2.2.x" >}} For an example, see [ReferenceGrant example]({{< link-hextra path="/install/advanced/#referencegrant-example" >}}).{{< /version >}}
+
+Note the following behavior when you use `secretSelector`:
+
+* The selector matches labels in every namespace, not only the namespace of the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
+* A matching secret in another namespace is skipped when no ReferenceGrant allows the reference.
+* Skipped secrets are reported only when no secret is left. If at least one secret is allowed, such as a secret in the same namespace as the policy, the policy is applied with the remaining secrets and no error is reported. As a result, a missing ReferenceGrant can silently reduce the set of API keys that are accepted.
+* The `failed to get secrets by selector: missing reference grant` error means that every matching secret was skipped.
 
 ### Custom header name
 

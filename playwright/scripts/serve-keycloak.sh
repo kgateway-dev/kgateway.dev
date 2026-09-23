@@ -25,10 +25,22 @@ trap cleanup EXIT INT TERM
 cleanup
 
 echo "==> starting ${IMAGE} on ${BASE_URL}"
+# KC_BOOTSTRAP_ADMIN_* rather than the older KEYCLOAK_ADMIN_*: the old names were deprecated in
+# Keycloak 25 and still work in 26, logging "KC-SERVICES0110: Environment variable 'KEYCLOAK_ADMIN'
+# is deprecated" on every boot. Verified against 26.7.3 — both spellings issue an admin token, so
+# this is a rename onto the supported names rather than a fix for a broken container. Keep it,
+# because the old names are on a path to removal and a seed that fails on "invalid_grant" after
+# that reads as a credentials problem rather than a version problem.
+#
+# The bootstrap account is a TEMPORARY admin, which is what puts the orange "create a permanent
+# admin account" banner across the top of every capture. That banner is part of the committed
+# baselines and the guide calls it out, so do not try to suppress it here: a reader who follows
+# the guide's manifest sees the same banner, and hiding it in the screenshots would make the
+# captures disagree with the console they actually get.
 docker run -d --rm --name "$CONTAINER" \
   -p "${HOST_PORT}:8080" \
-  -e KEYCLOAK_ADMIN=admin \
-  -e KEYCLOAK_ADMIN_PASSWORD=admin \
+  -e KC_BOOTSTRAP_ADMIN_USERNAME=admin \
+  -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin \
   "$IMAGE" start-dev >/dev/null
 
 echo "==> waiting for Keycloak to answer on ${BASE_URL}"

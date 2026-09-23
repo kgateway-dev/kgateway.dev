@@ -1,1 +1,0 @@
-This feature is available in the upstream Kubernetes Gateway API 1.3 or later.

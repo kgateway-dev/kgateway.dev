@@ -8,7 +8,7 @@ excludeSearch: true
 
 Kgateway v2.2 is packed with exciting new features and improvements. Here are a few select updates the kgateway team would like to highlight!
 
-This release introduces major breaking changes to the agentgateway implementation. We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway, please refer to our [migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/). 
+This release introduces major breaking changes to the agentgateway implementation. We have a new installation UX and new dedicated APIs. If you are currently running agentgateway with kgateway, please refer to our [migration guide](https://agentgateway.dev/docs/kubernetes/latest/documentation/migrate/). 
 
 ## 🔥Breaking changes
 
@@ -54,7 +54,7 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` controller environment variab
 
 In kgateway 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default. To disable them, set `controller.extraEnv.KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES=false` in your Helm installation. For more information, see the related kgateway PRs [#12695](https://github.com/kgateway-dev/kgateway/pull/12695) and [#12881](https://github.com/kgateway-dev/kgateway/pull/12881).
 
-For setup steps, see the get started guide in the [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/) or [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/quickstart/) docs.
+For setup steps, see the get started guide in the [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/) or [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/documentation/quickstart/) docs.
 
 ### Agentgateway ExtAuth policies fail closed
 
@@ -93,7 +93,7 @@ spec:
 EOF
 ```
 
-For steps to set up prompt guards, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/guardrails/overview/). 
+For steps to set up prompt guards, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/llm/guardrails/overview/). 
 
 
 ##  🗑️ Deprecated or removed features
@@ -166,7 +166,7 @@ See the following PRs for more information:
 * [12966](https://github.com/kgateway-dev/kgateway/pull/12966)
 * [13111](https://github.com/kgateway-dev/kgateway/pull/13111)
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/mcp/auth/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/mcp/auth/). 
 
 #### Inline and remote JWKS support
 
@@ -213,7 +213,7 @@ EOF
 
 You can also set TLS options when connecting to a remote JWKS source. See this [PR](https://github.com/kgateway-dev/kgateway/pull/13014) for more information. 
 
-To see an example in agentgateway, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/security/jwt/setup/). 
+To see an example in agentgateway, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/security/jwt/setup/). 
 
 #### Azure OpenAI backends
 
@@ -235,7 +235,7 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12836) for more information. 
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/providers/azure/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/integrations/llm/providers/azure/). 
 
 #### Model aliasing
 
@@ -285,7 +285,7 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12516) for more information.
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/security/csrf/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/security/csrf/). 
 
 #### Path-based API format routing (completions, messages, models, passthrough) 
 
@@ -313,7 +313,7 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12590) for more information.
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/llm/providers/multiple-endpoints/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/integrations/llm/providers/multiple-endpoints/). 
 
 #### OpenAI Responses API, Anthropic token counting, and Bedrock prompt caching
 You can now route traffic for the OpenAI Responses API and Anthropic token-counting endpoints, and configure prompt caching for Amazon Bedrock to improve performance and reduce costs. These enhancements enable significantly faster response times and can reduce LLM-related costs by up to 90% by avoiding repeated prompt processing.
@@ -402,7 +402,7 @@ spec:
 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/13226) for more information on the new changes.
 
-For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/observability/tracing/). 
+For setup steps, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/observability/tracing/). 
 
 ####  CipherSuite configuration via frontend TLS policy
 
@@ -440,7 +440,7 @@ See this [PR](https://github.com/kgateway-dev/kgateway/pull/13219) for more info
 Agentgateway proxies now support basic auth, API key auth and JWT auth. 
 See this [PR](https://github.com/kgateway-dev/kgateway/pull/12886) for more information.
 
-For a JWT setup example, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/security/jwt/setup/). 
+For a JWT setup example, see the [docs](https://agentgateway.dev/docs/kubernetes/latest/documentation/security/jwt/setup/). 
 
 ### Highlighted Envoy features 
 
@@ -777,7 +777,7 @@ See this [PR](https://github.com/kgateway-dev/kgateway/pull/12906) for more info
 If you’re currently running [Ingress Nginx](https://kubernetes.github.io/ingress-nginx/) to support the Kubernetes Ingress API, [ingress2gateway](https://github.com/kgateway-dev/ingress2gateway) can help you migrate to Gateway API by translating your existing Ingress manifests into Gateway, HTTPRoute, and implementation-specific policy resources. The tool provides coverage for common Ingress Nginx annotations (auth, rate limiting, CORS, session affinity, backend TLS, SSL redirect, and more) and can emit resources tailored for either kgateway (Envoy) or agentgateway. Choose your migration guide to learn more:
 
 * [Kgateway (Envoy) migration guide](https://kgateway.dev/docs/envoy/latest/migrate/)
-* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/migrate/)
+* [Agentgateway migration guide](https://agentgateway.dev/docs/kubernetes/latest/documentation/migrate/)
 
 ## Release notes
 Check out the full details of the kgateway v2.2 release in our [release notes](https://kgateway.dev/docs/envoy/latest/reference/release-notes/).
@@ -786,7 +786,7 @@ Check out the full details of the kgateway v2.2 release in our [release notes](h
 ## Availability
 kgateway v2.2  is available for download on [GitHub](https://github.com/kgateway-dev/kgateway).
 
-To get started with kgateway, check out our getting started guides for [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/) or [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/quickstart/).
+To get started with kgateway, check out our getting started guides for [kgateway](https://kgateway.dev/docs/envoy/latest/quickstart/) or [agentgateway](https://agentgateway.dev/docs/kubernetes/latest/documentation/quickstart/).
 
 ## Get Involved
 The simplest way to get involved with kgateway is by joining our [Slack](https://kgateway.dev/slack/) and [community meetings](https://github.com/kgateway-dev/community?tab=readme-ov-file#community-meetings).

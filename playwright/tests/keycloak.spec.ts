@@ -12,7 +12,7 @@ import { test, expect, login, gotoConsole, settle, maskClientSecret } from '../f
  * object are captured by filling the form and never submitting it, which is why the seeded realm
  * does not make them unreachable. Steps that inspect an EXISTING object rely on the seed.
  *
- * Images (light only — the Keycloak 22 console has no dark theme; see playwright.config.ts):
+ * Images (light only by choice, pinned via use.colorScheme; see playwright.config.ts):
  *   keycloak-login.png              — the admin console sign-in page
  *   realm-creation.png              — Create realm, name filled
  *   client-creation.png             — Create client page 1, General settings, Client ID filled
@@ -40,7 +40,13 @@ test('the admin console sign-in page', async ({ page }) => {
 
 test('creating a realm', async ({ page }) => {
   await login(page);
-  await gotoConsole(page, '/master/add-realm');
+  // Reach the form through the Manage realms page rather than by deep link. Keycloak 26 dropped
+  // the `#/<realm>/add-realm` route: navigating there now falls through to the realm settings
+  // page (h1 "master realm") with no form on it at all, so the old deep link captured the wrong
+  // screen rather than failing outright. The button on the realms list is the only way in, and it
+  // is also the path the guide tells the reader to take.
+  await gotoConsole(page, '/master/realms');
+  await page.getByRole('button', { name: /create realm/i }).click();
   const name = page.getByLabel(/realm name/i);
   await expect(name).toBeVisible();
   await name.fill(REALM);
@@ -64,7 +70,14 @@ test('creating a client: capability config', async ({ page }) => {
 
   // Client authentication lives on this page, not on General settings. Turning it on is what
   // makes the client confidential and gives it the secret the guide later copies.
-  const clientAuth = page.locator('#kc-authentication-switch, [name="publicClient"]').first();
+  //
+  // `#kc-authentication`, not the older `#kc-authentication-switch`: Keycloak 26 dropped the
+  // `-switch` suffix from this one control while keeping it on its neighbour
+  // (`#kc-authorization-switch`), so the rename is easy to miss by eye. Both ids stay in the
+  // selector list so this keeps working against either console.
+  const clientAuth = page
+    .locator('#kc-authentication, #kc-authentication-switch, [name="publicClient"]')
+    .first();
   await expect(clientAuth).toBeVisible();
   if (!(await clientAuth.isChecked())) {
     await clientAuth.click({ force: true });

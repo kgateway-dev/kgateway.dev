@@ -68,9 +68,9 @@ Deploy a Keycloak instance to test this guide against. The following steps creat
              image: quay.io/keycloak/keycloak:{{< reuse "kgw-docs/versions/keycloak-version.md" >}}
              args: ["start-dev", "--https-port=8443"]
              env:
-               - name: KEYCLOAK_ADMIN
+               - name: KC_BOOTSTRAP_ADMIN_USERNAME
                  value: "admin"
-               - name: KEYCLOAK_ADMIN_PASSWORD
+               - name: KC_BOOTSTRAP_ADMIN_PASSWORD
                  value: "admin"
                - name: KC_HTTPS_CERTIFICATE_FILE
                  value: /opt/keycloak/conf/tls.crt
@@ -192,12 +192,12 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: quay.io/keycloak/keycloak:22.0
+        image: quay.io/keycloak/keycloak:{{< reuse "kgw-docs/versions/keycloak-version.md" >}}
         args: ["start-dev", "--import-realm", "--https-port=8443"]
         env:
-        - name: KEYCLOAK_ADMIN
+        - name: KC_BOOTSTRAP_ADMIN_USERNAME
           value: "admin"
-        - name: KEYCLOAK_ADMIN_PASSWORD
+        - name: KC_BOOTSTRAP_ADMIN_PASSWORD
           value: "admin"
         - name: KC_HTTPS_CERTIFICATE_FILE
           value: /opt/keycloak/conf/tls.crt
@@ -258,7 +258,7 @@ Then, port‑forward Keycloak and verify the realm appears in the admin console:
 kubectl port-forward svc/keycloak -n keycloak 8443:8443
 ```
 
-Open `https://localhost:8443` in your browser, accept the self‑signed certificate warning, and log in with `admin / admin`. Confirm that `myrealm` is present in the realm dropdown.
+Open `https://localhost:8443` in your browser, accept the self‑signed certificate warning, and log in with `admin / admin`. Click **Manage realms** in the left sidebar, and confirm that `myrealm` is listed.
 
 > [!NOTE]
 > If you're using the ConfigMap approach, the realm is created automatically on startup. You do not need to manually create it through the admin console.
@@ -288,11 +288,15 @@ Create a realm, register kgateway as a confidential client, and add a test user.
 {{< reuse-image src="img/keycloak/keycloak-login.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/keycloak-login.png" >}}
 
+> [!NOTE]
+> The account that `KC_BOOTSTRAP_ADMIN_USERNAME` creates is a temporary admin, so every console page shows a banner that asks you to create a permanent admin account. That banner is expected here, and none of the steps in this guide depend on replacing the account. Create a permanent account and delete the temporary one before you use this Keycloak instance for anything beyond testing.
+
 ### Create a new realm
 
-1. Open the realm dropdown in the upper-left corner and click **Create realm**.
-2. Enter a realm name, such as `myrealm`.
-3. Click **Create**.
+1. Click **Manage realms** in the left sidebar.
+2. Click **Create realm**.
+3. In **Realm name**, enter a realm name, such as `myrealm`.
+4. Click **Create**.
 
 {{< reuse-image src="img/keycloak/realm-creation.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/realm-creation.png" >}}
@@ -311,10 +315,13 @@ The **Create client** wizard has three pages, and the settings that these guides
 4. Click **Next**.
 5. On the **Capability config** page, turn **Client authentication** on. This makes the client confidential, which is what gives it the client secret that you copy in a later section.
 
-   Leave the following authentication flows enabled. Both are on by default.
+   Then make sure that both of the following authentication flows are selected.
 
-   * **Standard flow** issues authorization codes, which the authorization code flow requires.
-   * **Direct access grants** enables the `password` grant, which the access token validation guide uses to fetch a token for testing.
+   * **Standard flow** issues authorization codes, which the authorization code flow requires. Keycloak selects this flow by default.
+   * **Direct access grants** enables the `password` grant, which the access token validation guide uses to fetch a token for testing. Keycloak clears this flow by default, so select it yourself.
+
+   > [!IMPORTANT]
+   > If you leave **Direct access grants** cleared, the client is still created without complaint, and the token request in the [access token validation]({{< link-hextra path="/security/oauth/keycloak/access-token/" >}}) guide fails later with `unauthorized_client`.
 
    {{< reuse-image src="img/keycloak/client-capability-config.png" >}}
    {{< reuse-image-dark srcDark="img/keycloak/client-capability-config.png" >}}
@@ -360,9 +367,10 @@ Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless
 ### Set a password for the test user
 
 1. Go to the **Credentials** tab.
-2. Set a password (such as, `password`).
-3. Turn **Temporary** off.
-4. Click **Set Password**.
+2. Click **Set password**.
+3. Enter a password, such as `password`, in both **Password** and **Password confirmation**.
+4. Turn **Temporary** off.
+5. Click **Save**, then click **Save password** to confirm.
 
 {{< reuse-image src="img/keycloak/user-password.png" >}}
 {{< reuse-image-dark srcDark="img/keycloak/user-password.png" >}}

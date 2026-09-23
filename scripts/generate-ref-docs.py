@@ -630,10 +630,14 @@ def _post_process_api_docs(api_file):
         f.write(content)
 
 
-def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
-    '''Generate API reference documentation'''
+def generate_api_docs(version, link_version, kgateway_dir='kgateway'):
+    '''Generate API reference documentation
+
+    link_version doubles as the directory segment under content/docs/envoy/,
+    since that segment is the version's URL path segment (main, latest, 2.3.x).
+    '''
     print(f'  → Generating API docs for version {version}')
-    
+
     # Check if the API directory exists
     api_path = f'{kgateway_dir}/api/v1alpha1/'
     if not os.path.exists(api_path):
@@ -679,7 +683,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         # Extract gateway.kgateway.dev/v1alpha1 package
         envoy_content = extract_package_section(generated_content, 'gateway.kgateway.dev/v1alpha1')
         if envoy_content:
-            target_path = f'content/docs/envoy/{url_path}/reference/'
+            target_path = f'content/docs/envoy/{link_version}/reference/'
             os.makedirs(target_path, exist_ok=True)
             api_file = f'{target_path}api.md'
             
@@ -712,7 +716,7 @@ def generate_api_docs(version, link_version, url_path, kgateway_dir='kgateway'):
         print(f'    Version {version} uses unified API - generating docs for envoy')
         
         for doc_dir in ['envoy']:
-            target_path = f'content/docs/{doc_dir}/{url_path}/reference/'
+            target_path = f'content/docs/{doc_dir}/{link_version}/reference/'
             os.makedirs(target_path, exist_ok=True)
             
             api_file = f'{target_path}api.md'
@@ -767,7 +771,7 @@ def _generate_shared_types(api_file, kgateway_dir='kgateway'):
         print(f'    Warning: generate-shared-types failed: {e}')
 
 
-def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway'):
+def generate_helm_docs(version, link_version, kgateway_dir='kgateway'):
     '''Generate Helm chart reference documentation'''
     print(f'  → Generating Helm docs for version {version}')
     
@@ -871,7 +875,7 @@ def generate_helm_docs(version, link_version, url_path, kgateway_dir='kgateway')
     return generated_any
 
 
-def generate_metrics_docs(version, link_version, url_path, kgateway_dir='kgateway'):
+def generate_metrics_docs(version, link_version, kgateway_dir='kgateway'):
     '''Generate control plane metrics documentation'''
     print(f'  → Generating metrics docs for version {version}')
     
@@ -943,10 +947,17 @@ def main():
     
     for version_info in versions:
         version = version_info['version']
-        link_version = version_info['linkVersion']
-        url_path = version_info['url']
-        
-        print(f'\n🔄 Processing version: {version} (linkVersion: {link_version}, path: {url_path})')
+        link_version = (version_info.get('linkVersion') or '').strip('/')
+
+        # linkVersion is the directory segment API docs are written into. An
+        # empty one would collapse content/docs/envoy/<seg>/reference/ down to
+        # content/docs/envoy/reference/, where every version overwrites the
+        # same file and no real version tree gets updated. Fail loudly instead.
+        if not link_version:
+            print(f'❌ Version {version} has no linkVersion in versions.json')
+            sys.exit(1)
+
+        print(f'\n🔄 Processing version: {version} (linkVersion: {link_version})')
         
         # Resolve tag or branch based on trigger type
         if is_release_trigger:
@@ -977,19 +988,19 @@ def main():
         success_count = 0
         
         try:
-            if generate_api_docs(version, link_version, url_path):
+            if generate_api_docs(version, link_version):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ API docs failed: {e}')
         
         try:
-            if generate_helm_docs(version, link_version, url_path):
+            if generate_helm_docs(version, link_version):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ Helm docs failed: {e}')
         
         try:
-            if generate_metrics_docs(version, link_version, url_path):
+            if generate_metrics_docs(version, link_version):
                 success_count += 1
         except Exception as e:
             print(f'   ⚠ Metrics docs failed: {e}')

@@ -409,5 +409,3 @@ kubectl delete httproute httpbin-anything -n httpbin
 {{< /version >}}
 
 
-
-

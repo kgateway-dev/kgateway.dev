@@ -4,9 +4,14 @@
 # version pinned in go.mod (semver tag or pseudo-version). Layouts and tests
 # stay in lockstep — bumping the module pin is one PR that updates both.
 #
-# Marked continue-on-error for the first ~week to let allowlists and
-# fixture-aware specs settle. Promote to a required check once the suite
-# stays green for a sustained run.
+# This job ran continue-on-error for its first several months so allowlists and
+# fixture-aware specs could settle. That soak has gone on long enough to hide a
+# real regression: the version dropdown spec failed for months on a `2.0.x`
+# entry in .docs-test.toml that the site had stopped building, and nobody saw it
+# because the job reported success regardless. A check that cannot fail is not a
+# check, so the suite is now blocking. If it goes red on an unrelated PR, fix the
+# spec or add a scoped entry to [allowlists] in .docs-test.toml — do not restore
+# continue-on-error.
 
 name: Framework tests
 
@@ -33,7 +38,6 @@ jobs:
   framework-test:
     name: Static + content checks
     runs-on: ubuntu-latest
-    continue-on-error: true
     # Bounds a hung `Install chromium` / apt-get step (observed stuck 30+ min
     # with no failure — GitHub's default job timeout is 6 hours) so the run
     # fails fast instead of sitting until that default kicks in.

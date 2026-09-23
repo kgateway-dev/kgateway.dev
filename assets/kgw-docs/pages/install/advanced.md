@@ -152,8 +152,8 @@ In multi-tenant clusters, different teams typically own separate namespaces and 
 
 In {{< reuse "kgw-docs/snippets/kgateway.md" >}}, you can configure how strictly you want ReferenceGrant requirements to be enforced by using the `KGW_REFERENCE_GRANT_MODE` environment variable on the control plane. You can choose between the following modes: 
 
-- **`STRICT`**: Enforce ReferenceGrants for all cross-namespace references. This mode provides the strongest namespace isolation and is recommended for new clusters.
-- **`PERMISSIVE`** (default): Enforce ReferenceGrants for `BackendRef` and `SecretRef` references, but not for cross-namespace `ExtensionRef` references. Before reference grant modes were introduced, {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources were able to reference and access a GatewayExtension resource in another namespace without a ReferenceGrant. `PERMISSIVE` mode allows these setups to function as before. Over time, you can add the missing ReferenceGrant resources in the required namespaces and migrate your cluster to `STRICT` ReferenceGrant validation. 
+- **`STRICT`**: Enforce ReferenceGrants for every cross-namespace reference in the [following table](#referencegrant-modes), including cross-namespace `ExtensionRef` references. This mode provides the strongest namespace isolation and is recommended for new clusters.
+- **`PERMISSIVE`** (default): Enforce ReferenceGrants for every cross-namespace reference in the [following table](#referencegrant-modes) except cross-namespace `ExtensionRef` references. Before reference grant modes were introduced, {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources were able to reference and access a GatewayExtension resource in another namespace without a ReferenceGrant. `PERMISSIVE` mode allows these setups to function as before. Over time, you can add the missing ReferenceGrant resources in the required namespaces and migrate your cluster to `STRICT` ReferenceGrant validation. 
 - **`OFF`**: Disable all ReferenceGrant validation. Not recommended for multi-tenant or production environments.
   > [!CAUTION]
   > Do not use `OFF` in multi-tenant or production environments. It breaks Gateway API compliance, bypasses namespace isolation, and lets any namespace access backends, secrets, and GatewayExtensions in other namespaces without restriction.
@@ -165,11 +165,64 @@ The following table shows which cross-namespace references are checked in each m
 | Source resource | Field | Referenced resource | `STRICT` | `PERMISSIVE` (default) | `OFF` |
 |---|---|---|---|---|---|
 | HTTPRoute / <br>GRPCRoute / <br>TCPRoute / <br>TLSRoute | `spec.rules[].backendRefs` | Service / Backend | checked | checked | allowed |
+| HTTPRoute / <br>GRPCRoute | `spec.rules[].filters[].requestMirror.backendRef` | Service / Backend | checked | checked | allowed |
 | Gateway / <br>ListenerSet | `spec.listeners[].tls.certificateRefs` | Secret | checked | checked | allowed |
-| TrafficPolicy | `spec.basicAuth.secretRef` / `spec.apiKeyAuth.secretRef` | Secret | checked | checked | allowed |
-| GatewayExtension (ExtAuth, ExtProc, RateLimit, OAuth2) | `spec.<type>.grpcService.backendRef` | Service | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs`, or `spec.default.clientCertificateValidation.caCertificateRefs` on a ListenerPolicy that targets the listener | Secret / ConfigMap | checked | checked | allowed |
+| Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
+| GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
+| ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
+{{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
+{{% /downstream %}}
+
+> [!IMPORTANT]
+> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
+> {{% downstream %}}
+> 
+> Cross-namespace references from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} are evaluated as the `TrafficPolicy` kind, including the `apiKeyAuth`, `basicAuth`, `headerModifiers`, and `extensionRef` fields, and the `extensionRef` fields in `entExtAuth` and `entRateLimit.global`. For these fields, you must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind in the `from` section of your ReferenceGrant. A grant that names the `enterprisekgateway.solo.io` group or the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind is accepted by the API server, never matches, and the policy fails with `missing reference grant`.
+> 
+> The exceptions are the Backend references in `entJWT` and `entWAF`, and the ConfigMap reference in `entGrpcJsonTranscoder`. These references are evaluated as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind, so their grants must name the `enterprisekgateway.solo.io` group and the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind.
+> 
+> References from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an AuthConfig, RateLimitConfig, or WAFPolicy resource are not validated in any mode, so `entExtAuth.authConfigRef`, `entRateLimit.global.rateLimitConfigRefs`, and `entWAF.wafPolicyRef` can select a resource in another namespace without a ReferenceGrant. Do not rely on `STRICT` mode to isolate these resources between namespaces. If you need to restrict them, use namespace discovery or RBAC instead.
+> {{% /downstream %}}
+
+### ReferenceGrant example {#referencegrant-example}
+
+To reference resources across namespaces, create a ReferenceGrant in the namespace of the resource that you want to access, not in the namespace of the resource that makes the reference. The `from` section describes the resource that makes the reference, and the `to` section describes the resource it is allowed to reach. For more information about which resource to reference in each field, see [Reference validation by mode](#referencegrant-modes). 
+
+The following example allows a policy in the `httpbin` namespace to read Secrets in the `team-secrets` namespace.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-apikey-secrets
+  # The namespace that holds the Secrets.
+  namespace: team-secrets
+spec:
+  from:
+  - group: gateway.kgateway.dev
+    kind: TrafficPolicy
+    # The namespace that holds the policy.
+    namespace: httpbin
+  to:
+  - group: ""
+    kind: Secret
+EOF
+```
+
+To restrict the grant to a single Secret, add `name` to the `to` entry. When you omit `name`, every Secret in the namespace is allowed.
 
 ### Enable STRICT mode {#set-referencegrant-mode}
 
@@ -220,7 +273,7 @@ The following table shows which cross-namespace references are checked in each m
 
 {{< /version >}}
 
-{{< version include-if="2.4.x,2.5.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 
 ## Disable automatic RBAC creation {#disable-rbac}
 

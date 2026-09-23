@@ -6,12 +6,16 @@ on:
     paths:
       - "scripts/**"
       - ".github/workflows/scripts-tests.yml"
+      - ".docs-test.toml"
+      - "versions.json"
   push:
     branches:
       - main
     paths:
       - "scripts/**"
       - ".github/workflows/scripts-tests.yml"
+      - ".docs-test.toml"
+      - "versions.json"
 
 jobs:
   python-unit-tests:

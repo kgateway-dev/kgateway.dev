@@ -13,6 +13,12 @@ For more details, review the [GitHub release notes](https://github.com/kgateway-
 
 ### 🔥 Breaking changes {#v23-breaking-changes}
 
+#### SDS sidecar binds to loopback by default {#v23-sds-loopback-bind}
+
+Starting in v2.3.8, the SDS (Secret Discovery Service) sidecar binds to `127.0.0.1:8234` (loopback) by default instead of `0.0.0.0:8234`. Previously, any pod on the cluster network could reach the SDS endpoint. Because all consumers of SDS run in the same pod as the sidecar, restricting the bind address to loopback closes this unintended exposure.
+
+If you need to reach the SDS sidecar from outside its pod in a trusted environment, set the `SDS_SERVER_ADDRESS=0.0.0.0:8234` environment variable on the `sds` container. For an example, see [Restore the SDS sidecar's pod-network bind address]({{< link-hextra path="/setup/customize/configs/#sds-bind-address" >}}). If you use a custom deployment overlay or manifest that overrides the SDS container's readiness probe, note that the default probe also changed, from a `tcpSocket` check on port 8234 to an `exec` probe that runs `sds healthcheck`, because a TCP probe against the pod IP no longer succeeds against a loopback-only listener.
+
 #### ServiceEntry resource watching gate
 
 The Istio ServiceEntry resource watching capability is now gated by the `KGW_ENABLE_ISTIO_INTEGRATION` controller environment variable, which defaults to false. Previously, this environment variable defaulted to true. 
