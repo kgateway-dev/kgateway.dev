@@ -167,35 +167,34 @@ The following table shows which cross-namespace references are checked in each m
 | HTTPRoute / <br>GRPCRoute / <br>TCPRoute / <br>TLSRoute | `spec.rules[].backendRefs` | Service / Backend | checked | checked | allowed |
 | HTTPRoute / <br>GRPCRoute | `spec.rules[].filters[].requestMirror.backendRef` | Service / Backend | checked | checked | allowed |
 | Gateway / <br>ListenerSet | `spec.listeners[].tls.certificateRefs` | Secret | checked | checked | allowed |
-| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs` or `spec.default.clientCertificateValidation.caCertificateRefs` on a ListenerPolicy that targets the listener | Secret / ConfigMap | checked | checked | allowed |
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs`, or `spec.default.clientCertificateValidation.caCertificateRefs` on a ListenerPolicy that targets the listener | Secret / ConfigMap | checked | checked | allowed |
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
-| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} /</br></br> `spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
-| ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` /</br></br> `spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
-| ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` /</br></br> `spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` /</br></br> `spec.headerModifiers.request.add[].secretRef`/ </br></br>`spec.headerModifiers.response.set[].secretRef` /</br></br> `spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` /</br></br> `spec.apiKeyAuth.secretRef` /</br></br> `spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
-{{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}* | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}* | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}* | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
+{{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
 {{% /downstream %}}
 
-This is usually the resource that you set the field on, but a CA certificate reference is always made by the Gateway or ListenerSet that owns the listener, even when you set `caCertificateRefs` on a ListenerPolicy. The ListenerPolicy fields in this table also exist under `spec.perPort[].listener.httpSettings`, where they behave the same way.
 > [!IMPORTANT]
-> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.perPort[].listener.httpSettings` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
-{{% downstream %}}
+> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
+> {{% downstream %}}
 > 
 > Cross-namespace references from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} are evaluated as the `TrafficPolicy` kind, including the `apiKeyAuth`, `basicAuth`, `headerModifiers`, and `extensionRef` fields, and the `extensionRef` fields in `entExtAuth` and `entRateLimit.global`. For these fields, you must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind in the `from` section of your ReferenceGrant. A grant that names the `enterprisekgateway.solo.io` group or the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind is accepted by the API server, never matches, and the policy fails with `missing reference grant`.
 > 
 > The exceptions are the Backend references in `entJWT` and `entWAF`, and the ConfigMap reference in `entGrpcJsonTranscoder`. These references are evaluated as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind, so their grants must name the `enterprisekgateway.solo.io` group and the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind.
 > 
 > References from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an AuthConfig, RateLimitConfig, or WAFPolicy resource are not validated in any mode, so `entExtAuth.authConfigRef`, `entRateLimit.global.rateLimitConfigRefs`, and `entWAF.wafPolicyRef` can select a resource in another namespace without a ReferenceGrant. Do not rely on `STRICT` mode to isolate these resources between namespaces. If you need to restrict them, use namespace discovery or RBAC instead.
-{{% /downstream %}}
+> {{% /downstream %}}
 
 ### ReferenceGrant example {#referencegrant-example}
 

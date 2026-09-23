@@ -57,7 +57,7 @@
     lab: kgateway-lab-kgateway-as-a-waypoint
 - id: aigw
   title: Basics of an AI Gateway 
-  description: In this pathway, explore the fundamentals of managing AI workloads with an AI Gateway. Learn about the essential features needed to secure, route and operate large language models (LLMs) securely as you scale your workloads.
+  description: In this pathway, explore how to manage AI workloads with an AI Gateway. Learn how to fail over between models and route to large language models (LLMs) with Gateway API Inference Extensions as you scale your workloads.
   image: /learningpaths/path3.png
   lessons:
   - title: Model Failover
