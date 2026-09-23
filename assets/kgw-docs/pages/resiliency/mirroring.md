@@ -175,95 +175,63 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
-## Control the Host header of mirrored requests {#request-mirror}
+## Other configurations {#request-mirror}
 
-By default, Envoy appends a `-shadow` suffix to the `Host` or `:authority` header of every mirrored request. A request to `mirror.example` reaches the shadow app as `mirror.example-shadow`, which lets that app tell shadowed traffic apart from production traffic. The suffix is not always wanted. A shadow app that routes on the `Host` header, or that validates it against a certificate, rejects the suffixed value.
+Review other common configurations. 
 
-The `requestMirror` section of a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} changes what the mirrored `Host` header contains. It configures mirrors that an HTTPRoute or GRPCRoute `RequestMirror` filter already creates. It does not create a mirror itself, so a route with no `RequestMirror` filter is unaffected.
+### Disable the `-shadow` host suffix
+
+By default, Envoy appends `-shadow` to the `Host`/`:authority` header of mirrored requests so the shadow destination can identify shadowed traffic. If your shadow destination has strict host-based routing rules that reject the modified header, set `disableShadowHostSuffixAppend: true` in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to send the original Host header unchanged.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: httpbin-mirror
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-mirror
+  requestMirror:
+    disableShadowHostSuffixAppend: true
+EOF
+```
 
 | Setting | Description |
 | ------- | ----------- |
-| `disableShadowHostSuffixAppend` | When `true`, the original `Host` or `:authority` header is preserved. When `false`, Envoy appends the `-shadow` suffix. When the field is unset, an inherited value from a less specific policy applies, and if none applies, Envoy appends the suffix. |
-| `hostRewriteLiteral` | Replaces the whole `Host` or `:authority` header with this value. The original port is not preserved, so include a port if the mirror destination needs one. Setting this field suppresses the `-shadow` suffix whatever `disableShadowHostSuffixAppend` says. |
+| `requestMirror.disableShadowHostSuffixAppend` | If `true`, the `-shadow` suffix is not appended to the `Host`/`:authority` header of mirrored requests. Defaults to `false`. |
 
-You must set at least one of the two settings.
+### Rewrite the Host header for mirrored requests
 
-You can attach the policy to an HTTPRoute, a GRPCRoute, or a Gateway, including a single Gateway listener through `sectionName`. Attached above the route level, it applies to every mirror on the routes that the Gateway or listener covers. When policies attach at more than one level, the most specific one wins the **whole** `requestMirror` section. The settings are not combined field by field, so a route-level policy that sets only `hostRewriteLiteral` discards a gateway-level `disableShadowHostSuffixAppend` rather than merging with it.
+If your shadow destination requires a specific Host/:authority value, such as a different hostname or a hostname with a port, you can use the hostRewriteLiteral field to replace the header entirely. The full header value is replaced, so include a port if the shadow destination needs one. The port from the original request is not carried over automatically.
 
-1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that preserves the original `Host` header on requests that are mirrored from the `httpbin-mirror` HTTPRoute that you created earlier.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
-   metadata:
-     name: httpbin-mirror-host
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin-mirror
-     requestMirror:
-       disableShadowHostSuffixAppend: true
-   EOF
-   ```
+> [!NOTE]
+> Setting `hostRewriteLiteral` suppresses the `-shadow` suffix, independent of what is set in the `disableShadowHostSuffixAppend` field.
 
-2. Port-forward the gateway proxy on port 19000 to open the Envoy admin interface.
-   ```sh
-   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
-   ```
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: httpbin-mirror
+  namespace: httpbin
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: httpbin-mirror
+  requestMirror:
+    hostRewriteLiteral: shadow.example:8080
+EOF
+```
 
-3. Extract the mirror policies from the Envoy route configuration and verify that `disableShadowHostSuffixAppend` is set to `true`.
-   ```sh
-   curl -s localhost:19000/config_dump | jq '[.. | objects | select(has("request_mirror_policies")) | .request_mirror_policies]'
-   ```
+| Setting | Description |
+| ------- | ----------- |
+| `requestMirror.hostRewriteLiteral` | Replaces the `Host`/`:authority` header of mirrored requests with this value. Include a port if the shadow destination needs one. |
 
-   Example output:
-   ```console
-   [
-     [
-       {
-         "cluster": "kube_httpbin_httpbin2_8000",
-         "disable_shadow_host_suffix_append": true
-       }
-     ]
-   ]
-   ```
-
-4. To send the mirrored traffic to a different hostname instead, replace the setting with `hostRewriteLiteral`. Include the port, because the original port is not carried over.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: TrafficPolicy
-   metadata:
-     name: httpbin-mirror-host
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin-mirror
-     requestMirror:
-       hostRewriteLiteral: shadow.example:8080
-   EOF
-   ```
-
-5. Check the route configuration again and verify that the mirror policy now carries the literal value.
-   ```sh
-   curl -s localhost:19000/config_dump | jq '[.. | objects | select(has("request_mirror_policies")) | .request_mirror_policies]'
-   ```
-
-   Example output:
-   ```console
-   [
-     [
-       {
-         "cluster": "kube_httpbin_httpbin2_8000",
-         "host_rewrite_literal": "shadow.example:8080"
-       }
-     ]
-   ]
-   ```
 
 {{< /version >}}
 
@@ -277,10 +245,5 @@ kubectl delete deployment httpbin2 -n httpbin
 kubectl delete httproute httpbin-mirror -n httpbin
 ```
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
-```sh
-kubectl delete trafficpolicy httpbin-mirror-host -n httpbin
-```
-{{< /version >}}
 
 
