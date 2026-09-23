@@ -14,7 +14,11 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🌟 New features {#v24-new-features}
 
+#### Share a local rate limit across Gateway replicas {#v25-share-local-ratelimit}
 
+The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports the `shareAcrossGateway` field for local rate limiting. By default, each Envoy proxy replica enforces its own local token bucket, so the effective rate increases as the Gateway scales out. Set `shareAcrossGateway` to `true` to divide the token bucket evenly across all Gateway proxy replicas, so the configured rate applies to the Gateway as a whole.
+
+For more information, see [Share a local rate limit across Gateway replicas]({{< link-hextra path="/security/ratelimit/local/#share-across-gateway" >}}).
 
 
 <!--

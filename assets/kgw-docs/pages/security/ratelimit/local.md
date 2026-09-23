@@ -250,44 +250,6 @@ Instead of applying local rate limiting to a particular route, you can also appl
    local_rate_limited      
    ```
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
-
-## Share a local rate limit across Gateway replicas {#share-across-gateway}
-
-By default, each Envoy proxy replica enforces its own local token bucket. To keep the configured rate from increasing when the Gateway scales out, set `rateLimit.local.shareAcrossGateway` to `true`.
-
-Add `shareAcrossGateway` to the same `rateLimit.local` configuration as the token bucket.
-
-```yaml
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-metadata:
-  name: shared-local-ratelimit
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: Gateway
-    name: http
-  rateLimit:
-    local:
-      tokenBucket:
-        maxTokens: 100
-        tokensPerFill: 100
-        fillInterval: 1s
-      shareAcrossGateway: true
-```
-
-| Setting | Description |
-| ------- | ----------- |
-| `targetRefs` | Selects the Gateway that uses the shared local rate limit. |
-| `maxTokens` | Sets the maximum number of tokens for the Gateway as a whole. Use a value that is greater than or equal to the number of Gateway proxy replicas. |
-| `tokensPerFill` | Sets the number of tokens that are added during each refill. |
-| `fillInterval` | Sets the amount of time between token bucket refills. |
-| `shareAcrossGateway` | Divides the token bucket evenly across the Gateway proxy replicas, so the configured rate applies to the Gateway as a whole. |
-
-{{< /version >}}
-
 ## Disable rate limiting for a route {#disable-route}
 
 Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{{< /gloss >}}  for a route. For example, you might have system critical routes that should be accessible even under high traffic conditions, such as a health check or admin endpoints. You can exclude a route from rate limiting by setting `rateLimit.local` to `{}` in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. 
