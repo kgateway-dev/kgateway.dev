@@ -27,6 +27,10 @@ You can now disable Envoy's default path normalization and slash merging on a li
 
 For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
+#### JWKS fetch timeout {#v25-jwks-timeout}
+
+You can now set the `timeout` field on the `jwks.remote` settings of a JWT provider in a GatewayExtension resource to configure how long the gateway waits for the remote JWKS server to respond to a single fetch. For more information, see [JWKS fetch timeout]({{< link-hextra path="/security/jwt/simple/basic/#jwks-timeout" >}}).
+
 
 <!--
 
