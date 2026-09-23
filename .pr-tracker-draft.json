@@ -1,5 +1,0 @@
-{
-  "title": "[Automated] Release notes from the docs PR tracker",
-  "body": "Release notes for the changes this run drafted, batched so the\ndrafting jobs do not all edit the same file.\n\n### `content/docs/envoy/main/reference/release-notes.md`\n\n- **Add a non-enforcing JWT validation mode** \u2014 feature, from https://github.com/kgateway-dev/kgateway/pull/14667\n\n",
-  "close_issues": ""
-}
