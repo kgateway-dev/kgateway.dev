@@ -226,7 +226,7 @@ spec:
 EOF
 ```
 
-A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version include-if="2.5.x" >}} If the same key value is stored under two different entry names, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports a `duplicate API key value` error in its status and API key auth is not applied. If the same key value is stored under the same entry name in more than one secret, the extra copies are ignored and no error is reported.{{< /version >}}
+A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} If the same key value is stored under two different entry names, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports a `duplicate API key value` error in its status and API key auth is not applied. If the same key value is stored under the same entry name in more than one secret, the extra copies are ignored and no error is reported.{{< /version >}}
 
 ### Secrets in another namespace
 

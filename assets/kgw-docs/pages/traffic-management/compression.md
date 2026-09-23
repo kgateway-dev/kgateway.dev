@@ -6,7 +6,7 @@ Gzip is an HTTP option that enables your gateway proxy to compress response data
 
 Use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure gzip compression and decompression per route. Choose between the following options: 
 
-- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header.{{< version include-if="2.4.x,2.5.x" >}} You can also configure [Brotli and Zstd](#multi-codec) as additional codecs by using the `libraries` field. Envoy negotiates the codec with the client with the `Accept-Encoding` header and uses the configured library order as a tiebreaker when the client accepts multiple codecs equally.{{< /version >}} The following content types are compressed by default:
+- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} You can also configure [Brotli and Zstd](#multi-codec) as additional codecs by using the `libraries` field. Envoy negotiates the codec with the client with the `Accept-Encoding` header and uses the configured library order as a tiebreaker when the client accepts multiple codecs equally.{{< /version >}} The following content types are compressed by default:
   - `application/javascript`
   - `application/json`
   - `application/xhtml+xml`
@@ -16,7 +16,7 @@ Use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure
   - `text/plain`
   - `text/xml`
 
-- **Request decompression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} decompresses gzip-encoded request bodies before forwarding them to the backend service.{{< version include-if="2.4.x,2.5.x" >}} You can also configure [Brotli and Zstd](#multi-codec-decompression) as additional codecs by using the `libraries` field. The codec is selected based on the `Content-Encoding` header of the incoming request.{{< /version >}}
+- **Request decompression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} decompresses gzip-encoded request bodies before forwarding them to the backend service.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} You can also configure [Brotli and Zstd](#multi-codec-decompression) as additional codecs by using the `libraries` field. The codec is selected based on the `Content-Encoding` header of the incoming request.{{< /version >}}
 
 For more information about how Envoy handles compression, see the [Envoy compressor filter docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/compressor_filter).
 
@@ -221,7 +221,7 @@ Enable gzip decompression on a route so that {{< reuse "kgw-docs/snippets/kgatew
    }
    ```
 
-{{< version exclude-if="2.3.x,2.2.x,2.1x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 
 ## Other configurations {#other}
 
