@@ -22,7 +22,7 @@ Any HTTPListenerPolicy resource that exists in your cluster at the time of the u
    ```sh
    kubectl get httplistenerpolicies -A
    ```
-
+   
 2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link path="/reference/api/kgateway/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
 
 3. Confirm that the new resources are accepted and that your listeners behave as expected.
@@ -62,6 +62,12 @@ For more information, see [Preserve request paths]({{< link-hextra path="/traffi
 You can now use the `maxConnectionDuration` field to set a maximum connection duration for downstream or upstream connections. 
 
 For more information, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
+
+#### Share a local rate limit across Gateway replicas {#v25-share-local-ratelimit}
+
+The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports the `shareAcrossGateway` field for local rate limiting. By default, each Envoy proxy replica enforces its own local token bucket, so the effective rate increases as the Gateway scales out. Set `shareAcrossGateway` to `true` to divide the token bucket evenly across all Gateway proxy replicas, so the configured rate applies to the Gateway as a whole.
+
+For more information, see [Share a local rate limit across Gateway replicas]({{< link-hextra path="/security/ratelimit/local/#share-across-gateway" >}}).
 
 <!--
 
