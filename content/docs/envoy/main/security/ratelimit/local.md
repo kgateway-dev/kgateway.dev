@@ -180,6 +180,44 @@ The following steps walk through a shadow mode setup where rate limiting is obse
    local_rate_limited
    ```
 
+## Other configurations {#other}
+
+Review other common local rate limiting configurations.
+
+### Share a local rate limit across Gateway replicas {#share-across-gateway}
+
+By default, each Envoy proxy replica enforces its own local token bucket. To keep the configured rate from increasing when the Gateway scales out, set `rateLimit.local.shareAcrossGateway` to `true`.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: shared-local-ratelimit
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: http
+  rateLimit:
+    local:
+      tokenBucket:
+        maxTokens: 100
+        tokensPerFill: 100
+        fillInterval: 1s
+      shareAcrossGateway: true
+EOF
+```
+
+| Setting | Description |
+| ------- | ----------- |
+| `targetRefs` | Selects the Gateway that uses the shared local rate limit. |
+| `maxTokens` | Sets the maximum number of tokens for the Gateway as a whole. Use a value that is greater than or equal to the number of Gateway proxy replicas. |
+| `tokensPerFill` | Sets the number of tokens that are added during each refill. |
+| `fillInterval` | Sets the amount of time between token bucket refills. |
+| `shareAcrossGateway` | Divides the token bucket evenly across the Gateway proxy replicas, so the configured rate applies to the Gateway as a whole. |
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
