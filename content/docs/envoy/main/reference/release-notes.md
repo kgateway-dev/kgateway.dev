@@ -10,6 +10,33 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v25-breaking-changes}
 
+#### Removed HTTPListenerPolicy CRD {#v25-httplistenerpolicy-removed}
+
+The deprecated HTTPListenerPolicy custom resource definition (CRD) is removed. Versions 2.4.x and earlier install this CRD, and version 2.5.x does not, so the upgrade deletes the CRD from your cluster. Kubernetes then garbage-collects every remaining HTTPListenerPolicy object in the cluster. 
+
+Any HTTPListenerPolicy resource that exists in your cluster at the time of the upgrade is deleted along with the CRD, and the listener configuration that it applied stops taking effect.
+
+**Required action**: Migrate your configuration to the ListenerPolicy resource **before** you upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}} by moving the policy spec under the `spec.default.httpSettings` block in your ListenerPolicy resource. If you already migrated to the ListenerPolicy in an earlier version, no action is needed. 
+
+1. List the HTTPListenerPolicy resources in your cluster. 
+   ```sh
+   kubectl get httplistenerpolicies -A
+   ```
+
+2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link path="/reference/api/kgateway/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
+
+3. Confirm that the new resources are accepted and that your listeners behave as expected.
+   ```sh
+   kubectl get ListenerPolicy <name> -n <namespace> -o yaml
+   ```
+
+4. Delete the HTTPListenerPolicy objects. 
+   ```sh
+   kubectl delete HTTPListenerPolicy <name> -n <namespace>
+   ```
+
+5. Continue with the [upgrade]({{< link path="/operations/upgrade/" >}}).
+
 #### SDS sidecar binds to loopback by default {#v25-sds-loopback-bind}
 
 The SDS (Secret Discovery Service) sidecar now binds to `127.0.0.1:8234` (loopback) by default instead of `0.0.0.0:8234`. Previously, any pod on the cluster network could reach the SDS endpoint. Because all consumers of SDS run in the same pod as the sidecar, restricting the bind address to loopback closes this unintended exposure.
