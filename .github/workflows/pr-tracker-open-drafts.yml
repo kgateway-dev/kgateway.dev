@@ -13,8 +13,10 @@
 # WHAT IT DOES. Once a day it lists branches named pr-tracker-draft-* on the
 # fork, skips any that already have a pull request, applies the branch's
 # documentation changes onto a branch here, and opens the pull request. Title
-# and body come from a metadata file the drafting run committed into the branch;
-# that file is never applied, so it never appears in the diff under review.
+# and body come from the message of the branch's tip commit, an empty commit the
+# drafting run signs. It changes no file, so nothing of it appears in the diff
+# under review, and a pull request opened by hand from the fork has no file to
+# delete either.
 #
 # WHAT TO REVIEW IT FOR. It copies content from a repository in another
 # organization, so it refuses any branch that touches a path outside
@@ -42,9 +44,10 @@ concurrency:
 # The PR is authored by github-actions[bot], so this repository's
 # pull_request workflows are held as "action_required" until a maintainer
 # clicks "Approve and run"; see the note added to each body.
-permissions:
-  contents: write
-  pull-requests: write
+# NOTHING BY DEFAULT; each job below asks for only what it uses. Listing
+# branches and pull requests is read-only, refreshing a description only edits
+# pull requests, and only the job that opens a pull request pushes a branch.
+permissions: {}
 
 env:
   # The fork the drafting pipeline pushes to. It is public, so every read of it
@@ -54,12 +57,26 @@ env:
   # The ONLY paths a draft may touch. Anything else in the branch is a reason to
   # skip the branch entirely rather than to copy part of it.
   ALLOWED_PATHS: 'content/docs assets'
-  METADATA_FILE: .pr-tracker-draft.json
+  # The tip commit's message carries the draft's metadata as JSON between
+  # `-----BEGIN <marker>-----` and `-----END <marker>-----` lines.
+  METADATA_MARKER: PR-TRACKER-DRAFT
+  # The public half of the key the drafting side signs every draft commit with.
+  # A branch whose tip is not signed by it is refused, however it got onto the
+  # fork. Empty refuses everything, which is the safe way for this to be
+  # misconfigured. Rotate it here and in the drafting side's secret together.
+  # Fingerprint SHA256:I7Bl2OInlVOMiHf4r2/vLs5Qf1O26Lny5sTUEfi/FqQ, created 2026-09-23.
+  DRAFTS_SIGNING_KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMyHmGhaENLYud+MXpz72Y+swQQdgGEnRdFUrsr8F39P pr-tracker-drafts'
+  # A cap, so a flood of branches on the fork cannot run up this repository's
+  # Actions minutes. The rest wait for the next run.
+  MAX_BRANCHES: 20
 
 jobs:
   find:
     name: Sort draft branches into new and already-open
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       branches: ${{ steps.list.outputs.branches }}
       refresh: ${{ steps.list.outputs.refresh }}
@@ -81,16 +98,55 @@ jobs:
               --jq ".[].name | select(startswith(\"${BRANCH_PREFIX}\"))")
           fi
 
+          # BRANCH NAMES ARE INPUT FROM ANOTHER ORGANIZATION, and git allows `"`,
+          # `$` and backticks in a ref name. So every name is held to the shape
+          # the drafting side produces before anything uses it, a rejected name
+          # is never echoed (a crafted one could carry a workflow command), and
+          # the JSON below is built by jq rather than by pasting names into it.
+          valid=()
+          for branch in ${candidates}; do
+            if [[ "${branch}" =~ ^${BRANCH_PREFIX}-[A-Za-z0-9._-]+$ ]]; then
+              valid+=("${branch}")
+            else
+              echo "::warning::skipped a branch whose name is not a draft branch name"
+            fi
+          done
+          if [ "${#valid[@]}" -gt "${MAX_BRANCHES}" ]; then
+            echo "::warning::${#valid[@]} draft branches; handling the first ${MAX_BRANCHES}, the rest next run."
+            valid=("${valid[@]:0:${MAX_BRANCHES}}")
+          fi
+
           # THREE OUTCOMES. No pull request: open one. An OPEN one: keep its
           # description in sync, because the drafting side can rewrite the body
           # on a re-run. MERGED or CLOSED: finished, and left alone.
           needed=()
           refresh=()
-          for branch in ${candidates}; do
+          for branch in "${valid[@]+"${valid[@]}"}"; do
             # --head takes the BARE ref name. The `owner:branch` form matches
             # nothing here and would reopen every branch on every run.
-            found=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${branch}" \
-              --state all --json url,state --jq '.[0] | select(.) | "\(.state) \(.url)"')
+            #
+            # ONLY A PULL REQUEST WHOSE HEAD IS OURS COUNTS. `--head` matches the
+            # branch NAME in any repository, and anybody can open a pull request
+            # here from their own fork under a draft's name: the names are public
+            # on the fork and predictable. Counted, that stranger's pull request
+            # would stop the real draft opening, and the refresh job would write
+            # the official draft description onto it. So the head must be in this
+            # repository (the copy the open job makes) or on the drafts fork (a
+            # pull request opened from the compare link). The owners reach jq
+            # through the environment, never spliced into the filter.
+            prs=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${branch}" \
+              --state all --json url,state,headRepositoryOwner)
+            found=$(UP_OWNER="${GITHUB_REPOSITORY%%/*}" FORK_OWNER="${FORK_REPO%%/*}" jq -r '
+              [.[] | select((.headRepositoryOwner.login | ascii_downcase) as $o
+                | $o == ($ENV.UP_OWNER | ascii_downcase) or $o == ($ENV.FORK_OWNER | ascii_downcase))]
+              | .[0] | select(.) | "\(.state) \(.url)"' <<< "${prs}")
+            strangers=$(UP_OWNER="${GITHUB_REPOSITORY%%/*}" FORK_OWNER="${FORK_REPO%%/*}" jq '
+              [.[] | select((.headRepositoryOwner.login | ascii_downcase) as $o
+                | $o != ($ENV.UP_OWNER | ascii_downcase) and $o != ($ENV.FORK_OWNER | ascii_downcase))]
+              | length' <<< "${prs}")
+            if [ "${strangers}" -gt 0 ]; then
+              echo "::warning::${strangers} pull request(s) from another repository use the draft branch name ${branch}; ignoring them. Check whether one is impersonating the draft."
+            fi
             if [ -z "${found}" ]; then
               needed+=("${branch}")
               continue
@@ -100,7 +156,7 @@ jobs:
             case "${state}" in
               OPEN)
                 echo "${branch}: open at ${url}; will refresh its description"
-                refresh+=("{\"branch\":\"${branch}\",\"url\":\"${url}\"}")
+                refresh+=("$(jq -nc --arg branch "${branch}" --arg url "${url}" '{branch: $branch, url: $url}')")
                 ;;
               *)
                 echo "${branch}: ${state} at ${url}; leaving it alone"
@@ -123,6 +179,8 @@ jobs:
     needs: find
     if: needs.find.outputs.refresh != '[]' && needs.find.outputs.refresh != ''
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -136,20 +194,80 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Straight out of the fork over the API: no clone, and nothing from
-          # the other organization lands in this workspace.
-          if ! gh api "repos/${FORK_REPO}/contents/${METADATA_FILE}?ref=${BRANCH}" \
-                --jq '.content' 2>/dev/null | base64 -d > /tmp/meta.json; then
-            echo "::notice::${BRANCH} has no ${METADATA_FILE}; leaving ${URL} as it is."
+          # From the fork's tip, and only once that tip is verified as the
+          # drafting side's: the description of an open pull request is the one
+          # thing here that can change after somebody reviewed it, so an
+          # unsigned tip must not be able to rewrite it.
+          if [ -z "${DRAFTS_SIGNING_KEY}" ]; then
+            echo "::error::DRAFTS_SIGNING_KEY is not set; leaving ${URL} as it is."
+            exit 1
+          fi
+          v="$(mktemp -d)"
+          git -C "$v" init -q
+          git -C "$v" fetch -q --depth 1 "https://github.com/${FORK_REPO}.git" "${BRANCH}"
+          signers="${RUNNER_TEMP}/allowed_signers"
+          printf 'action@github.com namespaces="git" %s\n' "${DRAFTS_SIGNING_KEY}" > "${signers}"
+          # SSH ONLY, AND THIS KEY ONLY. `git verify-commit` accepts any signature
+          # it can check, including an OpenPGP one against whatever keyring the
+          # machine has, so the other formats are pointed at `false` and the
+          # signing key's fingerprint must equal the pinned key's.
+          want=$(printf '%s\n' "${DRAFTS_SIGNING_KEY}" | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' || true)
+          got=$(git -C "$v" -c gpg.format=ssh -c "gpg.ssh.allowedSignersFile=${signers}" \
+                -c gpg.openpgp.program=false -c gpg.x509.program=false \
+                log -1 --format='%G?|%GF' FETCH_HEAD 2>/dev/null || true)
+          if [ -z "${want}" ] || [ "${got}" != "G|${want}" ]; then
+            echo "::error::the tip of ${BRANCH} is not signed by the drafting side's key; leaving ${URL} as it is."
+            exit 1
+          fi
+          # BOUND TO THIS NAME, AND RECENT. A signature covers a commit's content,
+          # not the branch it is pushed under or when it was made, so an old
+          # signed draft (one maintainers rejected, say) could be pushed again
+          # under a new name and opened as new. The drafting side writes the
+          # branch name and the push time into the signed metadata; a mismatch,
+          # or a draft older than 30 days, is refused. Parked drafts are pushed
+          # again every weekly run, so a real one never gets that old.
+          if ! git -C "$v" log -1 --format=%B FETCH_HEAD 2>/dev/null \
+            | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
+            > "${RUNNER_TEMP}/meta-check.json" \
+             || ! BRANCH="${BRANCH}" python3 - "${RUNNER_TEMP}/meta-check.json" <<'PY'
+          import datetime, json, os, sys
+          m = json.load(open(sys.argv[1]))
+          if m.get("branch") != os.environ["BRANCH"]:
+              sys.exit(1)
+          pushed = datetime.datetime.fromisoformat(str(m.get("pushed_at", "")).replace("Z", "+00:00"))
+          age = datetime.datetime.now(datetime.timezone.utc) - pushed
+          sys.exit(0 if datetime.timedelta(minutes=-10) <= age <= datetime.timedelta(days=30) else 1)
+          PY
+          then
+            echo "::error::the signed metadata on ${BRANCH} does not name this branch, or is more than 30 days old. Leaving ${URL} as it is."
+            exit 1
+          fi
+
+          if ! git -C "$v" log -1 --format=%B FETCH_HEAD 2>/dev/null \
+            | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
+            > /tmp/meta.json; then
+            echo "::notice::the tip of ${BRANCH} carries no draft metadata; leaving ${URL} as it is."
             exit 0
           fi
 
           python3 - <<'PY' > /tmp/body.md
-          import json, os
+          import json, os, re, secrets
+          # THE TEXT IS INPUT FROM ANOTHER ORGANIZATION TOO. A closing keyword
+          # ("Fixes #12") would close an issue here when the pull request merges,
+          # and the drafting side never writes one for a cross-repo pull request,
+          # so any that arrive are neutralized. The title is held to one line and
+          # the body to GitHub's limit, with room for what is appended below.
+          CLOSING = re.compile(
+              r"\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)(\s*:?\s+)"
+              r"(?=(?:[\w.-]+/[\w.-]+)?#\d+|https://github\.com/[^\s/]+/[^\s/]+/issues/\d+)",
+              re.IGNORECASE,
+          )
+          def clean_body(text):
+              return CLOSING.sub(lambda m: "Refs" + m.group(2), text)[:60000]
           meta = json.load(open("/tmp/meta.json"))
           branch = os.environ["BRANCH"]
           fork = os.environ["FORK_REPO"]
-          body = meta.get("body") or "Drafted by the PR tracker."
+          body = clean_body(str(meta.get("body") or "Drafted by the PR tracker."))
           body += f"\n\nDraft branch: [`{branch}`](https://github.com/{fork}/tree/{branch})"
           print(body)
           PY
@@ -157,6 +275,16 @@ jobs:
           # Compare first: every `gh pr edit` posts a timeline event and
           # notifies subscribers, so an unchanged body is not an edit.
           gh pr view "${URL}" --json body --jq '.body' > /tmp/current.md || : > /tmp/current.md
+          # KEEP THE REFERENCE TABLE. It was worked out against the code change
+          # when this pull request opened, and this job has no checkout to work
+          # it out again, so it is carried over rather than dropped.
+          python3 - <<'PY'
+          m, e = "<!-- pr-tracker-references -->", "<!-- /pr-tracker-references -->"
+          cur, body = open("/tmp/current.md").read(), open("/tmp/body.md").read()
+          i, j = cur.find(m), cur.find(e)
+          if 0 <= i < j and m not in body:
+              open("/tmp/body.md", "w").write(cur[i:j + len(e)] + "\n" + body)
+          PY
           if diff -q /tmp/current.md /tmp/body.md >/dev/null 2>&1; then
             echo "${URL}: description already current."
             exit 0
@@ -170,6 +298,9 @@ jobs:
     needs: find
     if: needs.find.outputs.branches != '[]' && needs.find.outputs.branches != ''
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     strategy:
       fail-fast: false
       matrix:
@@ -198,7 +329,61 @@ jobs:
           BRANCH: ${{ matrix.branch }}
         run: |
           set -euo pipefail
-          changed=$(git diff --name-only HEAD..."drafts/${BRANCH}")
+          # SIGNED BY THE DRAFTING SIDE, OR REFUSED. Write access to the fork is
+          # not the same as being the drafting pipeline: anybody who can push a
+          # branch there could otherwise have this workflow open a pull request
+          # here as github-actions[bot]. The tip's signature covers its whole
+          # tree and its message, so checking the tip checks everything this would
+          # copy and the metadata it is opened with.
+          if [ -z "${DRAFTS_SIGNING_KEY}" ]; then
+            echo "::error::DRAFTS_SIGNING_KEY is not set, so no draft can be verified. Refusing ${BRANCH}."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+          signers="${RUNNER_TEMP}/allowed_signers"
+          printf 'action@github.com namespaces="git" %s\n' "${DRAFTS_SIGNING_KEY}" > "${signers}"
+          # SSH ONLY, AND THIS KEY ONLY. `git verify-commit` accepts any signature
+          # it can check, including an OpenPGP one against whatever keyring the
+          # machine has, so the other formats are pointed at `false` and the
+          # signing key's fingerprint must equal the pinned key's.
+          want=$(printf '%s\n' "${DRAFTS_SIGNING_KEY}" | ssh-keygen -lf - 2>/dev/null | awk '{print $2}' || true)
+          got=$(git -c gpg.format=ssh -c "gpg.ssh.allowedSignersFile=${signers}" \
+                -c gpg.openpgp.program=false -c gpg.x509.program=false \
+                log -1 --format='%G?|%GF' "drafts/${BRANCH}" 2>/dev/null || true)
+          if [ -z "${want}" ] || [ "${got}" != "G|${want}" ]; then
+            echo "::error::the tip of ${BRANCH} is not signed by the drafting side's key. Refusing it."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          # BOUND TO THIS NAME, AND RECENT. A signature covers a commit's content,
+          # not the branch it is pushed under or when it was made, so an old
+          # signed draft (one maintainers rejected, say) could be pushed again
+          # under a new name and opened as new. The drafting side writes the
+          # branch name and the push time into the signed metadata; a mismatch,
+          # or a draft older than 30 days, is refused. Parked drafts are pushed
+          # again every weekly run, so a real one never gets that old.
+          if ! git log -1 --format=%B "drafts/${BRANCH}" 2>/dev/null \
+            | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
+            > "${RUNNER_TEMP}/meta-check.json" \
+             || ! BRANCH="${BRANCH}" python3 - "${RUNNER_TEMP}/meta-check.json" <<'PY'
+          import datetime, json, os, sys
+          m = json.load(open(sys.argv[1]))
+          if m.get("branch") != os.environ["BRANCH"]:
+              sys.exit(1)
+          pushed = datetime.datetime.fromisoformat(str(m.get("pushed_at", "")).replace("Z", "+00:00"))
+          age = datetime.datetime.now(datetime.timezone.utc) - pushed
+          sys.exit(0 if datetime.timedelta(minutes=-10) <= age <= datetime.timedelta(days=30) else 1)
+          PY
+          then
+            echo "::error::the signed metadata on ${BRANCH} does not name this branch, or is more than 30 days old. Refusing it."
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
+
+          # --no-renames: a rename out of .github/ into content/docs would
+          # otherwise list only its new, allowed-looking name.
+          changed=$(git diff --name-only --no-renames HEAD..."drafts/${BRANCH}")
           if [ -z "${changed}" ]; then
             echo "::warning::${BRANCH} changes nothing against main; skipping."
             echo "ok=false" >> "$GITHUB_OUTPUT"
@@ -208,7 +393,6 @@ jobs:
           bad=""
           while IFS= read -r file; do
             [ -n "${file}" ] || continue
-            [ "${file}" = "${METADATA_FILE}" ] && continue
             allowed=false
             for prefix in ${ALLOWED_PATHS}; do
               case "${file}" in
@@ -225,6 +409,22 @@ jobs:
             exit 1
           fi
 
+          # REGULAR FILES ONLY. The check above reads names, so a symlink named
+          # like a page would pass it and point anywhere, and a gitlink or an
+          # executable bit has no business in documentation. 000000 is the
+          # "before" or "after" of an added or deleted file.
+          modes=$(git diff --raw --no-renames HEAD..."drafts/${BRANCH}" | awk '{print $2}' | sort -u)
+          for mode in ${modes}; do
+            case "${mode}" in
+              100644|000000) ;;
+              *)
+                echo "::error::${BRANCH} adds a file with mode ${mode}; only regular files are accepted. Refusing it."
+                echo "ok=false" >> "$GITHUB_OUTPUT"
+                exit 1
+                ;;
+            esac
+          done
+
           echo "ok=true" >> "$GITHUB_OUTPUT"
           printf '%s\n' "${changed}" | sed 's/^/  /'
 
@@ -232,22 +432,126 @@ jobs:
         id: meta
         if: steps.guard.outputs.ok == 'true'
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: ${{ matrix.branch }}
         run: |
           set -euo pipefail
-          # From the branch, not from the working tree: the metadata file is
-          # never applied, so it cannot reach the diff.
-          if ! git show "drafts/${BRANCH}:${METADATA_FILE}" > /tmp/meta.json 2>/dev/null; then
-            echo "::warning::${BRANCH} has no ${METADATA_FILE}; using a fallback title."
+          # From the tip commit's message, not from the working tree: the
+          # metadata commit is empty, so it cannot reach the diff.
+          if ! git log -1 --format=%B "drafts/${BRANCH}" 2>/dev/null \
+            | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
+            > /tmp/meta.json; then
+            echo "::warning::the tip of ${BRANCH} carries no draft metadata; using a fallback title."
             printf '{}' > /tmp/meta.json
           fi
           python3 - <<'PY' >> "$GITHUB_OUTPUT"
-          import json, os
+          import json, os, re, secrets, subprocess
+          # THE TEXT IS INPUT FROM ANOTHER ORGANIZATION TOO. A closing keyword
+          # ("Fixes #12") would close an issue here when the pull request merges,
+          # and the drafting side never writes one for a cross-repo pull request,
+          # so any that arrive are neutralized. The title is held to one line and
+          # the body to GitHub's limit, with room for what is appended below.
+          CLOSING = re.compile(
+              r"\b(close[sd]?|fix(?:e[sd])?|resolve[sd]?)(\s*:?\s+)"
+              r"(?=(?:[\w.-]+/[\w.-]+)?#\d+|https://github\.com/[^\s/]+/[^\s/]+/issues/\d+)",
+              re.IGNORECASE,
+          )
+          def clean_body(text):
+              return CLOSING.sub(lambda m: "Refs" + m.group(2), text)[:60000]
+
+          # REFERENCES THE CODE CHANGE DOES NOT EXPLAIN. What a reader runs from these
+          # pages is the payload that matters most: a changed Helm repository, image or
+          # URL inside a long diff is easy to miss in review. Every URL, OCI reference,
+          # image reference and risky command the draft adds is looked for in the code
+          # pull requests it documents and in these docs as they are on main. Anything
+          # found in neither is listed at the top of the pull request, with its host
+          # marked if that host has never appeared either. A flag, never a refusal: on
+          # the first 20 drafts this listed 6 references in 1 draft, all legitimate.
+          REF_URL = re.compile(r"https?://[^\s)\]\"'`<>|]+")
+          REF_OCI = re.compile(r"oci://[^\s\"'`)]+")
+          REF_IMG = re.compile(r"(?<![\w/.@-])((?:[a-z0-9-]+\.)+[a-z]{2,}(?::\d+)?/[a-z0-9._-]+(?:/[a-z0-9._-]+)*)(?::[\w][\w.-]{0,127}|@sha256:[0-9a-f]{64})")
+          REF_RISKY = [
+              ("pipe to shell", re.compile(r"curl[^\n]*\|\s*(?:sudo\s+)?(?:ba|z)?sh\b")),
+              ("remote kubectl apply", re.compile(r"kubectl\s+(?:apply|create)\s+[^\n]*-f\s+https?://\S+")),
+              ("helm repo add", re.compile(r"helm\s+repo\s+add\s+\S+\s+\S+")),
+              ("TLS verification off", re.compile(r"--insecure(?:-skip-tls-verify)?\b|insecureSkipVerify:\s*true|skipVerify:\s*true|curl\s[^\n]*\s-k\b")),
+          ]
+          REF_MARK, REF_END = "<!-- pr-tracker-references -->", "<!-- /pr-tracker-references -->"
+
+          def ref_git(*args):
+              return subprocess.run(["git", *args], capture_output=True, text=True)
+
+          def draft_refs(added):
+              found = []
+              for kind, rx in [("URL", REF_URL), ("OCI reference", REF_OCI)]:
+                  found += [(kind, m.group(0).rstrip(".,;:!?*_")) for m in rx.finditer(added)]
+              for m in REF_IMG.finditer(added):
+                  if not added[max(0, m.start() - 3):m.start()].endswith("//"):
+                      found.append(("image", m.group(0)))
+              for kind, rx in REF_RISKY:
+                  found += [(kind, m.group(0).strip()[:160]) for m in rx.finditer(added)]
+              seen, out = set(), []
+              for kind, value in found:
+                  if (kind, value) not in seen:
+                      seen.add((kind, value))
+                      out.append((kind, value))
+              return out
+
+          def reference_table(base, head, paths, code_prs):
+              diff = ref_git("diff", "--no-renames", f"{base}...{head}", "--", *paths).stdout
+              added = "\n".join(l[1:] for l in diff.splitlines() if l.startswith("+") and not l.startswith("+++"))
+              refs = draft_refs(added)
+              if not refs:
+                  return ""
+              code_text, unread = "", []
+              for ref in code_prs[:10]:
+                  repo, _, number = ref.partition("#")
+                  r = subprocess.run(["gh", "pr", "diff", number, "--repo", repo], capture_output=True, text=True, timeout=120)
+                  if r.returncode == 0:
+                      code_text += r.stdout[:5_000_000]
+                  else:
+                      unread.append(ref)
+
+              def in_docs(needle):
+                  return ref_git("grep", "-q", "-F", "-e", needle, base, "--", *paths).returncode == 0
+
+              rows = []
+              for kind, value in refs:
+                  if value in code_text or in_docs(value):
+                      continue
+                  host = re.sub(r"^[a-z]+://", "", value).split("/")[0] if kind in ("URL", "OCI reference", "image") else ""
+                  seen = "n/a" if not host else ("yes" if host in code_text or in_docs(host) else "**no**")
+                  shown = value.replace("`", "'").replace("|", "\\|")[:160]
+                  rows.append(f"| `{shown}` | {kind} | {seen} |")
+              if not rows:
+                  return ""
+              compared = ", ".join(code_prs[:10]) if code_prs else ""
+              if compared:
+                  against = f"the code change ({compared}) nor these docs"
+              else:
+                  against = "these docs (the draft named no code pull request to compare against)"
+              lines = [REF_MARK, "> [!WARNING]",
+                       f"> **{len(rows)} reference(s) this draft adds appear in neither {against}.** "
+                       "Readers run what these pages say, so check each one before merging. "
+                       "A host marked **no** has never appeared in either."]
+              if unread:
+                  lines.append(f"> Could not read {', '.join(unread)}, so its references were not compared.")
+              lines += ["", "| Reference | Kind | Host seen before |", "| --- | --- | --- |", *rows[:50]]
+              if len(rows) > 50:
+                  lines.append(f"| … and {len(rows) - 50} more | | |")
+              lines += [REF_END, ""]
+              return "\n".join(lines)
           meta = json.load(open("/tmp/meta.json"))
           branch = os.environ["BRANCH"]
           fork = os.environ["FORK_REPO"]
-          title = meta.get("title") or f"[Automated] Draft docs ({branch})"
-          body = meta.get("body") or "Drafted by the PR tracker."
+          title = " ".join(str(meta.get("title") or f"[Automated] Draft docs ({branch})").split())[:200]
+          body = clean_body(str(meta.get("body") or "Drafted by the PR tracker."))
+          # Only refs in the shape the drafting side writes; anything else is dropped.
+          code_prs = [r for r in (meta.get("code_prs") or [])
+                      if isinstance(r, str) and re.fullmatch(r"[\w.-]+/[\w.-]+#\d+", r)]
+          table = reference_table("HEAD", f"drafts/{branch}", os.environ["ALLOWED_PATHS"].split(), code_prs)
+          if table:
+              body = table + "\n" + body
           body += f"\n\nDraft branch: [`{branch}`](https://github.com/{fork}/tree/{branch})"
           # SAY THAT THE CHECKS HAVE NOT RUN, because the quiet is misleading.
           # This pull request is opened by this repository's own GITHUB_TOKEN,
@@ -268,9 +572,12 @@ jobs:
               "> Please approve the checks before reviewing the content: an absence of failures "
               "here means the tests have not run, not that they passed."
           )
-          # Heredoc-delimited because both values are multi-line markdown.
-          print(f"title<<TITLE_EOF\n{title}\nTITLE_EOF")
-          print(f"body<<BODY_EOF\n{body}\nBODY_EOF")
+          # Heredoc-delimited because both values are multi-line markdown, and
+          # with a random delimiter: a fixed one inside the body would end the
+          # value early and let the rest of the body set other outputs.
+          delim = f"EOF_{secrets.token_hex(16)}"
+          print(f"title<<{delim}\n{title}\n{delim}")
+          print(f"body<<{delim}\n{body}\n{delim}")
           PY
 
       # THE DRAFT'S DIFF, NOT THE DRAFT'S DIRECTORIES. Checking out
@@ -280,9 +587,8 @@ jobs:
       # the draft's own changes, and a conflict with a newer edit fails this
       # branch loudly instead of silently undoing it.
       #
-      # Limited to ALLOWED_PATHS by pathspec as well as by the guard, so the
-      # metadata file and anything else cannot land even if the guard were
-      # somehow wrong.
+      # Limited to ALLOWED_PATHS by pathspec as well as by the guard, so
+      # nothing else can land even if the guard were somehow wrong.
       - name: Apply the draft onto a branch here
         if: steps.guard.outputs.ok == 'true'
         env:
@@ -290,7 +596,7 @@ jobs:
         run: |
           set -euo pipefail
           # shellcheck disable=SC2086 # ALLOWED_PATHS is a space-separated list
-          git diff --binary HEAD..."drafts/${BRANCH}" -- ${ALLOWED_PATHS} \
+          git diff --binary --no-renames HEAD..."drafts/${BRANCH}" -- ${ALLOWED_PATHS} \
             | git apply --index --3way
 
       # DCO: every commit here needs a Signed-off-by trailer, including this one.
