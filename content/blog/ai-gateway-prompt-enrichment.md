@@ -109,4 +109,4 @@ Sugar, $2
 
 Good work! You played around with prepending system instructions to your prompts with a simple kgateway TrafficPolicy. Now you're ready to feed the TrafficPolicy CRD to your favorite LLM and have it help you craft the perfect prompts for your AI-powered apps! 😂
 
-For more information, try out [AI Gateway](https://www.solo.io/resources/lab/kgateway-ai-lab-prompt-enrichment) in our free hands-on labs, get involved in the [community](https://github.com/kgateway-dev/kgateway), and let us know how it goes.
+For more information, get involved in the [community](https://github.com/kgateway-dev/kgateway), and let us know how it goes.
