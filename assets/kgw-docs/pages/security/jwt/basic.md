@@ -336,6 +336,29 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
+#### JWKS fetch timeout {#jwks-timeout}
+
+The `timeout` field sets how long the gateway waits for the remote JWKS server to respond to a single fetch. It bounds one attempt, so it works alongside `retryPolicy`, which decides how many attempts are made and how long to wait between them.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    timeout: 10s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `jwks.remote.timeout` | How long the gateway waits for the remote JWKS server to respond when it fetches signing keys. Accepts Go duration strings of up to 32 characters, and must be at least `1ms`. If unset, the gateway waits `5s`. |
+
+{{< /version >}}
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
 ### JWT caching {#jwt-caching}
 
 You can enable Envoy JWT caching for verified tokens in a JWT provider configuration. The cache stores tokens that already passed signature verification, so repeated requests with the same token do not repeat the parse, JWKS lookup, and signature verification work.

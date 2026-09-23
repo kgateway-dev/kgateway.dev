@@ -62,6 +62,10 @@ You can now enable Envoy's in-memory cache of successfully verified JWTs by usin
 
 You can now set how much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims of a JWT, by using the `clockSkew` field on a JWT provider in a GatewayExtension resource. Use this when a token that is still valid at the issuer arrives at the proxy as expired or not-yet-valid, such as when the identity provider runs outside the cluster or on a host with an unsynchronized clock. If unset, the gateway keeps Envoy's default tolerance of 60 seconds. For more information, see [Clock skew tolerance]({{< link-hextra path="/security/jwt/simple/basic/#clock-skew" >}}).
 
+#### JWKS fetch timeout {#v25-jwks-timeout}
+
+You can now set the `timeout` field on the `jwks.remote` settings of a JWT provider in a GatewayExtension resource to configure how long the gateway waits for the remote JWKS server to respond to a single fetch. For more information, see [JWKS fetch timeout]({{< link-hextra path="/security/jwt/simple/basic/#jwks-timeout" >}}).
+
 #### Preserve request paths {#v25-preserve-request-paths}
 You can now disable Envoy's default path normalization and slash merging on a listener by using the `normalizePath` and `mergeSlashes` fields in the HTTP settings of a ListenerPolicy resource. Disable these settings for backends that depend on the original, unmodified request path, such as S3-compatible object stores that use object keys containing repeated slashes.
 
