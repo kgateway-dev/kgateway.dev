@@ -66,8 +66,11 @@ env:
   # misconfigured. Rotate it here and in the drafting side's secret together.
   # Fingerprint SHA256:I7Bl2OInlVOMiHf4r2/vLs5Qf1O26Lny5sTUEfi/FqQ, created 2026-09-23.
   DRAFTS_SIGNING_KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMyHmGhaENLYud+MXpz72Y+swQQdgGEnRdFUrsr8F39P pr-tracker-drafts'
-  # A cap, so a flood of branches on the fork cannot run up this repository's
-  # Actions minutes. The rest wait for the next run.
+  # A cap on pull requests opened per run, so a flood of branches on the fork
+  # cannot run up this repository's Actions minutes. The rest wait for the next
+  # run. Applied to the branches that still NEED a pull request, never to the
+  # full list: nothing deletes branches from the fork, so merged drafts pile up,
+  # and a cap on the full list gave every slot to them and none to new drafts.
   MAX_BRANCHES: 20
 
 jobs:
@@ -111,14 +114,10 @@ jobs:
               echo "::warning::skipped a branch whose name is not a draft branch name"
             fi
           done
-          if [ "${#valid[@]}" -gt "${MAX_BRANCHES}" ]; then
-            echo "::warning::${#valid[@]} draft branches; handling the first ${MAX_BRANCHES}, the rest next run."
-            valid=("${valid[@]:0:${MAX_BRANCHES}}")
-          fi
-
           # THREE OUTCOMES. No pull request: open one. An OPEN one: keep its
           # description in sync, because the drafting side can rewrite the body
-          # on a re-run. MERGED or CLOSED: finished, and left alone.
+          # on a re-run, but only when this workflow opened it. MERGED or
+          # CLOSED: finished, and left alone.
           needed=()
           refresh=()
           for branch in "${valid[@]+"${valid[@]}"}"; do
@@ -135,11 +134,16 @@ jobs:
             # pull request opened from the compare link). The owners reach jq
             # through the environment, never spliced into the filter.
             prs=$(gh pr list --repo "${GITHUB_REPOSITORY}" --head "${branch}" \
-              --state all --json url,state,headRepositoryOwner)
+              --state all --json url,state,headRepositoryOwner,author)
+            # `ours` is true only for a pull request this workflow opened: the
+            # open job pushes its head here and GITHUB_TOKEN authors it.
             found=$(UP_OWNER="${GITHUB_REPOSITORY%%/*}" FORK_OWNER="${FORK_REPO%%/*}" jq -r '
               [.[] | select((.headRepositoryOwner.login | ascii_downcase) as $o
                 | $o == ($ENV.UP_OWNER | ascii_downcase) or $o == ($ENV.FORK_OWNER | ascii_downcase))]
-              | .[0] | select(.) | "\(.state) \(.url)"' <<< "${prs}")
+              | .[0] | select(.)
+              | ((.author.login == "app/github-actions")
+                  and ((.headRepositoryOwner.login | ascii_downcase) == ($ENV.UP_OWNER | ascii_downcase))) as $ours
+              | "\(.state) \($ours) \(.url)"' <<< "${prs}")
             strangers=$(UP_OWNER="${GITHUB_REPOSITORY%%/*}" FORK_OWNER="${FORK_REPO%%/*}" jq '
               [.[] | select((.headRepositoryOwner.login | ascii_downcase) as $o
                 | $o != ($ENV.UP_OWNER | ascii_downcase) and $o != ($ENV.FORK_OWNER | ascii_downcase))]
@@ -151,10 +155,15 @@ jobs:
               needed+=("${branch}")
               continue
             fi
-            state="${found%% *}"
-            url="${found#* }"
+            read -r state ours url <<< "${found}"
             case "${state}" in
               OPEN)
+                # OPENED BY HAND, FROM THE COMPARE LINK: a person wrote that
+                # description, so it is not this workflow's to replace.
+                if [ "${ours}" != true ]; then
+                  echo "${branch}: open at ${url}, opened by hand; leaving its description alone"
+                  continue
+                fi
                 echo "${branch}: open at ${url}; will refresh its description"
                 refresh+=("$(jq -nc --arg branch "${branch}" --arg url "${url}" '{branch: $branch, url: $url}')")
                 ;;
@@ -163,6 +172,11 @@ jobs:
                 ;;
             esac
           done
+
+          if [ "${#needed[@]}" -gt "${MAX_BRANCHES}" ]; then
+            echo "::warning::${#needed[@]} draft branches need a pull request; opening the first ${MAX_BRANCHES}, the rest next run."
+            needed=("${needed[@]:0:${MAX_BRANCHES}}")
+          fi
 
           printf 'branches=%s\n' "$(printf '%s\n' "${needed[@]+"${needed[@]}"}" | jq -R . | jq -sc 'map(select(. != ""))')" >> "$GITHUB_OUTPUT"
           printf 'refresh=%s\n' "$(printf '%s\n' "${refresh[@]+"${refresh[@]}"}" | jq -sc 'map(select(. != null))')" >> "$GITHUB_OUTPUT"
@@ -173,7 +187,9 @@ jobs:
 
   # DESCRIPTION ONLY, NEVER CONTENT. Rewriting the files of an open pull request
   # would discard anything a maintainer had pushed to it. The body is safe to
-  # replace because nothing but the drafting side writes it.
+  # replace because `find` sends only pull requests this workflow opened, whose
+  # body nothing but the drafting side writes. One opened by hand from the
+  # compare link has a description a person wrote, and is never refreshed.
   refresh:
     name: Refresh open PR descriptions
     needs: find
@@ -590,6 +606,7 @@ jobs:
       # Limited to ALLOWED_PATHS by pathspec as well as by the guard, so
       # nothing else can land even if the guard were somehow wrong.
       - name: Apply the draft onto a branch here
+        id: apply
         if: steps.guard.outputs.ok == 'true'
         env:
           BRANCH: ${{ matrix.branch }}
@@ -598,6 +615,9 @@ jobs:
           # shellcheck disable=SC2086 # ALLOWED_PATHS is a space-separated list
           git diff --binary --no-renames HEAD..."drafts/${BRANCH}" -- ${ALLOWED_PATHS} \
             | git apply --index --3way
+          # One path per line for `add-paths`, so ALLOWED_PATHS is the only list.
+          # shellcheck disable=SC2086
+          { echo "paths<<EOF"; printf '%s\n' ${ALLOWED_PATHS}; echo "EOF"; } >> "$GITHUB_OUTPUT"
 
       # DCO: every commit here needs a Signed-off-by trailer, including this one.
       - name: Open the pull request
@@ -607,9 +627,7 @@ jobs:
         with:
           base: main
           branch: ${{ matrix.branch }}
-          add-paths: |
-            content/docs
-            assets
+          add-paths: ${{ steps.apply.outputs.paths }}
           title: ${{ steps.meta.outputs.title }}
           body: ${{ steps.meta.outputs.body }}
           commit-message: ${{ steps.meta.outputs.title }}
