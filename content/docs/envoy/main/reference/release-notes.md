@@ -88,6 +88,10 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Evaluate JWT policies without rejecting requests
+
+You can now set `spec.jwt.validationMode: AllowMissingOrFailed` on a GatewayExtension resource to verify tokens without rejecting requests that send a missing or invalid JWT. Use this mode to observe how a JWT policy behaves against live traffic before changing to `Strict`. Verification failures are also recorded in Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. For more information, see [Allow JWT verification without rejecting requests]({{< link-hextra path="/security/jwt/simple/basic/#allow-missing-or-failed" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
