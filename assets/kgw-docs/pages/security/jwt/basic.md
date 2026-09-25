@@ -538,6 +538,65 @@ Example output:
 < HTTP/1.1 200 OK
 ```
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
+### Allow JWT verification without rejecting requests {#allow-missing-or-failed}
+
+Use `AllowMissingOrFailed` to evaluate a JWT policy against live traffic before you enforce it. The JWT filter verifies each token that a request sends, but the filter allows the request when the token is missing, expired, malformed, or otherwise invalid.
+
+> [!WARNING]
+> `AllowMissingOrFailed` provides no authentication. A downstream RBAC policy that matches JWT claims receives empty JWT metadata for invalid-token requests, the same as requests that send no token. If you set `claimsToHeaders`, invalid-token requests also reach the upstream without the configured claim headers.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    validationMode: AllowMissingOrFailed
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+EOF
+```
+
+Send a request without a token and a request with an invalid token. Both requests should return a `200 OK` response.
+
+{{< tabs >}}
+{{% tab name="Cloud Provider LoadBalancer" %}}
+```sh
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer invalid-token"
+```
+{{% /tab %}}
+{{% tab name="Port-forward for local testing" %}}
+```sh
+curl -vik localhost:8080/headers -H "host: www.example.com:8080"
+curl -vik localhost:8080/headers \
+  -H "host: www.example.com:8080" \
+  --header "Authorization: Bearer invalid-token"
+```
+{{% /tab %}}
+{{< /tabs >}}
+
+Example output:
+
+```text
+< HTTP/1.1 200 OK
+```
+
+Requests with valid tokens still populate JWT dynamic metadata and any headers that you configure with `claimsToHeaders`. In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` in access logs to record what `Strict` mode would reject.
+
+{{< /version >}}
+
 ### Configure audiences {#audiences}
 
 Restrict access to tokens that include a specific audience claim. An incoming token must include an `aud` claim that matches at least one of the listed values. The following example restricts access to tokens that include a `my-api` audience.
