@@ -23,7 +23,7 @@ Any HTTPListenerPolicy resource that exists in your cluster at the time of the u
    kubectl get httplistenerpolicies -A
    ```
    
-2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link path="/reference/api/kgateway/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
+2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link path="/reference/api/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
 
 3. Confirm that the new resources are accepted and that your listeners behave as expected.
    ```sh
@@ -87,6 +87,21 @@ For more information, see [Share a local rate limit across Gateway replicas]({{<
 You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to place the buffer filter at an earlier position in the HTTP filter chain. By default, the buffer filter runs after authentication, authorization, and rate limiting, so a filter that reads the request body first, such as external auth with request-body checks or ExtProc, can prevent `buffer.maxRequestSize` from being enforced. 
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
+
+#### Configure HTTP protocol upgrades on routes {#v25-http-upgrades}
+
+You can now use the `httpUpgrade` field on a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure HTTP protocol upgrades, such as WebSocket or CONNECT, for the targeted routes. Route-level settings override the matching upgrade type that is enabled on the listener. You can also terminate CONNECT requests on a route and forward the payload upstream as raw TCP data, which you cannot configure on a listener.
+
+Keep the following constraints in mind:
+* The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} must target a Gateway, HTTPRoute, or ListenerSet.
+* You cannot use `httpUpgrade` together with `buffer`, unless buffering is disabled.
+* After an upgrade is established, HTTP filters do not inspect the tunneled payload. Authenticate and authorize the initial upgrade request, and enable upgrades only for trusted clients.
+
+For more information, see the [TrafficPolicy API reference]({{< link-hextra path="/reference/api/#trafficpolicyspec" >}}).
+
+#### Add a non-enforcing JWT validation mode
+
+Set `spec.jwt.validationMode` to `AllowMissingOrFailed` on a JWT GatewayExtension to verify tokens without rejecting requests that have missing or invalid tokens. The proxy also records verification failures in `envoy.filters.http.jwt_authn:failed_status` dynamic metadata, so you can compare live traffic before switching to `Strict`. Previously, `Strict` rejected missing or invalid tokens, and `AllowMissing` still rejected invalid tokens. For more information, see [JWT validation modes]({{< link-hextra path="/security/jwt/simple/basic/#jwt-validation" >}}).
 
 <!--
 
