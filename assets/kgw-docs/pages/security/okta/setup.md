@@ -9,20 +9,23 @@ When you finish, you choose an authentication flow:
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
-1. An Okta account with a configured Native Application. At minimum, set the following on the Okta application:
+1. An Okta account with a configured Web Application. At minimum, set the following on the Okta application:
 
    | Setting | Value |
    |---|---|
-   | **Application Type** | Native |
+   | **Application Type** | Web |
    | **Sign-in redirect URIs** | `https://www.example.com/oauth2/redirect` |
    | **Sign-out redirect URIs** | `https://www.example.com` |
-   | **Grant types** | Authorization Code, Refresh Token, Resource Owner Password |
+   | **Grant types** | Authorization Code, Client Credentials |
 
    The redirect URI path is `/oauth2/redirect`, which is the default callback path that kgateway registers. You can override it with `redirectURI` in the `GatewayExtension` if needed.
 
 2. A test user created in your Okta directory.
 
-The authorization code flow requires an **HTTPS listener** on your gateway. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+3. An access policy and rule configured on the default authorization server. Without this policy, the browser login fails with the message that the user is not allowed to access the app. You create this policy later in [Configure the default authorization server](#configure-default-as).
+
+> [!NOTE]
+> Client Credentials requires API Access Management, which is not enabled on every Okta org. If you plan to use the access token validation flow with a Client Credentials token, confirm that your org has API Access Management enabled before you begin.
 
 ## Configure Okta
 
@@ -35,15 +38,12 @@ Create an Okta application, configure the required settings, and add a test user
 
 {{< reuse-image src="img/okta/okta-dashboard.png" >}}
 
-### Create a Native Application
+### Create a Web Application
 
 1. Navigate to **Applications** → **Applications**.
 2. Click **Create App Integration**.
-3. Select **OIDC - OpenID Connect** and **Native Application**.
+3. Select **OIDC - OpenID Connect** and **Web Application**.
 4. Click **Next**.
-
-> [!NOTE]
-> Selecting **Native Application** makes the **Resource Owner Password** grant available, which the Access Token flow requires. The sign-in redirect URIs work the same as for a web application.
 
 {{< reuse-image src="img/okta/okta-create-app.png" >}}
 
@@ -52,10 +52,7 @@ Create an Okta application, configure the required settings, and add a test user
 In the **General Settings** tab, configure the following:
 
 - **Name**: `kgateway-app`
-- **Grant types**: Check **Authorization Code**, **Refresh Token**, and **Resource Owner Password**.
-
-{{< reuse-image src="img/okta/okta-grant-types.png" >}}
-
+- **Grant types**: Check **Authorization Code** and **Client Credentials**.
 - **Sign-in redirect URIs**: Add `https://www.example.com/oauth2/redirect`.
 - **Sign-out redirect URIs**: Add `https://www.example.com`.
 - **Assignments**: Choose **"Skip group assignment for now"**.
@@ -63,13 +60,15 @@ In the **General Settings** tab, configure the following:
 
 {{< reuse-image src="img/okta/okta-redirect-uri.png" >}}
 
+> [!NOTE]
+> This guide registers `kgateway-app` as a Web application, not a Native application. Kgateway is a server-side confidential client that can hold the client secret and perform the code exchange, so the Web application flow applies. This also means you do not need to enable password-only authentication.
+
 ### Copy the Client ID and Client Secret
 
 1. After saving, you'll see the application details page.
 2. Copy the **Client ID** and **Client Secret** from the **Client Credentials** section. You'll need these for the kgateway GatewayExtension.
 
 {{< reuse-image src="img/okta/okta-client-credentials.png" >}}
-
 
 > [!NOTE]
 > The Client Secret is only shown once after creation. If you lose it, you can regenerate it, but this will invalidate any existing tokens.
@@ -89,26 +88,35 @@ In the **General Settings** tab, configure the following:
 
 {{< reuse-image src="img/okta/okta-users-list.png" >}}
 
-### Configure the Authentication Policy
+### Configure the default authorization server {#configure-default-as}
 
-To use the `password` grant, Okta's sign-on policy must allow password-only authentication. If your default policy enforces MFA, update the rule:
+Okta provides two authorization servers that matter for this guide: the Org authorization server and the default custom authorization server. The Org authorization server issues opaque tokens, which the gateway's JWT policy cannot validate. This guide uses the default authorization server at `/oauth2/default`, which issues JWTs that the gateway can validate.
 
-1. In the Okta Admin Console, go to **Security** → **Authentication**.
-2. Click the **"App sign-in"** tab.
-3. Click the **"Default"** policy.
-4. Click **"Edit"** (pencil icon) on the **"Catch-all Rule"**.
-5. Under **"User must authenticate with"**, select **"Any 1 factor type"**.
-6. Under **"Authentication methods"**, select **"Allow specific authentication methods"** and ensure only **"Password"** is checked.
-7. Click **"Update Rule"**.
+1. In the Okta Admin Console, navigate to **Security** → **API**.
+2. Open the **Authorization Servers** tab.
+3. Click **default**.
+4. Go to the **Access Policies** tab.
+5. Click **Add Policy** and configure the following:
+   - **Name**: `kgateway-access-policy`
+   - **Assign to**: **The following clients**, then select `kgateway-app`
+6. Click **Create Policy**.
 
-{{< reuse-image src="img/okta/okta-auth-policy.png" >}}
+{{< reuse-image src="img/okta/okta-access-policy.png" >}}
 
-> [!NOTE]
-> This change is only required for testing the Access Token flow. In production, you may want a stricter policy.
+7. On the new policy, click **Add rule** and configure the following:
+   - **Rule Name**: `kgateway-default-rule`
+   - **Grant type**: Check **Authorization Code**. Check **Client Credentials** too if you plan to use the access token validation flow.
+   - **User is**: **Any user assigned the app**
+   - **Scopes requested**: **Any scopes**
+8. Click **Create Rule**.
+
+{{< reuse-image src="img/okta/okta-access-rule.png" >}}
+
+After you save the policy and rule, the default authorization server issues tokens for the `kgateway-app` client, and the issuer, audience, and JWKS endpoints all resolve under `/oauth2/default`.
 
 ## Connect kgateway to Okta
 
-Both authentication flows need a network path from the gateway to Okta. Create these two resources first, whichever flow you use.
+Both authentication flows need a network path from the gateway to Okta. Create these two resources first, whichever flow you use. All URLs in this section, and in the flow guides that follow, resolve under `/oauth2/default` on your Okta domain.
 
 ### Create a Backend for Okta {#create-backend}
 
@@ -135,7 +143,7 @@ Replace `YOUR_OKTA_DOMAIN` with your Okta domain (such as `integrator-6003780.ok
 > [!NOTE]
 > This address is separate from the public Okta URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
 
-## Configure TLS for the Okta Backend {#configure-tls}
+### Configure TLS for the Okta Backend {#configure-tls}
 
 Since Okta uses a public, trusted certificate, you can use the system's trusted CA certificates. Create a `BackendConfigPolicy` to configure TLS.
 
@@ -165,7 +173,7 @@ Okta is configured and the gateway can reach it. Now protect a route with the fl
 
 {{< cards >}}
 {{< card link="../authorization-code" title="Authorization code flow" subtitle="Redirect browser users to Okta to log in, and store their tokens in session cookies." >}}
-{{< card link="../access-token" title="Access token validation" subtitle="Validate a token that an API client already holds, and reject requests without one." >}}
+{{< card link="../access-token" title="Access token validation" subtitle="Validate a JWT that an API client already holds, and reject requests without one." >}}
 {{< /cards >}}
 
 ## Cleanup {#cleanup}

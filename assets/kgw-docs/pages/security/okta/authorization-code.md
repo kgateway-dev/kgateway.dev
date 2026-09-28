@@ -2,7 +2,7 @@ Protect a route with the OAuth2 authorization code flow. Unauthenticated browser
 
 ## Before you begin
 
-1. Complete the [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/" >}}) page. This flow needs the Okta application, the test user, the `Backend`, and the `BackendConfigPolicy` that it creates.
+1. Complete the [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/" >}}) page. This flow needs the Okta application, the test user, the [access policy and rule on the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}), the `Backend`, and the `BackendConfigPolicy` that it creates.
 
 2. Make sure your gateway has an **HTTPS listener**. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
 
@@ -21,7 +21,9 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Okta. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources.
 
 > [!NOTE]
-> Okta's `iss` claim is derived from your Okta domain. Use the same domain consistently across `issuerURI` and the endpoint fields. The `redirectURI` must match the exact value you register in Okta's **Sign-in redirect URIs**. The gateway still reaches Okta through `backendRef`, so the two do not have to be the same address.
+> This guide uses the default custom authorization server at `/oauth2/default`, not the Org authorization server. The Org authorization server issues opaque tokens that the gateway's JWT policy cannot validate, while the default authorization server issues JWTs. All of the issuer and endpoint values below must resolve under `/oauth2/default`. If you also plan to use the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow, keep the issuer and audience consistent between both pages.
+>
+> The `redirectURI` must match the exact value you register in Okta's **Sign-in redirect URIs**. The gateway still reaches Okta through `backendRef`, so the two do not have to be the same address.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -38,9 +40,9 @@ spec:
       name: okta
       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://YOUR_OKTA_DOMAIN/oauth2/default
-    authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/authorize
-    tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/token
-    endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/logout
+    authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize
+    tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/token
+    endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/logout
     redirectURI: https://www.example.com/oauth2/redirect
     scopes:
       - openid
@@ -57,9 +59,11 @@ EOF
 | --- | --- |
 | `backendRef` | Points to the `Backend` from [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/#create-backend" >}}). Kgateway uses it to reach Okta for token exchange and OIDC discovery. |
 | `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
+| `authorizationEndpoint` | The Okta endpoint that the gateway redirects browser users to for login. For the default authorization server, this is `/oauth2/default/v1/authorize`. |
+| `tokenEndpoint` | The Okta endpoint that the gateway calls to exchange the authorization code for tokens. For the default authorization server, this is `/oauth2/default/v1/token`. |
 | `redirectURI` | The callback URL that kgateway sends to Okta as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Okta. Set it explicitly. |
 | `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
-| `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Okta ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. |
+| `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Okta ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. For the default authorization server, this is `/oauth2/default/v1/logout`. |
 | `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
 
 3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
@@ -151,11 +155,11 @@ curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
 {{% /tab %}}
 {{< /tabs >}}
 
-Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Okta application.
+Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Okta application, and the authorization endpoint is under `/oauth2/default`.
 
 ```text
 < HTTP/2 302
-< location: https://YOUR_OKTA_DOMAIN/oauth2/v1/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
+< location: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
 < set-cookie: OauthNonce-...;path=/;Max-Age=600;secure;HttpOnly
 ```
 
@@ -164,6 +168,8 @@ Example output. Note that the `redirect_uri` parameter matches the value that yo
 3. Log in with the test user credentials you created in the [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/#create-test-user" >}}).
 
 4. Verify that Okta returns you to the route and that the response shows the httpbin output. The gateway exchanged the authorization code for tokens and stored them in session cookies.
+
+If Okta shows the message that the user is not allowed to access the app, the access policy or rule on the default authorization server is missing or does not include `kgateway-app`. See [Configure the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}).
 
 If you get a `401` response with `CSRF token validation failed` in the gateway logs, you sent the request over HTTP. Retry over HTTPS.
 
@@ -256,7 +262,7 @@ spec:
   oauth2:
     # ... rest of the provider config ...
     jwt:
-      jwksURI: https://YOUR_OKTA_DOMAIN/oauth2/v1/keys
+      jwksURI: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/keys
       idToken:
         claimsToHeaders:
           - name: sub
@@ -323,9 +329,9 @@ spec:
       name: okta
       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
     issuerURI: https://YOUR_OKTA_DOMAIN/oauth2/default
-    authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/authorize
-    tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/token
-    endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/v1/logout
+    authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize
+    tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/token
+    endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/logout
     redirectURI: https://www.example.com/oauth2/redirect
     scopes:
       - openid
