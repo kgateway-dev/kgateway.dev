@@ -8,30 +8,35 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>404 - Page Not Found | kgateway</title>
+  <meta name="robots" content="noindex, follow">
   {{- partial "custom/head-end.html" . -}}
 </head>
 
 <script>
     var docsVersions = "{{ $docsVersions }}".slice(1, -1).split(' ');
     var pathname = window.location.pathname;
-    var match = window.location.href.match(/.*\/docs\/([a-zA-Z0-9\.]+)\/?/);
+    var extra = window.location.search + window.location.hash;
+    var match = pathname.match(/^\/docs\/([a-zA-Z0-9._-]+)\/?/);
     if (match) {
         var matchedPath = match[1];
         // Skip redirect for section names (envoy, agentgateway)
         if (matchedPath === "envoy" || matchedPath === "agentgateway") {
             // Let the section-specific redirects handle these
-        } else if (matchedPath === "latest" && pathname.startsWith("/docs/latest/") && pathname.length > "/docs/latest/".length) {
-            // /docs/latest/... (with more path) should go to /docs/envoy/latest/... (handles case when _redirects didn't fire)
-            window.location.assign(window.location.origin + "/docs/envoy/latest/" + pathname.slice("/docs/latest/".length));
         } else if (docsVersions.includes(matchedPath)) {
-            // /docs/{version} and /docs/{version}/ no longer exist; redirect to /docs/envoy/{version}
-            if (pathname === "/docs/" + matchedPath || pathname === "/docs/" + matchedPath + "/") {
+            // Check if subpath is present: /docs/{version}/... -> /docs/envoy/{version}/...
+            var versionPrefix = "/docs/" + matchedPath;
+            if (pathname.startsWith(versionPrefix + "/")) {
+                window.location.assign(window.location.origin + "/docs/envoy/" + matchedPath + "/" + pathname.slice((versionPrefix + "/").length) + extra);
+            } else if (pathname === versionPrefix || pathname === versionPrefix + "/") {
                 var trailingSlash = pathname.endsWith("/") ? "/" : "";
-                window.location.assign(window.location.origin + "/docs/envoy/" + matchedPath + trailingSlash);
+                window.location.assign(window.location.origin + "/docs/envoy/" + matchedPath + trailingSlash + extra);
             }
         } else {
-            // match is not a valid docs version, insert `latest` after docs and retry
-            window.location.assign(window.location.href.replace("/docs/", "/docs/latest/"));
+            // match is not a valid docs version, redirect legacy /docs/... to /docs/envoy/latest/...
+            var docsIndex = pathname.indexOf("/docs/");
+            if (docsIndex !== -1) {
+                window.location.assign(window.location.origin + "/docs/envoy/latest/" + pathname.slice(docsIndex + "/docs/".length) + extra);
+            }
         }
     }
 </script>
