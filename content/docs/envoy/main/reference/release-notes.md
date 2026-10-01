@@ -88,6 +88,12 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Strip trailing dots from hostnames {#v25-strip-trailing-host-dot}
+
+You can now use the `stripTrailingHostDot` field in the HTTP settings of a ListenerPolicy resource to strip a trailing dot from the `Host` or `:authority` header before route matching. Use this policy when a client sends a fully qualified domain name with a trailing dot, such as `example.com.`, which does not otherwise match an HTTPRoute hostname of `example.com`.
+
+For more information, see [Strip trailing dots from hostnames]({{< link-hextra path="/traffic-management/header-control/strip-trailing-host-dot/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
