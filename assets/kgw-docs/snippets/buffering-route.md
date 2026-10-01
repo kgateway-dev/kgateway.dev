@@ -63,7 +63,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
 
 4. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
 5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.

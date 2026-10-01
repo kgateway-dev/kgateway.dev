@@ -42,28 +42,24 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 2. Annotate the http Gateway resource to set a buffer limit of 1 kilobytes.
    ```yaml
    kubectl apply -f- <<EOF
-   kind: Gateway
-   apiVersion: gateway.networking.k8s.io/v1
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
    metadata:
-     name: http
-     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-     annotations:
-       kgateway.dev/per-connection-buffer-limit: '1Ki'
+     name: bufferlimits
+     namespace: kgateway-system
    spec:
-     gatewayClassName: {{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}
-     listeners:
-     - protocol: HTTP
-       port: 8080
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
        name: http
-       allowedRoutes:
-         namespaces:
-           from: All
+     default:
+       perConnectionBufferLimitBytes: 1024
    EOF
    ```
 
 3. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
 4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
@@ -139,3 +135,131 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
      }
    }
    ```
+
+## Set up buffer limits per route
+
+You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} to control how much data can be buffered per connection at the level of individual routes. This configuration can provide more fine-grained control than applying the buffer limit at the Gateway and can provide a method of overriding a buffer limit at the level of the Gateway.
+
+1. If you did not already, create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation-buffer-body
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     transformation:
+       response:
+         body:
+           parseAs: AsString
+           value: '{{ body() }}'
+   EOF
+   ```
+
+2. If you previously created the ListenerPolicy, remove it. 
+   ```sh
+   kubectl delete listenerpolicy bufferlimits -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 
+   ``` 
+   
+3. In a separate {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}}, apply a buffer limit of `maxRequestSize: '1024'` to the httpbin app. This setting limits the request payload to 1024 bytes.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: transformation-buffer-limit
+     namespace: httpbin
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: HTTPRoute
+       name: httpbin
+     buffer:
+       maxRequestSize: '1024'
+   EOF
+   ```
+
+4. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
+   ```sh
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
+   ```
+
+5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/anything \
+   -H "host: www.example.com:8080" \
+   -H "Content-Type: text/plain" \
+   -d "{\"payload\": \"$(< /tmp/large_payload_2k.txt)\"}"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik -X POST http://localhost:8080/anything \
+   -H "host: www.example.com:8080" \
+   -H "Content-Type: text/plain" \
+   -d "{\"payload\": \"$(< /tmp/large_payload_2k.txt)\"}"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik -X POST http://$INGRESS_GW_ADDRESS:8080/anything \
+      -H "host: www.example.com:8080" \
+      -H "Content-Type: application/json" \
+      -d "{\"payload\":  \"hello world\"}" 
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik -X POST http://localhost:8080/anything \
+      -H "host: www.example.com:8080" \
+      -H "Content-Type: application/json" \
+      -d "{\"payload\":  \"hello world\"}" 
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+
+   Example output:
+
+   ```json
+   {
+     "args": {},
+     "data": "{\"payload\": \"hello world\"}",
+     "files": {},
+     "form": {},
+     "headers": {
+       ...
+     },
+     "json": {
+       "payload": "hello world"
+     },
+     "method": "POST",
+     "origin": "...",
+     "url": "https://$INGRESS_GW_ADDRESS:8080/anything"
+   }
+   ```
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}{{< reuse "kgw-docs/pages/traffic-management/buffering-filter-stage.md" >}}{{< /version >}}
+
+## Cleanup
+
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin --ignore-not-found
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin --ignore-not-found{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} bufferedroute-policy -n httpbin --ignore-not-found
+kubectl delete httproute/bufferedroute gatewayextension/basic-ext-auth-buffer deployment/ext-authz service/ext-authz -n httpbin --ignore-not-found{{< /version >}}
+kubectl delete listenerpolicy bufferlimits -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+```
