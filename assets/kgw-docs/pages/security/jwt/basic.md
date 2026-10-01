@@ -453,7 +453,11 @@ Set `clockSkew` only as wide as the clock drift you actually observe, because a 
 
 Use the `validationMode` field to control whether requests without a JWT are allowed.
 
-Requests with valid tokens populate JWT dynamic metadata and any headers that you configure in the `claimsToHeaders` field. In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view the requests that failed the JWT validation. Note that failures are still captured, even if you choose a validation mode that allows through invalid-token requests, such as `AllowMissingOrFailed`. 
+Requests with valid tokens populate JWT dynamic metadata and any headers that you configure in the `claimsToHeaders` field.
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view the requests that failed the JWT validation. Note that failures are still captured, even if you choose a validation mode that allows through invalid-token requests, such as `AllowMissingOrFailed`.
+{{< /version >}}
 
 #### Strict (default)
 
