@@ -63,6 +63,11 @@ To let the backend make that decision, set the `proxy100Continue` field in a Lis
    EOF
    ```
 
+   | Field | Description |
+   | --- | --- |
+   | `spec.targetRefs` | The Gateway resources that the ListenerPolicy applies to. In this example, the policy applies to the `http` Gateway from the sample app guide. |
+   | `spec.default.httpSettings.proxy100Continue` | Set to `true` to forward requests with an `Expect: 100-continue` header to the backend, and to pass the `100 Continue` response from the backend back to the client. Omit the field or set it to `false` to let the gateway proxy answer with `100 Continue` itself. |
+
 3. Send the same request again.
 
    {{< tabs >}}
