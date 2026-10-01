@@ -184,7 +184,20 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    | grpcService | Configuration for connecting to the gRPC rate limit service. | Yes |
    | domain | Domain identity for the rate limit service. If you have different domains for different teams, each team can create their own GatewayExtension that their own {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} can reference. | Yes |
    | timeout | Timeout for rate limit service calls, such as `100ms`. | No |
-   | failOpen | When `true`, requests continue even if the rate limit service is unavailable. | No (defaults to `false`) |
+   | failOpen | When `true`, requests continue even if the rate limit service is unavailable. | No (defaults to `false`) |{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+   | percentEnabled | Percentage of requests for which the global rate limit filter calls the rate limit service. Requests outside this percentage skip the filter. Set a value from `0` to `100`. | No |
+   | percentEnforced | Percentage of enabled requests that the rate limit service decision can deny. To try rate limits without blocking traffic, set `percentEnabled` to `100` and `percentEnforced` to `0`. Set a value from `0` to `100`. | No |{{< /version >}}
+
+   {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+   To try a rate limit before the rate limit service starts denying requests, run the filter in shadow mode. In shadow mode, the filter calls the rate limit service and records the decision, but the filter does not block requests. When you are ready to enforce the rate limit service decision, set `percentEnforced` to `100`.
+
+   ```sh
+   kubectl patch gatewayextension global-ratelimit \
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
+     --type merge \
+     -p '{"spec":{"rateLimit":{"percentEnabled":100,"percentEnforced":0}}}'
+   ```
+   {{< /version >}}
 
 2. Create a Kubernetes ReferenceGrant to allow the GatewayExtension to access the Rate Limit Service. Otherwise, you can create the GatewayExtension and {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} in the same namespace as the Rate Limit Service.
 
