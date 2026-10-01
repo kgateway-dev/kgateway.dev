@@ -88,6 +88,10 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Controller Go memory limit tracks container memory resizes {#v25-controller-memory-limit}
+
+The `controller.goMemLimitPercent` Helm value now configures the controller with `AUTOMEMLIMIT`, so the controller computes `GOMEMLIMIT` from its live cgroup memory limit and refreshes the limit every 30 seconds. Use this setting when a Kubernetes LimitRange resource or Vertical Pod Autoscaler can change the controller memory limit after Helm renders the chart. For more information, see [Tune the controller Go memory limit]({{< link-hextra path="/install/helm/#controller-memory-limit" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

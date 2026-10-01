@@ -126,6 +126,25 @@ helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kg
    {{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}     kgateway.dev/{{< reuse "/kgw-docs/snippets/gatewayclass.md" >}}    True       6m36s
    ```
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+## Tune the controller Go memory limit {#controller-memory-limit}
+
+Use `controller.goMemLimitPercent` when a Kubernetes LimitRange resource or Vertical Pod Autoscaler (VPA) can change the controller container memory limit after Helm renders the chart. A value of `90` is the recommended starting point.
+
+```yaml
+controller:
+  goMemLimitPercent: 90
+```
+
+| Field | Description |
+| -- | -- |
+| `controller.goMemLimitPercent` | Sets the percentage of the live controller container cgroup memory limit that the Go runtime can use. Valid values are `1`-`100`. The default value, `0`, keeps the startup-time `resourceFieldRef` behavior for `GOMEMLIMIT`. |
+
+When you set `controller.goMemLimitPercent` to a nonzero value, the Helm chart renders the percentage as an `AUTOMEMLIMIT` ratio for the controller. At startup, the controller sets `GOMEMLIMIT` from the live cgroup memory limit. The controller refreshes the limit every 30 seconds, so in-place memory resizes can update the Go runtime limit without restarting the pod.
+
+If you enable strict validation, use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
+{{< /version >}}
+
 ## Next steps
 
 
