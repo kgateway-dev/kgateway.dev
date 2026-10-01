@@ -51,7 +51,8 @@ spec:
     idleTimeout: 10s  
     maxHeadersCount: 15
     maxStreamDuration: 30s
-    maxRequestsPerConnection: 100 
+    maxRequestsPerConnection: 100 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+    maxConnectionDuration: 600s{{< /version >}}
 ```
 
 | Setting | Description | 
@@ -59,7 +60,8 @@ spec:
 | `idleTimeout` | The idle timeout for connections. The idle timeout is defined as the period in which there are no active requests. When the idle timeout is reached, the connection is closed. Note that request-based timeouts mean that HTTP/2 PINGs do not keep the connection alive. If not specified, the idle timeout defaults to 1 hour. To disable idle timeouts, explicitly set this field to 0. **Warning**: Disabling the timeout has a highly likelihood of yielding connection leaks, such as due to lost TCP FIN packets.| 
 | `maxHeadersCount` | The maximum number of headers that can be sent in a connection. If not specified, the number defaults to 100. Requests that exceed this limit receive a 431 response for HTTP/1 and cause a stream reset for HTTP/2. | 
 | `maxStreamDuration` | The total duration to keep alive an HTTP request/response stream. If the time limit is reached, the stream is reset independent of any other timeouts. If not specified, this value is not set. | 
-| `maxRequestsPerConnection` | The maximum number of requests that can be sent per connection. | 
+| `maxRequestsPerConnection` | The maximum number of requests that can be sent per connection. | {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+| `maxConnectionDuration` | The maximum duration of a connection, measured from the time that the connection was established. When this duration is reached, the gateway starts the drain sequence. Unlike `idleTimeout`, this setting closes the connection even when the connection is actively serving requests, which makes it useful for forcing clients to periodically reconnect and rebalance. If not specified, connections have no maximum duration. | {{< /version >}}
  
 
 #### Additional HTTP 1.0 protocol options {#http1}
@@ -115,7 +117,8 @@ spec:
        idleTimeout: 10s  
        maxHeadersCount: 15
        maxStreamDuration: 30s
-       maxRequestsPerConnection: 100 
+       maxRequestsPerConnection: 100 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+       maxConnectionDuration: 600s{{< /version >}}
      http1ProtocolOptions:
        enableTrailers: true
        overrideStreamErrorOnInvalidHttpMessage: true
@@ -148,7 +151,8 @@ spec:
         "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
         "common_http_protocol_options": {
          "idle_timeout": "10s",
-         "max_headers_count": 15,
+         "max_headers_count": 15,{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+         "max_connection_duration": "600s",{{< /version >}}
          "max_stream_duration": "30s",
          "headers_with_underscores_action": "REJECT_REQUEST",
          "max_requests_per_connection": 100
