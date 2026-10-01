@@ -1,5 +1,10 @@
 ## Move the buffer filter before body-reading filters
 
+{{< version include-if="2.4.x" >}}
+> [!NOTE]
+> The `buffer.filterStage` field is available in version {{% upstream %}}2.4.5{{% /upstream %}}{{% downstream %}}2.3.4{{% /downstream %}} and later.
+{{< /version >}}
+
 By default, the buffer filter runs at a fixed position after authentication, authorization, and rate limiting, but before routing. This default position is not one of the values that you can set in the `buffer.filterStage.stage` and `buffer.filterStage.predicate` fields. To keep the buffer filter at the default position, omit the `buffer.filterStage` block entirely.
 
 The following stages and predicates are supported to determine the position of the buffer filter in the Envoy filter chain.
