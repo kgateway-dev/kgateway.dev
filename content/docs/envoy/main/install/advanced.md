@@ -175,6 +175,17 @@ controller:
     KGW_XDS_FIRST_CONNECT_DELAY: "2s"
 ```
 
+## Ordered ADS delivery {#ordered-ads-delivery}
+
+Ordered Aggregated Discovery Service (ADS) delivery is enabled by default. With ordered ADS delivery, the control plane preserves response order when one xDS snapshot adds resources to busy proxy streams. The preserved resources are Cluster Discovery Service (CDS), Endpoint Discovery Service (EDS), Listener Discovery Service (LDS), and Route Discovery Service (RDS).
+
+Before the default changed, the control plane used the original unordered delivery behavior unless `KGW_ENABLE_ORDERED_ADS` was set to `"true"`. If ordered ADS delivery causes an issue in your environment, set `KGW_ENABLE_ORDERED_ADS` to `"false"` on the controller to restore the previous behavior.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_ENABLE_ORDERED_ADS: "false"
+```
 
 ## Controller admin server bind address
 
@@ -196,5 +207,3 @@ controller:
   admin:
     bindAddress: 0.0.0.0
 ```
-
-
