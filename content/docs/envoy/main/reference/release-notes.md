@@ -88,6 +88,12 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Forward 100-continue requests to the backend {#v25-proxy-100-continue}
+
+You can now use the `proxy100Continue` field in the HTTP settings of a ListenerPolicy resource to let the backend decide whether to accept a request body instead of having the gateway proxy respond automatically. When enabled, the gateway proxy forwards the `Expect: 100-continue` header to the backend and passes the backend's `100 Continue` response back to the client.
+
+For more information, see [Forward 100-continue requests]({{< link-hextra path="/traffic-management/proxy-100-continue/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}

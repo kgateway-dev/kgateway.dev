@@ -2,9 +2,9 @@ Forward `Expect: 100-continue` requests to the backend so that the backend decid
 
 ## About 100-continue {#about}
 
-A client that is about to send a large request body can first send the request headers with an `Expect: 100-continue` header. The client then waits for a `100 Continue` response before it sends the body. Then the server can reject the request before the client uploads the body because the client is not authorized or the body is too large.
+A client that is about to send a large request body can first send the request headers with an `Expect: 100-continue` header. The client then waits for a `100 Continue` response before it sends the body. This process allows a server to reject the request before the client uploads the body, because the client is not authorized or the body is too large.
 
-By default, the gateway proxy handles this exchange itself. The gateway proxy removes the `Expect` header, immediately returns `100 Continue` to the client, and forwards the request without the header. As a result, the backend cannot reject the request before the client sends the body.
+By default, the gateway proxy handles this exchange itself. The gateway proxy removes the `Expect` header, immediately returns `100 Continue` to the client, and forwards the request without the header to the backend. Because of that, the backend cannot reject the request before the client sends the body.
 
 To let the backend make that decision, set the `proxy100Continue` field in a ListenerPolicy. The gateway proxy then forwards the `Expect: 100-continue` header to the backend, and passes the `100 Continue` response from the backend back to the client.
 
@@ -35,7 +35,7 @@ To let the backend make that decision, set the `proxy100Continue` field in a Lis
    {{% /tab %}}
    {{< /tabs >}}
 
-   In the output, the gateway proxy returns `100 Continue`. The `headers` in the response body do not include an `Expect` header, because the gateway proxy removed the header before it forwarded the request.
+   In the output, the gateway proxy returns a `100 Continue` HTTP response. The `headers` in the response body do not include an `Expect` header, because the gateway proxy removed the header before it forwarded the request.
 
    ```console
    < HTTP/1.1 100 Continue
@@ -68,7 +68,7 @@ To let the backend make that decision, set the `proxy100Continue` field in a Lis
    | `spec.targetRefs` | The Gateway resources that the ListenerPolicy applies to. In this example, the policy applies to the `http` Gateway from the sample app guide. |
    | `spec.default.httpSettings.proxy100Continue` | Set to `true` to forward requests with an `Expect: 100-continue` header to the backend, and to pass the `100 Continue` response from the backend back to the client. Omit the field or set it to `false` to let the gateway proxy answer with `100 Continue` itself. |
 
-3. Send the same request again.
+3. Send the same request to the httpbin app again. Verify that the `headers` in the response body include the `Expect` header, which means that the gateway proxy forwarded the header to httpbin. The `100 Continue` response now comes from httpbin.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -89,9 +89,8 @@ To let the backend make that decision, set the `proxy100Continue` field in a Lis
    {{% /tab %}}
    {{< /tabs >}}
 
-   This time, the `headers` in the response body include the `Expect` header, which means that the gateway proxy forwarded the header to httpbin. The `100 Continue` response now comes from httpbin.
-
-   ```console
+   Example output: 
+   ```console {hl_lines=[8,9]}
    < HTTP/1.1 100 Continue
    < HTTP/1.1 200 OK
    ...
@@ -107,21 +106,16 @@ To let the backend make that decision, set the `proxy100Continue` field in a Lis
    }
    ```
 
-4. Optional: Check the setting in the Envoy configuration of the gateway proxy.
-   1. Port-forward the gateway proxy on port 19000 to open the Envoy admin interface.
-      ```sh
-      kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
-      ```
+4. Optional: Port-forward the gateway proxy on port 19000 to open the Envoy admin interface, and verify that the `proxy_100_continue` field is set to `true` in the HTTP connection manager.
+   ```sh
+   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 & \
+   sleep 2 && curl -s localhost:19000/config_dump | grep proxy_100_continue
+   ```
 
-   2. Verify that the `proxy_100_continue` field is set to `true` in the HTTP connection manager.
-      ```sh
-      curl -s localhost:19000/config_dump | grep proxy_100_continue
-      ```
-
-      Example output:
-      ```console
-            "proxy_100_continue": true,
-      ```
+   Example output:
+   ```console
+         "proxy_100_continue": true,
+   ```
 
 ## Cleanup
 
