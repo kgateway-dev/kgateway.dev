@@ -82,10 +82,9 @@ EOF
 | Setting | Description |
 | -- | -- |
 | `allowConnect` | Enables RFC 8441 Extended CONNECT support on the HTTP/2 listener. Set to `true` to allow clients that use WebSocket-over-HTTP/2, such as Firefox, to establish WebSocket connections. Envoy translates the Extended CONNECT request into an HTTP/1.1 Upgrade before forwarding it to the upstream service. Defaults to `false`. |
-{{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
-To enable WebSocket and other HTTP protocol upgrades on a listener or on individual routes, see [HTTP protocol upgrades]({{< link-hextra path="/setup/http-upgrades/" >}}).
+> [!NOTE]
+The `allowConnect` setting only allows the Extended CONNECT request through the gateway proxy. Envoy still converts it into a regular `websocket` upgrade internally, so you also need to enable the `websocket` upgrade token, either on the listener or on the route. For more information, see [HTTP protocol upgrades]({{< link-hextra path="/setup/http-upgrades/" >}}).
 {{< /version >}}
 
 ## Cleanup
