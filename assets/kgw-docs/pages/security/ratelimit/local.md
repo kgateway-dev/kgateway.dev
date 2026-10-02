@@ -392,7 +392,7 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    ...
    ```
 
-{{< version exclude-if="2.3.x,2.4.x,2.5.x" >}}
+{{< version include-if="2.1.x,2.2.x" >}}
 
 ## Cleanup
 
@@ -407,7 +407,5 @@ kubectl delete httproute httpbin-anything -n httpbin
 ```
 
 {{< /version >}}
-
-
 
 

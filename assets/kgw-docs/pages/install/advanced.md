@@ -144,6 +144,29 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+## Tune the controller Go memory limit {#controller-memory-limit}
+
+By default, the Go runtime that the kgateway controller runs on does not know how much memory Kubernetes allows its container to use. The controller's garbage collector just runs on its own schedule, so the controller can keep allocating memory right up to the container's limit. When it crosses that limit, the Linux kernel kills the container immediately, with no warning and no chance for the controller to free memory first. This event appears as a Kubernetes pod restart, often labeled `OOMKilled`.
+
+The `GOMEMLIMIT` environment variable fixes this issue by giving the Go runtime a soft memory ceiling. As the pod's memory usage approaches that ceiling, the garbage collector starts freeing up memory, so the controller can stay under the container's limit instead of being killed when it goes over.
+
+By default, `controller.goMemLimitPercent` is set to `0`, which disables the Go memory limit feature. The Helm chart sets the `GOMEMLIMIT` environment variable when the controller pod starts by reading the `resources.limits.memory` on the associated Deployment. This limit is fixed throughout the pod's lifecycle. If the container's memory limit changes later, such as when a Kubernetes LimitRange resource is applied or a Vertical Pod Autoscaler (VPA) resizes the pod in place, `GOMEMLIMIT` does not follow that change until the pod restarts.
+
+To ajust the `GOMEMLIMIT` variable dynamically, set the `controller.goMemLimitPercent` field to a value between `1` and `100`. This way, the `GOMEMLIMIT` environment variable is kept in sync with the container's memory limit as it changes. Instead of reading the memory limit once at startup, the controller reads the container's live memory limit directly from its cgroup every 30 seconds, and sets `GOMEMLIMIT` to the percentage you configure of that current value. A value of `90` is the recommended starting point. The controller targets 90% of the container's memory limit, leaving 10% as headroom for memory that the Go runtime does not track, such as memory that is used by Envoy subprocesses.
+
+```yaml
+controller:
+  goMemLimitPercent: 90
+```
+
+| Field | Description |
+| -- | -- |
+| `controller.goMemLimitPercent` | Sets the percentage of the controller container's live memory limit that the Go runtime targets for `GOMEMLIMIT`. Valid values are `0`-`100`. The default value, `0`, sets `GOMEMLIMIT` once at pod startup from the container's memory limit and does not update it afterward. A value between `1` andd `100` re-reads the container's live memory limit every 30 seconds and sets `GOMEMLIMIT` to that percentage of it. |
+
+If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
+{{< /version >}}
+
 {{< version exclude-if="2.2.x,2.1.x">}}
 
 ## ReferenceGrant enforcement modes
@@ -171,38 +194,34 @@ The following table shows which cross-namespace references are checked in each m
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
-| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / `spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
-| ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / `spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
-| ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / `spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.headerModifiers.request.set[].secretRef` / `spec.headerModifiers.request.add[].secretRef`, and the same fields under `spec.headerModifiers.response` | Secret | checked | checked | allowed |{{% /version %}}
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.basicAuth.secretRef` / `spec.apiKeyAuth.secretRef` / `spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
-{{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
+| ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
+{{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
 {{% /downstream %}}
 
-> [!NOTE]
-> The **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. This is usually the resource that you set the field on, but a CA certificate reference is always made by the Gateway or ListenerSet that owns the listener, even when you set `caCertificateRefs` on a ListenerPolicy. The ListenerPolicy fields in this table also exist under `spec.perPort[].listener.httpSettings`, where they behave the same way.
-
-{{% downstream %}}
-> [!NOTE]
+> [!IMPORTANT]
+> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
+> {{% downstream %}}
+> 
+> Cross-namespace references from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} are evaluated as the `TrafficPolicy` kind, including the `apiKeyAuth`, `basicAuth`, `headerModifiers`, and `extensionRef` fields, and the `extensionRef` fields in `entExtAuth` and `entRateLimit.global`. For these fields, you must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind in the `from` section of your ReferenceGrant. A grant that names the `enterprisekgateway.solo.io` group or the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind is accepted by the API server, never matches, and the policy fails with `missing reference grant`.
+> 
+> The exceptions are the Backend references in `entJWT` and `entWAF`, and the ConfigMap reference in `entGrpcJsonTranscoder`. These references are evaluated as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind, so their grants must name the `enterprisekgateway.solo.io` group and the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind.
+> 
 > References from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an AuthConfig, RateLimitConfig, or WAFPolicy resource are not validated in any mode, so `entExtAuth.authConfigRef`, `entRateLimit.global.rateLimitConfigRefs`, and `entWAF.wafPolicyRef` can select a resource in another namespace without a ReferenceGrant. Do not rely on `STRICT` mode to isolate these resources between namespaces. If you need to restrict them, use namespace discovery or RBAC instead.
-{{% /downstream %}}
+> {{% /downstream %}}
 
 ### ReferenceGrant example {#referencegrant-example}
 
-To reference resources across namespaces, create a ReferenceGrant in the namespace of the resource that you want to access, not in the namespace of the resource that makes the reference. The `from` section describes the resource that makes the reference, and the `to` section describes the resource it is allowed to reach.
-
-{{% downstream %}}
-> [!IMPORTANT]
-> Most cross-namespace references from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} are evaluated as the `TrafficPolicy` kind, including the `apiKeyAuth`, `basicAuth`, `headerModifiers`, and `extensionRef` fields, and the `extensionRef` fields in `entExtAuth` and `entRateLimit.global`. For these, you must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind in the `from` section of your ReferenceGrant. A grant that names the `enterprisekgateway.solo.io` group or the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind is accepted by the API server, never matches, and the policy fails with `missing reference grant`.
-> 
-> The exceptions are the Backend references in `entJWT` and `entWAF`, and the ConfigMap reference in `entGrpcJsonTranscoder`. These are evaluated as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind, so their grants must name the `enterprisekgateway.solo.io` group and the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind.
-{{% /downstream %}}
+To reference resources across namespaces, create a ReferenceGrant in the namespace of the resource that you want to access, not in the namespace of the resource that makes the reference. The `from` section describes the resource that makes the reference, and the `to` section describes the resource it is allowed to reach. For more information about which resource to reference in each field, see [Reference validation by mode](#referencegrant-modes). 
 
 The following example allows a policy in the `httpbin` namespace to read Secrets in the `team-secrets` namespace.
 
