@@ -18,9 +18,11 @@ In addition, you can choose between the following validation modes:
 * **AllowValidOnly**: A connection between a client and the gateway proxy can only be established if the gateway can validate the client's TLS certificate successfully. For an example, see the [Default configuration for all listeners](#default) guide.
 * **AllowInsecureFallback**: The gateway proxy can establish a TLS connection, even if the client TLS certificate could not be validated successfully. For an example, see the [Per port configuration](#perport) guide.
 
+Both the default and perPort configurations are applied at the port level. To isolate the CA certificates of listeners that share a port, override the Gateway configuration for an individual listener by using a ListenerPolicy. For an example, see the [Per listener configuration](#per-listener) guide.
+
 ## About this guide
 
-In this guide, you learn how to apply default certificate validation configuration for all HTTPS listeners on a Gateway and how to override this configuration for a specific port. You further explore secure and insecure certificate validation modes, and use TLS annotations to limit connections to clients that present certificates with a specific Subject Alt Name and certificate hash. 
+In this guide, you learn how to apply default certificate validation configuration for all HTTPS listeners on a Gateway, how to override this configuration for a specific port, and how to override it for an individual listener so that listeners that share a port can use different CA certificates. You further explore secure and insecure certificate validation modes, and use TLS annotations to limit connections to clients that present certificates with a specific Subject Alt Name and certificate hash. 
 
 Throughout this guide, you use self-signed TLS certificates for the Certificate Authority. These certificates are used to sign the TLS certificates for the gateway proxy (server) and httpbin client. 
 
@@ -107,7 +109,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      -extensions v3_req -extfile <(echo "[v3_req]"; echo "subjectAltName=DNS:example.com,DNS:*.example.com")
    ```
 
-7. Continue with configuring a [Default configuration for all listeners](#default). Alternatively, you can explore how to [override the default configuration for a specific port](#perport). 
+7. Continue with configuring a [Default configuration for all listeners](#default). Alternatively, you can explore how to override the default configuration [for a specific port](#perport) or [for an individual listener](#per-listener). 
 
 
 ## Default configuration for all listeners {#default}
@@ -503,6 +505,337 @@ In this example, you override the default certificate validation configuration f
    {{% /tab %}}
    {{< /tabs >}}
 
+## Per listener configuration {#per-listener}
+
+The FrontendTLS `default` and `perPort` configurations are applied at the port level. When multiple listeners share the same port, the CA certificates of that port are combined into a single trust pool. As a result, any client certificate that is signed by any of these CAs is valid for every listener on that port.
+
+To give each listener its own trust boundary, use the `clientCertificateValidation` setting in a ListenerPolicy that targets a single listener with `sectionName`. The ListenerPolicy overrides the FrontendTLS validation configuration of the Gateway for that listener only. Listeners that are not targeted by a ListenerPolicy continue to use the `default` or `perPort` configuration of the Gateway.
+
+This setup is common in multi-tenant environments where each tenant has its own hostname and its own CA, but all tenants must be served by a single Gateway, and therefore a single load balancer.
+
+> [!IMPORTANT]
+> Per-listener validation can be bypassed when a wildcard listener, such as `*.example.com`, overlaps a more specific hostname on the same port. Because TLS connections to a port can be coalesced, a client that is validated against the CA of the wildcard listener can reuse that connection to reach the more specific listener. Use per-listener validation only if the hostnames of the listeners on a port do not overlap. For more information, see [GEP-91](https://gateway-api.sigs.k8s.io/geps/gep-91/) and [GEP-3567](https://github.com/kubernetes-sigs/gateway-api/issues/3567).
+
+Note that the validation modes of a ListenerPolicy differ from the FrontendTLS validation modes of a Gateway.
+
+| Resource | Field | Modes |
+| -- | -- | -- |
+| Gateway | `spec.tls.frontend.default.validation.mode` | `AllowValidOnly`, `AllowInsecureFallback` |
+| ListenerPolicy | `spec.default.clientCertificateValidation.mode` | `Require`, `Optional` |
+
+* **Require**: A connection can only be established if the client presents a valid certificate. This mode is equivalent to the `AllowValidOnly` mode of a Gateway.
+* **Optional**: A connection can be established without a client certificate. However, if a client presents a certificate that cannot be validated, the connection is rejected. Note that this mode is *not* equivalent to the `AllowInsecureFallback` mode of a Gateway, which establishes the connection even if the certificate is invalid.
+
+In this example, you serve two tenants from two listeners that share port 8443, and you isolate their CA certificates so that the client certificate of tenant A cannot be used to access the listener of tenant B.
+
+1. Navigate to the `example_certs` directory that you created in [Create TLS certificates](#create-tls-certificates), and create a separate CA and client certificate for each tenant.
+   ```sh
+   # Create the CA and client certificate for tenant A
+   openssl genrsa -out tenant-a-ca-key.pem 2048
+   openssl req -new -x509 -days 365 -key tenant-a-ca-key.pem -out tenant-a-ca-cert.pem \
+     -subj "/CN=Tenant A CA/O=Tenant A"
+
+   openssl genrsa -out tenant-a-client-key.pem 2048
+   openssl req -new -key tenant-a-client-key.pem -out tenant-a-client.csr \
+     -subj "/CN=client.tenant-a.example.com/O=Tenant A"
+   openssl x509 -req -days 365 -in tenant-a-client.csr \
+     -CA tenant-a-ca-cert.pem -CAkey tenant-a-ca-key.pem \
+     -CAcreateserial -out tenant-a-client-cert.pem
+
+   # Create the CA and client certificate for tenant B
+   openssl genrsa -out tenant-b-ca-key.pem 2048
+   openssl req -new -x509 -days 365 -key tenant-b-ca-key.pem -out tenant-b-ca-cert.pem \
+     -subj "/CN=Tenant B CA/O=Tenant B"
+
+   openssl genrsa -out tenant-b-client-key.pem 2048
+   openssl req -new -key tenant-b-client-key.pem -out tenant-b-client.csr \
+     -subj "/CN=client.tenant-b.example.com/O=Tenant B"
+   openssl x509 -req -days 365 -in tenant-b-client.csr \
+     -CA tenant-b-ca-cert.pem -CAkey tenant-b-ca-key.pem \
+     -CAcreateserial -out tenant-b-client-cert.pem
+   ```
+
+2. Store the CA certificate of each tenant in a separate configmap. The gateway proxy later uses these certificates to validate the client certificate that is presented on the listener of that tenant. You can also store the CA certificates in Kubernetes secrets. In both cases, the data key must be `ca.crt`.
+   ```sh
+   kubectl create configmap tenant-a-ca-cert \
+     --from-file=ca.crt=tenant-a-ca-cert.pem \
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+
+   kubectl create configmap tenant-b-ca-cert \
+     --from-file=ca.crt=tenant-b-ca-cert.pem \
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
+3. Update your Gateway to serve both tenants from port 8443. Each listener uses its own hostname, and both listeners use the same server TLS credentials, because the `https-cert` certificate that you created earlier includes the `*.example.com` Subject Alternative Name. The FrontendTLS `default` configuration continues to reference the `ca-cert` CA, which applies to any listener that is not targeted by a ListenerPolicy.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: Gateway
+   metadata:
+     name: mtls
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
+     tls:
+       frontend:
+         default:
+           validation:
+             mode: AllowValidOnly
+             caCertificateRefs:
+               - name: ca-cert
+                 kind: ConfigMap
+                 group: ""
+     listeners:
+     - name: tenant-a
+       protocol: HTTPS
+       port: 8443
+       hostname: tenant-a.example.com
+       tls:
+         mode: Terminate
+         certificateRefs:
+           - name: https-cert
+             kind: Secret
+       allowedRoutes:
+         namespaces:
+           from: All
+     - name: tenant-b
+       protocol: HTTPS
+       port: 8443
+       hostname: tenant-b.example.com
+       tls:
+         mode: Terminate
+         certificateRefs:
+           - name: https-cert
+             kind: Secret
+       allowedRoutes:
+         namespaces:
+           from: All
+   EOF
+   ```
+
+4. Create an HTTPRoute for each tenant that routes to the httpbin app.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-tenant-a
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     hostnames:
+     - "tenant-a.example.com"
+     parentRefs:
+       - name: mtls
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+         sectionName: tenant-a
+     rules:
+       - backendRefs:
+         - name: httpbin
+           port: 8000
+   ---
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin-tenant-b
+     namespace: httpbin
+     labels:
+       example: httpbin-route
+   spec:
+     hostnames:
+     - "tenant-b.example.com"
+     parentRefs:
+       - name: mtls
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+         sectionName: tenant-b
+     rules:
+       - backendRefs:
+         - name: httpbin
+           port: 8000
+   EOF
+   ```
+
+5. Create a ListenerPolicy for each listener. Each policy uses the `sectionName` field to target a single listener on the Gateway, and overrides the CA certificate that this listener uses to validate client certificates.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: tenant-a-mtls
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: mtls
+       sectionName: tenant-a
+     default:
+       clientCertificateValidation:
+         mode: Require
+         caCertificateRefs:
+         - name: tenant-a-ca-cert
+           kind: ConfigMap
+           group: ""
+   ---
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: tenant-b-mtls
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: mtls
+       sectionName: tenant-b
+     default:
+       clientCertificateValidation:
+         mode: Require
+         caCertificateRefs:
+         - name: tenant-b-ca-cert
+           kind: ConfigMap
+           group: ""
+   EOF
+   ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#clientcertificatevalidationconfig" >}}).
+
+   | Setting | Description |
+   | -- | -- |
+   | `targetRefs.sectionName` | The name of the listener on the Gateway that this policy applies to. If you omit this field, the policy applies to all listeners on the Gateway. |
+   | `clientCertificateValidation.mode` | How client certificate validation is enforced on this listener. Set to `Require` or `Optional`. |
+   | `clientCertificateValidation.caCertificateRefs` | References to the Kubernetes secrets or configmaps that contain the CA certificates that validate client certificates on this listener. Each reference must contain a `ca.crt` key with the PEM data. You can add up to 8 references, which are combined into a single trust pool for this listener. |
+
+   > [!NOTE]
+   > If the CA certificate is in a different namespace than the Gateway, you must create a ReferenceGrant. In the `from` section of the ReferenceGrant, refer to the Gateway or ListenerSet that owns the listener, not to the ListenerPolicy. For more information, see [Cross-namespace references]({{< link-hextra path="/install/advanced/" >}}).
+
+6. If you have not done so yet, get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   export INGRESS_GW_ADDRESS=$(kubectl get svc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} mtls -o jsonpath="{.status.loadBalancer.ingress[0]['hostname','ip']}")
+   echo $INGRESS_GW_ADDRESS
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   kubectl port-forward deploy/mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 8443:8443
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+7. Send a request to the listener of tenant A with the client certificate of tenant A. Verify that the request succeeds.
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
+   ```sh
+   curl -v -k --resolve "tenant-a.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-a.example.com:8443/get \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="LoadBalancer hostname" %}}
+   ```sh
+   curl -v -k --resolve "tenant-a.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-a.example.com:8443/get \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -v -k https://tenant-a.example.com:8443/get \
+     --resolve tenant-a.example.com:8443:127.0.0.1 \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```
+   ...
+   * Request completely sent off
+   < HTTP/2 200
+   ...
+   ```
+
+8. Repeat the request to the listener of tenant B, but continue to use the client certificate of tenant A. Verify that the request fails, because the listener of tenant B only trusts the CA of tenant B. Without per-listener validation, this request would succeed, because both CAs would be part of the trust pool of port 8443.
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
+   ```sh
+   curl -v -k --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="LoadBalancer hostname" %}}
+   ```sh
+   curl -v -k --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -v -k https://tenant-b.example.com:8443/get \
+     --resolve tenant-b.example.com:8443:127.0.0.1 \
+     --cert tenant-a-client-cert.pem \
+     --key tenant-a-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```
+   * LibreSSL SSL_read: LibreSSL/3.3.6: error:1404C45C:SSL routines:ST_OK:reason(1116), errno 0
+   * Failed receiving HTTP2 data: 56(Failure when receiving data from the peer)
+   * Connection #0 to host tenant-b.example.com left intact
+   curl: (56) LibreSSL SSL_read: LibreSSL/3.3.6: error:1404C45C:SSL routines:ST_OK:reason(1116), errno 0
+   ```
+
+9. Repeat the request to the listener of tenant B with the client certificate of tenant B. Verify that the request succeeds.
+   {{< tabs >}}
+   {{% tab name="LoadBalancer IP address" %}}
+   ```sh
+   curl -v -k --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
+     --cert tenant-b-client-cert.pem \
+     --key tenant-b-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="LoadBalancer hostname" %}}
+   ```sh
+   curl -v -k --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
+     --cert tenant-b-client-cert.pem \
+     --key tenant-b-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -v -k https://tenant-b.example.com:8443/get \
+     --resolve tenant-b.example.com:8443:127.0.0.1 \
+     --cert tenant-b-client-cert.pem \
+     --key tenant-b-client-key.pem \
+     --cacert ca-cert.pem
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```
+   ...
+   * Request completely sent off
+   < HTTP/2 200
+   ...
+   ```
+
 ## Additional TLS settings
 
 You can configure your mTLS listener to limit connections to clients that present a certificate with a specific certificate hash and Subject Alternative Names. Alternatively, you can configure your listeners to enforce other TLS settings, such as a minimum or maximum TLS version, specific cipher suites, or ECDH curves. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}). 
@@ -719,7 +1052,9 @@ You can configure your mTLS listener to limit connections to clients that presen
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete httproute httpbin-https -n httpbin
+kubectl delete httproute httpbin-https httpbin-tenant-a httpbin-tenant-b -n httpbin
+kubectl delete listenerpolicy tenant-a-mtls tenant-b-mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete configmap tenant-a-ca-cert tenant-b-ca-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete gateway mtls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete secret https-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete configmap ca-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
