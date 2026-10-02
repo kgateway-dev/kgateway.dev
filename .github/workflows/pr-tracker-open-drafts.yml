@@ -22,7 +22,7 @@
 # organization, so it refuses any branch that touches a path outside
 # ALLOWED_PATHS. The drafting side runs its own equivalent check, and this one
 # deliberately does not trust it.
-name: Open PR tracker draft PRs
+name: PR tracker draft PRs
 
 on:
   schedule:
