@@ -96,7 +96,7 @@ spec:
   - name: http
     namespace: kgateway-system
   hostnames:
-    - TrafficPolicy.example
+    - trafficpolicy.example
   rules:
   - matches:
     - path:
@@ -142,7 +142,7 @@ spec:
   - name: http
     namespace: kgateway-system
   hostnames:
-    - TrafficPolicy.example
+    - trafficpolicy.example
   rules:
   - name: rule0
     matches:
