@@ -87,6 +87,12 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### gRPC statistics {#v25-grpc-stats}
+
+You can now use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code, which isn't visible in ordinary HTTP response-code metrics. Collect statistics for every gRPC method, or use an allow list to limit per-method statistics to a bounded set of methods.
+
+For more information, see [gRPC statistics]({{< link-hextra path="/traffic-management/grpc-statistics/" >}}).
+
 #### Forward 100-continue requests to the backend {#v25-proxy-100-continue}
 
 You can now use the `proxy100Continue` field in the HTTP settings of a ListenerPolicy resource to let the backend decide whether to accept a request body instead of having the gateway proxy respond automatically. When enabled, the gateway proxy forwards the `Expect: 100-continue` header to the backend and passes the backend's `100 Continue` response back to the client.
