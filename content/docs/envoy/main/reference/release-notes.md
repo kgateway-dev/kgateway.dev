@@ -69,6 +69,9 @@ You can now disable Envoy's default path normalization and slash merging on a li
 
 For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
+#### HTTP protocol upgrades {#v25-http-upgrades}
+You can now allow WebSocket, `CONNECT`, and other HTTP protocol upgrades through your gateway proxy. Enable upgrade tokens listener-wide with a ListenerPolicy, or scope them to individual routes with a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}, which is also the only way to terminate `CONNECT` requests at the gateway proxy. For more information, see [HTTP protocol upgrades]({{< link-hextra path="/traffic-management/http-upgrades/" >}}).
+
 #### Maximum connection duration {#v25-max-connection-duration}
 
 You can now use the `maxConnectionDuration` field to set a maximum connection duration for downstream or upstream connections. 
