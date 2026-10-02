@@ -54,24 +54,23 @@ The `requestMirror` section of a {{< reuse "kgw-docs/snippets/trafficpolicy.md" 
 
 For more information, see [Mirroring]({{< link-hextra path="/resiliency/mirroring/#request-mirror" >}}).
 
-#### JWT verified token caching {#v25-jwt-cache}
+#### JWT enhancements {#v25-jwt-enhancements}
 
-You can now enable Envoy's in-memory cache of successfully verified JWTs by using the `cache` field on a JWT provider in a GatewayExtension resource. For a successfully verified token that is presented more than once, the gateway proxy does not parse the token again, or perform a JWKS lookup and signature verification. Expired tokens are automatically removed from the cache. For more information, see [JWT caching]({{< link-hextra path="/security/jwt/simple/basic/#jwt-caching" >}}).
+Several new fields extend the JWT provider in a GatewayExtension resource.
 
-#### JWT clock skew tolerance {#v25-jwt-clock-skew}
-
-You can now set how much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims of a JWT, by using the `clockSkew` field on a JWT provider in a GatewayExtension resource. Use this when a token that is still valid at the issuer arrives at the proxy as expired or not-yet-valid, such as when the identity provider runs outside the cluster or on a host with an unsynchronized clock. If unset, the gateway keeps Envoy's default tolerance of 60 seconds. For more information, see [Clock skew tolerance]({{< link-hextra path="/security/jwt/simple/basic/#clock-skew" >}}).
-
-#### JWKS fetch timeout {#v25-jwks-timeout}
-
-You can now set the `timeout` field on the `jwks.remote` settings of a JWT provider in a GatewayExtension resource to configure how long the gateway waits for the remote JWKS server to respond to a single fetch. For more information, see [JWKS fetch timeout]({{< link-hextra path="/security/jwt/simple/basic/#jwks-timeout" >}}).
+* **JWT verified token caching**: Enable Envoy's in-memory cache of successfully verified JWTs by using the `cache` field. For a successfully verified token that is presented more than once, the gateway proxy does not parse the token again, or perform a JWKS lookup and signature verification. Expired tokens are automatically removed from the cache. For more information, see [JWT caching]({{< link-hextra path="/security/jwt/simple/basic/#jwt-caching" >}}).
+* **JWT clock skew tolerance**: Set how much clock drift the gateway tolerates when it verifies the `exp` and `nbf` claims of a JWT, by using the `clockSkew` field. Use this when a token that is still valid at the issuer arrives at the proxy as expired or not-yet-valid, such as when the identity provider runs outside the cluster or on a host with an unsynchronized clock. If unset, the gateway keeps Envoy's default tolerance of 60 seconds. For more information, see [Clock skew tolerance]({{< link-hextra path="/security/jwt/simple/basic/#clock-skew" >}}).
+* **JWKS fetch timeout**: Set the `timeout` field on the `jwks.remote` settings to configure how long the gateway waits for the remote JWKS server to respond to a single fetch. For more information, see [JWKS fetch timeout]({{< link-hextra path="/security/jwt/simple/basic/#jwks-timeout" >}}).
+* **Evaluate JWT policies without rejecting requests**: Set `validationMode: AllowMissingOrFailed` to verify tokens without rejecting requests that send a missing or invalid JWT. Use this mode to observe how a JWT policy behaves against live traffic before changing to `Strict`. Verification failures are also recorded in Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. For more information, see [Allow JWT verification without rejecting requests]({{< link-hextra path="/security/jwt/simple/basic/#allow-missing-or-failed" >}}).
 
 #### Preserve request paths {#v25-preserve-request-paths}
+
 You can now disable Envoy's default path normalization and slash merging on a listener by using the `normalizePath` and `mergeSlashes` fields in the HTTP settings of a ListenerPolicy resource. Disable these settings for backends that depend on the original, unmodified request path, such as S3-compatible object stores that use object keys containing repeated slashes.
 
 For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
 #### Maximum connection duration {#v25-max-connection-duration}
+
 You can now use the `maxConnectionDuration` field to set a maximum connection duration for downstream or upstream connections. 
 
 For more information, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
@@ -93,6 +92,22 @@ For more information, see [Move the buffer filter before body-reading filters]({
 You can now use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code, which isn't visible in ordinary HTTP response-code metrics. Collect statistics for every gRPC method, or use an allow list to limit per-method statistics to a bounded set of methods.
 
 For more information, see [gRPC statistics]({{< link-hextra path="/traffic-management/grpc-statistics/" >}}).
+
+#### Forward 100-continue requests to the backend {#v25-proxy-100-continue}
+
+You can now use the `proxy100Continue` field in the HTTP settings of a ListenerPolicy resource to let the backend decide whether to accept a request body instead of having the gateway proxy respond automatically. When enabled, the gateway proxy forwards the `Expect: 100-continue` header to the backend and passes the backend's `100 Continue` response back to the client.
+
+For more information, see [Forward 100-continue requests]({{< link-hextra path="/traffic-management/proxy-100-continue/" >}}).
+
+#### Controller Go memory limit tracking {#v25-controller-memory-limit}
+
+The `controller.goMemLimitPercent` Helm value now keeps the controller's `GOMEMLIMIT` in sync with the container's memory limit as it changes, instead of setting it once at pod startup. The controller rereads the container's live memory limit every 30 seconds, so changes from a Kubernetes LimitRange resource or a Vertical Pod Autoscaler (VPA) resize take effect without restarting the pod. For more information, see [Tune the controller Go memory limit]({{< link-hextra path="/install/advanced/#controller-memory-limit" >}}).
+
+#### Strip trailing dots from hostnames {#v25-strip-trailing-host-dot}
+
+You can now use the `stripTrailingHostDot` field in the HTTP settings of a ListenerPolicy resource to strip a trailing dot from the `Host` or `:authority` header before route matching. Use this policy when a client sends a fully qualified domain name with a trailing dot, such as `example.com.`, which does not otherwise match an HTTPRoute hostname of `example.com`.
+
+For more information, see [Strip trailing dots from hostnames]({{< link-hextra path="/traffic-management/header-control/strip-trailing-host-dot/" >}}).
 
 <!--
 
