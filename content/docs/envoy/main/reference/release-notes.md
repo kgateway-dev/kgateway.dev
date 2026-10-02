@@ -88,6 +88,12 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### gRPC statistics {#v25-grpc-stats}
+
+You can now use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code, which isn't visible in ordinary HTTP response-code metrics. Collect statistics for every gRPC method, or use an allow list to limit per-method statistics to a bounded set of methods.
+
+For more information, see [gRPC statistics]({{< link-hextra path="/traffic-management/grpc-statistics/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
