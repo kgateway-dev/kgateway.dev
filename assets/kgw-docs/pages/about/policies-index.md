@@ -29,14 +29,14 @@ Review the policies that you can configure in kgateway and the level at which yo
 
 | Policy | Applied via |
 | -- | -- | 
-| [Access logging](../../security/access-logging) | HTTPListenerPolicy |
+| [Access logging](../../security/access-logging) | {{< version include-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}HTTPListenerPolicy{{< /version >}}{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}ListenerPolicy{{< /version >}} |
 | [Buffering](../../traffic-management/buffering)| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 | [CSRF](../../security/csrf)| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
 | [Direct response](../../traffic-management/direct-response/) | DirectResponse | 
 | [Dynamic Forward Proxy (DFP)](../../traffic-management/dfp)| Backend and HTTPRoute | 
 | {{< version include-if="2.0.x,2.1.x" >}}[External authorization](../../security/external-auth){{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}[External authorization](../../security/extauth/byo-ext-auth-service){{< /version >}} | GatewayExtension and {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} |
 | [External processing (ExtProc)](../../traffic-management/extproc/) | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | 
-| [Health checks for the Gateway](../../traffic-management/health-checks/gateway)| HTTPListenerPolicy | 
+| [Health checks for the Gateway](../../traffic-management/health-checks/gateway)| {{< version include-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}HTTPListenerPolicy{{< /version >}}{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}ListenerPolicy{{< /version >}} |
 | [Health checks for the Backends](../../traffic-management/health-checks/backend)| BackendConfigPolicy |{{%  version exclude-if="2.0.x" %}} 
 | [HTTP connection settings](../../resiliency/connection)| BackendConfigPolicy | 
 | [Outlier detection](../../resiliency/outlier-detection)| BackendConfigPolicy | {{% /version %}}
