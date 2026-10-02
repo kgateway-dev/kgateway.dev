@@ -64,4 +64,24 @@ The following settings are supported:
 | `kgateway.dev/verify-certificate-hash` | A comma-delimited list of the certificate hash (fingerprint) that must be present in the peer certificate that is presented during the TLS handshake. Use this setting for [mTLS listeners]({{< link-hextra path="/setup/listeners/mtls/" >}}) only.   | 
 | `kgateway.dev/verify-subject-alt-names` | A comma-delimited list of the Subject Alternative Names that must be present in the peer certificate that is presented during the TLS handshake. Use this setting for [mTLS listeners]({{< link-hextra path="/setup/listeners/mtls/" >}}) only.  |
 
+## Check TLS option errors {#tls-option-errors}
+
+After you apply a Gateway with TLS options, check the listener conditions to find option errors.
+
+If a TLS option key is unknown, the listener reports `Accepted=False` and `Programmed=False` with `reason: Invalid`. The `message` field contains the option error, such as `unknown tls option: kgateway.dev/signature-algorithm`.
+
+If `kgateway.dev/verify-subject-alt-names` is set without a trusted Certificate Authority (CA), the listener reports the CA error in `message`. When all certificate references resolve, `ResolvedRefs=True`. Do not use `ResolvedRefs` to diagnose these TLS option errors.
+
+```sh
+kubectl get gateway example-gateway -n default -o jsonpath='{range .status.listeners[?(@.name=="https-mtls-strict-validation")].conditions[*]}{.type}={.status} {.reason}: {.message}{"\n"}{end}'
+```
+
+Example output for an unknown `kgateway.dev/signature-algorithm` key:
+
+```console
+Accepted=False Invalid: unknown tls option: kgateway.dev/signature-algorithm
+Programmed=False Invalid: unknown tls option: kgateway.dev/signature-algorithm
+ResolvedRefs=True ResolvedRefs: Successfully resolved all references
+```
+
 
