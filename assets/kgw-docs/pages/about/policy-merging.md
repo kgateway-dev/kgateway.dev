@@ -14,6 +14,10 @@ Policy merging applies to the following policies:
 
 Resources that are higher in the parent-child hierarchy can use a special annotation to define how child resources inherit policies. This way, parent resources such as a Gateway or HTTPRoute can decide whether child resources can override the parent policies or not.
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+Policy merging is isolated for each delegation tree. The same delegated HTTPRoute can be reached through multiple parent routes. A merged policy for one parent does not change the policy configuration that another parent or translation cycle reuses.
+{{< /version >}}
+
 ## Merging annotation {#merging-annotation}
 
 The annotation on the parent resource is: `kgateway.dev/inherited-policy-priority`.
