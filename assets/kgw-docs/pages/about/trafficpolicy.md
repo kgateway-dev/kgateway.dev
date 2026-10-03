@@ -4,6 +4,10 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to attach poli
 
 You can apply {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
+Policies can attach to Gateway listeners, ListenerSets, or routes whose parents share a port. Policy status reports the specific listener, ListenerSet, or route parent that the policy targets.
+{{< /version >}}
+
 {{< version exclude-if="2.0.x" >}}
 > [!NOTE]
 > By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
