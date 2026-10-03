@@ -161,7 +161,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
      resourceVersion: "768"
      uid: 6dba42be-3e96-4616-a56a-267f0f01a207
    spec:
-    gatewayClassName: kgateway
+     gatewayClassName: kgateway
      listeners:
      - allowedRoutes:
          namespaces:
