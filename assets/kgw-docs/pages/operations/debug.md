@@ -24,6 +24,14 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/kgw-docs/snippets/
    | `/snapshots/krt` | View the current krt snapshot, or the point-in-time view of the transformed Kubernetes resources and their sync status that the control plane processed. These resources are then used to generate gateway configuration that is sent to the gateway proxies for routing decisions. |
    | `/snapshots/xds` | View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. For snapshots to be present, you must have a Gateway resource that creates a connected, Envoy-based kgateway proxy. | 
 
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+If the control plane pod does not start after you set `KGW_VALIDATOR_MODE`, review the control plane logs before you use the admin server. The valid values are `CACHE` and `BINARY`. An empty value or any other value prevents the control plane from starting, and the logs include `invalid validator mode`.
+
+```sh
+kubectl logs deploy/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+```
+{{< /version >}}
+
 ## Debug your gateway setup
 
 {{< reuse "kgw-docs/snippets/debug-gateway.md" >}}
