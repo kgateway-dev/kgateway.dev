@@ -98,6 +98,41 @@ Outlier detection is an important part of building resilient apps. An outlier de
    | `consecutive5xx` | The number of consecutive server-side error responses, such as 5XX HTTP response codes for HTTP traffic and connection failures for TCP traffic, before a host is ejected from the load balancing pool. In this example, you remove the host when one 5XX HTTP response code is returned. If not set, ejection occurs after 5 consecutive errors by default. If this field is set to 0, passive health checks are disabled. | 
    | `baseEjectionTime` | The duration that a host is removed from the load balancing pool before a new evaluation starts. If not set, this field defaults to `30s`.  |  
    | `maxEjectionPercent` | The maximum percent of hosts that can be ejected from the load balancing pool. In this example, 80% of all hosts can be ejected at a given time. If not set, this field defaults to `10` percent.  | 
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
+### Separate local-origin failures from 5xx responses {#local-origin-outlier-detection}
+
+For gRPC backends, legitimate application statuses such as `UNAVAILABLE` can map to HTTP 5xx responses in Envoy outlier detection. To eject hosts for locally originated failures without ejecting hosts for externally generated 5xx responses, set `splitExternalLocalOriginErrors` to `true` and disable consecutive 5xx enforcement.
+
+```yaml
+kubectl apply -f- <<EOF
+kind: BackendConfigPolicy
+apiVersion: gateway.kgateway.dev/v1alpha1
+metadata:
+  name: httpbin-policy
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: ""
+      kind: Service
+  outlierDetection:
+    splitExternalLocalOriginErrors: true
+    consecutiveLocalOriginFailure: 10
+    enforcingConsecutiveLocalOriginFailure: 100
+    enforcingConsecutive5xx: 0
+EOF
+```
+
+| Setting | Description |
+| -- | -- |
+| `splitExternalLocalOriginErrors` | Separates locally originated failures from externally generated errors. If omitted, this field defaults to `false`, and local-origin failure ejection does not use `consecutiveLocalOriginFailure` or `enforcingConsecutiveLocalOriginFailure`. |
+| `consecutiveLocalOriginFailure` | The number of consecutive locally originated failures before a host is ejected. This field takes effect only when `splitExternalLocalOriginErrors` is `true`. If omitted, the field defaults to `5`. Set this field to `0` to disable local-origin failure ejection. |
+| `enforcingConsecutiveLocalOriginFailure` | The percentage chance that a host is ejected after the local-origin failure threshold is reached. This field takes effect only when `splitExternalLocalOriginErrors` is `true`. If omitted, the field defaults to `100`. The value must be between `0` and `100`. |
+| `enforcingConsecutive5xx` | The percentage chance that a host is ejected after the consecutive 5xx threshold is reached. If omitted, the field defaults to `100`. Set this field to `0` to disable ejection for externally generated 5xx responses. The value must be between `0` and `100`. |
+
+{{< /version >}}
    
 6. Repeat the requests to the httpbin app. In the log output for both httpbin replicas, verify that all requests are still spread across both httpbin instances. 
    {{< tabs >}}
