@@ -473,20 +473,18 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    {{% /tab %}}
    {{< /tabs >}}
 
-4. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function. Note that the first request might take a few seconds to process, because the AWS Security Token Service (STS) credential request must be performed first. However, after the credentials are cached, subsequent requests are processed more quickly.
+4. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} routes requests to Lambda by sending a curl request to the `echo` function. For Lambda backends, the proxy sends the Lambda endpoint as the upstream `Host` header before signing the request. Route-level `URLRewrite` hostnames and {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} `autoHostRewrite` settings do not override this Lambda behavior. The first request might take a few seconds while AWS Security Token Service (STS) returns credentials. Later requests are faster because the proxy caches those credentials.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -H "Host: lambda.${AWS_LAMBDA_REGION}.amazonaws.com" \
-     $INGRESS_GW_ADDRESS:8080/echo \
+   curl $INGRESS_GW_ADDRESS:8080/echo \
      -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -H "Host: lambda.${AWS_LAMBDA_REGION}.amazonaws.com" \
-     $INGRESS_GW_ADDRESS:8080/echo \
+   curl localhost:8080/echo \
      -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
    {{% /tab %}}
