@@ -174,6 +174,49 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
 
 {{< /tabs >}}
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Troubleshoot unresolved policy targets {#target-not-found-status}
+
+If a BackendConfigPolicy or BackendTLSPolicy `spec.targetRefs` entry names a missing Service or {{< reuse "kgw-docs/snippets/backend.md" >}}, the policy reports the missing target in its status. When the target is missing, the policy status does not stay empty. The policy status includes a synthetic `StatusSummary` ancestor with `Accepted: False` and reason `TargetNotFound`.
+
+1. Check the policy status.
+
+   {{< tabs >}}
+   {{% tab name="BackendConfigPolicy" %}}
+   ```sh
+   kubectl get backendconfigpolicy nginx-tls-policy -n kgateway-base -o yaml
+   ```
+   {{% /tab %}}
+   {{% tab name="BackendTLSPolicy" %}}
+   ```sh
+   kubectl get backendtlspolicy nginx-tls-policy -n kgateway-base -o yaml
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+
+   ```yaml
+   status:
+     ancestors:
+     - ancestorRef:
+         group: gateway.kgateway.dev
+         kind: StatusSummary
+         name: StatusSummary
+       conditions:
+       - type: Accepted
+         status: "False"
+         reason: TargetNotFound
+         message: Service kgateway-base/missing-svc not found
+       - type: Attached
+         status: "False"
+         reason: TargetNotFound
+         message: Policy is not attached to targets that could not be resolved
+   ```
+
+2. Correct the `spec.targetRefs` entry so that the `name`, `kind`, and `group` values match an existing target. After the target resolves, the `StatusSummary` ancestor is removed from the policy status.
+{{< /version >}}
+
 ### Create an HTTPRoute {#create-http-route}
 
 Create an HTTPRoute that routes traffic to the NGINX server on the `example.com` hostname and HTTPS port 8443. Note that the parent Gateway is the sample `http` Gateway resource that you created [before you began](#before-you-begin).
