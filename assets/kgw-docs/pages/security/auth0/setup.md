@@ -101,7 +101,7 @@ Complete this step only if you plan to use the access token validation flow. The
    {{< reuse-image src="img/auth0/user-created.png" >}}
 
 > [!NOTE]
-> The steps above create a test user for this guide only. For production, use a dedicated Auth0 tenant and follow the Auth0 [production best practices](https://auth0.com/docs/best-practices).
+> The steps above create a test user for this guide only. For production, use a dedicated Auth0 tenant and follow the Auth0 [production best practices](https://auth0.com/docs/deploy-monitor/pre-deployment-checks).
 
 ## Connect kgateway to Auth0
 

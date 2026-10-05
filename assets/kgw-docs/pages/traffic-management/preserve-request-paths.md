@@ -2,7 +2,7 @@
 
 By default, Envoy applies two transformations to a request path before it forwards the request to the backend.
 
-* **Path normalization**: Envoy resolves the path per [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986), for example by collapsing `.` and `..` segments and decoding percent-encoded characters.
+* **Path normalization**: Envoy resolves the path per [RFC 3986](https://www.rfc-editor.org/rfc/rfc3986.html), for example by collapsing `.` and `..` segments and decoding percent-encoded characters.
 * **Slash merging**: Envoy collapses sequences of adjacent `/` characters into a single `/`.
 
 These defaults match Envoy's historical behavior and help guard against common path-based bypass techniques. However, some backends depend on the original, unmodified path. For example, S3-compatible object stores can use object keys that contain repeated slashes, such as `my-bucket//nested//key`. If Envoy merges these slashes before routing, the request no longer matches the intended object key.
