@@ -157,11 +157,11 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
    metadata:
      generation: 1
      name: http
-     namespace: kgateway-system
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      resourceVersion: "768"
      uid: 6dba42be-3e96-4616-a56a-267f0f01a207
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - allowedRoutes:
          namespaces:
