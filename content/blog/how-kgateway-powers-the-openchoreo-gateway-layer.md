@@ -376,7 +376,7 @@ spec:
 
 Beyond routing, hub-and-spoke connectivity, and TrafficPolicy-driven policies, OpenChoreo relies on a handful of other kgateway features directly.
 
-**WebSocket support:** A `HTTPListenerPolicy` turns on WebSocket upgrades at the `Gateway` level, enabled on both the control plane and data plane gateways. On the data plane, this lets user components run WebSocket services. On the control plane, several system services need WebSocket connections too. That includes the hub-and-spoke mTLS tunnel itself, since the cluster-agent to cluster-gateway connection is a WebSocket connection.
+**WebSocket support:** A ListenerPolicy turns on WebSocket upgrades at the `Gateway` level, enabled on both the control plane and data plane gateways. On the data plane, this lets user components run WebSocket services. On the control plane, several system services need WebSocket connections too. That includes the hub-and-spoke mTLS tunnel itself, since the cluster-agent to cluster-gateway connection is a WebSocket connection.
 
 **Disabled request timeouts and a long stream idle timeout for MCP:** OpenChoreo treats AI agents as first-class citizens. It runs an MCP server in both the control plane and observability plane, used by the OpenChoreo SRE Agent, FinOps Agent, and Portal Assistant Agent. A static `TrafficPolicy` targets the `HTTPRoute` in front of these services and replaces the gateway's default request timeout with a long `streamIdle`, so MCP responses and server-sent-event streams aren't cut off mid-flight.
 
