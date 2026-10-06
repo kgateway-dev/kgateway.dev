@@ -8,13 +8,13 @@ excludeSearch: true
 
 ## OpenChoreo, and the problem it solves
 
-Kubernetes is an infrastructure API, deliberately designed to be highly flexible for the people operating infrastructure. That same flexibility is exactly what makes it too complex for developers who just want to deploy an application. There's no built-in concept of an application, an environment, a promotion, or an owner. What is missing is a platform abstraction layer that builds these higher-level concepts on top of Kubernetes. Without it, someone has to build that layer, and most organizations end up building it by accident. For example, a Helm chart per team, a CI template that gets copied and mutated, an ingress convention that lives in one engineer's head.
+Kubernetes is an infrastructure API, deliberately designed to be highly flexible for the people operating infrastructure. That same flexibility is exactly what makes it too complex for developers who just want to deploy an application. Kubernetes has no built-in concept of an application, an environment, a promotion, or an owner. What is missing is a platform abstraction layer that builds these higher-level concepts on top of Kubernetes. Without it, someone has to build that layer, and most organizations end up building it by accident. For example, a Helm chart per team, a CI template that gets copied and mutated, an ingress convention that lives in one engineer's head.
 
 [OpenChoreo](https://openchoreo.dev/) takes a different approach and turns that layer into a product instead of an ongoing integration project. It's a modular, open source, ready-to-use internal developer platform for Kubernetes, and a CNCF Sandbox project. It defines high-level platform and developer abstractions to hide the infrastructure complexity from the developer, orchestrating Kubernetes and other CNCF and open-source projects underneath. Together, these bring development and architecture guardrails, a Backstage-powered developer portal, application CI/CD, GitOps, and observability into a single, cohesive platform.
 
 ## OpenChoreo’s multi-plane architecture and the gateway layer
 
-OpenChoreo is divided into four **planes** to separate concerns and provide architectural flexibility. This separation allows the planes to scale and be isolated independently, while also allowing workload execution to be distributed across different Kubernetes clusters or even different clouds, with centralized control maintained through the control plane. There is a **control plane** that reconciles desired state, one or more **data planes** where workloads run, an optional **workflow plane** for builds, and an optional **observability plane** for logs, metrics, and traces. Each plane can be its own Kubernetes cluster, or several of them can share one, and the control plane never has direct Kubernetes API access to any of them. Connectivity between the control plane and the other planes instead runs through a hub-and-spoke architecture, covered later in this article.
+OpenChoreo is divided into four **planes** to separate concerns and provide architectural flexibility. This separation allows the planes to scale and be isolated independently, while also allowing workload execution to be distributed across different Kubernetes clusters or even different clouds, with centralized control maintained through the control plane. The **control plane** reconciles desired state, one or more **data planes** run workloads, an optional **workflow plane** handles builds, and an optional **observability plane** collects logs, metrics, and traces. Each plane can be its own Kubernetes cluster, or several of them can share one, and the control plane never has direct Kubernetes API access to any of them. Connectivity between the control plane and the other planes instead runs through a hub-and-spoke architecture, covered later in this article.
 
 Every plane needs a way to get traffic in. Since each plane can be its own cluster, OpenChoreo doesn't have a single "gateway". Each plane that needs one runs its own gateway, and each gateway carries a distinctly different responsibility:
 
@@ -43,11 +43,11 @@ flowchart BT
         teledp["Telemetry Agents"]
         app["User Applications"]
         gwdp --> app
+        app <-- "push/pull logs, metrics, traces" --> teledp
     end
 
     subgraph wp["Workflow Plane"]
         agentwp["OpenChoreo Cluster Agent\n(Spoke;initiate mTLS tunnels)"]
-        telewp["Build Telemetry"]
         buildwf["Build Workflows"]
     end
 
@@ -66,7 +66,7 @@ flowchart BT
     agentop -- "outbound mTLS WebSocket" --> gwcp
 
     teledp -- "publish application logs, metrics, traces" --> gwop
-    telewp -- "publish build logs, metrics, traces" --> gwop
+    buildwf -- "publish build logs, metrics, traces" --> gwop
 
     classDef gateway fill:#6C5CE8,stroke:#4834A6,color:#ffffff,stroke-width:1px;
     class gwcp,gwdp,gwop gateway;
@@ -94,19 +94,19 @@ flowchart TB
 
     apiserver <-- "watch / reconcile" --> kgw
 
-    subgraph ns_cp["openchoreo-control-plane"]
+    subgraph ns_cp["Control plane namespace"]
         gw_cp["Gateway"]
         hr_cp["HTTPRoute(s)"]
         gw_cp --- hr_cp
     end
 
-    subgraph ns_dp["openchoreo-data-plane"]
+    subgraph ns_dp["Data plane namespace"]
         gw_dp["Gateway"]
         hr_dp["HTTPRoute(s)"]
         gw_dp --- hr_dp
     end
 
-    subgraph ns_op["openchoreo-observability-plane"]
+    subgraph ns_op["Observability plane namespace"]
         gw_op["Gateway"]
         hr_op["HTTPRoute(s)"]
         gw_op --- hr_op
@@ -119,11 +119,11 @@ flowchart TB
     classDef gateway fill:#6C5CE8,stroke:#4834A6,color:#ffffff,stroke-width:1px;
     class gw_cp,gw_dp,gw_op,kgw gateway;
 ```
-***Figure 2:** One kgateway controller, watching every namespace, reconciles a separate `Gateway` and its `HTTPRoute`s per plane's namespace.*
+***Figure 2:** One kgateway controller, watching every namespace, reconciles a separate Gateway and its HTTPRoutes per plane's namespace (`openchoreo-control-plane`, `openchoreo-data-plane`, and `openchoreo-observability-plane`).*
 
 ### Multiple gateway controllers for multi-cluster deployments
 
-For organizations that need stricter isolation, whether for security and compliance reasons, high availability, or to support a hybrid architecture, OpenChoreo planes can be deployed across multiple Kubernetes clusters instead of sharing one. The most distributed setup is four dedicated clusters, one per plane. There are other variations too. The control plane can run in its own cluster while the data, workflow, and observability planes share a second cluster. Or the control plane can run alone, the data and observability planes can share a cluster, and the workflow plane can run in a cluster of its own. Whatever the layout, every cluster gets its own kgateway controller, shared across whichever planes happen to live there.
+For organizations that need stricter isolation, whether for security and compliance reasons, high availability, or to support a hybrid architecture, OpenChoreo planes can be deployed across multiple Kubernetes clusters instead of sharing one. The most distributed setup is four dedicated clusters, one per plane. Other deployment topologies work too. The control plane can run in its own cluster while the data, workflow, and observability planes share a second cluster. Or the control plane can run alone, the data and observability planes can share a cluster, and the workflow plane can run in a cluster of its own. Whatever the topology, every cluster gets its own kgateway controller, shared across whichever planes happen to live there.
 
 &nbsp;
 
@@ -214,7 +214,7 @@ flowchart TB
     class k1,k2,k3,k4,k5,k6,k7,g1,g2,g3,g4,g5,g6,g7,g8,g9 gateway;
 ```
 
-***Figure 3:** In every one of these layouts, each cluster gets its own kgateway controller, and that single controller is used across whichever planes happen to be deployed in that cluster. The workflow plane never needs one of its own, since it has no inbound traffic to serve.*
+***Figure 3:** In every one of these topologies, each cluster gets its own kgateway controller, and that single controller is used across whichever planes happen to be deployed in that cluster. The workflow plane never needs one of its own, since it has no inbound traffic to serve.*
 
 ### Environment level gateways in a data plane
 
@@ -267,7 +267,7 @@ flowchart TB
 
 ### External and internal gateways in a data plane
 
-OpenChoreo supports external and internal gateways through the gateway architecture itself by using the Kubernetes Gateway API. The Gateway API’s `Gateway` resource has an `infrastructure` field, and kgateway uses it to configure vendor- and implementation-specific infrastructure, such as the load balancer type, the subnet a load balancer gets provisioned into, and the Kubernetes Service type. For an external gateway, the gateway is translated to an internet-facing load balancer. For an internal gateway, it translates to a load balancer that is placed inside a VPC, or simply a ClusterIP Service. The same single-controller, multiple-gateway pattern that is used everywhere else in OpenChoreo applies here too. One kgateway controller reconciles both the external and the internal Gateway.
+OpenChoreo supports external and internal gateways through the gateway architecture itself by using the Kubernetes Gateway API. The Gateway API’s Gateway resource has an `infrastructure` field, and kgateway uses it to configure vendor- and implementation-specific infrastructure, such as the load balancer type, the subnet a load balancer gets provisioned into, and the Kubernetes Service type. For an external gateway, the gateway is translated to an internet-facing load balancer. For an internal gateway, it translates to a load balancer that is placed inside a VPC, or simply a ClusterIP Service. The same single-controller, multiple-gateway pattern that is used everywhere else in OpenChoreo applies here too. One kgateway controller reconciles both the external and the internal Gateway.
 
 &nbsp;
 
@@ -298,7 +298,7 @@ flowchart TB
 
 So far, we've discussed the critical data path where the gateway serves external and internal clients with either system APIs or user-deployed application APIs. The platform layer also has to propagate control signals between the planes which is just as critical as the data path.
 
-In this multi-plane architecture, cluster-agents running in data, observability, and workflow planes connect to the cluster-gateway in the control plane. This connectivity happens over an mTLS WebSocket tunnel, and the control plane kgateway instance performs a TLS passthrough to facilitate it. With `mode: Passthrough`, kgateway never decrypts this traffic. It reads the SNI field in the TLS ClientHello, matches it against the `TLSRoute` hostname, and forwards the raw encrypted bytes straight to the cluster-gateway. This is one of the most critical control-signal flows in the platform.
+In this multi-plane architecture, cluster-agents running in data, observability, and workflow planes connect to the cluster-gateway in the control plane. This connectivity happens over an mTLS WebSocket tunnel, and the control plane kgateway instance performs a TLS passthrough to facilitate it. With `mode: Passthrough`, kgateway never decrypts this traffic. It reads the SNI field in the TLS ClientHello, matches it against the TLSRoute hostname, and forwards the raw encrypted bytes straight to the cluster-gateway. This is one of the most critical control-signal flows in the platform.
 
 &nbsp;
 
@@ -321,11 +321,11 @@ flowchart LR
 
 ### TrafficPolicy, and how OpenChoreo Traits encapsulate it
 
-kgateway is a feature-rich gateway that provides many vendor-specific features on top of the Kubernetes Gateway API, such as security, rate limiting, and request/response transformation. These are exposed through the kgateway `TrafficPolicy` resource, which pairs nicely with OpenChoreo Traits.
+kgateway is a feature-rich gateway that provides many vendor-specific features on top of the Kubernetes Gateway API, such as security, rate limiting, and request/response transformation. These are exposed through the kgateway TrafficPolicy resource, which pairs nicely with OpenChoreo Traits.
 
-A Trait attaches to an OpenChoreo component, and lets developers use kgateway functionality via developer abstractions that platform engineers define, without needing to know kgateway, or the Kubernetes Gateway API, exists underneath. With a Trait, a platform engineer can create, delete, or patch any Kubernetes object. That means a platform engineer can template a kgateway `TrafficPolicy` inside a Trait, and expose just a handful of parameters for developers to configure.
+A Trait attaches to an OpenChoreo component, and lets developers use kgateway functionality via developer abstractions that platform engineers define, without needing to know kgateway, or the Kubernetes Gateway API, exists underneath. With a Trait, a platform engineer can create, delete, or patch any Kubernetes object. That means a platform engineer can template a kgateway TrafficPolicy inside a Trait, and expose just a handful of parameters for developers to configure.
 
-Following is an example where a `TrafficPolicy` with rate limits is implemented as a Trait and exposed to developers as high-level rate limit parameters.
+Following is an example where a TrafficPolicy with rate limits is implemented as a Trait and exposed to developers as high-level rate limit parameters.
 
 ```yaml
 apiVersion: openchoreo.dev/v1alpha1
@@ -376,9 +376,9 @@ spec:
 
 Beyond routing, hub-and-spoke connectivity, and TrafficPolicy-driven policies, OpenChoreo relies on a handful of other kgateway features directly.
 
-**WebSocket support:** A ListenerPolicy turns on WebSocket upgrades at the `Gateway` level, enabled on both the control plane and data plane gateways. On the data plane, this lets user components run WebSocket services. On the control plane, several system services need WebSocket connections too. That includes the hub-and-spoke mTLS tunnel itself, since the cluster-agent to cluster-gateway connection is a WebSocket connection.
+**WebSocket support:** A ListenerPolicy turns on WebSocket upgrades at the Gateway level, enabled on both the control plane and data plane gateways. On the data plane, this lets user components run WebSocket services. On the control plane, several system services need WebSocket connections too. That includes the hub-and-spoke mTLS tunnel itself, since the cluster-agent to cluster-gateway connection is a WebSocket connection.
 
-**Disabled request timeouts and a long stream idle timeout for MCP:** OpenChoreo treats AI agents as first-class citizens. It runs an MCP server in both the control plane and observability plane, used by the OpenChoreo SRE Agent, FinOps Agent, and Portal Assistant Agent. A static `TrafficPolicy` targets the `HTTPRoute` in front of these services and replaces the gateway's default request timeout with a long `streamIdle`, so MCP responses and server-sent-event streams aren't cut off mid-flight.
+**Disabled request timeouts and a long stream idle timeout for MCP:** OpenChoreo treats AI agents as first-class citizens. It runs an MCP server in both the control plane and observability plane, used by the OpenChoreo SRE Agent, FinOps Agent, and Portal Assistant Agent. A static TrafficPolicy targets the HTTPRoute in front of these services and replaces the gateway's default request timeout with a long `streamIdle`, so MCP responses and server-sent-event streams aren't cut off mid-flight.
 
 **Session persistence for sticky sessions:** OpenChoreo lets developers and platform engineers exec into a running pod for troubleshooting, through the OpenChoreo control plane. Both the [`occ` CLI](https://openchoreo.dev/docs/next/getting-started/cli-installation/) and the Backstage Portal support this today. An exec session is sticky by nature, every request in that session has to land on the same backend pod, which is exactly what session persistence of kgateway is for.
 
