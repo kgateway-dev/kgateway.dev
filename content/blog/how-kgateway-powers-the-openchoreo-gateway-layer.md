@@ -357,7 +357,7 @@ spec:
 
 A developer attaches it the same way they'd attach any other trait:
 
-```
+```yaml
 apiVersion: openchoreo.dev/v1alpha1
 kind: Component
 metadata:
