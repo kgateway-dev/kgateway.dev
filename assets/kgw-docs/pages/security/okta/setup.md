@@ -31,86 +31,72 @@ When you finish, you choose an authentication flow:
 
 Create an Okta application, configure the required settings, and add a test user.
 
-### Access the Okta Admin Console
-
-1. Go to your Okta Admin Console (such as, `https://your-okta-domain-admin.okta.com`).
-2. Log in with your administrator credentials.
-
-{{< reuse-image src="img/okta/okta-dashboard.png" >}}
-
 ### Create a Web Application
 
-1. Navigate to **Applications** → **Applications**.
-2. Click **Create App Integration**.
-3. Select **OIDC - OpenID Connect** and **Web Application**.
-4. Click **Next**.
+Kgateway is a server-side confidential client. It holds the client secret and performs the code exchange itself, so register it as a Web application rather than a Native or single-page application.
 
-{{< reuse-image src="img/okta/okta-create-app.png" >}}
+1. Log in to your Okta Admin Console, such as `https://YOUR_OKTA_DOMAIN-admin.okta.com`, with your administrator credentials.
+2. Go to **Applications** > **Applications**, and click **Create App Integration**.
+3. Select **OIDC - OpenID Connect**, select **Web Application**, and click **Next**.
 
-### Configure application settings
+   {{< reuse-image src="img/okta/okta-create-app.png" >}}
 
-In the **General Settings** tab, configure the following:
+4. In the **General Settings** tab, configure the application.
 
-- **Name**: `kgateway-app`
-- **Grant types**: Check **Authorization Code** and **Client Credentials**.
-- **Sign-in redirect URIs**: Add `https://www.example.com/oauth2/redirect`.
-- **Sign-out redirect URIs**: Add `https://www.example.com`.
-- **Assignments**: Choose **"Skip group assignment for now"**.
-- Click **Save**.
+   * **App integration name**: `kgateway-app`
+   * **Grant type**: **Authorization Code**. Also select **Client Credentials** if you plan to request tokens for the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow directly.
+   * **Sign-in redirect URIs**: `https://www.example.com/oauth2/redirect`
+   * **Sign-out redirect URIs**: `https://www.example.com`
+   * **Assignments**: **Skip group assignment for now**
 
-{{< reuse-image src="img/okta/okta-redirect-uri.png" >}}
+   {{< reuse-image src="img/okta/okta-redirect-uri.png" >}}
 
-> [!NOTE]
-> This guide registers `kgateway-app` as a Web application, not a Native application. Kgateway is a server-side confidential client that can hold the client secret and perform the code exchange, so the Web application flow applies. This also means you do not need to enable password-only authentication.
+5. Click **Save**.
 
 ### Copy the Client ID and Client Secret
 
-1. After saving, you'll see the application details page.
-2. Copy the **Client ID** and **Client Secret** from the **Client Credentials** section. You'll need these for the kgateway GatewayExtension.
+1. On the application details page, find the **Client Credentials** section.
+2. Copy the **Client ID** and the **Client Secret**. You need both for the `GatewayExtension` that you create in the flow guides.
 
-{{< reuse-image src="img/okta/okta-client-credentials.png" >}}
+   {{< reuse-image src="img/okta/okta-client-credentials.png" >}}
 
-> [!NOTE]
-> The Client Secret is only shown once after creation. If you lose it, you can regenerate it, but this will invalidate any existing tokens.
+   > [!NOTE]
+   > The Client Secret is shown only once after creation. If you lose it, you can generate a new one, but generating a new one invalidates any existing tokens.
 
 ### Create a test user {#create-test-user}
 
-1. In the Okta Admin Console, navigate to **Directory** → **People**.
-2. Click **Add person**.
-3. Fill in the details:
-   - **First name**: `Test`
-   - **Last name**: `User`
-   - **Username**: `testuser@example.com`
-   - **Primary email**: `testuser@example.com`
-   - **Activation**: Select **"I will set password"** and enter a password (such as, `password`).
-   - **Uncheck** "User must change password at next login".
-4. Click **Save**.
+1. In the Okta Admin Console, go to **Directory** > **People**, and click **Add person**.
+2. Enter the user details.
 
-{{< reuse-image src="img/okta/okta-users-list.png" >}}
+   * **First name**: `Test`
+   * **Last name**: `User`
+   * **Username** and **Primary email**: `testuser@example.com`
+   * **Activation**: **I will set password**, then enter a password of your choice
+   * Clear **User must change password on first login**
+
+3. Click **Save**.
 
 ### Configure the default authorization server {#configure-default-as}
 
-Okta provides two authorization servers that matter for this guide: the Org authorization server and the default custom authorization server. The Org authorization server issues opaque tokens, which the gateway's JWT policy cannot validate. This guide uses the default authorization server at `/oauth2/default`, which issues JWTs that the gateway can validate.
+Okta provides two kinds of authorization server: the Org authorization server, which mints tokens for Okta's own APIs, and custom authorization servers, which mint tokens for your APIs. This guide uses the custom authorization server named `default`, at `/oauth2/default`, because only a custom authorization server lets you set the audience, define scopes, and control the token contents that the gateway validates. Okta documents that tokens from the Org authorization server "aren't intended for validation or use by your own apps or resource servers" and that their contents are "subject to change at any time without notice."
 
-1. In the Okta Admin Console, navigate to **Security** → **API**.
-2. Open the **Authorization Servers** tab.
-3. Click **default**.
-4. Go to the **Access Policies** tab.
-5. Click **Add Policy** and configure the following:
-   - **Name**: `kgateway-access-policy`
-   - **Assign to**: **The following clients**, then select `kgateway-app`
-6. Click **Create Policy**.
+1. In the Okta Admin Console, go to **Security** > **API**, and open the **Authorization Servers** tab.
+2. Click **default**, then go to the **Access Policies** tab.
+3. Click **Add Policy**, configure the policy, and click **Create Policy**.
 
-{{< reuse-image src="img/okta/okta-access-policy.png" >}}
+   * **Name**: `kgateway-access-policy`
+   * **Assign to**: **The following clients**, then select `kgateway-app`
 
-7. On the new policy, click **Add rule** and configure the following:
-   - **Rule Name**: `kgateway-default-rule`
-   - **Grant type**: Check **Authorization Code**. Check **Client Credentials** too if you plan to use the access token validation flow.
-   - **User is**: **Any user assigned the app**
-   - **Scopes requested**: **Any scopes**
-8. Click **Create Rule**.
+   {{< reuse-image src="img/okta/okta-access-policy.png" >}}
 
-{{< reuse-image src="img/okta/okta-access-rule.png" >}}
+4. On the new policy, click **Add rule**, configure the rule, and click **Create Rule**.
+
+   * **Rule Name**: `kgateway-default-rule`
+   * **Grant type**: **Authorization Code**. Also select **Client Credentials** if you plan to request tokens for the access token validation flow directly.
+   * **User is**: **Any user assigned the app**
+   * **Scopes requested**: **Any scopes**
+
+   {{< reuse-image src="img/okta/okta-access-rule.png" >}}
 
 After you save the policy and rule, the default authorization server issues tokens for the `kgateway-app` client, and the issuer, audience, and JWKS endpoints all resolve under `/oauth2/default`.
 

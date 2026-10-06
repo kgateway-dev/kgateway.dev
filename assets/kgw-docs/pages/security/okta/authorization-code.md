@@ -20,75 +20,75 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
 
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Okta. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources.
 
-> [!NOTE]
-> This guide uses the default custom authorization server at `/oauth2/default`, not the Org authorization server. The Org authorization server issues opaque tokens that the gateway's JWT policy cannot validate, while the default authorization server issues JWTs. All of the issuer and endpoint values below must resolve under `/oauth2/default`. If you also plan to use the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow, keep the issuer and audience consistent between both pages.
->
-> The `redirectURI` must match the exact value you register in Okta's **Sign-in redirect URIs**. The gateway still reaches Okta through `backendRef`, so the two do not have to be the same address.
+   > [!NOTE]
+   > This guide uses the custom authorization server named `default`, at `/oauth2/default`, not the Org authorization server. Only a custom authorization server lets you control the audience and token contents that the gateway validates. All of the issuer and endpoint values below must resolve under `/oauth2/default`. If you also plan to use the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow, keep the issuer and audience consistent between both pages.
+   >
+   > The `redirectURI` must match the exact value you register in Okta's **Sign-in redirect URIs**. The gateway still reaches Okta through `backendRef`, so the two do not have to be the same address.
 
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: GatewayExtension
-metadata:
-  name: okta-oauth2
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  oauth2:
-    backendRef:
-      group: gateway.kgateway.dev
-      kind: Backend
-      name: okta
-      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-    issuerURI: https://YOUR_OKTA_DOMAIN/oauth2/default
-    authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize
-    tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/token
-    endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/logout
-    redirectURI: https://www.example.com/oauth2/redirect
-    scopes:
-      - openid
-      - email
-      - profile
-    credentials:
-      clientID: YOUR_CLIENT_ID
-      clientSecretRef:
-        name: okta-client-secret
-EOF
-```
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: GatewayExtension
+   metadata:
+     name: okta-oauth2
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     oauth2:
+       backendRef:
+         group: gateway.kgateway.dev
+         kind: Backend
+         name: okta
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+       issuerURI: https://YOUR_OKTA_DOMAIN/oauth2/default
+       authorizationEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize
+       tokenEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/token
+       endSessionEndpoint: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/logout
+       redirectURI: https://www.example.com/oauth2/redirect
+       scopes:
+         - openid
+         - email
+         - profile
+       credentials:
+         clientID: YOUR_CLIENT_ID
+         clientSecretRef:
+           name: okta-client-secret
+   EOF
+   ```
 
-| **Field** | **Description** |
-| --- | --- |
-| `backendRef` | Points to the `Backend` from [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/#create-backend" >}}). Kgateway uses it to reach Okta for token exchange and OIDC discovery. |
-| `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
-| `authorizationEndpoint` | The Okta endpoint that the gateway redirects browser users to for login. For the default authorization server, this is `/oauth2/default/v1/authorize`. |
-| `tokenEndpoint` | The Okta endpoint that the gateway calls to exchange the authorization code for tokens. For the default authorization server, this is `/oauth2/default/v1/token`. |
-| `redirectURI` | The callback URL that kgateway sends to Okta as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Okta. Set it explicitly. |
-| `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
-| `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Okta ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. For the default authorization server, this is `/oauth2/default/v1/logout`. |
-| `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
+   | **Field** | **Description** |
+   | --- | --- |
+   | `backendRef` | Points to the `Backend` from [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/#create-backend" >}}). Kgateway uses it to reach Okta for token exchange and OIDC discovery. |
+   | `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
+   | `authorizationEndpoint` | The Okta endpoint that the gateway redirects browser users to for login. For the default authorization server, this is `/oauth2/default/v1/authorize`. |
+   | `tokenEndpoint` | The Okta endpoint that the gateway calls to exchange the authorization code for tokens. For the default authorization server, this is `/oauth2/default/v1/token`. |
+   | `redirectURI` | The callback URL that kgateway sends to Okta as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Okta. Set it explicitly. |
+   | `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
+   | `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Okta ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. For the default authorization server, this is `/oauth2/default/v1/logout`. |
+   | `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
 
 3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the extension by name. This policy tells the gateway to enforce the login flow on a specific route.
 
-> [!WARNING]
-> The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route, especially for browser-facing apps.
+   > [!WARNING]
+   > The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route, especially for browser-facing apps.
 
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-metadata:
-  name: okta-oauth2-policy
-  namespace: httpbin
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: httpbin
-  oauth2:
-    extensionRef:
-      name: okta-oauth2
-      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-EOF
-```
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: okta-oauth2-policy
+     namespace: httpbin
+   spec:
+     targetRefs:
+       - group: gateway.networking.k8s.io
+         kind: HTTPRoute
+         name: httpbin
+     oauth2:
+       extensionRef:
+         name: okta-oauth2
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   EOF
+   ```
 
    > [!IMPORTANT]
    > `targetRefs` has no `namespace` field, so the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} can target only resources in its own namespace. Create the policy in the same namespace as the resource that you want to protect. The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) is in the `httpbin` namespace, so this policy is created there too. `extensionRef` does take a `namespace`, so the GatewayExtension can stay in `{{< reuse "kgw-docs/snippets/namespace.md" >}}`.
@@ -99,40 +99,40 @@ EOF
 
 4. Verify that the policy attached to the route.
 
-```sh
-kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} okta-oauth2-policy -n httpbin -o yaml
-```
+   ```sh
+   kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} okta-oauth2-policy -n httpbin -o yaml
+   ```
 
-In the `status.ancestors` section of the output, confirm that the `Accepted` and `Attached` conditions are both `True`. An empty status means that the policy did not attach to anything.
+   In the `status.ancestors` section of the output, confirm that the `Accepted` and `Attached` conditions are both `True`. An empty status means that the policy did not attach to anything.
 
-```yaml
-    - message: Policy accepted
-      reason: Valid
-      status: "True"
-      type: Accepted
-    - message: Attached to all targets
-      reason: Attached
-      status: "True"
-      type: Attached
-```
+   ```yaml
+       - message: Policy accepted
+         reason: Valid
+         status: "True"
+         type: Accepted
+       - message: Attached to all targets
+         reason: Attached
+         status: "True"
+         type: Attached
+   ```
 
-If your HTTPRoute uses a `PathPrefix` or `Exact` match, it must also match the OAuth2 callback path that you set in `redirectURI`. Otherwise, the redirect back from Okta returns a 404 error.
+   If your HTTPRoute uses a `PathPrefix` or `Exact` match, it must also match the OAuth2 callback path that you set in `redirectURI`. Otherwise, the redirect back from Okta returns a 404 error.
 
-The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) has no path matches, so it already serves every path and needs no change.
+   The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) has no path matches, so it already serves every path and needs no change.
 
-> [!NOTE]
-> If your route matches only `/status`, add the callback path as a second match:
->
-> ```yaml
-> rules:
->   - matches:
->       - path:
->           type: PathPrefix
->           value: /status
->       - path:
->           type: PathPrefix
->           value: /oauth2/redirect
-> ```
+   > [!NOTE]
+   > If your route matches only `/status`, add the callback path as a second match:
+   >
+   > ```yaml
+   > rules:
+   >   - matches:
+   >       - path:
+   >           type: PathPrefix
+   >           value: /status
+   >       - path:
+   >           type: PathPrefix
+   >           value: /oauth2/redirect
+   > ```
 
 ## Verify {#verify}
 
@@ -140,28 +140,28 @@ Use the verification steps below to confirm that the Authorization Code flow wor
 
 1. Send a request without a session cookie. The gateway redirects to Okta.
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
-```
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
+   ```
 
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
-```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
+   ```
 
-{{% /tab %}}
-{{< /tabs >}}
+   {{% /tab %}}
+   {{< /tabs >}}
 
-Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Okta application, and the authorization endpoint is under `/oauth2/default`.
+   Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Okta application, and the authorization endpoint is under `/oauth2/default`.
 
-```text
-< HTTP/2 302
-< location: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
-< set-cookie: OauthNonce-...;path=/;Max-Age=600;secure;HttpOnly
-```
+   ```text
+   < HTTP/2 302
+   < location: https://YOUR_OKTA_DOMAIN/oauth2/default/v1/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
+   < set-cookie: OauthNonce-...;path=/;Max-Age=600;secure;HttpOnly
+   ```
 
 2. Open a browser and go to your protected route, such as `https://www.example.com/headers`. The gateway redirects you to the Okta login page.
 
@@ -169,38 +169,38 @@ Example output. Note that the `redirect_uri` parameter matches the value that yo
 
 4. Verify that Okta returns you to the route and that the response shows the httpbin output. The gateway exchanged the authorization code for tokens and stored them in session cookies.
 
-If Okta shows the message that the user is not allowed to access the app, the access policy or rule on the default authorization server is missing or does not include `kgateway-app`. See [Configure the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}).
+   If Okta shows the message that the user is not allowed to access the app, the access policy or rule on the default authorization server is missing or does not include `kgateway-app`. See [Configure the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}).
 
-If you get a `401` response with `CSRF token validation failed` in the gateway logs, you sent the request over HTTP. Retry over HTTPS.
+   If you get a `401` response with `CSRF token validation failed` in the gateway logs, you sent the request over HTTP. Retry over HTTPS.
 
-If Okta shows `Invalid parameter: redirect_uri`, the `redirectURI` on the `GatewayExtension` does not match a redirect URI that is registered on the Okta application.
+   If Okta shows `The 'redirect_uri' parameter must be a Login redirect URI in the client app settings`, the `redirectURI` on the `GatewayExtension` does not match a redirect URI that is registered on the Okta application.
 
 5. Optional: If you added the [`denyRedirect` setting](#deny-redirect) to your GatewayExtension, send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
-  -H "host: www.example.com" \
-  -H "Accept: application/json"
-```
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" \
+     -H "host: www.example.com" \
+     -H "Accept: application/json"
+   ```
 
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vik "https://localhost:8443/headers" \
-  -H "host: www.example.com" \
-  -H "Accept: application/json"
-```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik "https://localhost:8443/headers" \
+     -H "host: www.example.com" \
+     -H "Accept: application/json"
+   ```
 
-{{% /tab %}}
-{{< /tabs >}}
+   {{% /tab %}}
+   {{< /tabs >}}
 
-Example output:
+   Example output:
 
-```text
-< HTTP/2 401
-```
+   ```text
+   < HTTP/2 401
+   ```
 
 ## Cleanup {#cleanup}
 
@@ -316,7 +316,7 @@ The full GatewayExtension with `denyRedirect` included:
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: okta-oauth2
@@ -350,4 +350,4 @@ EOF
 ```
 
 > [!IMPORTANT]
-> This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Okta, and the login fails with `Invalid parameter: redirect_uri`.
+> This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Okta, and the login fails with `The 'redirect_uri' parameter must be a Login redirect URI in the client app settings`.
