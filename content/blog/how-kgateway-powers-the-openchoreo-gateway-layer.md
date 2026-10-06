@@ -88,7 +88,7 @@ In a single-cluster deployment, typical for evaluation and right-sized productio
 ```mermaid
 flowchart TB
     apiserver[("Kubernetes API server")]
-    kgw["kgateway controller\n(single instance, watches Gateway and\nHTTPRoute across every namespace)"]
+    kgw["kgateway controller\n(single instance, watches Gateway and\nHTTPRoute resources across every namespace)"]
 
     apiserver <-- "watch / reconcile" --> kgw
 
