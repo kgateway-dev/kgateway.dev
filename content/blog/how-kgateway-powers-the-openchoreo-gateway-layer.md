@@ -384,7 +384,7 @@ Beyond routing, hub-and-spoke connectivity, and TrafficPolicy-driven policies, O
 
 Across all the use cases, it's evident that kgateway is a critical piece of software in the OpenChoreo platform layer. The use cases range from serving user applications, to serving system services, to handling all the cross-plane communication over mTLS tunnels.
 
-It’s stability, feature-richness, and flexibility have been genuinely impressive to build on, and that's worth appreciating outright. A real shout-out is owed to the kgateway maintainers for that. We're looking forward to adopting even more of its features such as ListenerSet support and HTTPRoute Delegation in OpenChoreo going forward.
+Its stability, feature-richness, and flexibility have been genuinely impressive to build on, and that's worth appreciating outright. A real shout-out is owed to the kgateway maintainers for that. We're looking forward to adopting even more of its features such as ListenerSet support and HTTPRoute Delegation in OpenChoreo going forward.
 
 ## Learn more about OpenChoreo
 
