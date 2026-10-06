@@ -325,7 +325,7 @@ A Trait attaches to an OpenChoreo component, and lets developers use kgateway fu
 
 Following is an example where a `TrafficPolicy` with rate limits is implemented as a Trait and exposed to developers as high-level rate limit parameters.
 
-```
+```yaml
 apiVersion: openchoreo.dev/v1alpha1
 kind: ClusterTrait
 metadata:
