@@ -267,7 +267,7 @@ flowchart TB
 
 ### External and internal gateways in a data plane
 
-OpenChoreo supports external and internal gateways through the gateway architecture itself, using the Kubernetes Gateway API. The Gateway API’s `Gateway` resource has an `infrastructure` field, and kgateway uses it to configure vendor- and implementation-specific infrastructure, such as the load balancer type, the subnet a load balancer gets provisioned into, and the Kubernetes Service type. For an external gateway, that translates to an internet-facing load balancer. For an internal gateway, it translates to a load balancer placed inside a VPC, or simply a `ClusterIP` Service. The same single-controller, multiple-gateway pattern used everywhere else in OpenChoreo applies here too. One kgateway controller reconciles both the external and the internal `Gateway`.
+OpenChoreo supports external and internal gateways through the gateway architecture itself by using the Kubernetes Gateway API. The Gateway API’s `Gateway` resource has an `infrastructure` field, and kgateway uses it to configure vendor- and implementation-specific infrastructure, such as the load balancer type, the subnet a load balancer gets provisioned into, and the Kubernetes Service type. For an external gateway, the gateway is translated to an internet-facing load balancer. For an internal gateway, it translates to a load balancer that is placed inside a VPC, or simply a ClusterIP Service. The same single-controller, multiple-gateway pattern that is used everywhere else in OpenChoreo applies here too. One kgateway controller reconciles both the external and the internal Gateway.
 
 &nbsp;
 
