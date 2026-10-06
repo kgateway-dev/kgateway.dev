@@ -214,7 +214,7 @@ flowchart TB
 
 ***Figure 3:** In every one of these layouts, each cluster gets its own kgateway controller, and that single controller is used across whichever planes happen to be deployed in that cluster. The workflow plane never needs one of its own, since it has no inbound traffic to serve.*
 
-### Environment level gateways in a Dataplane
+### Environment level gateways in a data plane
 
 Multiple environments sharing a single data plane can also have a flexible gateway architecture. By default, all the applications in all the environments share the same physical gateway. For isolation, high availability, and scalability, per-environment gateways can be provisioned and configured instead.
 
