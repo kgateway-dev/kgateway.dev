@@ -392,7 +392,7 @@ Its stability, feature-richness, and flexibility have been genuinely impressive 
 
 [What is OpenChoreo | OpenChoreo](https://openchoreo.dev/docs/)
 
-[OpenChoreo Architecture](https://openchoreo.dev/docs/overview/architecture/)
+[OpenChoreo Architecture | OpenChoreo](https://openchoreo.dev/docs/overview/architecture/)
 
 [Developer Abstractions | OpenChoreo](https://openchoreo.dev/docs/concepts/developer-abstractions/)
 
