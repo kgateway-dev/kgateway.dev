@@ -119,7 +119,7 @@ flowchart TB
 ```
 ***Figure 2:** One kgateway controller, watching every namespace, reconciles a separate `Gateway` and its `HTTPRoute`s per plane's namespace.*
 
-### Multiple gateway controllers for multi cluster deployments
+### Multiple gateway controllers for multi-cluster deployments
 
 For organizations that need stricter isolation, whether for security and compliance reasons, high availability, or to support a hybrid architecture, OpenChoreo planes can be deployed across multiple Kubernetes clusters instead of sharing one. The most distributed setup is four dedicated clusters, one per plane. There are other variations too. The control plane can run in its own cluster while the data, workflow, and observability planes share a second cluster. Or the control plane can run alone, the data and observability planes can share a cluster, and the workflow plane can run in a cluster of its own. Whatever the layout, every cluster gets its own kgateway controller, shared across whichever planes happen to live there.
 
