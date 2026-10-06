@@ -220,7 +220,7 @@ flowchart TB
 
 Multiple environments sharing a single data plane can also have a flexible gateway architecture. By default, all the applications in all the environments share the same physical gateway. For isolation, high availability, and scalability, per-environment gateways can be provisioned and configured instead.
 
-Consider three environments, dev, staging, and production, sharing the same Kubernetes cluster. One option is to give each environment its own dedicated gateway, three separate gateways for three environments. Another option is to serve all the lower environments through a single shared gateway, and give production a separate, dedicated gateway of its own.
+Consider three environments, dev, staging, and production, sharing the same Kubernetes cluster. One option is to give each environment its own dedicated gateway resulting in three separate gateways for three environments. Another option is to serve all the lower environments through a single shared gateway, and give production a separate, dedicated gateway of its own.
 
 &nbsp;
 
