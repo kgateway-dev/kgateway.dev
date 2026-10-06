@@ -1,10 +1,10 @@
-Protect a route with the OAuth2 authorization code flow. Unauthenticated browser requests are redirected to Okta to log in, the gateway exchanges the returned authorization code for tokens, and it stores those tokens in session cookies. Your upstream service does not need to know that any of this happened.
+Protect a route with the OAuth2 authorization code flow. When a browser request is unauthenticated, the gateway redirects it to Okta. After login, the gateway exchanges the authorization code for tokens and stores them in session cookies. Your upstream service does not need to handle the OAuth2 flow.
 
 ## Before you begin
 
 1. Complete the [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/" >}}) page. This flow needs the Okta application, the test user, the [access policy and rule on the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}), the `Backend`, and the `BackendConfigPolicy` that it creates.
 
-2. Make sure your gateway has an **HTTPS listener**. Kgateway sets the OAuth2 nonce and code verifier cookies with the `Secure` attribute, so browsers do not return them over plain HTTP and the callback fails CSRF validation. To add one, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP, because it does not use cookies.
+2. Make sure your gateway has an **HTTPS listener**. Kgateway marks the OAuth2 nonce and code verifier cookies as `Secure`, so browsers do not send them over HTTP. Without those cookies, callback validation fails. To add an HTTPS listener, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}). The access token validation flow works over HTTP because it does not use cookies.
 
 ## Configure the authorization code flow
 
@@ -21,7 +21,7 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Okta. The GatewayExtension is independent of routing, so you can reuse the same extension across multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources.
 
    > [!NOTE]
-   > This guide uses the custom authorization server named `default`, at `/oauth2/default`, not the Org authorization server. Only a custom authorization server lets you control the audience and token contents that the gateway validates. All of the issuer and endpoint values below must resolve under `/oauth2/default`. If you also plan to use the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow, keep the issuer and audience consistent between both pages.
+   > This guide uses the custom authorization server named `default`, at `/oauth2/default`, not the Org authorization server. A custom authorization server lets you control the audience and token contents that the gateway validates. Use `/oauth2/default` in all issuer and endpoint values below. If you also use the [access token validation]({{< link-hextra path="/security/oauth/okta/access-token/" >}}) flow, use the same issuer and audience in both configurations.
    >
    > The `redirectURI` must match the exact value you register in Okta's **Sign-in redirect URIs**. The gateway still reaches Okta through `backendRef`, so the two do not have to be the same address.
 
@@ -61,7 +61,7 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
    | `issuerURI` | Triggers OIDC discovery. Kgateway fetches `/.well-known/openid-configuration` from this URL and fills in the authorization, token, and end-session endpoints. If you also set those explicitly (as in the example), the explicit values win. Setting both is fine if you want the config to be readable without relying on discovery. |
    | `authorizationEndpoint` | The Okta endpoint that the gateway redirects browser users to for login. For the default authorization server, this is `/oauth2/default/v1/authorize`. |
    | `tokenEndpoint` | The Okta endpoint that the gateway calls to exchange the authorization code for tokens. For the default authorization server, this is `/oauth2/default/v1/token`. |
-   | `redirectURI` | The callback URL that kgateway sends to Okta as the `redirect_uri` parameter, and the path that the gateway intercepts to complete the code exchange. If you omit this field, it defaults to `<request-scheme>://<host>/oauth2/redirect` derived from the original request, which is easy to mismatch with the value registered in Okta. Set it explicitly. |
+   | `redirectURI` | The callback URL that kgateway sends to Okta as the `redirect_uri` parameter. The gateway also intercepts this path to complete the code exchange. If you omit this field, kgateway derives it from the original request scheme and host. The default is `<request-scheme>://<host>/oauth2/redirect`, which might not match the URI registered in Okta. Set the field explicitly. |
    | `scopes` | Defaults to `user` if not set. For OIDC you need `openid` in the list. Add `email` and `profile` if your app needs those claims. |
    | `endSessionEndpoint` | Handles single logout. When a user hits `/logout`, kgateway clears their session cookies and sends their browser to this URL so Okta ends the session too. This is RP-initiated logout in the OIDC spec. Only set it if `openid` is in your scopes. For the default authorization server, this is `/oauth2/default/v1/logout`. |
    | `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
@@ -91,9 +91,9 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
    ```
 
    > [!IMPORTANT]
-   > `targetRefs` has no `namespace` field, so the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} can target only resources in its own namespace. Create the policy in the same namespace as the resource that you want to protect. The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) is in the `httpbin` namespace, so this policy is created there too. `extensionRef` does take a `namespace`, so the GatewayExtension can stay in `{{< reuse "kgw-docs/snippets/namespace.md" >}}`.
+   > `targetRefs` has no `namespace` field. The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} can target only resources in its own namespace, so create the policy alongside the resource you want to protect. The HTTPRoute from the [Sample app guide]({{< link-hextra path="/install/sample-app/" >}}) is in the `httpbin` namespace, so create the policy there. By contrast, `extensionRef` includes a `namespace` field, so the GatewayExtension can stay in `{{< reuse "kgw-docs/snippets/namespace.md" >}}`.
    >
-   > If the namespaces do not match, the policy is still accepted but never attaches, and requests reach your app unauthenticated. Verify that the policy attached before you rely on it.
+   > If the namespaces do not match, the policy is accepted but does not attach. Requests then reach your app unauthenticated. Verify that the policy attached before you rely on it.
    >
    > `targetRefs` can also point to a Gateway, which applies the policy to every route that the Gateway serves. In that case, create the policy in the Gateway's namespace.
 
@@ -103,7 +103,7 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
    kubectl get {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} okta-oauth2-policy -n httpbin -o yaml
    ```
 
-   In the `status.ancestors` section of the output, confirm that the `Accepted` and `Attached` conditions are both `True`. An empty status means that the policy did not attach to anything.
+   In the `status.ancestors` section, confirm that both the `Accepted` and `Attached` conditions are `True`. An empty status means that the policy did not attach to anything.
 
    ```yaml
        - message: Policy accepted
@@ -136,7 +136,7 @@ Create the Kubernetes Secret that holds the Okta client secret, a `GatewayExtens
 
 ## Verify {#verify}
 
-Use the verification steps below to confirm that the Authorization Code flow works. Send these requests to the HTTPS listener, because the session cookies that this flow relies on are set with the `Secure` attribute.
+Send these requests to the HTTPS listener. This flow relies on session cookies with the `Secure` attribute.
 
 1. Send a request without a session cookie. The gateway redirects to Okta.
 
@@ -155,7 +155,7 @@ Use the verification steps below to confirm that the Authorization Code flow wor
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output. Note that the `redirect_uri` parameter matches the value that you registered on the Okta application, and the authorization endpoint is under `/oauth2/default`.
+   Example output. The `redirect_uri` parameter matches the value registered on the Okta application. The authorization endpoint is under `/oauth2/default`.
 
    ```text
    < HTTP/2 302
@@ -167,7 +167,7 @@ Use the verification steps below to confirm that the Authorization Code flow wor
 
 3. Log in with the test user credentials you created in the [Okta setup]({{< link-hextra path="/security/oauth/okta/setup/#create-test-user" >}}).
 
-4. Verify that Okta returns you to the route and that the response shows the httpbin output. The gateway exchanged the authorization code for tokens and stored them in session cookies.
+4. Verify that Okta returns you to the route and that the response shows the httpbin output. The gateway exchanges the authorization code for tokens and stores them in session cookies.
 
    If Okta shows the message that the user is not allowed to access the app, the access policy or rule on the default authorization server is missing or does not include `kgateway-app`. See [Configure the default authorization server]({{< link-hextra path="/security/oauth/okta/setup/#configure-default-as" >}}).
 
@@ -175,7 +175,7 @@ Use the verification steps below to confirm that the Authorization Code flow wor
 
    If Okta shows `The 'redirect_uri' parameter must be a Login redirect URI in the client app settings`, the `redirectURI` on the `GatewayExtension` does not match a redirect URI that is registered on the Okta application.
 
-5. Optional: If you added the [`denyRedirect` setting](#deny-redirect) to your GatewayExtension, send the same request with `Accept: application/json`. Because `denyRedirect` matches on this header, the gateway returns `401` directly instead of redirecting.
+5. Optional: If you added the [`denyRedirect` setting](#deny-redirect) to your GatewayExtension, send the same request with `Accept: application/json`. The gateway matches this header and returns `401` instead of redirecting.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -220,7 +220,7 @@ The authorization code flow works without the following settings. Add the ones y
 
 ### Configure cookie settings {#cookie-config}
 
-Kgateway stores the access and ID tokens in session cookies. The default SameSite policy is `Lax`. If you need custom cookie names (for example, to read them in downstream services or share across subdomains), set them explicitly under `cookies` on the GatewayExtension.
+Kgateway stores the access and ID tokens in session cookies. The default SameSite policy is `Lax`. Set custom cookie names if downstream services need to read them or your app spans subdomains. Configure the names under `cookies` on the GatewayExtension.
 
 ```yaml
 spec:
@@ -237,14 +237,14 @@ spec:
 | **Field** | **Description** |
 | --- | --- |
 | `domain` | Sets the cookie domain, which makes the session cookies valid for that domain and all of its subdomains. Set it if your app spans subdomains. If you omit it, the cookies apply only to the host that set them. |
-| `sameSite` | `Strict` means the browser does not send cookies on any cross-site request, including top-level navigations. Use `Lax`, the default, if users arrive at your app through links from other origins, such as an email link. `None` requires HTTPS and should only be used when you explicitly need cross-site cookie sharing. |
+| `sameSite` | `Strict` prevents the browser from sending cookies on cross-site requests, including top-level navigations. Use the default, `Lax`, if users arrive through links from other origins, such as email links. `None` requires HTTPS. Use it only when you need cross-site cookie sharing. |
 | `names` | Overrides the generated cookie names, which is useful if a downstream service reads them. |
 
 Add this block to the `GatewayExtension` manifest from the previous step and re-apply it. Because the manifest replaces the resource, keep the other fields that you already set, including `redirectURI`.
 
 ### Forward the access token to your app {#forward-access-token}
 
-By default the gateway keeps the tokens in cookies and does not pass them upstream. Set `forwardAccessToken` if your app needs the access token itself, for example to call another API on the user's behalf. The token is forwarded in the `Authorization` header and in a cookie named `BearerToken`.
+By default, the gateway keeps tokens in cookies and does not pass them upstream. Set `forwardAccessToken` if your app needs the access token, such as when it calls another API on the user's behalf. The gateway forwards the token in the `Authorization` header and a cookie named `BearerToken`.
 
 ```yaml
 spec:
@@ -255,7 +255,7 @@ spec:
 
 ### Copy token claims into request headers {#claims-to-headers}
 
-Kgateway can verify the token signature and copy individual claims into headers that your app reads, which saves the app from parsing the token. Set `jwksURI` so the gateway can fetch the signing keys, then map each claim to a header.
+Kgateway can verify the token signature and copy individual claims into headers for your app. This saves the app from parsing the token. Set `jwksURI` so the gateway can fetch the signing keys. Then map each claim to a header.
 
 ```yaml
 spec:
@@ -275,9 +275,9 @@ Use `accessToken` in place of `idToken` to map claims from the access token inst
 
 ### Stop redirecting API clients {#deny-redirect}
 
-This step is optional. By default, any unauthenticated request gets a `302` redirect to the Okta login page. That response works for a browser, but not for API clients. curl, mobile apps, and AJAX calls that hit an unauthenticated route silently follow the redirect, land on the Okta login HTML, and fail.
+This step is optional. By default, an unauthenticated request gets a `302` redirect to the Okta login page. Browsers can follow this redirect. API clients might follow it too, then receive the Okta login page instead of an API response. This can affect curl, mobile apps, and AJAX calls.
 
-The `denyRedirect` field on `OAuth2Provider` lets you match specific requests and return 401 instead of redirecting them. It takes a list of `HTTPHeaderMatch` entries, and a request matches if it satisfies all of them.
+The `denyRedirect` field on `OAuth2Provider` lets you match specific requests and return `401` instead of redirecting them. It takes a list of `HTTPHeaderMatch` entries. A request matches only if it satisfies every entry.
 
 Pattern for matching JSON API clients:
 
@@ -292,7 +292,7 @@ spec:
           value: application/json
 ```
 
-For requests that might send `Accept: application/json; charset=utf-8` or similar variations, use `RegularExpression`:
+If requests might send `Accept: application/json; charset=utf-8` or similar values, use `RegularExpression`:
 
 ```yaml
 denyRedirect:
@@ -350,4 +350,4 @@ EOF
 ```
 
 > [!IMPORTANT]
-> This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Okta, and the login fails with `The 'redirect_uri' parameter must be a Login redirect URI in the client app settings`.
+> This manifest replaces the `GatewayExtension` that you created earlier. Include every field that you want to keep. If you omit `redirectURI`, kgateway uses the derived default instead. That default might not match the URI registered in Okta, causing login to fail with `The 'redirect_uri' parameter must be a Login redirect URI in the client app settings`.

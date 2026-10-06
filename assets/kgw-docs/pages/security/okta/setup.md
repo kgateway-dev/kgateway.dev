@@ -78,7 +78,7 @@ Kgateway is a server-side confidential client. It holds the client secret and pe
 
 ### Configure the default authorization server {#configure-default-as}
 
-Okta provides two kinds of authorization server: the Org authorization server, which mints tokens for Okta's own APIs, and custom authorization servers, which mint tokens for your APIs. This guide uses the custom authorization server named `default`, at `/oauth2/default`, because only a custom authorization server lets you set the audience, define scopes, and control the token contents that the gateway validates. Okta documents that tokens from the Org authorization server "aren't intended for validation or use by your own apps or resource servers" and that their contents are "subject to change at any time without notice."
+Okta provides two kinds of authorization server. The Org authorization server mints tokens for Okta's APIs. Custom authorization servers mint tokens for your APIs. This guide uses the custom authorization server named `default`, at `/oauth2/default`. Only a custom authorization server lets you set the audience, define scopes, and control the token contents that the gateway validates. Okta says that Org authorization server tokens "aren't intended for validation or use by your own apps or resource servers." Their contents are also "subject to change at any time without notice."
 
 1. In the Okta Admin Console, go to **Security** > **API**, and open the **Authorization Servers** tab.
 2. Click **default**, then go to the **Access Policies** tab.
@@ -102,11 +102,11 @@ After you save the policy and rule, the default authorization server issues toke
 
 ## Connect kgateway to Okta
 
-Both authentication flows need a network path from the gateway to Okta. Create these two resources first, whichever flow you use. All URLs in this section, and in the flow guides that follow, resolve under `/oauth2/default` on your Okta domain.
+Both authentication flows need a network path from the gateway to Okta. Create these two resources before configuring either flow. All URLs in this section and the flow guides resolve under `/oauth2/default` on your Okta domain.
 
 ### Create a Backend for Okta {#create-backend}
 
-Create a `Backend` resource that defines how kgateway reaches your Okta instance. This Backend uses the `Static` type with the host and port configured for Okta.
+Create a `Backend` resource to define how kgateway reaches your Okta instance. This Backend uses the `Static` type, with Okta's host and port configured.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -127,11 +127,11 @@ EOF
 Replace `YOUR_OKTA_DOMAIN` with your Okta domain (such as `integrator-6003780.okta.com`). The port must be `443` because kgateway communicates with Okta over HTTPS.
 
 > [!NOTE]
-> This address is separate from the public Okta URL that you configure on the `GatewayExtension` in the next steps. The `Backend` is the network path that the gateway uses for token exchange and OIDC discovery, and it does not have to be reachable from the browser.
+> This address is separate from the public Okta URL that you configure on the `GatewayExtension`. The `Backend` provides the network path for token exchange and OIDC discovery. The browser does not need to reach it.
 
 ### Configure TLS for the Okta Backend {#configure-tls}
 
-Since Okta uses a public, trusted certificate, you can use the system's trusted CA certificates. Create a `BackendConfigPolicy` to configure TLS.
+Okta uses a certificate from a public, trusted CA, so you can use the system's trusted CA certificates. Create a `BackendConfigPolicy` to configure TLS.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -151,7 +151,7 @@ spec:
 EOF
 ```
 
-Replace `YOUR_OKTA_DOMAIN` with your Okta domain (such as `integrator-6003780.okta.com`). The `wellKnownCACertificates: System` setting tells Envoy to use the system's trusted CA certificates.
+Replace `YOUR_OKTA_DOMAIN` with your Okta domain, such as `integrator-6003780.okta.com`. The `wellKnownCACertificates: System` setting tells Envoy to use the system's trusted CA certificates.
 
 ## Next steps
 
