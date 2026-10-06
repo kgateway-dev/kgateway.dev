@@ -298,7 +298,7 @@ flowchart TB
 
 So far, we've discussed the critical data path where the gateway serves external and internal clients with either system APIs or user-deployed application APIs. The platform layer also has to propagate control signals between the planes which is just as critical as the data path.
 
-In this multi-plane architecture, cluster-agents running in data, observability, and workflow planes connect to the cluster-gateway in the control plane. This connectivity happens over a mTLS WebSocket tunnel, and the control plane kgateway instance performs a TLS passthrough to facilitate it. With `mode: Passthrough`, kgateway never decrypts this traffic. It reads the SNI field in the TLS ClientHello, matches it against the `TLSRoute` hostname, and forwards the raw encrypted bytes straight to the cluster-gateway. This is one of the most critical control-signal flows in the platform.
+In this multi-plane architecture, cluster-agents running in data, observability, and workflow planes connect to the cluster-gateway in the control plane. This connectivity happens over an mTLS WebSocket tunnel, and the control plane kgateway instance performs a TLS passthrough to facilitate it. With `mode: Passthrough`, kgateway never decrypts this traffic. It reads the SNI field in the TLS ClientHello, matches it against the `TLSRoute` hostname, and forwards the raw encrypted bytes straight to the cluster-gateway. This is one of the most critical control-signal flows in the platform.
 
 &nbsp;
 
