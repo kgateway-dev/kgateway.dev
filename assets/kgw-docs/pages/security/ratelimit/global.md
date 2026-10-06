@@ -189,7 +189,7 @@ Create a GatewayExtension resource that points to your Rate Limit Service.
    | percentEnforced | Percentage of enabled requests that the rate limit service decision can deny. To try rate limits without blocking traffic, set `percentEnabled` to `100` and `percentEnforced` to `0`. Set a value from `0` to `100`. | No |{{< /version >}}
 
    {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
-   To try a rate limit before the rate limit service starts denying requests, run the filter in shadow mode. In shadow mode, the filter calls the rate limit service and records the decision, but the filter does not block requests. When you are ready to enforce the rate limit service decision, set `percentEnforced` to `100`.
+   To try a rate limit before the rate limit service starts denying requests, run the filter in shadow mode. In shadow mode, the filter calls the rate limit service and records the decision, but the filter does not block requests. To enable shadow mode, set `percentEnforced` to `0` and keep `percentEnabled` at `100`. If you set `percentEnabled` to `0`, the filter skips the rate limit service entirely, so no decisions are recorded. When you are ready to enforce the rate limit service decision, set `percentEnforced` to `100`.
 
    ```sh
    kubectl patch gatewayextension global-ratelimit \
