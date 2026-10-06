@@ -239,12 +239,12 @@ You can set up access logs to write to a file. The following example writes acce
    EOF
    ```
 
-3. Create an HTTPListenerPolicy resource to define your access logging rules. The following example writes access logs in string format to the `/dev/default-access-logs.txt` file in the volume of the gateway proxy. 
+3. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs in string format to the `/dev/default-access-logs.txt` file in the volume of the gateway proxy. 
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: access-logs
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -253,10 +253,12 @@ You can set up access logs to write to a file. The following example writes acce
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     accessLog:
-     - fileSink:
-         path: /dev/default-access-logs.txt
-         stringFormat: ""
+     default:
+       httpSettings:
+         accessLog:
+         - fileSink:
+             path: /dev/default-access-logs.txt
+             stringFormat: ""
    EOF
    ```
 
@@ -313,12 +315,12 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 1. Create or get the details of the gRPC service. The following example creates a simple `log-test` service in the {{< reuse "kgw-docs/snippets/namespace.md" >}} namespace that listens on port 50051.
 
-2. Create an HTTPListenerPolicy resource to define your access logging rules. The following example writes access logs to gRPC service that you created in the previous step. It logs requests that use the `x-my-cool-test-filter` header when the value is `test`. For more Envoy filters, see the [Envoy access log docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto).  
+2. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to gRPC service that you created in the previous step. It logs requests that use the `x-my-cool-test-filter` header when the value is `test`. For more Envoy filters, see the [Envoy access log docs](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto).  
    
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: HTTPListenerPolicy
+   kind: ListenerPolicy
    metadata:
      name: access-logs
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -327,18 +329,20 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
      - group: gateway.networking.k8s.io
        kind: Gateway
        name: http
-     accessLog:
-     - grpcService:
-         logName: "test-accesslog-service"
-         backendRef:
-           name: log-test
-           port: 50051
-       filter:
-           headerFilter:
-               header:
-                 value: "test"
-                 name: "x-my-cool-test-filter"
-                 type: "Exact"
+     default:
+       httpSettings:
+         accessLog:
+         - grpcService:
+             logName: "test-accesslog-service"
+             backendRef:
+               name: log-test
+               port: 50051
+           filter:
+               headerFilter:
+                   header:
+                     value: "test"
+                     name: "x-my-cool-test-filter"
+                     type: "Exact"
    EOF
    ```
 
@@ -368,7 +372,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
    transfer-encoding: chunked
    ```
 
-4. Send another request, this time with the header that you configured in the HTTPListenerPolicy. Verify that your request succeeds and that you get back a 200 HTTP response code.  
+4. Send another request, this time with the header that you configured in the ListenerPolicy. Verify that your request succeeds and that you get back a 200 HTTP response code.  
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
