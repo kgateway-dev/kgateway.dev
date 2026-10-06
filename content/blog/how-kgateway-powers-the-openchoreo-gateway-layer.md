@@ -79,6 +79,8 @@ OpenChoreo has built its gateway architecture on top of the [Kubernetes Gateway 
 
 ## How OpenChoreo uses kgateway
 
+Review common OpenChoreo setups and how kgateway can help you manage the Gateway deployments for you. 
+
 ### One controller, multiple gateways, for single-cluster deployments
 
 In a single-cluster deployment, typical for evaluation and right-sized production, one kgateway controller watches every namespace and reconciles a separate Gateway object for each of the control plane, data plane, and observability plane. Each Gateway is configured independently, with its own listener configuration, TLS configuration, and hostnames, but the same kgateway controller instance manages all three.
