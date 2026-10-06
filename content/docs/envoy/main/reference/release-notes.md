@@ -90,6 +90,10 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Global rate limiting shadow mode {#v25-global-rate-limit-shadow}
+
+GatewayExtension rate limit configuration now supports `percentEnabled` and `percentEnforced`, so you can trial global rate limit decisions before the gateway proxy denies live traffic. Set `percentEnabled: 100` and `percentEnforced: 0` to call the rate limit service and record its decision without blocking requests. For more information, see [Global rate limiting]({{< link-hextra path="/security/ratelimit/global/#gateway-extension" >}}).
+
 #### gRPC statistics {#v25-grpc-stats}
 
 You can now use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code, which isn't visible in ordinary HTTP response-code metrics. Collect statistics for every gRPC method, or use an allow list to limit per-method statistics to a bounded set of methods.
@@ -122,4 +126,3 @@ For more information, see [Strip trailing dots from hostnames]({{< link-hextra p
 
 ### 🚧 Known issues {#v2.2-known-issues}
 -->
-
