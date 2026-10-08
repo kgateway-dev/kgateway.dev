@@ -97,7 +97,8 @@ Outlier detection is an important part of building resilient apps. An outlier de
    | `interval`| The time interval after which the hosts are evaluated to determine if they are healthy or not. In this example, the hosts are evaluated every 2 seconds. If not set, this field defaults to `10s`.   | 
    | `consecutive5xx` | The number of consecutive server-side error responses, such as 5XX HTTP response codes for HTTP traffic and connection failures for TCP traffic, before a host is ejected from the load balancing pool. In this example, you remove the host when one 5XX HTTP response code is returned. If not set, ejection occurs after 5 consecutive errors by default. If this field is set to 0, passive health checks are disabled. | 
    | `baseEjectionTime` | The duration that a host is removed from the load balancing pool before a new evaluation starts. If not set, this field defaults to `30s`.  |  
-   | `maxEjectionPercent` | The maximum percent of hosts that can be ejected from the load balancing pool. In this example, 80% of all hosts can be ejected at a given time. If not set, this field defaults to `10` percent.  | 
+   | `maxEjectionPercent` | The maximum percent of hosts that can be ejected from the load balancing pool. In this example, 80% of all hosts can be ejected at a given time. If not set, this field defaults to `10` percent.  |
+
    
 6. Repeat the requests to the httpbin app. In the log output for both httpbin replicas, verify that all requests are still spread across both httpbin instances. 
    {{< tabs >}}
@@ -225,6 +226,9 @@ Outlier detection is an important part of building resilient apps. An outlier de
     envoy_cluster_outlier_detection_ejections_enforced_consecutive_5xx{envoy_cluster_name="kube_httpbin_httpbin_8000"} 1
     ```
 
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}{{< reuse "kgw-docs/snippets/outlier-detection-local-origin.md" >}}{{< /version >}}
+
 ## Cleanup
 
 1. Scale down the httpbin app to 1 replica. 
@@ -237,7 +241,9 @@ Outlier detection is an important part of building resilient apps. An outlier de
    kubectl delete backendconfigpolicy httpbin-policy -n httpbin
    ```
 
-
-
-
-
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+3. Remove the HTTPRoute for the `/refused` path that you created in the local-origin section.
+   ```sh
+   kubectl delete httproute httpbin-refused -n httpbin
+   ```
+{{< /version >}}
