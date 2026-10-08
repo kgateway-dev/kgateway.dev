@@ -166,7 +166,7 @@ The `GOMEMLIMIT` environment variable fixes this issue by giving the Go runtime 
 
 By default, `controller.goMemLimitPercent` is set to `0`, which disables the Go memory limit feature. The Helm chart sets the `GOMEMLIMIT` environment variable when the controller pod starts by reading the `resources.limits.memory` on the associated Deployment. This limit is fixed throughout the pod's lifecycle. If the container's memory limit changes later, such as when a Kubernetes LimitRange resource is applied or a Vertical Pod Autoscaler (VPA) resizes the pod in place, `GOMEMLIMIT` does not follow that change until the pod restarts.
 
-To ajust the `GOMEMLIMIT` variable dynamically, set the `controller.goMemLimitPercent` field to a value between `1` and `100`. This way, the `GOMEMLIMIT` environment variable is kept in sync with the container's memory limit as it changes. Instead of reading the memory limit once at startup, the controller reads the container's live memory limit directly from its cgroup every 30 seconds, and sets `GOMEMLIMIT` to the percentage you configure of that current value. A value of `90` is the recommended starting point. The controller targets 90% of the container's memory limit, leaving 10% as headroom for memory that the Go runtime does not track, such as memory that is used by Envoy subprocesses.
+To adjust the `GOMEMLIMIT` variable dynamically, set the `controller.goMemLimitPercent` field to a value between `1` and `100`. This way, the `GOMEMLIMIT` environment variable is kept in sync with the container's memory limit as it changes. Instead of reading the memory limit once at startup, the controller reads the container's live memory limit directly from its cgroup every 30 seconds, and sets `GOMEMLIMIT` to the percentage you configure of that current value. A value of `90` is the recommended starting point. The controller targets 90% of the container's memory limit, leaving 10% as headroom for memory that the Go runtime does not track, such as memory that is used by Envoy subprocesses.
 
 ```yaml
 controller:
@@ -175,7 +175,7 @@ controller:
 
 | Field | Description |
 | -- | -- |
-| `controller.goMemLimitPercent` | Sets the percentage of the controller container's live memory limit that the Go runtime targets for `GOMEMLIMIT`. Valid values are `0`-`100`. The default value, `0`, sets `GOMEMLIMIT` once at pod startup from the container's memory limit and does not update it afterward. A value between `1` andd `100` re-reads the container's live memory limit every 30 seconds and sets `GOMEMLIMIT` to that percentage of it. |
+| `controller.goMemLimitPercent` | Sets the percentage of the controller container's live memory limit that the Go runtime targets for `GOMEMLIMIT`. Valid values are `0`-`100`. The default value, `0`, sets `GOMEMLIMIT` once at pod startup from the container's memory limit and does not update it afterward. A value between `1` and `100` re-reads the container's live memory limit every 30 seconds and sets `GOMEMLIMIT` to that percentage of it. |
 
 If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
 {{< /version >}}
