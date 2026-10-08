@@ -93,7 +93,7 @@ The `controller.goMemLimitPercent` Helm value now keeps the controller's `GOMEML
 
 #### Common labels on the controller pod template {#v25-controller-common-labels}
 
-The `commonLabels` Helm value now applies to the controller pod template, in addition to resource metadata such as the controller Deployment. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}).
+The `commonLabels` Helm value now applies to the controller pod template, in addition to the metadata of resources such as the controller Deployment. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}).
 
 #### Strip trailing dots from hostnames {#v25-strip-trailing-host-dot}
 
