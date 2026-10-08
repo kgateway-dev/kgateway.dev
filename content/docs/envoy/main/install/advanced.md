@@ -8,7 +8,7 @@ description: Install kgateway and related components.
 
 ## Common labels
 
-Add custom labels to all resources that are created by the Helm charts. These resources include the controller Deployment metadata, controller pod template, Service, ServiceAccount, and ClusterRoles. These labels are separate from selector labels, so you can update `commonLabels` without changing the Deployment's immutable selector labels.
+Add custom labels to all resources that are created by the Helm charts. These resources include the controller Deployment metadata, controller pod template, Service, ServiceAccount, and ClusterRoles. The labels are separate from selector labels, so you can update `commonLabels` without changing the Deployment's immutable selector labels.
 
 The following snippet adds the `label-key` and `kgw-managed` labels to all resources. 
 
