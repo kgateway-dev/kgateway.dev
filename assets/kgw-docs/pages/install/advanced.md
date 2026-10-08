@@ -110,10 +110,23 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 
 | Mode | Behavior |
 | --- | --- |
-| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. This mode protects multi-tenant clusters from individual misconfiguration without dropping the entire snapshot. |
-| `strict` | In addition to the `standard` behavior, the control plane runs an Envoy preflight validation against the generated xDS snapshot. If Envoy would reject the snapshot, the entire snapshot is blocked and the previous valid configuration remains in place. This mode prevents misconfigurations that would otherwise cause Envoy to NACK an xDS update from reaching the data plane. |
+| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. |
+| `strict` | In addition to the `standard` checks, the control plane validates the generated configuration with Envoy before it sends the configuration to the proxies. Instead of sending invalid configuration, the control plane removes or replaces only the invalid parts, so that Envoy does not NACK the update and valid changes continue to be applied. For more information, see [How strict mode handles invalid configuration](#strict-invalid-configuration). |
 
-`standard` mode is the default and is appropriate for most production environments. `strict` mode is recommended when you cannot tolerate a NACKed xDS update reaching the data plane; for example, you might have downstream automation that depends on every accepted change being safe.
+`standard` mode is the default and is appropriate for most production environments. `strict` mode is recommended when you cannot tolerate a NACKed xDS update reaching the data plane, for example when one team's invalid route must not block configuration updates for other routes on the same listener.
+
+### How strict mode handles invalid configuration {#strict-invalid-configuration}
+
+Strict mode does not keep a previous version of a route when an update to the route is invalid. The control plane translates the current state of your resources, and handles invalid configuration as follows.
+
+| Invalid configuration | Result | Status |
+| --- | --- | --- |
+| A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
+| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route |
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+If a virtual host is still invalid after its invalid route rules are removed or replaced, the control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response, and the affected listener reports `Accepted=False` with reason `ListenerReplaced`.{{< /version >}}
+
+For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
 
 ### Enable strict validation
 
