@@ -531,8 +531,21 @@ jobs:
               def in_docs(needle):
                   return ref_git("grep", "-q", "-F", "-e", needle, base, "--", *paths).returncode == 0
 
+              # A draft citing the code pull request it documents is expected, and that
+              # link is in neither the pull request's own diff nor main, so without this
+              # every draft that cites its source was flagged. A link to one of its tabs
+              # (`/files`, `/commits`, `/changes`) is the same pull request.
+              own_prs = {f"github.com/{r.replace('#', '/pull/')}".lower() for r in code_prs}
+
+              def is_own_pr(value):
+                  bare = re.sub(r"^https?://(?:www\.)?", "", value).split("#")[0].split("?")[0].rstrip("/").lower()
+                  bare = re.sub(r"/(?:files|commits|changes)(?:/.*)?$", "", bare)
+                  return bare in own_prs
+
               rows = []
               for kind, value in refs:
+                  if kind == "URL" and is_own_pr(value):
+                      continue
                   if value in code_text or in_docs(value):
                       continue
                   host = re.sub(r"^[a-z]+://", "", value).split("/")[0] if kind in ("URL", "OCI reference", "image") else ""
