@@ -4,3 +4,5 @@ github.com/solo-io/docs-theme-extras v0.3.10 h1:t2BkRKkD24hDKvatZGLxXZVspnNQGRfV
 github.com/solo-io/docs-theme-extras v0.3.10/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
 github.com/solo-io/docs-theme-extras v0.3.15 h1:Wx44OmemNz4Ptoxc7dFuGkf86fTJ30mcAo6rdCivaEU=
 github.com/solo-io/docs-theme-extras v0.3.15/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
+github.com/solo-io/docs-theme-extras v0.3.16 h1:lPSS9awzzgeD39h32v3gEISlerOr0rEwi+QW3yy7b3A=
+github.com/solo-io/docs-theme-extras v0.3.16/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
