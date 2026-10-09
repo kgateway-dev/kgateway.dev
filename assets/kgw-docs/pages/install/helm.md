@@ -36,8 +36,10 @@ Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane by usin
    customresourcedefinition.apiextensions.k8s.io/grpcroutes.gateway.networking.k8s.io created
    ```
 
-2. Apply the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} CRDs for the upgrade version by using Helm.
+2. Apply the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} CRDs for the upgrade version.
 
+   {{< tabs >}}
+   {{% tab name="Helm" %}}
    1. **Optional**: To check the CRDs locally, download the CRDs to a `helm` directory.
 
       ```sh
@@ -50,6 +52,17 @@ Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane by usin
         --namespace {{< reuse "kgw-docs/snippets/namespace.md" >}} \
         --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway-crds.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway-crds.md" >}} 
       ```
+   {{% /tab %}}
+   {{% tab name="kubectl" %}}
+   If you prefer not to use Helm, you can apply the CRD manifests directly with `kubectl`. This creates the CRDs in your cluster, but does not create the {{< reuse "kgw-docs/snippets/namespace.md" >}} namespace for you, so be sure to create it first.
+   ```sh
+   kubectl create namespace {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   for crd in backendconfigpolicies backends directresponses gatewayextensions gatewayparameters listenerpolicies trafficpolicies; do
+     kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/{{< reuse "kgw-docs/versions/github-branch.md" >}}/install/helm/kgateway-crds/templates/gateway.kgateway.dev_$crd.yaml
+   done
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 3. Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart.
 
