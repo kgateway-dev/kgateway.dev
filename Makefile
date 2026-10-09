@@ -24,13 +24,32 @@ init-git-hooks:  ## Use the tracked version of Git hooks from this repo
 # pipeline this replaced, and docs-theme-extras docs/configuration/pdf-export.md
 # for why both engines existed.
 .PHONY: build
-build:
+build: check-node-deps
 	hugo160 --gc --minify
+
+# The site's CSS goes through PostCSS + Tailwind from node_modules. Without them
+# Hugo fails deep in a template with a PostCSS error that does not say what to
+# do. A fresh clone or git worktree has no node_modules, so check first.
+.PHONY: check-node-deps
+check-node-deps:
+	@test -d node_modules/postcss-cli || { echo "node_modules is missing. Run 'npm install' in $(CURDIR) first."; exit 1; }
+
+# `make serve` builds every version in content/docs/. VERSION=<linkVersion>
+# (for example VERSION=main or VERSION=latest) builds only that version, for a
+# faster preview. scripts/local-version-config.py derives the skip list from
+# hugo.yaml's `params.versions` and writes hugo-local-version.yaml (gitignored).
+VERSION_CONFIG = $(if $(VERSION),--config hugo.yaml$(COMMA)hugo-local-version.yaml)
+COMMA := ,
+
+# NO_SEARCH=1 builds without the search index (the search box does nothing),
+# for a faster preview.
+NO_SEARCH_ENV = $(if $(NO_SEARCH),HUGO_PARAMS_SEARCH_ENABLE=false )
 
 # Local dev server.
 .PHONY: serve
-serve:
-	hugo160 server
+serve: check-node-deps
+	@$(if $(VERSION),python3 scripts/local-version-config.py --version $(VERSION),:)
+	$(NO_SEARCH_ENV)hugo160 server $(VERSION_CONFIG)
 
 # Alias
 .PHONY: server
