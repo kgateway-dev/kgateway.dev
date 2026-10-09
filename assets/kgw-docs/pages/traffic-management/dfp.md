@@ -58,6 +58,9 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
    EOF
    ```
 
+   > [!NOTE]
+   > DFP Backends work only with HTTPRoute and GRPCRoute resources. TCPRoute and TLSRoute resources are not supported.
+
 3. Send a request to a hostname of your choice, such as `httpbin.org`. Verify that your gateway proxy successfully resolves the `httpbin.org` host and returns its welcome page.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
