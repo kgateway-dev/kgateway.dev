@@ -112,6 +112,12 @@ You can now use the `stripTrailingHostDot` field in the HTTP settings of a Liste
 
 For more information, see [Strip trailing dots from hostnames]({{< link-hextra path="/traffic-management/header-control/strip-trailing-host-dot/" >}}).
 
+### 🔄 Feature changes {#v25-feature-changes}
+
+#### Lambda backends set the Host header {#v25-lambda-host-header}
+
+AWS Lambda backends now send the Lambda endpoint as the upstream `Host` header before the proxy signs the request. Previously, you had to send the `Host` header as part of your request. Now, the `Host` header is automatically generated in the format `lambda.<region>.amazonaws.com`. To use a different endpoint, set the `spec.aws.lambda.endpointURL` field of the Backend. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}).
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
