@@ -75,8 +75,8 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
 4. Store the server certificate and key in a Kubernetes secret. 
    ```yaml
    # Base64 encode server certificate and key
-   SERVER_CERT=$(cat server-cert.pem | base64 -w 0)
-   SERVER_KEY=$(cat server-key.pem | base64 -w 0)
+   SERVER_CERT=$(cat server-cert.pem | base64 | tr -d '\n')
+   SERVER_KEY=$(cat server-key.pem | base64 | tr -d '\n')
 
    # Create the secret
    kubectl create secret tls https-cert \

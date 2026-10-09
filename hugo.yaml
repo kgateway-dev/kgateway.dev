@@ -225,7 +225,7 @@ params:
   # sections it applies to. The contract, in full, with a TOML and a YAML
   # template: docs-theme-extras USAGE.md, "Versions and sections".
   #
-  # Also consumed by this repo's local partials (404.html, navbar.html,
+  # Also consumed by this repo's local partials (navbar.html,
   # navbar-version.html, breadcrumb.html).
   versions:
     - version: "2.5.x"
