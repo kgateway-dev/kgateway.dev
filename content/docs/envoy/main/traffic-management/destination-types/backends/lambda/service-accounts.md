@@ -432,6 +432,9 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    {{% /tab %}}
    {{< /tabs >}}
 
+   > [!TIP]
+   > The proxy builds the Lambda hostname from the `region` field, in the format `lambda.<region>.amazonaws.com`, and uses it as the `Host` header. To use a different endpoint, set the `spec.aws.lambda.endpointURL` field to a URL that includes the port, such as `http://localstack:4566`.
+
 2. Create an HTTPRoute resource that references the `lambda` Backend.
    
    ```yaml
@@ -473,7 +476,9 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    {{% /tab %}}
    {{< /tabs >}}
 
-4. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} routes requests to Lambda by sending a curl request to the `echo` function. For Lambda backends, the proxy sends the Lambda endpoint as the upstream `Host` header before signing the request. Route-level `URLRewrite` hostnames and {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} `autoHostRewrite` settings do not override this Lambda behavior. The first request might take a few seconds while AWS Security Token Service (STS) returns credentials. Later requests are faster because the proxy caches those credentials.
+4. Send a curl request to the `echo` function to confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} routes requests to Lambda. You do not need to set a `Host` header. The first request might take a few seconds while AWS Security Token Service (STS) returns credentials. Later requests are faster because the proxy caches those credentials.
+
+   A `URLRewrite` filter that sets `hostname` and the `autoHostRewrite` field of a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} do not change the `Host` header that the proxy sends to Lambda. To change the `Host` header, set the `spec.aws.lambda.endpointURL` field of the Backend.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
