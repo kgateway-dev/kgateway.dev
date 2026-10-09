@@ -123,18 +123,28 @@ rbac:
 
 ### Match an OAuth scope {#scope}
 
-You can authorize requests based on an OAuth scope, such as one that is issued by an identity provider. Unlike the single-value claims in the previous examples, the scope is conventionally a single string of space-delimited scopes, such as `read write admin`. To match one scope without accidentally matching a longer scope that contains it (for example, matching `admin` but not `superadmin`), split the string on spaces and test for membership in the resulting list. The following policy allows requests with a JWT where the `scope` includes `admin`.
+You can authorize requests based on an OAuth scope, such as one that is issued by an identity provider. OAuth scopes are commonly represented in the standard `scope` claim as a single string of space-delimited scopes, such as `read write admin`. However, the CEL matcher used by the RBAC policy does not support splitting strings with `.split(' ')`.
+
+To match one scope exactly, configure your identity provider or token minter to emit an array-shaped claim, such as `scp`, and test for membership in that list. The following policy allows requests with a JWT where the `scp` claim includes `admin`.
 
 ```yaml
 rbac:
   action: Allow
   policy:
     matchExpressions:
-      - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope'].split(' ')"
+      - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scp']"
+```
+
+For example, the JWT payload must include an array-shaped claim similar to the following.
+
+```json
+{
+  "scp": ["read", "write", "admin"]
+}
 ```
 
 > [!NOTE]
-> The sample token in the [Basic JWT policy](../basic/) guide does not include a `scope` claim, so this example does not match that token. To try it out, use a token that carries a space-delimited `scope` claim. If your identity provider issues `scope` as a list instead of a string, drop the `.split(' ')` and match the list directly: `"'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope']"`.
+> Avoid matching a space-delimited `scope` string with substring checks such as `contains('admin')`, because that can accidentally match longer scope values such as `superadmin`. If your identity provider only emits a space-delimited `scope` string, configure it to emit an array-shaped claim for exact scope matching.
 
 ## Cleanup {#cleanup}
 
