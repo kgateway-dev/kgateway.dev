@@ -131,6 +131,18 @@ The outlier detection policy that you can configure in the BackendConfigPolicy r
 
 AWS Lambda backends now send the Lambda endpoint as the upstream `Host` header before the proxy signs the request. Previously, you had to send the `Host` header as part of your request. Now, the `Host` header is automatically generated in the format `lambda.<region>.amazonaws.com`. To use a different endpoint, set the `spec.aws.lambda.endpointURL` field of the Backend. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}).
 
+#### Ordered ADS delivery is on by default {#v25-ordered-ads}
+
+The controller now sends Aggregated Discovery Service (ADS) responses to each proxy in a fixed order: clusters (CDS), endpoints (EDS), listeners (LDS), and routes (RDS). Before, responses that were ready at the same time on a busy stream could arrive out of order. A route could then reach a proxy before the cluster that the route references, and requests could fail with a transient `503` response that has the `NC` response flag.
+
+You do not need to take any action. To restore the previous behavior, set the `KGW_ENABLE_ORDERED_ADS` environment variable to `"false"` on the controller. 
+
+```yaml
+controller:
+  extraEnv:
+    KGW_ENABLE_ORDERED_ADS: "false"
+```
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
