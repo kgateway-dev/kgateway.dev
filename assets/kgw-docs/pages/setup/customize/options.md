@@ -139,7 +139,7 @@ For a step-by-step guide, see [Change proxy config]({{< link-hextra path="/setup
 You can attach a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource to a GatewayClass that is shared by all Gateways that use that class or to an individual Gateway. When resources are attached at both levels, they are processed in the following order:
 
 1. **Built-in configuration on the GatewayClass is applied first** – Built-in fields such as `kube.deployment`, `kube.service`, and `kube.podTemplate` from the GatewayClass {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} are applied first.
-2. **Built-in configuration on the Gateway overrides the GatewayClass** – If the same built-in field is set on both the Gateway and the GatewayClass, the Gateway value takes precedence.
+2. **Built-in configuration on the Gateway overrides the GatewayClass** – If the same built-in field is set on both the Gateway and the GatewayClass, the Gateway value takes precedence. Nested settings, such as `podTemplate.securityContext`, are merged field by field, so a field that only the GatewayClass sets is kept.
 3. **Overlay configuration on the GatewayClass is applied** – After all built-in configuration is processed, the GatewayClass overlay fields are applied to the rendered resources.
 4. **Overlay configuration on the Gateway overrides the GatewayClass** – If conflicting overlay configuration is specified on the Gateway, the configuration in the GatewayClass is overridden by using strategic merge patch semantics. Consider the following examples:
    - For scalar values, such as `dnsPolicy` in a Deployment overlay, the Gateway configuration takes precedence.
