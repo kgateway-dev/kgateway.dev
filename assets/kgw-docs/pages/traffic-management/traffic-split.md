@@ -13,7 +13,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
    kubectl create namespace helloworld
    ```
 
-2. Deploy the Hellworld sample apps. 
+2. Deploy the Helloworld sample apps. 
    ```sh
    kubectl -n helloworld apply -f https://raw.githubusercontent.com/solo-io/gloo-edge-use-cases/main/docs/sample-apps/helloworld.yaml
    ```
