@@ -336,6 +336,29 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 {{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
+#### JWKS fetch timeout {#jwks-timeout}
+
+The `timeout` field sets how long the gateway waits for the remote JWKS server to respond to a single fetch. It bounds one attempt, so it works alongside `retryPolicy`, which decides how many attempts are made and how long to wait between them.
+
+```yaml
+jwks:
+  remote:
+    url: $KEYCLOAK_URL/realms/master/protocol/openid-connect/certs
+    backendRef:
+      name: keycloak
+      kind: Backend
+      group: gateway.kgateway.dev
+    timeout: 10s
+```
+
+| Field | Description |
+| ----- | ----- |
+| `jwks.remote.timeout` | How long the gateway waits for the remote JWKS server to respond when it fetches signing keys. Accepts Go duration strings of up to 32 characters, and must be at least `1ms`. If unset, the gateway waits `5s`. |
+
+{{< /version >}}
+
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+
 ### JWT caching {#jwt-caching}
 
 You can enable Envoy JWT caching for verified tokens in a JWT provider configuration. The cache stores tokens that already passed signature verification, so repeated requests with the same token do not repeat the parse, JWKS lookup, and signature verification work.
@@ -428,9 +451,13 @@ Set `clockSkew` only as wide as the clock drift you actually observe, because a 
 
 ### JWT validation modes {#jwt-validation}
 
-The `validationMode` field in `spec.jwt` controls whether requests without a JWT are allowed. To change the mode, reapply the GatewayExtension that you created earlier with the updated `validationMode` value.
+Use the `validationMode` field to control whether requests without a JWT are allowed.
 
-**Strict** (default): Requests without a valid JWT are rejected with a `401 Unauthorized` response.
+Requests with valid tokens populate JWT dynamic metadata and any headers that you configure in the `claimsToHeaders` field. In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view the requests that failed the JWT validation. Note that failures are still captured, even if you choose a validation mode that allows through invalid-token requests, such as `AllowMissingOrFailed`. 
+
+#### Strict (default)
+
+Requests without a valid JWT are rejected with a `401 Unauthorized` response.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -450,31 +477,10 @@ spec:
             inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
 EOF
 ```
-Send a request without a token to verify the behavior:
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
+#### AllowMissing
 
-```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-
-```sh
-curl -vik localhost:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{< /tabs >}}
-
-Example output:
-
-```text
-< HTTP/1.1 401 Unauthorized
-Jwt is missing
-```
-
-**AllowMissing**: Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use `AllowMissing`, pair it with an RBAC policy to enforce authorization, because unauthenticated requests are allowed through. For an example, see [Restrict access based on claims](../claim-based-rbac/).
+Requests without a token are allowed through. Requests that present an invalid token are still rejected. When you use the `AllowMissing` validation mode, pair it with an RBAC policy to enforce authorization based on JWT claims as unauthenticated requests are allowed through. For an example, see [Restrict access based on claims](../claim-based-rbac/).
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -494,26 +500,38 @@ spec:
             inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
 EOF
 ```
-Send a request without a token to verify the behavior:
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vik localhost:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{< /tabs >}}
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
 
-Example output:
+#### AllowMissingOrFailed {#allow-missing-or-failed}
 
+Use the `AllowMissingOrFailed` validation mode to evaluate a JWT policy against live traffic before you enforce it. The JWT filter verifies each token that a request sends, but the filter allows the request through when the token is missing, expired, malformed, or otherwise invalid.
+
+> [!WARNING]
+> `AllowMissingOrFailed` provides no authentication. A downstream RBAC policy that matches JWT claims receives empty JWT metadata for invalid-token requests, the same as requests that send no token. If you set `claimsToHeaders`, invalid-token requests also reach the upstream without the configured claim headers.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: GatewayExtension
+metadata:
+  name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  jwt:
+    validationMode: AllowMissingOrFailed
+    providers:
+      - name: selfminted
+        issuer: kgateway.dev
+        jwks:
+          local:
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+EOF
 ```
-< HTTP/1.1 200 OK
-```
+
+If a request would have failed the JWT verification, the failure is written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view these requests. 
+
+{{< /version >}}
 
 ### Configure audiences {#audiences}
 

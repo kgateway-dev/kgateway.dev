@@ -96,7 +96,7 @@ spec:
   - name: http
     namespace: kgateway-system
   hostnames:
-    - TrafficPolicy.example
+    - trafficpolicy.example
   rules:
   - matches:
     - path:
@@ -142,7 +142,7 @@ spec:
   - name: http
     namespace: kgateway-system
   hostnames:
-    - TrafficPolicy.example
+    - trafficpolicy.example
   rules:
   - name: rule0
     matches:
@@ -171,7 +171,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: local-ratelimit
-  namespace: kgateway-system
+  namespace: httpbin
 spec:
   targetRefs: 
   - group: gateway.networking.k8s.io

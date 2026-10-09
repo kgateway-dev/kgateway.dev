@@ -134,6 +134,11 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    EOF
    ```
 
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   > [!TIP]
+   > The proxy builds the Lambda hostname from the `region` field, in the format `lambda.<region>.amazonaws.com`, and uses it as the `Host` header. To use a different endpoint, set the `spec.aws.lambda.endpointURL` field to a URL that includes the port, such as `http://localstack:4566`.
+   {{< /version >}}
+
 2. Create an HTTPRoute resource that references the `lambda` Backend.
    
    ```yaml
@@ -160,22 +165,45 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    EOF
    ```
 
-3. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
-   
+   > [!NOTE]
+   > AWS Lambda Backends work only with HTTPRoute and GRPCRoute resources. TCPRoute and TLSRoute resources are not supported.
+
+3. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}You do not need to set a `Host` header.{{< /version >}}
+
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   A `URLRewrite` filter that sets `hostname` and the `autoHostRewrite` field of a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} do not change the `Host` header that the proxy sends to Lambda. To change the `Host` header, set the `spec.aws.lambda.endpointURL` field of the Backend.
+   {{< /version >}}
+
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
+   {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
    ```sh
    curl -H "Host: lambda.${REGION}.amazonaws.com" \
      $INGRESS_GW_ADDRESS:8080/echo \
      -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
+   {{< /version >}}
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   ```sh
+   curl $INGRESS_GW_ADDRESS:8080/echo \
+     -d '{"key1":"value1", "key2":"value2"}' -X POST
+   ```
+   {{< /version >}}
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
+   {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
    ```sh
    curl -H "Host: lambda.${REGION}.amazonaws.com" \
      localhost:8080/echo \
      -d '{"key1":"value1", "key2":"value2"}' -X POST
    ```
+   {{< /version >}}
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   ```sh
+   curl localhost:8080/echo \
+     -d '{"key1":"value1", "key2":"value2"}' -X POST
+   ```
+   {{< /version >}}
    {{% /tab %}}
    {{< /tabs >}}
 
