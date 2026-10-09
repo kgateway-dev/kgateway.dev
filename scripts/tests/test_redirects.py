@@ -54,9 +54,9 @@ def test_static_redirects_precede_wildcards():
 def test_maintainer_requested_redirects():
     rules = _rules()
     expected = {
-        "/docs/2.0.x/integrations/inference-extension": "/docs/envoy/latest/integrations",
-        "/docs/2.0.x/integrations/istio/ambient/waypoint": "/docs/envoy/latest/integrations/istio/ambient",
-        "/docs/2.0.x/setup/customize/general-steps": "/docs/envoy/latest/setup/customize",
+        "/docs/2.0.x/integrations/inference-extension": "/docs/envoy/latest/integrations/",
+        "/docs/2.0.x/integrations/istio/ambient/waypoint": "/docs/envoy/latest/integrations/istio/ambient/",
+        "/docs/2.0.x/setup/customize/general-steps": "/docs/envoy/latest/setup/customize/",
         "/docs/latest": "/docs/envoy/latest/",
         "/docs/main": "/docs/envoy/main/",
         "/docs/2.0.x": "/docs/envoy/latest/",
