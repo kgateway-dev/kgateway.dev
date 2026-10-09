@@ -39,8 +39,6 @@ spec:
       - name: 
         value: 
       remove: []
-      - name: 
-        value: 
       body:
         value: 
         parseAs: 
@@ -96,7 +94,7 @@ Learn more about the template attributes that you can use to transform headers a
 
 ### `add`, `set`, `remove`
 
-Apply transformation templates to add, set, or remode request or response headers. 
+Apply transformation templates to add, set, or remove request or response headers. 
 
 #### Static value
 

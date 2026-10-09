@@ -1,6 +1,6 @@
 ---
 title: Compression
-weight: 10
+weight: 20
 description: Reduce response payload sizes and decompress incoming request bodies with gzip compression.
 ---
 

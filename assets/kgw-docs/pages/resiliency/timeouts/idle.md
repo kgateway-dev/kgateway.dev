@@ -80,6 +80,11 @@ Note that the idle timeout configures the timeout for the entire connection from
       }
       ```
       
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+> [!TIP]
+> An idle timeout closes a connection only when the connection has no active requests. To limit the total lifetime of a connection, even when the connection is actively serving requests, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

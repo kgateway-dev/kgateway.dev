@@ -1,34 +1,68 @@
 - logoPath: users/account-technologies-logo.png
+  name: Account Technologies
 - logoPath: users/adp-logo.png
+  name: ADP
 - logoPath: users/apptentive-logo.png
+  name: Apptentive
 - logoPath: users/bmw-logo.png
+  name: BMW
 - logoPath: users/buda-com-logo.png
+  name: Buda.com
 - logoPath: users/CARFAX_Logo.svg
+  name: CARFAX
 - logoPath: users/cjib_logo.jpg
+  name: CJIB
 - logoPath: users/constant-contact-logo.png
+  name: Constant Contact
 - logoPath: users/crealogix-logo.png
+  name: Crealogix
 - logoPath: users/DAZN-logo.png
+  name: DAZN
 - logoPath: users/dtn-logo.png
+  name: DTN
 - logoPath: users/emburse-logo.png
+  name: Emburse
 - logoPath: users/fitch-group-logo-transparent.png
+  name: Fitch Group
 - logoPath: users/fremtind-logo.png
+  name: Fremtind
 - logoPath: users/hipages_logo.png
+  name: hipages
 - logoPath: users/intermax-logo.png
+  name: Intermax
 - logoPath: users/mattel-logo.png
+  name: Mattel
 - logoPath: users/mission-lane-logo.png
+  name: Mission Lane
 - logoPath: users/new_relic-logo.png
+  name: New Relic
 - logoPath: users/ntt-communications-logo.png
+  name: NTT Communications
 - logoPath: users/office-depot-logo.png
+  name: Office Depot
 - logoPath: users/outsystems-logo.png
+  name: OutSystems
 - logoPath: users/Owlet.png
+  name: Owlet
 - logoPath: users/parkmobile-logo.png
+  name: ParkMobile
 - logoPath: users/pega-logo.png
+  name: Pega
 - logoPath: users/pinecone-logo.png
+  name: Pinecone
 - logoPath: users/public-safety-canada-logo.png
+  name: Public Safety Canada
 - logoPath: users/qlik-logo.png
+  name: Qlik
 - logoPath: users/rei-logo.png
+  name: REI
 - logoPath: users/repay-logo.png
+  name: REPAY
 - logoPath: users/schneider-electric-logo.png
+  name: Schneider Electric
 - logoPath: users/snyk-logo.png
+  name: Snyk
 - logoPath: users/sumo-logic-logo.png
+  name: Sumo Logic
 - logoPath: users/t-mobile-logo.png
+  name: T-Mobile

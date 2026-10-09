@@ -451,7 +451,7 @@ For a JWT setup example, see the [docs](https://agentgateway.dev/docs/kubernetes
 
 Issue: https://github.com/kgateway-dev/kgateway/issues/12910
 
-One of the most common themes of feedback we received from the v2.1 release is that there were several missing features which can be considered “tablestakes” for API gateways. This feedback was completely valid and we took it to heart, so we gathered the most requested features and made sure to deliver them for the v2.2 release! Huge thanks goes to all that gave us this important feedback on Slack, GitHub, or anywhere else!
+One of the most common themes of feedback we received from the v2.1 release is that there were several missing features which can be considered “table stakes” for API gateways. This feedback was completely valid and we took it to heart, so we gathered the most requested features and made sure to deliver them for the v2.2 release! Huge thanks goes to all that gave us this important feedback on Slack, GitHub, or anywhere else!
 
 #### API key authentication
 

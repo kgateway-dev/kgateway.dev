@@ -1,5 +1,3 @@
-Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing.
-
 ## About gRPC routing
 
 The GRPCRoute resource provides protocol-aware routing for gRPC traffic within the Kubernetes Gateway API. Unlike the HTTPRoute, which requires matching on HTTP paths and methods, the GRPCRoute allows you to define routing rules by using gRPC-native concepts, such as service and method names.

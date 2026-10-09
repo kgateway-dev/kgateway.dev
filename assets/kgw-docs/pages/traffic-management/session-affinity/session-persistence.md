@@ -64,12 +64,14 @@ spec:
           port: 3000
       sessionPersistence:
         sessionName: Session-B
-        type: Header
-        idleTimeout: 10s
+        type: Header{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
+        idleTimeout: 10s{{< /version >}}
 ```
 
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 > [!NOTE]
 > Note that `sessionPersistence.idleTimeout` is currently not supported in Envoy-based gateway proxies. Setting this value has no effect on the gateway proxy.
+{{< /version >}}
 
 {{< reuse "/kgw-docs/snippets/review-table.md" >}}
 
@@ -77,9 +79,9 @@ spec:
 | -- | -- | 
 | `sessionName` | The name of the persistent session, which is reflected in the cookie or the header that the proxy sends in response to the client and the client reuses in subsequent requests. To prevent unpredictable behavior or rejection, do not reuse session names. |
 | `type` | The request property, either `Header` or `Cookie`, to base session persistence on. Defaults to `Cookie`. |
-| `idleTimeout` | The idle timeout of the persistent session. Once the session has been idle for more than the specified duration, the session becomes invalid. |
 | `absoluteTimeout` | The absolute timeout of the persistent session. Once the duration has elapsed, the session becomes invalid. |
-| `cookieConfig.lifetimeType` | If the `type` is `Cookie`, the `lifetimeType` determines whether the session cookie has a `Permanent` or `Session`-based lifetime. A permanent cookie persists until its specified expiry time, while a session cookie is deleted when the current session ends. When set to `Permanent`, `absoluteTimeout` indicates the cookie's lifetime as defined by either the `Expires` or `Max-Age` cookie attributes, and is required. When set to `Session`, `absoluteTimeout` indicates the absolute lifetime of the cookie that is tracked by the gateway, and is optional. **Note**: To maintain affinity even when the gateway proxy restarts, you must set this field to `Permanent`. Defaults to `Session`. |
+| `cookieConfig.lifetimeType` | If the `type` is `Cookie`, the `lifetimeType` determines whether the session cookie has a `Permanent` or `Session`-based lifetime. A permanent cookie persists until its specified expiry time, while a session cookie is deleted when the current session ends. When set to `Permanent`, `absoluteTimeout` indicates the cookie's lifetime as defined by either the `Expires` or `Max-Age` cookie attributes, and is required. When set to `Session`, `absoluteTimeout` indicates the absolute lifetime of the cookie that is tracked by the gateway, and is optional. **Note**: To maintain affinity even when the gateway proxy restarts, you must set this field to `Permanent`. Defaults to `Session`. |{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
+| `idleTimeout` | The idle timeout of the persistent session. Once the session has been idle for more than the specified duration, the session becomes invalid. |{{< /version >}}
 
 ## Verify the session persistence configuration {#verify}
 

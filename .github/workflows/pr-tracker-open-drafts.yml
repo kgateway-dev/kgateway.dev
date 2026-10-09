@@ -22,7 +22,7 @@
 # organization, so it refuses any branch that touches a path outside
 # ALLOWED_PATHS. The drafting side runs its own equivalent check, and this one
 # deliberately does not trust it.
-name: Open PR tracker draft PRs
+name: PR tracker draft PRs
 
 on:
   schedule:
@@ -531,8 +531,21 @@ jobs:
               def in_docs(needle):
                   return ref_git("grep", "-q", "-F", "-e", needle, base, "--", *paths).returncode == 0
 
+              # A draft citing the code pull request it documents is expected, and that
+              # link is in neither the pull request's own diff nor main, so without this
+              # every draft that cites its source was flagged. A link to one of its tabs
+              # (`/files`, `/commits`, `/changes`) is the same pull request.
+              own_prs = {f"github.com/{r.replace('#', '/pull/')}".lower() for r in code_prs}
+
+              def is_own_pr(value):
+                  bare = re.sub(r"^https?://(?:www\.)?", "", value).split("#")[0].split("?")[0].rstrip("/").lower()
+                  bare = re.sub(r"/(?:files|commits|changes)(?:/.*)?$", "", bare)
+                  return bare in own_prs
+
               rows = []
               for kind, value in refs:
+                  if kind == "URL" and is_own_pr(value):
+                      continue
                   if value in code_text or in_docs(value):
                       continue
                   host = re.sub(r"^[a-z]+://", "", value).split("/")[0] if kind in ("URL", "OCI reference", "image") else ""
@@ -600,8 +613,23 @@ jobs:
       # `content/docs` wholesale from the fork branch would also bring back that
       # branch's copy of every page it did NOT edit, reverting anything merged
       # here since the draft was cut. Applying the three-dot diff carries only
-      # the draft's own changes, and a conflict with a newer edit fails this
-      # branch loudly instead of silently undoing it.
+      # the draft's own changes, and a conflict with a newer edit stops this
+      # branch instead of silently undoing it.
+      #
+      # A CONFLICT IS AN OUTCOME, NOT A FAILURE. It means somebody edited the
+      # same lines here after the draft was cut, often by folding the draft's
+      # content in by hand. No pull request is opened, the conflicting files are
+      # listed in the run summary with a compare link, and the job passes. The
+      # drafting side drafts the change again against the newer main on its next
+      # weekly run, while the code change is recent, and pushes a branch that
+      # applies if there is still something to add. If there is not, the old
+      # branch stays and is reported here each day until its metadata expires,
+      # as a warning rather than a failure. Before this, every such branch failed the run
+      # every day until its metadata expired (agentgateway/website run
+      # 37031254363: four drafts, all already covered by a hand edit the day
+      # before).
+      #
+      # Any other apply error still fails the job.
       #
       # Limited to ALLOWED_PATHS by pathspec as well as by the guard, so
       # nothing else can land even if the guard were somehow wrong.
@@ -612,9 +640,30 @@ jobs:
           BRANCH: ${{ matrix.branch }}
         run: |
           set -euo pipefail
+          # Written to a file first so that a failed diff fails the step rather
+          # than reading as a conflict.
+          patch="${RUNNER_TEMP}/draft.patch"
           # shellcheck disable=SC2086 # ALLOWED_PATHS is a space-separated list
-          git diff --binary --no-renames HEAD..."drafts/${BRANCH}" -- ${ALLOWED_PATHS} \
-            | git apply --index --3way
+          git diff --binary --no-renames HEAD..."drafts/${BRANCH}" -- ${ALLOWED_PATHS} > "${patch}"
+          if ! git apply --index --3way "${patch}"; then
+            conflicts=$(git diff --name-only --diff-filter=U)
+            if [ -z "${conflicts}" ]; then
+              echo "::error::the diff of ${BRANCH} does not apply, and not because of a conflict."
+              exit 1
+            fi
+            git reset -q --hard HEAD
+            # File names come from the fork, so they are only ever written
+            # indented into the summary, never into a workflow command.
+            echo "::warning::${BRANCH} conflicts with newer edits on main; no pull request opened. See the run summary."
+            {
+              echo "- \`${BRANCH}\`: conflicts with newer edits on main, so no pull request was opened. The next drafting run redrafts it against main if the code change is still recent. Conflicting files:"
+              printf '%s\n' "${conflicts}" | tr -d '`' | sed 's/^/    - `/; s/$/`/'
+              echo "  Compare: https://github.com/${GITHUB_REPOSITORY}/compare/main...${FORK_REPO%%/*}:${FORK_REPO#*/}:${BRANCH}"
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "conflict=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "conflict=false" >> "$GITHUB_OUTPUT"
           # One path per line for `add-paths`, so ALLOWED_PATHS is the only list.
           # shellcheck disable=SC2086
           { echo "paths<<EOF"; printf '%s\n' ${ALLOWED_PATHS}; echo "EOF"; } >> "$GITHUB_OUTPUT"
@@ -622,7 +671,7 @@ jobs:
       # DCO: every commit here needs a Signed-off-by trailer, including this one.
       - name: Open the pull request
         id: cpr
-        if: steps.guard.outputs.ok == 'true'
+        if: steps.guard.outputs.ok == 'true' && steps.apply.outputs.conflict == 'false'
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
         with:
           base: main
@@ -638,7 +687,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Say what happened
-        if: steps.guard.outputs.ok == 'true'
+        if: steps.guard.outputs.ok == 'true' && steps.apply.outputs.conflict == 'false'
         env:
           URL: ${{ steps.cpr.outputs.pull-request-url }}
           BRANCH: ${{ matrix.branch }}

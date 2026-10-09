@@ -289,6 +289,8 @@ spec:
 EOF
 ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}{{< reuse "kgw-docs/pages/setup/customize/security-context-merge.md" >}}{{< /version >}}
+
 ### Remove default security contexts for OpenShift {#openshift-security-context}
 
 OpenShift manages security contexts through Security Context Constraints (SCCs). Set the built-in `omitDefaultSecurityContext` field to prevent the control plane from adding default pod and container security contexts, so that OpenShift can assign appropriate values.

@@ -8,6 +8,7 @@ on:
       - ".github/workflows/scripts-tests.yml"
       - ".docs-test.toml"
       - "versions.json"
+      - "static/_redirects"
   push:
     branches:
       - main
@@ -16,6 +17,7 @@ on:
       - ".github/workflows/scripts-tests.yml"
       - ".docs-test.toml"
       - "versions.json"
+      - "static/_redirects"
 
 jobs:
   python-unit-tests:
