@@ -160,6 +160,9 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    EOF
    ```
 
+   > [!NOTE]
+   > AWS Lambda Backends work only with HTTPRoute and GRPCRoute resources. TCPRoute and TLSRoute resources are not supported.
+
 3. Confirm that {{< reuse "/kgw-docs/snippets/kgateway.md" >}} correctly routes requests to Lambda by sending a curl request to the `echo` function.
    
    {{< tabs >}}

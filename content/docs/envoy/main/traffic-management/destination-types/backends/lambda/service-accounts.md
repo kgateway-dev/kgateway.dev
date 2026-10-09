@@ -458,6 +458,9 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
    EOF
    ```
 
+   > [!NOTE]
+   > AWS Lambda Backends work only with HTTPRoute and GRPCRoute resources. TCPRoute and TLSRoute resources are not supported.
+
 3. Get the external address of the gateway and save it in an environment variable.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
