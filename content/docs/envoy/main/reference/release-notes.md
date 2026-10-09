@@ -135,7 +135,7 @@ AWS Lambda backends now send the Lambda endpoint as the upstream `Host` header b
 
 The controller now sends Aggregated Discovery Service (ADS) responses to each proxy in a fixed order: clusters (CDS), endpoints (EDS), listeners (LDS), and routes (RDS). Before, responses that were ready at the same time on a busy stream could arrive out of order. A route could then reach a proxy before the cluster that the route references, and requests could fail with a transient `503` response that has the `NC` response flag.
 
-You do not need to take any action. To restore the previous behavior, set the `KGW_ENABLE_ORDERED_ADS` environment variable to `"false"` on the controller. If you disable ordered ADS delivery, file an issue in the kgateway repository that describes the problem.
+You do not need to take any action. To restore the previous behavior, set the `KGW_ENABLE_ORDERED_ADS` environment variable to `"false"` on the controller. 
 
 ```yaml
 controller:
