@@ -451,7 +451,7 @@ During this mentorship, I had the opportunity to work across several areas of th
 5. Building Security integration of kgateway with Istio and Kyverno for its exAuth and CEL based Authz testing policies.
 6. Running Demo for Security integration of kgateway with Istio & Kyverno.
 7. Contributing to **Argo Rollouts** integration to kgateway, while using **agentgateway** as its gatewayClass.
-8. Advocating for kgateway project through a demo video on my Youtube channel with its agentgateway integration in version v2.1 and MCP walkthrough.
+8. Advocating for kgateway project through a demo video on my YouTube channel with its agentgateway integration in version v2.1 and MCP walkthrough.
 
 ## Mentorship Conclusion
 My LFX Mentorship with the kgateway community has been much more than completing weekly tasks or shipping a handful of PRs — it has fundamentally shaped how I think about open-source collaboration, real-world infrastructure design, and the responsibility that comes with contributing to a CNCF ecosystem project. This journey helped me understand the true depth of modern API gateways, the evolving role of Ambient Mesh, and how governance, observability, security, and automation must work together to create reliable platforms.

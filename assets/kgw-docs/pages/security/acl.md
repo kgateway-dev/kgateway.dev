@@ -193,7 +193,7 @@ Allow all traffic by default, but block traffic from specific CIDR ranges. When 
 
 ### Hole-punching
 
-Use longest-prefix matching to allow a specific subnet within a broader denied range. When a client IP address matches more than one rule, the most specific CIDR prefix wins, indepedent of the rule order that you defined in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. 
+Use longest-prefix matching to allow a specific subnet within a broader denied range. When a client IP address matches more than one rule, the most specific CIDR prefix wins, independent of the rule order that you defined in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. 
 
 1. Update the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to deny the entire `10.0.0.0/8` range, but punch a hole to allow requests from the `10.1.0.0/16` range without including the host `10.1.2.3`. 
 
