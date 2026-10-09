@@ -1,7 +1,14 @@
 - logoPath: integrations/amazon-elb.svg
+  name: Amazon Elastic Load Balancing
 - logoPath: integrations/aws-lambda.svg
+  name: AWS Lambda
 - logoPath: integrations/azure.svg
+  name: Microsoft Azure
 - logoPath: integrations/argo.svg
+  name: Argo
 - logoPath: integrations/istio.svg
+  name: Istio
 - logoPath: integrations/cert-manager.png
+  name: cert-manager
 - logoPath: integrations/external-dns.png
+  name: ExternalDNS
