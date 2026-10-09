@@ -31,7 +31,7 @@ If you are unsure which Envoy minor version your kgateway release targets, check
 
 2. Set up a Docker engine with [BuildKit / `buildx`](https://docs.docker.com/build/buildkit/) support. For example, you can install the [Docker Desktop app](https://www.docker.com/products/docker-desktop/).
 
-3. Set up a container registry that your cluster can pull from and connect to it. If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "docs/snippets/gatewayparameters.md" >}}.
+3. Set up a container registry that your cluster can pull from and connect to it. If your cluster pulls from a private registry, [set up image pull secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) on the proxy pods. You can add them with the `podTemplate.imagePullSecrets` field in {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}.
 
 4. Install `rustup`, the Rust toolchain installer. The correct Rust version is then picked up automatically from the `rust-toolchain.toml` file in the repository.
 
@@ -95,15 +95,15 @@ docker push registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 
 ## Step 3: Customize the Envoy image {#envoy-image}
 
-Create a {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that points `spec.kube.envoyContainer.image` to your custom wrapper image.
+Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource that points `spec.kube.envoyContainer.image` to your custom wrapper image.
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: {{< reuse "docs/snippets/gatewayparam-apiversion.md" >}}
-kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
 metadata:
   name: custom-envoy-image
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   kube:
     envoyContainer:
@@ -126,7 +126,7 @@ The `image` field follows the same structure used for all container images in kg
 
 ## Step 4: Reference the GatewayParameters from your Gateway {#gateway}
 
-Create or update your Gateway resource to reference the {{< reuse "docs/snippets/gatewayparameters.md" >}} you just created.
+Create or update your Gateway resource to reference the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} you just created.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -134,13 +134,13 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-gateway
-  namespace: {{< reuse "docs/snippets/namespace.md" >}}
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: {{< reuse "docs/snippets/gatewayclass.md" >}}
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
-      group: {{< reuse "docs/snippets/gatewayparam-group.md" >}}
-      kind: {{< reuse "docs/snippets/gatewayparameters.md" >}}
+      group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+      kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
       name: custom-envoy-image
   listeners:
     - name: http
@@ -156,28 +156,28 @@ When kgateway reconciles this Gateway, it creates a proxy Deployment with the cu
 
 ## Apply to all gateways by default {#default}
 
-If you want every Gateway using the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass to pick up your custom image automatically, set the `gatewayClassParametersRefs.kgateway` Helm value instead of attaching the {{< reuse "docs/snippets/gatewayparameters.md" >}} to each Gateway individually.
+If you want every Gateway using the `{{< reuse "kgw-docs/snippets/gatewayclass.md" >}}` GatewayClass to pick up your custom image automatically, set the `gatewayClassParametersRefs.kgateway` Helm value instead of attaching the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} to each Gateway individually.
 
 1. Get the current Helm values for your kgateway installation.
 
    ```sh
-   helm get values {{< reuse "/docs/snippets/helm-kgateway.md" >}} -n {{< reuse "docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > values.yaml
    ```
 
-2. Configure the `{{< reuse "docs/snippets/gatewayclass.md" >}}` GatewayClass with the {{< reuse "docs/snippets/gatewayparameters.md" >}} resource that you created earlier. Add the following to your `values.yaml` file.
+2. Configure the `{{< reuse "kgw-docs/snippets/gatewayclass.md" >}}` GatewayClass with the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource that you created earlier. Add the following to your `values.yaml` file.
 
    ```yaml
    gatewayClassParametersRefs:
      kgateway:
        name: custom-envoy-image
-       namespace: {{< reuse "docs/snippets/namespace.md" >}}
+       namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
 3. Upgrade your kgateway installation with the updated values.
 
    ```sh
-   helm upgrade -i -n {{< reuse "docs/snippets/namespace.md" >}} {{< reuse "/docs/snippets/helm-kgateway.md" >}} \
-     oci://{{< reuse "/docs/snippets/helm-path.md" >}}/charts/{{< reuse "/docs/snippets/helm-kgateway.md" >}} \
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml
    ```
 
@@ -186,7 +186,7 @@ If you want every Gateway using the `{{< reuse "docs/snippets/gatewayclass.md" >
 Check that the proxy pods are running the custom image.
 
 ```sh
-kubectl get pods -n {{< reuse "docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=my-gateway \
+kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=my-gateway \
   -o jsonpath='{.items[0].spec.containers[0].image}'
 ```
 
@@ -198,9 +198,9 @@ registry.example.com/myorg/envoy-wrapper:v2.3.0-custom
 
 ## Cleanup {#cleanup}
 
-{{< reuse "docs/snippets/cleanup.md" >}}
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete gateway my-gateway -n {{< reuse "docs/snippets/namespace.md" >}}
-kubectl delete {{< reuse "docs/snippets/gatewayparameters.md" >}} custom-envoy-image -n {{< reuse "docs/snippets/namespace.md" >}}
+kubectl delete gateway my-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} custom-envoy-image -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
