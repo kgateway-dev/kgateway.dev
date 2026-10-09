@@ -39,8 +39,6 @@ spec:
       - name: 
         value: 
       remove: []
-      - name: 
-        value: 
       body:
         value: 
         parseAs: 

@@ -118,13 +118,19 @@ jobs:
       # outright (apt-get update stalls on endless "Ign:" retries instead of
       # failing) — same root cause as the timeout guard above. Point apt at
       # the direct global mirror before Playwright's installer shells out to
-      # apt-get, instead of just waiting longer.
+      # apt-get, instead of just waiting longer. Use https: plain http to
+      # archive.ubuntu.com has also stalled ~30s per index file before apt
+      # falls back to https, which alone used up the 15-minute job budget
+      # (kagent-dev/website#568). The short timeout makes any remaining dead
+      # endpoint fail over in seconds rather than half a minute.
       - name: Work around flaky azure.archive.ubuntu.com apt mirror
         run: |
-          sudo sed -i 's|azure\.archive\.ubuntu\.com|archive.ubuntu.com|g' \
+          sudo sed -i -E 's|http://(azure\.)?archive\.ubuntu\.com|https://archive.ubuntu.com|g' \
             /etc/apt/sources.list \
             /etc/apt/sources.list.d/*.sources \
             /etc/apt/apt-mirrors.txt 2>/dev/null || true
+          printf 'Acquire::http::Timeout "10";\nAcquire::https::Timeout "10";\n' \
+            | sudo tee /etc/apt/apt.conf.d/99-ci-timeout >/dev/null
 
       - name: Install chromium
         working-directory: docs-theme-extras

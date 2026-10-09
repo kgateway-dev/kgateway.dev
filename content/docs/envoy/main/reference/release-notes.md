@@ -23,7 +23,7 @@ Any HTTPListenerPolicy resource that exists in your cluster at the time of the u
    kubectl get httplistenerpolicies -A
    ```
    
-2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link path="/reference/api/kgateway/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
+2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link-hextra path="/reference/api/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
 
 3. Confirm that the new resources are accepted and that your listeners behave as expected.
    ```sh
@@ -90,6 +90,10 @@ You can now use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets
 
 For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
 
+#### Global rate limiting shadow mode {#v25-global-rate-limit-shadow}
+
+GatewayExtension rate limit configuration now supports `percentEnabled` and `percentEnforced`, so you can trial global rate limit decisions before the gateway proxy denies live traffic. Set `percentEnabled: 100` and `percentEnforced: 0` to call the rate limit service and record its decision without blocking requests. For more information, see [Global rate limiting]({{< link-hextra path="/security/ratelimit/global/#gateway-extension" >}}).
+
 #### gRPC statistics {#v25-grpc-stats}
 
 You can now use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code, which isn't visible in ordinary HTTP response-code metrics. Collect statistics for every gRPC method, or use an allow list to limit per-method statistics to a bounded set of methods.
@@ -106,11 +110,20 @@ For more information, see [Forward 100-continue requests]({{< link-hextra path="
 
 The `controller.goMemLimitPercent` Helm value now keeps the controller's `GOMEMLIMIT` in sync with the container's memory limit as it changes, instead of setting it once at pod startup. The controller rereads the container's live memory limit every 30 seconds, so changes from a Kubernetes LimitRange resource or a Vertical Pod Autoscaler (VPA) resize take effect without restarting the pod. For more information, see [Tune the controller Go memory limit]({{< link-hextra path="/install/advanced/#controller-memory-limit" >}}).
 
+#### Common labels on the controller pod template {#v25-controller-common-labels}
+
+The `commonLabels` Helm value now applies to the controller pod template, in addition to the metadata of resources such as the controller Deployment. For more information, see [Common labels]({{< link-hextra path="/install/advanced/#common-labels" >}}).
+
 #### Strip trailing dots from hostnames {#v25-strip-trailing-host-dot}
 
 You can now use the `stripTrailingHostDot` field in the HTTP settings of a ListenerPolicy resource to strip a trailing dot from the `Host` or `:authority` header before route matching. Use this policy when a client sends a fully qualified domain name with a trailing dot, such as `example.com.`, which does not otherwise match an HTTPRoute hostname of `example.com`.
 
 For more information, see [Strip trailing dots from hostnames]({{< link-hextra path="/traffic-management/header-control/strip-trailing-host-dot/" >}}).
+
+#### Separate local-origin outlier detection failures {#v25-local-origin-outlier-detection}
+
+The outlier detection policy that you can configure in the BackendConfigPolicy resource can now separate locally originated failures from externally generated HTTP 5xx responses. Set `splitExternalLocalOriginErrors` to `true`, then use `consecutiveLocalOriginFailure`, `enforcingConsecutiveLocalOriginFailure`, and `enforcingConsecutive5xx` to eject hosts for local-origin failures without ejecting hosts for external 5xx responses. For more information, see [Separate local-origin failures from 5xx responses]({{< link-hextra path="/resiliency/outlier-detection/#local-origin-outlier-detection" >}}).
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
@@ -128,4 +141,3 @@ AWS Lambda backends now send the Lambda endpoint as the upstream `Host` header b
 
 ### 🚧 Known issues {#v2.2-known-issues}
 -->
-

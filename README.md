@@ -10,7 +10,14 @@
 1. `git clone git@github.com:kgateway-dev/kgateway.dev.git`
 2. `cd kgateway.dev`
 3. `npm install`
-4. `hugo server`
+4. Start the server with one of these commands:
+
+   | Command | Builds |
+   |---|---|
+   | `make serve` or `hugo server` | Every docs version in `content/docs/envoy/`. |
+   | `make serve VERSION=<linkVersion>` | Only one version, such as `VERSION=main` or `VERSION=latest`, for a faster preview. Links into other versions do not resolve locally. |
+   | `make serve NO_SEARCH=1` | Same as `make serve`, without the search index. The search box does nothing, but the build is faster. Combine with `VERSION=`. |
+
 5. Visit http://localhost:1313/
 
 ## Contributing

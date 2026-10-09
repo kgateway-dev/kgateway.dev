@@ -34,7 +34,7 @@ An application programming interface (API) is a method to allow a machine to tal
 
 Today, an API most commonly refers to a web API, a method using HTTP (or a derivative like gRPC) to provide access to machine readable data in a format like JSON or XML. Web APIs are sometimes referred to as web services, which is where Amazon Web Services (AWS) gets its name.
 
-As an example, take a look at the API for NASA's popular [Astronomy Picture of the Day](https://apod.nasa.gov/apod/astropix.html) service. The most common way that humans access this service is through the UI that is the NASA website. However, if you want a machine to use this service, you can also use the API.
+As an example, take a look at the API for NASA's popular [Astronomy Picture of the Day](https://science.nasa.gov/apod/) service. The most common way that humans access this service is through the UI that is the NASA website. However, if you want a machine to use this service, you can also use the API.
 
 To start, you [generate an API key](https://api.nasa.gov/) that gives access to the API. Then, you set up your program to perform an HTTP GET request to the API endpoint: `https://api.nasa.gov/planetary/apod?api_key=$YOUR_API_KEY`. 
 

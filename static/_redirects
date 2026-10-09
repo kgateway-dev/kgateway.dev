@@ -40,30 +40,6 @@
 /docs/main/security/external-auth /docs/envoy/main/security/extauth 301
 /docs/main/security/external-auth/ /docs/envoy/main/security/extauth/ 301
 
-# Specific page renames: 2.0.x (removed version mapped to current successors)
-/docs/2.0.x/about/policies/httplistenerpolicy /docs/envoy/latest/about/policies/listenerpolicy 301
-/docs/2.0.x/about/policies/httplistenerpolicy/ /docs/envoy/latest/about/policies/listenerpolicy/ 301
-/docs/2.0.x/integrations/inference-extension /docs/envoy/latest/integrations 301
-/docs/2.0.x/integrations/inference-extension/ /docs/envoy/latest/integrations/ 301
-/docs/2.0.x/integrations/istio/ambient/waypoint /docs/envoy/latest/integrations/istio/ambient 301
-/docs/2.0.x/integrations/istio/ambient/waypoint/ /docs/envoy/latest/integrations/istio/ambient/ 301
-/docs/2.0.x/reference/helm/crds /docs/envoy/latest/reference/helm/kgateway-crds 301
-/docs/2.0.x/reference/helm/crds/ /docs/envoy/latest/reference/helm/kgateway-crds/ 301
-/docs/2.0.x/reference/helm/helm /docs/envoy/latest/reference/helm/kgateway 301
-/docs/2.0.x/reference/helm/helm/ /docs/envoy/latest/reference/helm/kgateway/ 301
-/docs/2.0.x/security/external-auth /docs/envoy/latest/security/extauth 301
-/docs/2.0.x/security/external-auth/ /docs/envoy/latest/security/extauth/ 301
-/docs/2.0.x/setup/customize/aws-elb /docs/envoy/latest/integrations/aws-elb 301
-/docs/2.0.x/setup/customize/aws-elb/ /docs/envoy/latest/integrations/aws-elb/ 301
-/docs/2.0.x/setup/customize/aws-elb/alb /docs/envoy/latest/integrations/aws-elb/alb 301
-/docs/2.0.x/setup/customize/aws-elb/alb/ /docs/envoy/latest/integrations/aws-elb/alb/ 301
-/docs/2.0.x/setup/customize/aws-elb/nlb /docs/envoy/latest/integrations/aws-elb/nlb 301
-/docs/2.0.x/setup/customize/aws-elb/nlb/ /docs/envoy/latest/integrations/aws-elb/nlb/ 301
-/docs/2.0.x/setup/customize/general-steps /docs/envoy/latest/setup/customize 301
-/docs/2.0.x/setup/customize/general-steps/ /docs/envoy/latest/setup/customize/ 301
-/docs/2.0.x/setup/customize/selfmanaged /docs/envoy/latest/setup/customize/envoy/selfmanaged 301
-/docs/2.0.x/setup/customize/selfmanaged/ /docs/envoy/latest/setup/customize/envoy/selfmanaged/ 301
-
 # Bare version roots must be explicit because a splat does not match them.
 /docs/latest /docs/envoy/latest/ 301
 /docs/latest/ /docs/envoy/latest/ 301
@@ -112,6 +88,41 @@
 /docs/main/resiliency/tcp-keepalive* /docs/envoy/main/resiliency/keepalive/tcp/ 301
 /docs/main/setup/hpa* /docs/envoy/main/setup/customize/configs/ 301
 /docs/main/setup/selfmanaged* /docs/envoy/main/setup/customize/envoy/selfmanaged/ 301
+
+# Specific page renames: 2.0.x (removed version mapped to current successors).
+# The aws-elb children must stay above their parent, whose trailing * would
+# otherwise swallow them.
+/docs/2.0.x/about/policies/httplistenerpolicy* /docs/envoy/latest/about/policies/listenerpolicy/ 301
+/docs/2.0.x/integrations/inference-extension* /docs/envoy/latest/integrations/ 301
+/docs/2.0.x/integrations/istio/ambient/waypoint* /docs/envoy/latest/integrations/istio/ambient/ 301
+/docs/2.0.x/reference/helm/crds* /docs/envoy/latest/reference/helm/kgateway-crds/ 301
+/docs/2.0.x/reference/helm/helm* /docs/envoy/latest/reference/helm/kgateway/ 301
+/docs/2.0.x/security/external-auth* /docs/envoy/latest/security/extauth/ 301
+/docs/2.0.x/setup/customize/aws-elb/alb* /docs/envoy/latest/integrations/aws-elb/alb/ 301
+/docs/2.0.x/setup/customize/aws-elb/nlb* /docs/envoy/latest/integrations/aws-elb/nlb/ 301
+/docs/2.0.x/setup/customize/aws-elb* /docs/envoy/latest/integrations/aws-elb/ 301
+/docs/2.0.x/setup/customize/general-steps* /docs/envoy/latest/setup/customize/ 301
+/docs/2.0.x/setup/customize/selfmanaged* /docs/envoy/latest/setup/customize/envoy/selfmanaged/ 301
+
+# Pre-versioning URLs. Before September 2025 the docs had no version segment
+# (/docs/security/...). layouts/404.html used to bounce these to
+# /docs/envoy/latest/ in JavaScript; the 404 now comes from docs-theme-extras,
+# whose suggestions need a version segment to work from, so they are handled
+# here instead. One rule per top-level section of the original tree. A
+# /docs/:section/* placeholder would cover them all, but would also match
+# /docs/envoy/ itself.
+/docs/about* /docs/envoy/latest/about:splat 301
+/docs/ai* /docs/envoy/latest/ai:splat 301
+/docs/faqs* /docs/envoy/latest/faqs:splat 301
+/docs/integrations* /docs/envoy/latest/integrations:splat 301
+/docs/observability* /docs/envoy/latest/observability:splat 301
+/docs/operations* /docs/envoy/latest/operations:splat 301
+/docs/quickstart* /docs/envoy/latest/quickstart:splat 301
+/docs/reference* /docs/envoy/latest/reference:splat 301
+/docs/resiliency* /docs/envoy/latest/resiliency:splat 301
+/docs/security* /docs/envoy/latest/security:splat 301
+/docs/setup* /docs/envoy/latest/setup:splat 301
+/docs/traffic-management* /docs/envoy/latest/traffic-management:splat 301
 
 # JWT docs restructured under simple/
 /docs/envoy/2.1.x/security/jwt/basic* /docs/envoy/2.1.x/security/jwt/simple/basic/ 301
