@@ -54,9 +54,11 @@ def test_resolve_branch_for_version(gen_ref_docs, monkeypatch):
 def test_resolve_tag_for_version_filters_rc_beta_and_returns_latest(gen_ref_docs, monkeypatch):
     output = "\n".join(
         [
+            "sha1 refs/tags/v2.2.1^{}",
             "sha1 refs/tags/v2.2.1",
             "sha2 refs/tags/v2.2.3-rc1",
             "sha3 refs/tags/v2.2.4-beta1",
+            "sha5 refs/tags/v2.2.0-alpha.1",
             "sha4 refs/tags/v2.2.5",
         ]
     )
@@ -68,6 +70,50 @@ def test_resolve_tag_for_version_filters_rc_beta_and_returns_latest(gen_ref_docs
 
     resolved = gen_ref_docs.resolve_tag_for_version("2.2.x", "latest")
     assert resolved == "v2.2.5"
+
+
+def test_resolve_tag_for_version_handles_peeled_tags_and_alpha(gen_ref_docs, monkeypatch):
+    # Regression test for Issue #1059:
+    # 1. Peeled tags ending in ^{} (e.g. annotated tags like v2.2.1^{}) must not cause ValueError: invalid literal for int()
+    # 2. Pre-release -alpha tags (e.g. v2.4.0-alpha.1) must be filtered out and not break int conversion
+    output = "\n".join(
+        [
+            "sha1 refs/tags/v2.4.0-alpha.1",
+            "sha2 refs/tags/v2.4.0-alpha.2",
+            "sha3 refs/tags/v2.4.0-beta.1",
+            "sha4 refs/tags/v2.4.0-rc.1",
+            "sha5 refs/tags/v2.4.0",
+            "sha6 refs/tags/v2.4.5^{}",
+            "sha6 refs/tags/v2.4.5",
+            "sha7 refs/tags/v2.4.6^{}",
+            "sha7 refs/tags/v2.4.6",
+        ]
+    )
+
+    def fake_run(cmd, capture_output, text, check):
+        return SimpleNamespace(stdout=output)
+
+    monkeypatch.setattr(gen_ref_docs.subprocess, "run", fake_run)
+
+    resolved = gen_ref_docs.resolve_tag_for_version("2.4.x", "latest")
+    assert resolved == "v2.4.6"
+
+
+def test_generate_api_docs_returns_false_on_extraction_failure(gen_ref_docs, monkeypatch, tmp_path):
+    kgateway_dir = tmp_path / "kgateway"
+    (kgateway_dir / "api" / "v1alpha1").mkdir(parents=True)
+
+    def fake_run(cmd, check=True):
+        with open("./out.md", "w") as f:
+            f.write("# Dummy out")
+        return SimpleNamespace(returncode=0)
+
+    monkeypatch.setattr(gen_ref_docs.subprocess, "run", fake_run)
+    monkeypatch.setattr(gen_ref_docs, "extract_package_section", lambda content, pkg: None)
+
+    res = gen_ref_docs.generate_api_docs("2.2.x", "test-version", kgateway_dir=str(kgateway_dir))
+    assert res is False
+
 
 
 def test_generate_shared_types_invokes_script_when_shared_exists(gen_ref_docs, monkeypatch, tmp_path):
