@@ -59,6 +59,7 @@ def test_resolve_tag_for_version_filters_rc_beta_and_returns_latest(gen_ref_docs
             "sha2 refs/tags/v2.2.3-rc1",
             "sha3 refs/tags/v2.2.4-beta1",
             "sha5 refs/tags/v2.2.0-alpha.1",
+            "sha6 refs/tags/v2.2.2-patch1",
             "sha4 refs/tags/v2.2.5",
         ]
     )
@@ -97,6 +98,28 @@ def test_resolve_tag_for_version_handles_peeled_tags_and_alpha(gen_ref_docs, mon
 
     resolved = gen_ref_docs.resolve_tag_for_version("2.4.x", "latest")
     assert resolved == "v2.4.6"
+
+
+def test_resolve_tag_for_version_escapes_prefix_and_excludes_patch_tags(gen_ref_docs, monkeypatch):
+    # Tests that dots in version prefix are escaped (e.g. 2.1.x does not match v211.3 or v2-1.3)
+    # and that suffix tags such as -patch1 are excluded by the regex.
+    output = "\n".join(
+        [
+            "sha1 refs/tags/v211.3",
+            "sha2 refs/tags/v2-1.3",
+            "sha3 refs/tags/v2.1.0-patch1",
+            "sha4 refs/tags/v2.1.2",
+            "sha5 refs/tags/v2.1.1",
+        ]
+    )
+
+    def fake_run(cmd, capture_output, text, check):
+        return SimpleNamespace(stdout=output)
+
+    monkeypatch.setattr(gen_ref_docs.subprocess, "run", fake_run)
+
+    resolved = gen_ref_docs.resolve_tag_for_version("2.1.x", "2.1.x")
+    assert resolved == "v2.1.2"
 
 
 def test_generate_api_docs_returns_false_on_extraction_failure(gen_ref_docs, monkeypatch, tmp_path):

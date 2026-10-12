@@ -103,20 +103,18 @@ def resolve_tag_for_version(version, link_version):
                               capture_output=True, text=True, check=True)
         if result.stdout.strip():
             # Filter tags that match our version pattern
-            # Create regex pattern: 2.1.x becomes ^v2\.1\.\d+$
-            version_pattern = version.replace('.x', r'\.\d+')
-            pattern = rf'^v{version_pattern}$'
+            prefix = re.escape(version.removesuffix('.x'))
+            pattern = rf'v{prefix}\.\d+'
             matching_tags = []
             for line in result.stdout.strip().split('\n'):
-                if 'refs/tags/' in line and not line.endswith('^{}'):
+                if 'refs/tags/' in line:
                     tag_name = line.split('/')[-1]
-                    if re.match(pattern, tag_name) and not any(suffix in tag_name for suffix in ['-rc', '-beta', '-alpha', '-main', '-agw']):
+                    if re.fullmatch(pattern, tag_name):
                         matching_tags.append(tag_name)
             
             if matching_tags:
-                # Deduplicate tags and sort by version to take the latest
-                matching_tags = list(dict.fromkeys(matching_tags))
-                matching_tags.sort(key=lambda x: [int(n) for n in x.replace('v', '').split('.') if n.isdigit()], reverse=True)
+                # Sort by version and take the latest
+                matching_tags.sort(key=lambda x: [int(n) for n in x.replace('v', '').split('.')], reverse=True)
                 return matching_tags[0]
             else:
                 print(f'No stable tags found for version {version}')
