@@ -423,6 +423,50 @@ EOF
 ```
 {{< /version >}}
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### BackendTLSPolicy TLS options
+
+Use `spec.options` in a BackendTLSPolicy resource to set TLS extension options on the upstream TLS connection. These options use the same `kgateway.dev/*` keys as Gateway listener TLS options, with one exception: `kgateway.dev/verify-subject-alt-names`. BackendTLSPolicy rejects `kgateway.dev/verify-subject-alt-names` because `spec.validation.hostname` already sets the required Subject Alternative Name check.
+
+The following example adds the ECDH curve that a P-384 ECDSA backend certificate needs. The example also restricts the upstream TLS handshake to TLS versions 1.2 through 1.3. For the full listener TLS option list, see [TLS listener settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}).
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  namespace: kgateway-base
+  name: nginx-tls-policy
+  labels:
+    app: nginx
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  validation:
+    hostname: "example.com"
+    caCertificateRefs:
+    - group: ""
+      kind: ConfigMap
+      name: ca
+  options:
+    kgateway.dev/ecdh-curves: "P-384,P-256"
+    kgateway.dev/min-tls-version: "1.2"
+    kgateway.dev/max-tls-version: "1.3"
+EOF
+```
+
+{{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+|---------|-------------|
+| `spec.options` | The TLS extension options to apply to the upstream TLS context that BackendTLSPolicy creates. Set any of these keys: `kgateway.dev/alpn-protocols`, `kgateway.dev/cipher-suites`, `kgateway.dev/ecdh-curves`, `kgateway.dev/min-tls-version`, `kgateway.dev/max-tls-version`, `kgateway.dev/signature-algorithms`, and `kgateway.dev/verify-certificate-hash`. |
+| `kgateway.dev/ecdh-curves` | A comma-delimited list of key exchange curves for the upstream TLS handshake. If the backend uses a P-384 ECDSA certificate, include `P-384` in this list. Without `P-384`, Envoy's default ECDH curve list rejects that backend certificate. |
+| `kgateway.dev/min-tls-version` | The minimum TLS version for the upstream TLS handshake. If you set this option to `1.3` and omit `kgateway.dev/max-tls-version`, the generated Envoy configuration also uses TLS 1.3 as the maximum. |
+| `kgateway.dev/max-tls-version` | The maximum TLS version for the upstream TLS handshake. Set this option with `kgateway.dev/min-tls-version` when the backend requires an exact TLS version range. |
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
