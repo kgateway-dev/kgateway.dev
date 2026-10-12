@@ -124,6 +124,12 @@ For more information, see [Strip trailing dots from hostnames]({{< link-hextra p
 
 The outlier detection policy that you can configure in the BackendConfigPolicy resource can now separate locally originated failures from externally generated HTTP 5xx responses. Set `splitExternalLocalOriginErrors` to `true`, then use `consecutiveLocalOriginFailure`, `enforcingConsecutiveLocalOriginFailure`, and `enforcingConsecutive5xx` to eject hosts for local-origin failures without ejecting hosts for external 5xx responses. For more information, see [Separate local-origin failures from 5xx responses]({{< link-hextra path="/resiliency/outlier-detection/#local-origin-outlier-detection" >}}).
 
+#### BackendTLSPolicy supports TLS settings {#v25-backendtlspolicy-tls-settings}
+
+You can now set TLS settings for upstream connections, such as ECDH curves, TLS versions, and signature algorithms, in the `spec.options` field of a BackendTLSPolicy. The options use the same `kgateway.dev/*` keys as Gateway listener TLS options.
+
+For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 

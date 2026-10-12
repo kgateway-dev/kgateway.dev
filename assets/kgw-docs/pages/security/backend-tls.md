@@ -393,34 +393,87 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
 Review other configurations.
 
-### Signature algorithms {#signature-algorithms}
+### TLS settings {#tls-settings}
 
-Use the `tls.parameters.signatureAlgorithms` field in a BackendConfigPolicy resource to restrict which TLS signature algorithms the gateway proxy advertises when establishing upstream TLS connections. This setup is useful when your backend requires a specific set of algorithms for compliance or security reasons. If unset, Envoy's defaults apply.
+Restrict the TLS settings that the gateway proxy uses when it originates the upstream TLS connection, such as the key exchange curves, the TLS version range, and the signature algorithms. These settings are useful when your backend requires specific parameters for compliance or security reasons, such as a P-384 ECDSA server certificate that the Envoy default ECDH curve list rejects. If you do not set a parameter, the Envoy default applies.
 
-The following example restricts the upstream TLS connection to ECDSA and RSA-PSS signature algorithms.
+Set the parameters in the same policy that you created for the TLS connection in this guide. When a backend has both a BackendTLSPolicy and a BackendConfigPolicy, the BackendTLSPolicy takes precedence for TLS and the BackendConfigPolicy TLS settings are ignored.
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+The following table compares what each policy supports for TLS settings.
+
+| Capability | BackendTLSPolicy | BackendConfigPolicy |
+|------------|------------------|---------------------|
+| ECDH curves, cipher suites, TLS version range, signature algorithms, and ALPN protocols | Supported through `spec.options` | Supported through `tls.parameters` and `tls.alpnProtocols` |
+| Certificate hash verification | Supported through `kgateway.dev/verify-certificate-hash` | Not supported |
+| Additional Subject Alternative Name verification | Not supported. The `kgateway.dev/verify-subject-alt-names` option is rejected because `spec.validation.hostname` already sets the required check. | Supported through `tls.verifySubjectAltNames` |
+| SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` |
+{{< /version >}}
+
+The following examples update the `nginx-tls-policy` that you created earlier. The values in the examples are illustrative. Adjust them to match what your backend supports.
+
+{{< version include-if="2.4.x" >}}
+{{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
+{{< /version >}}
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< tabs >}}
+{{% tab name="BackendConfigPolicy" %}}
+
+{{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
+
+{{% /tab %}}
+{{% tab name="BackendTLSPolicy" %}}
+
+Use `spec.options` in a BackendTLSPolicy resource to set the TLS settings. The options use the same `kgateway.dev/*` keys as Gateway listener TLS options. Each option takes a single string value, with list values separated by commas.
 
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: BackendConfigPolicy
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
 metadata:
-  name: nginx-tls-policy
   namespace: kgateway-base
+  name: nginx-tls-policy
+  labels:
+    app: nginx
 spec:
   targetRefs:
   - group: ""
     kind: Service
     name: nginx
-  tls:
-    sni: "example.com"
-    secretRef:
+  validation:
+    hostname: "example.com"
+    caCertificateRefs:
+    - group: ""
+      kind: ConfigMap
       name: ca
-    parameters:
-      signatureAlgorithms:
-        - ecdsa_secp256r1_sha256
-        - rsa_pss_rsae_sha256
+  options:
+    kgateway.dev/ecdh-curves: "P-384,P-256"
+    kgateway.dev/cipher-suites: "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384"
+    kgateway.dev/min-tls-version: "1.2"
+    kgateway.dev/max-tls-version: "1.3"
+    kgateway.dev/signature-algorithms: "ecdsa_secp256r1_sha256,rsa_pss_rsae_sha256"
+    kgateway.dev/alpn-protocols: "http/1.1"
+    kgateway.dev/verify-certificate-hash: "<SHA256_CERTIFICATE_HASH>"
 EOF
 ```
+
+{{< reuse "kgw-docs/snippets/review-table.md" >}} For the full list of TLS options, see [TLS listener settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}).
+
+| Setting | Description |
+|---------|-------------|
+| `kgateway.dev/ecdh-curves` | A comma-delimited list of key exchange curves for the upstream TLS handshake. If the backend uses a P-384 ECDSA certificate, include `P-384` in this list. |
+| `kgateway.dev/cipher-suites` | A comma-delimited list of cipher suites for the upstream TLS handshake. Cipher suites apply to TLS 1.2 and earlier. |
+| `kgateway.dev/min-tls-version` | The minimum TLS version for the upstream TLS handshake. If you set this option to `1.3` and omit `kgateway.dev/max-tls-version`, the generated Envoy configuration also uses TLS 1.3 as the maximum. |
+| `kgateway.dev/max-tls-version` | The maximum TLS version for the upstream TLS handshake. |
+| `kgateway.dev/signature-algorithms` | A comma-delimited list of TLS signature algorithms that the gateway proxy advertises during the upstream TLS handshake. |
+| `kgateway.dev/alpn-protocols` | A comma-delimited list of Application-Layer Protocol Negotiation (ALPN) protocols that the gateway proxy offers to the backend. If you do not set this option, the proxy offers no ALPN protocols. |
+| `kgateway.dev/verify-certificate-hash` | The SHA-256 hash of the backend certificate, in hex format. The backend certificate must match this hash. Replace `<SHA256_CERTIFICATE_HASH>` with the hash of your backend certificate. |
+
+{{% /tab %}}
+{{< /tabs >}}
+{{< /version >}}
+
 {{< /version >}}
 
 ## Cleanup
