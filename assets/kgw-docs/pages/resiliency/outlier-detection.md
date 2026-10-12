@@ -270,7 +270,7 @@ A local-origin failure is a request for which the upstream never sends a respons
 
 2. Verify that the policy is accepted and attached.
    ```sh
-   kubectl get backendconfigpolicy httpbin-policy -n httpbin -o jsonpath='{.status.ancestors[0].conditions[*].message}'
+   kubectl get backendconfigpolicy httpbin-policy -n httpbin -o jsonpath='{.status.ancestors[*].conditions[*].message}'
    ```
 
    Example output:
