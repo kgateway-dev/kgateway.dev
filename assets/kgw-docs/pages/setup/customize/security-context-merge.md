@@ -13,6 +13,8 @@ Lists are merged differently:
 
 Nested settings, such as `windowsOptions`, also merge field by field. For example, a Gateway can set `windowsOptions.gmsaCredentialSpecName` to name a GMSA credential spec, and the inline `windowsOptions.gmsaCredentialSpec` contents from the GatewayClass are kept.
 
+{{< version exclude-if="2.3.x,2.4.x" >}}Newer Kubernetes security context fields follow the same rule. For pod security contexts, `supplementalGroupsPolicy`, `appArmorProfile`, and `seLinuxChangePolicy` merge field by field. For container security contexts, `appArmorProfile` merges field by field.{{< /version >}}
+
 Consider the following GatewayClass configuration:
 
 ```yaml
