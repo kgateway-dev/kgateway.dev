@@ -231,33 +231,56 @@ jobs:
           got=$(git -C "$v" -c gpg.format=ssh -c "gpg.ssh.allowedSignersFile=${signers}" \
                 -c gpg.openpgp.program=false -c gpg.x509.program=false \
                 log -1 --format='%G?|%GF' FETCH_HEAD 2>/dev/null || true)
+          # A WARNING THAT SKIPS, NOT A FAILURE, HERE. The usual cause is a
+          # maintainer pushing a fix onto the draft branch, which is ordinary
+          # review, and failing on it turned every daily run red until the next
+          # redraft. Skipping is the outcome the check protects anyway: the
+          # description is left as it is. The open job below still refuses an
+          # unsigned tip outright, because there it would copy content.
           if [ -z "${want}" ] || [ "${got}" != "G|${want}" ]; then
-            echo "::error::the tip of ${BRANCH} is not signed by the drafting side's key; leaving ${URL} as it is."
-            exit 1
+            echo "::warning::the tip of ${BRANCH} is not the drafting side's signed commit (a maintainer may have pushed to it); leaving ${URL} as it is."
+            echo "- Skipped ${URL}: the tip of \`${BRANCH}\` is not the drafting side's signed commit." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
           fi
           # BOUND TO THIS NAME, AND RECENT. A signature covers a commit's content,
           # not the branch it is pushed under or when it was made, so an old
           # signed draft (one maintainers rejected, say) could be pushed again
-          # under a new name and opened as new. The drafting side writes the
-          # branch name and the push time into the signed metadata; a mismatch,
-          # or a draft older than 30 days, is refused. Parked drafts are pushed
-          # again every weekly run, so a real one never gets that old.
+          # under a new name. The drafting side writes the branch name and the
+          # push time into the signed metadata.
+          #
+          # A WRONG NAME FAILS; AGE ALONE SKIPS. A name mismatch is a replayed
+          # draft and somebody should look. An old push time is not: an open
+          # pull request whose draft was never redrafted reaches 30 days just by
+          # waiting for review, and failing on it would turn every later run red.
+          # Either way the description is left as it is.
           if ! git -C "$v" log -1 --format=%B FETCH_HEAD 2>/dev/null \
             | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
-            > "${RUNNER_TEMP}/meta-check.json" \
-             || ! BRANCH="${BRANCH}" python3 - "${RUNNER_TEMP}/meta-check.json" <<'PY'
+            > "${RUNNER_TEMP}/meta-check.json"; then
+            echo "::error::the signed tip of ${BRANCH} carries no draft metadata. Leaving ${URL} as it is."
+            exit 1
+          fi
+          meta_status=0
+          BRANCH="${BRANCH}" python3 - "${RUNNER_TEMP}/meta-check.json" <<'PY' || meta_status=$?
           import datetime, json, os, sys
           m = json.load(open(sys.argv[1]))
           if m.get("branch") != os.environ["BRANCH"]:
               sys.exit(1)
           pushed = datetime.datetime.fromisoformat(str(m.get("pushed_at", "")).replace("Z", "+00:00"))
           age = datetime.datetime.now(datetime.timezone.utc) - pushed
-          sys.exit(0 if datetime.timedelta(minutes=-10) <= age <= datetime.timedelta(days=30) else 1)
+          sys.exit(0 if datetime.timedelta(minutes=-10) <= age <= datetime.timedelta(days=30) else 2)
           PY
-          then
-            echo "::error::the signed metadata on ${BRANCH} does not name this branch, or is more than 30 days old. Leaving ${URL} as it is."
-            exit 1
-          fi
+          case "${meta_status}" in
+            0) ;;
+            2)
+              echo "::warning::the draft on ${BRANCH} was pushed more than 30 days ago; leaving ${URL} as it is."
+              echo "- Skipped ${URL}: the draft on \`${BRANCH}\` is more than 30 days old." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+              ;;
+            *)
+              echo "::error::the signed metadata on ${BRANCH} does not name this branch. Leaving ${URL} as it is."
+              exit 1
+              ;;
+          esac
 
           if ! git -C "$v" log -1 --format=%B FETCH_HEAD 2>/dev/null \
             | awk -v m="${METADATA_MARKER}" '$0 == "-----END " m "-----" && f { ok = 1; exit } f { print } $0 == "-----BEGIN " m "-----" { f = 1 } END { exit !ok }' \
