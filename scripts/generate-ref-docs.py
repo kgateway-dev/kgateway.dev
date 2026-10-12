@@ -103,14 +103,13 @@ def resolve_tag_for_version(version, link_version):
                               capture_output=True, text=True, check=True)
         if result.stdout.strip():
             # Filter tags that match our version pattern
-            # Create regex pattern: 2.1.x becomes v2\.1\.\d+
-            version_pattern = version.replace('.x', r'\.\d+')
-            pattern = f'v{version_pattern}'
+            prefix = re.escape(version.removesuffix('.x'))
+            pattern = rf'v{prefix}\.\d+'
             matching_tags = []
             for line in result.stdout.strip().split('\n'):
                 if 'refs/tags/' in line:
                     tag_name = line.split('/')[-1]
-                    if re.match(pattern, tag_name) and not any(suffix in tag_name for suffix in ['-rc', '-beta', '-main', '-agw']):
+                    if re.fullmatch(pattern, tag_name):
                         matching_tags.append(tag_name)
             
             if matching_tags:
@@ -709,6 +708,7 @@ def generate_api_docs(version, link_version, kgateway_dir='kgateway'):
             print(f'    ✓ Generated envoy API docs in {api_file}')
         else:
             print(f'    ⚠ Warning: Could not extract gateway.kgateway.dev/v1alpha1 package')
+            return False
         
         return True
     else:
