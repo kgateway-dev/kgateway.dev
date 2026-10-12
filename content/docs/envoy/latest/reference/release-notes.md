@@ -205,7 +205,7 @@ For more information, see [BackendConfigPolicy]({{< link-hextra path="/about/pol
 You can now restrict which TLS signature algorithms are used during TLS handshake negotiation, on both the downstream (listener) and upstream (backend) sides:
 
 * **Downstream**: Set the `kgateway.dev/signature-algorithms` annotation on a Gateway listener to control which algorithms Envoy advertises to connecting clients. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}).
-* **Upstream**: Set `spec.tls.parameters.signatureAlgorithms` in a BackendConfigPolicy to control which algorithms the gateway proxy uses when establishing TLS connections to backend services. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/#signature-algorithms" >}}).
+* **Upstream**: Set `spec.tls.parameters.signatureAlgorithms` in a BackendConfigPolicy to control which algorithms the gateway proxy uses when establishing TLS connections to backend services. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
 #### Gateway-level TrafficPolicy inheritance {#v24-gateway-trafficpolicy}
 
