@@ -47,7 +47,7 @@ Create a `GatewayExtension` to configure token validation. Then create a `Traffi
    | `issuer` | Must match the `iss` claim in your tokens exactly. For the default authorization server, Okta uses `https://YOUR_OKTA_DOMAIN/oauth2/default`. Decode a real token and check its `iss` claim. |
    | `jwks.remote.backendRef` | The `Backend` that the gateway uses to fetch the signing keys. The JWKS endpoint does not need to be reachable from outside the cluster. |
    | `jwks.remote.url` | The JWKS URL. For the default authorization server, use `/oauth2/default/v1/keys`. Kgateway connects through `backendRef` and uses this URL for the request path and `Host` header. |
-   | `audiences` | Accepted values for the `aud` claim. The gateway rejects a token if none of its audiences match. The default authorization server uses `api://default`. You can use the Identifier from your own authorization server instead. Decode a token and check its `aud` claim at [jwt.io](https://jwt.io). |
+   | `audiences` | Accepted values for the `aud` claim. The gateway rejects a token if none of its audiences match. The default authorization server uses `api://default`. You can use the Identifier from your own authorization server instead. Decode a token and check its `aud` claim at [jwt.io](https://www.jwt.io/). |
 
    > [!NOTE]
    > The `validationMode` field is optional and defaults to `Strict`. This mode requires a valid JWT on every request. The guide sets it explicitly to make the intent clear. Set it to `AllowMissing` only if you want requests without a token to pass through. Pair that mode with an authorization policy that restricts those requests.
