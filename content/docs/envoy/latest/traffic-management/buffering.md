@@ -14,5 +14,3 @@ prev: /docs/traffic-management/route-delegation
 > The `buffer.filterStage` field is available in {{< reuse "/kgw-docs/snippets/kgateway.md" >}} version 2.4.5 and later.
 
 {{< reuse "kgw-docs/snippets/buffering-filter-stage.md" >}}
-
-{{< reuse "kgw-docs/snippets/buffering-filter-stage-cleanup.md" >}}

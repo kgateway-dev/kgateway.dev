@@ -223,3 +223,15 @@ The following example uses a separate route and hostname so that the buffer and 
        "payload": "hello world"
      }
    ```
+
+## Cleanup
+
+{{< reuse "kgw-docs/snippets/cleanup.md" >}}
+
+```sh
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} transformation-buffer-body -n httpbin --ignore-not-found
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} transformation-buffer-limit -n httpbin --ignore-not-found
+kubectl delete {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} bufferedroute-policy -n httpbin --ignore-not-found
+kubectl delete httproute/bufferedroute gatewayextension/basic-ext-auth-buffer deployment/ext-authz service/ext-authz -n httpbin --ignore-not-found
+kubectl delete listenerpolicy bufferlimits -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+```

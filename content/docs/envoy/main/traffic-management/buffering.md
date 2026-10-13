@@ -11,5 +11,3 @@ prev: /docs/traffic-management/route-delegation
 ## Move the buffer filter before body-reading filters
 
 {{< reuse "kgw-docs/snippets/buffering-filter-stage.md" >}}
-
-{{< reuse "kgw-docs/snippets/buffering-filter-stage-cleanup.md" >}}
