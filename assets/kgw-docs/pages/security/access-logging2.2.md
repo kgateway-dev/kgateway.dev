@@ -435,7 +435,7 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 > [!WARNING]
 > This feature is an experimental API and subject to breaking changes in future releases.
 
-You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
+You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}}. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
 
 1. Get the Helm values file for your current installation and save the values to a local file. 
    ```sh
@@ -455,7 +455,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
      --version {{< reuse "kgw-docs/versions/n-patch.md" >}} 
    ```
 
-4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, and `namespace` of the originating route resource to the JSON access log output.
+4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}} of the originating route resource to the JSON access log output.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -481,6 +481,8 @@ You can optionally enable kgateway to attach route source metadata to every Envo
                  route_kind: "%METADATA(ROUTE:dev.kgateway.route_source:kind)%"
                  route_name: "%METADATA(ROUTE:dev.kgateway.route_source:name)%"
                  route_namespace: "%METADATA(ROUTE:dev.kgateway.route_source:namespace)%"
+                 route_rule: "%METADATA(ROUTE:dev.kgateway.route_source:rule)%"{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+                 route_match: "%METADATA(ROUTE:dev.kgateway.route_source:match)%"{{< /version >}}
    EOF
    ```
 
@@ -490,7 +492,8 @@ You can optionally enable kgateway to attach route source metadata to every Envo
    | `%METADATA(ROUTE:dev.kgateway.route_source:name)%` | The name of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:namespace)%` | The namespace of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:group)%` | The API group of the Kubernetes route resource. |
-   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | The rule index within the route resource that matched the request. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | {{< version include-if="2.4.x" >}}The generated name of the Envoy route that the route rule translates into, in the format `<kind>-<name>-<namespace>-<rule_index>-<match_index>-<rule_name>`, such as `httproute-my-route-default-0-0-to-backend`. If the rule has no name, the `-<rule_name>` suffix is omitted.{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}The name of the rule in the route resource that matched the request, such as `to-backend`. If the rule has no name, the value is `_rule-<index>`, where `<index>` is the zero-based position of the rule in the `rules` list, such as `_rule-1`. The `_` prefix keeps generated values from colliding with rule names, because Gateway API rule names must start with a letter.{{< /version >}} |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   | `%METADATA(ROUTE:dev.kgateway.route_source:match)%` | The match in the rule that the Envoy route was generated from, in the format `_match-<index>`, where `<index>` is the zero-based position of the match in the rule's `matches` list, such as `_match-0`. Together, `rule` and `match` identify the exact match that handled the request. |{{< /version >}}
 
 {{< /version >}}
 
