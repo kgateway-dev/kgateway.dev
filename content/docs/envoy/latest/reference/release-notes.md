@@ -90,6 +90,12 @@ The following ExtProc features are now available in the GatewayExtension resourc
 * **Configurable filter stages**: Control where in the Envoy filter chain an ExtProc filter runs by setting the `filterStage` field. You can also apply multiple ExtProc filters to the same route at different stages. For more information, see [Staged ExtProc filters]({{< link-hextra path="/traffic-management/extproc/filter-stages/" >}}).
 * **Forward Envoy attributes**: Configure the `requestAttributes` field to forward connection-level Envoy attributes, such as `source.address` or `connection.requested_server_name`, to your ExtProc server. Envoy populates the `ProcessingRequest.attributes` map with the specified attribute values on every HTTP request. For more information, see [Request attributes]({{< link-hextra path="/traffic-management/extproc/header-manipulation/#request-attributes" >}}).
 
+#### Move the buffer filter before body-reading filters {#v24-buffer-filter-stage}
+
+Starting in v2.4.5, you can use the `buffer.filterStage` field on a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to place the buffer filter at an earlier position in the HTTP filter chain. By default, the buffer filter runs after authentication, authorization, and rate limiting, so a filter that reads the request body first, such as external auth with request-body checks or ExtProc, can prevent `buffer.maxRequestSize` from being enforced. The default placement is unchanged.
+
+For more information, see [Move the buffer filter before body-reading filters]({{< link-hextra path="/traffic-management/buffering/#move-the-buffer-filter-before-body-reading-filters" >}}).
+
 #### Header control enhancements {#v24-header-control}
 
 The following header control features are now available:
