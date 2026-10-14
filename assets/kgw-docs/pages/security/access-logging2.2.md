@@ -437,6 +437,10 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, and `rule`. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
 
+{{< version exclude-if="2.2.x,2.3.x,2.4.x" >}}
+The metadata also includes a `match` field that identifies the HTTPRoute match entry that selected the Envoy route.
+{{< /version >}}
+
 1. Get the Helm values file for your current installation and save the values to a local file. 
    ```sh
    helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n kgateway-system -o yaml > values.yaml
@@ -484,13 +488,23 @@ You can optionally enable kgateway to attach route source metadata to every Envo
    EOF
    ```
 
+   {{< version exclude-if="2.2.x,2.3.x,2.4.x" >}}
+   To record the original HTTPRoute rule and match that selected the Envoy route, add the following fields to the same `jsonFormat` block.
+   ```yaml
+                 route_rule: "%METADATA(ROUTE:dev.kgateway.route_source:rule)%"
+                 route_match: "%METADATA(ROUTE:dev.kgateway.route_source:match)%"
+   ```
+   {{< /version >}}
+
    | Field | Description |
    | ----- | ----------- |
    | `%METADATA(ROUTE:dev.kgateway.route_source:kind)%` | The kind of the Kubernetes route resource, such as `HTTPRoute`. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:name)%` | The name of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:namespace)%` | The namespace of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:group)%` | The API group of the Kubernetes route resource. |
-   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | The rule index within the route resource that matched the request. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | The rule index within the route resource that matched the request. |{{< version exclude-if="2.2.x,2.3.x,2.4.x" >}}
+   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | The HTTPRoute rule name if the rule has one. For an unnamed rule, the value is `_rule-<index>`, where `<index>` is the zero-based position of the rule in `rules[]`. |
+   | `%METADATA(ROUTE:dev.kgateway.route_source:match)%` | The HTTPRoute match that selected the route, as `_match-<index>`, where `<index>` is the zero-based position of the match in `rules[].matches`. |{{< /version >}}
 
 {{< /version >}}
 

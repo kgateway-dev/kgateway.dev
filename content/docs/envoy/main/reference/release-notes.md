@@ -43,6 +43,10 @@ The SDS (Secret Discovery Service) sidecar now binds to `127.0.0.1:8234` (loopba
 
 If you need to reach the SDS sidecar from outside its pod in a trusted environment, set the `SDS_SERVER_ADDRESS=0.0.0.0:8234` environment variable on the `sds` container. For an example, see [Change the SDS sidecar's pod-network bind address]({{< link-hextra path="/setup/customize/configs/#sds-bind-address" >}}). If you use a custom deployment overlay or manifest that overrides the SDS container's readiness probe, note that the default probe also changed, from a `tcpSocket` check on port 8234 to an `exec` probe that runs `sds healthcheck`, because a TCP probe against the pod IP no longer succeeds against a loopback-only listener.
 
+#### Route source metadata uses route rule names and match indexes
+
+Route source metadata now writes the `rule` value as the original HTTPRoute rule name when available, or `_rule-<index>` for unnamed rules, instead of the generated Envoy route value. The metadata also adds a string `match` value such as `_match-0`; update access log consumers that parse `dev.kgateway.route_source.rule`, and see [Route source metadata]({{< link-hextra path="/security/access-logging/#route-source-metadata" >}}).
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}
