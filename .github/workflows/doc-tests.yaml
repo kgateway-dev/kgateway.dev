@@ -130,10 +130,13 @@ jobs:
 
       # The runner exits 0 when it finds nothing to run, for example when the
       # docs-tests ref has no products/kgateway/ yet. That green run tested
-      # nothing, so it must fail here instead.
+      # nothing, so it must fail here instead. A scenario skipped because its
+      # test markup no longer attaches is listed under skipped_needs_update, not
+      # tests. It counts here: it proves products/kgateway/ resolved, and the
+      # summary already flags it as a warning.
       - name: Check that tests ran
         run: |
-          count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}))" 2>/dev/null || echo 0)
+          count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}) + len(d.get('skipped_needs_update') or {}))" 2>/dev/null || echo 0)
           echo "Doc test scenarios run: $count"
           if [ "$count" -eq 0 ]; then
             echo "::error::No doc test scenarios ran. Check that docs-tests (ref '${{ inputs.docs_tests_ref || 'main' }}') has products/kgateway/."
