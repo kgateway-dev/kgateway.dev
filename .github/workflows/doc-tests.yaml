@@ -128,6 +128,18 @@ jobs:
             --docs-tests-root docs-tests \
             --annotation-report out/annotations/attach-report.json < /dev/null
 
+      # The runner exits 0 when it finds nothing to run, for example when the
+      # docs-tests ref has no products/kgateway/ yet. That green run tested
+      # nothing, so it must fail here instead.
+      - name: Check that tests ran
+        run: |
+          count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}))" 2>/dev/null || echo 0)
+          echo "Doc test scenarios run: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No doc test scenarios ran. Check that docs-tests (ref '${{ inputs.docs_tests_ref || 'main' }}') has products/kgateway/."
+            exit 1
+          fi
+
       - name: Job summary
         if: always()
         run: |
