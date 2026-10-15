@@ -1,6 +1,14 @@
 User-agent: *
 {{- if eq hugo.Environment "production" }}
-Sitemap: {{ "sitemap.xml" | absURL }}
+{{- /* robots.txt requires a full Sitemap URL. With baseURL "/" (kept host-less
+       so canonifyURLs does not point previews at production), absURL returns
+       "/sitemap.xml", so prepend themeExtras.prodHost. A baseURL that already
+       carries a host passes through unchanged. */}}
+{{- $sitemap := "sitemap.xml" | absURL }}
+{{- if and (hasPrefix $sitemap "/") (not (hasPrefix $sitemap "//")) }}
+  {{- $sitemap = print (partial "utils/prod-host.html" .) $sitemap }}
+{{- end }}
+Sitemap: {{ $sitemap }}
 {{- else }}
 Disallow: /
 {{- end }}
