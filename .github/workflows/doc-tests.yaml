@@ -1,0 +1,162 @@
+name: Doc tests
+
+# Runs the code examples in the docs against a real cluster, to check that the
+# guides still work.
+#
+# The pages carry no test markup. The scenarios, and the markup that says which
+# code blocks to run and what to check, live in solo-io/docs-tests under
+# products/kgateway/, and are attached to a copy of the pages at test time. To
+# add or change a test, edit it there, not here.
+#
+# PILOT: one scenario so far, Direct responses in traffic management, run on
+# the latest and main version trees. Each run creates its own kind cluster.
+#
+# The `doc-test-results` artifact from the latest scheduled run on main is what
+# a production build reads to show the "Verified" badge on a page whose tests
+# passed (docs-tests scripts/doc_test_fetch_artifacts.sh with
+# DOC_TESTS_SITE_REPO=kgateway-dev/kgateway.dev, then doc_test_inject_status.py).
+
+on:
+  pull_request:
+    paths:
+      # The pages the pilot scenario runs, and this file. Widen this as
+      # scenarios are added in docs-tests.
+      - 'assets/kgw-docs/pages/traffic-management/direct-response.md'
+      - 'assets/kgw-docs/pages/envoy/quickstart.md'
+      - 'assets/kgw-docs/snippets/envoy/get-started.md'
+      - 'assets/kgw-docs/snippets/prereq.md'
+      - 'assets/kgw-docs/versions/**'
+      - 'content/docs/envoy/latest/install/sample-app.md'
+      - 'content/docs/envoy/main/install/sample-app.md'
+      - 'content/docs/envoy/latest/traffic-management/direct-response.md'
+      - 'content/docs/envoy/main/traffic-management/direct-response.md'
+      - '.github/workflows/doc-tests.yaml'
+  schedule:
+    # Daily at 06:30 UTC, after docs-tests refreshes its annotations at 05:00.
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+    inputs:
+      docs_tests_ref:
+        description: 'docs-tests branch or commit SHA to test with (default: main)'
+        type: string
+        default: ''
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Read-only: this workflow runs commands taken from the pages, including the
+# pages of a pull request.
+permissions:
+  contents: read
+
+jobs:
+  run-test:
+    name: Run doc tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      # persist-credentials: false on both checkouts, so the token is not left
+      # in .git/config for the commands this job runs from the pages.
+      - name: Checkout kgateway.dev
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout docs-tests
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: solo-io/docs-tests
+          ref: ${{ inputs.docs_tests_ref || 'main' }}
+          path: docs-tests
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v6
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Install yamltest
+        run: npm install -g yamltest@latest
+
+      # A release binary rather than `go install`, pinned and checksum-verified.
+      # Bump CPK_VERSION to upgrade. It gives each test cluster's Gateway
+      # service a load balancer address, which the guides read into
+      # INGRESS_GW_ADDRESS.
+      - name: Install cloud-provider-kind
+        env:
+          CPK_VERSION: v0.12.0
+        run: |
+          set -euo pipefail
+          v="${CPK_VERSION#v}"
+          base="https://github.com/kubernetes-sigs/cloud-provider-kind/releases/download/${CPK_VERSION}"
+          tarball="cloud-provider-kind_${v}_linux_amd64.tar.gz"
+          cd "$RUNNER_TEMP"
+          curl -fsSL --retry 5 --retry-all-errors -o "$tarball" "$base/$tarball"
+          curl -fsSL --retry 5 --retry-all-errors -o cpk-checksums.txt "$base/cloud-provider-kind_${v}_checksums.txt"
+          grep " ${tarball}\$" cpk-checksums.txt | sha256sum -c -
+          mkdir -p "$HOME/.local/bin"
+          tar -xzf "$tarball" -C "$HOME/.local/bin" cloud-provider-kind
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      # Attach the test markup from docs-tests to this checkout. The report
+      # lists markup that no longer matches its page, so the runner skips that
+      # scenario with a warning instead of running it with a step missing.
+      - name: Attach test annotations
+        run: |
+          python3 docs-tests/scripts/annotations.py attach --repo . \
+            --annotations docs-tests/products/kgateway/annotations \
+            --report out/annotations/attach-report.json
+
+      # Every scenario docs-tests defines for this site, one kind cluster each.
+      # stdin is closed so a guide command that reads stdin cannot swallow the
+      # rest of the run.
+      - name: Run doc tests
+        env:
+          DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
+          PYTHONUNBUFFERED: '1'
+        run: |
+          python3 docs-tests/scripts/doc_test_run.py --repo-root . \
+            --docs-tests-root docs-tests \
+            --annotation-report out/annotations/attach-report.json < /dev/null
+
+      - name: Job summary
+        if: always()
+        run: |
+          if [ -f out/tests/generated/test-results.yaml ]; then
+            {
+              echo "## Doc test results"
+              echo
+              echo '```yaml'
+              cat out/tests/generated/test-results.yaml
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Read by production builds for the Verified badge. Keep the name: the
+      # fetch script looks for an artifact called doc-test-results.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: doc-test-results
+          path: out/tests/generated/test-results.yaml
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Upload test context (on failure)
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: doc-test-context
+          path: out/tests/generated/context/
+          retention-days: 7
+          if-no-files-found: ignore
