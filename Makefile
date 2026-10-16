@@ -27,6 +27,18 @@ init-git-hooks:  ## Use the tracked version of Git hooks from this repo
 build: check-node-deps
 	hugo160 --gc --minify
 
+# Production build with the doc-test "Verified" badge, for Cloudflare Pages.
+# scripts/doc-test-status.sh writes the latest doc-test results into page front
+# matter first; it needs GITHUB_TOKEN, and without it the site builds with no
+# badges. HUGO defaults to `hugo`, the binary on the Cloudflare build image. To
+# try it locally: make fetch-test-artifacts-build HUGO=hugo160, then discard the
+# `test_status` fields it adds to the pages.
+HUGO ?= hugo
+.PHONY: fetch-test-artifacts-build
+fetch-test-artifacts-build: check-node-deps
+	bash scripts/doc-test-status.sh
+	$(HUGO) --gc --minify
+
 # The site's CSS goes through PostCSS + Tailwind from node_modules. Without them
 # Hugo fails deep in a template with a PostCSS error that does not say what to
 # do. A fresh clone or git worktree has no node_modules, so check first.
