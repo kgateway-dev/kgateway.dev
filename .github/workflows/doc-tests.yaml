@@ -157,12 +157,14 @@ jobs:
           fi
 
       # Read by production builds for the Verified badge. Keep the name: the
-      # fetch script looks for an artifact called doc-test-results.
+      # fetch script looks for an artifact called doc-test-results. A manual
+      # run with another docs_tests_ref tries unmerged tests, so its results
+      # go under a different name and never reach the badge.
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: doc-test-results
+          name: ${{ inputs.docs_tests_ref && inputs.docs_tests_ref != 'main' && 'doc-test-results-trial' || 'doc-test-results' }}
           path: out/tests/generated/test-results.yaml
           retention-days: 14
           if-no-files-found: ignore
