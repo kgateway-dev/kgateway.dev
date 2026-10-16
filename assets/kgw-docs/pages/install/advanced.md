@@ -1,4 +1,4 @@
-<!-- Comment 3 -->
+<!-- Comment 4 -->
 You can update several installation settings in your Helm values file. For example, you can update the namespace, set resource limits and requests, or enable extensions such as for AI. 
 
 Set the version you want to configure in an environment variable, such as the latest patch version (`{{< reuse "kgw-docs/versions/n-patch.md" >}}`).
