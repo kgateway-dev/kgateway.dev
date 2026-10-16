@@ -223,14 +223,7 @@ The following table shows which cross-namespace references are checked in each m
 
 > [!IMPORTANT]
 > In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
-> {{% downstream %}}
-> 
-> Cross-namespace references from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} are evaluated as the `TrafficPolicy` kind, including the `apiKeyAuth`, `basicAuth`, `headerModifiers`, and `extensionRef` fields, and the `extensionRef` fields in `entExtAuth` and `entRateLimit.global`. For these fields, you must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind in the `from` section of your ReferenceGrant. A grant that names the `enterprisekgateway.solo.io` group or the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind is accepted by the API server, never matches, and the policy fails with `missing reference grant`.
-> 
-> The exceptions are the Backend references in `entJWT` and `entWAF`, and the ConfigMap reference in `entGrpcJsonTranscoder`. These references are evaluated as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind, so their grants must name the `enterprisekgateway.solo.io` group and the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} kind.
-> 
-> References from an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an AuthConfig, RateLimitConfig, or WAFPolicy resource are not validated in any mode, so `entExtAuth.authConfigRef`, `entRateLimit.global.rateLimitConfigRefs`, and `entWAF.wafPolicyRef` can select a resource in another namespace without a ReferenceGrant. Do not rely on `STRICT` mode to isolate these resources between namespaces. If you need to restrict them, use namespace discovery or RBAC instead.
-> {{% /downstream %}}
+> {{< reuse "kgw-docs/snippets/referencegrant-policy-kind-note.md" >}}
 
 ### ReferenceGrant example {#referencegrant-example}
 
