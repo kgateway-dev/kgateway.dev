@@ -2,4 +2,4 @@ module github.com/kgateway-dev/kgateway.dev
 
 go 1.21
 
-require github.com/solo-io/docs-theme-extras v0.3.17-beta.1 // indirect
+require github.com/solo-io/docs-theme-extras v0.3.18 // indirect

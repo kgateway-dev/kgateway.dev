@@ -18,6 +18,20 @@ Matching is plain substring replacement, not regex. Two consequences to keep in 
 
 The fix-ups run twice over the API reference: once in `_post_process_api_docs`, and again over the finished file after `generate-shared-types.py` appends the shared type documentation. The second pass is needed because that appended section is read straight from Go doc comments and never goes through the first pass.
 
+## Doc-test status
+
+`doc-test-status.sh` writes the latest doc-test results into page front matter, so pages whose code examples passed show a "Verified" badge under the title. The `fetch-test-artifacts-build` Makefile target runs it and then the production Hugo build, so Cloudflare Pages can use that target as its build command:
+
+```shell
+make fetch-test-artifacts-build
+```
+
+The target calls `hugo` by default. Locally, pass your binary, such as `make fetch-test-artifacts-build HUGO=hugo160`.
+
+It downloads the `doc-test-results` artifact from the latest Doc tests workflow run on `main` (`.github/workflows/doc-tests.yaml`) and needs a `GITHUB_TOKEN` with read access to this repo's Actions. Without a token or results, it prints a warning and exits 0, and the site builds without badges. It only edits the build checkout; don't commit the `test_status` fields it adds.
+
+The tests themselves are defined in [solo-io/docs-tests](https://github.com/solo-io/docs-tests) under `products/kgateway/`.
+
 ## Unit tests
 
 Unit tests for scripts in this directory live in `scripts/tests/`.
