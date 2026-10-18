@@ -2,6 +2,8 @@ Inject custom Envoy bootstrap configuration into a managed gateway proxy by over
 
 Use this technique to set bootstrap-level Envoy options that are not exposed as built-in fields on the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource, such as the [`stats_config.histogram_bucket_settings`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/metrics/v3/stats.proto#envoy-v3-api-msg-config-metrics-v3-statsconfig) to tune histogram bucket boundaries for your metrics.
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To configure Envoy's global downstream connection limit, use the built-in [`envoyContainer.bootstrap.maxDownstreamConnections`]({{< link-hextra path="/setup/customize/configs/#limit-downstream-connections" >}}) field instead of overriding the bootstrap ConfigMap.{{< /version >}}
+
 > [!WARNING]
 > This is an advanced workaround. Prefer the [built-in customization fields]({{< link-hextra path="/setup/customize/options/#built-in" >}}) whenever they cover your use case, because they are validated at apply time and updated automatically when you upgrade. A custom bootstrap ConfigMap is **not** validated by the control plane and is **not** updated automatically on upgrade. You must keep it in sync with the generated bootstrap format yourself.
 
