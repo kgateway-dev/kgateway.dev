@@ -4,6 +4,11 @@ Configure and manage HTTP connections to an upstream service.
 
 You can use a BackendConfigPolicy to apply HTTP connection settings to a service in your cluster. These settings include general settings, such as connection timeouts or the maximum number of connections that an upstream service can receive. You can also configure settings for HTTP/2 and HTTP/1 requests. 
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+> [!NOTE]
+> To cap the number of downstream connections that the gateway proxy accepts across all listeners, see [Limit downstream connections]({{< link-hextra path="/setup/customize/configs/#limit-downstream-connections" >}}).
+{{< /version >}}
+
 * [General connection settings](#general-settings)
 * [HTTP protocol options](#http)
 * [Additional HTTP 1.0 protocol options](#http1)

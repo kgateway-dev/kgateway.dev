@@ -207,6 +207,27 @@ EOF
 > [!NOTE]
 > Do not set `deployment.replicas` when you use an HPA, because the fixed value conflicts with autoscaling.
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Limit downstream connections {#limit-downstream-connections}
+
+Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be `1` or greater. Because this setting changes the Envoy bootstrap configuration, updating the value restarts the proxy.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    envoyContainer:
+      bootstrap:
+        maxDownstreamConnections: 5000
+EOF
+```
+{{< /version >}}
+
 ### Image pull secrets {#image-pull-secrets}
 
 Add image pull secrets to pull container images from private registries with the built-in `podTemplate.imagePullSecrets` field.

@@ -87,6 +87,12 @@ You can now use the `maxConnectionDuration` field to set a maximum connection du
 
 For more information, see [Maximum connection duration]({{< link-hextra path="/resiliency/timeouts/max-connection-duration/" >}}).
 
+#### Limit downstream connections {#v25-max-downstream-connections}
+
+You can now set a global limit on the number of active downstream connections that the gateway proxy accepts across all listeners by using the `envoyContainer.bootstrap.maxDownstreamConnections` field in your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. By default, no limit is set. 
+
+For more information, see [Limit downstream connections]({{< link-hextra path="/setup/customize/configs/#limit-downstream-connections" >}}).
+
 #### Share a local rate limit across Gateway replicas {#v25-share-local-ratelimit}
 
 The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource now supports the `shareAcrossGateway` field for local rate limiting. By default, each Envoy proxy replica enforces its own local token bucket, so the effective rate increases as the Gateway scales out. Set `shareAcrossGateway` to `true` to divide the token bucket evenly across all Gateway proxy replicas, so the configured rate applies to the Gateway as a whole.
