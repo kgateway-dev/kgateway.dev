@@ -17,6 +17,10 @@ concurrency:
 
 jobs:
   linkChecker:
+    # Forks inherit the weekly cron and would file their own report. Run the
+    # scheduled check only in the source repo; pull request and manual runs
+    # still run everywhere, forks included.
+    if: github.event_name != 'schedule' || github.repository == 'kgateway-dev/kgateway.dev'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     permissions:
