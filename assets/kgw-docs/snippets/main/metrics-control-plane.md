@@ -9,12 +9,10 @@ kgateway_ec2_discovery_poll_total|counter|namespace, name, result, reason|Total 
 kgateway_envoy_xds_rejects_active|gauge|gateway_namespace, gateway_name, type_url|Number of xDS responses currently rejected by envoy proxy
 kgateway_envoy_xds_rejects_total|counter|gateway_namespace, gateway_name, type_url|Total number of xDS responses rejected by envoy proxy
 kgateway_resources_managed|gauge|namespace, parent, resource|Current number of resources managed
-kgateway_resources_status_sync_duration_seconds|histogram|gateway, namespace, resource|Duration of time for a resource update to receive a status report
-kgateway_resources_status_syncs_completed_total|counter|gateway, namespace, resource|Total number of status syncs completed for resources
-kgateway_resources_status_syncs_started_total|counter|gateway, namespace, resource|Total number of status syncs started
-kgateway_resources_updates_dropped_total|counter||Total number of resources metrics updates dropped. If this metric is ever greater than 0, all resources subsystem metrics should be considered invalid until process restart
+kgateway_resources_updates_dropped_total|counter||Total number of xds_snapshot sync metrics updates dropped. If this metric is ever greater than 0, the xds_snapshot sync metrics should be considered invalid until process restart
 kgateway_routing_domains|gauge|namespace, gateway, port|Number of domains per listener
 kgateway_routing_replacements_total|counter|gateway_namespace, gateway, error_type|Number of routes, virtual hosts, or route configurations replaced with a synthetic 500 direct response due to invalid configuration detected during translation.
+kgateway_status_writes_total|counter|kind, result|Total number of status write attempts by resource kind and result. result=\"error\" counts writes that failed after every retry.
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
 kgateway_translator_translations_total|counter|name, namespace, translator, result|Total number of translations
 kgateway_validation_cache_hits_total|counter|caller|Total number of Envoy validation cache hits.
