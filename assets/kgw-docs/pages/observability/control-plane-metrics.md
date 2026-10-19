@@ -38,7 +38,11 @@ Helpful terms:
 
   * Status sync metrics represent the time it takes for you as a user to view the status that is reported on the resource.
   * Snapshot sync metrics roughly represent the time it takes for a resource change to become effective in the gateway proxies.
-{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}* Status write: A status write is an attempt to save the status of a resource. The `result` label has one of the following values: `written` when the status was saved, `unchanged` when the live status already matched, `conflict` or `not_found` when the write hit a conflict or the resource no longer existed (the control plane tries again when it processes the resource next), and `error` when the write failed after all retries.
+{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}* Status write: A status write is an attempt to save the status of a resource. The `result` label has one of the following values: 
+    * `written` when the status was saved.
+    * `unchanged` when the live status already matched.
+    * `conflict` or `not_found` when the write hit a conflict or the resource no longer existed (the control plane tries again when it processes the resource next).
+    * `error` when the write failed after all retries.
 
 * Snapshot sync: A snapshot sync roughly represents the time it takes for a resource change to become effective in the gateway proxies.
 {{< /version >}}
