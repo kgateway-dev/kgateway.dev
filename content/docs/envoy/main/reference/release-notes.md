@@ -89,7 +89,7 @@ For more information, see [Maximum connection duration]({{< link-hextra path="/r
 
 #### Limit downstream connections {#v25-max-downstream-connections}
 
-You can now set a global limit on the number of active downstream connections that the gateway proxy accepts across all listeners. Use the new `envoyContainer.bootstrap.maxDownstreamConnections` field in your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. By default, no limit is set. Because this setting is part of the Envoy bootstrap configuration, changing the value restarts the proxy.
+You can now set a global limit on the number of active downstream connections that the gateway proxy accepts across all listeners by using the `envoyContainer.bootstrap.maxDownstreamConnections` field in your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource. By default, no limit is set. 
 
 For more information, see [Limit downstream connections]({{< link-hextra path="/setup/customize/configs/#limit-downstream-connections" >}}).
 
