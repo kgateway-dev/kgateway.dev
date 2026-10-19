@@ -34,10 +34,18 @@ Helpful terms:
 
 * Snapshot: A complete, point-in-time representation of the current state of resources that the controller builds and serves to a gateway proxy via the Envoy extensible Discovery Service (XDS) API.
 
-* Sync: The metrics refer to two kinds of syncs:
-  
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}* Sync: The metrics refer to two kinds of syncs:
+
   * Status sync metrics represent the time it takes for you as a user to view the status that is reported on the resource.
   * Snapshot sync metrics roughly represent the time it takes for a resource change to become effective in the gateway proxies.
+{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}* Status write: A status write is an attempt to save the status of a resource. The `result` label has one of the following values: 
+    * `written` when the status was saved.
+    * `unchanged` when the live status already matched.
+    * `conflict` or `not_found` when the write hit a conflict or the resource no longer existed (the control plane tries again when it processes the resource next).
+    * `error` when the write failed after all retries.
+
+* Snapshot sync: A snapshot sync roughly represents the time it takes for a resource change to become effective in the gateway proxies.
+{{< /version >}}
 
 * Transform: The process of the control plane converting high-level resources or intermediate representations (IR) into lower-level representations into the structure that the XDS API expects for a snapshot.
 
