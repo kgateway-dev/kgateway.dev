@@ -52,9 +52,23 @@ When you enable route source metadata, the `dev.kgateway.route_source` filter me
 
 If your access log formats, log queries, or dashboards parse the previous `rule` value, update them. For more information, see [Route source metadata]({{< link-hextra path="/security/access-logging/#route-source-metadata" >}}).
 
-#### Status write metrics replace resource status sync metrics {#v25-status-write-metrics-replace-resource-status-sync-metrics}
+#### Status sync metrics and Go functions removed {#v25-metrics-functions-removal}
 
-The control plane no longer emits `kgateway_resources_status_syncs_started_total`, `kgateway_resources_status_syncs_completed_total`, or `kgateway_resources_status_sync_duration_seconds`. Use `kgateway_status_writes_total{kind, result}` to monitor status writes, and alert on `result="error"` for writes that fail after all retries. Code built on kgateway must also stop using `statussync.Writer.OnSync`, `statussync.EndResourceStatusSyncOnWriteSuccess`, `metrics.StartResourceStatusSync`, and `metrics.EndResourceStatusSync`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
+The control plane no longer emits the following metrics: 
+* `kgateway_status_syncer_status_syncs_total`
+* `kgateway_status_syncer_status_sync_duration_seconds`
+* `kgateway_resources_status_syncs_started_total`
+* `kgateway_resources_status_syncs_completed_total`
+* `kgateway_resources_status_sync_duration_seconds`
+
+If your dashboards, alerts, or recording rules use any of these metrics, update them to use the new `kgateway_status_writes_total{kind, result}` metric instead. To catch status writes that still fail after all retries, alert on `result="error"`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
+
+If you build on kgateway as a Go library, the following functions are also removed. Stop using them in your code:
+
+* `statussync.Writer.OnSync`
+* `statussync.EndResourceStatusSyncOnWriteSuccess`
+* `metrics.StartResourceStatusSync`
+* `metrics.EndResourceStatusSync`
 
 ### 🌟 New features {#v25-new-features}
 
