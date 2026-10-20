@@ -70,6 +70,10 @@ If you build on kgateway as a Go library, the following functions are also remov
 * `metrics.StartResourceStatusSync`
 * `metrics.EndResourceStatusSync`
 
+#### High-cardinality control plane metrics removed {#v25-high-cardinality-control-plane-metrics-removed}
+
+The control plane no longer emits the `kgateway_translator_translations_running` and `kgateway_controller_reconciliations_running` gauges. The `kgateway_translator_translations_total` and `kgateway_translator_translation_duration_seconds` metrics no longer include the `translator="TranslateHTTPRoute"` series, so update Prometheus alerts, dashboards, and queries that use those series.
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}

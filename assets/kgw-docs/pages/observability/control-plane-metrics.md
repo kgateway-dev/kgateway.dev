@@ -49,6 +49,10 @@ Helpful terms:
 
 * Transform: The process of the control plane converting high-level resources or intermediate representations (IR) into lower-level representations into the structure that the XDS API expects for a snapshot.
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The control plane metrics endpoint does not emit `kgateway_translator_translations_running` or `kgateway_controller_reconciliations_running`. The `kgateway_translator_translations_total` and `kgateway_translator_translation_duration_seconds` metrics also do not emit a `translator="TranslateHTTPRoute"` series.
+
+{{< /version >}}
+
 {{< reuse "kgw-docs/snippets/control-plane-metrics.md" >}}
 
 ## Monitor NACKs
