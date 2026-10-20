@@ -329,6 +329,45 @@ Return a non-default HTTP status code and include extra headers in the denial re
    ...
    ```
 
+### gRPC traffic and ACL deny responses
+
+When applying an IP-based ACL to gRPC traffic, a denied request might return a trailers-only `HTTP/2 200` with `grpc-status: 0` (OK) and an empty response body instead of `PERMISSION_DENIED` (`grpc-status: 7`). This causes gRPC clients (such as `grpcurl`) to fail with an unexpected `EOF` error instead of reporting a permission denial. This behavior is due to an upstream Envoy dynamic module issue ([kgateway issue #14839](https://github.com/kgateway-dev/kgateway/issues/14839) / [Envoy issue #48410](https://github.com/envoyproxy/envoy/issues/48410)).
+
+To work around this issue, configure explicit `grpc-status` and `grpc-message` headers in `TrafficPolicy.spec.acl.denyResponse.headers`. Envoy preserves these headers on denial, allowing gRPC clients to properly receive `rpc error: code = PermissionDenied`.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+metadata:
+  name: acl-grpc-deny
+  namespace: grpc-app
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: GRPCRoute
+    name: example-grpc-route
+  acl:
+    defaultAction: deny
+    denyResponse:
+      headers:
+      - name: "grpc-status"
+        value: "7"
+      - name: "grpc-message"
+        value: "Access Denied by IP ACL Policy"
+    rules:
+    - cidrs:
+      - 10.0.0.0/8
+      action: allow
+EOF
+```
+
+> [!WARNING]
+> **Scope to GRPCRoute**: Ensure that you attach the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} specifically to your `GRPCRoute` resource via `targetRefs`, rather than globally at the `Gateway` level. Attaching this policy globally causes standard HTTP routes to receive stray `grpc-status: 7` headers in their denial responses.
+
+> [!IMPORTANT]
+> **`statusCode` has no effect on gRPC status**: Setting `denyResponse.statusCode` (such as `401` or `403`) does not automatically map to gRPC status codes on affected Envoy versions. You must explicitly set the `grpc-status` response header to return the expected gRPC status code to the client.
+
 ## Monitor ACL denials
 
 The ACL filter increments the gateway proxy's `dev.kgateway.http.acl.blocked` metric on every denied request. You can monitor this metric to observe the number of denied requests in your environment. 
