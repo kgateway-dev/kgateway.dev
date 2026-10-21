@@ -68,26 +68,56 @@ I tested this on kgateway v2.4.7 over HTTP/1.1 and HTTP/2, including uppercase a
 
 I'll be honest: this is a blunt instrument. It breaks every file upload, and any HTML form that posts as multipart. For a lot of PHP applications (think WordPress or Magento admin screens) that's a real problem.
 
-If that's you, change the `targetRefs` from the Gateway to the HTTPRoutes that serve your PHP application, and leave out the routes that really need uploads. For those remaining routes, cap the request size at the gateway, as the advisory recommends:
+If that's you, change the `targetRefs` from the Gateway to the HTTPRoutes that serve your PHP application, and leave out the routes that really need uploads. For those remaining routes, cap the size of multipart requests at the gateway, as the advisory recommends. Give multipart requests their own rule in your existing HTTPRoute, so you can attach the size limit to just that rule:
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: my-upload-route
+  namespace: my-php-app
+spec:
+  parentRefs:
+    - name: my-gateway
+      namespace: my-gateway-ns
+  rules:
+    # Multipart requests get their own rule, so only they are buffered and capped.
+    - name: multipart
+      matches:
+        - path: {type: PathPrefix, value: /upload}
+          headers:
+            - name: Content-Type
+              type: RegularExpression
+              value: "(?i).*multipart.*"
+      backendRefs:
+        - name: my-php-app
+          port: 80
+    # Everything else on this path streams through to PHP as before.
+    - name: default
+      matches:
+        - path: {type: PathPrefix, value: /upload}
+      backendRefs:
+        - name: my-php-app
+          port: 80
+---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
-  name: php2shell-limit-upload-size
+  name: php2shell-limit-multipart-size
   namespace: my-php-app
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: my-upload-route
+      sectionName: multipart   # only the multipart rule
   buffer:
     # Envoy buffers the body and returns 413 once it exceeds this size,
     # whether or not the client sent a Content-Length.
     maxRequestSize: 1Mi
 ```
 
-In my tests a 512Ki upload went through and a 2Mi upload got a `413`, both with a `Content-Length` and as a chunked request without one. Pick the smallest limit your uploads actually need, and keep it at or below PHP's `post_max_size`. The advisory suggests 32M for applications that accept uploads. Keep in mind that Envoy holds each request body in memory up to this limit, so don't set it higher than you have to.
+In my tests a 512Ki upload went through, and a 2Mi upload got a `413` from the gateway. That held with and without a `Content-Length`, over HTTP/2, and for the same casing, comma and duplicate-header variants as before. JSON and form posts on the same path weren't buffered and went straight to the backend. Pick the smallest limit your uploads actually need, and keep it at or below PHP's `post_max_size`. The advisory suggests 32M for applications that accept uploads. Keep in mind that Envoy holds each multipart body in memory up to this limit, so don't set it higher than you have to.
 
 A size cap reduces the risk of the out-of-memory attack, but it doesn't remove it, so also put authentication in front of these routes *at the gateway*. kgateway supports [JWT](https://kgateway.dev/docs/envoy/latest/security/jwt/), [OAuth2/OIDC](https://kgateway.dev/docs/envoy/latest/security/oauth/) and [API keys](https://kgateway.dev/docs/envoy/latest/security/extauth/apikey/). For internal-only applications, an [IP allowlist](https://kgateway.dev/docs/envoy/latest/security/acl/) does the job as well. It shrinks the set of people who can try from "the internet" to "people who can log in".
 
@@ -125,6 +155,6 @@ To set expectations correctly: these policies cut off the attack paths that the 
 
 ## Wrapping up
 
-So, to summarize: patch PHP first, to 8.5.12, 8.4.27, 8.3.36 or 8.2.35, or a backport from your vendor. Until every PHP workload is patched, block multipart requests at the gateway. On the routes that need uploads, cap the request size and put gateway-level authentication in front of them. Then make sure the gateway is the only way in. Once you're fully patched, remove the multipart block. The size limits are worth keeping, since the advisory recommends them even after patching.
+So, to summarize: patch PHP first, to 8.5.12, 8.4.27, 8.3.36 or 8.2.35, or a backport from your vendor. Until every PHP workload is patched, block multipart requests at the gateway. On the routes that need uploads, cap the size of multipart requests and put gateway-level authentication in front of them. Then make sure the gateway is the only way in. Once you're fully patched, remove the multipart block. The size limits are worth keeping, since the advisory recommends them even after patching.
 
 If you have questions, or you find a variant that slips past the policy, come and find us in the [kgateway Slack](https://kgateway.dev/slack/). We'd love to hear from you.
