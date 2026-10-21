@@ -15,11 +15,9 @@ Let me be clear up front: the fix is to patch PHP. Nothing in this post replaces
 
 ## What the advisories say
 
-**CVE-2026-109618, RCE via out-of-memory corruption.** When PHP runs out of memory, it aborts the request with a `longjmp()`. If that happens while internal request data is only partially initialized, the request shutdown code later treats the invalid data as valid. The advisory lists several ways to drive a request into that state while it stays within PHP's apparent limits, and all of them are multipart tricks: a multipart body without a usable `Content-Length`, a multipart part with an unlimited number of headers, and empty file controls with nested field names. With Apache mod_php this happens entirely while PHP parses the request body, before any application code runs. PHP-FPM is susceptible through other paths, though no complete FPM exploit has been demonstrated.
+In short: [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) corrupts request state when PHP runs out of memory, and [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp) lets a later request reuse state left behind by a failed one. What matters for this post is how an attacker gets there without help from your application: crafted multipart request bodies that exhaust PHP's memory while it parses them, and session upload progress, which PHP runs on multipart uploads. With Apache mod_php, that all happens before any application code runs.
 
-**CVE-2026-109619, RCE via stale global state.** A fatal error, including running out of memory or hitting the execution time limit, can leave state behind that points to freed memory. A later request handled by the same worker can then use that state before PHP initializes it. One of the two confirmed ways to reach the stale state is session upload progress, which PHP triggers on multipart uploads. The other is a diagnostic raised by per-request INI configuration, which is a server-side setting and not something a request can control.
-
-The fixed versions are 8.5.12, 8.4.27, 8.3.36 and 8.2.35. PHP 8.1 and older no longer get releases from the PHP project, but PHP has published source backports for 7.4, 8.0 and 8.1, and your distribution or LTS vendor may ship fixed packages. PHP considers the risk highest for mod_php, and also lists PHP-FPM, php-cgi, FrankenPHP and LiteSpeed as at risk.
+PHP considers the risk highest for mod_php, but PHP-FPM, php-cgi, FrankenPHP and LiteSpeed are affected too. The fixed versions are 8.5.12, 8.4.27, 8.3.36 and 8.2.35. For older branches, check with your distribution or LTS vendor. The advisories linked above have the full technical details.
 
 ## Why the gateway is a good place for this
 
