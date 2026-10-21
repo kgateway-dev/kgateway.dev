@@ -1,7 +1,7 @@
 ---
 title: "PHP2Shell: Buying time at the gateway with kgateway"
 toc: false
-publishDate: 2026-10-21T00:00:00-00:00
+publishDate: 2026-10-21T14:15:00-00:00
 author: Duncan Doyle
 excludeSearch: true
 ---
