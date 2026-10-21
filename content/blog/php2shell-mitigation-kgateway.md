@@ -89,7 +89,7 @@ spec:
 
 In my tests a 512Ki upload went through and a 2Mi upload got a `413`, both with a `Content-Length` and as a chunked request without one. Pick the smallest limit your uploads actually need, and keep it at or below PHP's `post_max_size`. The advisory suggests 32M for applications that accept uploads. Keep in mind that Envoy holds each request body in memory up to this limit, so don't set it higher than you have to.
 
-A size cap makes the out-of-memory attack much harder, but it doesn't remove it, so also put authentication in front of these routes *at the gateway*. kgateway supports [JWT](https://kgateway.dev/docs/envoy/latest/security/jwt/), [OAuth2/OIDC](https://kgateway.dev/docs/envoy/latest/security/oauth/) and [API keys](https://kgateway.dev/docs/envoy/latest/security/extauth/apikey/). For internal-only applications, an [IP allowlist](https://kgateway.dev/docs/envoy/latest/security/acl/) does the job as well. It shrinks the set of people who can try from "the internet" to "people who can log in".
+A size cap reduces the risk of the out-of-memory attack, but it doesn't remove it, so also put authentication in front of these routes *at the gateway*. kgateway supports [JWT](https://kgateway.dev/docs/envoy/latest/security/jwt/), [OAuth2/OIDC](https://kgateway.dev/docs/envoy/latest/security/oauth/) and [API keys](https://kgateway.dev/docs/envoy/latest/security/extauth/apikey/). For internal-only applications, an [IP allowlist](https://kgateway.dev/docs/envoy/latest/security/acl/) does the job as well. It shrinks the set of people who can try from "the internet" to "people who can log in".
 
 ## Don't forget the side door
 
