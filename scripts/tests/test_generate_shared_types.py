@@ -134,3 +134,95 @@ def test_find_documented_types_and_broken_links(gen_shared_types, tmp_path):
 
     assert documented == {"KnownType"}
     assert broken == {"MissingType"}
+
+
+def test_parse_go_file_extracts_multi_tag_struct_fields(gen_shared_types, tmp_path):
+    go_file = tmp_path / "multi_tag.go"
+    go_file.write_text(
+        "\n".join(
+            [
+                "package shared",
+                "",
+                "type ServiceConfig struct {",
+                '    // Name is the service identifier.',
+                '    Name string `protobuf:"bytes,1,opt,name=name" json:"name"`',
+                '    // Labels are custom labels.',
+                '    Labels map[string]string `yaml:"labels" json:"labels,omitempty"`',
+                "}",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    parsed = gen_shared_types.parse_go_file(go_file, source="shared", is_enterprise=False)
+    assert len(parsed) == 1
+    config = parsed[0]
+    assert config.name == "ServiceConfig"
+    assert len(config.fields) == 2
+    assert config.fields[0].name == "Name"
+    assert config.fields[0].json_name == "name"
+    assert config.fields[0].required is True
+    assert config.fields[1].name == "Labels"
+    assert config.fields[1].json_name == "labels"
+    assert config.fields[1].required is False
+
+
+def test_parse_go_file_extracts_slice_pointer_and_map_aliases(gen_shared_types, tmp_path):
+    go_file = tmp_path / "aliases.go"
+    go_file.write_text(
+        "\n".join(
+            [
+                "package shared",
+                "",
+                "// StringList is a slice of strings.",
+                "type StringList []string",
+                "",
+                "// NodePtr is a pointer to Node.",
+                "type NodePtr *Node",
+                "",
+                "// HeaderMap is a header dictionary.",
+                "type HeaderMap map[string]string // inline comment",
+            ]
+        ),
+        encoding="utf-8",
+    )
+
+    parsed = gen_shared_types.parse_go_file(go_file, source="shared", is_enterprise=False)
+    by_name = {t.name: t for t in parsed}
+
+    assert "StringList" in by_name
+    assert by_name["StringList"].kind == "alias"
+    assert by_name["StringList"].underlying_type == "[]string"
+
+    assert "NodePtr" in by_name
+    assert by_name["NodePtr"].kind == "alias"
+    assert by_name["NodePtr"].underlying_type == "*Node"
+
+    assert "HeaderMap" in by_name
+    assert by_name["HeaderMap"].kind == "alias"
+    assert by_name["HeaderMap"].underlying_type == "map[string]string"
+
+
+def test_format_go_type_as_link_handles_qualified_types(gen_shared_types):
+    # With documented_types containing the unqualified name
+    assert (
+        gen_shared_types.format_go_type_as_link("shared.PolicyStatus", {"PolicyStatus"})
+        == "[shared.PolicyStatus](#policystatus)"
+    )
+    assert (
+        gen_shared_types.format_go_type_as_link("[]*shared.PolicyStatus", {"PolicyStatus"})
+        == "[]*[shared.PolicyStatus](#policystatus)"
+    )
+
+    # When not in documented_types, render as italic
+    assert (
+        gen_shared_types.format_go_type_as_link("shared.PolicyStatus", {"OtherType"})
+        == "_shared.PolicyStatus_"
+    )
+
+    # When documented_types is None, format as link directly
+    assert (
+        gen_shared_types.format_go_type_as_link("metav1.Duration")
+        == "[metav1.Duration](#duration)"
+    )
+
