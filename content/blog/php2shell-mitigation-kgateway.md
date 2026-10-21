@@ -7,7 +7,7 @@ excludeSearch: true
 ---
 
 > [!NOTE]
-> **Last updated: 21 October 2026, 14:30 UTC.** PHP has published its official advisories and fixed releases, and this post now reflects them. An earlier version was written before the advisory, based on details that surfaced ahead of the coordinated disclosure.
+> **Last updated: 21 October 2026, 14:15 UTC.** PHP has published its official advisories and fixed releases, and this post now reflects them. An earlier version was written before the advisory, based on details that surfaced ahead of the coordinated disclosure.
 
 On 20 October the PHP security team [announced](https://www.php.net/) an out-of-band security release for two critical vulnerabilities, both rated CVSS v4.0 9.2. Before that release shipped, details leaked, and a proof-of-concept tool started circulating under the name "PHP2Shell". On 21 October PHP released 8.5.12, 8.4.27, 8.3.36 and 8.2.35, which fix both issues: [CVE-2026-109618](https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w) and [CVE-2026-109619](https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp). Both allow unauthenticated remote code execution.
 
