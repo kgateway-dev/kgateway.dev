@@ -6,6 +6,9 @@ author: Duncan Doyle
 excludeSearch: true
 ---
 
+> [!NOTE]
+> **Last updated: 21 October 2026, 13:30 UTC.** This is early guidance, written before PHP published its official advisory, which is scheduled for 14:00 UTC today. It's based on details that surfaced ahead of the coordinated disclosure, and on analysis by independent security researchers. We'll update this post as soon as the advisory is out.
+
 If you run PHP anywhere, you've probably had a busy couple of days. On 20 October the PHP security team [announced](https://www.php.net/) an out-of-band security release for two critical vulnerabilities, both rated CVSS v4.0 9.2. Before that release shipped, details leaked, a proof-of-concept tool started circulating under the name "PHP2Shell", and the two issues are now tracked as CVE-2026-109618 and CVE-2026-109619. [Cloudflare reported](https://sansec.io/research/php2shell) early attack attempts hours before the patch was out.
 
 Let me be clear up front: the fix is to patch PHP. Nothing in this post replaces that. But there is always a window between "the patch is out" and "every PHP pod in my fleet runs the patched version", and for a lot of teams that window is measured in days, not minutes. If your PHP applications sit behind kgateway, you can use the gateway to close the most likely attack path during that window. In this post I'll show you how.
