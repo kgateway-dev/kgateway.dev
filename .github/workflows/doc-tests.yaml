@@ -10,6 +10,8 @@ name: Doc tests
 #
 # PILOT: one scenario so far, Direct responses in traffic management, run on
 # the latest and main version trees. Each run creates its own kind cluster.
+# A pull request runs only the scenarios its changed files reach (see "Select
+# tests for changed files"); the schedule and manual runs run all of them.
 #
 # The `doc-test-results` artifact from the latest scheduled run on main is what
 # a production build reads to show the "Verified" badge on a page whose tests
@@ -18,18 +20,13 @@ name: Doc tests
 
 on:
   pull_request:
+    # Any markdown, not a list of the scenarios' pages: which pages a scenario
+    # reads changes whenever docs-tests adds one, and a list kept here goes
+    # stale without saying so. "Select tests for changed files" decides what
+    # runs, and stops the job early when a PR reaches no scenario.
     paths:
-      # The pages the pilot scenario runs, and this file. Widen this as
-      # scenarios are added in docs-tests.
-      - 'assets/kgw-docs/pages/traffic-management/direct-response.md'
-      - 'assets/kgw-docs/pages/envoy/quickstart.md'
-      - 'assets/kgw-docs/snippets/envoy/get-started.md'
-      - 'assets/kgw-docs/snippets/prereq.md'
-      - 'assets/kgw-docs/versions/**'
-      - 'content/docs/envoy/latest/install/sample-app.md'
-      - 'content/docs/envoy/main/install/sample-app.md'
-      - 'content/docs/envoy/latest/traffic-management/direct-response.md'
-      - 'content/docs/envoy/main/traffic-management/direct-response.md'
+      - 'assets/**/*.md'
+      - 'content/**/*.md'
       - '.github/workflows/doc-tests.yaml'
   schedule:
     # Daily at 06:30 UTC, after docs-tests refreshes its annotations at 05:00.
@@ -40,6 +37,14 @@ on:
         description: 'docs-tests branch or commit SHA to test with (default: main)'
         type: string
         default: ''
+      slack_notification:
+        description: 'Post the results to Slack'
+        type: boolean
+        default: false
+      slack_channel:
+        description: 'Slack channel to post to'
+        type: string
+        default: '#doctopus-tests'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -84,7 +89,56 @@ jobs:
       - name: Install Python dependencies
         run: pip install pyyaml
 
+      # On a pull request, run only the scenarios the changed files reach.
+      # reuse_consumers.py walks the reuse edges and the scenarios' needs: and
+      # before: steps, so a change to a shared snippet selects every scenario
+      # that renders or runs it. A change to this workflow can affect every
+      # scenario, so it runs the full suite. Runs before the annotations are
+      # attached, so it reads the pages as the PR wrote them.
+      - name: Select tests for changed files
+        id: select
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # No `|| true`: an empty list from a failed call would look like
+          # "nothing to test" and pass having tested nothing.
+          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            --paginate --jq '.[].filename' > "$RUNNER_TEMP/changed.txt"
+          cat "$RUNNER_TEMP/changed.txt"
+          if grep -qx '.github/workflows/doc-tests.yaml' "$RUNNER_TEMP/changed.txt"; then
+            echo "This workflow changed; running the full suite."
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          python3 docs-tests/scripts/reuse_consumers.py --repo-root . \
+            --stdin < "$RUNNER_TEMP/changed.txt" > "$RUNNER_TEMP/pages.txt"
+          # A page the PR deleted is selected as itself, and has nothing left
+          # to test.
+          : > "$RUNNER_TEMP/selected.txt"
+          while IFS= read -r page; do
+            [ -f "$page" ] && echo "$page" >> "$RUNNER_TEMP/selected.txt"
+          done < "$RUNNER_TEMP/pages.txt"
+          count=0
+          if [ -s "$RUNNER_TEMP/selected.txt" ]; then
+            files=()
+            while IFS= read -r page; do files+=("$page"); done < "$RUNNER_TEMP/selected.txt"
+            count=$(python3 docs-tests/scripts/doc_test_run.py --repo-root . \
+              --docs-tests-root docs-tests --no-verbose --list-tests \
+              --file "${files[@]}" | python3 -c 'import json, sys; print(len(json.load(sys.stdin)))')
+          fi
+          echo "Scenarios selected: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::notice::The changed files reach no doc test scenario. No tests run."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install yamltest
+        if: steps.select.outputs.run != 'false'
         run: npm install -g yamltest@latest
 
       # A release binary rather than `go install`, pinned and checksum-verified.
@@ -92,6 +146,7 @@ jobs:
       # service a load balancer address, which the guides read into
       # INGRESS_GW_ADDRESS.
       - name: Install cloud-provider-kind
+        if: steps.select.outputs.run != 'false'
         env:
           CPK_VERSION: v0.12.0
         run: |
@@ -111,6 +166,7 @@ jobs:
       # lists markup that no longer matches its page, so the runner skips that
       # scenario with a warning instead of running it with a step missing.
       - name: Attach test annotations
+        if: steps.select.outputs.run != 'false'
         run: |
           python3 docs-tests/scripts/annotations.py attach --repo . \
             --annotations docs-tests/products/kgateway/annotations \
@@ -120,13 +176,21 @@ jobs:
       # stdin is closed so a guide command that reads stdin cannot swallow the
       # rest of the run.
       - name: Run doc tests
+        if: steps.select.outputs.run != 'false'
         env:
           DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
           PYTHONUNBUFFERED: '1'
+          SELECTED: ${{ steps.select.outputs.files }}
         run: |
+          file_args=()
+          if [ -n "$SELECTED" ]; then
+            file_args=(--file)
+            while IFS= read -r page; do file_args+=("$page"); done < "$SELECTED"
+          fi
           python3 docs-tests/scripts/doc_test_run.py --repo-root . \
             --docs-tests-root docs-tests \
-            --annotation-report out/annotations/attach-report.json < /dev/null
+            --annotation-report out/annotations/attach-report.json \
+            "${file_args[@]}" < /dev/null
 
       # The runner exits 0 when it finds nothing to run, for example when the
       # docs-tests ref has no products/kgateway/ yet. That green run tested
@@ -135,6 +199,7 @@ jobs:
       # tests. It counts here: it proves products/kgateway/ resolved, and the
       # summary already flags it as a warning.
       - name: Check that tests ran
+        if: steps.select.outputs.run != 'false'
         run: |
           count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}) + len(d.get('skipped_needs_update') or {}))" 2>/dev/null || echo 0)
           echo "Doc test scenarios run: $count"
@@ -154,6 +219,69 @@ jobs:
               cat out/tests/generated/test-results.yaml
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # Scheduled runs on the upstream repo only, so a fork that syncs main
+      # does not post a second copy. A manual run posts when asked to. The
+      # header names the product because other repos post doc test results to
+      # the same channel. Failed tests go in a thread reply.
+      - name: Post results to Slack
+        if: >-
+          always() && github.repository == 'kgateway-dev/kgateway.dev' &&
+          (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.slack_notification))
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.slack_channel || '#doctopus-tests' }}
+          PRODUCT: kgateway OSS
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SLACK_BOT_TOKEN}" ]; then
+            echo "SLACK_BOT_TOKEN is not set, skipping the Slack post."
+            exit 0
+          fi
+
+          RESULTS_FILE=out/tests/generated/test-results.yaml
+          if [ -f "$RESULTS_FILE" ]; then
+            PAYLOAD=$(python3 docs-tests/scripts/report_summary.py --slack --run-url "$RUN_URL" "$RESULTS_FILE")
+          else
+            # The run failed before any test wrote results, for example while
+            # setting up. Post the job status so the failure is not silent.
+            PAYLOAD=$(jq -n --arg status "$JOB_STATUS" --arg url "$RUN_URL" '{main: {
+              text: "❌ Doc Test Results — no results (job \($status))",
+              blocks: [
+                {type: "header", text: {type: "plain_text", text: "❌ Doc Test Results — no results (job \($status))"}},
+                {type: "section", text: {type: "mrkdwn", text: "The run ended before any test wrote results. <\($url)|View the run>"}}
+              ]}, thread: null}')
+          fi
+
+          MAIN=$(echo "$PAYLOAD" | jq --arg product "$PRODUCT" --arg channel "$SLACK_CHANNEL" '
+            .main
+            | .text |= sub("Doc Test Results"; "Doc Test Results (\($product))")
+            | .blocks[0].text.text |= (sub("Doc Test Results"; "Doc Test Results (\($product))") | .[:150])
+            | . + {channel: $channel}
+          ')
+          RESP=$(curl -sS -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+            -H "Content-Type: application/json; charset=utf-8" \
+            -d "$MAIN")
+          if ! echo "$RESP" | jq -e '.ok' > /dev/null; then
+            echo "::error::Slack post failed: $RESP"
+            exit 1
+          fi
+
+          if echo "$PAYLOAD" | jq -e '.thread' > /dev/null; then
+            THREAD=$(echo "$PAYLOAD" | jq --arg channel "$SLACK_CHANNEL" --arg ts "$(echo "$RESP" | jq -r '.ts')" \
+              '.thread + {channel: $channel, thread_ts: $ts}')
+            THREAD_RESP=$(curl -sS -X POST https://slack.com/api/chat.postMessage \
+              -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+              -H "Content-Type: application/json; charset=utf-8" \
+              -d "$THREAD")
+            if ! echo "$THREAD_RESP" | jq -e '.ok' > /dev/null; then
+              echo "::error::Slack thread reply failed: $THREAD_RESP"
+              exit 1
+            fi
           fi
 
       # Read by production builds for the Verified badge. Keep the name: the

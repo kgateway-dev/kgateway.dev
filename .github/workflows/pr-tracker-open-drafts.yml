@@ -672,11 +672,13 @@ jobs:
       # same lines here after the draft was cut, often by folding the draft's
       # content in by hand. No pull request is opened, the conflicting files are
       # listed in the run summary with a compare link, and the job passes. The
-      # drafting side drafts the change again against the newer main on its next
-      # weekly run, while the code change is recent, and pushes a branch that
-      # applies if there is still something to add. If there is not, the old
-      # branch stays and is reported here each day until its metadata expires,
-      # as a warning rather than a failure. Before this, every such branch failed the run
+      # drafting side checks a parked draft on its next run: once the draft is
+      # about 30 hours old and still conflicts, it deletes this branch and drafts
+      # the change again against the newer main. After two redrafts that still
+      # conflict it drops the change and lists it in its Slack post, because a
+      # draft that keeps conflicting is almost always covered by a hand edit
+      # already. Until then the branch is reported here as a warning, not a
+      # failure. Before this, every such branch failed the run
       # every day until its metadata expired (agentgateway/website run
       # 37031254363: four drafts, all already covered by a hand edit the day
       # before).
@@ -708,7 +710,7 @@ jobs:
             # indented into the summary, never into a workflow command.
             echo "::warning::${BRANCH} conflicts with newer edits on main; no pull request opened. See the run summary."
             {
-              echo "- \`${BRANCH}\`: conflicts with newer edits on main, so no pull request was opened. The next drafting run redrafts it against main if the code change is still recent. Conflicting files:"
+              echo "- \`${BRANCH}\`: conflicts with newer edits on main, so no pull request was opened. Once the draft is about 30 hours old, the drafting pipeline deletes this branch and drafts the change again against main. After two redrafts that still conflict, it drops the change, which is most likely documented already. Conflicting files:"
               printf '%s\n' "${conflicts}" | tr -d '`' | sed 's/^/    - `/; s/$/`/'
               echo "  Compare: https://github.com/${GITHUB_REPOSITORY}/compare/main...${FORK_REPO%%/*}:${FORK_REPO#*/}:${BRANCH}"
             } >> "$GITHUB_STEP_SUMMARY"
