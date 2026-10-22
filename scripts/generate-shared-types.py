@@ -107,9 +107,9 @@ def parse_struct_fields(content: str, struct_start: int, struct_end: int, lines:
     field_content = struct_content[field_content_start:i-1]
     
     # Parse each field line
-    # Match: FieldName Type `json:"name,omitempty"`
+    # Match: FieldName Type `json:"name,omitempty"` (also allows preceding tags like protobuf/yaml)
     field_pattern = re.compile(
-        r'^\s*(\w+)\s+([^\s`]+(?:\s*\[[^\]]*\][^\s`]*)?)\s*`json:"([^"]+)"',
+        r'^\s*(\w+)\s+([^\s`]+(?:\s*\[[^\]]*\][^\s`]*)?)\s*`[^`]*\bjson:"([^"]+)"[^`]*`',
         re.MULTILINE
     )
     
@@ -165,22 +165,22 @@ def parse_go_file(filepath: Path, source: str = "", is_enterprise: bool = False)
     lines = content.split('\n')
     
     # Find type definitions
-    # Pattern for: type Name struct { or type Name = string or type Name string
+    # Pattern for: type Name struct { or type Name = string or type Name string or type Name []string
     type_pattern = re.compile(
-        r'^type\s+(\w+)\s+(struct\s*\{|=?\s*(\w+))',
+        r'^type\s+(\w+)\s+(?:(struct\s*\{)|=?\s*([^\n\r{]+))',
         re.MULTILINE
     )
     
     for match in type_pattern.finditer(content):
         type_name = match.group(1)
-        type_def = match.group(2).strip()
+        is_struct = bool(match.group(2))
         
         # Get line number for doc comment
         line_num = content[:match.start()].count('\n')
         description = extract_doc_comment(lines, line_num)
         validation = extract_validation_annotations(lines, line_num)
         
-        if type_def.startswith("struct"):
+        if is_struct:
             # Find the end of the struct
             brace_count = 0
             started = False
@@ -208,7 +208,8 @@ def parse_go_file(filepath: Path, source: str = "", is_enterprise: bool = False)
             ))
         else:
             # Type alias
-            underlying = match.group(3) if match.group(3) else type_def.replace("=", "").strip()
+            raw_alias = match.group(3) if match.group(3) else ""
+            underlying = re.sub(r'//.*$', '', raw_alias).strip()
             types.append(TypeInfo(
                 name=type_name,
                 kind="alias",
@@ -242,20 +243,28 @@ def format_go_type_as_link(go_type: str, documented_types: set[str] | None = Non
     if go_type.startswith("map["):
         return go_type  # Keep maps as-is for simplicity
 
-    # Check if it's a custom type (starts with uppercase, not a builtin)
+    # Handle package-qualified types (e.g. shared.PolicyStatus, gwv1.PolicyStatus)
+    local_packages = {"shared", "v1alpha1"}
     builtins = {"string", "int", "int32", "int64", "bool", "float32", "float64", "byte", "error"}
-    if go_type and go_type[0].isupper() and go_type.lower() not in builtins:
-        # Determine the type name (strip package prefix if present)
-        if "." in go_type:
-            type_name = go_type.split(".")[-1]
+    if "." in go_type:
+        pkg, type_name = go_type.split(".", 1)
+        if pkg in local_packages:
+            if type_name and type_name[0].isupper() and type_name.lower() not in builtins:
+                if documented_types is not None and type_name not in documented_types:
+                    return f"_{go_type}_"
+                return f"[{go_type}](#{type_name.lower()})"
         else:
-            type_name = go_type
+            # External package type (e.g., gwv1.PolicyStatus, metav1.Duration).
+            # Do not link to local headings to avoid collisions with local types.
+            if documented_types is not None and type_name and type_name[0].isupper() and type_name.lower() not in builtins:
+                return f"_{go_type}_"
+            return go_type
 
-        # Only create an anchor link if the type is documented
-        if documented_types is not None and type_name not in documented_types:
+    # Unqualified custom types (starts with uppercase, not a builtin)
+    if go_type and go_type[0].isupper() and go_type.lower() not in builtins:
+        if documented_types is not None and go_type not in documented_types:
             return f"_{go_type}_"
-
-        return f"[{go_type}](#{type_name.lower()})"
+        return f"[{go_type}](#{go_type.lower()})"
 
     return go_type
 
