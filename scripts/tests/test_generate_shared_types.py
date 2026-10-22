@@ -204,7 +204,7 @@ def test_parse_go_file_extracts_slice_pointer_and_map_aliases(gen_shared_types, 
 
 
 def test_format_go_type_as_link_handles_qualified_types(gen_shared_types):
-    # With documented_types containing the unqualified name
+    # Local packages (shared., v1alpha1.) link to local headings when documented
     assert (
         gen_shared_types.format_go_type_as_link("shared.PolicyStatus", {"PolicyStatus"})
         == "[shared.PolicyStatus](#policystatus)"
@@ -213,6 +213,10 @@ def test_format_go_type_as_link_handles_qualified_types(gen_shared_types):
         gen_shared_types.format_go_type_as_link("[]*shared.PolicyStatus", {"PolicyStatus"})
         == "[]*[shared.PolicyStatus](#policystatus)"
     )
+    assert (
+        gen_shared_types.format_go_type_as_link("v1alpha1.RouteConfig", {"RouteConfig"})
+        == "[v1alpha1.RouteConfig](#routeconfig)"
+    )
 
     # When not in documented_types, render as italic
     assert (
@@ -220,9 +224,18 @@ def test_format_go_type_as_link_handles_qualified_types(gen_shared_types):
         == "_shared.PolicyStatus_"
     )
 
-    # When documented_types is None, format as link directly
+    # External package types (gwv1., metav1., corev1.) must not link to local headings
+    # to avoid collisions with local types (e.g. gwv1.PolicyStatus vs shared.PolicyStatus)
+    assert (
+        gen_shared_types.format_go_type_as_link("gwv1.PolicyStatus", {"PolicyStatus"})
+        == "_gwv1.PolicyStatus_"
+    )
+    assert (
+        gen_shared_types.format_go_type_as_link("metav1.Duration", {"PolicyStatus"})
+        == "_metav1.Duration_"
+    )
     assert (
         gen_shared_types.format_go_type_as_link("metav1.Duration")
-        == "[metav1.Duration](#duration)"
+        == "metav1.Duration"
     )
 

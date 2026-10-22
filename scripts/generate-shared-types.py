@@ -243,15 +243,28 @@ def format_go_type_as_link(go_type: str, documented_types: set[str] | None = Non
     if go_type.startswith("map["):
         return go_type  # Keep maps as-is for simplicity
 
-    # Check if it's a custom type (starts with uppercase, not a builtin)
-    type_name = go_type.split(".")[-1] if "." in go_type else go_type
+    # Handle package-qualified types (e.g. shared.PolicyStatus, gwv1.PolicyStatus)
+    local_packages = {"shared", "v1alpha1"}
     builtins = {"string", "int", "int32", "int64", "bool", "float32", "float64", "byte", "error"}
-    if type_name and type_name[0].isupper() and type_name.lower() not in builtins:
-        # Only create an anchor link if the type is documented
-        if documented_types is not None and type_name not in documented_types:
-            return f"_{go_type}_"
+    if "." in go_type:
+        pkg, type_name = go_type.split(".", 1)
+        if pkg in local_packages:
+            if type_name and type_name[0].isupper() and type_name.lower() not in builtins:
+                if documented_types is not None and type_name not in documented_types:
+                    return f"_{go_type}_"
+                return f"[{go_type}](#{type_name.lower()})"
+        else:
+            # External package type (e.g., gwv1.PolicyStatus, metav1.Duration).
+            # Do not link to local headings to avoid collisions with local types.
+            if documented_types is not None and type_name and type_name[0].isupper() and type_name.lower() not in builtins:
+                return f"_{go_type}_"
+            return go_type
 
-        return f"[{go_type}](#{type_name.lower()})"
+    # Unqualified custom types (starts with uppercase, not a builtin)
+    if go_type and go_type[0].isupper() and go_type.lower() not in builtins:
+        if documented_types is not None and go_type not in documented_types:
+            return f"_{go_type}_"
+        return f"[{go_type}](#{go_type.lower()})"
 
     return go_type
 
