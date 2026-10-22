@@ -460,6 +460,7 @@ _Appears in:_
 | `outlierDetection` _[OutlierDetection](#outlierdetection)_ | OutlierDetection contains the options necessary to configure passive health checking. |  |  |
 | `circuitBreakers` _[CircuitBreakers](#circuitbreakers)_ | CircuitBreakers contains the options necessary to configure circuit breaking.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking) for more details. |  |  |
 | `upstreamProxyProtocol` _[UpstreamProxyProtocol](#upstreamproxyprotocol)_ | UpstreamProxyProtocol configures the PROXY protocol for upstream connections to the backend.<br />When enabled, the proxy protocol header is prepended to upstream connections,<br />allowing backend services to see the original client connection information.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/proxy_protocol/v3/upstream_proxy_protocol.proto) for more details. |  |  |
+| `tunnel` _[Tunnel](#tunnel)_ | Tunnel sends Backend connections through an HTTP CONNECT proxy.<br />Destination TLS uses tls; proxy TLS uses the proxy backend's policy.<br />Requires Backend targetRefs; targetSelectors are not supported. |  |  |
 
 
 #### BackendSpec
@@ -4138,6 +4139,39 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `request` _[Transform](#transform)_ | Request is used to modify the request path. |  |  |
 | `response` _[Transform](#transform)_ | Response is used to modify the response path. |  |  |
+
+
+#### Tunnel
+
+
+
+Tunnel configures HTTP CONNECT tunneling through a forward proxy.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `proxy` _[TunnelProxy](#tunnelproxy)_ | Proxy identifies the forward proxy that establishes the tunnel. |  |  |
+| `headers` _HTTPHeader array_ | Headers are sent only on CONNECT requests. Each requires a name and<br />exactly one of value or secretRef. |  | MaxItems: 16 <br /> |
+
+
+#### TunnelProxy
+
+
+
+TunnelProxy identifies the forward proxy for a tunnel.
+
+
+
+_Appears in:_
+- [Tunnel](#tunnel)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `backendRef` _[BackendObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#backendobjectreference)_ | BackendRef references the proxy Service or Backend. CONNECT uses that<br />backend's HTTP protocol. |  |  |
 
 
 #### URLRewrite
