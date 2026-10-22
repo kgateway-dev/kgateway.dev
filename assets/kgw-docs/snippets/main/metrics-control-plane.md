@@ -1,5 +1,6 @@
 Name|Type|Labels|Help
 --|--|--|--
+kgateway_build_info|gauge|version, revision, goversion, goos, goarch|Build information of the running controller. The series always has value 1.
 kgateway_controller_reconcile_duration_seconds|histogram|controller, name, namespace|Reconcile duration for controller
 kgateway_controller_reconciliations_total|counter|controller, name, namespace, result|Total number of controller reconciliations
 kgateway_ec2_discovery_endpoints_active|gauge|namespace, name|Current number of active Envoy endpoints discovered for an EC2 Backend
