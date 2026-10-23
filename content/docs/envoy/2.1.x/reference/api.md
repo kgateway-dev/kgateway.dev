@@ -3835,8 +3835,8 @@ Configuration defining a jittered exponential back off strategy. Ref: https://ww
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `baseInterval` | metav1.Duration | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
-| `maxInterval` | *metav1.Duration | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
+| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
+| `maxInterval` | *_metav1.Duration_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
 
 #### GrpcStatus
 
@@ -3874,15 +3874,15 @@ OTelTracesSamplerType defines the available OpenTelemetry trace sampler types. T
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `ancestorRef` | _gwv1.ParentReference_ | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
 | `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
-| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+| `conditions` | []_metav1.Condition_ | Conditions describes the status of the Policy with respect to the given Ancestor.  |
 
 #### PolicyStatus
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `conditions` | []metav1.Condition |  |
+| `conditions` | []_metav1.Condition_ |  |
 | `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
 
 #### RateLimitDescriptorEntryGeneric

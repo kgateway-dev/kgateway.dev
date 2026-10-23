@@ -4006,8 +4006,8 @@ HeaderModifiers can be used to define the policy to modify request and response 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `request` | *gwv1.HTTPHeaderFilter | Request modifies request headers. |
-| `response` | *gwv1.HTTPHeaderFilter | Response modifies response headers. |
+| `request` | *_gwv1.HTTPHeaderFilter_ | Request modifies request headers. |
+| `response` | *_gwv1.HTTPHeaderFilter_ | Response modifies response headers. |
 
 #### IPOrCIDR
 
@@ -4042,7 +4042,7 @@ KubernetesResourceOverlay provides a mechanism to customize generated Kubernetes
 | Field | Type | Description |
 |-------|------|-------------|
 | `metadata` | *[ObjectMetadata](#objectmetadata) | metadata defines a subset of object metadata to be customized. Labels and annotations are merged with existing values. If both GatewayClass and Gateway parameters define the same label or annotation key, the Gateway value takes precedence (applied second). |
-| `spec` | *apiextensionsv1.JSON | Spec provides an opaque mechanism to configure the resource Spec. This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec) and will be merged with the generated configuration using **Strategic Merge Patch** semantics.  # Application Order  Overlays are applied after all typed configuration fields from both levels. The full merge order is:  1. GatewayClass typed configuration fields 2. Gateway typed configuration fields 3. GatewayClass overlays 4. Gateway overlays (can override all previous values)  # Strategic Merge Patch & Deletion Guide  This merge strategy allows you to override individual fields, merge lists, or delete items without needing to provide the entire resource definition.  **1. Replacing Values (Scalars):** Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.  **2. Merging Lists (Append/Merge):** Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`) will append your items to the generated list, or update existing items if keys match.  **3. Deleting Fields or List Items ($patch: delete):** To remove a field or list item from the generated resource, use the `$patch: delete` directive. This works for both map fields and list items, and is the recommended approach because it works with both client-side and server-side apply.  spec: template: spec: # Delete pod-level securityContext securityContext: $patch: delete # Delete nodeSelector nodeSelector: $patch: delete containers: # Be sure to use the correct proxy name here or you will add a container instead of modifying a container: - name: proxy-name # Delete container-level securityContext securityContext: $patch: delete  **4. Null Values (server-side apply only):** Setting a field to `null` can also remove it, but this ONLY works with `kubectl apply --server-side` or equivalent. With regular client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server, so the deletion won't occur. Prefer `$patch: delete` for consistent behavior across both apply modes.  spec: template: spec: nodeSelector: null  # Removes nodeSelector (server-side apply only!)  **5. Replacing Maps Entirely ($patch: replace):** To replace an entire map with your values (instead of merging), use `$patch: replace`. This removes all existing keys and replaces them with only your specified keys.  spec: template: spec: nodeSelector: $patch: replace custom-key: custom-value  **6. Replacing Lists Entirely ($patch: replace):** If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.  service: spec: ports: - $patch: replace - name: http port: 80 targetPort: 8080 protocol: TCP - name: https port: 443 targetPort: 8443 protocol: TCP  |
+| `spec` | *_apiextensionsv1.JSON_ | Spec provides an opaque mechanism to configure the resource Spec. This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec) and will be merged with the generated configuration using **Strategic Merge Patch** semantics.  # Application Order  Overlays are applied after all typed configuration fields from both levels. The full merge order is:  1. GatewayClass typed configuration fields 2. Gateway typed configuration fields 3. GatewayClass overlays 4. Gateway overlays (can override all previous values)  # Strategic Merge Patch & Deletion Guide  This merge strategy allows you to override individual fields, merge lists, or delete items without needing to provide the entire resource definition.  **1. Replacing Values (Scalars):** Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.  **2. Merging Lists (Append/Merge):** Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`) will append your items to the generated list, or update existing items if keys match.  **3. Deleting Fields or List Items ($patch: delete):** To remove a field or list item from the generated resource, use the `$patch: delete` directive. This works for both map fields and list items, and is the recommended approach because it works with both client-side and server-side apply.  spec: template: spec: # Delete pod-level securityContext securityContext: $patch: delete # Delete nodeSelector nodeSelector: $patch: delete containers: # Be sure to use the correct proxy name here or you will add a container instead of modifying a container: - name: proxy-name # Delete container-level securityContext securityContext: $patch: delete  **4. Null Values (server-side apply only):** Setting a field to `null` can also remove it, but this ONLY works with `kubectl apply --server-side` or equivalent. With regular client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server, so the deletion won't occur. Prefer `$patch: delete` for consistent behavior across both apply modes.  spec: template: spec: nodeSelector: null  # Removes nodeSelector (server-side apply only!)  **5. Replacing Maps Entirely ($patch: replace):** To replace an entire map with your values (instead of merging), use `$patch: replace`. This removes all existing keys and replaces them with only your specified keys.  spec: template: spec: nodeSelector: $patch: replace custom-key: custom-value  **6. Replacing Lists Entirely ($patch: replace):** If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.  service: spec: ports: - $patch: replace - name: http port: 80 targetPort: 8080 protocol: TCP - name: https port: 443 targetPort: 8443 protocol: TCP  |
 
 #### LocalPolicyTargetReference
 
@@ -4050,9 +4050,9 @@ Select the object to attach the policy by Group, Kind, and Name. The object must
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
-| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
-| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+| `group` | _gwv1.Group_ | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | _gwv1.Kind_ | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `name` | _gwv1.ObjectName_ | The name of the target resource. **Required.** |
 
 #### LocalPolicyTargetSelector
 
@@ -4060,8 +4060,8 @@ LocalPolicyTargetSelector selects the object to attach the policy by Group, Kind
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
-| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `group` | _gwv1.Group_ | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | _gwv1.Kind_ | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
 | `matchLabels` | map[string]string | Label selector to select the target resource. **Required.** |
 
 #### MetadataPathSegment
@@ -4078,8 +4078,8 @@ Select the object by Name and Namespace. You can target only one object at a tim
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
-| `namespace` | *gwv1.Namespace | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
+| `name` | _gwv1.ObjectName_ | The name of the target resource. **Required.** |
+| `namespace` | *_gwv1.Namespace_ | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
 
 #### ObjectMetadata
 
@@ -4103,9 +4103,9 @@ Op represents comparison operators.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `ancestorRef` | _gwv1.ParentReference_ | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
 | `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
-| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+| `conditions` | []_metav1.Condition_ | Conditions describes the status of the Policy with respect to the given Ancestor.  |
 
 #### PolicyDisable
 
@@ -4115,7 +4115,7 @@ PolicyDisable is used to disable a policy.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `conditions` | []metav1.Condition |  |
+| `conditions` | []_metav1.Condition_ |  |
 | `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
 
 #### RateLimitDescriptorEntryGeneric
@@ -4131,5 +4131,5 @@ RateLimitDescriptorEntryGeneric defines a generic key-value descriptor entry.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `request` | *metav1.Duration | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
-| `streamIdle` | *metav1.Duration | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
+| `request` | *_metav1.Duration_ | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
+| `streamIdle` | *_metav1.Duration_ | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
