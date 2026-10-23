@@ -4440,8 +4440,8 @@ Configuration defining a jittered exponential back off strategy. Ref: https://ww
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `baseInterval` | metav1.Duration | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
-| `maxInterval` | *metav1.Duration | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
+| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
+| `maxInterval` | *_metav1.Duration_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
 
 #### BodyFormat
 
@@ -4454,7 +4454,7 @@ BodyFormat configures an Envoy response body using formatting. Either JSON or Te
 |-------|------|-------------|
 | `contentType` | *string | ContentType defines the HTTP Content-Type header to be sent with the response. By default, `text/plain` is used for the Text format and `application/json` for the JSON format. Note: This setting does not currently take effect due to a bug in Envoy, a fix for which is pending release. The option is included for completeness and will become effective with a future version of Envoy. |
 | `text` | *string | Text is a format string by which Envoy will format the response body. Mutually exclusive with JSON. See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-text-format for details. |
-| `json` | *apiextensionsv1.JSON | JSON is a format object by which Envoy will produce a JSON response body. Mutually exclusive with Text. See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-json-format for details.  Setting a field to `null` in the JSON object requires the use of `kubectl apply --server-side` or equivalent. With the default client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server. |
+| `json` | *_apiextensionsv1.JSON_ | JSON is a format object by which Envoy will produce a JSON response body. Mutually exclusive with Text. See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/substitution_format_string.proto#envoy-v3-api-field-config-core-v3-substitutionformatstring-json-format for details.  Setting a field to `null` in the JSON object requires the use of `kubectl apply --server-side` or equivalent. With the default client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server. |
 
 #### CELExpression
 
@@ -4488,11 +4488,11 @@ Common gRPC service configuration created by setting `envoy_grpc“ as the gRPC 
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `backendRef` | gwv1.BackendRef | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) **Required.** |
+| `backendRef` | _gwv1.BackendRef_ | The backend gRPC service. Can be any type of supported backend (Kubernetes Service, kgateway Backend, etc..) **Required.** |
 | `authority` | *string | The :authority header in the grpc request. If this field is not set, the authority header value will be cluster_name. Note that this authority does not override the SNI. The SNI is provided by the transport socket of the cluster. |
 | `maxReceiveMessageLength` | *int32 | Maximum gRPC message size that is allowed to be received. If a message over this limit is received, the gRPC stream is terminated with the RESOURCE_EXHAUSTED error. Defaults to 0, which means unlimited. |
 | `skipEnvoyHeaders` | *bool | This provides gRPC client level control over envoy generated headers. If false, the header will be sent but it can be overridden by per stream option. If true, the header will be removed and can not be overridden by per stream option. Default to false. |
-| `timeout` | *metav1.Duration | The timeout for the gRPC request. This is the timeout for a specific request |
+| `timeout` | *_metav1.Duration_ | The timeout for the gRPC request. This is the timeout for a specific request |
 | `initialMetadata` | [][HeaderValue](#headervalue) | Additional metadata to include in streams initiated to the GrpcService. This can be used for scenarios in which additional ad hoc authorization headers (e.g. x-foo-bar: baz-key) are to be injected |
 | `retryPolicy` | *[RetryPolicy](#retrypolicy) | Indicates the retry policy for re-establishing the gRPC stream. If max interval is not provided, it will be set to ten times the provided base interval |
 
@@ -4586,7 +4586,7 @@ HTTPHeader represents a single header name/value pair. Exactly one of value or s
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | *gwv1.HTTPHeaderName | Name is the HTTP header field name. Name matching is case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2.) Required when value is set. When secretRef is used, if omitted the Secret data key is used as the header name; if both name and key are omitted every Secret entry is injected as a header. |
+| `name` | *_gwv1.HTTPHeaderName_ | Name is the HTTP header field name. Name matching is case-insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2.) Required when value is set. When secretRef is used, if omitted the Secret data key is used as the header name; if both name and key are omitted every Secret entry is injected as a header. |
 | `value` | *string | Value is an inline string value for the header. Mutually exclusive with secretRef. Must consist of printable US-ASCII characters. (See https://tools.ietf.org/html/rfc7230#section-3.2.) |
 | `secretRef` | *[SecretRefWithKey](#secretrefwithkey) | SecretRef sources the header value from a key in a Kubernetes Secret. Mutually exclusive with value. |
 
@@ -4609,7 +4609,7 @@ HeaderFilter filters requests based on headers. Based on: https://www.envoyproxy
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `header` | gwv1.HTTPHeaderMatch | **Required.** |
+| `header` | _gwv1.HTTPHeaderMatch_ | **Required.** |
 
 #### HeaderModifiers
 
@@ -4648,7 +4648,7 @@ JWKSAsyncFetch configures asynchronous fetching of the remote JWKS.
 | Field | Type | Description |
 |-------|------|-------------|
 | `fastListener` | *bool | FastListener controls when the listener is considered ready relative to the initial JWKS fetch. If false or unset, the listener waits for the first JWKS fetch to complete before it starts serving traffic, so requests are never validated against an empty key set. If true, the listener starts immediately and the first fetch happens in the background. |
-| `failedRefetchDuration` | *metav1.Duration | FailedRefetchDuration is how long to wait before retrying the fetch after a failure. If unspecified, Envoy default of 1 second is used. |
+| `failedRefetchDuration` | *_metav1.Duration_ | FailedRefetchDuration is how long to wait before retrying the fetch after a failure. If unspecified, Envoy default of 1 second is used. |
 
 #### JWKSRetryBackOff
 
@@ -4659,8 +4659,8 @@ JWKSRetryBackOff configures an exponential backoff strategy. Ref: https://www.en
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `baseInterval` | metav1.Duration | BaseInterval is the base interval for the exponential backoff computation. It must be greater than zero and less than or equal to MaxInterval. **Required.** |
-| `maxInterval` | *metav1.Duration | MaxInterval is the maximum interval between retries. If set, it must be greater than or equal to BaseInterval. Defaults to 10 times the BaseInterval. |
+| `baseInterval` | _metav1.Duration_ | BaseInterval is the base interval for the exponential backoff computation. It must be greater than zero and less than or equal to MaxInterval. **Required.** |
+| `maxInterval` | *_metav1.Duration_ | MaxInterval is the maximum interval between retries. If set, it must be greater than or equal to BaseInterval. Defaults to 10 times the BaseInterval. |
 
 #### JWKSRetryPolicy
 
@@ -4695,7 +4695,7 @@ KubernetesResourceOverlay provides a mechanism to customize generated Kubernetes
 | Field | Type | Description |
 |-------|------|-------------|
 | `metadata` | *[ObjectMetadata](#objectmetadata) | metadata defines a subset of object metadata to be customized. Labels and annotations are merged with existing values. If both GatewayClass and Gateway parameters define the same label or annotation key, the Gateway value takes precedence (applied second). |
-| `spec` | *apiextensionsv1.JSON | Spec provides an opaque mechanism to configure the resource Spec. This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec) and will be merged with the generated configuration using **Strategic Merge Patch** semantics.  # Application Order  Overlays are applied after all typed configuration fields from both levels. The full merge order is:  1. GatewayClass typed configuration fields 2. Gateway typed configuration fields 3. GatewayClass overlays 4. Gateway overlays (can override all previous values)  # Strategic Merge Patch & Deletion Guide  This merge strategy allows you to override individual fields, merge lists, or delete items without needing to provide the entire resource definition.  **1. Replacing Values (Scalars):** Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.  **2. Merging Lists (Append/Merge):** Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`) will append your items to the generated list, or update existing items if keys match.  **3. Deleting Fields or List Items ($patch: delete):** To remove a field or list item from the generated resource, use the `$patch: delete` directive. This works for both map fields and list items, and is the recommended approach because it works with both client-side and server-side apply.  spec: template: spec: # Delete pod-level securityContext securityContext: $patch: delete # Delete nodeSelector nodeSelector: $patch: delete containers: # Be sure to use the correct proxy name here or you will add a container instead of modifying a container: - name: proxy-name # Delete container-level securityContext securityContext: $patch: delete  **4. Null Values (server-side apply only):** Setting a field to `null` can also remove it, but this ONLY works with `kubectl apply --server-side` or equivalent. With regular client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server, so the deletion won't occur. Prefer `$patch: delete` for consistent behavior across both apply modes.  spec: template: spec: nodeSelector: null  # Removes nodeSelector (server-side apply only!)  **5. Replacing Maps Entirely ($patch: replace):** To replace an entire map with your values (instead of merging), use `$patch: replace`. This removes all existing keys and replaces them with only your specified keys.  spec: template: spec: nodeSelector: $patch: replace custom-key: custom-value  **6. Replacing Lists Entirely ($patch: replace):** If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.  service: spec: ports: - $patch: replace - name: http port: 80 targetPort: 8080 protocol: TCP - name: https port: 443 targetPort: 8443 protocol: TCP  |
+| `spec` | *_apiextensionsv1.JSON_ | Spec provides an opaque mechanism to configure the resource Spec. This field accepts a complete or partial Kubernetes resource spec (e.g., PodSpec, ServiceSpec) and will be merged with the generated configuration using **Strategic Merge Patch** semantics.  # Application Order  Overlays are applied after all typed configuration fields from both levels. The full merge order is:  1. GatewayClass typed configuration fields 2. Gateway typed configuration fields 3. GatewayClass overlays 4. Gateway overlays (can override all previous values)  # Strategic Merge Patch & Deletion Guide  This merge strategy allows you to override individual fields, merge lists, or delete items without needing to provide the entire resource definition.  **1. Replacing Values (Scalars):** Simple fields (strings, integers, booleans) in your config will overwrite the generated defaults.  **2. Merging Lists (Append/Merge):** Lists with "merge keys" (like `containers` which merges on `name`, or `tolerations` which merges on `key`) will append your items to the generated list, or update existing items if keys match.  **3. Deleting Fields or List Items ($patch: delete):** To remove a field or list item from the generated resource, use the `$patch: delete` directive. This works for both map fields and list items, and is the recommended approach because it works with both client-side and server-side apply.  spec: template: spec: # Delete pod-level securityContext securityContext: $patch: delete # Delete nodeSelector nodeSelector: $patch: delete containers: # Be sure to use the correct proxy name here or you will add a container instead of modifying a container: - name: proxy-name # Delete container-level securityContext securityContext: $patch: delete  **4. Null Values (server-side apply only):** Setting a field to `null` can also remove it, but this ONLY works with `kubectl apply --server-side` or equivalent. With regular client-side `kubectl apply`, null values are stripped by kubectl before reaching the API server, so the deletion won't occur. Prefer `$patch: delete` for consistent behavior across both apply modes.  spec: template: spec: nodeSelector: null  # Removes nodeSelector (server-side apply only!)  **5. Replacing Maps Entirely ($patch: replace):** To replace an entire map with your values (instead of merging), use `$patch: replace`. This removes all existing keys and replaces them with only your specified keys.  spec: template: spec: nodeSelector: $patch: replace custom-key: custom-value  **6. Replacing Lists Entirely ($patch: replace):** If you want to strictly define a list and ignore all generated defaults, use `$patch: replace`.  service: spec: ports: - $patch: replace - name: http port: 80 targetPort: 8080 protocol: TCP - name: https port: 443 targetPort: 8443 protocol: TCP  |
 
 #### LocalPolicyTargetReference
 
@@ -4703,9 +4703,9 @@ Select the object to attach the policy by Group, Kind, and Name. The object must
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
-| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
-| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
+| `group` | _gwv1.Group_ | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | _gwv1.Kind_ | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `name` | _gwv1.ObjectName_ | The name of the target resource. **Required.** |
 
 #### LocalPolicyTargetSelector
 
@@ -4713,8 +4713,8 @@ LocalPolicyTargetSelector selects the object to attach the policy by Group, Kind
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `group` | gwv1.Group | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
-| `kind` | gwv1.Kind | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
+| `group` | _gwv1.Group_ | The API group of the target resource. For Kubernetes Gateway API resources, the group is `gateway.networking.k8s.io`. **Required.** |
+| `kind` | _gwv1.Kind_ | The API kind of the target resource, such as Gateway or HTTPRoute. **Required.** |
 | `matchLabels` | map[string]string | Label selector to select the target resource. **Required.** |
 
 #### MetadataKey
@@ -4749,8 +4749,8 @@ Select the object by Name and Namespace. You can target only one object at a tim
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | gwv1.ObjectName | The name of the target resource. **Required.** |
-| `namespace` | *gwv1.Namespace | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
+| `name` | _gwv1.ObjectName_ | The name of the target resource. **Required.** |
+| `namespace` | *_gwv1.Namespace_ | The namespace of the target resource. If not set, defaults to the namespace of the parent object. |
 
 #### ObjectMetadata
 
@@ -4776,9 +4776,9 @@ OpenTelemetryTracingConfig represents the top-level Envoy's OpenTelemetry tracer
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `ancestorRef` | gwv1.ParentReference | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
+| `ancestorRef` | _gwv1.ParentReference_ | AncestorRef corresponds with a ParentRef in the spec that this PolicyAncestorStatus struct describes the status of. **Required.** |
 | `controllerName` | string | ControllerName is a domain/path string that indicates the name of the controller that wrote this status. This corresponds with the controllerName field on GatewayClass.  Example: "example.net/gateway-controller".  The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are valid [Kubernetes names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).  Controllers MUST populate this field when writing status. Controllers should ensure that entries to status populated with their ControllerName are cleaned up when they are no longer necessary. **Required.** |
-| `conditions` | []metav1.Condition | Conditions describes the status of the Policy with respect to the given Ancestor.  |
+| `conditions` | []_metav1.Condition_ | Conditions describes the status of the Policy with respect to the given Ancestor.  |
 
 #### PolicyDisable
 
@@ -4788,7 +4788,7 @@ PolicyDisable is used to disable a policy.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `conditions` | []metav1.Condition |  |
+| `conditions` | []_metav1.Condition_ |  |
 | `ancestors` | [][PolicyAncestorStatus](#policyancestorstatus) | **Required.** |
 
 #### RateLimitDescriptorEntryGeneric
@@ -4857,9 +4857,9 @@ SecretRefWithKey identifies a Kubernetes Secret and optionally a specific key wi
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `name` | gwv1.ObjectName | Name is the name of the Kubernetes Secret. **Required.** |
+| `name` | _gwv1.ObjectName_ | Name is the name of the Kubernetes Secret. **Required.** |
 | `key` | *string | Key is the key within the Secret's data map to use as the header value. When omitted and the parent HTTPHeader.name is set, that name is used as the key. When both key and name are omitted, all entries in the Secret are injected as headers. |
-| `namespace` | *gwv1.Namespace | Namespace is the namespace of the Secret. If omitted, defaults to the namespace of the referencing policy. Cross-namespace references require a ReferenceGrant in the target namespace permitting access from the policy's namespace. |
+| `namespace` | *_gwv1.Namespace_ | Namespace is the namespace of the Secret. If omitted, defaults to the namespace of the referencing policy. Cross-namespace references require a ReferenceGrant in the target namespace permitting access from the policy's namespace. |
 
 #### StatusCodeFilter
 
@@ -4871,5 +4871,5 @@ StatusCodeFilter filters based on HTTP status code. Based on: https://www.envoyp
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `request` | *metav1.Duration | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
-| `streamIdle` | *metav1.Duration | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
+| `request` | *_metav1.Duration_ | Request specifies a timeout for an individual request from the gateway to a backend. This spans between the point at which the entire downstream request (i.e. end-of-stream) has been processed and when the backend response has been completely processed. A value of 0 effectively disables the timeout. It is specified as a sequence of decimal numbers, each with optional fraction and a unit suffix, such as "1s" or "500ms".  |
+| `streamIdle` | *_metav1.Duration_ | StreamIdle specifies a timeout for a requests' idle streams. A value of 0 effectively disables the timeout.  |
