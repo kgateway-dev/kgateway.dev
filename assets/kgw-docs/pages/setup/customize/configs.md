@@ -548,6 +548,34 @@ spec:
 EOF
 ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Proxy Service IP families {#proxy-service-ip-families}
+
+Use `service.ipFamilyPolicy` and `service.ipFamilies` to request one or two address families for the Service that exposes the gateway proxy. The requested families must be configured on the cluster. If you omit these fields, Kubernetes uses the cluster default. For more information, see the [Kubernetes dual-stack Service documentation](https://kubernetes.io/docs/concepts/services-networking/dual-stack/).
+
+The following example requires a dual-stack Service and makes IPv6 the primary family.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    service:
+      type: LoadBalancer
+      ipFamilyPolicy: RequireDualStack
+      ipFamilies:
+        - IPv6
+        - IPv4
+EOF
+```
+
+Kubernetes does not allow the first `ipFamilies` entry to change on an existing Service. To change the primary family, delete the proxy Service or recreate the Gateway. Kubernetes assigns new cluster and LoadBalancer addresses to the Service.
+{{< /version >}}
+
 ### LoadBalancer source IP ranges {#load-balancer-source-ranges}
 
 Set up an allowlist with `service.loadBalancerSourceRanges` to restrict which source client IPs can connect to the LoadBalancer Service that exposes the gateway proxy.

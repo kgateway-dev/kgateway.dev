@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### IPv6 and dual-stack support {#v25-ipv6-and-dual-stack-support}
+
+You can configure dual-stack proxy Services with `GatewayParameters.spec.kube.service.ipFamilyPolicy` and `GatewayParameters.spec.kube.service.ipFamilies`, and set per-backend DNS address-family resolution with `BackendConfigPolicy.spec.dns.lookupFamily`. These API fields are experimental and might change in future releases. The proxy readiness and stats listeners now follow `KGW_LISTENER_BIND_IPV6`; on nodes that disable the IPv6 kernel stack with `ipv6.disable=1`, set `KGW_LISTENER_BIND_IPV6=false` to keep an IPv4-only bootstrap. For more information, see [Proxy Service IP families]({{< link-hextra path="/setup/customize/configs/#proxy-service-ip-families" >}}).
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
