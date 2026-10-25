@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### Route changes are batched before Gateway translation {#v25-route-changes-are-batched-before-gateway-translation}
+
+The control plane now batches bursts of route changes before Gateway translation, so each affected Gateway rebuilds once per batch instead of once per route. The default window is `10ms`, with a maximum delay of `100ms`. Tune the behavior with `KGW_TRANSLATION_DEBOUNCE` and `KGW_TRANSLATION_DEBOUNCE_MAX`, or set `KGW_TRANSLATION_DEBOUNCE=0` to disable batching. For more information, see [Tune route translation batching]({{< link-hextra path="/install/advanced/#route-translation-batching" >}}).
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
