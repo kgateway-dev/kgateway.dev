@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### HTTP CONNECT tunnels for backend connections {#v25-http-connect-tunnels-for-backend-connections}
+
+You can now tunnel connections from a Static {{< reuse "kgw-docs/snippets/backend.md" >}} through an HTTP forward proxy, such as an egress proxy. In a BackendConfigPolicy that targets the {{< reuse "kgw-docs/snippets/backend.md" >}}, use `spec.tunnel.proxy.backendRef` to reference the forward proxy. The gateway proxy sends an HTTP `CONNECT` request to the forward proxy, which opens the connection to the destination. You can also use `spec.tunnel.headers` to add headers, such as `Proxy-Authorization`, to the `CONNECT` request. Tunnels are supported for single-host Static {{< reuse "kgw-docs/snippets/backend.md" >}} destinations only. For more information, see [HTTP CONNECT tunnels]({{< link-hextra path="/traffic-management/http-connect-tunnels/" >}}).
+
 #### Controller build information metric {#v25-controller-build-information-metric}
 
 The control plane now emits the `kgateway_build_info` metric, so you can see which controller build is running from Prometheus. The metric always has the value `1`. The build details are in its labels: `version`, `revision` (Git commit), `goversion`, `goos`, and `goarch`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
