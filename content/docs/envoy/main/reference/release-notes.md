@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### Controller build information metric {#v25-controller-build-information-metric}
+
+The control plane now emits the `kgateway_build_info` metric, so you can see which controller build is running from Prometheus. The metric always has the value `1`. The build details are in its labels: `version`, `revision` (Git commit), `goversion`, `goos`, and `goarch`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
+
 #### Route change batching {#v25-route-change-batching}
 
 The control plane now batches route changes before Gateway translation, so each affected Gateway rebuilds once per batch instead of once per route. Batching is enabled by default and waits `10ms` after the last change, up to a maximum of `100ms`. To adjust the timing, set the `KGW_TRANSLATION_DEBOUNCE` and `KGW_TRANSLATION_DEBOUNCE_MAX` environment variables on the controller. For more information, see [Tune route translation batching]({{< link-hextra path="/install/advanced/#route-translation-batching" >}}).
