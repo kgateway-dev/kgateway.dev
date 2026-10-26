@@ -461,6 +461,7 @@ _Appears in:_
 | `circuitBreakers` _[CircuitBreakers](#circuitbreakers)_ | CircuitBreakers contains the options necessary to configure circuit breaking.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/circuit_breaking) for more details. |  |  |
 | `upstreamProxyProtocol` _[UpstreamProxyProtocol](#upstreamproxyprotocol)_ | UpstreamProxyProtocol configures the PROXY protocol for upstream connections to the backend.<br />When enabled, the proxy protocol header is prepended to upstream connections,<br />allowing backend services to see the original client connection information.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/proxy_protocol/v3/upstream_proxy_protocol.proto) for more details. |  |  |
 | `tunnel` _[Tunnel](#tunnel)_ | Tunnel sends Backend connections through an HTTP CONNECT proxy.<br />Destination TLS uses tls; proxy TLS uses the proxy backend's policy.<br />Requires Backend targetRefs; targetSelectors are not supported. |  |  |
+| `sessionPersistence` _[SessionPersistence](#sessionpersistence)_ | SessionPersistence pins a client to one endpoint of the backend using a<br />cookie or header. It applies to HTTPRoutes and GRPCRoutes that reference<br />the backend, and has no effect on TCPRoutes or TLSRoutes. When a route<br />splits traffic, it only pins a client to an endpoint within the backend<br />chosen by the split. When set, it takes precedence over the<br />sessionPersistence field of an HTTPRoute or GRPCRoute rule.<br /><br />This field is experimental and subject to breaking changes. It mirrors the<br />experimental Gateway API SessionPersistence type (v1.7). |  |  |
 
 
 #### BackendSpec
@@ -864,6 +865,41 @@ _Appears in:_
 | `sameSite` _string_ | SameSite controls cross-site sending of cookies.<br />Supported values are Strict, Lax, and None. |  | Enum: [Strict Lax None] <br /> |
 
 
+#### CookieLifetimeType
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Permanent Session]
+
+_Appears in:_
+- [SessionPersistenceCookieConfig](#sessionpersistencecookieconfig)
+
+| Field | Description |
+| --- | --- |
+| `Session` | SessionCookieLifetimeType specifies the type for a session<br />cookie.<br /> |
+| `Permanent` | PermanentCookieLifetimeType specifies the type for a permanent<br />cookie.<br /> |
+
+
+#### CookieName
+
+_Underlying type:_ _string_
+
+CookieName is the name of a cookie. Cookie names and header names share the
+same RFC token character set (RFC 6265 defines cookie-name = token).
+
+_Validation:_
+- MaxLength: 256
+- MinLength: 1
+- Pattern: `^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+
+_Appears in:_
+- [SessionPersistenceCookieConfig](#sessionpersistencecookieconfig)
+
+
+
 #### CorsPolicy
 
 
@@ -921,6 +957,7 @@ _Appears in:_
 | `refreshRate` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RefreshRate controls how frequently Envoy polls DNS for this backend's hostnames.<br /><br />Minimum value is 1ms. If unset, Envoy's default of 5s is used.<br />When Envoy respects DNS TTLs, lower TTL values effectively override this setting,<br />so RefreshRate acts as the maximum polling interval.<br />Recommended value for large-scale deployments is 60s or higher. |  | MaxLength: 32 <br />Type: string <br /> |
 | `jitter` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Jitter adds a random delay of up to this duration before each DNS refresh,<br />spreading query load over time and helping prevent thundering-herd spikes.<br />Must be less than or equal to refreshRate when both are set. |  | MaxLength: 32 <br />Type: string <br /> |
 | `respectTTL` _boolean_ | RespectTTL instructs Envoy to honor TTL values returned by DNS responses.<br />When enabled, TTLs lower than RefreshRate effectively become the refresh interval. |  |  |
+| `lookupFamily` _[DnsLookupFamily](#dnslookupfamily)_ | LookupFamily selects the address families used to resolve this backend's<br />hostnames. It applies only to backends resolved through DNS, such as a<br />Backend with a hostname, and has no effect on Kubernetes Services. When<br />omitted, KGW_DNS_LOOKUP_FAMILY applies; its default, V4_PREFERRED, is<br />equivalent to IPv4Preferred.<br /><br />For backends reached through DNS64/NAT64 without IPv4 egress, use IPv6Only<br />or IPv6Preferred so Envoy can use synthesized AAAA records. IPv4Preferred<br />selects IPv4 addresses when available, even if those addresses are<br />unreachable, so a cluster that reaches all IPv4 destinations this way should<br />change KGW_DNS_LOOKUP_FAMILY rather than override each backend.<br /><br />Amazon EKS IPv6 clusters using the Amazon VPC CNI provide IPv4 egress<br />through a host-local IPv4 address and node SNAT, so the default reaches<br />IPv4-only backends without an override.<br /><br />IPv6Preferred and IPv4Preferred fall back only when DNS returns no addresses<br />for the preferred family, not when a connection fails. All returns both<br />families, and for most backends each address becomes a separate endpoint,<br />so requests sent to an unreachable family fail rather than fall back.<br /><br />Note: This feature is experimental and subject to breaking changes in future releases. |  | Enum: [IPv4Preferred IPv4Only IPv6Only IPv6Preferred All] <br /> |
 
 
 #### DenominatorType
@@ -978,6 +1015,28 @@ _Appears in:_
 | `status` _integer_ | StatusCode defines the HTTP status code to return for this route. |  | Maximum: 599 <br />Minimum: 200 <br /> |
 | `body` _string_ | Body defines the content to be returned in the HTTP response body.<br />The maximum length of the body is restricted to prevent excessively large responses.<br />If this field and BodyFormat are both omitted, no body is included in the response.<br />Mutually exclusive with BodyFormat. |  | MaxLength: 4096 <br />MinLength: 1 <br /> |
 | `bodyFormat` _[BodyFormat](#bodyformat)_ | BodyFormat defines the content to be returned in the HTTP response body as an Envoy format string.<br />If this field and Body are both omitted, no body is included in the response.<br />Mutually exclusive with Body.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-directresponseaction-body-format for details. |  |  |
+
+
+#### DnsLookupFamily
+
+_Underlying type:_ _string_
+
+DnsLookupFamily selects the address families Envoy resolves for a DNS backend.
+See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto#enum-config-cluster-v3-cluster-dnslookupfamily) for more details.
+
+_Validation:_
+- Enum: [IPv4Preferred IPv4Only IPv6Only IPv6Preferred All]
+
+_Appears in:_
+- [DNS](#dns)
+
+| Field | Description |
+| --- | --- |
+| `IPv4Preferred` | DnsLookupFamilyIPv4Preferred resolves both families and prefers IPv4, falling<br />back to IPv6 when no IPv4 address is returned. This is kgateway's default.<br />Equivalent to the V4_PREFERRED value of the KGW_DNS_LOOKUP_FAMILY setting.<br /> |
+| `IPv4Only` | DnsLookupFamilyIPv4Only resolves only IPv4 addresses.<br /> |
+| `IPv6Only` | DnsLookupFamilyIPv6Only resolves only IPv6 addresses.<br /> |
+| `IPv6Preferred` | DnsLookupFamilyIPv6Preferred resolves both families and prefers IPv6, falling<br />back to IPv4 when no IPv6 address is returned. Equivalent to the AUTO value<br />of the KGW_DNS_LOOKUP_FAMILY setting, which is also Envoy's own default.<br /> |
+| `All` | DnsLookupFamilyAll resolves both families and returns every address. Only<br />backends that keep all addresses in a single endpoint use happy eyeballs;<br />for others, each address is load-balanced as a separate endpoint.<br /> |
 
 
 #### DnsResolver
@@ -3072,6 +3131,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `consecutive5xx` _integer_ | The number of consecutive server-side error responses (for HTTP traffic,<br />5xx responses; for TCP traffic, connection failures; etc.) before an<br />ejection occurs. Defaults to 5. If this is zero, consecutive 5xx passive<br />health checks will be disabled. In the future, other types of passive<br />health checking might be added, but none will be enabled by default. | 5 | Minimum: 0 <br /> |
 | `enforcingConsecutive5xx` _integer_ | The percentage chance that a host is ejected when an outlier status is<br />detected through consecutive 5xx responses. This setting can be used to<br />disable ejection or to ramp it up slowly. Defaults to 100. |  | Maximum: 100 <br />Minimum: 0 <br /> |
+| `consecutiveGatewayFailure` _integer_ | The number of consecutive gateway failures (502, 503 and 504 status<br />codes) before a host is ejected. When set, ejection is always enforced.<br />When unset, consecutive gateway failure ejection is disabled. |  | Minimum: 1 <br /> |
 | `splitExternalLocalOriginErrors` _boolean_ | Determines whether to distinguish locally originated failures from<br />externally generated errors. When true, consecutiveLocalOriginFailure and<br />enforcingConsecutiveLocalOriginFailure are used for locally originated<br />failures. Defaults to false. |  |  |
 | `consecutiveLocalOriginFailure` _integer_ | The number of consecutive locally originated failures before an ejection<br />occurs. Defaults to 5. This setting takes effect only when<br />splitExternalLocalOriginErrors is true. If this is zero, consecutive local<br />origin failure ejection is disabled. |  | Minimum: 0 <br /> |
 | `enforcingConsecutiveLocalOriginFailure` _integer_ | The percentage chance that a host is ejected when an outlier status is<br />detected through consecutive locally originated failures. This setting can<br />be used to disable ejection or to ramp it up slowly. Defaults to 100 and<br />takes effect only when splitExternalLocalOriginErrors is true. |  | Maximum: 100 <br />Minimum: 0 <br /> |
@@ -3715,6 +3775,8 @@ _Appears in:_
 | `externalTrafficPolicy` _string_ | ExternalTrafficPolicy defines the external traffic policy for the service.<br />Valid values are Cluster and Local. Default value is Cluster. |  |  |
 | `loadBalancerClass` _string_ | LoadBalancerClass is the class of the load balancer implementation this Service belongs to.<br />If specified, the value of this field must be a label-style identifier, with an optional prefix.<br />This field can only be set when the Service type is 'LoadBalancer'. If not set, the default<br />load balancer implementation is used. See<br />https://kubernetes.io/docs/concepts/services-networking/service/#load-balancer-class |  |  |
 | `loadBalancerSourceRanges` _string array_ | LoadBalancerSourceRanges restricts traffic through the cloud-provider load-balancer<br />to the specified client IPs. This field will be ignored if the cloud-provider does<br />not support the feature.<br />More info: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/ |  |  |
+| `ipFamilies` _[IPFamily](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#ipfamily-v1-core) array_ | IPFamilies is the list of IP families (IPv4 and/or IPv6) assigned to the Service,<br />in order of preference. If unset, the cluster's default is used. See<br />https://kubernetes.io/docs/concepts/services-networking/dual-stack/<br />This field is only honored for Services that allocate a cluster IP, and the<br />families requested here must be configured on the cluster.<br /><br />Kubernetes does not allow the first family to change on an existing Service:<br />the second family can be added or dropped, but a change to the first one,<br />including setting it on a Gateway whose Service took a different cluster<br />default, is rejected. The proxy Service then stops being updated, and so do<br />the resources applied after it, such as the Deployment. To change the first<br />family, delete the proxy Service or recreate the Gateway; either gives the<br />Service new cluster and LoadBalancer addresses.<br /><br />Note: This feature is experimental and subject to breaking changes in future releases. |  | MaxItems: 2 <br /> |
+| `ipFamilyPolicy` _[IPFamilyPolicy](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#ipfamilypolicy-v1-core)_ | IPFamilyPolicy represents the dual-stack preference of the Service.<br />`SingleStack` allocates one family, `PreferDualStack` allocates two when the<br />cluster has dual-stack configured and falls back to one when it does not, and<br />`RequireDualStack` fails allocation unless two families are available.<br />If unset, the cluster's default is used.<br /><br />Note: This feature is experimental and subject to breaking changes in future releases. |  | Enum: [SingleStack PreferDualStack RequireDualStack] <br /> |
 
 
 #### ServiceAccount
@@ -3732,6 +3794,81 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `extraLabels` _object (keys:string, values:string)_ | Additional labels to add to the ServiceAccount object metadata. |  |  |
 | `extraAnnotations` _object (keys:string, values:string)_ | Additional annotations to add to the ServiceAccount object metadata.<br />If the same annotation is present on `Gateway.spec.infrastructure.annotations`, the `Gateway` takes precedence. |  |  |
+
+
+#### SessionPersistence
+
+
+
+SessionPersistence defines the desired state of SessionPersistence.
+It mirrors the Gateway API v1.7 SessionPersistence type.
+
+
+This type is experimental and subject to breaking changes.
+
+
+
+_Appears in:_
+- [BackendConfigPolicySpec](#backendconfigpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `absoluteTimeout` _[Duration](#duration)_ | AbsoluteTimeout defines the absolute timeout of the persistent<br />session. Once the AbsoluteTimeout duration has elapsed, the<br />session becomes invalid.<br /><br />Only cookie sessions with lifetimeType Permanent support this field, where it<br />sets the cookie lifetime. It has no effect for header sessions and for Session<br />cookies (the default lifetimeType), as the gateway does not track the session<br />lifetime separately from the cookie. |  |  |
+| `type` _[SessionPersistenceType](#sessionpersistencetype)_ | Type defines the type of session persistence such as through<br />the use of a header or cookie. Defaults to cookie based session<br />persistence. | Cookie | Enum: [Cookie Header] <br /> |
+| `cookie` _[SessionPersistenceCookieConfig](#sessionpersistencecookieconfig)_ | Cookie provides configuration settings that are specific<br />to cookie-based session persistence. |  |  |
+| `header` _[SessionPersistenceHeaderConfig](#sessionpersistenceheaderconfig)_ | Header provides configuration settings that are specific<br />to header-based session persistence. |  |  |
+
+
+#### SessionPersistenceCookieConfig
+
+
+
+SessionPersistenceCookieConfig defines the configuration for cookie-based session persistence.
+
+
+
+_Appears in:_
+- [SessionPersistence](#sessionpersistence)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _[CookieName](#cookiename)_ | Name defines the name of the cookie used for session persistence.<br />If not specified, a unique cookie name is generated for each backend.<br />Users should avoid reusing cookie names to prevent unintended<br />consequences, such as rejection or unpredictable behavior. Avoid using the<br />same cookie name for backends in the same traffic split, as clients lose<br />their session whenever the split switches backends. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+| `path` _string_ | Path defines the cookie Path attribute. Defaults to "/". | / | MaxLength: 1024 <br /> |
+| `lifetimeType` _[CookieLifetimeType](#cookielifetimetype)_ | LifetimeType specifies whether the cookie has a permanent or<br />session-based lifetime. A permanent cookie persists until its<br />specified expiry time, defined by the Expires or Max-Age cookie<br />attributes, while a session cookie is deleted when the current<br />session ends.<br /><br />When set to "Permanent", AbsoluteTimeout indicates the<br />cookie's lifetime via the Expires or Max-Age cookie attributes<br />and is required.<br /><br />When set to "Session", AbsoluteTimeout has no effect, as the<br />gateway does not track the session lifetime separately from<br />the cookie.<br /><br />Defaults to "Session". | Session | Enum: [Permanent Session] <br /> |
+
+
+#### SessionPersistenceHeaderConfig
+
+
+
+SessionPersistenceHeaderConfig defines the configuration for header-based session persistence.
+
+
+
+_Appears in:_
+- [SessionPersistence](#sessionpersistence)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `name` _[HeaderName](#headername)_ | Name defines the name of the header used for session persistence.<br />The client must include this header in subsequent requests to<br />maintain the session. Avoid using the same header name for backends in<br />the same traffic split, as clients lose their session whenever the split<br />switches backends. |  | MaxLength: 256 <br />MinLength: 1 <br />Pattern: `^[A-Za-z0-9!#$%&'*+\-.^_\x60\|~]+$` <br /> |
+
+
+#### SessionPersistenceType
+
+_Underlying type:_ _string_
+
+
+
+_Validation:_
+- Enum: [Cookie Header]
+
+_Appears in:_
+- [SessionPersistence](#sessionpersistence)
+
+| Field | Description |
+| --- | --- |
+| `Cookie` | CookieBasedSessionPersistence specifies cookie-based session<br />persistence.<br /> |
+| `Header` | HeaderBasedSessionPersistence specifies header-based session<br />persistence.<br /> |
 
 
 #### SetCurrentClientCertDetails
