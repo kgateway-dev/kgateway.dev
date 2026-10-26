@@ -9,6 +9,9 @@ By default, the gateway proxy rejects upgrade requests from clients. To enable u
 | ListenerPolicy | Gateway listener | `spec.default.httpSettings.upgradeConfig.enabledUpgrades` | Lists the `Upgrade` header values the listener accepts. Needs at least one entry. |
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} | Gateway, HTTPRoute, or ListenerSet | `spec.httpUpgrade` | Configures upgrades for the Gateway, HTTPRoute, or ListenerSet that the policy targets, and is the only place `CONNECT` termination can be set. |
 
+> [!NOTE]
+> This page covers upgrade and `CONNECT` requests that clients send to the gateway proxy. To have the gateway proxy tunnel its own connections to a backend through a forward proxy, see [HTTP CONNECT tunnels]({{< link-hextra path="/traffic-management/http-connect-tunnels/" >}}).
+
 > [!WARNING]
 > **After an upgrade is established, the tunneled payload is not inspected by HTTP filters.** Authenticate and authorize the initial upgrade request, enable upgrades only for clients you trust, and do not enable request buffering on a route that carries upgrades.
 
