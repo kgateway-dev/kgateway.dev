@@ -177,9 +177,14 @@ controller:
 
 ## Tune route translation batching {#route-translation-batching}
 
-By default, the control plane batches route changes before they trigger Gateway translation. When many HTTPRoute, GRPCRoute, TCPRoute, or TLSRoute resources change in a short time, each affected Gateway rebuilds once per batch instead of once per route. Batching reduces controller CPU and memory use at route scale. Route status and proxy configuration updates might be delayed by tens of milliseconds.
+When many HTTPRoute, GRPCRoute, TCPRoute, or TLSRoute resources change in a short time, the control plane groups the changes into a batch by default. Each affected Gateway rebuilds once per batch instead of once per route. Batching reduces controller CPU and memory use at route scale, but route status and proxy configuration updates might be delayed by tens of milliseconds.
 
-Set `KGW_TRANSLATION_DEBOUNCE` to control how long the control plane waits for more route changes before it flushes a batch. The default value is `10ms`. Set `KGW_TRANSLATION_DEBOUNCE_MAX` to control the maximum time that changes can be held while new changes keep arriving. The default value is `100ms`. Both values use Go duration strings, such as `25ms` or `1s`. If `KGW_TRANSLATION_DEBOUNCE_MAX` is lower than `KGW_TRANSLATION_DEBOUNCE`, the control plane raises the maximum to the debounce value.
+Each new route change restarts a timer, and the control plane flushes the batch when the timer expires. The control plane uses the following environment variables to control when it flushes batches of changes. You can change the default values for these environment variables to customize this behavior to your needs.
+
+* `KGW_TRANSLATION_DEBOUNCE`: How long the control plane waits without any new route changes before it flushes a batch. The default value is `10ms`.
+* `KGW_TRANSLATION_DEBOUNCE_MAX`: The longest time that a batch can be held in total. If route changes keep arriving, the timer keeps restarting and the batch might never flush. When a batch reaches this limit, the control plane flushes it anyway, even if new changes arrive. The default value is `100ms`.
+
+Both values use Go duration strings, such as `25ms` or `1s`. If `KGW_TRANSLATION_DEBOUNCE_MAX` is lower than `KGW_TRANSLATION_DEBOUNCE`, the control plane raises the maximum to the debounce value.
 
 ```yaml
 controller:
