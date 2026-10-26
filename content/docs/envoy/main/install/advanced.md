@@ -175,6 +175,32 @@ controller:
     KGW_XDS_FIRST_CONNECT_DELAY: "2s"
 ```
 
+## Tune route translation batching {#route-translation-batching}
+
+When many HTTPRoute, GRPCRoute, TCPRoute, or TLSRoute resources change in a short time, the control plane groups the changes into a batch by default. Each affected Gateway rebuilds once per batch instead of once per route. Batching reduces controller CPU and memory use at route scale, but route status and proxy configuration updates might be delayed by tens of milliseconds.
+
+Each new route change restarts a timer, and the control plane flushes the batch when the timer expires. The control plane uses the following environment variables to control when it flushes batches of changes. You can change the default values for these environment variables to customize this behavior to your needs.
+
+* `KGW_TRANSLATION_DEBOUNCE`: How long the control plane waits without any new route changes before it flushes a batch. The default value is `10ms`.
+* `KGW_TRANSLATION_DEBOUNCE_MAX`: The longest time that a batch can be held in total. If route changes keep arriving, the timer keeps restarting and the batch might never flush. When a batch reaches this limit, the control plane flushes it anyway, even if new changes arrive. The default value is `100ms`.
+
+Both values use Go duration strings, such as `25ms` or `1s`. If `KGW_TRANSLATION_DEBOUNCE_MAX` is lower than `KGW_TRANSLATION_DEBOUNCE`, the control plane raises the maximum to the debounce value.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_TRANSLATION_DEBOUNCE: "25ms"
+    KGW_TRANSLATION_DEBOUNCE_MAX: "250ms"
+```
+
+To send each route change to Gateway translation immediately, set `KGW_TRANSLATION_DEBOUNCE` to `0`.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_TRANSLATION_DEBOUNCE: "0"
+```
+
 
 ## Controller admin server bind address
 
