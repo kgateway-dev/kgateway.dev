@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### HTTP CONNECT tunnels for backend connections {#v25-http-connect-tunnels-for-backend-connections}
+
+You can use `BackendConfigPolicy.spec.tunnel` to send Static {{< reuse "kgw-docs/snippets/backend.md" >}} connections through an HTTP CONNECT proxy. Configure the proxy with `spec.tunnel.proxy.backendRef`, add optional CONNECT headers with `spec.tunnel.headers`, and see [HTTP CONNECT tunnels]({{< link-hextra path="/about/policies/backendconfigpolicy/#http-connect-tunnels" >}}) for the required {{< reuse "kgw-docs/snippets/backend.md" >}} target and tunnel limits.
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
