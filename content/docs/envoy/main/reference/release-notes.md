@@ -169,7 +169,7 @@ For more information, see [TLS settings]({{< link-hextra path="/security/backend
 
 #### HTTP CONNECT tunnels for backend connections {#v25-http-connect-tunnels-for-backend-connections}
 
-You can use `BackendConfigPolicy.spec.tunnel` to send Static {{< reuse "kgw-docs/snippets/backend.md" >}} connections through an HTTP CONNECT proxy. Configure the proxy with `spec.tunnel.proxy.backendRef`, add optional CONNECT headers with `spec.tunnel.headers`, and see [HTTP CONNECT tunnels]({{< link-hextra path="/about/policies/backendconfigpolicy/#http-connect-tunnels" >}}) for the required {{< reuse "kgw-docs/snippets/backend.md" >}} target and tunnel limits.
+You can now tunnel connections from a Static {{< reuse "kgw-docs/snippets/backend.md" >}} through an HTTP forward proxy, such as an egress proxy. In a BackendConfigPolicy that targets the {{< reuse "kgw-docs/snippets/backend.md" >}}, use `spec.tunnel.proxy.backendRef` to reference the forward proxy. The gateway proxy sends an HTTP `CONNECT` request to the forward proxy, which opens the connection to the destination. You can also use `spec.tunnel.headers` to add headers, such as `Proxy-Authorization`, to the `CONNECT` request. Tunnels are supported for single-host Static {{< reuse "kgw-docs/snippets/backend.md" >}} destinations only. For more information, see [HTTP CONNECT tunnels]({{< link-hextra path="/traffic-management/http-connect-tunnels/" >}}).
 
 
 ### 🔄 Feature changes {#v25-feature-changes}
