@@ -551,9 +551,14 @@ EOF
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Proxy Service IP families {#proxy-service-ip-families}
 
-Use `service.ipFamilyPolicy` and `service.ipFamilies` to request one or two address families for the Service that exposes the gateway proxy. The requested families must be configured on the cluster. If you omit these fields, Kubernetes uses the cluster default. For more information, see the [Kubernetes dual-stack Service documentation](https://kubernetes.io/docs/concepts/services-networking/dual-stack/).
+Use `service.ipFamilyPolicy` and `service.ipFamilies` to control whether the Service that exposes the gateway proxy gets IPv4 addresses, IPv6 addresses, or both. If you omit these fields, Kubernetes uses the cluster default. For more information, see the [Kubernetes dual-stack Service documentation](https://kubernetes.io/docs/concepts/services-networking/dual-stack/). These fields are experimental and might change in future releases.
 
-The following example requires a dual-stack Service and makes IPv6 the primary family.
+| Field | Description |
+| -- | -- |
+| `ipFamilyPolicy` | Whether the Service gets one or two address families. `SingleStack` allocates one family. `PreferDualStack` allocates two families when the cluster has dual-stack configured, and falls back to one family when it does not. `RequireDualStack` fails the allocation unless two families are available. |
+| `ipFamilies` | Up to two address families, `IPv4` or `IPv6`, in order of preference. The first entry is the primary family. The families that you request must be configured on the cluster. The field is honored only for Services that allocate a cluster IP. |
+
+The following example requires a dual-stack Service and makes IPv6 the primary family. If the cluster does not support dual-stack, Kubernetes fails the allocation and the Service is not created.
 
 ```yaml
 kubectl apply -f- <<'EOF'
@@ -573,7 +578,8 @@ spec:
 EOF
 ```
 
-Kubernetes does not allow the first `ipFamilies` entry to change on an existing Service. To change the primary family, delete the proxy Service or recreate the Gateway. Kubernetes assigns new cluster and LoadBalancer addresses to the Service.
+> [!WARNING]
+> Kubernetes does not allow the first `ipFamilies` entry to change on an existing Service. This includes setting `ipFamilies` on a Gateway whose Service already uses a different primary family. When Kubernetes rejects the change, the control plane stops updating the proxy Service and the resources that it applies after the Service, such as the Gateway Deployment. To change the primary family, delete the proxy Service or recreate the Gateway. Kubernetes assigns new cluster and LoadBalancer addresses to the Service. You can add or remove the second family without recreating the Service.
 {{< /version >}}
 
 ### LoadBalancer source IP ranges {#load-balancer-source-ranges}

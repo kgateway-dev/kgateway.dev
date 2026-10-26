@@ -169,7 +169,11 @@ For more information, see [TLS settings]({{< link-hextra path="/security/backend
 
 #### IPv6 and dual-stack support {#v25-ipv6-and-dual-stack-support}
 
-You can configure dual-stack proxy Services with `GatewayParameters.spec.kube.service.ipFamilyPolicy` and `GatewayParameters.spec.kube.service.ipFamilies`, and set per-backend DNS address-family resolution with `BackendConfigPolicy.spec.dns.lookupFamily`. These API fields are experimental and might change in future releases. The proxy readiness and stats listeners now follow `KGW_LISTENER_BIND_IPV6`; on nodes that disable the IPv6 kernel stack with `ipv6.disable=1`, set `KGW_LISTENER_BIND_IPV6=false` to keep an IPv4-only bootstrap. For more information, see [Proxy Service IP families]({{< link-hextra path="/setup/customize/configs/#proxy-service-ip-families" >}}).
+You can now control IPv4 and IPv6 behavior in the following places. The API fields are experimental and might change in future releases.
+
+* **Proxy Service**: Use `ipFamilyPolicy` and `ipFamilies` in the `spec.kube.service` field of a GatewayParameters resource to request an IPv4, IPv6, or dual-stack Service for the gateway proxy. For more information, see [Proxy Service IP families]({{< link-hextra path="/setup/customize/configs/#proxy-service-ip-families" >}}).
+* **Backend DNS resolution**: Use `BackendConfigPolicy.spec.dns.lookupFamily` to choose which address families the gateway proxy resolves for a single Backend that is reached through DNS, such as a Static Backend with a hostname. The field overrides the controller-wide `KGW_DNS_LOOKUP_FAMILY` setting, which prefers IPv4 by default. For more information, see [DNS lookup family]({{< link-hextra path="/install/advanced/#dns-lookup-family" >}}).
+* **Readiness and stats listeners**: The proxy readiness and stats listeners now follow the existing `KGW_LISTENER_BIND_IPV6` controller setting, which defaults to `true`, instead of always binding to IPv4. On nodes that disable the IPv6 kernel stack with `ipv6.disable=1`, set `KGW_LISTENER_BIND_IPV6=false` to keep an IPv4-only bootstrap. For more information, see [Listener bind address]({{< link-hextra path="/install/advanced/#listener-bind-address" >}}).
 
 
 ### 🔄 Feature changes {#v25-feature-changes}

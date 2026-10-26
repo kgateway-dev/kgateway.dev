@@ -2,6 +2,11 @@ Route requests to services that listen for incoming traffic on a fixed IP addres
 
 You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource.
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+> [!NOTE]
+> The gateway proxy resolves DNS names through DNS and prefers IPv4 addresses by default. To change the address families that the gateway proxy resolves for a Backend, set the `spec.dns.lookupFamily` field in a BackendConfigPolicy. To change the default for all Backends, see [DNS lookup family]({{< link-hextra path="/install/advanced/#dns-lookup-family" >}}).
+{{< /version >}}
+
 ## Before you begin
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
