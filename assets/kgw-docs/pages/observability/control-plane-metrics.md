@@ -28,9 +28,6 @@ Review the following table to understand more about each metric.
 
 Helpful terms:
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}* Build info: Metadata about the running control plane binary. The `kgateway_build_info` gauge reports labels for the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} version, Git revision, Go version, operating system, and architecture. The series value is `1`. If the build does not embed version information, the `version` label is `undefined`.
-
-{{< /version >}}
 * Controller: A Kubernetes controller that reconciles resources as part of the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane deployment.
 
 * Resource: A Kubernetes object that is managed by a controller of the control plane.

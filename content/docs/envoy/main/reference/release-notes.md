@@ -169,7 +169,7 @@ For more information, see [TLS settings]({{< link-hextra path="/security/backend
 
 #### Controller build information metric {#v25-controller-build-information-metric}
 
-The control plane now emits the `kgateway_build_info` gauge with value `1`, labeled with the controller version, Git revision, Go version, operating system, and architecture. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
+The control plane now emits the `kgateway_build_info` metric, so you can see which controller build is running from Prometheus. The metric always has the value `1`. The build details are in its labels: `version`, `revision` (Git commit), `goversion`, `goos`, and `goarch`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
 
 
 ### 🔄 Feature changes {#v25-feature-changes}
