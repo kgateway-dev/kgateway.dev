@@ -167,6 +167,10 @@ You can now set TLS settings for upstream connections, such as ECDH curves, TLS 
 
 For more information, see [TLS settings]({{< link-hextra path="/security/backend-tls/#tls-settings" >}}).
 
+#### Controller build information metric {#v25-controller-build-information-metric}
+
+The control plane now emits the `kgateway_build_info` gauge with value `1`, labeled with the controller version, Git revision, Go version, operating system, and architecture. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
+
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
