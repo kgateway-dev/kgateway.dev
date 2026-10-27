@@ -21,6 +21,18 @@ When a token is available in the token bucket it can be assigned to an incoming 
 {{< reuse-image src="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
 {{< reuse-image-dark srcDark="/img/local-rate-limiting.svg" caption="Local rate limiting" width="600px" >}}
 
+### Token bucket scope {#bucket-scope}
+
+Each Envoy pod creates a separate token bucket for every local rate limit configuration that applies to a route. How many buckets you get depends on what the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} targets.
+
+| Target | Token buckets | What this means |
+| --- | --- | --- |
+| HTTPRoute | One bucket for each path match in the HTTPRoute. | `maxTokens` applies to each path match separately, not to the HTTPRoute as a whole. Path matches in the same rule also get separate buckets. |
+| Gateway | One bucket for the entire Gateway. | All routes that the Gateway serves share the bucket, including routes with different hostnames. |
+| Gateway listener (`sectionName`) | One bucket for each hostname on the listener. | Routes that share a hostname share a bucket. Routes with different hostnames get separate buckets. |
+
+For example, a policy with `maxTokens: 5` that targets an HTTPRoute with two path matches, `/a` and `/b`, allows 5 requests to each path before an Envoy pod returns a 429 response, so up to 10 requests in total. If you add a third path match to the HTTPRoute, the total grows to 15, even though you did not change the policy. To enforce a single limit across many routes, target the Gateway instead.
+
 ### Local rate limiting
 
 In {{< reuse "kgw-docs/snippets/kgateway.md" >}}, you use a [{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}]({{< link-hextra path="/about/policies/trafficpolicy/" >}}) to set up local rate limiting for your routes. You can choose between the following attachment options: 
@@ -36,7 +48,7 @@ Note that if you apply a policy to an HTTPRoute and to a Gateway at the same tim
 
 ## Route configuration {#route}
 
-Set up local rate limiting for a particular route. 
+Set up local rate limiting for a particular route. Note that the token bucket applies to each path match of the route separately. For more information, see [Token bucket scope](#bucket-scope).
 
 1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with your local rate limiting settings. 
    ```yaml
@@ -157,7 +169,7 @@ Set up local rate limiting for a particular route.
    
 ## Gateway configuration {#gateway}
 
-Instead of applying local rate limiting to a particular route, you can also apply it to an entire gateway. This way, the local rate limiting settings are applied to all the routes that the gateway serves. 
+Instead of applying local rate limiting to a particular route, you can also apply it to an entire gateway. This way, the local rate limiting settings are applied to all the routes that the gateway serves. All of these routes share a single token bucket. For more information, see [Token bucket scope](#bucket-scope).
 
 1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with your local rate limiting settings. Use the `targetRefs` section to apply the policy to a specific Gateway. The policy automatically applies to all the routes that the Gateway serves. 
    ```yaml

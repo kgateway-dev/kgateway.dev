@@ -30,3 +30,25 @@ serviceEntriesExclusionLabelSelectors:
   - matchLabels:
       env: staging
 ```
+
+## Exclude WorkloadEntries from discovery {#exclude-workloadentries}
+
+When a ServiceEntry has a `workloadSelector`, {{< reuse "kgw-docs/snippets/kgateway.md" >}} adds every WorkloadEntry with matching labels as an endpoint of that ServiceEntry, so that the gateway can route traffic to it.
+
+Sometimes a WorkloadEntry that matches the selector is not a real backend. For example, it might represent the address of another gateway or proxy. To stop the gateway from sending traffic to it, exclude the WorkloadEntry from endpoint discovery.
+
+To exclude WorkloadEntries, set the `KGW_WORKLOAD_ENTRIES_EXCLUSION_LABELS` environment variable on the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane to a comma-separated list of label keys. By default, no WorkloadEntries are excluded. This setting applies only if the [Istio integration]({{< link-hextra path="/integrations/istio/ambient/ambient-ingress/#step-1-enable-the-istio-integration" >}}) is enabled.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_WORKLOAD_ENTRIES_EXCLUSION_LABELS: "example.io/source-kind,example.io/infrastructure"
+```
+
+Note the following behavior:
+
+* A WorkloadEntry is excluded if it has any of the label keys that you list, regardless of the value of the label. For example, if you list the `example.io/infrastructure` key, a WorkloadEntry with the label `example.io/infrastructure: "false"` is also excluded.
+* The label keys are checked in both the `metadata.labels` and the `spec.labels` fields of the WorkloadEntry.
+* An excluded WorkloadEntry is not used as an endpoint for any ServiceEntry that the gateway discovers. The WorkloadEntry itself is not changed or deleted, so other components, such as Istio, can still use it.
+
+To exclude entire ServiceEntry resources, or to match label values, use the [`serviceEntriesExclusionLabelSelectors` Helm value](#exclude-serviceentries) instead.

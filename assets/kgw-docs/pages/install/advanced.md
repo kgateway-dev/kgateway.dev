@@ -240,8 +240,8 @@ metadata:
   namespace: team-secrets
 spec:
   from:
-  - group: {{< reuse "kgw-docs/snippets/referencegrant-from-policy-group.md" >}}
-    kind: {{< reuse "kgw-docs/snippets/referencegrant-from-policy-kind.md" >}}
+  - group: {{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}
+    kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
     # The namespace that holds the policy.
     namespace: httpbin
   to:
