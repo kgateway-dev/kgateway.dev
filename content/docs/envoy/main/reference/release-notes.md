@@ -211,6 +211,10 @@ The control plane now emits the `kgateway_build_info` metric, so you can see whi
 The control plane now batches route changes before Gateway translation, so each affected Gateway rebuilds once per batch instead of once per route. Batching is enabled by default and waits `10ms` after the last change, up to a maximum of `100ms`. To adjust the timing, set the `KGW_TRANSLATION_DEBOUNCE` and `KGW_TRANSLATION_DEBOUNCE_MAX` environment variables on the controller. For more information, see [Tune route translation batching]({{< link-hextra path="/install/advanced/#route-translation-batching" >}}).
 
 
+#### Log ext-auth latency {#v25-extauth-latency-access-log}
+
+External auth filters now expose per-request stats that you can reference in access logs. For example, use `%FILTER_STATE(ext_auth/<namespace>/<name>:FIELD:latency_us)%` to log how long the external auth check took. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
+
 ### 🔄 Feature changes {#v25-feature-changes}
 
 #### Lambda backends set the Host header {#v25-lambda-host-header}

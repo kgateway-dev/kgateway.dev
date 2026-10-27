@@ -497,6 +497,74 @@ You can optionally enable kgateway to attach route source metadata to every Envo
 
 {{< /version >}}
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+
+### Log ext-auth latency {#extauth-latency}
+
+If you use an external auth service, you can write the time that the external auth check took for each request to your access logs. The data is emitted from the Envoy `ext_authz` filter and is available for every request that makes an external auth check, including requests that the service denies. For more information, see the [Envoy `ext_authz` filter documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#logging).
+
+1. Set up external auth for your gateway or route. For more information, see [External auth]({{< link-hextra path="/security/extauth/" >}}).
+
+2. Update your ListenerPolicy to include the extauth fields in your access log format. The following example adds the latency of the external auth check and the number of bytes that were sent and received to the JSON access log output.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: access-logs
+     namespace: kgateway-system
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     default:
+       httpSettings:
+         accessLog:
+           - fileSink:
+               path: /dev/stdout
+               jsonFormat:
+                 response_code: "%RESPONSE_CODE%"
+                 extauth_latency_us: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:latency_us)%"
+                 extauth_bytes_sent: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:bytesSent)%"
+                 extauth_bytes_received: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:bytesReceived)%"
+   EOF
+   ```
+
+   Envoy uses the name of the filter as the filter state key. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} names each ext-auth filter `ext_auth/<namespace>/<name>`, where `<namespace>` and `<name>` are the namespace and name of your GatewayExtension resource. In this example, the GatewayExtension is named `basic-ext-auth` and is in the `kgateway-system` namespace. Use this key instead of the `envoy.filters.http.ext_authz` key that is shown in the Envoy documentation.
+
+   | Field | Description |
+   | ----- | ----------- |
+   | `latency_us` | The time in microseconds that the external auth check took. |
+   | `bytesSent` | The number of bytes that the gateway proxy sent to the external auth service. Available only for gRPC external auth services. |
+   | `bytesReceived` | The number of bytes that the gateway proxy received from the external auth service. Available only for gRPC external auth services. |
+
+3. Send a request to a route that your external auth policy protects.
+
+4. Get the logs for the gateway pod and verify that the entry includes the ext-auth fields.
+
+   ```sh
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq
+   ```
+
+   Example output:
+   ```json
+   {
+     "extauth_bytes_received": "1135",
+     "extauth_bytes_sent": "638",
+     "extauth_latency_us": "1643",
+     "response_code": 200
+   }
+   ```
+
+   The ext-auth values are written as strings. Envoy adds the ext-auth fields only for requests that make a check call to the external auth service.
+
+> [!NOTE]
+> The `%FILTER_STATE(<key>:TYPED)%` format is not supported for external auth. Use the `FIELD` format as shown in the example.
+
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
