@@ -74,6 +74,21 @@ If you build on kgateway as a Go library, the following functions are also remov
 
 The control plane no longer emits the `kgateway_translator_translations_running` and `kgateway_controller_reconciliations_running` gauges. The `kgateway_translator_translations_total` and `kgateway_translator_translation_duration_seconds` metrics no longer include the `translator="TranslateHTTPRoute"` series, so update Prometheus alerts, dashboards, and queries that use those series.
 
+#### Listener ports are no longer container ports {#v25-listener-container-ports}
+
+The proxy Deployment no longer lists Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled. The Service that {{< reuse "kgw-docs/snippets/kgateway.md" >}} generates for the Gateway is unchanged.
+
+Because of this change, updating a listener port in the proxy deployment now only restarts the proxy pod in the following cases:
+
+* **Pod template change**: The pod template of every managed Gateway changes. The pod restarts as part of the upgrade. 
+* **First low port**: A Gateway gains its first listener port below port number 1024. {{< reuse "kgw-docs/snippets/kgateway.md" >}} adds a pod setting that allows the proxy to bind low ports. For example, a Gateway with listeners on ports 8080 and 8443 restarts when you add a listener on port 443. Adding a listener on port 80 afterward does not restart the pods, because the Gateway already has a port below 1024.
+* **Last low port**: A Gateway loses its last listener port below port number 1024. {{< reuse "kgw-docs/snippets/kgateway.md" >}} removes that pod setting. For example, a Gateway with listeners on ports 80 and 443 does not restart when you remove port 80, but restarts when you also remove port 443.
+
+Any resource, such as a custom proxy Service or a NetworkPolicy resource, that refers to the proxy's container ports by name no longer works. Before you upgrade, check the following setups and update them if needed:
+
+* **Named port references**: If a NetworkPolicy rule or a Service that you created uses the name `listener-<port>` format to reference proxy port, switch to the port number. With a default-deny NetworkPolicy, a rule that no longer matches blocks traffic to the proxy. The Service that {{< reuse "kgw-docs/snippets/kgateway.md" >}} generates already uses port numbers and is not affected.
+* **`hostNetwork` set in a deployment overlay**: Container ports also act as host ports, which keep two proxies that use the same port off the same node. Without the container ports, the scheduler can place both proxies on one node, and the second proxy fails to bind. To prevent this, add your Gateway's listener ports as container ports in the overlay. For an example, see [Add container ports for hostNetwork]({{< link-hextra path="/setup/customize/configs/#host-network-ports" >}}).
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}

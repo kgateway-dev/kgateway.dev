@@ -471,6 +471,38 @@ EOF
 > [!CAUTION]
 > Changing the pod-network bind address to all interfaces exposes the SDS endpoint to any pod on the cluster network. Enable this feature only in a trusted environment.
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Add container ports for hostNetwork {#host-network-ports}
+
+The proxy Deployment does not list Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled.
+
+If you set `hostNetwork` in a deployment overlay, container ports also act as host ports, which keep two proxies that use the same port off the same node. Without the container ports, the scheduler can place both proxies on one node, and the second proxy fails to bind. To prevent this, add your Gateway's listener ports as container ports in the overlay.
+
+The following example adds port 8080 to the proxy container and keeps the existing container ports, such as `http-monitoring`. Add one entry for each listener port of your Gateway.
+
+```yaml
+kubectl apply --server-side -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    deploymentOverlay:
+      spec:
+        template:
+          spec:
+            hostNetwork: true
+            containers:
+              - name: kgateway-proxy
+                ports:
+                  - containerPort: 8080
+                    protocol: TCP
+EOF
+```
+{{< /version >}}
+
 ### Replace all volumes {#replace-volumes}
 
 Use `$patch: replace` to take full control of the pod volume list instead of merging additional volumes with `podTemplate.extraVolumes`. Place `$patch: replace` as a separate list item before the actual volumes.
