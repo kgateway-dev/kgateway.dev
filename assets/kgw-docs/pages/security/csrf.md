@@ -145,11 +145,15 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
    Example output:
 
    ```console
-   http.http.csrf.missing_source_origin: 1
-   http.http.csrf.request_invalid: 0
-   http.http.csrf.request_valid: 1
+   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.missing_source_origin: 1
+   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_invalid: 0
+   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_valid: 1
    ...
    ```
+
+   {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   The stat prefix `http_8080` consists of `http_` and the port of the listener.
+   {{< /version >}}
 
    * `missing_source_origin`: The number of requests that were sent without an origin. The number is `1` because you sent the first request without an origin.
    * `request_invalid`: The number of requests that were sent with an origin that did not match the destination origin. The number is `0` because you did not send an invalid request.

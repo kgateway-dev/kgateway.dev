@@ -1,8 +1,10 @@
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/">}}) to ensure that your apps are available even if they are temporarily unavailable.
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
+{{< /version >}}
 
 ## About request retries
 
@@ -10,19 +12,25 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Before you begin
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
+{{< /version >}}
 
 ## Step 1: Set up your environment for retries
 
-To use retries, you need to install the experimental channel. You can also set up two things that help you test retries: a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To use retries, you need to install the experimental channel. You can also set up two things that help you test retries:{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To test retries, set up two things:{{< /version >}} a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
 
+{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
-
-2. Install a sample app that you can simulate a failure for, such as adding a `sleep` command to the [Bookinfo reviews app](https://istio.io/latest/docs/examples/bookinfo/).
+{{% /version %}}
+1. Install a sample app that you can simulate a failure for, such as adding a `sleep` command to the [Bookinfo reviews app](https://istio.io/latest/docs/examples/bookinfo/).
 
    ```sh
    kubectl apply -f- <<EOF
@@ -93,7 +101,7 @@ To use retries, you need to install the experimental channel. You can also set u
    EOF
    ```
 
-3. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide]({{< link-hextra path="/security/access-logging/" >}}) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/substitution_formatter.html#config-access-log-format-response-flags).
+1. Apply an access log policy to the gateway that tracks the number of retries. The key log in the following example is `response_flags`, which is used to verify that the request was retried. For more information, see the [Access logging guide]({{< link-hextra path="/security/access-logging/" >}}) and the [Envoy access logs response flags docs](https://www.envoyproxy.io/docs/envoy/latest/configuration/advanced/substitution_formatter.html#config-access-log-format-response-flags).
 
    ```yaml
    kubectl apply -f- <<EOF

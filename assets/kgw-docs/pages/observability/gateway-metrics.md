@@ -19,6 +19,37 @@ The following steps show you how to quickly view the metrics endpoint of the gat
    envoy_cluster_external_upstream_rq{envoy_response_code="200",envoy_cluster_name="kube_httpbin_httpbin_8000"} 5
    ```
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## Per-listener metrics {#listener-metrics}
+
+The gateway proxy reports the HTTP connection manager and TCP proxy stats for each listener separately. Envoy names these stats with a stat prefix that {{< reuse "kgw-docs/snippets/kgateway.md" >}} sets for each listener. In Prometheus, the stat prefix is the value of the `envoy_http_conn_manager_prefix` label. In the Envoy admin stats, it is part of the stat name, such as `http.http_8080.downstream_rq_total`.
+
+The stat prefix has the following format.
+
+| Listener | Stat prefix |
+| -- | -- |
+| HTTP | `http_<port>` |
+| HTTPS | `https_<port>_<listener>` |
+| HTTPS listener of a ListenerSet | `https_<port>_<namespace>_<listenerset>_<listener>` |
+| TCPRoute | `tcp_<port>_<namespace>_<route>` |
+| TLSRoute | `tls_<port>_<namespace>_<route>` |
+
+For example, a Gateway with an HTTP listener on port 8080 and an HTTPS listener named `tenant-a` on port 8443 reports the stat prefixes `http_8080` and `https_8443_tenant-a`.
+
+Use the stat prefix to query the metrics of a single listener, or of all listeners.
+
+```
+# Requests of the tenant-a listener only
+sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix="https_8443_tenant-a"}[5m]))
+
+# Requests of all HTTP and HTTPS listeners
+sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix=~"http_.*|https_.*"}[5m]))
+```
+
+To reduce the stats that the proxy tracks to the stats of one listener, use a stats matcher, such as `prefix: "http.https_8443_tenant-a."`. For more information, see [Filter Envoy stats](#filter-stats).
+
+{{< /version >}}
+
 ## Filter stats at query time {#filter-query-time}
 
 By default, {{< reuse "kgw-docs/snippets/kgateway.md" >}} configures the stats endpoint at `/stats/prometheus?usedonly`. The `?usedonly` query parameter tells Envoy to omit stats with default (zero) values when responding to a Prometheus scrape request. This reduces the size of each scrape response without affecting what Envoy tracks internally.

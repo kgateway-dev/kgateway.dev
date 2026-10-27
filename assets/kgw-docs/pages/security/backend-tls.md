@@ -467,11 +467,24 @@ EOF
 | `kgateway.dev/min-tls-version` | The minimum TLS version for the upstream TLS handshake. If you set this option to `1.3` and omit `kgateway.dev/max-tls-version`, the generated Envoy configuration also uses TLS 1.3 as the maximum. |
 | `kgateway.dev/max-tls-version` | The maximum TLS version for the upstream TLS handshake. |
 | `kgateway.dev/signature-algorithms` | A comma-delimited list of TLS signature algorithms that the gateway proxy advertises during the upstream TLS handshake. |
-| `kgateway.dev/alpn-protocols` | A comma-delimited list of Application-Layer Protocol Negotiation (ALPN) protocols that the gateway proxy offers to the backend. If you do not set this option, the proxy offers no ALPN protocols. |
+| `kgateway.dev/alpn-protocols` | A comma-delimited list of Application-Layer Protocol Negotiation (ALPN) protocols that the gateway proxy offers to the backend. If you do not set this option and the Service port has no `appProtocol`, the proxy negotiates HTTP/2 or HTTP/1.1 through ALPN. For more information, see [HTTP version](#http-version). |
 | `kgateway.dev/verify-certificate-hash` | The SHA-256 hash of the backend certificate, in hex format. The backend certificate must match this hash. Replace `<SHA256_CERTIFICATE_HASH>` with the hash of your backend certificate. |
 
 {{% /tab %}}
 {{< /tabs >}}
+
+### HTTP version {#http-version}
+
+If you attach a BackendTLSPolicy to a Service and the Service port has no `appProtocol`, the gateway proxy offers HTTP/2 and HTTP/1.1 during the TLS handshake (ALPN) and uses the version that the backend selects. The proxy uses HTTP/2 if the backend supports it. For example, a backend such as an NGINX server that has HTTP/2 enabled on its TLS port is reached over HTTP/2. Previously, the gateway proxy always used HTTP/1.1 for these backends.
+
+To always use HTTP/1.1, set the `appProtocol` of the Service port to `http`. The following example sets the `appProtocol` for the HTTPS port of the NGINX service from this guide, which is the second port of the Service.
+
+```sh
+kubectl patch service nginx -n kgateway-base --type='json' \
+  -p='[{"op":"add","path":"/spec/ports/1/appProtocol","value":"http"}]'
+```
+
+For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< link-hextra path="/traffic-management/http2/" >}}).
 {{< /version >}}
 
 {{< /version >}}

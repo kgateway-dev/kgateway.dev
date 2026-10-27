@@ -97,6 +97,87 @@ When a listener is modified or removed, Envoy now asks the connections on the ol
 
 If your clients cannot handle a connection that closes after 60 seconds, you can restore the previous behavior by setting the drain flags in the `envoyContainer.extraArgs` field of your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}. For an example, see [Change the listener drain behavior]({{< link-hextra path="/setup/customize/configs/#drain-settings" >}}).
 
+#### Stats of the gateway proxy are reported per listener {#v25-stat-prefix}
+
+The Envoy HTTP connection manager and TCP proxy stats are now reported per listener. Previously, all HTTP and HTTPS listeners shared the stat prefix `http`, and the stat prefixes of TCPRoutes and TLSRoutes contained dots that split their stats across metric names. The stat prefix now follows a stable format.
+
+| Listener | Stat prefix |
+| -- | -- |
+| HTTP | `http_<port>` |
+| HTTPS | `https_<port>_<listener>` |
+| HTTPS listener of a ListenerSet | `https_<port>_<namespace>_<listenerset>_<listener>` |
+| TCPRoute | `tcp_<port>_<namespace>_<route>` |
+| TLSRoute | `tls_<port>_<namespace>_<route>` |
+
+For example, a Gateway has an HTTP listener on port 8080 and two HTTPS listeners, `tenant-a` and `tenant-b`, on port 8443. Previously, all three listeners reported the same stats under the prefix `http`. Now, each listener reports its own stats.
+
+| Listener | Stat prefix before | Stat prefix after |
+| -- | -- | -- |
+| HTTP on port 8080 | `http` | `http_8080` |
+| HTTPS `tenant-a` on port 8443 | `http` | `https_8443_tenant-a` |
+| HTTPS `tenant-b` on port 8443 | `http` | `https_8443_tenant-b` |
+
+In Prometheus, the stat prefix is the value of the `envoy_http_conn_manager_prefix` label. In the Envoy admin stats, it is part of the stat name. For example, the request counter of the `tenant-a` listener changed from `http.http.downstream_rq_total` to `http.https_8443_tenant-a.downstream_rq_total`.
+
+To keep your dashboards and alerts working, update the following settings if you use these stats.
+
+* **Prometheus queries** that match `envoy_http_conn_manager_prefix="http"`, or the previous per-route `envoy_tcp_*` metric names. A query that filters on the old prefix no longer returns data.
+
+  ```
+  # Before: requests of all listeners
+  sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix="http"}[5m]))
+
+  # After: requests of all HTTP and HTTPS listeners
+  sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix=~"http_.*|https_.*"}[5m]))
+
+  # After: requests of the tenant-a listener only
+  sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix="https_8443_tenant-a"}[5m]))
+  ```
+
+* **`stats.matcher` entries** in your GatewayParameters resources that match raw stat names. An entry that matches the old prefix no longer matches any stats.
+
+  ```yaml
+  # Before: matched the stats of all HTTP and HTTPS listeners
+  inclusionList:
+  - prefix: "http.http."
+
+  # After: matches the stats of the HTTP listener on port 8080
+  inclusionList:
+  - prefix: "http.http_8080."
+  ```
+
+Queries that do not use these labels are not affected. A Gateway with many HTTPS listeners or ListenerSets exposes more HTTP connection manager series, one set for each listener.
+
+#### Support for running kgateway as an ambient waypoint removed {#v25-waypoint-removed}
+
+The deprecated support for running {{< reuse "kgw-docs/snippets/kgateway.md" >}} as an Istio ambient waypoint is removed. The following items are removed:
+
+* The `kgateway-waypoint` GatewayClass.
+* The translation of Istio AuthorizationPolicy resources.
+* The `KGW_WAYPOINT_LOCAL_BINDING` setting.
+
+To move your existing waypoints to Istio waypoints, see the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md).
+
+Sending ingress traffic through an Istio waypoint that has the `istio.io/ingress-use-waypoint` label is still supported. To enable this feature, set the `waypoint.enabled` Helm value to `true`. If you do not use Helm, set the `KGW_INGRESS_USE_WAYPOINTS=true` environment variable on the controller. Note the the default value of the environment variable changed from `true` to `false`. 
+
+> [!NOTE]
+> The controller ClusterRole still grants `get`, `list`, and `watch` permissions on `authorizationpolicies.security.istio.io` APIs, so that upgrades are safe. However, {{< reuse "kgw-docs/snippets/kgateway.md" >}} no longer uses them. The permissions are removed in the next minor release. If you maintain a custom ClusterRole, or use these permissions for something else, plan for their removal.
+
+#### Kubernetes Gateway API version 1.7.0-rc.3 {#v25-gw-api}
+
+The Kubernetes Gateway API dependency is updated to support version 1.7.0-rc.3. To upgrade the Gateway API custom resources in your cluster, see [Upgrade]({{< link-hextra path="/operations/upgrade/" >}}). For all changes in this version, see the [Gateway API release notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.7.0-rc.3). The following changes can affect your {{< reuse "kgw-docs/snippets/kgateway.md" >}} configuration.
+
+* **Session persistence changes**: 
+  * **HTTPRoute session persistence replaced by BackendConfigPolicy**: The Gateway API version 1.7 deprecates the `sessionPersistence` setting on an HTTPRoute in favor of the session persistence that you can set in a BackendConfigPolicy. The HTTPRoute field still works in this version, but a BackendConfigPolicy that targets the backend takes precedence. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
+  * **Renamed session persistence fields in HTTPRoutes**: This change applies if you keep the `sessionPersistence` field in an HTTPRoute rule. The `sessionName` and `cookieConfig` fields are removed. Use `cookie.name` and `cookie.lifetimeType` for cookies, and `header.name` for headers. The API server rejects an HTTPRoute that sets the removed fields, so migrate your HTTPRoutes before you upgrade the Gateway API CRDs.
+  * **Default cookie lifetime for session persistence in HTTPRoutes**: This change applies if you keep the `sessionPersistence` field in an HTTPRoute rule and set `absoluteTimeout` for cookie-based session persistence. If you do not set `cookie.lifetimeType`, the cookie now has the `Session` lifetime. Previously, the cookie got a `Max-Age` from `absoluteTimeout`. A `Session` cookie has no `Max-Age`, so the client deletes it when its session ends, such as when the browser closes, and `absoluteTimeout` has no effect. To keep the previous behavior, set `cookie.lifetimeType: Permanent`.
+* **Retries**: The `retry` field of an HTTPRoute is now part of the standard channel of the Gateway API. Retries work without the experimental CRDs and when experimental Gateway API features are disabled. For more information, see [Retries]({{< link-hextra path="/resiliency/retry/retry/" >}}).
+* **BackendTLSPolicy and the HTTP version**: This applies if you use a BackendTLSPolicy for a Service that does not set `appProtocol` on its port. Previously, the gateway proxy always used HTTP/1.1 for these backends. Now, the proxy offers both HTTP/2 and HTTP/1.1 during the TLS handshake (ALPN) and uses the version that the backend selects, which is HTTP/2 if the backend supports it. To always use HTTP/1.1, set `appProtocol: http` on the port of the Service. For more information, see [HTTP version]({{< link-hextra path="/security/backend-tls/#http-version" >}}).
+
+#### Supported Kubernetes versions {#v25-kubernetes-versions}
+
+{{< reuse "kgw-docs/snippets/kgateway.md" >}} 2.5 supports Kubernetes versions 1.33 to 1.37. Support for Kubernetes 1.32 is removed. If your cluster runs Kubernetes 1.32, upgrade the cluster to version 1.33 or later before you upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}}. For the supported versions of other components, see [Supported versions]({{< link-hextra path="/reference/versions/" >}}).
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}
@@ -214,6 +295,10 @@ The control plane now batches route changes before Gateway translation, so each 
 #### Log ext-auth latency {#v25-extauth-latency-access-log}
 
 External auth filters now expose per-request stats that you can reference in access logs. For example, use `%FILTER_STATE(ext_auth/<namespace>/<name>:FIELD:latency_us)%` to log how long the external auth check took. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
+
+#### Session persistence in the BackendConfigPolicy {#v25-backend-session-persistence}
+
+You can now configure session persistence, also known as sticky sessions, in the `sessionPersistence` field of a [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/" >}}). The policy pins a client to one instance of a Service or Backend by using a cookie or a header, and applies to the HTTPRoutes and GRPCRoutes that route to it. It replaces session persistence in HTTPRoute rules, which the Gateway API version 1.7 deprecates. If you set both, the BackendConfigPolicy takes precedence. This feature is experimental. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
 
 ### 🔄 Feature changes {#v25-feature-changes}
 

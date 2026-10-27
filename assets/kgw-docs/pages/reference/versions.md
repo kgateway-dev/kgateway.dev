@@ -3,13 +3,15 @@ Review the following information about released versions for kgateway.
 ## Released versions
 
 | Kgateway | Release date | Kubernetes | Gateway API`*` | Envoy | Helm | Istio`†` |
-|----------|--------------|------------|----------------|-------|------|----------|
+|----------|--------------|------------|----------------|-------|------|----------|{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+| 2.5.x | TBD | 1.33 - 1.37 | 1.5 - 1.7 | Proxy 1.39, API v3 | >= 3.12 | 1.27 - 1.31 |{{< /version >}}
 | 2.4.x | 23 July 2026 | 1.32 - 1.36 | 1.4 - 1.6 | Proxy 1.38, API v3 | >= 3.12 | 1.26 - 1.30 |
 | 2.3.x | 19 May 2026 | 1.31 - 1.35 | 1.3 - 1.5 | Proxy 1.37, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.2.x | 09 Feb 2026 | 1.31 - 1.35 | 1.2 - 1.4 | Proxy 1.36, API v3 | >= 3.12 | 1.23 - 1.27 |
 | 2.1.x | 10 Oct 2025 | 1.31 - 1.34 | 1.2 - 1.4 | Proxy 1.35, API v3 | >= 3.12 | 1.23 - 1.27 |
 
 <!--See tested min/max versions in https://github.com/kgateway-dev/kgateway/tree/main/.github/workflows/.env/nightly-tests-->
+<!-- TODO: For 2.5.x, set the release date and confirm the Gateway API (1.5 - 1.7) and Istio (1.27 - 1.31) ranges. Kubernetes (1.33 - 1.37) and Envoy (1.39) come from the CI test versions on main. -->
 
 `*` Gateway API versions: The kgateway project is conformant to the Kubernetes Gateway API specification for the **standard** channel. The latest kgateway and Gateway API versions support the **experimental** channel, but might not for older versions. For more details, see the [Gateway API docs](https://gateway-api.sigs.k8s.io/docs/implementations/list/#kgateway) and kgateway conformance report per version, such as Gateway API [v1.6.1](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/v1.6/kgateway).
 
