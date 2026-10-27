@@ -89,6 +89,14 @@ Any resource, such as a custom proxy Service or a NetworkPolicy resource, that r
 * **Named port references**: If a NetworkPolicy rule or a Service that you created uses the name `listener-<port>` format to reference proxy port, switch to the port number. With a default-deny NetworkPolicy, a rule that no longer matches blocks traffic to the proxy. The Service that {{< reuse "kgw-docs/snippets/kgateway.md" >}} generates already uses port numbers and is not affected.
 * **`hostNetwork` set in a deployment overlay**: Container ports also act as host ports, which keep two proxies that use the same port off the same node. Without the container ports, the scheduler can place both proxies on one node, and the second proxy fails to bind. To prevent this, add your Gateway's listener ports as container ports in the overlay. For an example, see [Add container ports for hostNetwork]({{< link-hextra path="/setup/customize/configs/#host-network-ports" >}}).
 
+#### Shorter default drain time for listener changes {#v25-drain-time}
+
+The gateway proxy now starts Envoy with `--drain-time-s 60` and `--drain-strategy immediate`. Previously, the proxy used the Envoy defaults of 600 seconds and `gradual`.
+
+When a listener is modified or removed, Envoy now asks the connections on the old listener to close right away, and force-closes the connections that are still open after 60 seconds. Previously, the connections were phased out gradually over 10 minutes. This change frees the memory that the old listener configuration holds much sooner. However, long-lived connections, such as WebSockets or streams, can now be closed after 60 seconds when their listener is modified.
+
+If your clients cannot handle a connection that closes after 60 seconds, you can restore the previous behavior by setting the drain flags in the `envoyContainer.extraArgs` field of your {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}. For an example, see [Change the listener drain behavior]({{< link-hextra path="/setup/customize/configs/#drain-settings" >}}).
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}

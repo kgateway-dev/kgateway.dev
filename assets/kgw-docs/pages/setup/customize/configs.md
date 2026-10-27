@@ -228,6 +228,39 @@ EOF
 ```
 {{< /version >}}
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Change the listener drain behavior {#drain-settings}
+
+When a listener is modified or removed, Envoy drains the connections on the old listener. By default, {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} starts the gateway proxy with `--drain-time-s 60` and `--drain-strategy immediate`. Envoy asks the connections on the old listener to close right away, and force-closes the connections that are still open after 60 seconds.
+
+To change this behavior, set the flags in the `envoyContainer.extraArgs` field. A flag that you set replaces the default. The following example restores the Envoy defaults of 600 seconds and `gradual`, which phases out connections over 10 minutes. If you already use `extraArgs`, add the flags to your list.
+
+```yaml
+kubectl apply -f- <<'EOF'
+apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+metadata:
+  name: gw-params
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+spec:
+  kube:
+    envoyContainer:
+      extraArgs:
+        - --drain-time-s
+        - "600"
+        - --drain-strategy
+        - gradual
+EOF
+```
+
+| Flag | Description |
+| -- | -- |
+| `--drain-time-s` | The time in seconds that Envoy drains connections on a modified or removed listener. Connections that are still open at the end of this time are force-closed. |
+| `--drain-strategy` | How Envoy asks connections to close during the drain time. `immediate` asks all connections to close as soon as the drain starts. `gradual` increases the share of connections that are asked to close until all of them are asked by the end of the drain time. |
+
+For more information, see the [Envoy draining documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/operations/draining) and the [Envoy command line options](https://www.envoyproxy.io/docs/envoy/latest/operations/cli).
+{{< /version >}}
+
 ### Image pull secrets {#image-pull-secrets}
 
 Add image pull secrets to pull container images from private registries with the built-in `podTemplate.imagePullSecrets` field.
