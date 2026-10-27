@@ -178,6 +178,15 @@ The Kubernetes Gateway API dependency is updated to support version 1.7.0-rc.3. 
 
 {{< reuse "kgw-docs/snippets/kgateway.md" >}} 2.5 supports Kubernetes versions 1.33 to 1.37. Support for Kubernetes 1.32 is removed. If your cluster runs Kubernetes 1.32, upgrade the cluster to version 1.33 or later before you upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}}. For the supported versions of other components, see [Supported versions]({{< link-hextra path="/reference/versions/" >}}).
 
+#### Envoy 1.39 {#v25-envoy-139}
+
+The Envoy dependency in {{< reuse "kgw-docs/snippets/kgateway.md" >}} was upgraded to 1.39.x. For all upstream changes, see the [Envoy 1.39 changelog](https://www.envoyproxy.io/docs/envoy/latest/version_history/v1.39/v1.39). The following upstream breaking changes can affect your gateways. {{< reuse "kgw-docs/snippets/kgateway.md" >}} does not expose Envoy runtime guards, so you cannot revert these changes with a setting.
+
+* **TLS client versions**: On listeners that terminate or inspect TLS, such as HTTPS and TLS listeners, the proxy now rejects clients that send a TLS version outside of the range TLS 1.0 to TLS 1.3. Previously, the proxy did not check the client's version at this stage. If you have legacy clients, check the TLS versions that they send before you upgrade.
+* **OpenTelemetry trace sampling**: The OpenTelemetry tracer now honors the sampling decisions that the proxy makes when a request enters, including `clientSampling`, `randomSampling`, and `overallSampling` in the `tracing` section of your ListenerPolicy. Previously, a request that arrived with a sampled `traceparent` header could be exported even when these settings excluded it. After the upgrade, you might see fewer spans. For more information, see [Tracing]({{< link-hextra path="/observability/tracing/" >}}).
+* **Upstream TLS failure reasons**: The proxy no longer includes the reason for an upstream transport failure, such as a TLS certificate validation error, in the response body that it sends to the client. The reason is still available in the access log through the `%UPSTREAM_TRANSPORT_FAILURE_REASON%` command operator. If your clients or tests match on this text in the response body, such as for a Backend that uses a BackendTLSPolicy, update them to match the status code instead.
+* **Multi-value header matching**: A header match now checks each value of a header that is sent in separate header lines, instead of the comma-joined string. For example, a request that sends `x-role: user` and `x-role: admin` as two headers now matches a rule for `admin`, and no longer matches a rule for `user,admin`. A single header line that contains `user,admin` is still matched as one value. This change applies to header matches in HTTPRoutes and to other policies that match on headers.
+
 ### 🌟 New features {#v25-new-features}
 
 #### Control the Host header of mirrored requests {#v25-request-mirror-host}

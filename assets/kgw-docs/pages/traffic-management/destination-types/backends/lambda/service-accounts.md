@@ -335,6 +335,86 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
 
 At this point, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} is routing directly to the `echo` Lambda function using an IRSA!
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+## Assume a different IAM role (optional) {#assume-role}
+
+By default, the gateway proxy signs requests to Lambda with the credentials of its own IRSA. To use a separate, least-privilege role for a Lambda Backend, set `auth.type` to `AssumeRole` instead. The proxy then uses the credentials of its IRSA to call `sts:AssumeRole` for the role that you specify, and signs requests to Lambda with the temporary credentials that AWS returns. You can use a different role for each Backend.
+
+The proxy calls the AWS STS endpoint for the Backend's region, such as `sts.us-east-1.amazonaws.com`. Make sure that the gateway proxy pods can reach this endpoint.
+
+{{< /version >}}
+{{< version include-if="2.4.x" >}}
+> [!NOTE]
+> In 2.4 versions earlier than 2.4.5, the proxy ignores the `assumeRole.roleArn` setting and signs requests with the credentials of its IRSA instead.
+
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+1. Create an IAM role that the gateway proxy IRSA is allowed to assume, and attach the Lambda policy to it. The `lambda-role` in this example is the IRSA that you created earlier.
+   ```sh
+   aws iam create-role \
+     --role-name lambda-invoke-role \
+     --assume-role-policy-document "{
+       \"Version\": \"2012-10-17\",
+       \"Statement\": [{
+         \"Effect\": \"Allow\",
+         \"Principal\": {\"AWS\": \"arn:aws:iam::${AWS_ACCOUNT_ID}:role/lambda-role\"},
+         \"Action\": \"sts:AssumeRole\"
+       }]
+     }"
+
+   aws iam attach-role-policy \
+     --role-name lambda-invoke-role \
+     --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
+
+   export ROLE_ARN=$(aws iam get-role --role-name lambda-invoke-role --query 'Role.Arn' --output text)
+   echo $ROLE_ARN
+   ```
+
+2. Allow the IRSA to assume the new role.
+   ```sh
+   aws iam put-role-policy \
+     --role-name lambda-role \
+     --policy-name assume-lambda-invoke-role \
+     --policy-document "{
+       \"Version\": \"2012-10-17\",
+       \"Statement\": [{
+         \"Effect\": \"Allow\",
+         \"Action\": \"sts:AssumeRole\",
+         \"Resource\": \"${ROLE_ARN}\"
+       }]
+     }"
+   ```
+
+3. Update the `lambda` Backend to assume the role.
+   ```yaml
+   kubectl apply -f - <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: lambda
+     namespace: {{< reuse "/kgw-docs/snippets/namespace.md" >}}
+   spec:
+     type: AWS
+     aws:
+       region: ${AWS_LAMBDA_REGION}
+       accountId: "${AWS_ACCOUNT_ID}"
+       auth:
+         type: AssumeRole
+         assumeRole:
+           roleArn: "${ROLE_ARN}"
+       lambda:
+         functionName: echo
+   EOF
+   ```
+
+   | Field | Description |
+   |---|---|
+   | `auth.type` | The authentication method. Use `AssumeRole` to sign requests with the temporary credentials of another IAM role. If you omit the `auth` field, the proxy signs requests with the credentials of its own IRSA. |
+   | `auth.assumeRole.roleArn` | The ARN of the IAM role to assume. Required when `auth.type` is `AssumeRole`. |
+
+4. Send the same request to the `echo` function as before. The response is the same, because the assumed role has the same Lambda permissions as the IRSA.
+
+{{< /version >}}
 ## Cleanup
 
 {{% reuse "kgw-docs/snippets/cleanup.md" %}}
@@ -349,6 +429,17 @@ At this point, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} is routing directl
 
 2. Use the AWS Lambda console to delete the `echo` test function.
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}### Assumed role (optional)
+
+If you created the `lambda-invoke-role` role, delete it and the inline policy of the IRSA.
+
+```sh
+aws iam delete-role-policy --role-name lambda-role --policy-name assume-lambda-invoke-role
+aws iam detach-role-policy --role-name lambda-invoke-role --policy-arn arn:aws:iam::${AWS_ACCOUNT_ID}:policy/lambda-policy
+aws iam delete-role --role-name lambda-invoke-role
+```
+
+{{< /version >}}
 ### IRSA authorization (optional)
 
 If you no longer need to access Lambda functions from {{< reuse "/kgw-docs/snippets/kgateway.md" >}}:
