@@ -109,6 +109,31 @@
       "old": "https://cloud.google.com/vertex-ai/docs",
       "new": "https://docs.cloud.google.com/gemini-enterprise-agent-platform",
       "reason": "Vertex AI docs landing page moved to the Gemini Enterprise agent platform docs."
+    },
+    {
+      "old": "https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_lambda_filter#configuration-as-a-listener-filter",
+      "new": "https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/aws_lambda_filter",
+      "reason": "The aws_lambda_filter page no longer has a \"Configuration as a listener filter\" section, so the fragment does not resolve. Link to the page instead."
+    },
+    {
+      "old": "applied to HTTP/2 backends.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig)",
+      "new": "applied to HTTP/2 backends.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-msg-config-core-v3-http2protocoloptions)",
+      "reason": "The Http2ProtocolOptions field linked to a TLS SslConfig message that does not exist in Envoy. Link to the Http2ProtocolOptions message. The preceding text keeps this entry from changing the TLS link below."
+    },
+    {
+      "old": "to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-sslconfig)",
+      "new": "to use TLS origination.<br />See [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/transport_sockets/tls/v3/tls.proto#envoy-v3-api-msg-extensions-transport-sockets-tls-v3-upstreamtlscontext)",
+      "reason": "Envoy has no SslConfig message in tls.proto. TLS origination to a backend is configured with UpstreamTlsContext."
+    },
+    {
+      "old": "Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "new": "[Kubernetes names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "reason": "Gateway API status description wraps a bare URL in parentheses, so the link checker includes the closing parenthesis in the fragment (#names%29). Use a Markdown link, as newer versions do."
+    },
+    {
+      "old": "https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html",
+      "new": "https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades",
+      "reason": "Envoy docs dropped the .html suffix; the old URL redirects."
     }
   ]
 }

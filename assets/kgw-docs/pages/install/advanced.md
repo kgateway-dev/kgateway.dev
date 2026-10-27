@@ -100,7 +100,7 @@ discoveryNamespaceSelectors:
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.
 {{< /conditional-text >}}
 
-## Strict validation
+## Resource validation
 
 {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} supports two validation modes for routes and policies in the control plane: `standard` and `strict`. The validation mode controls how the control plane handles invalid configuration before it is sent to Envoy.
 
@@ -110,21 +110,21 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 
 | Mode | Behavior |
 | --- | --- |
-| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. |
+| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. </br></br>The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. The routes keep reporting that they are accepted and programmed, so the resource statuses do not show the problem. To find out when Envoy rejects an update, [monitor NACKs]({{< link-hextra path="/observability/control-plane-metrics/#monitor-nacks" >}}). |
 | `strict` | In addition to the `standard` checks, the control plane validates the generated configuration with Envoy before it sends the configuration to the proxies. Instead of sending invalid configuration, the control plane removes or replaces only the invalid parts, so that Envoy does not NACK the update and valid changes continue to be applied. For more information, see [How strict mode handles invalid configuration](#strict-invalid-configuration). |
 
-`standard` mode is the default and is appropriate for most production environments. `strict` mode is recommended when you cannot tolerate a NACKed xDS update reaching the data plane, for example when one team's invalid route must not block configuration updates for other routes on the same listener.
+> [!NOTE]
+> The `standard` mode is the default resource validation mode and is appropriate for most production environments. Use `strict` mode when you cannot tolerate that a NACKed xDS update reaches the data plane. For example, use `strict` mode when one team's invalid route must not block configuration updates for other routes on the same listener. In exchange, the invalid route itself returns errors until you fix it, instead of continuing to serve its previous configuration. For more information, see [Invalid configuration handling in strict mode](#strict-invalid-configuration).
 
-### How strict mode handles invalid configuration {#strict-invalid-configuration}
+### Invalid configuration handling in strict mode {#strict-invalid-configuration}
 
 Strict mode does not keep a previous version of a route when an update to the route is invalid. The control plane translates the current state of your resources, and handles invalid configuration as follows.
 
 | Invalid configuration | Result | Status |
 | --- | --- | --- |
 | A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
-| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route |
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
-If a virtual host is still invalid after its invalid route rules are removed or replaced, the control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response, and the affected listener reports `Accepted=False` with reason `ListenerReplaced`.{{< /version >}}
+| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+| A virtual host that is still invalid after the control plane removes or replaces its invalid route rules | The control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response. | `Accepted=False` with reason `ListenerReplaced` on the listener |{{< /version >}}
 
 For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
 
@@ -149,7 +149,6 @@ To check which mode is active, inspect the `KGW_VALIDATION_MODE` environment var
 kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment kgateway \
   -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_VALIDATION_MODE")].value}'
 ```
-
 
 ### Transformation policies and strict validation
 
