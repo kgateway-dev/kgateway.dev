@@ -48,55 +48,227 @@ spec:
 
 ## Verify the health check configuration {#verify}
 
-To try out an active health check policy, you can follow these steps to create a BackendConfigPolicy for the httpbin sample app and check the endpoint status in the Envoy service directory.
+To verify an active health check, use an app that has several endpoints, of which only some fail. In the following example, a single Kubernetes service selects the pods of two Deployments. One Deployment runs 1 replica that always returns an `HTTP 503` response. The other Deployment runs 2 replicas that always succeed. The service therefore has three endpoints, and two of them (about 67%) are always healthy. This share is above the default panic threshold of 50%, so the health check can take effect.
 
-1. Create a BackendConfigPolicy resource that configures a health check on the httpbin path `/status/503`. This path always returns a `503 Service Unavailable` HTTP response code, which {{< reuse "/kgw-docs/snippets/kgateway.md" >}} interprets as a failing request.
+> [!NOTE]
+> If most of the endpoints of a Backend fail their health checks, requests can still reach the failing endpoints. When the share of healthy endpoints drops below the panic threshold, which is 50% by default, Envoy enters panic mode. In panic mode, Envoy ignores the health status and sends requests to all endpoints. For example, an active health check does not stop requests to an app that has only one endpoint, even if that endpoint is marked as unhealthy. To change the panic threshold, see [Configure the panic threshold](#panic-threshold). For more information, see the Envoy [panic threshold](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/panic_threshold) documentation.
+
+1. Deploy the sample app. The app uses the [fake-service](https://github.com/nicholasjackson/fake-service) image, which you can configure to return errors. The `health-check-demo-failing` Deployment has 1 replica and an error rate of `1`, so all requests to its pod fail with a `503` response. The `health-check-demo-ok` Deployment has 2 replicas and no errors.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: v1
+   kind: Service
+   metadata:
+     name: health-check-demo
+     namespace: httpbin
+   spec:
+     selector:
+       app: health-check-demo
+     ports:
+     - name: http
+       port: 8000
+       targetPort: 8000
+   ---
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: health-check-demo-failing
+     namespace: httpbin
+   spec:
+     replicas: 1 # One pod that always fails
+     selector:
+       matchLabels:
+         app: health-check-demo
+         variant: failing
+     template:
+       metadata:
+         labels:
+           app: health-check-demo
+           variant: failing
+       spec:
+         containers:
+         - name: app
+           image: nicholasjackson/fake-service:v0.20.0
+           ports:
+           - containerPort: 8000
+           env:
+           - name: LISTEN_ADDR
+             value: "0.0.0.0:8000"
+           - name: NAME
+             value: failing
+           - name: ERROR_RATE
+             value: "1"
+           - name: ERROR_CODE
+             value: "503"
+   ---
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: health-check-demo-ok
+     namespace: httpbin
+   spec:
+     replicas: 2 # Two pods that always succeed
+     selector:
+       matchLabels:
+         app: health-check-demo
+         variant: ok
+     template:
+       metadata:
+         labels:
+           app: health-check-demo
+           variant: ok
+       spec:
+         containers:
+         - name: app
+           image: nicholasjackson/fake-service:v0.20.0
+           ports:
+           - containerPort: 8000
+           env:
+           - name: LISTEN_ADDR
+             value: "0.0.0.0:8000"
+           - name: NAME
+             value: ok
+   EOF
+   ```
+
+2. Create an HTTPRoute that routes requests for the `healthcheck.example` domain to the sample app.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: health-check-demo
+     namespace: httpbin
+   spec:
+     parentRefs:
+     - name: http
+       namespace: {{< reuse "/kgw-docs/snippets/namespace.md" >}}
+     hostnames:
+     - healthcheck.example
+     rules:
+     - backendRefs:
+       - name: health-check-demo
+         port: 8000
+   EOF
+   ```
+
+3. Send 30 requests to the sample app and count the HTTP response codes. Because no health check is configured yet, about one third of the requests reach the failing pod and return a `503` response.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   for i in $(seq 1 30); do curl -s -o /dev/null -w "%{http_code}\n" http://$INGRESS_GW_ADDRESS:8080/ -H "host: healthcheck.example"; done | sort | uniq -c
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   for i in $(seq 1 30); do curl -s -o /dev/null -w "%{http_code}\n" localhost:8080/ -H "host: healthcheck.example"; done | sort | uniq -c
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```console
+     20 200
+     10 503
+   ```
+
+4. Create a BackendConfigPolicy resource that configures an active health check on the root path of the sample app. The failing pod returns a `503` response on this path.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
    kind: BackendConfigPolicy
    metadata:
-     name: httpbin-healthcheck
+     name: health-check-demo
      namespace: httpbin
    spec:
      targetRefs:
-       - name: httpbin
+       - name: health-check-demo
          group: ""
          kind: Service
      healthCheck:
        healthyThreshold: 1
        http:
-         path: /status/503
+         path: /
        interval: 2s
        timeout: 1s
        unhealthyThreshold: 1
    EOF
    ```
 
-2. Check the endpoint in the Envoy service directory.
-   1. Port-forward the `http` gateway deployment on port 19000.
-      ```shell
-      kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
-      ```
-   2. Send an `HTTP GET` request to the `/clusters` endpoint.
-      ```sh
-      curl -X GET 127.0.0.1:19000/clusters
-      ```
-   3. In the output, search for `/failed_active_hc`, which indicates that the Backend failed its active health check. For example, you might see a line such as the following.
-      ```
-      httpbin_httpbin::10.XX.X.XX:8080::health_flags::/failed_active_hc
-      ```
-   4. Stop port-forwarding the `http` deployment.
-      ```sh
-      lsof -ti:19000 | xargs kill -9
-      ```
+5. Check the endpoints in the Envoy service directory. The following command port-forwards the `http` gateway deployment on port 19000, gets the health status of the endpoints of the sample app, and stops the port-forwarding. Only the pod of the failing Deployment is marked with `/failed_active_hc`.
+   ```sh
+   kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
+   sleep 2
+   curl -s 127.0.0.1:19000/clusters | grep health-check-demo | grep health_flags
+   lsof -ti:19000 | xargs kill -9
+   ```
+
+   Example output:
+   ```console
+   kube_httpbin_health-check-demo_8000::10.XX.X.XX:8000::health_flags::healthy
+   kube_httpbin_health-check-demo_8000::10.XX.X.XX:8000::health_flags::/failed_active_hc
+   kube_httpbin_health-check-demo_8000::10.XX.X.XX:8000::health_flags::healthy
+   ```
+
+6. Send the 30 requests again. This time, all requests succeed, because the gateway no longer sends requests to the failing pod.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   for i in $(seq 1 30); do curl -s -o /dev/null -w "%{http_code}\n" http://$INGRESS_GW_ADDRESS:8080/ -H "host: healthcheck.example"; done | sort | uniq -c
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   for i in $(seq 1 30); do curl -s -o /dev/null -w "%{http_code}\n" localhost:8080/ -H "host: healthcheck.example"; done | sort | uniq -c
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```console
+     30 200
+   ```
+
+## Configure the panic threshold {#panic-threshold}
+
+By default, Envoy enters panic mode when fewer than 50% of the endpoints of a Backend are healthy. To change this threshold, set the `loadBalancer.healthyPanicThreshold` field in the BackendConfigPolicy to a percentage between `0` and `100`. When the share of healthy endpoints drops below this percentage, Envoy enters panic mode. You must set this field together with a load balancing algorithm, such as `roundRobin`. For more information about load balancing settings, see [Simple load balancing]({{< link-hextra path="/traffic-management/session-affinity/loadbalancing/" >}}).
+
+The following example sets the panic threshold to `0` for the sample app. This value disables panic mode, so requests are never sent to endpoints that fail their health check. If all endpoints of the Backend are unhealthy, requests to the Backend fail with a `503` response.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: health-check-demo
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: health-check-demo
+      group: ""
+      kind: Service
+  healthCheck:
+    healthyThreshold: 1
+    http:
+      path: /
+    interval: 2s
+    timeout: 1s
+    unhealthyThreshold: 1
+  loadBalancer:
+    roundRobin: {}
+    healthyPanicThreshold: 0
+EOF
+```
 
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
-kubectl delete BackendConfigPolicy httpbin-healthcheck -n httpbin
+kubectl delete BackendConfigPolicy health-check-demo -n httpbin
+kubectl delete HTTPRoute health-check-demo -n httpbin
+kubectl delete Service health-check-demo -n httpbin
+kubectl delete Deployment health-check-demo-failing health-check-demo-ok -n httpbin
 ```
 
 
