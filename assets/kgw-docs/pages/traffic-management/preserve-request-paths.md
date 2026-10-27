@@ -103,10 +103,82 @@ Use a ListenerPolicy to disable path normalization, slash merging, or both, for 
    > [!NOTE]
    > The 301 response comes from httpbin's underlying Werkzeug framework, which has its own, independent path normalization. Httpbin redirects any request with a repeated slash to the canonical single-slash path. This behavior only triggers if httpbin receives the raw, unmerged path with repeated slashes. If Envoy had merged the slashes before proxying the request, httpbin would receive the already-canonical path and return a normal 200 response with no redirect.
 
+## Handle escaped slashes {#escaped-slashes}
+
+Path normalization and slash merging do not change an escaped slash (`%2F`), because RFC 3986 treats `%2F` as data and not as a path separator. As a result, a request for `/anything/a%2Fb` reaches the backend unchanged. This can bypass your rules if the backend decodes `%2F` itself. For example, a route or policy that applies only to the path prefix `/internal/` does not match a request for `/internal%2Fsecret`, but a backend that decodes the path treats this request as `/internal/secret`.
+
+To control how the proxy handles escaped slashes, set the `pathWithEscapedSlashesAction` field in the `httpSettings` of a ListenerPolicy. The field supports the following values.
+
+| Value | Description |
+| --- | --- |
+| `KeepUnchanged` | Forward the request with the escaped slashes unchanged. |
+| `RejectRequest` | Reject the request with a 400 response. |
+| `UnescapeAndRedirect` | Replace each escaped slash with a slash, and send the client a 307 redirect to the new path. |
+| `UnescapeAndForward` | Replace each escaped slash with a slash, and forward the request to the backend with the new path. The routing decision is made on the new path. |
+
+If you do not set the field, Envoy keeps the escaped slashes unchanged, which is the same as `KeepUnchanged`. This default might change in a future version of Envoy.
+
+1. Create a ListenerPolicy that rejects requests with escaped slashes in the path. In `targetRefs`, attach the policy to the Gateway. To use a different action, change the value of `pathWithEscapedSlashesAction`.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: escaped-slashes
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     default:
+       httpSettings:
+         pathWithEscapedSlashesAction: RejectRequest
+   EOF
+   ```
+
+   > [!NOTE]
+   > To combine this setting with `normalizePath` or `mergeSlashes` from the previous section, add the field to the same ListenerPolicy.
+
+2. Send a request with an escaped slash in the path.
+
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/a%2Fb -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/anything/a%2Fb -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```console
+   HTTP/1.1 400 Bad Request
+   ```
+
+3. Change the action to `UnescapeAndRedirect` and send the request again. The proxy responds with a redirect to the path that has the escaped slash replaced.
+
+   ```sh
+   kubectl patch listenerpolicy escaped-slashes -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --type=merge \
+     -p '{"spec":{"default":{"httpSettings":{"pathWithEscapedSlashesAction":"UnescapeAndRedirect"}}}}'
+   ```
+
+   Example output:
+   ```console
+   HTTP/1.1 307 Temporary Redirect
+   location: /anything/a/b
+   ```
+
 ## Cleanup {#cleanup}
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
 kubectl delete listenerpolicy preserve-path-handling -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+kubectl delete listenerpolicy escaped-slashes -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
 ```

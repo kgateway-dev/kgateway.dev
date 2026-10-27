@@ -309,6 +309,22 @@ External auth filters now expose per-request stats that you can reference in acc
 
 You can now configure session persistence, also known as sticky sessions, in the `sessionPersistence` field of a [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/" >}}). The policy pins a client to one instance of a Service or Backend by using a cookie or a header, and applies to the HTTPRoutes and GRPCRoutes that route to it. It replaces session persistence in HTTPRoute rules, which the Gateway API version 1.7 deprecates. If you set both, the BackendConfigPolicy takes precedence. This feature is experimental. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
 
+#### Handle escaped slashes in request paths {#v25-escaped-slashes}
+
+You can now control how the gateway proxy handles escaped slashes (`%2F`) in request paths. In the `httpSettings` of a ListenerPolicy, set `pathWithEscapedSlashesAction` to `KeepUnchanged`, `RejectRequest`, `UnescapeAndRedirect`, or `UnescapeAndForward`. By default, the proxy keeps escaped slashes unchanged. This setting is useful if a backend decodes `%2F` itself and you want to prevent requests from bypassing your path-based rules. For more information, see [Handle escaped slashes]({{< link-hextra path="/traffic-management/preserve-request-paths/#escaped-slashes" >}}).
+
+#### Eject hosts after gateway failures {#v25-consecutive-gateway-failure}
+
+In the `outlierDetection` of a BackendConfigPolicy, you can now set `consecutiveGatewayFailure` to eject a host after consecutive 502, 503, or 504 responses. Other 5xx responses do not count toward this threshold. When you set the field, the proxy always ejects the host after the threshold is reached. For more information, see [Eject hosts after gateway failures]({{< link-hextra path="/resiliency/outlier-detection/#gateway-failure-outlier-detection" >}}).
+
+#### Configure leader election timings {#v25-leader-election-timings}
+
+You can now configure the leader election timings of the controller with the `controller.leaderElection.*` Helm values. For more information, see [Leader election timings]({{< link-hextra path="/install/advanced/#leader-election-timings" >}}).
+
+#### Access logs for TCP and TLS listeners {#v25-tcp-access-log}
+
+The ListenerPolicy now supports access logs for TCP and TLS listeners via the `tcpSettings.accessLog` field. For more information, see [Access logs for TCP and TLS listeners]({{< link-hextra path="/security/access-logging/#tcp-access-log" >}}).
+
 ### 🔄 Feature changes {#v25-feature-changes}
 
 #### Lambda backends set the Host header {#v25-lambda-host-header}

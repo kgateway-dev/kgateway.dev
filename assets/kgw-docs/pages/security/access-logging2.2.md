@@ -565,6 +565,61 @@ If you use an external auth service, you can write the time that the external au
 
 {{< /version >}}
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## Access logs for TCP and TLS listeners {#tcp-access-log}
+
+The `httpSettings.accessLog` field applies to HTTP and HTTPS listeners. To log connections on listeners that serve TCPRoutes or TLSRoutes, set the `tcpSettings.accessLog` field in a ListenerPolicy instead. This field applies to TCP listeners and to TLS listeners in both the `Terminate` and `Passthrough` modes. The proxy writes one log entry for each connection, and not for each request.
+
+1. Set up a TCP listener and a TCPRoute, such as in the [TCP listener]({{< link-hextra path="/setup/listeners/tcp/" >}}) guide.
+
+2. Create a ListenerPolicy that logs each connection to the `stdout` stream of the gateway proxy. In `targetRefs`, select the `tcp-gateway` Gateway from the TCP listener guide. Because TCP connections have no HTTP properties, the format uses only data that is available for TCP, such as the addresses, bytes, and duration of the connection.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: tcp-access-logs
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: tcp-gateway
+     default:
+       tcpSettings:
+         accessLog:
+         - fileSink:
+             path: /dev/stdout
+             jsonFormat:
+               start_time: "%START_TIME%"
+               downstream_remote_address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+               upstream_host: "%UPSTREAM_HOST%"
+               bytes_received: "%BYTES_RECEIVED%"
+               bytes_sent: "%BYTES_SENT%"
+               duration: "%DURATION%"
+               response_flags: "%RESPONSE_FLAGS%"
+   EOF
+   ```
+
+3. Send a TCP request to the gateway, such as in the [verify steps]({{< link-hextra path="/setup/listeners/tcp/#verify-tcp-route" >}}) of the TCP listener guide.
+
+4. Get the logs of the gateway proxy. The proxy writes the log entry when the connection closes.
+   ```sh
+   kubectl logs deploy/tcp-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} | tail -n 1
+   ```
+
+   Example output:
+   ```json
+   {"bytes_received":88,"bytes_sent":147,"downstream_remote_address":"127.0.0.1:49638","duration":1004,"response_flags":"-","start_time":"2026-10-27T20:56:15.708Z","upstream_host":"10.244.0.96:8080"}
+   ```
+
+The `tcpSettings.accessLog` field accepts the same sinks as `httpSettings.accessLog`, such as `fileSink`, `grpcService`, and `openTelemetry`, with the following differences:
+
+* **HTTP-only settings are rejected**: The `statusCodeFilter`, `headerFilter`, `grpcStatusFilter`, and `traceableFilter` filters, and the `additional*ToLog` fields of `grpcService`, apply only to HTTP traffic. If you set them, the ListenerPolicy is not accepted. The status of the policy names the field that is not supported, such as `filter.statusCodeFilter is not supported for TCP access logs`.
+* **gRPC sinks use the TCP gRPC access log service**: The proxy sends the entries to your service with Envoy's TCP gRPC access logger. Make sure that your access log service handles TCP log entries.
+* **Section policies apply only to the listener with settings**: If you target a listener with `sectionName`, the policy reports a status for a TCP or TLS listener only when it sets `tcpSettings` or `transportSocketConnectTimeout`.
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

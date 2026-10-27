@@ -61,6 +61,28 @@ controller:
     KGW_DISABLE_LEADER_ELECTION: "true"
 ```
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Leader election timings {#leader-election-timings}
+
+On clusters with a slow or temporarily unavailable Kubernetes API server, the controller can fail to renew its lease in time. The controller then repeatedly loses and re-acquires leadership. To make the controller more tolerant of a slow API server, increase the leader election timings through the `controller.leaderElection` Helm values.
+
+```yaml
+controller:
+  leaderElection:
+    leaseDuration: 30s
+    renewDeadline: 20s
+    retryPeriod: 5s
+```
+
+| Helm value | Environment variable | Description | Default |
+| -- | -- | -- | -- |
+| `controller.leaderElection.leaseDuration` | `KGW_LEADER_ELECTION_LEASE_DURATION` | The time that controller replicas that are not the leader wait before they try to take over a lease that the leader has not renewed. This value must be greater than `renewDeadline`. | `15s` |
+| `controller.leaderElection.renewDeadline` | `KGW_LEADER_ELECTION_RENEW_DEADLINE` | The time that the leader keeps trying to renew its lease before it stops leading. This value must be greater than `retryPeriod` and less than `leaseDuration`. | `10s` |
+| `controller.leaderElection.retryPeriod` | `KGW_LEADER_ELECTION_RETRY_PERIOD` | The time between attempts to acquire or renew the lease. | `2s` |
+
+
+{{< /version >}}
+
 
 ## Namespace discovery {#namespace-discovery}
 
