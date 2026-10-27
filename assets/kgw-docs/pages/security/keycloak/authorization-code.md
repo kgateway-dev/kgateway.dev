@@ -339,3 +339,9 @@ EOF
 
 > [!IMPORTANT]
 > This manifest replaces the `GatewayExtension` that you created earlier, so it must repeat every field that you want to keep. Omitting `redirectURI` here reverts it to the derived default, which no longer matches the redirect URI registered in Keycloak, and the login fails with `Invalid parameter: redirect_uri`.
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Protect an app that uses WebSockets {#websockets}
+
+If your app uses WebSockets, enable WebSocket upgrades on the gateway listener or on the route. Otherwise, the gateway proxy rejects the WebSocket handshake with an empty `HTTP 403` response before authentication runs. For more information, see [HTTP protocol upgrades]({{< link-hextra path="/traffic-management/http-upgrades/" >}}).
+{{< /version >}}

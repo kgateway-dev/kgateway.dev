@@ -92,6 +92,12 @@ sequenceDiagram
 
 The gateway stores access tokens, ID tokens, and optionally refresh tokens in secure, HTTP-only session cookies. These cookies are managed by the gateway and are not exposed to the user's browser, ensuring that tokens are not accessible to client-side scripts.
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## WebSocket apps {#websockets}
+
+If the app that you protect with OAuth2 uses WebSockets or another HTTP protocol upgrade, enable the upgrade on the gateway listener or on the route. By default, the gateway proxy rejects every upgrade request with an `HTTP 403` response and an empty body, before the request reaches authentication. This `403` response does not mean that authentication failed, and it also affects users who are logged in. For more information, see [HTTP protocol upgrades]({{< link-hextra path="/traffic-management/http-upgrades/" >}}).
+{{< /version >}}
+
 ## Provider independence
 
 Although this documentation uses providers such as Keycloak and Auth0, any standards-compliant OpenID Connect provider can be configured by supplying the appropriate OAuth2 backend configuration.
