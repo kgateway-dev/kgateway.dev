@@ -50,12 +50,14 @@ Specify timeouts for a specific route.
    ```
    {{% /tab %}}
    {{% tab name="Option 2: TrafficPolicy" %}}
+{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
    1.  Install the experimental channel of the Kubernetes Gateway API to use this feature.
        ```sh
        kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
        ```
    
-   2. Create the HTTPRoute with two routes, `/headers` and `/anything`, and add an HTTPRoute rule name to each path. You use the rule name later to apply the timeout to a particular route. 
+{{% /version %}}
+   1. Create the HTTPRoute with two routes, `/headers` and `/anything`, and add an HTTPRoute rule name to each path. You use the rule name later to apply the timeout to a particular route. 
       ```yaml
       kubectl apply -n httpbin -f- <<EOF
       apiVersion: gateway.networking.k8s.io/v1
@@ -94,7 +96,7 @@ Specify timeouts for a specific route.
       EOF
       ```
    
-   3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with your timeout settings and use the `targetRefs.sectionName` to apply the timeout to a specific HTTPRoute rule. In this example, you apply the policy to the `timeout` rule that points to the `/headers` path in your HTTPRoute resource.
+   1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with your timeout settings and use the `targetRefs.sectionName` to apply the timeout to a specific HTTPRoute rule. In this example, you apply the policy to the `timeout` rule that points to the `/headers` path in your HTTPRoute resource.
       ```yaml
       kubectl apply -f- <<EOF
       apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}

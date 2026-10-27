@@ -10,11 +10,7 @@ Set up a TLS listener on the Gateway that terminates incoming TLS traffic and ro
 
 {{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
-Install the experimental channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
-
-```shell
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-```
+Make sure that your cluster has the standard channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version 1.6 or later, which includes TCPRoutes. The Get started guide installs a supported version. You do not need to install the experimental channel to use TCPRoutes.
 
 ## Create a TLS certificate
 
@@ -220,7 +216,7 @@ Create a TCPRoute that routes traffic on port 8443 to the httpbin app.
 {{% tab name="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: TCPRoute
 metadata:
   name: tls-terminate-tcp-route
@@ -242,7 +238,7 @@ EOF
 {{% tab name="ListenerSets" %}}
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: TCPRoute
 metadata:
   name: tls-terminate-tcp-route

@@ -1,3 +1,4 @@
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The following features are experimental in the upstream Kubernetes Gateway API project, and are subject to change.
 
 | Feature | Minimum Gateway API version |
@@ -9,6 +10,15 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | [Retries]({{< link-hextra path="/resiliency/retry/" >}}) | 1.2 |
 | [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 |
 | [HTTPRoute rule attachment option]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-rule" >}}) | 1.3 |
+{{< /version >}}
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+The following feature is experimental in the upstream Kubernetes Gateway API project, and is subject to change. Features that are in the standard channel, such as ListenerSets, TCPRoutes, CORS policies, and retries, do not require the experimental channel.
+
+| Feature | Minimum Gateway API version |
+| --- | --- |
+| [Session persistence in HTTPRoutes]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 |
+{{< /version >}}
 
 {{< version exclude-if="2.0.x,2.1.x" >}}
 > [!NOTE]

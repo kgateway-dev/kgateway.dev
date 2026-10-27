@@ -6,18 +6,11 @@ weight: 10
 
 The following guide deploys a sample TCP echo app, sets up a TCP listener on the gateway, and creates a [TCPRoute](https://gateway-api.sigs.k8s.io/guides/user-guides/tcp/) to the sample app.
 
-> [!WARNING]
-> {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
-
 ## Before you begin
 
 1. Follow the [Get started guide]({{< link-hextra path="/quickstart" >}}) to install {{< reuse "kgw-docs/snippets/kgateway.md" >}}.
 
-2. Install the experimental channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
-
-   ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-   ```
+2. Make sure that your cluster has the standard channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version 1.6 or later, which includes TCPRoutes. The Get started guide installs a supported version. You do not need to install the experimental channel to use TCPRoutes.
 
 3. {{< reuse "kgw-docs/snippets/prereq-listenerset.md" >}}
 
@@ -220,7 +213,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    {{% tab name="Gateway listeners" %}}
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha2
+   apiVersion: gateway.networking.k8s.io/v1
    kind: TCPRoute
    metadata:
      name: tcp-route-echo
@@ -243,7 +236,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    {{% tab name="ListenerSets" %}}
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1alpha2
+   apiVersion: gateway.networking.k8s.io/v1
    kind: TCPRoute
    metadata:
      name: tcp-route-echo

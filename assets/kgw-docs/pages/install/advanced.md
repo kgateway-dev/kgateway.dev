@@ -26,6 +26,7 @@ When using the development build {{< reuse "kgw-docs/versions/patch-dev.md" >}},
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features such as the following:
 
 - TCPRoutes
@@ -34,6 +35,16 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 - CORS policies
 - Retries
 - Session persistence
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features and API versions, such as the following:
+
+- Session persistence in HTTPRoutes
+- The legacy `XListenerSet` resource in the `gateway.networking.x-k8s.io` API group
+- The pre-v1 API versions of TCPRoutes and TLSRoutes, such as `v1alpha2`
+
+Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled.
+{{< /version >}}
 
 {{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 

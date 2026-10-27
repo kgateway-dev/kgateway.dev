@@ -65,7 +65,7 @@ spec:
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
 > [!WARNING]
-> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later{{< /version >}}.
 
 The following example shows a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRefs` field is not set. Because of that, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
@@ -122,8 +122,10 @@ spec:
 
 ### HTTPRoute rule {#attach-to-rule}
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!NOTE]
 > To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
+{{< /version >}}
 
 Instead of using the `extensionRef` filter to apply a policy to a specific route, you can attach a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to an HTTPRoute rule by using the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}'s `targetRefs.sectionName` option. 
 
