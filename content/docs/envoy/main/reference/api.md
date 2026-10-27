@@ -95,6 +95,7 @@ AccessLog represents the top-level access log configuration.
 
 _Appears in:_
 - [HTTPSettings](#httpsettings)
+- [TCPSettings](#tcpsettings)
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
@@ -1878,6 +1879,7 @@ _Appears in:_
 | `generateRequestId` _boolean_ | GenerateRequestId:  Whether the connection manager will generate the x-request-id header if it does not exist.<br />This defaults to true. Generating a random UUID4 is expensive so in high throughput scenarios where this feature is not desired it can be disabled.<br />See here for more information https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-generate-request-id |  |  |
 | `normalizePath` _boolean_ | NormalizePath determines whether the connection manager normalizes the path per RFC 3986 before<br />routing, e.g. collapsing `.` and `..` segments and decoding percent-encoded characters. This<br />defaults to true. Disable this if a backend (e.g. an S3-compatible object store) needs to see<br />the original, unnormalized request path.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-normalize-path |  |  |
 | `mergeSlashes` _boolean_ | MergeSlashes determines whether the connection manager merges adjacent slashes in the request<br />path before routing. This defaults to true. Disable this if a backend (e.g. an S3-compatible<br />object store) relies on repeated slashes in the path having meaning, such as object keys that<br />contain "//".<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-merge-slashes |  |  |
+| `pathWithEscapedSlashesAction` _[PathWithEscapedSlashesAction](#pathwithescapedslashesaction)_ | PathWithEscapedSlashesAction determines how the connection manager handles requests whose<br />path contains escaped slash sequences (%2F, %2f, %5C, %5c). This runs before path<br />normalization and slash merging. If unset, Envoy's implementation specific default applies,<br />which is currently KeepUnchanged: the escaped sequences are passed through to routing as-is,<br />so a request for /foo%2Fbar does not match a /foo/ prefix.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-path-with-escaped-slashes-action |  | Enum: [KeepUnchanged RejectRequest UnescapeAndRedirect UnescapeAndForward] <br /> |
 | `proxy100Continue` _boolean_ | Proxy100Continue determines whether Envoy forwards requests with an<br />Expect: 100-continue header upstream and proxies upstream 100 Continue<br />responses downstream. When unset or false, Envoy handles the response locally. |  |  |
 | `xffNumTrustedHops` _integer_ | XffNumTrustedHops is the number of additional ingress proxy hops from the right side of the X-Forwarded-For HTTP header to trust when determining the origin client's IP address.<br />This is mutually exclusive with XffTrustedCIDRs.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-xff-num-trusted-hops |  | Minimum: 0 <br /> |
 | `xffTrustedCIDRs` _CIDR array_ | XffTrustedCIDRs are ranges of IPs that may appear in the X-Forwarded-For HTTP header and are trusted when determining the origin client's IP address.<br />This is mutually exclusive with XffNumTrustedHops and requires UseRemoteAddress to be set to false.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/http/original_ip_detection/xff/v3/xff.proto#envoy-v3-api-field-extensions-http-original-ip-detection-xff-v3-xffconfig-xff-trusted-cidrs |  | MinItems: 1 <br /> |
@@ -2487,6 +2489,7 @@ _Appears in:_
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | TCPKeepalive configures OS-level TCP keepalive checks for downstream client connections accepted by this listener. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
 | `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPSettings is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
+| `tcpSettings` _[TCPSettings](#tcpsettings)_ | TCPSettings is intended to be used for configuring the Envoy `TcpProxy` network filter that serves<br />TCP listeners and TLS listeners (both Terminate and Passthrough), such as those backing TCPRoutes and TLSRoutes. |  |  |
 | `transportSocketConnectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | TransportSocketConnectTimeout is the timeout for the transport socket to complete after a new connection is accepted.<br />If the timeout fires, the connection is closed. Setting this protects Envoy from clients that open connections and<br />then never complete the TLS handshake. Applied to every filter chain on the listener.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener_components.proto#envoy-v3-api-field-config-listener-v3-filterchain-transport-socket-connect-timeout |  | MaxLength: 32 <br />Type: string <br /> |
 
 
@@ -2508,6 +2511,7 @@ _Appears in:_
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | TCPKeepalive configures OS-level TCP keepalive checks for downstream client connections accepted by this listener. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | PerConnectionBufferLimitBytes sets the per-connection buffer limit for all listeners on the gateway.<br />This controls the maximum size of read and write buffers for new connections.<br />When using Envoy as an edge proxy, configuring the listener buffer limit is important to guard against<br />potential attacks or misconfigured downstreams that could hog the proxy's resources.<br />If unspecified, an implementation-defined default is applied (1MiB).<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener.proto#envoy-v3-api-field-config-listener-v3-listener-per-connection-buffer-limit-bytes |  | Minimum: 0 <br /> |
 | `httpSettings` _[HTTPSettings](#httpsettings)_ | HTTPSettings is intended to be used for configuring the Envoy `HttpConnectionManager` and any other config or policy<br />that should map 1-to-1 with a given HTTP listener, such as the Envoy health check HTTP filter. |  |  |
+| `tcpSettings` _[TCPSettings](#tcpsettings)_ | TCPSettings is intended to be used for configuring the Envoy `TcpProxy` network filter that serves<br />TCP listeners and TLS listeners (both Terminate and Passthrough), such as those backing TCPRoutes and TLSRoutes. |  |  |
 | `transportSocketConnectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | TransportSocketConnectTimeout is the timeout for the transport socket to complete after a new connection is accepted.<br />If the timeout fires, the connection is closed. Setting this protects Envoy from clients that open connections and<br />then never complete the TLS handshake. Applied to every filter chain on the listener.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/listener/v3/listener_components.proto#envoy-v3-api-field-config-listener-v3-filterchain-transport-socket-connect-timeout |  | MaxLength: 32 <br />Type: string <br /> |
 
 
@@ -3074,7 +3078,7 @@ _Appears in:_
 | `forwardAccessToken` _boolean_ | ForwardAccessToken specifies whether to forward the access token to the backend service.<br />If set to true, the token is forwarded over a cookie named BearerToken and is also set in the Authorization header.<br />Defaults to false. |  |  |
 | `scopes` _string array_ | List of OAuth scopes to be claimed in the authentication request.<br />Defaults to "user" scope if not specified.<br />When using OpenID, the "openid" scope must be included.<br />Refer to https://datatracker.ietf.org/doc/html/rfc6749#section-3.3 for more details. |  |  |
 | `credentials` _[OAuth2Credentials](#oauth2credentials)_ | Credentials specifies the Oauth2 client credentials to use for authentication. |  |  |
-| `issuerURI` _string_ | IssuerURI specifies the OpenID provider's issuer URL to discover the OpenID provider's configuration.<br />The Issuer must be a URI RFC 3986 [RFC3986] with a scheme component that must be https, a host component,<br />and optionally, port and path components and no query or fragment components.<br />It discovers the authorizationEndpoint, tokenEndpoint, endSessionEndpoint, and jwksURI if specified in the discovery response.<br />Explicit configuration of these options will take precedence over the discovered values.<br />Refer to https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig for more details.<br />Note that the OpenID provider configuration is cached. It is refreshed periodically in the background, and a failed<br />discovery is retried, so a provider that is unreachable when the configuration is first discovered is picked up once<br />it becomes reachable. Discovery stops once authorizationEndpoint, tokenEndpoint, endSessionEndpoint, and jwksURI<br />(when JWT parsing is configured) are all set explicitly, since none of the discovered values are then used. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?$` <br /> |
+| `issuerURI` _string_ | IssuerURI specifies the OpenID provider's issuer URL to discover the OpenID provider's configuration.<br />The Issuer must be a URI RFC 3986 [RFC3986] with a scheme component that must be https, a host component,<br />and optionally, port and path components and no query or fragment components.<br />It discovers the authorizationEndpoint, tokenEndpoint, endSessionEndpoint, and jwksURI if specified in the discovery response.<br />Explicit configuration of these options will take precedence over the discovered values.<br />Refer to https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig for more details.<br />Note that the OpenID provider configuration is cached. It is refreshed periodically in the background, and a failed<br />discovery is retried, so a provider that is unreachable when the configuration is first discovered is picked up once<br />it becomes reachable. Discovery stops once authorizationEndpoint, tokenEndpoint, endSessionEndpoint, and jwksURI<br />(when JWT parsing is configured) are all set explicitly, since none of the discovered values are then used.<br />Discovery is performed by the control plane and trusts the CA certificates of the BackendTLSPolicy attached to<br />backendRef in addition to the system trust store, so an issuer served under a private or self-signed CA works.<br />The certificate must be valid for the issuer URI's own host. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?$` <br /> |
 | `endSessionEndpoint` _[HttpsUri](#httpsuri)_ | EndSessionEndpoint specifies the URL that redirects a user's browser to in order to initiate a single logout<br />across all applications and the OpenID provider. Users are directed to this endpoint when they access the logout path.<br />This should only be set when the OpenID provider supports RP-Initiated Logout and "openid" is included in the list of scopes.<br />If both IssuerURI and this value are specified, the value discovered from the issuer will *not* be used and this takes precedence.<br />Refer to https://openid.net/specs/openid-connect-rpinitiated-1_0.html#RPLogout for more details. |  | Pattern: `^https://([a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]\{0,61\}[a-zA-Z0-9])?(:[0-9]\{1,5\})?(/[a-zA-Z0-9\-._~!$&'()*+,;=:@%]*)*/?(\?[a-zA-Z0-9\-._~!$&'()*+,;=:@%/?]*)?$` <br /> |
 | `cookies` _[OAuth2CookieConfig](#oauth2cookieconfig)_ | Cookies specifies the configuration for the OAuth2 cookies. |  |  |
 | `jwt` _[OAuth2JWTConfig](#oauth2jwtconfig)_ | JWT specifies the configuration for whether and how to process the retrieved access and ID tokens as JSON Web Token. |  |  |
@@ -3155,6 +3159,26 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `pattern` _string_ | Pattern is the regex pattern that matches the URL path.<br />The pattern must be a valid RE2 regular expression.<br />If the HTTPRoute uses a RegularExpression path match, this field can use capture groups<br />from that match. |  | MaxLength: 1024 <br />MinLength: 1 <br /> |
 | `substitution` _string_ | Substitution is the replacement string for the matched pattern.<br />It can include backreferences to captured groups from the pattern (e.g., \1, \2)<br />or named groups (e.g., \g<name>). |  | MaxLength: 1024 <br />MinLength: 1 <br /> |
+
+
+#### PathWithEscapedSlashesAction
+
+_Underlying type:_ _string_
+
+PathWithEscapedSlashesAction determines how Envoy handles escaped slash sequences
+(%2F, %2f, %5C, %5c) in the request path.
+
+
+
+_Appears in:_
+- [HTTPSettings](#httpsettings)
+
+| Field | Description |
+| --- | --- |
+| `KeepUnchanged` | PathWithEscapedSlashesActionKeepUnchanged keeps the escaped sequences as-is.<br /> |
+| `RejectRequest` | PathWithEscapedSlashesActionRejectRequest rejects the request with a 400 status.<br /> |
+| `UnescapeAndRedirect` | PathWithEscapedSlashesActionUnescapeAndRedirect unescapes the sequences and redirects the<br />client to the resulting path.<br /> |
+| `UnescapeAndForward` | PathWithEscapedSlashesActionUnescapeAndForward unescapes the sequences and forwards the<br />request with the resulting path.<br /> |
 
 
 #### Pod
@@ -4029,6 +4053,23 @@ _Appears in:_
 | `keepAliveProbes` _integer_ | Maximum number of keep-alive probes to send before dropping the connection. |  | Minimum: 0 <br /> |
 | `keepAliveTime` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The number of seconds a connection needs to be idle before keep-alive probes start being sent. |  | MaxLength: 32 <br />Type: string <br /> |
 | `keepAliveInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The number of seconds between keep-alive probes. |  | MaxLength: 32 <br />Type: string <br /> |
+
+
+#### TCPSettings
+
+
+
+TCPSettings configures the Envoy `TcpProxy` network filter.
+
+
+
+_Appears in:_
+- [ListenerConfig](#listenerconfig)
+- [ListenerDefaultConfig](#listenerdefaultconfig)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `accessLog` _[AccessLog](#accesslog) array_ | AccessLog configures per-connection access logging for the `TcpProxy` filter.<br />It accepts the same configuration as httpSettings.accessLog, except for fields that<br />only apply to HTTP traffic: the statusCodeFilter, headerFilter, grpcStatusFilter and<br />traceableFilter filters, and the additional*ToLog fields of grpcService.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/tcp_proxy/v3/tcp_proxy.proto#envoy-v3-api-field-extensions-filters-network-tcp-proxy-v3-tcpproxy-access-log |  | MaxItems: 16 <br /> |
 
 
 #### TLS

@@ -34,9 +34,9 @@ kgateway_validation_valid_total|counter|caller|Total number of successful Envoy 
 kgateway_xds_auth_rq_failure_total|counter||Total number of failed xDS auth requests
 kgateway_xds_auth_rq_success_total|counter||Total number of successful xDS auth requests
 kgateway_xds_auth_rq_total|counter||Total number of xDS auth requests
-kgateway_xds_cluster_scoping_disabled_gateways|gauge|gatewayLabel, namespaceLabel|Gateways with a connected proxy group whose CDS is unscoped because its configuration selects a destination at request time
-kgateway_xds_cluster_scoping_dropped_clusters|gauge|gatewayLabel, namespaceLabel|Most backend clusters withheld from any of a gateway's connected proxy groups because their configuration references none of them
-kgateway_xds_cluster_scoping_transitions_total|counter|gatewayLabel, namespaceLabel, transition|Clusters whose emitted-set change needed a grace window, per proxy group, by transition
+kgateway_xds_scoping_disabled_gateways|gauge|gatewayLabel, namespaceLabel|Gateways with a connected proxy group whose CDS, EDS and backend-owned LDS/SDS resources are unscoped because its configuration selects a destination at request time
+kgateway_xds_scoping_dropped_clusters|gauge|gatewayLabel, namespaceLabel|Most backend clusters withheld from any of a gateway's connected proxy groups because their configuration references none of them
+kgateway_xds_scoping_transitions_total|counter|gatewayLabel, namespaceLabel, transition|Clusters whose emitted-set change needed a grace window, per proxy group, by transition
 kgateway_xds_snapshot_deferred_clients|gauge|gateway, namespace|Connected xDS clients whose snapshot is currently withheld because per-client inputs are not ready
 kgateway_xds_snapshot_resources|gauge|gateway, namespace, resource|Current number of resources in XDS snapshot
 kgateway_xds_snapshot_sync_duration_seconds|histogram|gateway, namespace|Duration of time for a gateway resource update to be synced in an XDS snapshot
