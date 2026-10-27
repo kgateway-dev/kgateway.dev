@@ -240,8 +240,8 @@ metadata:
   namespace: team-secrets
 spec:
   from:
-  - group: gateway.kgateway.dev
-    kind: TrafficPolicy
+  - group: {{< reuse "kgw-docs/snippets/referencegrant-from-policy-group.md" >}}
+    kind: {{< reuse "kgw-docs/snippets/referencegrant-from-policy-kind.md" >}}
     # The namespace that holds the policy.
     namespace: httpbin
   to:
@@ -251,6 +251,12 @@ EOF
 ```
 
 To restrict the grant to a single Secret, add `name` to the `to` entry. When you omit `name`, every Secret in the namespace is allowed.
+
+If a policy reports `missing reference grant`, check the following settings of your ReferenceGrant.
+
+* The ReferenceGrant is in the namespace of the resource that you want to access, such as the namespace of the Secret.
+* The `from` section matches the group, kind, and namespace of the resource that makes the reference. The API server accepts a ReferenceGrant with a group or kind that does not match, but that grant never matches the reference.
+* The `to` section matches the group and kind of the resource that you want to access, and the `name`, if you set one.
 
 ### Enable STRICT mode {#set-referencegrant-mode}
 

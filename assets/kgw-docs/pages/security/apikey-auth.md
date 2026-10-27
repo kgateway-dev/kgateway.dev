@@ -230,14 +230,16 @@ A selector can match several secrets, and each secret can hold several API keys,
 
 ### Secrets in another namespace
 
-The secrets that you refer to in `secretRef`, or match with `secretSelector`, do not need to be in the same namespace as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. A cross-namespace reference requires a [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) in the namespace that holds the secret. In the ReferenceGrant, the `from` section must use the `gateway.kgateway.dev` group and the `TrafficPolicy` kind.{{< version exclude-if="2.2.x" >}} For an example, see [ReferenceGrant example]({{< link-hextra path="/install/advanced/#referencegrant-example" >}}).{{< /version >}}
+The secrets that you refer to in `secretRef`, or match with `secretSelector`, do not need to be in the same namespace as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. A cross-namespace reference requires a [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) in the namespace that holds the secret. In the ReferenceGrant, the `from` section must use the `{{< reuse "kgw-docs/snippets/referencegrant-from-policy-group.md" >}}` group and the `{{< reuse "kgw-docs/snippets/referencegrant-from-policy-kind.md" >}}` kind.{{< version exclude-if="2.2.x" >}} For an example, see [ReferenceGrant example]({{< link-hextra path="/install/advanced/#referencegrant-example" >}}).{{< /version >}}
+
+The API server accepts a ReferenceGrant with a different group or kind, but that grant never matches the policy, so the reference is denied. If a `secretRef` reference is denied, the policy reports `Accepted=False` with the reason `Invalid` and a message such as `API key secret <name>: cannot reference secret <namespace>/<name> : missing reference grant`.
 
 Note the following behavior when you use `secretSelector`:
 
 * The selector matches labels in every namespace, not only the namespace of the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 * A matching secret in another namespace is skipped when no ReferenceGrant allows the reference.
-* Skipped secrets are reported only when no secret is left. If at least one secret is allowed, such as a secret in the same namespace as the policy, the policy is applied with the remaining secrets and no error is reported. As a result, a missing ReferenceGrant can silently reduce the set of API keys that are accepted.
-* The `failed to get secrets by selector: missing reference grant` error means that every matching secret was skipped.
+* {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}Skipped secrets are reported only when no secret is left. {{< /version >}}If at least one secret is allowed, such as a secret in the same namespace as the policy, the policy is applied with the remaining secrets and no error is reported. As a result, a missing ReferenceGrant can silently reduce the set of API keys that are accepted.
+* {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}The `failed to get secrets by selector: missing reference grant` error means that every matching secret was skipped.{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}If every matching secret is skipped, the policy reports `Accepted=False` with the reason `Invalid` and the message `no secrets found matching selector <labels> in namespace <namespace>`. This is the same message as when no secret matches, so it does not show that a matching secret exists in a namespace that did not grant access.{{< /version >}}
 
 ### Custom header name
 
