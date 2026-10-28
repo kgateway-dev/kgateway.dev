@@ -267,7 +267,7 @@ The following steps set the panic threshold to `0` for the sample app. This valu
    sleep 10
    ```
 
-3. Send a request to the sample app. The gateway does not send the request to the failing pod. Instead, the gateway proxy responds with a `503` response and the `no healthy upstream` message. With the default panic threshold, the request reaches the failing pod, and you see the error response of the app instead.
+3. Send a request to the sample app. Because the panic threshold is `0`, the gateway proxy does not fall back to the unhealthy pod. Instead, the proxy itself responds with a `503` response and the `no healthy upstream` message. If you used the default panic threshold, the proxy would enter panic mode and send the request to the failing pod, and you would see the error response of the app instead.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
