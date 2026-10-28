@@ -138,6 +138,69 @@ To set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway 
       2025-03-19T17:32:46.810472Z	info	access	connection complete	src.addr=10.0.71.117:42468 src.workload="http-9db6c8995-l54dw" src.namespace="{{< reuse "kgw-docs/snippets/namespace.md" >}}" src.identity="spiffe://cluster.local/ns/{{< reuse "kgw-docs/snippets/namespace.md" >}}/sa/http" dst.addr=10.0.65.144:15008 dst.hbone_addr=10.0.65.144:8080 dst.service="httpbin.httpbin.svc.cluster.local" dst.workload="httpbin-577649ddb-7nc8p" dst.namespace="httpbin" dst.identity="spiffe://cluster.local/ns/httpbin/sa/httpbin" direction="inbound" bytes_sent=1290 bytes_recv=550 duration="6742ms"
       ```
 
+{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
+## Step 4 (optional): Send ingress traffic through a waypoint {#ingress-use-waypoint}
+
+By default, the gateway proxy sends traffic straight to the pods of a backend, so an Istio waypoint that is attached to the backend does not see ingress traffic. To apply the waypoint's Layer 7 policies and telemetry to ingress traffic too, turn on the ingress-use-waypoint integration and label the backend. The gateway proxy then sends the backend's traffic to the cluster IP of its Service, and the ztunnel passes the traffic through the waypoint.
+
+The gateway proxy uses the waypoint only when all of the following are true:
+
+* The pods of the gateway proxy are in the ambient mesh. You added the {{< reuse "kgw-docs/snippets/namespace.md" >}} namespace in step 3. A gateway proxy outside the mesh keeps sending traffic straight to the pods.
+* The backend has an Istio waypoint, attached with the `istio.io/use-waypoint` label.
+* The Service or ServiceEntry, or its namespace, has the `istio.io/ingress-use-waypoint=true` label.
+* The Service has a cluster IP. A headless Service (`clusterIP: None`) has no cluster IP, so requests to it fail with a `503` response. Do not add the label to a headless Service.
+* For a ServiceEntry, the Istio integration from step 1 is enabled. Without it, ServiceEntries are not used as backends.
+
+1. Get the current Helm values for your {{< reuse "kgw-docs/snippets/kgateway.md" >}} release and save them to a file.
+   ```sh
+   helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > values.yaml
+   ```
+
+2. Turn on the ingress-use-waypoint integration by upgrading the Helm release with the `waypoint.enabled` value. This value is `false` by default. If you do not use Helm, set the `KGW_INGRESS_USE_WAYPOINTS=true` environment variable on the controller instead.
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml \
+     --set waypoint.enabled=true
+   ```
+
+3. Create an Istio waypoint for the `httpbin` namespace, and attach it to the namespace. The `--enroll-namespace` option adds the `istio.io/use-waypoint` label to the namespace.
+   ```sh
+   istioctl waypoint apply -n httpbin --enroll-namespace --wait
+   ```
+
+4. Label the httpbin Service so that the gateway proxy sends its ingress traffic through the waypoint.
+   ```sh
+   kubectl label service httpbin -n httpbin istio.io/ingress-use-waypoint=true
+   ```
+
+5. Send a request to the httpbin app and verify that you get back a `200` HTTP response code.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/headers -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+6. Check the logs of the ztunnel that runs on the same node as the gateway proxy. The request now goes to the waypoint, so the destination of the connection is the waypoint workload instead of the httpbin pod.
+   ```sh
+   kubectl logs <ztunnel-instance> -n istio-system | grep waypoint
+   ```
+
+To stop sending ingress traffic through the waypoint, remove the label.
+
+```sh
+kubectl label service httpbin -n httpbin istio.io/ingress-use-waypoint-
+```
+{{% /version %}}
+
 ## Next
 
 Now that you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as the ingress gateway for your ambient mesh, you can further control and secure ingress traffic with [Policies]({{< link-hextra path="/about/policies/" >}}){{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}, or review [Additional ambient configurations]({{< link-hextra path="/integrations/istio/ambient/additional-settings/" >}}){{< /version >}}.
