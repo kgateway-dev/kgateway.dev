@@ -326,13 +326,19 @@ The following table shows which cross-namespace references are checked in each m
 | ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
 | ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
-| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
+| {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
+| {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
+| {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (same namespace) | allowed | allowed | allowed |
+| {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.<plugin>.extensionRef` | GatewayExtension (different namespace) | checked | allowed | allowed |
 {{% downstream %}}| {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entJWT.<stage>.providers.<name>.jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entWAF.wafServerRef` | Service / Backend | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}† | `spec.entGrpcJsonTranscoder.protoDescriptorConfigMap` | ConfigMap | checked | checked | allowed |
+{{% /downstream %}}
+
+{{% downstream %}}
+\* Fields that the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} inherits from the upstream TrafficPolicy API.
+
+† Fields that are available only in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 {{% /downstream %}}
 
 > [!IMPORTANT]
@@ -355,8 +361,8 @@ metadata:
   namespace: team-secrets
 spec:
   from:
-  - group: {{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}
-    kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+  - group: {{< reuse "kgw-docs/snippets/referencegrant-from-group.md" >}}
+    kind: {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}
     # The namespace that holds the policy.
     namespace: httpbin
   to:
