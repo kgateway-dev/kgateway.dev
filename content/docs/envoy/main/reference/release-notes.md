@@ -292,10 +292,6 @@ The control plane now emits the `kgateway_build_info` metric, so you can see whi
 
 ### 🔄 Feature changes {#v25-feature-changes}
 
-#### Listeners on reserved ports no longer cause deployment errors {#v25-reserved-ports}
-
-If a Gateway or ListenerSet listener uses a reserved port, such as 9091, {{< reuse "kgw-docs/snippets/kgateway.md" >}} rejects the listener and reports the `Invalid` reason in the status, as in earlier versions. Previously, the gateway proxy Deployment also failed to apply with a `duplicate entries for key [containerPort=9091,protocol="TCP"]` error in the logs. Now, the proxy deploys without the reserved port, and the Service does not include it. For the list of reserved ports, see [Reserved ports]({{< link-hextra path="/reference/ports/" >}}).
-
 #### Lambda backends set the Host header {#v25-lambda-host-header}
 
 AWS Lambda backends now send the Lambda endpoint as the upstream `Host` header before the proxy signs the request. Previously, you had to send the `Host` header as part of your request. Now, the `Host` header is automatically generated in the format `lambda.<region>.amazonaws.com`. To use a different endpoint, set the `spec.aws.lambda.endpointURL` field of the Backend. For more information, see [Access AWS Lambda with a service account]({{< link-hextra path="/traffic-management/destination-types/backends/lambda/service-accounts/" >}}).
