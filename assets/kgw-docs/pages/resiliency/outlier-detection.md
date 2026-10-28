@@ -379,7 +379,7 @@ The following table shows the difference between the `consecutive5xx` and `conse
 
 A 502, 503, or 504 response counts toward both fields. If you enable both, the proxy ejects a host when it reaches the first threshold.
 
-In the following steps, a host is one of the two httpbin replicas that you scaled up in step 1 of the first section. The gateway proxy load balances requests across these two hosts. The httpbin `/status/<code>` path returns the status code that you request, so you can use it to simulate an upstream that returns an error or reports that it is unavailable.
+In the following steps, a host is one of the two httpbin replicas that you scaled up in [Set up outlier detection](#set-up-outlier-detection). The gateway proxy load balances requests across these two hosts. The httpbin `/status/<code>` path returns the status code that you request, so you can use it to simulate an upstream that returns an error or reports that it is unavailable.
 
 1. Update the BackendConfigPolicy. The following policy ejects a host for 1 hour after 3 consecutive gateway failures. Because the `consecutive5xx` field is enabled by default, set it to `0` so that only gateway failures eject a host.
    ```yaml
@@ -407,7 +407,7 @@ In the following steps, a host is one of the two httpbin replicas that you scale
 
    | Setting | Description |
    | --- | --- |
-   | `interval`, `baseEjectionTime`, `maxEjectionPercent` | The same settings as in the previous sections. |
+   | `interval`, `baseEjectionTime`, `maxEjectionPercent` | The same settings as in [Set up outlier detection](#set-up-outlier-detection). |
    | `consecutive5xx` | The number of consecutive 5xx responses before a host is ejected. In this example, the value is `0`, so 5xx responses do not eject a host. |
    | `consecutiveGatewayFailure` | The number of consecutive 502, 503, and 504 responses before a host is ejected. In this example, a host is ejected after 3 gateway failures. When you set this field, the proxy always ejects the host after the threshold is reached. If you do not set this field, hosts are not ejected for gateway failures. |
 

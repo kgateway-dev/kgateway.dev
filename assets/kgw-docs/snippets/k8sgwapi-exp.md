@@ -13,11 +13,16 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 {{< /version >}}
 
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
-The following feature is experimental in the upstream Kubernetes Gateway API project, and is subject to change. Features that are in the standard channel, such as ListenerSets, TCPRoutes, CORS policies, and retries, do not require the experimental channel.
+Features that are in the standard channel of the upstream Kubernetes Gateway API project do not require the experimental channel. The following table shows the minimum Gateway API version for the standard channel.
 
-| Feature | Minimum Gateway API version |
+| Feature | Standard channel in Gateway API version |
 | --- | --- |
-| [Session persistence in HTTPRoutes]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 |
+| [ListenerSets]({{< link-hextra path="/setup/listeners/overview/#listenersets" >}}) | 1.5 |
+| [CORS policies]({{< link-hextra path="/security/cors/" >}}) | 1.5 |
+| [TCPRoutes]({{< link-hextra path="/setup/listeners/tcp/" >}}) | 1.6 |
+| [Retries]({{< link-hextra path="/resiliency/retry/" >}}) | 1.7 |
+
+In earlier Gateway API versions, these features require the experimental channel. The `sessionPersistence` field of an HTTPRoute rule is experimental and deprecated. To set up session persistence, use a BackendConfigPolicy instead. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
 {{< /version >}}
 
 {{< version exclude-if="2.0.x,2.1.x" >}}

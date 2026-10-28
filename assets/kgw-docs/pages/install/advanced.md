@@ -39,11 +39,11 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features and API versions, such as the following:
 
-- Session persistence in HTTPRoutes
+- Session persistence in HTTPRoutes, which is deprecated in favor of session persistence in a BackendConfigPolicy
 - The legacy `XListenerSet` resource in the `gateway.networking.x-k8s.io` API group
 - Support for the pre-v1 API versions of TCPRoutes and TLSRoutes, such as `v1alpha2`, in clusters where the Gateway API CRDs do not serve `v1`
 
-Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled.
+Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled. Retries are in the standard channel in Gateway API version 1.7 and later.
 {{< /version >}}
 
 {{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.

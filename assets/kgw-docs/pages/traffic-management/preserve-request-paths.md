@@ -161,12 +161,27 @@ If you do not set the field, Envoy keeps the escaped slashes unchanged, which is
    HTTP/1.1 400 Bad Request
    ```
 
-3. Change the action to `UnescapeAndRedirect` and send the request again. The proxy responds with a redirect to the path that has the escaped slash replaced.
+3. Change the action to `UnescapeAndRedirect`.
 
    ```sh
    kubectl patch listenerpolicy escaped-slashes -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --type=merge \
      -p '{"spec":{"default":{"httpSettings":{"pathWithEscapedSlashesAction":"UnescapeAndRedirect"}}}}'
    ```
+
+4. Send the request with the escaped slash again. The proxy responds with a redirect to the path that has the escaped slash replaced.
+
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/anything/a%2Fb -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/anything/a%2Fb -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
    Example output:
    ```console

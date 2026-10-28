@@ -124,15 +124,15 @@ To try out session persistence, you can follow these steps to define cookie-base
 
 4. Send a request to the httpbin app and verify that you see the `Session-A` cookie in the `set-cookie` header of your response. The `-c` option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
    {{< tabs >}}
-   {{% tab name="LoadBalancer IP address or hostname" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i -c cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+   curl -i -c cookie-jar http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -i -c cookie-jar -k localhost:8080/headers \
+   curl -i -c cookie-jar localhost:8080/headers \
    -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
@@ -144,27 +144,27 @@ To try out session persistence, you can follow these steps to define cookie-base
    access-control-allow-credentials: true
    access-control-allow-origin: *
    content-type: application/json; encoding=utf-8
-   date: Tue, 27 Oct 2026 17:20:40 GMT
-   content-length: 445
+   date: Wed, 28 Oct 2026 02:21:26 GMT
+   content-length: 446
    x-envoy-upstream-service-time: 0
-   set-cookie: Session-A="ChAxMC4yNDQuMC44MDo4MDAwENOKhNcG"; Max-Age=1800; Path=/; HttpOnly
+   set-cookie: Session-A="Cg8xMC4yNDQuMC4zOjgwODAQrsaF1wY="; Max-Age=1800; Path=/; HttpOnly
    server: envoy
    ...
    ```
 
 5. Repeat the request a few more times. Include the cookie that you stored in the local file by using the `-b` option. Make sure to send these requests within the 30 minute cookie validity period.
    {{< tabs >}}
-   {{% tab name="LoadBalancer IP address or hostname" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..10}; do
-   curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+   curl -i -b cookie-jar http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
-   curl -i -b cookie-jar -k localhost:8080/headers \
+   curl -i -b cookie-jar localhost:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
    {{% /tab %}}
@@ -175,14 +175,13 @@ To try out session persistence, you can follow these steps to define cookie-base
    kubectl logs -n httpbin <httpbin-pod>
    ```
 
-   Example output for one pod, in which all 10 subsequent requests (timestamps at `17:20`) are served after the previous 1 request (timestamp at `17:17`):
+   Example output for one pod, in which the first request (timestamp at `02:21:26`) and all 10 subsequent requests (timestamps at `02:21:27`) are served by the same instance:
    ```
-   Defaulted container "httpbin" out of: httpbin, curl
-   go-httpbin listening on http://0.0.0.0:8080
-   time="2026-10-27T17:17:09.8479" status=200 method="GET" uri="/headers" size_bytes=440 duration_ms=0.10 user_agent="curl/8.7.1" client_ip=10.244.0.7
-   time="2026-10-27T17:20:32.1077" status=200 method="GET" uri="/headers" size_bytes=445 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
-   time="2026-10-27T17:20:40.7017" status=200 method="GET" uri="/headers" size_bytes=445 duration_ms=0.05 user_agent="curl/8.7.1" client_ip=10.244.0.7
-   time="2026-10-27T17:20:49.5744" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
+   ...
+   time="2026-10-28T02:21:26.3729" status=200 method="GET" uri="/headers" size_bytes=446 duration_ms=0.03 user_agent="curl/8.7.1" client_ip=10.244.0.87
+   time="2026-10-28T02:21:27.4003" status=200 method="GET" uri="/headers" size_bytes=528 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.87
+   time="2026-10-28T02:21:27.4155" status=200 method="GET" uri="/headers" size_bytes=528 duration_ms=0.02 user_agent="curl/8.7.1" client_ip=10.244.0.87
+   time="2026-10-28T02:21:27.428" status=200 method="GET" uri="/headers" size_bytes=528 duration_ms=0.01 user_agent="curl/8.7.1" client_ip=10.244.0.87
    ...
    ```
 
@@ -193,7 +192,7 @@ To try out session persistence, you can follow these steps to define cookie-base
       ```
    2. Verify that the gateway proxy pod is running.
       ```sh
-      kubectl get po -n kgateway-system -l gateway.networking.k8s.io/gateway-name=http
+      kubectl get po -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -l gateway.networking.k8s.io/gateway-name=http
       ```
       Example output:
       ```
@@ -216,17 +215,17 @@ To try out session persistence, you can follow these steps to define cookie-base
       {{< /tabs >}}
    4. Repeat the same request with the session cookie. Make sure to send this request within the 30 minute cookie validity period.
       {{< tabs >}}
-      {{% tab name="LoadBalancer IP address or hostname" %}}
+      {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    for i in {1..10}; do
-   curl -i -b cookie-jar -k http://$INGRESS_GW_ADDRESS:8080/headers \
+   curl -i -b cookie-jar http://$INGRESS_GW_ADDRESS:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
       {{% /tab %}}
       {{% tab name="Port-forward for local testing" %}}
    ```sh
    for i in {1..10}; do
-   curl -i -b cookie-jar -k localhost:8080/headers \
+   curl -i -b cookie-jar localhost:8080/headers \
    -H "host: www.example.com:8080"; done
    ```
       {{% /tab %}}
@@ -236,14 +235,13 @@ To try out session persistence, you can follow these steps to define cookie-base
       kubectl logs -n httpbin <httpbin-pod>
       ```
 
-      Example output for one pod, in which all 10 new requests (timestamps at `17:24`) are served after the previous 10 requests (timestamps at `17:20`):
+      Example output for one pod, in which all 10 new requests (timestamps at `02:22:54`) are served after the previous requests (timestamps at `02:21:27`):
       ```
       ...
-      time="2026-10-27T17:20:40.7017" status=200 method="GET" uri="/headers" size_bytes=445 duration_ms=0.05 user_agent="curl/8.7.1" client_ip=10.244.0.7
-      time="2026-10-27T17:20:41.5744" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
-      time="2026-10-27T17:24:06.5744" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
-      time="2026-10-27T17:24:06.6013" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.7
-      time="2026-10-27T17:24:06.631" status=200 method="GET" uri="/headers" size_bytes=515 duration_ms=0.03 user_agent="curl/8.7.1" client_ip=10.244.0.7
+      time="2026-10-28T02:21:27.5063" status=200 method="GET" uri="/headers" size_bytes=528 duration_ms=0.01 user_agent="curl/8.7.1" client_ip=10.244.0.87
+      time="2026-10-28T02:22:54.33" status=200 method="GET" uri="/headers" size_bytes=529 duration_ms=0.12 user_agent="curl/8.7.1" client_ip=10.244.0.87
+      time="2026-10-28T02:22:54.3502" status=200 method="GET" uri="/headers" size_bytes=529 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.87
+      time="2026-10-28T02:22:54.3639" status=200 method="GET" uri="/headers" size_bytes=529 duration_ms=0.04 user_agent="curl/8.7.1" client_ip=10.244.0.87
       ...
       ```
 

@@ -195,10 +195,10 @@ To verify an active health check, use an app that has several endpoints, of whic
    EOF
    ```
 
-5. Check the endpoints in the Envoy service directory. The following command port-forwards the `http` gateway deployment on port 19000, gets the health status of the endpoints of the sample app, and stops the port-forwarding. Only the pod of the failing Deployment is marked with `/failed_active_hc`.
+5. Check the endpoints in the Envoy service directory. The following command port-forwards the `http` gateway deployment on port 19000, waits for the health check to run, gets the health status of the endpoints of the sample app, and stops the port-forwarding. Only the pod of the failing Deployment is marked with `/failed_active_hc`.
    ```sh
    kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
-   sleep 2
+   sleep 5
    curl -s 127.0.0.1:19000/clusters | grep health-check-demo | grep health_flags
    lsof -ti:19000 | xargs kill -9
    ```
@@ -233,32 +233,65 @@ To verify an active health check, use an app that has several endpoints, of whic
 
 By default, Envoy enters panic mode when fewer than 50% of the endpoints of a Backend are healthy. To change this threshold, set the `loadBalancer.healthyPanicThreshold` field in the BackendConfigPolicy to a percentage between `0` and `100`. When the share of healthy endpoints drops below this percentage, Envoy enters panic mode. You must set this field together with a load balancing algorithm, such as `roundRobin`. For more information about load balancing settings, see [Simple load balancing]({{< link-hextra path="/traffic-management/session-affinity/loadbalancing/" >}}).
 
-The following example sets the panic threshold to `0` for the sample app. This value disables panic mode, so requests are never sent to endpoints that fail their health check. If all endpoints of the Backend are unhealthy, requests to the Backend fail with a `503` response.
+The following steps set the panic threshold to `0` for the sample app. This value disables panic mode, so requests are never sent to endpoints that fail their health check. If all endpoints of the Backend are unhealthy, requests to the Backend fail with a `503` response.
 
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: BackendConfigPolicy
-metadata:
-  name: health-check-demo
-  namespace: httpbin
-spec:
-  targetRefs:
-    - name: health-check-demo
-      group: ""
-      kind: Service
-  healthCheck:
-    healthyThreshold: 1
-    http:
-      path: /
-    interval: 2s
-    timeout: 1s
-    unhealthyThreshold: 1
-  loadBalancer:
-    roundRobin: {}
-    healthyPanicThreshold: 0
-EOF
-```
+1. Update the BackendConfigPolicy to set the panic threshold to `0`.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: BackendConfigPolicy
+   metadata:
+     name: health-check-demo
+     namespace: httpbin
+   spec:
+     targetRefs:
+       - name: health-check-demo
+         group: ""
+         kind: Service
+     healthCheck:
+       healthyThreshold: 1
+       http:
+         path: /
+       interval: 2s
+       timeout: 1s
+       unhealthyThreshold: 1
+     loadBalancer:
+       roundRobin: {}
+       healthyPanicThreshold: 0
+   EOF
+   ```
+
+2. Scale the Deployment of the healthy pods down to 0, so that the only remaining endpoint is the failing pod. Wait a few seconds for the health check to mark the endpoint as unhealthy.
+   ```sh
+   kubectl scale deployment health-check-demo-ok -n httpbin --replicas=0
+   sleep 10
+   ```
+
+3. Send a request to the sample app. The gateway does not send the request to the failing pod. Instead, the gateway proxy responds with a `503` response and the `no healthy upstream` message. With the default panic threshold, the request reaches the failing pod, and you see the error response of the app instead.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -i http://$INGRESS_GW_ADDRESS:8080/ -H "host: healthcheck.example"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -i localhost:8080/ -H "host: healthcheck.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```console
+   HTTP/1.1 503 Service Unavailable
+   ...
+   no healthy upstream
+   ```
+
+4. Scale the Deployment of the healthy pods back up.
+   ```sh
+   kubectl scale deployment health-check-demo-ok -n httpbin --replicas=2
+   ```
 
 ## Cleanup
 
