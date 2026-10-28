@@ -148,6 +148,12 @@ If you build on kgateway as a Go library, the following functions are also remov
 * `metrics.StartResourceStatusSync`
 * `metrics.EndResourceStatusSync`
 
+#### Gateway API 1.7.0 updates route, listener, and backend TLS behavior {#v25-gateway-api-1-7-0-updates-route-listener-and-backend-tls-behavior}
+
+{{< reuse "kgw-docs/snippets/kgateway.md" >}} now uses Gateway API 1.7.0. Before upgrading the Gateway API custom resources, migrate HTTPRoute session persistence from `sessionName` and `cookieConfig` to `cookie.name`, `cookie.lifetimeType`, and `header.name`. Set `cookie.lifetimeType: Permanent` when `absoluteTimeout` must set the cookie `Max-Age`.
+
+HTTPRoute `retry` no longer requires experimental features, BackendTLSPolicy backends without `appProtocol` negotiate HTTP/2 or HTTP/1.1 through ALPN, Terminate and Passthrough TLS listeners can share a port without experimental features, waypoint AuthorizationPolicy method matches are case-insensitive, and Kubernetes 1.33 is now the minimum supported Kubernetes version. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}), [Retries]({{< link-hextra path="/resiliency/retry/retry/" >}}), [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}), and [Waypoint]({{< link-hextra path="/integrations/istio/ambient/waypoint/" >}}).
+
 ### 🌟 New features {#v25-new-features}
 
 #### Preserve request paths {#v25-preserve-request-paths}

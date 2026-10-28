@@ -736,7 +736,7 @@ Use {{< reuse "/kgw-docs/snippets/kgateway.md" >}}'s {{< reuse "/kgw-docs/snippe
 
 ### Istio AuthorizationPolicy
 
-Apply an Istio AuthorizationPolicy to allow access from specific apps only. 
+Apply an Istio AuthorizationPolicy to allow access from specific apps only. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}HTTP method matching is case-insensitive. This policy denies `GET` and `get` requests.{{< /version >}}
 
 1. Send a `GET` request from the client to the httpbin2 app. Verify that your request succeeds. 
    ```sh
