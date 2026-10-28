@@ -1,7 +1,10 @@
 Ensure that traffic from a client is always routed to the same backend instance for the duration of a session.
 
 > [!WARNING]
-> Session persistence in the BackendConfigPolicy is experimental and subject to breaking changes.
+> Session persistence is experimental.
+>
+> * **BackendConfigPolicy**: The `sessionPersistence` field is an experimental {{< reuse "/kgw-docs/snippets/kgateway.md" >}} API and is subject to breaking changes. The field does not require the experimental channel of the Kubernetes Gateway API.
+> * **HTTPRoute**: The `sessionPersistence` field is part of the experimental channel of the Kubernetes Gateway API, which deprecates the field in version 1.7.
 
 ## About
 
@@ -13,10 +16,13 @@ In session persistence, a client directly provides information, such as a header
 
 **Header**: When you use header-based persistence, a client sends a request to your app, and receives an HTTP response header. The client then reuses that value in the same header in subsequent HTTP requests. The gateway proxy uses this header to maintain a persistent connection to a single backend instance on behalf of the client.
 
-You configure session persistence in the `sessionPersistence` field of a [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/" >}}) that targets a Service or a Backend. The policy applies to the HTTPRoutes and GRPCRoutes that route to the backend. It has no effect on TCPRoutes or TLSRoutes. If a route splits traffic between backends, the policy pins a client only to an instance of the backend that the split selects.
+You can configure session persistence in one of the following ways.
+
+* **HTTPRoute**: Set the `sessionPersistence` field of an HTTPRoute rule. The settings apply to the requests that the rule matches.
+* **BackendConfigPolicy**: Set the `sessionPersistence` field of a [BackendConfigPolicy]({{< link-hextra path="/about/policies/backendconfigpolicy/" >}}) that targets a Service or a Backend. The policy applies to the HTTPRoutes and GRPCRoutes that route to the backend. It has no effect on TCPRoutes or TLSRoutes. If a route splits traffic between backends, the policy pins a client only to an instance of the backend that the split selects.
 
 > [!NOTE]
-> The Kubernetes Gateway API version 1.7 deprecates the `sessionPersistence` field of an HTTPRoute rule in favor of session persistence on the backend. Use the BackendConfigPolicy instead. If a backend has a BackendConfigPolicy with session persistence, the policy takes precedence over the `sessionPersistence` field of a route rule, and the route reports the `SessionPersistenceOverridden` reason on its `kgateway.dev/Programmed` condition.
+> The Kubernetes Gateway API version 1.7 deprecates the `sessionPersistence` field of an HTTPRoute rule in favor of session persistence on the backend. The field still works in this version. If a backend has a BackendConfigPolicy with session persistence, the policy takes precedence over the `sessionPersistence` field of a route rule, and the route reports the `SessionPersistenceOverridden` reason on its `kgateway.dev/Programmed` condition.
 
 ### Session persistence versus session affinity
 
@@ -32,7 +38,76 @@ For more information about session persistence, see the [Kubernetes Gateway API 
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
+The requirements depend on the option that you use.
+
+* **HTTPRoute**: Install the experimental channel of the Kubernetes Gateway API, because the `sessionPersistence` field of an HTTPRoute is not part of the standard channel. {{< reuse "/kgw-docs/snippets/kgateway.md" >}} ignores the field if you disable experimental Gateway API features. For more information, see [Experimental Gateway API features]({{< link-hextra path="/install/advanced/#experimental-gateway-api-features" >}}).
+
+  ```sh
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+  ```
+
+* **BackendConfigPolicy**: You do not need the experimental channel of the Kubernetes Gateway API. The option also works if you disable experimental Gateway API features.
+
 ## Configure session persistence
+
+{{< tabs >}}
+{{% tab name="HTTPRoute" %}}
+
+Define session persistence based on either a cookie or a header in the `sessionPersistence` section of an HTTPRoute rule. The following example defines cookie-based session persistence for requests to `/path-A`, and header-based session persistence for requests to `/path-B`.
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: example-route
+  namespace: default
+spec:
+  parentRefs:
+    - name: example-gateway
+      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /path-A
+      backendRefs:
+        - name: backend
+          port: 3000
+      sessionPersistence:
+        type: Cookie
+        absoluteTimeout: 10s
+        cookie:
+          name: Session-A
+          lifetimeType: Permanent
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /path-B
+      backendRefs:
+        - name: backend
+          port: 3000
+      sessionPersistence:
+        type: Header
+        header:
+          name: Session-B
+```
+
+{{< reuse "/kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+| -- | -- |
+| `type` | The request property, either `Header` or `Cookie`, to base session persistence on. Defaults to `Cookie`. |
+| `cookie.name` | The name of the cookie that the proxy sends in response to the client and that the client reuses in subsequent requests. If you do not set a name, the cookie is named `sessionPersistence`. To prevent unpredictable behavior or rejection, do not reuse cookie names. |
+| `cookie.path` | The `Path` attribute of the cookie. Defaults to `/`. |
+| `cookie.lifetimeType` | Whether the cookie has a `Permanent` or a `Session`-based lifetime. A permanent cookie persists until its expiry time, while a session cookie is deleted when the current session ends. Defaults to `Session`. When set to `Permanent`, `absoluteTimeout` is required. |
+| `header.name` | The name of the header that the proxy sends in response to the client. The client must include this header in subsequent requests to maintain the session. Required if the `type` is `Header`. |
+| `absoluteTimeout` | The absolute timeout of the persistent session. Once the duration has elapsed, the session becomes invalid. Only cookies with the `Permanent` lifetime support this field. For session cookies and headers, the field has no effect. |
+
+> [!NOTE]
+> You must set the `cookie` field if the `type` is `Cookie`, and the `header` field if the `type` is `Header`. The `sessionName`, `cookieConfig`, and `idleTimeout` fields are not available in the Kubernetes Gateway API version 1.7.
+
+{{% /tab %}}
+{{% tab name="BackendConfigPolicy" %}}
 
 Define session persistence based on either a cookie or a header in the `sessionPersistence` section of a BackendConfigPolicy. The following example defines cookie-based session persistence for the `httpbin` service.
 
@@ -79,6 +154,9 @@ To use a header instead, set the `type` to `Header` and the name of the header.
 > [!NOTE]
 > If you set an `absoluteTimeout` that has no effect, the BackendConfigPolicy is still accepted, but its `Accepted` condition has the `PartiallyValid` reason and the following message: `spec.sessionPersistence.absoluteTimeout only has an effect for Cookie sessions with spec.sessionPersistence.cookie.lifetimeType Permanent`. Session persistence has no effect on Backends of the dynamic forward proxy type, and the policy reports this in the same way.
 
+{{% /tab %}}
+{{< /tabs >}}
+
 ## Verify the session persistence configuration {#verify}
 
 To try out session persistence, you can follow these steps to define cookie-based session persistence for the httpbin sample app.
@@ -100,7 +178,38 @@ To try out session persistence, you can follow these steps to define cookie-base
    httpbin-8d557795f-h8ks9   3/3     Running       0          26m
    ```
 
-3. Create a BackendConfigPolicy for the httpbin service with the following `sessionPersistence` section. These settings instruct the gateway proxy to create a persistent session cookie called `Session-A` for any new client connections to the httpbin app. Each created session has an absolute timeout of 30 minutes, and the cookie persists for that time.
+3. Configure session persistence for the httpbin app. These settings instruct the gateway proxy to create a persistent session cookie called `Session-A` for any new client connections to the httpbin app. Each created session has an absolute timeout of 30 minutes, and the cookie persists for that time.
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
+   Modify the sample HTTPRoute resource for the httpbin app to add the `sessionPersistence` section.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+         sessionPersistence:
+           type: Cookie
+           absoluteTimeout: 30m
+           cookie:
+             name: Session-A
+             lifetimeType: Permanent
+   EOF
+   ```
+   {{% /tab %}}
+   {{% tab name="BackendConfigPolicy" %}}
+   Create a BackendConfigPolicy for the httpbin service with the `sessionPersistence` section.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -121,6 +230,8 @@ To try out session persistence, you can follow these steps to define cookie-base
          lifetimeType: Permanent
    EOF
    ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
 4. Send a request to the httpbin app and verify that you see the `Session-A` cookie in the `set-cookie` header of your response. The `-c` option stores the cookie in a local file on your machine so that you can use it in subsequent requests.
    {{< tabs >}}
@@ -254,7 +365,34 @@ To try out session persistence, you can follow these steps to define cookie-base
    kubectl scale deployment httpbin -n httpbin --replicas=1
    ```
 
-2. Delete the BackendConfigPolicy.
+2. Remove the session persistence configuration.
+   {{< tabs >}}
+   {{% tab name="HTTPRoute" %}}
+   Remove the session persistence settings from the httpbin HTTPRoute.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     name: httpbin
+     namespace: httpbin
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+     hostnames:
+       - "www.example.com"
+     rules:
+       - backendRefs:
+           - name: httpbin
+             port: 8000
+   EOF
+   ```
+   {{% /tab %}}
+   {{% tab name="BackendConfigPolicy" %}}
+   Delete the BackendConfigPolicy.
    ```sh
    kubectl delete backendconfigpolicy session-persistence -n httpbin
    ```
+   {{% /tab %}}
+   {{< /tabs >}}

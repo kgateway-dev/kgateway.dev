@@ -10,7 +10,14 @@ Set up a TLS listener on the Gateway that terminates incoming TLS traffic and ro
 
 {{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
-Make sure that your cluster has the standard channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version 1.6 or later, which includes TCPRoutes. The Get started guide installs a supported version. You do not need to install the experimental channel to use TCPRoutes.
+Make sure that your cluster has the standard channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version 1.6 or later, which includes TCPRoutes. The Get started guide installs a supported version.
+
+> [!NOTE]
+> TCPRoutes are part of the standard channel in Gateway API version 1.6 and later. If your cluster runs Gateway API version 1.5, install the experimental channel instead of the standard channel, and use `gateway.networking.k8s.io/v1alpha2` as the `apiVersion` of your TCPRoutes. The following example installs version 1.5.1.
+>
+> ```sh
+> kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
+> ```
 
 ## Create a TLS certificate
 

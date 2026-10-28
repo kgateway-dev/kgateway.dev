@@ -103,6 +103,7 @@ Use a ListenerPolicy to disable path normalization, slash merging, or both, for 
    > [!NOTE]
    > The 301 response comes from httpbin's underlying Werkzeug framework, which has its own, independent path normalization. Httpbin redirects any request with a repeated slash to the canonical single-slash path. This behavior only triggers if httpbin receives the raw, unmerged path with repeated slashes. If Envoy had merged the slashes before proxying the request, httpbin would receive the already-canonical path and return a normal 200 response with no redirect.
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Handle escaped slashes {#escaped-slashes}
 
 Path normalization and slash merging do not change an escaped slash (`%2F`), because RFC 3986 treats `%2F` as data and not as a path separator. As a result, a request for `/anything/a%2Fb` reaches the backend unchanged. This can bypass your rules if the backend decodes `%2F` itself. For example, a route or policy that applies only to the path prefix `/internal/` does not match a request for `/internal%2Fsecret`, but a backend that decodes the path treats this request as `/internal/secret`.
@@ -188,6 +189,7 @@ If you do not set the field, Envoy keeps the escaped slashes unchanged, which is
    HTTP/1.1 307 Temporary Redirect
    location: /anything/a/b
    ```
+{{< /version >}}
 
 ## Cleanup {#cleanup}
 
@@ -195,5 +197,5 @@ If you do not set the field, Envoy keeps the escaped slashes unchanged, which is
 
 ```sh
 kubectl delete listenerpolicy preserve-path-handling -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
-kubectl delete listenerpolicy escaped-slashes -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}kubectl delete listenerpolicy escaped-slashes -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found{{< /version >}}
 ```
