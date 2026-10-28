@@ -1,3 +1,4 @@
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The following features are experimental in the upstream Kubernetes Gateway API project, and are subject to change.
 
 | Feature | Minimum Gateway API version |
@@ -9,6 +10,20 @@ The following features are experimental in the upstream Kubernetes Gateway API p
 | [Retries]({{< link-hextra path="/resiliency/retry/" >}}) | 1.2 |
 | [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence" >}}) | 1.3 |
 | [HTTPRoute rule attachment option]({{< link-hextra path="/about/policies/trafficpolicy/#attach-to-rule" >}}) | 1.3 |
+{{< /version >}}
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+Features that are in the standard channel of the upstream Kubernetes Gateway API project do not require the experimental channel. The following table shows the minimum Gateway API version for the standard channel.
+
+| Feature | Standard channel in Gateway API version |
+| --- | --- |
+| [ListenerSets]({{< link-hextra path="/setup/listeners/overview/#listenersets" >}}) | 1.5 |
+| [CORS policies]({{< link-hextra path="/security/cors/" >}}) | 1.5 |
+| [TCPRoutes]({{< link-hextra path="/setup/listeners/tcp/" >}}) | 1.6 |
+| [Retries]({{< link-hextra path="/resiliency/retry/" >}}) | 1.7 |
+
+In earlier Gateway API versions, these features require the experimental channel. The `sessionPersistence` field of an HTTPRoute rule is experimental and deprecated. To set up session persistence, use a BackendConfigPolicy instead. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
+{{< /version >}}
 
 {{< version exclude-if="2.0.x,2.1.x" >}}
 > [!NOTE]

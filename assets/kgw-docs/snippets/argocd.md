@@ -16,7 +16,7 @@
    
    {{< version exclude-if="2.0.x,2.1.x" >}}
    > [!NOTE]
-   > If you need to use an experimental feature such as TCPRoutes, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/feature-maturity/#experimental-features).
+   > If you need to use an experimental feature{{< version exclude-if="2.5.x" >}} such as TCPRoutes{{< /version >}}, install the experimental CRDs. For more information, see [Experimental features in Gateway API](../../reference/feature-maturity/#experimental-features).
    {{< /version >}}
    
 2. Port-forward the Argo CD server on port 9999.

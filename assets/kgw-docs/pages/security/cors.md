@@ -1,7 +1,9 @@
 Enforce client-site access controls with cross-origin resource sharing (CORS).
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
+{{< /version >}}
 
 ## About CORS
 
@@ -31,7 +33,12 @@ You can configure the CORS policy at two levels:
 
 ## Before you begin
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< reuse "kgw-docs/snippets/prereq.md" >}}
+{{< /version >}}
 
 ## Set up CORS policies
 

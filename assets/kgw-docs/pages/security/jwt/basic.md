@@ -736,7 +736,7 @@ Expected output:
 Jwt is missing
 ```
 
-**2. Disable JWT with the TrafficPolicy:**
+**2. Disable JWT with the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}:**
 
 ```yaml
 kubectl apply -f- <<EOF

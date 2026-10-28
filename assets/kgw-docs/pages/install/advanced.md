@@ -26,6 +26,7 @@ When using the development build {{< reuse "kgw-docs/versions/patch-dev.md" >}},
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features such as the following:
 
 - TCPRoutes
@@ -34,6 +35,16 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 - CORS policies
 - Retries
 - Session persistence
+{{< /version >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features and API versions, such as the following:
+
+- Session persistence in HTTPRoutes, which is deprecated in favor of session persistence in a BackendConfigPolicy
+- The legacy `XListenerSet` resource in the `gateway.networking.x-k8s.io` API group
+- Support for the pre-v1 API versions of TCPRoutes and TLSRoutes, such as `v1alpha2`, in clusters where the Gateway API CRDs do not serve `v1`
+
+Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled. Retries are in the standard channel in Gateway API version 1.7 and later.
+{{< /version >}}
 
 {{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 
@@ -60,6 +71,28 @@ controller:
   extraEnv:
     KGW_DISABLE_LEADER_ELECTION: "true"
 ```
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+### Leader election timings {#leader-election-timings}
+
+On clusters with a slow or temporarily unavailable Kubernetes API server, the controller can fail to renew its lease in time. The controller then repeatedly loses and re-acquires leadership. To make the controller more tolerant of a slow API server, increase the leader election timings through the `controller.leaderElection` Helm values.
+
+```yaml
+controller:
+  leaderElection:
+    leaseDuration: 30s
+    renewDeadline: 20s
+    retryPeriod: 5s
+```
+
+| Helm value | Environment variable | Description | Default |
+| -- | -- | -- | -- |
+| `controller.leaderElection.leaseDuration` | `KGW_LEADER_ELECTION_LEASE_DURATION` | The time that controller replicas that are not the leader wait before they try to take over a lease that the leader has not renewed. This value must be greater than `renewDeadline`. | `15s` |
+| `controller.leaderElection.renewDeadline` | `KGW_LEADER_ELECTION_RENEW_DEADLINE` | The time that the leader keeps trying to renew its lease before it stops leading. This value must be greater than `retryPeriod` and less than `leaseDuration`. | `10s` |
+| `controller.leaderElection.retryPeriod` | `KGW_LEADER_ELECTION_RETRY_PERIOD` | The time between attempts to acquire or renew the lease. | `2s` |
+
+
+{{< /version >}}
 
 
 ## Namespace discovery {#namespace-discovery}
@@ -95,12 +128,94 @@ discoveryNamespaceSelectors:
 ```
 
 {{< conditional-text include-if="envoy" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## Scope xDS configuration per gateway {#xds-scoping}
+
+> [!WARNING]
+> The `REFERENCED` scoping mode is experimental and might change in future releases.
+
+The control plane sends configuration to the gateway proxies over xDS. By default, every gateway proxy receives a cluster for every backend that the control plane discovers, even if no route of that Gateway uses it. In a cluster with many Services and few routed ones, each proxy carries a large config dump and reports stats for many clusters that it never uses.
+
+### Enable xDS scoping
+
+You can scope the xDS configuration so that each gateway's proxies receive only the clusters that the gateway's configuration references by using the `controller.xds.scoping` Helm values. These clusters include the backends that your routes send traffic to, and the backends that your policies call while the proxy processes a request. Examples are an external auth, external processing, or rate limit service, a server that hosts the JWKS for JWT validation, and a gRPC access log service. The proxies also receive the endpoints, listeners, and secrets that these backends need, such as the internal listener of an HTTP CONNECT tunnel. Scoping does not change the listeners and secrets that you configure on the Gateway, such as an HTTPS listener and its TLS certificate. The proxies always receive them.
+
+1. Set the scoping mode in your Helm values file. The control plane supports the following scoping modes:
+   * `ALL` (default): Every gateway proxy receives a cluster for every discovered backend, whether or not a route uses it.
+   * `REFERENCED`: Each gateway's proxies receive only the clusters that the gateway's configuration references. A gateway whose routes select the destination at request time stays unscoped.
+
+   The following example enables the `REFERENCED` mode.
+   ```yaml
+   controller:
+     xds:
+       scoping:
+         mode: REFERENCED
+   ```
+
+   The Helm value sets the `KGW_XDS_SCOPING_MODE` environment variable on the control plane.
+
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file.
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml
+   ```
+
+### Monitor xDS scoping
+
+The control plane reports the following metrics, each with the `gateway` and `namespace` labels, so that you can see how scoping affects each gateway. Note that scoping metrics are emitted only in `REFERENCED` mode. 
+
+{{< table >}}
+| Metric | Description |
+| -- | -- |
+| `kgateway_xds_snapshot_resources` (Gauge) | The number of resources that the control plane publishes to the gateway proxy. Filter for `resource="Cluster"` to see how many clusters the proxies receive after scoping. |
+| `kgateway_xds_scoping_dropped_clusters` (Gauge) | The number of clusters that the control plane withholds from the gateway proxy, because the gateway's configuration references none of them. If a gateway has several groups of proxies, such as in different zones, the metric reports the most that any group withholds. |
+| `kgateway_xds_scoping_disabled_gateways` (Gauge) | `1` if the gateway is unscoped and receives all clusters, because its routes select the destination at request time, such as through a header. The control plane cannot determine in advance which clusters the gateway needs. If a gateway has several groups of proxies, such as in different zones, `1` means that at least one group is unscoped. </br></br> The proxies of an unscoped gateway still receive all clusters, so scoping does not reduce their configuration or stats. Because the gateway keeps working, consider alerting on a value of `1` to find out when scoping stops applying to a gateway. If all gateways are scoped, the value is `0`.  |
+| `kgateway_xds_scoping_transitions_total` (Counter) | The number of cluster transitions that the control plane delayed, such as when you add a route to a new backend or remove the last route to a backend. The `transition` label shows the kind of transition. For the label values, see [Tune cluster transitions](#xds-scoping-transitions). |
+{{< /table >}}
+
+
+You can access scoping metrics by querying the controller's metrics endpoint. 
+```sh
+kubectl get --raw \
+  "/api/v1/namespaces/{{< reuse "kgw-docs/snippets/namespace.md" >}}/services/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}:9092/proxy/metrics" \
+  | grep -E 'kgateway_xds_scoping|kgateway_xds_snapshot_resources.*Cluster'
+```
+
+Example output: 
+```console
+kgateway_xds_scoping_disabled_gateways{gateway="http",namespace="kgateway-system"} 0
+kgateway_xds_scoping_dropped_clusters{gateway="http",namespace="kgateway-system"} 12
+kgateway_xds_snapshot_resources{gateway="http",namespace="kgateway-system",resource="Cluster"} 2
+```
+
+In this example, the gateway proxies receive 2 clusters, and the control plane withholds 12 clusters. The `kgateway_xds_scoping_transitions_total` metric appears after you add or remove a route to a backend.
+
+### Tune cluster transitions {#xds-scoping-transitions}
+
+A transition is a change to the clusters that a gateway proxy receives. It happens when you add a route to a backend that is new to the gateway, or when you remove the last route to a backend. Envoy does not necessarily apply cluster updates before route updates, so the control plane delays one half of the change to reduce brief 503 errors.
+
+* **Adding a route to a new backend**: The control plane sends the cluster first, and holds the route until the cluster had time to reach the proxy.
+* **Removing the last route to a backend**: The control plane sends the route update first, and keeps the cluster for a while before it removes the cluster.
+
+You can tune how long the control plane delays each half of a transition with the following settings. Set them in the `controller.xds.scoping` section of your Helm values file, or as environment variables on the control plane. The control plane counts transitions in the `kgateway_xds_scoping_transitions_total` metric, by the `transition` label.
+
+| Helm value | Environment variable | Description | Default |
+| -- | -- | -- | -- |
+| `referenceAhead` | `KGW_XDS_SCOPING_REFERENCE_AHEAD` | How long the control plane holds routes, listeners, and secrets that name a cluster that is new to a proxy, so that the cluster reaches the proxy first. The metric counts each hold as `reference_ahead_held`. | `2s` |
+| `dereferenceGrace` | `KGW_XDS_SCOPING_DEREFERENCE_GRACE` | How long a cluster stays published after the control plane sends the route update that stops naming it, so that the update reaches the proxy first. The cluster of a deleted backend is removed at once. The metric counts a kept cluster as `dereference_graced`, and the removal of the cluster afterward as `dereference_pruned`. | `5s` |
+
+Watch the rate of the `reference_ahead_held` transition. A high rate means that your route changes often add clusters that are new to the gateway, and each change waits for the `referenceAhead` time. If these waits delay your route changes more than you can accept, consider setting a lower `referenceAhead` time. A lower time increases the risk of brief 503 errors.
+
+{{< /version >}}
+
 ## TLS encryption {#tls-encryption}
 
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.
 {{< /conditional-text >}}
 
-## Strict validation
+## Resource validation
 
 {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} supports two validation modes for routes and policies in the control plane: `standard` and `strict`. The validation mode controls how the control plane handles invalid configuration before it is sent to Envoy.
 
@@ -110,21 +225,21 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 
 | Mode | Behavior |
 | --- | --- |
-| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. |
+| `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. </br></br>The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. The routes keep reporting that they are accepted and programmed, so the resource statuses do not show the problem. To find out when Envoy rejects an update, [monitor NACKs]({{< link-hextra path="/observability/control-plane-metrics/#monitor-nacks" >}}). |
 | `strict` | In addition to the `standard` checks, the control plane validates the generated configuration with Envoy before it sends the configuration to the proxies. Instead of sending invalid configuration, the control plane removes or replaces only the invalid parts, so that Envoy does not NACK the update and valid changes continue to be applied. For more information, see [How strict mode handles invalid configuration](#strict-invalid-configuration). |
 
-`standard` mode is the default and is appropriate for most production environments. `strict` mode is recommended when you cannot tolerate a NACKed xDS update reaching the data plane, for example when one team's invalid route must not block configuration updates for other routes on the same listener.
+> [!NOTE]
+> The `standard` mode is the default resource validation mode and is appropriate for most production environments. Use `strict` mode when you cannot tolerate that a NACKed xDS update reaches the data plane. For example, use `strict` mode when one team's invalid route must not block configuration updates for other routes on the same listener. In exchange, the invalid route itself returns errors until you fix it, instead of continuing to serve its previous configuration. For more information, see [Invalid configuration handling in strict mode](#strict-invalid-configuration).
 
-### How strict mode handles invalid configuration {#strict-invalid-configuration}
+### Invalid configuration handling in strict mode {#strict-invalid-configuration}
 
 Strict mode does not keep a previous version of a route when an update to the route is invalid. The control plane translates the current state of your resources, and handles invalid configuration as follows.
 
 | Invalid configuration | Result | Status |
 | --- | --- | --- |
 | A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
-| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route |
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
-If a virtual host is still invalid after its invalid route rules are removed or replaced, the control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response, and the affected listener reports `Accepted=False` with reason `ListenerReplaced`.{{< /version >}}
+| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+| A virtual host that is still invalid after the control plane removes or replaces its invalid route rules | The control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response. | `Accepted=False` with reason `ListenerReplaced` on the listener |{{< /version >}}
 
 For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
 
@@ -149,7 +264,6 @@ To check which mode is active, inspect the `KGW_VALIDATION_MODE` environment var
 kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment kgateway \
   -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_VALIDATION_MODE")].value}'
 ```
-
 
 ### Transformation policies and strict validation
 
@@ -241,8 +355,8 @@ metadata:
   namespace: team-secrets
 spec:
   from:
-  - group: gateway.kgateway.dev
-    kind: TrafficPolicy
+  - group: {{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}
+    kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
     # The namespace that holds the policy.
     namespace: httpbin
   to:
@@ -252,6 +366,12 @@ EOF
 ```
 
 To restrict the grant to a single Secret, add `name` to the `to` entry. When you omit `name`, every Secret in the namespace is allowed.
+
+If a policy reports `missing reference grant`, check the following settings of your ReferenceGrant.
+
+* The ReferenceGrant is in the namespace of the resource that you want to access, such as the namespace of the Secret.
+* The `from` section matches the group, kind, and namespace of the resource that makes the reference. The API server accepts a ReferenceGrant with a group or kind that does not match, but that grant never matches the reference.
+* The `to` section matches the group and kind of the resource that you want to access, and the `name`, if you set one.
 
 ### Enable STRICT mode {#set-referencegrant-mode}
 

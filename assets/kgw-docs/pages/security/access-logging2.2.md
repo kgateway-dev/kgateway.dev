@@ -497,6 +497,129 @@ You can optionally enable kgateway to attach route source metadata to every Envo
 
 {{< /version >}}
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+
+### Log ext-auth latency {#extauth-latency}
+
+If you use an external auth service, you can write the time that the external auth check took for each request to your access logs. The data is emitted from the Envoy `ext_authz` filter and is available for every request that makes an external auth check, including requests that the service denies. For more information, see the [Envoy `ext_authz` filter documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#logging).
+
+1. Set up external auth for your gateway or route. For more information, see [External auth]({{< link-hextra path="/security/extauth/" >}}).
+
+2. Update your ListenerPolicy to include the extauth fields in your access log format. The following example adds the latency of the external auth check and the number of bytes that were sent and received to the JSON access log output.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: access-logs
+     namespace: kgateway-system
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: http
+     default:
+       httpSettings:
+         accessLog:
+           - fileSink:
+               path: /dev/stdout
+               jsonFormat:
+                 response_code: "%RESPONSE_CODE%"
+                 extauth_latency_us: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:latency_us)%"
+                 extauth_bytes_sent: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:bytesSent)%"
+                 extauth_bytes_received: "%FILTER_STATE(ext_auth/kgateway-system/basic-ext-auth:FIELD:bytesReceived)%"
+   EOF
+   ```
+
+   Envoy uses the name of the filter as the filter state key. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} names each ext-auth filter `ext_auth/<namespace>/<name>`, where `<namespace>` and `<name>` are the namespace and name of your GatewayExtension resource. In this example, the GatewayExtension is named `basic-ext-auth` and is in the `kgateway-system` namespace. Use this key instead of the `envoy.filters.http.ext_authz` key that is shown in the Envoy documentation.
+
+   | Field | Description |
+   | ----- | ----------- |
+   | `latency_us` | The time in microseconds that the external auth check took. |
+   | `bytesSent` | The number of bytes that the gateway proxy sent to the external auth service. Available only for gRPC external auth services. |
+   | `bytesReceived` | The number of bytes that the gateway proxy received from the external auth service. Available only for gRPC external auth services. |
+
+3. Send a request to a route that your external auth policy protects.
+
+4. Get the logs for the gateway pod and verify that the entry includes the ext-auth fields.
+
+   ```sh
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http | tail -1 | jq
+   ```
+
+   Example output:
+   ```json
+   {
+     "extauth_bytes_received": "1135",
+     "extauth_bytes_sent": "638",
+     "extauth_latency_us": "1643",
+     "response_code": 200
+   }
+   ```
+
+   The ext-auth values are written as strings. Envoy adds the ext-auth fields only for requests that make a check call to the external auth service.
+
+> [!NOTE]
+> The `%FILTER_STATE(<key>:TYPED)%` format is not supported for external auth. Use the `FIELD` format as shown in the example.
+
+{{< /version >}}
+
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## Access logs for TCP and TLS listeners {#tcp-access-log}
+
+The `httpSettings.accessLog` field applies to HTTP and HTTPS listeners. To log connections on listeners that serve TCPRoutes or TLSRoutes, set the `tcpSettings.accessLog` field in a ListenerPolicy instead. This field applies to TCP listeners and to TLS listeners in both the `Terminate` and `Passthrough` modes. The proxy writes one log entry for each connection, and not for each request.
+
+1. Set up a TCP listener and a TCPRoute, such as in the [TCP listener]({{< link-hextra path="/setup/listeners/tcp/" >}}) guide.
+
+2. Create a ListenerPolicy that logs each connection to the `stdout` stream of the gateway proxy. In `targetRefs`, select the `tcp-gateway` Gateway from the TCP listener guide. Because TCP connections have no HTTP properties, the format uses only data that is available for TCP, such as the addresses, bytes, and duration of the connection.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: ListenerPolicy
+   metadata:
+     name: tcp-access-logs
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.networking.k8s.io
+       kind: Gateway
+       name: tcp-gateway
+     default:
+       tcpSettings:
+         accessLog:
+         - fileSink:
+             path: /dev/stdout
+             jsonFormat:
+               start_time: "%START_TIME%"
+               downstream_remote_address: "%DOWNSTREAM_REMOTE_ADDRESS%"
+               upstream_host: "%UPSTREAM_HOST%"
+               bytes_received: "%BYTES_RECEIVED%"
+               bytes_sent: "%BYTES_SENT%"
+               duration: "%DURATION%"
+               response_flags: "%RESPONSE_FLAGS%"
+   EOF
+   ```
+
+3. Send a TCP request to the gateway, such as in the [verify steps]({{< link-hextra path="/setup/listeners/tcp/#verify-tcp-route" >}}) of the TCP listener guide.
+
+4. Get the logs of the gateway proxy. The proxy writes the log entry when the connection closes.
+   ```sh
+   kubectl logs deploy/tcp-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} | tail -n 1
+   ```
+
+   Example output:
+   ```json
+   {"bytes_received":88,"bytes_sent":147,"downstream_remote_address":"127.0.0.1:49638","duration":1004,"response_flags":"-","start_time":"2026-10-27T20:56:15.708Z","upstream_host":"10.244.0.96:8080"}
+   ```
+
+The `tcpSettings.accessLog` field accepts the same sinks as `httpSettings.accessLog`, such as `fileSink`, `grpcService`, and `openTelemetry`, with the following differences:
+
+* **HTTP-only settings are rejected**: The `statusCodeFilter`, `headerFilter`, `grpcStatusFilter`, and `traceableFilter` filters, and the `additional*ToLog` fields of `grpcService`, apply only to HTTP traffic. If you set them, the ListenerPolicy is not accepted. The status of the policy names the field that is not supported, such as `filter.statusCodeFilter is not supported for TCP access logs`.
+* **gRPC sinks use the TCP gRPC access log service**: The proxy sends the entries to your service with Envoy's TCP gRPC access logger. Make sure that your access log service handles TCP log entries.
+* **Section policies apply only to the listener with settings**: If you target a listener with `sectionName`, the policy reports a status for a TCP or TLS listener only when it sets `tcpSettings` or `transportSocketConnectTimeout`.
+{{< /version >}}
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}

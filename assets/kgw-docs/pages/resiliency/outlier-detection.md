@@ -365,6 +365,112 @@ A local-origin failure is a request for which the upstream never sends a respons
    envoy_cluster_outlier_detection_ejections_enforced_consecutive_local_origin_failure{envoy_cluster_name="kube_httpbin_httpbin_9000"} 1
    envoy_cluster_outlier_detection_ejections_overflow{envoy_cluster_name="kube_httpbin_httpbin_9000"} 2
    ```
+
+## Eject hosts after gateway failures {#gateway-failure-outlier-detection}
+
+The `consecutive5xx` field ejects a host after it returns consecutive 5xx responses, such as 500, 502, or 503. Some apps return a 500 during normal operation, such as for an invalid request, which can eject a healthy host. Envoy calls a 502, 503, or 504 response a gateway failure. These status codes usually mean that the host, or a proxy or load balancer in front of it, is unavailable, as opposed to a 500, which reports an error with one request. Use the `consecutiveGatewayFailure` field to eject a host only after these status codes, and to ignore other 5xx responses.
+
+The following table shows the difference between the `consecutive5xx` and `consecutiveGatewayFailure` fields and the HTTP response codes that count towards them. 
+
+| Field | Responses that the upstream host returns and that count | Default |
+| -- | -- | -- |
+| `consecutive5xx` | All 5xx responses, such as 500, 501, 502, 503, and 504. | Enabled with a threshold of 5. Set to `0` to disable. |
+| `consecutiveGatewayFailure` | Only 502, 503, and 504 responses. | Disabled. Set a threshold to enable. |
+
+A 502, 503, or 504 response counts toward both fields. If you enable both, the proxy ejects a host when it reaches the first threshold.
+
+In the following steps, a host is one of the two httpbin replicas that you scaled up in [Set up outlier detection](#set-up-outlier-detection). The gateway proxy load balances requests across these two hosts. The httpbin `/status/<code>` path returns the status code that you request, so you can use it to simulate an upstream that returns an error or reports that it is unavailable.
+
+1. Update the BackendConfigPolicy. The following policy ejects a host for 1 hour after 3 consecutive gateway failures. Because the `consecutive5xx` field is enabled by default, set it to `0` so that only gateway failures eject a host.
+   ```yaml
+   kubectl apply -f- <<EOF
+   kind: BackendConfigPolicy
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   metadata:
+     name: httpbin-policy
+     namespace: httpbin
+   spec:
+     targetRefs:
+       - name: httpbin
+         group: ""
+         kind: Service
+     outlierDetection:
+       interval: 2s
+       baseEjectionTime: 1h
+       maxEjectionPercent: 80
+       consecutive5xx: 0
+       consecutiveGatewayFailure: 3
+   EOF
+   ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | --- | --- |
+   | `interval`, `baseEjectionTime`, `maxEjectionPercent` | The same settings as in [Set up outlier detection](#set-up-outlier-detection). |
+   | `consecutive5xx` | The number of consecutive 5xx responses before a host is ejected. In this example, the value is `0`, so 5xx responses do not eject a host. |
+   | `consecutiveGatewayFailure` | The number of consecutive 502, 503, and 504 responses before a host is ejected. In this example, a host is ejected after 3 gateway failures. When you set this field, the proxy always ejects the host after the threshold is reached. If you do not set this field, hosts are not ejected for gateway failures. |
+
+2. Simulate an upstream error. Send 10 requests to the `/status/500` path. Both httpbin replicas return a 500 response. A 500 is a 5xx response but not a gateway failure, and the `consecutive5xx` check is disabled, so the proxy does not eject a host. Verify that every request returns a 500 response.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
+   ```sh
+   for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" http://$INGRESS_GW_ADDRESS:8080/status/500 -H "host: www.example.com:8080"; done
+   ```
+   {{% /tab %}}
+   {{% tab name="Port forward for local testing" %}}
+   ```sh
+   for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" localhost:8080/status/500 -H "host: www.example.com:8080"; done
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   ```console
+   500
+   500
+   500
+   ...
+   ```
+
+3. Simulate an upstream that reports that it is unavailable. Send 10 requests to the `/status/503` path. Both httpbin replicas return a 503 response, which counts as a gateway failure. After a replica returns 3 consecutive 503 responses, the proxy ejects it. The `maxEjectionPercent` of 80% allows the proxy to eject only one of the two replicas, so the other replica stays in the load balancing pool and still returns 503 responses. Verify that every request returns a 503 response.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider Load Balancer" %}}
+   ```sh
+   for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" http://$INGRESS_GW_ADDRESS:8080/status/503 -H "host: www.example.com:8080"; done
+   ```
+   {{% /tab %}}
+   {{% tab name="Port forward for local testing" %}}
+   ```sh
+   for i in {1..10}; do curl -s -o /dev/null -w "%{http_code}\n" localhost:8080/status/503 -H "host: www.example.com:8080"; done
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output: 
+   ```console
+   503
+   503
+   503
+   ...
+   ```
+
+4. Port-forward the Gateway pod on port 19000.
+   ```sh
+   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
+   ```
+
+5. Open the [stats Prometheus](http://localhost:19000/stats/prometheus) endpoint and look for the following metrics for the `kube_httpbin_httpbin_8000` cluster.
+   * `envoy_cluster_outlier_detection_ejections_enforced_consecutive_gateway_failure`: The number of ejections for gateway failures. In this example, the number is 1, because the proxy ejected one httpbin replica after the 503 responses in step 3. The 500 responses in step 2 did not increase the number.
+   * `envoy_cluster_outlier_detection_ejections_enforced_consecutive_5xx`: The number of ejections for 5xx responses. In this example, the number is 0, because the `consecutive5xx` check is disabled.
+   * `envoy_cluster_outlier_detection_ejections_active`: The number of hosts that are ejected right now. In this example, the number is 1.
+
+   Example output:
+   ```console
+   envoy_cluster_outlier_detection_ejections_enforced_consecutive_gateway_failure{envoy_cluster_name="kube_httpbin_httpbin_8000"} 1
+   envoy_cluster_outlier_detection_ejections_enforced_consecutive_5xx{envoy_cluster_name="kube_httpbin_httpbin_8000"} 0
+   envoy_cluster_outlier_detection_ejections_active{envoy_cluster_name="kube_httpbin_httpbin_8000"} 1
+   ```
 {{< /version >}}
 
 ## Cleanup

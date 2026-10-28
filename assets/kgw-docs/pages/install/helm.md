@@ -67,7 +67,7 @@ Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane by usin
       
       {{< tabs >}}
 {{% tab name="Basic installation" %}}
-{{< version exclude-if="2.0.x,2.1.x" >}}Note: Experimental Gateway API features such as TCPRoutes are enabled by default in kgateway 2.2 and later. For more information, see [Experimental Gateway API features](../advanced/#experimental-gateway-api-features).{{< /version >}}
+{{< version include-if="2.2.x,2.3.x,2.4.x" >}}Note: Experimental Gateway API features such as TCPRoutes are enabled by default in kgateway 2.2 and later. For more information, see [Experimental Gateway API features](../advanced/#experimental-gateway-api-features).{{< /version >}}{{< version include-if="2.5.x" >}}Note: Experimental Gateway API features, such as the legacy `XListenerSet` resource, are enabled by default. For more information, see [Experimental Gateway API features](../advanced/#experimental-gateway-api-features).{{< /version >}}
 ```sh
 helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
 --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}}

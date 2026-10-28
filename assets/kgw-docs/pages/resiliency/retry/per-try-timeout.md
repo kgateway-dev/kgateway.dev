@@ -12,22 +12,34 @@ Note that if you configured a global request timeout, the per-try timeout must b
 
 Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try timeouts on a Gateway listener level, use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} instead. 
 
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
+{{< /version >}}
 
 ## Before you begin
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+> [!NOTE]
+> Retries are part of the standard channel in Gateway API version 1.7 and later. If your cluster runs Gateway API version 1.6 or earlier, install the experimental channel instead of the standard channel. The following example installs version 1.6.3.
+>
+> ```sh
+> kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/experimental-install.yaml
+> ```
+{{< /version >}}
+
 ## Set up per-retry timeouts
 
+{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh
    kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
-
-2. Configure the per-retry timeout. You can apply the timeout to an HTTPRoute, or Gateway listener.
+{{% /version %}}
+1. Configure the per-retry timeout. You can apply the timeout to an HTTPRoute, or Gateway listener.
    {{< tabs >}}
    {{% tab name="HTTPRoute (Kubernetes GW API)" %}}
    Use the `timeouts.backendRequest` field to configure the per-try timeout. Note that you must set a retry policy also to configure a per-try timeout. 
