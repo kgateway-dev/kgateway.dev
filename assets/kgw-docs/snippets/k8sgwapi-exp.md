@@ -21,6 +21,7 @@ Features that are in the standard channel of the upstream Kubernetes Gateway API
 | [CORS policies]({{< link-hextra path="/security/cors/" >}}) | 1.5 |
 | [TCPRoutes]({{< link-hextra path="/setup/listeners/tcp/" >}}) | 1.6 |
 | [Retries]({{< link-hextra path="/resiliency/retry/" >}}) | 1.7 |
+| [TLS termination and TLS passthrough listeners on the same port]({{< link-hextra path="/setup/listeners/tls-termination/" >}}) | 1.7 |
 
 In earlier Gateway API versions, these features require the experimental channel. The `sessionPersistence` field of an HTTPRoute rule is experimental and deprecated. To set up session persistence, use a BackendConfigPolicy instead. For more information, see [Session persistence]({{< link-hextra path="/traffic-management/session-affinity/session-persistence/" >}}).
 {{< /version >}}
