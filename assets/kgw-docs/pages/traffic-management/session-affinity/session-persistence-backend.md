@@ -51,6 +51,54 @@ The requirements depend on the option that you use.
 ## Configure session persistence
 
 {{< tabs >}}
+{{% tab name="BackendConfigPolicy" %}}
+
+Define session persistence based on either a cookie or a header in the `sessionPersistence` section of a BackendConfigPolicy. The following example defines cookie-based session persistence for the `httpbin` service.
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: session-persistence
+  namespace: httpbin
+spec:
+  targetRefs:
+    - name: httpbin
+      group: ""
+      kind: Service
+  sessionPersistence:
+    type: Cookie
+    absoluteTimeout: 30m
+    cookie:
+      name: Session-A
+      lifetimeType: Permanent
+```
+
+To use a header instead, set the `type` to `Header` and the name of the header.
+
+```yaml
+  sessionPersistence:
+    type: Header
+    header:
+      name: Session-B
+```
+
+{{< reuse "/kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+| -- | -- |
+| `targetRefs` | The Service or Backend that the policy applies to. |
+| `type` | The request property, either `Header` or `Cookie`, to base session persistence on. Defaults to `Cookie`. |
+| `cookie.name` | The name of the cookie that the proxy sends in response to the client and that the client reuses in subsequent requests. If you do not set a name, a unique name such as `kgw-sp-1cccccdd2c8865e2` is generated for each backend. To prevent unpredictable behavior or rejection, do not reuse cookie names. Do not use the same name for backends in the same traffic split, because clients lose their session whenever the split switches backends. |
+| `cookie.path` | The `Path` attribute of the cookie. Defaults to `/`. |
+| `cookie.lifetimeType` | Whether the cookie has a `Permanent` or a `Session`-based lifetime. A permanent cookie persists until its expiry time, while a session cookie is deleted when the current session ends. Defaults to `Session`. When set to `Permanent`, `absoluteTimeout` is required. |
+| `header.name` | The name of the header that the proxy sends in response to the client. The client must include this header in subsequent requests to maintain the session. Required if the `type` is `Header`. |
+| `absoluteTimeout` | The absolute timeout of the persistent session. Once the duration has elapsed, the session becomes invalid. Only cookies with the `Permanent` lifetime support this field. For session cookies and headers, the field has no effect. |
+
+> [!NOTE]
+> If you set an `absoluteTimeout` that has no effect, the BackendConfigPolicy is still accepted, but its `Accepted` condition has the `PartiallyValid` reason and the following message: `spec.sessionPersistence.absoluteTimeout only has an effect for Cookie sessions with spec.sessionPersistence.cookie.lifetimeType Permanent`. Session persistence has no effect on Backends of the dynamic forward proxy type, and the policy reports this in the same way.
+
+{{% /tab %}}
 {{% tab name="HTTPRoute" %}}
 
 Define session persistence based on either a cookie or a header in the `sessionPersistence` section of an HTTPRoute rule. The following example defines cookie-based session persistence for requests to `/path-A`, and header-based session persistence for requests to `/path-B`.
@@ -107,54 +155,6 @@ spec:
 > You must set the `cookie` field if the `type` is `Cookie`, and the `header` field if the `type` is `Header`. The `sessionName`, `cookieConfig`, and `idleTimeout` fields are not available in the Kubernetes Gateway API version 1.7.
 
 {{% /tab %}}
-{{% tab name="BackendConfigPolicy" %}}
-
-Define session persistence based on either a cookie or a header in the `sessionPersistence` section of a BackendConfigPolicy. The following example defines cookie-based session persistence for the `httpbin` service.
-
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: BackendConfigPolicy
-metadata:
-  name: session-persistence
-  namespace: httpbin
-spec:
-  targetRefs:
-    - name: httpbin
-      group: ""
-      kind: Service
-  sessionPersistence:
-    type: Cookie
-    absoluteTimeout: 30m
-    cookie:
-      name: Session-A
-      lifetimeType: Permanent
-```
-
-To use a header instead, set the `type` to `Header` and the name of the header.
-
-```yaml
-  sessionPersistence:
-    type: Header
-    header:
-      name: Session-B
-```
-
-{{< reuse "/kgw-docs/snippets/review-table.md" >}}
-
-| Setting | Description |
-| -- | -- |
-| `targetRefs` | The Service or Backend that the policy applies to. |
-| `type` | The request property, either `Header` or `Cookie`, to base session persistence on. Defaults to `Cookie`. |
-| `cookie.name` | The name of the cookie that the proxy sends in response to the client and that the client reuses in subsequent requests. If you do not set a name, a unique name such as `kgw-sp-1cccccdd2c8865e2` is generated for each backend. To prevent unpredictable behavior or rejection, do not reuse cookie names. Do not use the same name for backends in the same traffic split, because clients lose their session whenever the split switches backends. |
-| `cookie.path` | The `Path` attribute of the cookie. Defaults to `/`. |
-| `cookie.lifetimeType` | Whether the cookie has a `Permanent` or a `Session`-based lifetime. A permanent cookie persists until its expiry time, while a session cookie is deleted when the current session ends. Defaults to `Session`. When set to `Permanent`, `absoluteTimeout` is required. |
-| `header.name` | The name of the header that the proxy sends in response to the client. The client must include this header in subsequent requests to maintain the session. Required if the `type` is `Header`. |
-| `absoluteTimeout` | The absolute timeout of the persistent session. Once the duration has elapsed, the session becomes invalid. Only cookies with the `Permanent` lifetime support this field. For session cookies and headers, the field has no effect. |
-
-> [!NOTE]
-> If you set an `absoluteTimeout` that has no effect, the BackendConfigPolicy is still accepted, but its `Accepted` condition has the `PartiallyValid` reason and the following message: `spec.sessionPersistence.absoluteTimeout only has an effect for Cookie sessions with spec.sessionPersistence.cookie.lifetimeType Permanent`. Session persistence has no effect on Backends of the dynamic forward proxy type, and the policy reports this in the same way.
-
-{{% /tab %}}
 {{< /tabs >}}
 
 ## Verify the session persistence configuration {#verify}
@@ -180,6 +180,29 @@ To try out session persistence, you can follow these steps to define cookie-base
 
 3. Configure session persistence for the httpbin app. These settings instruct the gateway proxy to create a persistent session cookie called `Session-A` for any new client connections to the httpbin app. Each created session has an absolute timeout of 30 minutes, and the cookie persists for that time.
    {{< tabs >}}
+   {{% tab name="BackendConfigPolicy" %}}
+   Create a BackendConfigPolicy for the httpbin service with the `sessionPersistence` section.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: BackendConfigPolicy
+   metadata:
+     name: session-persistence
+     namespace: httpbin
+   spec:
+     targetRefs:
+       - name: httpbin
+         group: ""
+         kind: Service
+     sessionPersistence:
+       type: Cookie
+       absoluteTimeout: 30m
+       cookie:
+         name: Session-A
+         lifetimeType: Permanent
+   EOF
+   ```
+   {{% /tab %}}
    {{% tab name="HTTPRoute" %}}
    Modify the sample HTTPRoute resource for the httpbin app to add the `sessionPersistence` section.
    ```yaml
@@ -205,29 +228,6 @@ To try out session persistence, you can follow these steps to define cookie-base
            cookie:
              name: Session-A
              lifetimeType: Permanent
-   EOF
-   ```
-   {{% /tab %}}
-   {{% tab name="BackendConfigPolicy" %}}
-   Create a BackendConfigPolicy for the httpbin service with the `sessionPersistence` section.
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: BackendConfigPolicy
-   metadata:
-     name: session-persistence
-     namespace: httpbin
-   spec:
-     targetRefs:
-       - name: httpbin
-         group: ""
-         kind: Service
-     sessionPersistence:
-       type: Cookie
-       absoluteTimeout: 30m
-       cookie:
-         name: Session-A
-         lifetimeType: Permanent
    EOF
    ```
    {{% /tab %}}
@@ -367,6 +367,12 @@ To try out session persistence, you can follow these steps to define cookie-base
 
 2. Remove the session persistence configuration.
    {{< tabs >}}
+   {{% tab name="BackendConfigPolicy" %}}
+   Delete the BackendConfigPolicy.
+   ```sh
+   kubectl delete backendconfigpolicy session-persistence -n httpbin
+   ```
+   {{% /tab %}}
    {{% tab name="HTTPRoute" %}}
    Remove the session persistence settings from the httpbin HTTPRoute.
    ```yaml
@@ -387,12 +393,6 @@ To try out session persistence, you can follow these steps to define cookie-base
            - name: httpbin
              port: 8000
    EOF
-   ```
-   {{% /tab %}}
-   {{% tab name="BackendConfigPolicy" %}}
-   Delete the BackendConfigPolicy.
-   ```sh
-   kubectl delete backendconfigpolicy session-persistence -n httpbin
    ```
    {{% /tab %}}
    {{< /tabs >}}

@@ -38,7 +38,7 @@ The Envoy dependency in {{< reuse "kgw-docs/snippets/kgateway.md" >}} was upgrad
 
 The proxy Deployment no longer lists Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled. The Service that {{< reuse "kgw-docs/snippets/kgateway.md" >}} generates for the Gateway is unchanged.
 
-The pod template of every managed Gateway changes, so the proxy pods restart once during the upgrade. After the upgrade, a listener port change restarts the proxy pods only in the following cases:
+When you upgrade to 2.5, the pod template of every managed Gateway changes, so the proxy pods restart once during the upgrade. After the upgrade, a listener port change restarts the proxy pods only in the following cases:
 
 * **First low port**: A Gateway gains its first listener port below port number 1024. {{< reuse "kgw-docs/snippets/kgateway.md" >}} adds a pod setting that allows the proxy to bind low ports. For example, a Gateway with listeners on ports 8080 and 8443 restarts when you add a listener on port 443. Adding a listener on port 80 afterward does not restart the pods, because the Gateway already has a port below 1024.
 * **Last low port**: A Gateway loses its last listener port below port number 1024. {{< reuse "kgw-docs/snippets/kgateway.md" >}} removes that pod setting. For example, a Gateway with listeners on ports 80 and 443 does not restart when you remove port 80, but restarts when you also remove port 443.
