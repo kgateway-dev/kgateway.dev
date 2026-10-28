@@ -41,7 +41,7 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 
 - Session persistence in HTTPRoutes
 - The legacy `XListenerSet` resource in the `gateway.networking.x-k8s.io` API group
-- The pre-v1 API versions of TCPRoutes and TLSRoutes, such as `v1alpha2`
+- Support for the pre-v1 API versions of TCPRoutes and TLSRoutes, such as `v1alpha2`, in clusters where the Gateway API CRDs do not serve `v1`
 
 Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled.
 {{< /version >}}
@@ -128,6 +128,88 @@ discoveryNamespaceSelectors:
 ```
 
 {{< conditional-text include-if="envoy" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## Scope xDS configuration per gateway {#xds-scoping}
+
+> [!WARNING]
+> The `REFERENCED` scoping mode is experimental and might change in future releases.
+
+The control plane sends configuration to the gateway proxies over xDS. By default, every gateway proxy receives a cluster for every backend that the control plane discovers, even if no route of that Gateway uses it. In a cluster with many Services and few routed ones, each proxy carries a large config dump and reports stats for many clusters that it never uses.
+
+### Enable xDS scoping
+
+You can scope the xDS configuration so that each gateway's proxies receive only the clusters that the gateway's configuration references by using the `controller.xds.scoping` Helm values. These clusters include the backends that your routes send traffic to, and the backends that your policies call while the proxy processes a request. Examples are an external auth, external processing, or rate limit service, a server that hosts the JWKS for JWT validation, and a gRPC access log service. The proxies also receive the endpoints, listeners, and secrets that these backends need, such as the internal listener of an HTTP CONNECT tunnel. Scoping does not change the listeners and secrets that you configure on the Gateway, such as an HTTPS listener and its TLS certificate. The proxies always receive them.
+
+1. Set the scoping mode in your Helm values file. The control plane supports the following scoping modes:
+   * `ALL` (default): Every gateway proxy receives a cluster for every discovered backend, whether or not a route uses it.
+   * `REFERENCED`: Each gateway's proxies receive only the clusters that the gateway's configuration references. A gateway whose routes select the destination at request time stays unscoped.
+
+   The following example enables the `REFERENCED` mode.
+   ```yaml
+   controller:
+     xds:
+       scoping:
+         mode: REFERENCED
+   ```
+
+   The Helm value sets the `KGW_XDS_SCOPING_MODE` environment variable on the control plane.
+
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file.
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml
+   ```
+
+### Monitor xDS scoping
+
+The control plane reports the following metrics, each with the `gateway` and `namespace` labels, so that you can see how scoping affects each gateway. Note that scoping metrics are emitted only in `REFERENCED` mode. 
+
+{{< table >}}
+| Metric | Description |
+| -- | -- |
+| `kgateway_xds_snapshot_resources` (Gauge) | The number of resources that the control plane publishes to the gateway proxy. Filter for `resource="Cluster"` to see how many clusters the proxies receive after scoping. |
+| `kgateway_xds_scoping_dropped_clusters` (Gauge) | The number of clusters that the control plane withholds from the gateway proxy, because the gateway's configuration references none of them. If a gateway has several groups of proxies, such as in different zones, the metric reports the most that any group withholds. |
+| `kgateway_xds_scoping_disabled_gateways` (Gauge) | `1` if the gateway is unscoped and receives all clusters, because its routes select the destination at request time, such as through a header. The control plane cannot determine in advance which clusters the gateway needs. If a gateway has several groups of proxies, such as in different zones, `1` means that at least one group is unscoped. </br></br> The proxies of an unscoped gateway still receive all clusters, so scoping does not reduce their configuration or stats. Because the gateway keeps working, consider alerting on a value of `1` to find out when scoping stops applying to a gateway. If all gateways are scoped, the value is `0`.  |
+| `kgateway_xds_scoping_transitions_total` (Counter) | The number of cluster transitions that the control plane delayed, such as when you add a route to a new backend or remove the last route to a backend. The `transition` label shows the kind of transition. For the label values, see [Tune cluster transitions](#xds-scoping-transitions). |
+{{< /table >}}
+
+
+You can access scoping metrics by querying the controller's metrics endpoint. 
+```sh
+kubectl get --raw \
+  "/api/v1/namespaces/{{< reuse "kgw-docs/snippets/namespace.md" >}}/services/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}:9092/proxy/metrics" \
+  | grep -E 'kgateway_xds_scoping|kgateway_xds_snapshot_resources.*Cluster'
+```
+
+Example output: 
+```console
+kgateway_xds_scoping_disabled_gateways{gateway="http",namespace="kgateway-system"} 0
+kgateway_xds_scoping_dropped_clusters{gateway="http",namespace="kgateway-system"} 12
+kgateway_xds_snapshot_resources{gateway="http",namespace="kgateway-system",resource="Cluster"} 2
+```
+
+In this example, the gateway proxies receive 2 clusters, and the control plane withholds 12 clusters. The `kgateway_xds_scoping_transitions_total` metric appears after you add or remove a route to a backend.
+
+### Tune cluster transitions {#xds-scoping-transitions}
+
+A transition is a change to the clusters that a gateway proxy receives. It happens when you add a route to a backend that is new to the gateway, or when you remove the last route to a backend. Envoy does not necessarily apply cluster updates before route updates, so the control plane delays one half of the change to reduce brief 503 errors.
+
+* **Adding a route to a new backend**: The control plane sends the cluster first, and holds the route until the cluster had time to reach the proxy.
+* **Removing the last route to a backend**: The control plane sends the route update first, and keeps the cluster for a while before it removes the cluster.
+
+You can tune how long the control plane delays each half of a transition with the following settings. Set them in the `controller.xds.scoping` section of your Helm values file, or as environment variables on the control plane. The control plane counts transitions in the `kgateway_xds_scoping_transitions_total` metric, by the `transition` label.
+
+| Helm value | Environment variable | Description | Default |
+| -- | -- | -- | -- |
+| `referenceAhead` | `KGW_XDS_SCOPING_REFERENCE_AHEAD` | How long the control plane holds routes, listeners, and secrets that name a cluster that is new to a proxy, so that the cluster reaches the proxy first. The metric counts each hold as `reference_ahead_held`. | `2s` |
+| `dereferenceGrace` | `KGW_XDS_SCOPING_DEREFERENCE_GRACE` | How long a cluster stays published after the control plane sends the route update that stops naming it, so that the update reaches the proxy first. The cluster of a deleted backend is removed at once. The metric counts a kept cluster as `dereference_graced`, and the removal of the cluster afterward as `dereference_pruned`. | `5s` |
+
+Watch the rate of the `reference_ahead_held` transition. A high rate means that your route changes often add clusters that are new to the gateway, and each change waits for the `referenceAhead` time. If these waits delay your route changes more than you can accept, consider setting a lower `referenceAhead` time. A lower time increases the risk of brief 503 errors.
+
+{{< /version >}}
+
 ## TLS encryption {#tls-encryption}
 
 You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane. For more information, see the [TLS encryption]({{< link-hextra path="/install/tls" >}}) docs.

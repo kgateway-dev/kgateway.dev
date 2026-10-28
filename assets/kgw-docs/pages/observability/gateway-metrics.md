@@ -22,7 +22,7 @@ The following steps show you how to quickly view the metrics endpoint of the gat
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Per-listener metrics {#listener-metrics}
 
-The gateway proxy reports the HTTP connection manager and TCP proxy stats for each listener separately. Envoy names these stats with a stat prefix that {{< reuse "kgw-docs/snippets/kgateway.md" >}} sets for each listener. In Prometheus, the stat prefix is the value of the `envoy_http_conn_manager_prefix` label. In the Envoy admin stats, it is part of the stat name, such as `http.http_8080.downstream_rq_total`.
+The gateway proxy reports the HTTP connection manager and TCP proxy stats for each listener separately. Envoy names these stats with a stat prefix that {{< reuse "kgw-docs/snippets/kgateway.md" >}} sets for each listener. In Prometheus, the stat prefix is the value of the `envoy_http_conn_manager_prefix` label for HTTP and HTTPS listeners, and of the `envoy_tcp_prefix` label for TCPRoutes and TLSRoutes. In the Envoy admin stats, it is part of the stat name, such as `http.http_8080.downstream_rq_total` or `tcp.tcp_8000_<namespace>_<route>.downstream_cx_total`. In earlier versions, all HTTP and HTTPS listeners shared the stat prefix `http`.
 
 The stat prefix has the following format.
 
@@ -44,9 +44,16 @@ sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix="https_84
 
 # Requests of all HTTP and HTTPS listeners
 sum(rate(envoy_http_downstream_rq_total{envoy_http_conn_manager_prefix=~"http_.*|https_.*"}[5m]))
+
+# Connections of a TCPRoute
+sum(rate(envoy_tcp_downstream_cx_total{envoy_tcp_prefix="tcp_8000_<namespace>_<route>"}[5m]))
 ```
 
-To reduce the stats that the proxy tracks to the stats of one listener, use a stats matcher, such as `prefix: "http.https_8443_tenant-a."`. For more information, see [Filter Envoy stats](#filter-stats).
+Update the Prometheus queries and dashboards that filter on the earlier prefix, such as `envoy_http_conn_manager_prefix="http"`. These queries no longer return data.
+
+To reduce the stats that the proxy tracks to the stats of one listener, use a stats matcher, such as `prefix: "http.https_8443_tenant-a."`. For more information, see [Filter Envoy stats](#filter-stats). A stats matcher that uses the earlier prefix, such as `prefix: "http.http."`, no longer matches any stats. Use the prefix of each listener instead, such as `http.http_8080.`.
+
+A Gateway with many HTTPS listeners or ListenerSets exposes more HTTP connection manager series, one set for each listener.
 
 {{< /version >}}
 
