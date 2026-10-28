@@ -505,13 +505,18 @@ EOF
 > Changing the pod-network bind address to all interfaces exposes the SDS endpoint to any pod on the cluster network. Enable this feature only in a trusted environment.
 
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
-### Add container ports for hostNetwork {#host-network-ports}
+### Run the proxy with hostNetwork {#host-network-ports}
 
 The proxy Deployment does not list Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled.
 
-If you set `hostNetwork` in a deployment overlay, container ports also act as host ports, which keep two proxies that use the same port off the same node. Without the container ports, the scheduler can place both proxies on one node, and the second proxy fails to bind. To prevent this, add your Gateway's listener ports as container ports in the overlay.
+If you set `hostNetwork` in a deployment overlay, the proxy uses the network of the node, and each container port also acts as a host port. The scheduler does not place two pods that use the same host port on one node. Keep the following considerations in mind.
 
-The following example adds port 8080 to the proxy container and keeps the existing container ports, such as `http-monitoring`. Add one entry for each listener port of your Gateway.
+* **DNS policy**: The proxy connects to the control plane by the DNS name of the control plane Service, which ends in `.svc.cluster.local`. A pod with `hostNetwork` uses the DNS settings of the node by default, and the node cannot resolve in-cluster names. As a result, the proxy cannot reach the control plane and never becomes ready. Set `dnsPolicy: ClusterFirstWithHostNet` in the overlay so that the pod uses the DNS of the cluster, even though it uses the network of the node.
+* **Two proxies on one node**: Two proxies on the same node conflict on the ports that they bind, such as the Envoy admin port `19000`. The second proxy fails to start with an error such as `cannot bind '127.0.0.1:19000': Address already in use`.
+  * **Stats enabled (default)**: Each proxy has the `http-monitoring` container port 9091, so the scheduler already keeps the proxies on different nodes.
+  * **Stats disabled**: Nothing keeps the proxies apart, and the scheduler can place both on one node. To keep proxies that use the same listener ports on different nodes, add your Gateway's listener ports as container ports in the overlay.
+
+The following example sets `hostNetwork` and the DNS policy for the proxy pod, and adds port 8080 as a container port to the proxy container. The existing container ports, such as `http-monitoring`, are kept. If you disable stats, add one container port for each listener port of your Gateway.
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
@@ -527,6 +532,7 @@ spec:
         template:
           spec:
             hostNetwork: true
+            dnsPolicy: ClusterFirstWithHostNet
             containers:
               - name: kgateway-proxy
                 ports:
