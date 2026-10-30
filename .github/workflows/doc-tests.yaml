@@ -32,6 +32,8 @@ name: Doc tests
 # (classify_pr_results.py in docs-tests decides, the same rules as the
 # agentgateway and solo-io/docs PRs). A failure that is not the PR's leaves it
 # green, and goes on the grey "Doc tests: test update required" check instead.
+# A schema scenario is the PR's when it fails and main's nightly run does not
+# fail it too; one that also fails on main is listed in the run summary.
 #
 # The `doc-test-results` artifact from the latest scheduled run on main is what
 # a production build reads to show the "Verified" badge on a page whose tests
@@ -371,6 +373,7 @@ jobs:
       # Writes its own report, which the next step merges into the one the
       # badge, the job summary, and Slack read.
       - name: Run schema checks
+        id: schema
         if: ${{ !cancelled() && steps.schema-prep.outcome == 'success' }}
         env:
           SELECTED: ${{ steps.pages.outputs.files }}
@@ -388,7 +391,12 @@ jobs:
             --docs-tests-root docs-tests --condition envoy \
             --annotation-report out/annotations/attach-report.json \
             --report-file out/tests/schema/test-results.yaml \
-            "${file_args[@]}"
+            "${file_args[@]}" || status=$?
+          [ "${status:-0}" -eq 0 ] && exit 0
+          # On a pull request, "Check whether this change caused the schema
+          # failure" decides whether this job goes red.
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          [ "${{ github.event_name }}" = pull_request ] || exit "$status"
 
       - name: Merge functional and schema results
         if: ${{ !cancelled() }}
@@ -420,7 +428,7 @@ jobs:
       # one that also happens on main. No nightly results means nothing is
       # known to fail on main.
       - name: Find the nightly results on main
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && (steps.run.outputs.failed == 'true' || steps.schema.outputs.failed == 'true') }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -466,6 +474,37 @@ jobs:
               | "::error title=Your change broke a doc test::\(.name): \(.title). The run summary shows the step and its output."' verdicts.json
             exit 1
           fi
+
+      # The schema results carry no failed step for classify_pr_results.py to
+      # read, so the same rule is applied here per scenario: a schema scenario
+      # that fails is the PR's unless main's nightly run fails it too. The run
+      # selects only the scenarios on pages the PR reaches. No nightly results
+      # means nothing is known to fail on main.
+      - name: Check whether this change caused the schema failure
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.schema.outputs.failed == 'true' }}
+        run: |
+          python3 - <<'EOF'
+          import os, sys, yaml
+
+          def failing(path):
+              if not os.path.isfile(path):
+                  return {}
+              tests = (yaml.safe_load(open(path)) or {}).get("tests") or {}
+              return {k: v for k, v in tests.items() if v.get("type") == "schema" and v.get("status") != "passed"}
+
+          ours = failing("out/tests/schema/test-results.yaml")
+          known = failing(os.path.join(os.environ["RUNNER_TEMP"], "nightly", "test-results.yaml"))
+          new = [k for k in ours if k not in known]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+              for k in new:
+                  out.write(f"\n## Needs your fix: `{k}`\n\n```\n{ours[k].get('error', '')}\n```\n")
+              if len(ours) > len(new):
+                  out.write("\n## Schema checks that also fail on main\n\nNot caused by this change.\n\n")
+                  out.write("".join(f"- `{k}`\n" for k in ours if k in known))
+          for k in new:
+              print(f"::error title=Your change broke a schema check::{k}. The run summary shows the error.")
+          sys.exit(1 if new else 0)
+          EOF
 
       # "Report results" merges this with the macOS and Windows jobs' results.
       - name: Upload test results
