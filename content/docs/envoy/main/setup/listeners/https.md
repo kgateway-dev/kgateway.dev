@@ -78,9 +78,9 @@ Set up an HTTPS listener on your Gateway.
           namespaces:
             from: All        
         listeners:
-        - protocol: HTTPS
+        - protocol: HTTP
           port: 80
-          name: https
+          name: http
           allowedRoutes:
             namespaces:
               from: All
@@ -140,7 +140,7 @@ Set up an HTTPS listener on your Gateway.
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
+2. Check the status of the Gateway to make sure that your configuration is accepted. In the output, the Gateway has an `Accepted` condition of `True`. Each listener also has a `Conflicted` condition of `False`, which means that the listener does not conflict with other listeners on the Gateway. 
    ```sh
    kubectl get gateway https -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
@@ -245,7 +245,7 @@ Set up an HTTPS listener on your Gateway.
    - attachedRoutes: 1
    ```
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
 
    ```sh
    kubectl get listenerset -n {{< reuse "kgw-docs/snippets/namespace.md" >}} my-https-listenerset -o yaml
@@ -297,12 +297,12 @@ Set up an HTTPS listener on your Gateway.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vik --resolve "https.example.com:443:${INGRESS_GW_ADDRESS}" https://https.example.com:443/status/200
+   curl -vi --cacert example_certs/root.crt --resolve "https.example.com:443:${INGRESS_GW_ADDRESS}" https://https.example.com:443/status/200
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -vik --connect-to https.example.com:443:localhost:8443 https://https.example.com:443/status/200
+   curl -vi --cacert example_certs/root.crt --connect-to https.example.com:443:localhost:8443 https://https.example.com:443/status/200
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -327,11 +327,11 @@ Set up an HTTPS listener on your Gateway.
    * SSL connection using TLSv1.2 / ECDHE-RSA-CHACHA20-POLY1305
    * ALPN, server accepted to use h2
    * Server certificate:
-   *  subject: CN=*; O=gateway
+   *  subject: CN=*.example.com; O=any domain
    *  start date: Nov  5 01:54:04 2023 GMT
    *  expire date: Nov  2 01:54:04 2033 GMT
-   *  issuer: CN=*; O=root
-   *  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+   *  issuer: O=any domain; CN=*
+   *  SSL certificate verify ok.
    * Using HTTP2, server supports multi-use
    * Connection state changed (HTTP/2 confirmed)
    * Copying HTTP/2 data in stream buffer to connection buffer after upgrade: len=0
@@ -354,13 +354,15 @@ Set up an HTTPS listener on your Gateway.
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}
 ```sh
-kubectl delete -A gateways,httproutes,secret -l example=httpbin-https
+kubectl delete -A gateways,httproutes -l example=httpbin-https
+kubectl delete secret -A -l gateway=https
 rm -rf example_certs
 ```
 {{% /tab %}}
-{{% tab name="ListenerSet" %}}
+{{% tab name="ListenerSets" %}}
 ```sh
-kubectl delete -A gateways,httproutes,listenersets,secret -l example=httpbin-https
+kubectl delete -A gateways,httproutes,listenersets -l example=httpbin-https
+kubectl delete secret -A -l gateway=https
 rm -rf example_certs
 ```
 {{% /tab %}}

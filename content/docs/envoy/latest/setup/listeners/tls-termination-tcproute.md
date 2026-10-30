@@ -10,11 +10,14 @@ Set up a TLS listener on the Gateway that terminates incoming TLS traffic and ro
 
 {{< reuse "kgw-docs/snippets/cert-prereqs.md" >}}
 
-Install the experimental channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} so that you can use TCPRoutes.
+Make sure that your cluster has the standard channel of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version 1.6 or later, which includes TCPRoutes. The Get started guide installs a supported version.
 
-```shell
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
-```
+> [!NOTE]
+> TCPRoutes are part of the standard channel in Gateway API version 1.6 and later. If your cluster runs Gateway API version 1.5, install the experimental channel instead of the standard channel, and use `gateway.networking.k8s.io/v1alpha2` as the `apiVersion` of your TCPRoutes. The following example installs version 1.5.1.
+>
+> ```sh
+> kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.1/experimental-install.yaml
+> ```
 
 ## Create a TLS certificate
 
@@ -220,7 +223,7 @@ Create a TCPRoute that routes traffic on port 8443 to the httpbin app.
 {{% tab name="Gateway listeners" %}}
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: TCPRoute
 metadata:
   name: tls-terminate-tcp-route
@@ -242,7 +245,7 @@ EOF
 {{% tab name="ListenerSets" %}}
 ```yaml
 kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: TCPRoute
 metadata:
   name: tls-terminate-tcp-route
@@ -279,14 +282,14 @@ EOF
 
    * **Load balancer IP**:
      ```sh
-     curl -vik --resolve "app.example.com:8443:${INGRESS_GW_ADDRESS}" \
+     curl -vi --resolve "app.example.com:8443:${INGRESS_GW_ADDRESS}" \
        --cacert example_certs/root.crt \
        https://app.example.com:8443/status/200
      ```
 
    * **Load balancer hostname**:
      ```sh
-     curl -vik --resolve "app.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" \
+     curl -vi --resolve "app.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" \
        --cacert example_certs/root.crt \
        https://app.example.com:8443/status/200
      ```
@@ -308,7 +311,7 @@ EOF
 
 2. Send a request to the `app.example.com` domain and verify that you get back a 200 HTTP response code.
    ```sh
-   curl -vik --connect-to app.example.com:8443:localhost:8443 \
+   curl -vi --connect-to app.example.com:8443:localhost:8443 \
      --cacert example_certs/root.crt \
      https://app.example.com:8443/status/200
    ```
@@ -331,13 +334,15 @@ EOF
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}
 ```sh
-kubectl delete -A gateways,tcproutes,secret -l example=tls-terminate-tcp
+kubectl delete -A gateways,tcproutes -l example=tls-terminate-tcp
+kubectl delete secret tls-terminate-tcp -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf example_certs
 ```
 {{% /tab %}}
-{{% tab name="ListenerSet" %}}
+{{% tab name="ListenerSets" %}}
 ```sh
-kubectl delete -A gateways,tcproutes,listenersets,secret -l example=tls-terminate-tcp
+kubectl delete -A gateways,tcproutes,listenersets -l example=tls-terminate-tcp
+kubectl delete secret tls-terminate-tcp -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf example_certs
 ```
 {{% /tab %}}

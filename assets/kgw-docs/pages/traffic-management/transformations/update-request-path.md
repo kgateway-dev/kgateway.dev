@@ -24,8 +24,6 @@ Common pseudo headers include:
    * If the request contains the `foo:bar` header, the request path is rewritten to the `/post` path. In addition, the HTTP method is changed to the `POST` method.  
    * If the request does not contain the `foo:bar` header, the request path and method do not change. 
 
-   {{< tabs >}}
-   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF  
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -47,31 +45,6 @@ Common pseudo headers include:
            value: '{% if request_header("foo") == "bar" %}POST{% else %}{{ request_header(":method")}}{% endif %}'
    EOF
    ```
-   {{% /tab %}}
-   {{% tab name="Agentgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF  
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     name: transformation
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     transformation:
-       request:
-         set:
-         - name: ":path"
-           value: 'request.headers["foo"] == "bar" ? "/post" : request.path'
-         - name: ":method"
-           value: 'request.headers["foo"] == "bar" ? "POST" : request.method'
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
 2. Send a request to the `/get` endpoint of the httpbin app. Include the `foo: bar` request header to trigger the request transformation. Verify that you get back a 200 HTTP response code and that your request path is rewritten to the `/post` endpoint. The `/post` endpoint accepts requests only if the HTTP `POST` method is used. The 200 HTTP response code therefore also indicates that the HTTP method was successfully changed from `GET` to `POST`. 
    {{< tabs >}}

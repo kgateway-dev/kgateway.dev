@@ -65,7 +65,7 @@ spec:
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
 > [!WARNING]
-> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later{{< /version >}}.
+> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later{{< /version >}}.
 
 The following example shows a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRefs` field is not set. Because of that, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
@@ -122,7 +122,7 @@ spec:
 
 ### HTTPRoute rule {#attach-to-rule}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 > [!NOTE]
 > To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 {{< /version >}}
@@ -131,7 +131,7 @@ Instead of using the `extensionRef` filter to apply a policy to a specific route
 
 You can also use this attachment option alongside the `extensionRef` filter. However, policies that are attached via the `extensionRef` filter take precedence over policies that are attached via the `targetRefs.sectionName` option.
 
-The following HTTPRoute defines two HTTPRoute rules that both route traffic to the httpbin app. 
+The following HTTPRoute defines two HTTPRoute rules that both route traffic to the httpbin app. Note that this example replaces the `httpbin` HTTPRoute that you created as part of the sample app setup, and does not set a hostname. 
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.networking.k8s.io/v1
@@ -227,7 +227,7 @@ metadata:
   name: http
   namespace: kgateway-system
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   listeners:
   - name: http
     protocol: HTTP
@@ -276,7 +276,7 @@ If you apply multiple {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} by us
 
 By default, the following rules apply. You can update the behavior by using the `kgateway.dev/inherited-policy-priority` annotation. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
 
-* If you apply multiple {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} that define the same top-level policy, the policies are not merged and only the oldest policy is enforced. Policies with a later timestamp are ignored. 
+* If you apply multiple {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} that define the same top-level policy, the oldest policy is enforced for that top-level policy, and the same top-level policy in policies with a later timestamp is ignored. For some top-level policies, such as `extProc`, you can enable deep merging instead by using the `policyMerge` Helm setting or the `KGW_POLICY_MERGE` environment variable. 
 * {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} that define different top-level policies are merged and are enforced in combination. 
 * In addition to the timestamp, the attachment option of a policy determines the policy priority. In general, more specific policy targets have higher priority and take precedence over less specific policies. For example, a policy targeting an individual route has higher priority than a policy targeting all the routes in an HTTPRoute resource. However, keep in mind that these rules might be different in a route delegation setup. For more information, see [Policy inheritance and overrides in delegation setups](#delegation). 
 * Lower priority policies can augment higher priority policies by defining other top-level policies. For example, if you already attached a local rate limiting policy to a Gateway listener by using the `targetRefs.sectionName` option, you can add another {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that defines a transformation policy and apply that policy to the entire Gateway. 
@@ -299,7 +299,7 @@ Review the following Gateway and HTTPRoute policy priorities, sorted from highes
 | -- | -- | -- | 
 | 1 | [Individual HTTPRoute policy](#attach-to-route) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to an individual route by using the `extensionRef` filter in the HTTPRoute has the highest priority. Note that if you have multiple HTTPRoute policies that are attached via the `extensionRef` option and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
 | 2 | [HTTPRoute rule policy](#attach-to-rule) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to an HTTPRoute rule by using the `targetRefs.sectionName` option has a lower priority. This policy can still augment any `extensionRef` policies by defining different top-level policies. Note that if you have multiple HTTPRoute rule policies and all define the same top-level policy, only the one with the oldest timestamp is applied. | 
-| 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple HTTPRoute rule policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
+| 3 | [All HTTPRoute routes policy](#attach-to-all-routes) | A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that is attached to all routes in an HTTPRoute resource by using the `targetRefs` option has the lowest priority. You can still augment any higher priority policies by defining different top-level policies. If you have multiple all-routes policies and they all specify the same top-level policy, only the one with the oldest timestamp is applied. | 
 
 > [!NOTE]
 > Gateway-level {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} propagate to all child HTTPRoutes. If a child HTTPRoute has its own {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that defines the same top-level policy, the route-level policy takes precedence and the gateway-level one is ignored for that route. For example, if you set a 60-second request timeout at the gateway level, all HTTPRoutes inherit that timeout unless a route defines its own timeout, which overrides the gateway default.

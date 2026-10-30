@@ -72,9 +72,9 @@ Set up local rate limiting for a particular route. Note that the token bucket ap
    | ------- | ----------- |
    | `maxTokens` | The maximum number of tokens that are available to use.   |
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
-   | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
+   | `fillInterval` | The number of seconds, after which the token bucket is refilled. |
 
-2. Create an HTTPRoute that limits requests to the httpbin app along the `ratelimit.example` domain. To apply the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that created earlier, you use the `extensionRef` filter. 
+2. Create an HTTPRoute that limits requests to the httpbin app along the `ratelimit.example` domain. To apply the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that you created earlier, you use the `extensionRef` filter. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -198,9 +198,9 @@ Instead of applying local rate limiting to a particular route, you can also appl
    | `targetRefs`| Select the Gateway that you want to apply your local rate limiting configuration to. In this example, the policy is applied to all the routes that the `http` gateway serves.  |
    | `maxTokens` | The maximum number of tokens that are available to use.   |
    | `tokensPerFill` | The number of tokens that are added during a refill.  |
-   | `fillIntervall` | The number of seconds, after which the token bucket is refilled. |
+   | `fillInterval` | The number of seconds, after which the token bucket is refilled. |
    
-3. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. Verify that the request succeeds.
+2. Send a request to the httpbin app alongside the `www.example.com` domain that you set up as part of the getting started tutorial. Verify that the request succeeds.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -231,7 +231,7 @@ Instead of applying local rate limiting to a particular route, you can also appl
    server: envoy
    ```
 
-4. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the gateway is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the gateway. 
+3. Send another request to the httpbin app. Note that this time the request is denied with a 429 HTTP response code and a `local_rate_limited` message in your CLI output. Because the gateway is configured with only 1 token that is refilled every 100 seconds, the token was assigned to the connection of the first request. No tokens were available to be assigned to the second request. If you wait for 100 seconds, the token bucket is refilled and a new connection can be accepted by the gateway. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -404,8 +404,6 @@ Sometimes, you might want to disable {{< gloss "Rate Limiting" >}}rate limiting{
    ...
    ```
 
-{{< version include-if="2.1.x,2.2.x" >}}
-
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
@@ -418,6 +416,5 @@ kubectl delete httproute httpbin-ratelimit -n httpbin
 kubectl delete httproute httpbin-anything -n httpbin
 ```
 
-{{< /version >}}
 
 

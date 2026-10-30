@@ -91,14 +91,14 @@ Remove a header that is reserved for use by another service, such as an external
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}[API reference]({{< link-hextra path="/reference/api/#listenerpolicyspec" >}}){{< /version >}}.
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the {{< version include-if="2.1.x,2.2.x,2.3.x" >}}[API reference]({{< link-hextra path="/reference/api/#httplistenerpolicyspec" >}}){{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}[API reference]({{< link-hextra path="/reference/api/#listenerpolicyspec" >}}){{< /version >}}.
 
    | Setting                    | Description                                              |
    |----------------------------|----------------------------------------------------------|
    | targetRefs                 | References the Gateway resources this policy applies to. |
    | earlyRequestHeaderModifier | Header mutations applied before route selection.         |
 
-3. Repeat the test request to the sample httpbin app. The `x-user-id` header is no longer present in the response.
+3. Repeat the test request to the sample httpbin app. The `x-user-id` header is no longer present in the request headers that the httpbin app echoes back.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}  

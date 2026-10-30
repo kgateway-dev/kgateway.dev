@@ -180,7 +180,7 @@ Steps to set up the sample gRPC service:
          observedGeneration: 1
          reason: ResolvedRefs
          status: "True"
-        type: ResolvedRefs
+         type: ResolvedRefs
        controllerName: kgateway.dev/kgateway
        parentRef:
          group: gateway.networking.k8s.io
@@ -196,7 +196,7 @@ Verify that the gRPC route to the echo service is working. The steps vary depend
 {{% tab name="Cloud Provider LoadBalancer" %}}
 1. Send a request to the gRPC echo service by using the gRPC client app. Verify that you see the `pong` message in your response. 
    ```sh
-   kubectl exec -n kgateway-system grpcurl-client -c grpcurl -- \
+   kubectl exec -n {{< reuse "kgw-docs/snippets/namespace.md" >}} grpcurl-client -c grpcurl -- \
      grpcurl -plaintext -authority grpc.com -vv grpc:80 yages.Echo/Ping
    ```
 
@@ -209,10 +209,10 @@ Verify that the gRPC route to the echo service is working. The steps vary depend
 
 2. Optional: Explore other gRPC endpoints. 
    ```sh
-   kubectl exec -n kgateway-system grpcurl-client -c grpcurl -- \
+   kubectl exec -n {{< reuse "kgw-docs/snippets/namespace.md" >}} grpcurl-client -c grpcurl -- \
      grpcurl -plaintext -authority grpc.com -vv grpc:80 list
 
-   kubectl exec -n kgateway-system grpcurl-client -c grpcurl -- \
+   kubectl exec -n {{< reuse "kgw-docs/snippets/namespace.md" >}} grpcurl-client -c grpcurl -- \
      grpcurl -plaintext -authority grpc.com -vv grpc:80 describe yages.Echo
    ```
 

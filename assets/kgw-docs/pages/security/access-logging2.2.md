@@ -31,7 +31,7 @@ When Envoy is used as an HTTP proxy, additional HTTP information is available fo
 
 You can set up access logs to write to a standard (stdout/stderr) stream. The following example writes access logs to a stdout in the pod of the selected `http` gateway.
 
-1. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom string format that is defined in the `jsonFormat` field. 
+1. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom JSON format that is defined in the `jsonFormat` field. 
 
    ```yaml 
    kubectl apply -f- <<EOF
@@ -180,7 +180,7 @@ kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http 
 
 Example output:
 ```console
-[2024-08-19T20:57:57.511Z] "GET /headers" "HTTP/1.1" "200" "-"
+[2024-08-19T20:57:57.511Z] "GET /status/200" "HTTP/1.1" "200" "-"
 ```
 
 <!-- TODO
@@ -203,11 +203,11 @@ You can set up access logs to write to a file. The following example writes acce
    spec:
      kube:
        envoyContainer:
-         volumeMounts:
+         extraVolumeMounts:
            - mountPath: /dev/
              name: access-logs
        podTemplate:
-         volumes:
+         extraVolumes:
            - name: access-logs
              emptyDir: {}  # Creates a writable volume for the logs
    EOF
@@ -452,7 +452,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml \
-     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} 
+     --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}}
    ```
 
 4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}} of the originating route resource to the JSON access log output.

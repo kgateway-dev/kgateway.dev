@@ -111,6 +111,8 @@ Use the verification steps below to confirm that the Access Token Validation flo
 
 3. Obtain a token from Keycloak with the `password` grant. The `-k` option accepts the self-signed certificate that the setup steps create.
 
+   Replace `YOUR_CLIENT_SECRET` with your Keycloak client secret. If you used the [ConfigMap-based setup]({{< link-hextra path="/security/oauth/keycloak/setup/#configmap-setup" >}}), the secret is `kgateway-client-secret`.
+
    Request the token from the same Keycloak address that you set as the `issuer` on the `GatewayExtension`. Keycloak derives the `iss` claim from the address the request arrives on, so fetching a token from a different address produces a token that the gateway rejects.
 
    {{< tabs >}}
@@ -147,7 +149,7 @@ Use the verification steps below to confirm that the Access Token Validation flo
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
    ```sh
-   echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
+   echo $TOKEN | jq -rR 'split(".")[1] | gsub("-"; "+") | gsub("_"; "/") | @base64d | fromjson | {iss, aud}'
    ```
 
    Example output. If `aud` does not include your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client.

@@ -104,7 +104,7 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
          "0"
        ],
        "Host": [
-         "csrf.example:8080"
+         "www.example.com:8080"
        ],
        "Origin": [
          "allowThisOne.example.com"
@@ -123,7 +123,7 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
        ]
      },
      "origin": "10.X.X.XX:33896",
-     "url": "http://csrf.example:8080/post",
+     "url": "http://www.example.com:8080/post",
      "data": "",
      "files": null,
      "form": null,

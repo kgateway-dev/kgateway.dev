@@ -210,6 +210,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
     time="2025-09-15T21:25:11.7473" status=200 method="GET" uri="/status/200" size_bytes=0 duration_ms=0.03 user_agent="curl/8.7.1" client_ip=10.0.9.76
     time="2025-09-15T21:25:11.9098" status=200 method="GET" uri="/status/200" size_bytes=0 duration_ms=0.01 user_agent="curl/8.7.1" client_ip=10.0.15.215
     time="2025-09-15T21:25:12.0824" status=200 method="GET" uri="/status/200" size_bytes=0 duration_ms=0.01 user_agent="curl/8.7.1" client_ip=10.0.9.76
+    ```
 
 11. Port-forward the Gateway pod on port 19000. 
     ```sh

@@ -4,8 +4,8 @@ Create a 3-level route delegation hierarchy with a parent, child, and grandchild
 
 In this guide you walk through a route delegation example that demonstrates route delegation from a parent HTTPRoute resource to a child HTTPRoute resource, and from a child HTTPRoute resource to a grandchild HTTPRoute resource. The following image illustrates the route delegation hierarchy:
 
-{{< reuse-image src="img//route-delegation-multi-level.svg" >}} 
-{{< reuse-image-dark srcDark="img//route-delegation-multi-level-dark.svg" >}} 
+{{< reuse-image src="img/route-delegation-multi-level.svg" >}} 
+{{< reuse-image-dark srcDark="img/route-delegation-multi-level-dark.svg" >}} 
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource `parent` delegates traffic as follows: 
@@ -28,8 +28,8 @@ In this guide you walk through a route delegation example that demonstrates rout
 ## Setup
 
 1. Create the parent HTTPRoute resource that matches incoming traffic on the `delegation.example` domain. The HTTPRoute resource specifies two routes: 
-   * `/route1/team1`: The routing decision is delegated to a child HTTPRoute resource in the `team1` namespace. 
-   * `/route2/team2`: The routing decision is delegated to a child HTTPRoute resource in the `team2` namespace. 
+   * `/anything/team1`: The routing decision is delegated to a child HTTPRoute resource in the `team1` namespace. 
+   * `/anything/team2`: The routing decision is delegated to a child HTTPRoute resource in the `team2` namespace. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -126,7 +126,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    EOF
    ```
    
-6. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
+5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -154,7 +154,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
    
-7. Send another request to the `delegation.example` domain along the `/anything/team1/bar` path. Verify that you get back a 404 HTTP response code, because this route is not specified in the child HTTPRoute resource `child-team1`. 
+6. Send another request to the `delegation.example` domain along the `/anything/team1/bar` path. Verify that you get back a 404 HTTP response code, because this route is not specified in the child HTTPRoute resource `child-team1`. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -178,7 +178,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
 
-8. Send another request to the `delegation.example` domain. This time, you use the `/anything/team2/grandchild/bar` path that is configured on the `grandchild` HTTPRoute resource. Verify that you get back a 200 HTTP response code.
+7. Send another request to the `delegation.example` domain. This time, you use the `/anything/team2/grandchild/bar` path that is configured on the `grandchild` HTTPRoute resource. Verify that you get back a 200 HTTP response code.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -206,7 +206,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
 
-9. Send another request to the `delegation.example` domain along the `/anything/team2/grandchild/foo` path. Because the grandchild HTTPRoute resource uses a regular expression to match incoming traffic, you can use any valid endpoint in the httpbin app to route traffic to the httpbin app in the `team2` namespace.  
+8. Send another request to the `delegation.example` domain along the `/anything/team2/grandchild/foo` path. Because the grandchild HTTPRoute resource uses a regular expression to match incoming traffic, you can use any valid endpoint in the httpbin app to route traffic to the httpbin app in the `team2` namespace.  
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

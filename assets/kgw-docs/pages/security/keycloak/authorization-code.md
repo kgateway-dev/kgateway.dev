@@ -10,7 +10,7 @@ Protect a route with the OAuth2 authorization code flow. Unauthenticated browser
 
 Create the Kubernetes Secret that holds the Keycloak client secret, a `GatewayExtension` that configures the provider, and a `TrafficPolicy` that enforces the flow on a route.
 
-1. Create a Kubernetes Secret with the Keycloak client secret. Kgateway reads the value from the `client-secret` key specifically, so the key name matters. Replace `YOUR_CLIENT_SECRET` with the value that you copied from the **Credentials** tab of your Keycloak client during [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/" >}}).
+1. Create a Kubernetes Secret with the Keycloak client secret. Kgateway reads the value from the `client-secret` key specifically, so the key name matters. Replace `YOUR_CLIENT_SECRET` with the value that you copied from the **Credentials** tab of your Keycloak client during [Keycloak setup]({{< link-hextra path="/security/oauth/keycloak/setup/" >}}). If you used the ConfigMap-based setup, the secret is `kgateway-client-secret`.
 
    ```sh
    kubectl create secret generic keycloak-client-secret \

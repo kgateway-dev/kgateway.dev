@@ -95,6 +95,7 @@ Use the `AnyPort` setting to strip any port from the `Host` header, regardless o
    | `spec.default.httpSettings.stripHostPortMode` | How Envoy strips the port from the `Host`/`authority` header. In this example, the `AnyPort` setting is used that removes any port that the client sends as part of the request. |
 
 3. Send another request to the httpbin app. Verify that this time, port 9999 is not returned in the `Host` header. 
+
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -222,7 +223,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
          "*/*"
        ],
        "Host": [
-        "www.example.com"
+         "www.example.com"
        ],
        "User-Agent": [
          "curl/8.7.1"
@@ -231,6 +232,7 @@ Use the `MatchingPort` setting to strip the port only when it matches the listen
    ```
 
 4. Send another request to the httpbin app. This time, you include a port in the `Host` header that does not match the listener port, such as `9999`. Verify that the port is not removed from the `Host` header.
+
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

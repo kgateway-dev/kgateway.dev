@@ -11,7 +11,7 @@ You can use a BackendConfigPolicy to apply HTTP connection settings to a service
 
 * [General connection settings](#general-settings)
 * [HTTP protocol options](#http)
-* [Additional HTTP 1.0 protocol options](#http1)
+* [Additional HTTP/1.1 protocol options](#http1)
 
 ### General connection settings {#general-settings}
 
@@ -69,7 +69,7 @@ spec:
 | `maxConnectionDuration` | The maximum duration of a connection, measured from the time that the connection was established. When this duration is reached, the gateway starts the drain sequence. Unlike `idleTimeout`, this setting closes the connection even when the connection is actively serving requests, which makes it useful for forcing clients to periodically reconnect and rebalance. If not specified, connections have no maximum duration. | {{< /version >}}
  
 
-#### Additional HTTP 1.0 protocol options {#http1}
+#### Additional HTTP/1.1 protocol options {#http1}
 
 The BackendConfigPolicy allows you to apply additional configuration to HTTP/1 connections. 
 
@@ -94,7 +94,7 @@ spec:
 | -- | -- | 
 | `enableTrailers` | Enables trailers for HTTP/1 requests. Trailers are headers that are sent after the request body is sent. By default, the HTTP/1 codec drops proxied trailers. | 
 | `overrideStreamErrorOnInvalidHttpMessage` | When set to false, the proxy terminates HTTP/1.1 connections when an invalid HTTP message is received, such as malformatted headers. When set to true, the proxy leaves the HTTP/1.1 connection open where possible. | 
-| `headerFormat` | By default, the proxy normalizes header keys to lowercase. Set to `PreserveCaseHeaderKeyFormat` to preserve the original casing after the request is proxied. Set to `properCaseHeaderKeyFormat` to capitalize the first character and any character following a special character if it's an alpha character. For example, `content-type` becomes `Content-Type`, and `foo$b#$are` becomes `Foo$B#$Are`. |
+| `preserveHttp1HeaderCase` | By default, the proxy normalizes header keys to lowercase. Set to `true` to preserve the original casing of HTTP/1.1 header keys after the request is proxied. |
 
 
 ## Before you begin

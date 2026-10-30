@@ -142,7 +142,7 @@ You can scope the xDS configuration so that each gateway's proxies receive only 
 
 1. Set the scoping mode in your Helm values file. The control plane supports the following scoping modes:
    * `ALL` (default): Every gateway proxy receives a cluster for every discovered backend, whether or not a route uses it.
-   * `REFERENCED`: Each gateway's proxies receive only the clusters that the gateway's configuration references. A gateway whose routes select the destination at request time stays unscoped.
+   * `REFERENCED`: Each gateway's proxies receive only the clusters that the gateway's configuration references. A gateway whose routes select the destination at request time is not scoped and receives all clusters.
 
    The following example enables the `REFERENCED` mode.
    ```yaml
@@ -158,7 +158,7 @@ You can scope the xDS configuration so that each gateway's proxies receive only 
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
-     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
      -f values.yaml
    ```
 
@@ -171,7 +171,7 @@ The control plane reports the following metrics, each with the `gateway` and `na
 | -- | -- |
 | `kgateway_xds_snapshot_resources` (Gauge) | The number of resources that the control plane publishes to the gateway proxy. Filter for `resource="Cluster"` to see how many clusters the proxies receive after scoping. |
 | `kgateway_xds_scoping_dropped_clusters` (Gauge) | The number of clusters that the control plane withholds from the gateway proxy, because the gateway's configuration references none of them. If a gateway has several groups of proxies, such as in different zones, the metric reports the most that any group withholds. |
-| `kgateway_xds_scoping_disabled_gateways` (Gauge) | `1` if the gateway is unscoped and receives all clusters, because its routes select the destination at request time, such as through a header. The control plane cannot determine in advance which clusters the gateway needs. If a gateway has several groups of proxies, such as in different zones, `1` means that at least one group is unscoped. </br></br> The proxies of an unscoped gateway still receive all clusters, so scoping does not reduce their configuration or stats. Because the gateway keeps working, consider alerting on a value of `1` to find out when scoping stops applying to a gateway. If all gateways are scoped, the value is `0`.  |
+| `kgateway_xds_scoping_disabled_gateways` (Gauge) | `1` if the gateway is not scoped and receives all clusters, because its routes select the destination at request time, such as through a header. The control plane cannot determine in advance which clusters the gateway needs. If a gateway has several groups of proxies, such as in different zones, `1` means that at least one group is not scoped. </br></br> The proxies of a gateway that is not scoped still receive all clusters, so scoping does not reduce their configuration or stats. Because the gateway keeps working, consider alerting on a value of `1` to find out when scoping stops applying to a gateway. If all gateways are scoped, the value is `0`.  |
 | `kgateway_xds_scoping_transitions_total` (Counter) | The number of cluster transitions that the control plane delayed, such as when you add a route to a new backend or remove the last route to a backend. The `transition` label shows the kind of transition. For the label values, see [Tune cluster transitions](#xds-scoping-transitions). |
 {{< /table >}}
 
@@ -243,7 +243,7 @@ Strict mode does not keep a previous version of a route when an update to the ro
 
 For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
 
-### Enable strict validation
+### Enable strict validation {#strict-validation}
 
 Set the `validation.level` Helm value to `strict` when you install or upgrade kgateway. Restart the control plane to apply the change.
 
@@ -271,7 +271,7 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x,2.0.x" >}}
 ## Tune the controller Go memory limit {#controller-memory-limit}
 
 By default, the Go runtime that the kgateway controller runs on does not know how much memory Kubernetes allows its container to use. The controller's garbage collector just runs on its own schedule, so the controller can keep allocating memory right up to the container's limit. When it crosses that limit, the Linux kernel kills the container immediately, with no warning and no chance for the controller to free memory first. This event appears as a Kubernetes pod restart, often labeled `OOMKilled`.
@@ -409,7 +409,7 @@ If a policy reports `missing reference grant`, check the following settings of y
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
-     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
      -f values.yaml
    ```
 
@@ -422,7 +422,7 @@ If a policy reports `missing reference grant`, check the following settings of y
 7. Verify the active mode.
 
    ```sh
-   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "kgw-docs/snippets/kgateway.md" >}}  \
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "kgw-docs/snippets/pod-name.md" >}} \
      -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_REFERENCE_GRANT_MODE")].value}'
    ```
 

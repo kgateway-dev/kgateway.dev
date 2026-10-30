@@ -34,13 +34,13 @@ weight: 10
     Validate the binary against the checksum file.
 
     ```bash
-    echo "$(cat checksums.txt)  ingress2gateway" | shasum -a 256 --check
+    grep -F "  ingress2gateway_${OS}_${ARCH}.tar.gz" checksums.txt | shasum -a 256 --check
     ```
 
-    If valid, the output is:
+    If valid, the output names the tarball and ends in `OK`, such as:
 
-    ```bash
-    ingress2gateway_$OS_$ARCH.tar.gz: OK
+    ```console
+    ingress2gateway_Darwin_arm64.tar.gz: OK
     ```
 
 4. Extract the tarball.

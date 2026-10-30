@@ -22,7 +22,7 @@ A request retry is the number of times a request is retried if it fails. This se
 > Retries are part of the standard channel in Gateway API version 1.7 and later. If your cluster runs Gateway API version 1.6 or earlier, install the experimental channel instead of the standard channel. The following example installs version 1.6.3.
 >
 > ```sh
-> kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/experimental-install.yaml
+> kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/experimental-install.yaml
 > ```
 {{< /version >}}
 
@@ -34,7 +34,7 @@ A request retry is the number of times a request is retried if it fails. This se
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 {{% /version %}}
 1. Install a sample app that you can simulate a failure for, such as adding a `sleep` command to the [Bookinfo reviews app](https://istio.io/latest/docs/examples/bookinfo/).
@@ -186,7 +186,6 @@ Set up retries to the reviews app.
    | `parentRefs` | The gateway to which the request is sent. In this example, you select the `http` gateway that you set up before you began. |
    | `rules` | The rules to apply to requests. |
    | `matches` | The path to match the request. In this example, you match any requests to the reviews app with `/`. |
-   | `path` | The path to match the request. In this example, you match the request to the `/reviews/1` path. |
    | `backendRefs` | The backend service to which the request is sent. In this example, you select the `reviews` service that you set up in the previous step. |
    | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
@@ -430,7 +429,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:80"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:8080"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
@@ -457,7 +456,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
    Example output: Note that the `response_flags` field now has values as follows:
 
    * `URX` means `UpstreamRetryLimitExceeded`, which verifies that the request was retried.
-   * `UF` means `UpstreamOverflow`, which verifies that the request failed.
+   * `UF` means upstream connection failure, which verifies that the request failed because the gateway proxy could not connect to the reviews app.
    
    ```json
    {

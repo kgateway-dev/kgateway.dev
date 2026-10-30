@@ -22,7 +22,7 @@ You can use the built-in customization fields in the {{< reuse "kgw-docs/snippet
 
 1. Create a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource with your custom configuration. The following example changes the following proxy settings:
    * `service.type`: Changes the service type from `LoadBalancer` to `NodePort`
-   * `envoyContainer.bootstrap.logformat`: Configures the Envoy application logs to use JSON format. 
+   * `envoyContainer.bootstrap.logFormat`: Configures the Envoy application logs to use JSON format. 
    * `envoyContainer.extraArgs`: Adds a custom base ID and enables CPU set threading for the gateway proxy. 
    
    For other examples, see the [Gateway customization guides]({{< link-hextra path="/setup/customize/" >}}).
@@ -93,7 +93,7 @@ You can use the built-in customization fields in the {{< reuse "kgw-docs/snippet
 
    ```
    NAME     TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-   custom   NodePort   10.96.123.456   <none>        80:30xxx/TCP   30s
+   custom   NodePort   10.96.123.45   <none>        80:30xxx/TCP   30s
    ```
 
 4. Verify that the Envoy application logs are emitted in JSON format.
@@ -110,7 +110,7 @@ You can use the built-in customization fields in the {{< reuse "kgw-docs/snippet
 
 5. Check the container arguments that are passed to the gateway proxy and verify that you see the custom base ID and CPU set threading. 
    ```sh
-   kubectl get deploy/custom -n kgateway-system -o yaml 
+   kubectl get deploy/custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml 
    ```
 
    Example output: 

@@ -193,7 +193,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ```
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
-   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -348,8 +348,8 @@ kubectl delete backend json-backend
 {{% tab name="HTTPS" %}}
 ```sh
 kubectl delete httproute static-backend
-kubectl delete backendconfigpolicy static-tls-policy
-kubectl delete backendtlspolicy static-tls-policy
+kubectl delete backendconfigpolicy static-tls-policy --ignore-not-found
+kubectl delete backendtlspolicy static-tls-policy --ignore-not-found
 kubectl delete backend json-backend
 ```
 {{% /tab %}}

@@ -10,7 +10,7 @@ The following stages are supported. The stages are listed in the order that a re
 |---|---|
 | `Fault` | Earliest stage. ExtProc is executed before fault injection. |
 | `AuthN` | External authentication stage. |
-| `AuthZ` | Authorization stage. This setting is the default when the `filterStage` field is not set. |
+| `AuthZ` | Authorization stage. When the `filterStage` field is not set, ExtProc runs after this stage. |
 | `RateLimit` | Rate limiting stage. |
 | `Route` | Final processing stage before the request leaves the gateway proxy. |
 
@@ -40,10 +40,9 @@ A common use case is to observe how a request changes as it passes through the f
 > [!NOTE]
 > By default, creating multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field results in a policy conflict error. To ensure that you can apply multiple ExtProc stages to the same route, enable deep merging for ExtProc policies by either setting `policyMerge.{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}.extProc=DeepMerge` in your Helm installation or using the `KGW_POLICY_MERGE={"{{< reuse "kgw-docs/snippets/policymerge-trafficpolicy.md" >}}":{"extProc":"DeepMerge"}}` environment variable.
 
-1. Optional: Get the values of your current Helm installation. 
+1. Get the values of your current Helm installation. The next step uses these values so that the upgrade keeps your current settings. 
    ```sh
    helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > values.yaml
-   open values.yaml
    ```
 
 2. Upgrade your Helm installation to enable deep merging for multiple {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resources that all specify the same `extProc` field. 
@@ -60,13 +59,13 @@ A common use case is to observe how a request changes as it passes through the f
    kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
-4. Build the ExtProc server image and load it into your cluster. The image is not published to a public registry and must be built locally from the [kgateway](https://github.com/kgateway-dev/kgateway) repository. Run the following commands from the root of that repository. Replace `<cluster-name>` with the name of your kind cluster.
+4. Build the ExtProc server image and load it into your cluster. The image is not published to a public registry and must be built locally from the [kgateway](https://github.com/kgateway-dev/kgateway) repository. Run the following commands from the root of that repository. The commands require Go and Docker, and load the image into a kind cluster. Replace `<cluster-name>` with the name of your kind cluster.
    ```sh
    make extproc-server-docker EXTPROC_SERVER_VERSION=0.0.2
    make cluster-load-extproc-server CLUSTER_NAME=<cluster-name> EXTPROC_SERVER_VERSION=0.0.2
    ```
 
-5. Deploy the ExtProc server. This example uses a prebuilt ExtProc server that manipulates request and response headers based on instructions that are sent in an instructions header.
+5. Deploy the ExtProc server. This example uses the ExtProc server image that you built in the previous step. The server manipulates request and response headers based on instructions that are sent in an instructions header.
    ```yaml
    kubectl apply -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -f- <<EOF
    apiVersion: apps/v1

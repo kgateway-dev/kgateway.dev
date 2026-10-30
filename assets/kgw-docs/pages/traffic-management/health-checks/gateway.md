@@ -8,7 +8,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
  
 ## Configure a health check on a gateway
 
-1. Create a ListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
+1. Create a ListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. This example uses `/check/healthz`, but you can define any path.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -24,16 +24,16 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
      default:
        httpSettings:
          healthCheck:
-           path: <path>
+           path: /check/healthz
    EOF
    ```
 
-2. To test the health check, drain the Envoy connections by sending an `HTTP POST` request to the `/healthcheck/fail` endpoint of the Envoy admin port.
+2. To test the health check, make it fail by sending an `HTTP POST` request to the `/healthcheck/fail` endpoint of the Envoy admin port.
    1. Port-forward the `http` deployment on port 19000.
       ```shell
       kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
       ```
-   2. Send an `HTTP POST` request to the `/healthcheck/fail` endpoint. This causes Envoy connections to begin draining.
+   2. Send an `HTTP POST` request to the `/healthcheck/fail` endpoint. Envoy now fails the health check, but keeps its existing connections open.
       ```sh
       curl -X POST 127.0.0.1:19000/healthcheck/fail
       ```
@@ -42,12 +42,12 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   curl -i $INGRESS_GW_ADDRESS:8080/check/healthz
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -i localhost:8080/<path>
+   curl -i localhost:8080/check/healthz
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -72,12 +72,12 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   curl -i $INGRESS_GW_ADDRESS:8080/check/healthz
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -i localhost:8080/<path>
+   curl -i localhost:8080/check/healthz
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -93,7 +93,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
 
 6. Stop port-forwarding the `http` deployment.
    ```sh
-   lsof -ti:19000 | xargs kill -9
+   pkill -f "kubectl port-forward deploy/http"
    ```
 
 ## Cleanup

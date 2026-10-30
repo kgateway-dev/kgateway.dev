@@ -31,6 +31,8 @@ Steps to install:
              prefix: loki_index_
              period: 24h
      auth_enabled: false
+     limits_config:
+       allow_structured_metadata: true
    singleBinary:
      replicas: 1
    minio:
@@ -46,8 +48,10 @@ Steps to install:
          installOperator: false
    lokiCanary:
      enabled: false
-   limits_config:
-     allow_structured_metadata: true
+   chunksCache:
+     enabled: false
+   resultsCache:
+     enabled: false
    memberlist:
      service:
        publishNotReadyAddresses: true

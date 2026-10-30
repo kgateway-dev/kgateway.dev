@@ -8,10 +8,32 @@ name: Doc tests
 # products/kgateway/, and are attached to a copy of the pages at test time. To
 # add or change a test, edit it there, not here.
 #
-# PILOT: one scenario so far, Direct responses in traffic management, run on
-# the latest and main version trees. Each run creates its own kind cluster.
+# Two kinds of scenario, on the latest and main version trees:
+#
+#   functional: runs the guide's commands in a kind cluster, one cluster per
+#               scenario.
+#   schema:     checks the kgateway and Gateway API resources on a page against
+#               the CRDs of the release that version tree documents. No cluster.
+#
 # A pull request runs only the scenarios its changed files reach (see "Select
 # tests for changed files"); the schedule and manual runs run all of them.
+#
+# Jobs: "Select tests" picks the scenarios once. "Run doc tests" runs the Linux
+# ones in kind clusters, plus the schema checks. "Run doc tests (macos)" and
+# "(windows)" run the scenarios a manifest gives `runner: macos` or `runner:
+# windows`, such as the ingress2gateway install pages, with no cluster. "Report
+# results" merges every job's results into the doc-test-results artifact, posts
+# to Slack, and on a PR posts the grey check.
+#
+# On a pull request, red means the author has something to fix, and green means
+# they do not. "Run doc tests" is red only when the PR broke a step on a page it
+# reaches and main's nightly run did not already fail there (each test job
+# decides for its own scenarios)
+# (classify_pr_results.py in docs-tests decides, the same rules as the
+# agentgateway and solo-io/docs PRs). A failure that is not the PR's leaves it
+# green, and goes on the grey "Doc tests: test update required" check instead.
+# A schema scenario is the PR's when it fails and main's nightly run does not
+# fail it too; one that also fails on main is listed in the run summary.
 #
 # The `doc-test-results` artifact from the latest scheduled run on main is what
 # a production build reads to show the "Verified" badge on a page whose tests
@@ -56,10 +78,115 @@ permissions:
   contents: read
 
 jobs:
+  # On a pull request, run only the scenarios the changed files reach.
+  # reuse_consumers.py walks the reuse edges and the scenarios' needs: and
+  # before: steps, so a change to a shared snippet selects every scenario that
+  # renders or runs it. A change to this workflow can affect every scenario, so
+  # it runs the full suite. Reads the pages as the PR wrote them, before any
+  # annotations are attached. Every job below reads its outputs.
+  select:
+    name: Select tests
+    runs-on: ubuntu-latest
+    outputs:
+      # Linux functional scenarios to run: true or false.
+      run: ${{ steps.select.outputs.run }}
+      schema: ${{ steps.select.outputs.schema }}
+      # JSON list of the content pages the PR reaches, empty for the full suite.
+      pages: ${{ steps.select.outputs.pages }}
+      # Every selected functional scenario, {file, test, runner}, for the PR verdicts.
+      expected: ${{ steps.select.outputs.expected }}
+      # The macOS and Windows runners with scenarios to run.
+      os_matrix: ${{ steps.select.outputs.os_matrix }}
+      has_os: ${{ steps.select.outputs.has_os }}
+    steps:
+      - name: Checkout kgateway.dev
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout docs-tests
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: solo-io/docs-tests
+          ref: ${{ inputs.docs_tests_ref || 'main' }}
+          path: docs-tests
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Select tests for changed files
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          file_args=()
+          pages=""
+          if [ "${{ github.event_name }}" = pull_request ]; then
+            # No `|| true`: an empty list from a failed call would look like
+            # "nothing to test" and pass having tested nothing.
+            gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+              --paginate --jq '.[].filename' > "$RUNNER_TEMP/changed.txt"
+            cat "$RUNNER_TEMP/changed.txt"
+            if grep -qx '.github/workflows/doc-tests.yaml' "$RUNNER_TEMP/changed.txt"; then
+              echo "This workflow changed; running the full suite."
+            else
+              python3 docs-tests/scripts/reuse_consumers.py --repo-root . \
+                --stdin < "$RUNNER_TEMP/changed.txt" > "$RUNNER_TEMP/pages.txt"
+              # A page the PR deleted is selected as itself, and has nothing
+              # left to test.
+              : > "$RUNNER_TEMP/selected.txt"
+              while IFS= read -r page; do
+                [ -f "$page" ] && echo "$page" >> "$RUNNER_TEMP/selected.txt"
+              done < "$RUNNER_TEMP/pages.txt"
+              if [ ! -s "$RUNNER_TEMP/selected.txt" ]; then
+                echo "::notice::The changed files reach no page with doc tests. No tests run."
+                { echo "run=false"; echo "schema=false"; echo "has_os=false"; echo 'os_matrix={"include":[]}'; echo "expected=[]"; } >> "$GITHUB_OUTPUT"
+                exit 0
+              fi
+              file_args=(--file)
+              while IFS= read -r page; do file_args+=("$page"); done < "$RUNNER_TEMP/selected.txt"
+              pages=$(jq -Rsc 'split("\n") | map(select(length > 0))' "$RUNNER_TEMP/selected.txt")
+            fi
+          fi
+          # Schema scenarios are not in --list-tests, which lists only
+          # functional ones. The schema check runs on any selected page, and
+          # finds nothing to do on a page without a schema scenario.
+          echo "schema=true" >> "$GITHUB_OUTPUT"
+          echo "pages=$pages" >> "$GITHUB_OUTPUT"
+          TESTS=$(python3 docs-tests/scripts/doc_test_run.py --repo-root . \
+            --docs-tests-root docs-tests --condition envoy --no-verbose --list-tests \
+            "${file_args[@]}")
+          echo "expected=$(jq -c 'map({file, test, runner})' <<<"$TESTS")" >> "$GITHUB_OUTPUT"
+          linux=$(jq '[.[] | select(.runner == "linux")] | length' <<<"$TESTS")
+          echo "Linux functional scenarios selected: $linux"
+          if [ "$linux" -eq 0 ]; then
+            echo "::notice::The changed files reach no Linux functional doc test scenario. No cluster tests run."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+          os_matrix=$(jq -c '{include: [map(.runner) | unique[] | select(. != "linux") | {runner: ., os: "\(.)-latest"}]}' <<<"$TESTS")
+          echo "Other runners: $os_matrix"
+          echo "os_matrix=$os_matrix" >> "$GITHUB_OUTPUT"
+          echo "has_os=$(jq '.include | length > 0' <<<"$os_matrix")" >> "$GITHUB_OUTPUT"
+
   run-test:
     name: Run doc tests
+    needs: select
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # actions: read, for the nightly run's results in "Find the nightly
+    # results on main". Still nothing that writes.
+    permissions:
+      contents: read
+      actions: read
     steps:
       # persist-credentials: false on both checkouts, so the token is not left
       # in .git/config for the commands this job runs from the pages.
@@ -87,58 +214,21 @@ jobs:
           node-version: 'lts/*'
 
       - name: Install Python dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml jsonschema
 
-      # On a pull request, run only the scenarios the changed files reach.
-      # reuse_consumers.py walks the reuse edges and the scenarios' needs: and
-      # before: steps, so a change to a shared snippet selects every scenario
-      # that renders or runs it. A change to this workflow can affect every
-      # scenario, so it runs the full suite. Runs before the annotations are
-      # attached, so it reads the pages as the PR wrote them.
-      - name: Select tests for changed files
-        id: select
-        if: github.event_name == 'pull_request'
+      # The selected pages as a file, one per line, for --file. None means
+      # the full suite.
+      - name: Write the selected pages
+        id: pages
+        if: needs.select.outputs.pages != ''
         env:
-          GH_TOKEN: ${{ github.token }}
+          PAGES: ${{ needs.select.outputs.pages }}
         run: |
-          set -euo pipefail
-          # No `|| true`: an empty list from a failed call would look like
-          # "nothing to test" and pass having tested nothing.
-          gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
-            --paginate --jq '.[].filename' > "$RUNNER_TEMP/changed.txt"
-          cat "$RUNNER_TEMP/changed.txt"
-          if grep -qx '.github/workflows/doc-tests.yaml' "$RUNNER_TEMP/changed.txt"; then
-            echo "This workflow changed; running the full suite."
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          python3 docs-tests/scripts/reuse_consumers.py --repo-root . \
-            --stdin < "$RUNNER_TEMP/changed.txt" > "$RUNNER_TEMP/pages.txt"
-          # A page the PR deleted is selected as itself, and has nothing left
-          # to test.
-          : > "$RUNNER_TEMP/selected.txt"
-          while IFS= read -r page; do
-            [ -f "$page" ] && echo "$page" >> "$RUNNER_TEMP/selected.txt"
-          done < "$RUNNER_TEMP/pages.txt"
-          count=0
-          if [ -s "$RUNNER_TEMP/selected.txt" ]; then
-            files=()
-            while IFS= read -r page; do files+=("$page"); done < "$RUNNER_TEMP/selected.txt"
-            count=$(python3 docs-tests/scripts/doc_test_run.py --repo-root . \
-              --docs-tests-root docs-tests --no-verbose --list-tests \
-              --file "${files[@]}" | python3 -c 'import json, sys; print(len(json.load(sys.stdin)))')
-          fi
-          echo "Scenarios selected: $count"
-          if [ "$count" -eq 0 ]; then
-            echo "::notice::The changed files reach no doc test scenario. No tests run."
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
-          fi
+          jq -r '.[]' <<<"$PAGES" > "$RUNNER_TEMP/selected.txt"
+          echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
 
       - name: Install yamltest
-        if: steps.select.outputs.run != 'false'
+        if: needs.select.outputs.run != 'false'
         run: npm install -g yamltest@latest
 
       # A release binary rather than `go install`, pinned and checksum-verified.
@@ -146,7 +236,7 @@ jobs:
       # service a load balancer address, which the guides read into
       # INGRESS_GW_ADDRESS.
       - name: Install cloud-provider-kind
-        if: steps.select.outputs.run != 'false'
+        if: needs.select.outputs.run != 'false'
         env:
           CPK_VERSION: v0.12.0
         run: |
@@ -166,31 +256,157 @@ jobs:
       # lists markup that no longer matches its page, so the runner skips that
       # scenario with a warning instead of running it with a step missing.
       - name: Attach test annotations
-        if: steps.select.outputs.run != 'false'
+        if: needs.select.outputs.run != 'false' || needs.select.outputs.schema != 'false'
         run: |
           python3 docs-tests/scripts/annotations.py attach --repo . \
             --annotations docs-tests/products/kgateway/annotations \
             --report out/annotations/attach-report.json
 
+      # Schema checks: each version tree against the CRDs of the release it
+      # documents. main/ documents kgateway's default branch. latest/
+      # documents the newest stable patch of the minor that hugo.yaml labels
+      # `latest` (2.4.x -> v2.4.<n>). It is not read from n-patch.md, so a
+      # pin that lags a release still gets checked against the fields that
+      # the pages document.
+      - name: Resolve kgateway release for latest
+        id: latest-tag
+        if: needs.select.outputs.schema != 'false'
+        run: |
+          set -euo pipefail
+          MINOR=$(python3 -c 'import yaml; v = yaml.safe_load(open("hugo.yaml"))["params"]["versions"]; print(next(e["version"] for e in v if e.get("linkVersion") == "latest").removesuffix(".x"))')
+          TAG=$(git ls-remote --tags --refs https://github.com/kgateway-dev/kgateway.git "refs/tags/v${MINOR}.*" \
+            | awk '{ sub("refs/tags/", "", $2); print $2 }' | grep -E "^v${MINOR//./\\.}\.[0-9]+$" | sort -V | tail -n 1 || true)
+          if [ -z "$TAG" ]; then
+            echo "::error::No stable kgateway tag v${MINOR}.<patch> found for the latest docs (${MINOR}.x in hugo.yaml)."
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "latest/ is checked against kgateway $TAG CRDs; main/ against the default branch."
+
+      - name: Checkout kgateway main (CRD schemas for main)
+        if: needs.select.outputs.schema != 'false'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: kgateway-dev/kgateway
+          path: kgateway-main
+          sparse-checkout: install/helm/kgateway-crds
+          persist-credentials: false
+
+      - name: Checkout kgateway ${{ steps.latest-tag.outputs.tag }} (CRD schemas for latest)
+        if: needs.select.outputs.schema != 'false'
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: kgateway-dev/kgateway
+          ref: ${{ steps.latest-tag.outputs.tag }}
+          path: kgateway-latest
+          sparse-checkout: install/helm/kgateway-crds
+          persist-credentials: false
+
+      # The kgateway CRD chart templates some CRDs, so render it rather than
+      # read the templates. Gateway API kinds are checked against the
+      # experimental CRDs of the release each tree installs
+      # (k8s-gw-version.md); experimental is a superset of standard. Core kinds
+      # (Service, Deployment, ...) go through kubeconform, against the newest
+      # Kubernetes version these docs support.
+      - name: Prepare CRD schemas and kubeconform
+        id: schema-prep
+        if: needs.select.outputs.schema != 'false'
+        env:
+          KUBECONFORM_VERSION: v0.8.0
+        run: |
+          set -euo pipefail
+          for tree in latest main; do
+            mkdir -p "$RUNNER_TEMP/crds/$tree"
+            helm template kgateway-crds "kgateway-$tree/install/helm/kgateway-crds" > "$RUNNER_TEMP/crds/$tree/kgateway-crds.yaml"
+            GWAPI=$(python3 - "$tree" <<'EOF'
+          import re, sys, yaml
+          tree = sys.argv[1]
+          versions = yaml.safe_load(open("hugo.yaml"))["params"]["versions"]
+          release = next(e["version"] for e in versions if e.get("linkVersion") == tree)
+          text = open("assets/kgw-docs/versions/k8s-gw-version.md").read()
+          for gate, value in re.findall(r'include-if="([^"]*)"\s*>}}([^{]*){{', text):
+              if release in [g.strip() for g in gate.split(",")]:
+                  print(value.strip())
+                  break
+          else:
+              sys.exit(f"k8s-gw-version.md has no Gateway API version for {release}")
+          EOF
+            )
+            curl -fsSL --retry 5 --retry-all-errors -o "$RUNNER_TEMP/crds/$tree/gateway-api.yaml" \
+              "https://github.com/kubernetes-sigs/gateway-api/releases/download/v${GWAPI}/experimental-install.yaml"
+            echo "$tree/: Gateway API v${GWAPI} (experimental)."
+          done
+          curl -fsSL --retry 5 --retry-all-errors "https://github.com/yannh/kubeconform/releases/download/${KUBECONFORM_VERSION}/kubeconform-linux-amd64.tar.gz" \
+            | tar -xz -C "$RUNNER_TEMP" kubeconform
+          KUBE=$(tr -d '[:space:]' < assets/kgw-docs/versions/max-kube.md)
+          echo "KUBERNETES_VERSION=${KUBE}.0" >> "$GITHUB_ENV"
+          echo "Kubernetes ${KUBE}.0 schemas via kubeconform ${KUBECONFORM_VERSION}."
+
       # Every scenario docs-tests defines for this site, one kind cluster each.
       # stdin is closed so a guide command that reads stdin cannot swallow the
       # rest of the run.
       - name: Run doc tests
-        if: steps.select.outputs.run != 'false'
+        id: run
+        if: needs.select.outputs.run != 'false'
         env:
           DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
           PYTHONUNBUFFERED: '1'
-          SELECTED: ${{ steps.select.outputs.files }}
+          SELECTED: ${{ steps.pages.outputs.files }}
         run: |
           file_args=()
           if [ -n "$SELECTED" ]; then
             file_args=(--file)
             while IFS= read -r page; do file_args+=("$page"); done < "$SELECTED"
           fi
+          status=0
           python3 docs-tests/scripts/doc_test_run.py --repo-root . \
-            --docs-tests-root docs-tests \
+            --docs-tests-root docs-tests --condition envoy \
             --annotation-report out/annotations/attach-report.json \
-            "${file_args[@]}" < /dev/null
+            "${file_args[@]}" < /dev/null || status=$?
+          [ "$status" -eq 0 ] && exit 0
+          # On a pull request, "Check whether this change caused the failure"
+          # decides whether this job goes red.
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          [ "${{ github.event_name }}" = pull_request ] || exit "$status"
+
+      # Runs even when a functional test failed, so one report covers both.
+      # Writes its own report, which the next step merges into the one the
+      # badge, the job summary, and Slack read.
+      - name: Run schema checks
+        id: schema
+        if: ${{ !cancelled() && steps.schema-prep.outcome == 'success' }}
+        env:
+          SELECTED: ${{ steps.pages.outputs.files }}
+        run: |
+          file_args=()
+          if [ -n "$SELECTED" ]; then
+            file_args=(--file)
+            while IFS= read -r page; do file_args+=("$page"); done < "$SELECTED"
+          fi
+          python3 docs-tests/scripts/doc_test_schema_check.py --repo-root . \
+            --crd-dir latest="$RUNNER_TEMP/crds/latest" \
+            --crd-dir main="$RUNNER_TEMP/crds/main" \
+            --kubeconform "$RUNNER_TEMP/kubeconform" \
+            --kubernetes-version "$KUBERNETES_VERSION" \
+            --docs-tests-root docs-tests --condition envoy \
+            --annotation-report out/annotations/attach-report.json \
+            --report-file out/tests/schema/test-results.yaml \
+            "${file_args[@]}" || status=$?
+          [ "${status:-0}" -eq 0 ] && exit 0
+          # On a pull request, "Check whether this change caused the schema
+          # failure" decides whether this job goes red.
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          [ "${{ github.event_name }}" = pull_request ] || exit "$status"
+
+      - name: Merge functional and schema results
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/results/functional" "$RUNNER_TEMP/results/schema"
+          [ -f out/tests/generated/test-results.yaml ] && cp out/tests/generated/test-results.yaml "$RUNNER_TEMP/results/functional/"
+          [ -f out/tests/schema/test-results.yaml ] && cp out/tests/schema/test-results.yaml "$RUNNER_TEMP/results/schema/"
+          if [ -n "$(find "$RUNNER_TEMP/results" -name test-results.yaml)" ]; then
+            python3 docs-tests/scripts/merge_test_results.py "$RUNNER_TEMP/results" out/tests/generated/test-results.yaml
+          fi
 
       # The runner exits 0 when it finds nothing to run, for example when the
       # docs-tests ref has no products/kgateway/ yet. That green run tested
@@ -199,13 +415,307 @@ jobs:
       # tests. It counts here: it proves products/kgateway/ resolved, and the
       # summary already flags it as a warning.
       - name: Check that tests ran
-        if: steps.select.outputs.run != 'false'
+        if: ${{ !cancelled() && needs.select.outputs.run != 'false' }}
         run: |
           count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}) + len(d.get('skipped_needs_update') or {}))" 2>/dev/null || echo 0)
           echo "Doc test scenarios run: $count"
           if [ "$count" -eq 0 ]; then
             echo "::error::No doc test scenarios ran. Check that docs-tests (ref '${{ inputs.docs_tests_ref || 'main' }}') has products/kgateway/."
             exit 1
+          fi
+
+      # The latest nightly run's results, to tell a failure this PR caused from
+      # one that also happens on main. No nightly results means nothing is
+      # known to fail on main.
+      - name: Find the nightly results on main
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && (steps.run.outputs.failed == 'true' || steps.schema.outputs.failed == 'true') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # `|| true`: an error here only means there is nothing to compare with.
+          RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
+            --branch main --event schedule --status completed --limit 1 \
+            --json databaseId --jq '.[0].databaseId // empty' || true)
+          if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
+            echo "Comparing with nightly run $RUN_ID."
+          else
+            echo "::notice::No nightly doc test results to compare with."
+          fi
+
+      # Red only when the PR broke a step: a code block on a page the PR
+      # reaches failed, and main's nightly run did not already fail there.
+      # Anything else (a failure that also happens on main, a docs-tests check
+      # that is out of date, a step on a page the PR does not reach) is for the
+      # docs team, which sees it in the nightly run. "Report results" lists
+      # those on the grey "Doc tests: test update required" check.
+      - name: Check whether this change caused the failure
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        env:
+          EXPECTED: ${{ needs.select.outputs.expected }}
+          SELECTED: ${{ steps.pages.outputs.files }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          if [ -n "$SELECTED" ]; then
+            ARGS+=(--affected-pages "$SELECTED")
+          fi
+          if [ -f "$RUNNER_TEMP/nightly/test-results.yaml" ]; then
+            ARGS+=(--known-results "$RUNNER_TEMP/nightly/test-results.yaml")
+          fi
+          jq -c 'map(select(.runner == "linux") | {file, test})' <<<"$EXPECTED" > expected.json
+          python3 docs-tests/scripts/classify_pr_results.py \
+            --results out/tests/generated/test-results.yaml \
+            --expected expected.json "${ARGS[@]}" --output verdicts.json
+          jq -r '.[] | select(.conclusion == "failure") | "\n## Needs your fix: `\(.name)`\n\n\(.summary)\n"' verdicts.json \
+            >> "$GITHUB_STEP_SUMMARY"
+          if jq -e 'any(.[]; .conclusion == "failure")' verdicts.json > /dev/null; then
+            jq -r '.[] | select(.conclusion == "failure")
+              | "::error title=Your change broke a doc test::\(.name): \(.title). The run summary shows the step and its output."' verdicts.json
+            exit 1
+          fi
+
+      # The schema results carry no failed step for classify_pr_results.py to
+      # read, so the same rule is applied here per scenario: a schema scenario
+      # that fails is the PR's unless main's nightly run fails it too. The run
+      # selects only the scenarios on pages the PR reaches. No nightly results
+      # means nothing is known to fail on main.
+      - name: Check whether this change caused the schema failure
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.schema.outputs.failed == 'true' }}
+        run: |
+          python3 - <<'EOF'
+          import os, sys, yaml
+
+          def failing(path):
+              if not os.path.isfile(path):
+                  return {}
+              tests = (yaml.safe_load(open(path)) or {}).get("tests") or {}
+              return {k: v for k, v in tests.items() if v.get("type") == "schema" and v.get("status") != "passed"}
+
+          ours = failing("out/tests/schema/test-results.yaml")
+          known = failing(os.path.join(os.environ["RUNNER_TEMP"], "nightly", "test-results.yaml"))
+          new = [k for k in ours if k not in known]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as out:
+              for k in new:
+                  out.write(f"\n## Needs your fix: `{k}`\n\n```\n{ours[k].get('error', '')}\n```\n")
+              if len(ours) > len(new):
+                  out.write("\n## Schema checks that also fail on main\n\nNot caused by this change.\n\n")
+                  out.write("".join(f"- `{k}`\n" for k in ours if k in known))
+          for k in new:
+              print(f"::error title=Your change broke a schema check::{k}. The run summary shows the error.")
+          sys.exit(1 if new else 0)
+          EOF
+
+      # "Report results" merges this with the macOS and Windows jobs' results.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-result-linux
+          path: out/tests/generated/test-results.yaml
+          retention-days: 1
+          if-no-files-found: ignore
+
+      - name: Upload test context (on failure)
+        if: failure() || steps.run.outputs.failed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: doc-test-context
+          path: out/tests/generated/context/
+          retention-days: 7
+          if-no-files-found: ignore
+
+  # Scenarios a manifest gives `runner: macos` or `runner: windows`, such as
+  # the ingress2gateway install pages: no cluster, on that OS's hosted
+  # runner. doc_test_run.py runs only the scenarios for the OS it is on.
+  run-test-os:
+    name: Run doc tests (${{ matrix.runner }})
+    needs: select
+    if: needs.select.outputs.has_os == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    defaults:
+      run:
+        # Git Bash on Windows, not the default PowerShell.
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.select.outputs.os_matrix) }}
+    steps:
+      # Windows checkouts convert line endings to CRLF by default, and the
+      # generated bash scripts then fail on the carriage returns.
+      - name: Keep LF line endings (Windows)
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+
+      - name: Checkout kgateway.dev
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout docs-tests
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: solo-io/docs-tests
+          ref: ${{ inputs.docs_tests_ref || 'main' }}
+          path: docs-tests
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      # `python`, not `python3`, in this job: Windows has no python3.
+      - name: Install Python dependencies
+        run: python -m pip install pyyaml
+
+      - name: Write the selected pages
+        id: pages
+        if: needs.select.outputs.pages != ''
+        env:
+          PAGES: ${{ needs.select.outputs.pages }}
+        run: |
+          jq -r '.[]' <<<"$PAGES" | tr -d '\r' > "$RUNNER_TEMP/selected.txt"
+          echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
+
+      - name: Attach test annotations
+        run: |
+          python docs-tests/scripts/annotations.py attach --repo . \
+            --annotations docs-tests/products/kgateway/annotations \
+            --report out/annotations/attach-report.json
+
+      - name: Run doc tests
+        id: run
+        env:
+          DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
+          PYTHONUNBUFFERED: '1'
+          SELECTED: ${{ steps.pages.outputs.files }}
+          # Git Bash on Windows. A bare `bash` can resolve to the WSL launcher.
+          DOC_TEST_BASH: ${{ runner.os == 'Windows' && 'C:\Program Files\Git\bin\bash.exe' || '' }}
+        run: |
+          file_args=()
+          if [ -n "$SELECTED" ]; then
+            file_args=(--file)
+            while IFS= read -r page; do file_args+=("$page"); done < "$SELECTED"
+          fi
+          status=0
+          python docs-tests/scripts/doc_test_run.py --repo-root . \
+            --docs-tests-root docs-tests --condition envoy \
+            --annotation-report out/annotations/attach-report.json \
+            "${file_args[@]}" < /dev/null || status=$?
+          [ "$status" -eq 0 ] && exit 0
+          # On a pull request, "Check whether this change caused the failure"
+          # decides whether this job goes red.
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          [ "${{ github.event_name }}" = pull_request ] || exit "$status"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-result-${{ matrix.runner }}
+          path: out/tests/generated/test-results.yaml
+          retention-days: 1
+          if-no-files-found: ignore
+
+      - name: Upload test context (on failure)
+        if: failure() || steps.run.outputs.failed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: doc-test-context-${{ matrix.runner }}
+          path: out/tests/generated/context/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Find the nightly results on main
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # `|| true`: an error here only means there is nothing to compare with.
+          RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
+            --branch main --event schedule --status completed --limit 1 \
+            --json databaseId --jq '.[0].databaseId // empty' || true)
+          if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
+            echo "Comparing with nightly run $RUN_ID."
+          else
+            echo "::notice::No nightly doc test results to compare with."
+          fi
+
+      # The same rule as "Run doc tests": red only when the PR broke a step.
+      - name: Check whether this change caused the failure
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        env:
+          EXPECTED: ${{ needs.select.outputs.expected }}
+          SELECTED: ${{ steps.pages.outputs.files }}
+          RUNNER: ${{ matrix.runner }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          if [ -n "$SELECTED" ]; then
+            ARGS+=(--affected-pages "$SELECTED")
+          fi
+          if [ -f "$RUNNER_TEMP/nightly/test-results.yaml" ]; then
+            ARGS+=(--known-results "$RUNNER_TEMP/nightly/test-results.yaml")
+          fi
+          jq -c --arg runner "$RUNNER" 'map(select(.runner == $runner) | {file, test})' <<<"$EXPECTED" > expected.json
+          python docs-tests/scripts/classify_pr_results.py \
+            --results out/tests/generated/test-results.yaml \
+            --expected expected.json "${ARGS[@]}" --output verdicts.json
+          jq -r '.[] | select(.conclusion == "failure") | "\n## Needs your fix: `\(.name)`\n\n\(.summary)\n"' verdicts.json \
+            >> "$GITHUB_STEP_SUMMARY"
+          if jq -e 'any(.[]; .conclusion == "failure")' verdicts.json > /dev/null; then
+            jq -r '.[] | select(.conclusion == "failure")
+              | "::error title=Your change broke a doc test::\(.name): \(.title). The run summary shows the step and its output."' verdicts.json | tr -d '\r'
+            exit 1
+          fi
+
+  # Merges every test job's results into the one report that the Verified
+  # badge, the job summary, Slack, and the next PR's comparison read. Runs
+  # nothing from the pages, only the docs-tests scripts on the results, so it
+  # can have checks: write for the grey check.
+  report:
+    name: Report results
+    needs: [select, run-test, run-test-os]
+    if: ${{ !cancelled() && needs.select.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      checks: write
+    steps:
+      - name: Checkout docs-tests
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: solo-io/docs-tests
+          ref: ${{ inputs.docs_tests_ref || 'main' }}
+          path: docs-tests
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml
+
+      - name: Download test results
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: test-result-*
+          path: collected/
+
+      - name: Merge test results
+        run: |
+          mkdir -p collected out/tests/generated
+          if [ -n "$(find collected -name test-results.yaml)" ]; then
+            python3 docs-tests/scripts/merge_test_results.py collected out/tests/generated/test-results.yaml
           fi
 
       - name: Job summary
@@ -233,7 +743,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: ${{ github.event_name == 'workflow_dispatch' && inputs.slack_channel || '#doctopus-tests' }}
           PRODUCT: kgateway OSS
-          JOB_STATUS: ${{ job.status }}
+          JOB_STATUS: ${{ (contains(needs.*.result, 'failure') && 'failure') || (contains(needs.*.result, 'cancelled') && 'cancelled') || 'success' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           set -euo pipefail
@@ -297,11 +807,56 @@ jobs:
           retention-days: 14
           if-no-files-found: ignore
 
-      - name: Upload test context (on failure)
-        if: failure()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: doc-test-context
-          path: out/tests/generated/context/
-          retention-days: 7
-          if-no-files-found: ignore
+      # The grey "Doc tests: test update required" check on a pull request:
+      # failures that are not the PR's, listed so nobody mistakes them for
+      # passes. Green when there are none, so a rerun on the same commit
+      # replaces an old grey one. Only for a PR from a branch in this repo: a
+      # fork's PR gets a read-only token, which cannot create checks, so there
+      # the list is only in the test jobs' run summaries.
+      - name: Find the nightly results on main
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && needs.select.outputs.expected != '[]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # `|| true`: an error here only means there is nothing to compare with.
+          RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
+            --branch main --event schedule --status completed --limit 1 \
+            --json databaseId --jq '.[0].databaseId // empty' || true)
+          if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
+            echo "Comparing with nightly run $RUN_ID."
+          fi
+
+      - name: Post the test update required check
+        if: >-
+          github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && needs.select.outputs.expected != '[]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED: ${{ needs.select.outputs.expected }}
+          PAGES: ${{ needs.select.outputs.pages }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          if [ -n "$PAGES" ]; then
+            jq -r '.[]' <<<"$PAGES" > pages.txt
+            ARGS+=(--affected-pages pages.txt)
+          fi
+          if [ -f "$RUNNER_TEMP/nightly/test-results.yaml" ]; then
+            ARGS+=(--known-results "$RUNNER_TEMP/nightly/test-results.yaml")
+          fi
+          jq -c 'map({file, test})' <<<"$EXPECTED" > expected.json
+          python3 docs-tests/scripts/classify_pr_results.py \
+            --results out/tests/generated/test-results.yaml \
+            --expected expected.json "${ARGS[@]}" \
+            --output verdicts.json --groups groups.json --summary "$GITHUB_STEP_SUMMARY"
+          jq -c --arg sha "$HEAD_SHA" --arg url "$RUN_URL" '.[] | select(.name == "Doc tests: test update required")
+            | {name, head_sha: $sha, status: "completed", conclusion, details_url: $url,
+               output: {title, summary, text: "**Full report:** the [summary page of the doc tests run](\($url)) lists every scenario and its result."}}' groups.json \
+            | gh api "repos/$GITHUB_REPOSITORY/check-runs" --input - --jq '"\(.name): \(.conclusion)"'

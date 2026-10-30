@@ -1,6 +1,6 @@
 Originate a one-way TLS connection from the Gateway to a backend. 
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
@@ -15,16 +15,16 @@ However, to additionally set up different hostnames on the Backend that you want
 
 ## About this guide
 
-In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy resources originate one-way TLS connections for the following services: 
+In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy resources to originate one-way TLS connections for the following services: 
 * [**In-cluster service**](#in-cluster-service): An NGINX server that is configured with a self-signed TLS certificate and deployed to the same cluster as the Gateway. You use a BackendTLSPolicy to originate TLS connections to NGINX. 
 * [**External service**](#external-service): The `httpbin.org` hostname, which represents an external service that you want to originate a TLS connection to. You use a BackendConfigPolicy resource to originate TLS connections to that hostname. 
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 {{< /version >}}
 
@@ -84,23 +84,23 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    stringData:
      ca.crt: |
        -----BEGIN CERTIFICATE-----
-       MIIDFTCCAf2gAwIBAgIUG9Mdv3nOQ2i7v68OgjArU4lhBikwDQYJKoZIhvcNAQEL
-       BQAwFjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjUwNzA3MTA0MDQwWhcNMjYw
-       NzA3MTA0MDQwWjAWMRQwEgYDVQQDDAtleGFtcGxlLmNvbTCCASIwDQYJKoZIhvcN
-       AQEBBQADggEPADCCAQoCggEBANueqwfAApjTfg+nxIoKVK4sK/YlNICvdoEq1UEL
-       StE9wfTv0J27uNIsfpMqCx0Ni9Rjt1hzjunc8HUJDeobMNxGaZmryQofrdJWJ7Uu
-       t5jeLW/w0MelPOfFLsDiM5REy4WuPm2X6v1Z1N3N5GR3UNDOtDtsbjS1momvooLO
-       9WxPIr2cfmPqr81fyyD2ReZsMC/8lVs0PkA9XBplMzpSU53DWl5/Nyh2d1W5ENK0
-       Zw1l5Ze4UGUeohQMa5cD5hmZcBjOeJF8MuSTi3167KSopoqfgHTvC5IsBeWXAyZF
-       81ihFYAq+SbhUZeUlsxc1wveuAdBRzafcYkK47gYmbq1K60CAwEAAaNbMFkwFgYD
+       MIIDFTCCAf2gAwIBAgIUIlv+uw9O1gTwKnf4HvCIFusHWh4wDQYJKoZIhvcNAQEL
+       BQAwFjEUMBIGA1UEAwwLZXhhbXBsZS5jb20wHhcNMjYwNzA3MTY0OTM2WhcNMzYw
+       NzA0MTY0OTM2WjAWMRQwEgYDVQQDDAtleGFtcGxlLmNvbTCCASIwDQYJKoZIhvcN
+       AQEBBQADggEPADCCAQoCggEBAJJiw/saYoXDnvJ2hgLGErN/DEOU7NCFE7h5tECa
+       8uTmBV2m2bXnlXjg6umB0rPsKSOnSpF2qCt64Ll7I+/kODyu/VkuhYA/ki5Wi32V
+       uFU7scb1FwbuhNL1/zq6hRhpsqajmpt6Q7ndpfp1mVXx/dblsufV6dyODkjenU97
+       BukkLXar+G0KBouw1MNqLzN9y6ISuo0BvEvfLBUi0b9NuNXmtICrffBHzVNBf7Sx
+       7KEW4nSO+55AoLJnAga6X0ZvSQju9GXE9iyrV4YRY51fwW/E+jU4GYOlUQow7bEI
+       fOJDupwoUuFsUthhMCNpnJS955hxPFjqmeWJCJs0rTNoU1UCAwEAAaNbMFkwFgYD
        VR0RBA8wDYILZXhhbXBsZS5jb20wCwYDVR0PBAQDAgeAMBMGA1UdJQQMMAoGCCsG
-       AQUFBwMBMB0GA1UdDgQWBBSoa1Zu2o+pQ6sq2HcOjAglZkp01zANBgkqhkiG9w0B
-       AQsFAAOCAQEADZq1EMw/jMl0z2LpPh8cXbP09BnfXhoFbpL4cFrcBNEyig0oPO0j
-       YN1e4bfURNduFVnC/FDnZhR3FlAt8a6ozJAwmJp+nQCYFoDQwotSx12y5Bc9IXwd
-       BRZaLgHYy2NjGp2UgAya2z23BkUnwOJwJNMCzuGw3pOsmDQY0diR8ZWmEYYEPheW
-       6BVkrikzUNXv3tB8LmWzxV9V3eN71fnP5u39IM/UQsOZGRUow/8tvN2/d0W4dHky
-       t/kdgLKhf4gU2wXq/WbeqxlDSpjo7q/emNl59v1FHeR3eITSSjESU+dQgRsYaGEn
-       SWP+58ApfCcURLpMxUmxkO1ayfecNJbmSQ==
+       AQUFBwMBMB0GA1UdDgQWBBQRB7nN8rfErGTItgws/E8EPzPSIjANBgkqhkiG9w0B
+       AQsFAAOCAQEAH63LT5aquDjz13D4HuXGiJlXyBnTmYQ5yQRbioeWJp3msai12/MJ
+       /St1T4CyhWV5pUAUDdpjsjgAZjGxntYdw/fs4bJbLqnbKGC5ujObxwZ/tzbPvm+v
+       t0UH8beP4ba5wKzwqeWu3sWMNPwoxyzIRQpInZPSxnqYe/7ataB93d3wLS/AcuU6
+       Lijsx/zJXw0xNoyfJjvqdI0cSoV6lyYggxul06Mc5d08NNeck/gObDc3Ku2IapN3
+       Ith7RWjemymjJw/gQZguqctyRnBaAZZrFES8s6Acqsxa3Ee9Oyk+9OZs6wnXWscZ
+       cmk3NzvSnsKQt+jTR3DZWdUR5Iua0WP6xw==
        -----END CERTIFICATE-----
    EOF
    ```
@@ -146,7 +146,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml
    ```
 
-2. Create the TLS policy.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+2. Create the TLS policy.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -253,12 +253,12 @@ Now that your TLS backend and routing resources are configured, verify the TLS c
 
 4. Search for the following stats that indicate the TLS connection is working. The count increases each time that the Gateway sends a request to the NGINX server.
 
-   * `cluster.kube_default_nginx_8443.ssl.versions.TLSv1.2`: The number of TLSv1.2 connections from the Envoy gateway proxy to the NGINX server.
-   * `cluster.kube_default_nginx_8443.ssl.handshake`: The number of successful TLS handshakes between the Envoy gateway proxy and the NGINX server.
+   * `cluster.kube_kgateway-base_nginx_8443.ssl.versions.TLSv1.2`: The number of TLSv1.2 connections from the Envoy gateway proxy to the NGINX server.
+   * `cluster.kube_kgateway-base_nginx_8443.ssl.handshake`: The number of successful TLS handshakes between the Envoy gateway proxy and the NGINX server.
    
 ## External service
 
-Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
+Set up a Backend resource that represents your external service. Then, use a BackendTLSPolicy or BackendConfigPolicy to instruct the gateway proxy to originate a TLS connection from the gateway proxy to the external service. 
 
 > [!NOTE]
 > If your gateway proxy runs inside an Istio service mesh, Istio's automatic mTLS can override the TLS settings from your BackendTLSPolicy or BackendConfigPolicy, causing backend TLS connections to fail. To prevent this failure, add the `kgateway.dev/disable-istio-auto-mtls: "true"` annotation to the Backend resource. For more information, see [Istio ingress]({{< link-hextra path="/integrations/istio/sidecar/ingress/" >}}).
@@ -303,7 +303,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
-   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -527,6 +527,7 @@ For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< 
    
    ```sh
    kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -A -l app=nginx
+   kubectl delete configmap ca -n kgateway-base --ignore-not-found
    ```
 
 3. If you want to re-create a BackendTLSPolicy after deleting one, restart the control plane.

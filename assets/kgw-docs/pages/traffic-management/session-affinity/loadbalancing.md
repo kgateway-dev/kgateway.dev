@@ -13,11 +13,11 @@ The [least request load balancer algorithm](https://www.envoyproxy.io/docs/envoy
 
 ### Round robin
 
-The [round robin load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects a backend host in a round robin order. If a `localityType` is also defined, a weighted round robin algorithm is used, in which higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
+The [round robin load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-round-robin) selects a backend host in a round robin order. If a `localityType` is also defined, a weighted round robin algorithm is used, in which higher weighted endpoints are considered more often in the round robin rotation to achieve the selected weight. 
 
 ### Random
 
-The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#weighted-least-request) selects a random host that is available. This load balancing algorithm usually performs better than the round robin algorithm if no health checks are configured for the backend host. 
+The [random load balancer algorithm](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#random) selects a random host that is available. This load balancing algorithm usually performs better than the round robin algorithm if no health checks are configured for the backend host. 
 
 ## Other load balancing options
 
@@ -28,13 +28,13 @@ Learn about other load balancing options that you can set in the load balancer p
 
 ### Healthy panic threshold 
 
-By default, {{< reuse "kgw-docs/snippets/kgateway.md" >}} only considers services that are healthy and available when load balancing incoming requests among backend services. In the case that the number of healthy backend services becomes too low, you can instruct {{< reuse "kgw-docs/snippets/kgateway.md" >}} to disregard the backend health status and either load balance requests among all or no hosts by using the `healthy_panic_threshold` setting. If not set, the threshold defaults to 50%. To disable panic mode, set this field to 0.
+By default, {{< reuse "kgw-docs/snippets/kgateway.md" >}} only considers services that are healthy and available when load balancing incoming requests among backend services. In the case that the number of healthy backend services becomes too low, you can instruct {{< reuse "kgw-docs/snippets/kgateway.md" >}} to disregard the backend health status and either load balance requests among all or no hosts by using the `healthyPanicThreshold` setting. If not set, the threshold defaults to 50%. To disable panic mode, set this field to 0.
 
 To learn more about this setting and when to use it, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/panic_threshold#arch-overview-load-balancing-panic-threshold). 
 
 ### Update merge window 
 
-Sometimes, your deployments might have health checks and metadata updates that use a lot of CPU and memory. In such cases, you can use the `update_merge_window` setting. This way, {{< reuse "kgw-docs/snippets/kgateway.md" >}} merges all updates together within a specific timeframe. For more information about this setting, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto#config-cluster-v3-cluster-commonlbconfig). If not set, the update merge window defaults to 1000ms. To disable the update merge window, set this field to 0s.
+Sometimes, your deployments might have health checks and metadata updates that use a lot of CPU and memory. In such cases, you can use the `updateMergeWindow` setting. This way, {{< reuse "kgw-docs/snippets/kgateway.md" >}} merges all updates together within a specific timeframe. For more information about this setting, see the [Envoy documentation](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/cluster/v3/cluster.proto#config-cluster-v3-cluster-commonlbconfig). If not set, the update merge window defaults to 1000ms. To disable the update merge window, set this field to 0s.
 
 ## Before you begin
 
@@ -75,8 +75,8 @@ Define the load balancing algorithm that you want to use for your backend app in
    | -- | -- |
    | `choiceCount` | The number of random available backend hosts to consider when choosing the host with the fewest requests. Defaults to 2. |
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
-   | `slowStart.window` | The duration of the slow start window. If set, a newly-created backend endpoint remains in slow start mode from its creation time until the duration of the slow start window has elapsed. |
-   | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
+   | `slowStart.window` | The duration of the slow start window. If set, a newly created backend endpoint remains in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab name="Round robin" %}}
@@ -106,8 +106,8 @@ Define the load balancing algorithm that you want to use for your backend app in
    | Setting | Description |
    | -- | -- |
    | `slowStart` | When you add new backend hosts to the pool of endpoints to route to, slow start mode progressively increases the amount of traffic that is routed to those backends. This can be useful for services that require warm-up time to serve full production loads, to prevent request timeouts, loss of data, and deteriorated user experience. |
-   | `slowStart.window` | The duration of the slow start window. If set, any newly-created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
-   | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly-increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
+   | `slowStart.window` | The duration of the slow start window. If set, any newly created backend endpoints remain in slow start mode from its creation time until the duration of the slow start window has elapsed. |
+   | `slowStart.aggression` | The rate of traffic increase over the duration of the slow start window. Defaults to 1.0, so that the endpoint receives a linearly increasing amount of traffic.{{< version exclude-if="2.0.x" >}} For more information about fine-tuning this value, see the [API docs]({{< link-hextra path="/reference/api/#slowstart" >}}).{{< /version >}} |
    | `slowStart.minWeightPercent` | The minimum percentage of weight that an endpoint must have in the calculation of aggression. This helps prevent weights that are so small that endpoints receive no traffic during the slow start window. Defaults to 10%. |
    {{% /tab %}}
    {{% tab name="Random" %}}
@@ -136,9 +136,9 @@ Define the load balancing algorithm that you want to use for your backend app in
       ```sh
       kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 & 
       ```
-   2. Open the `config_dump` endpoint. 
+   2. Get the Envoy configuration from the `config_dump` endpoint. 
       ```sh
-      open http://localhost:19000/config_dump
+      curl -s http://localhost:19000/config_dump
       ```
    3. Search for the `load_balancing_policy` field, and verify that the policy that you set is listed, along with your other load balancing settings. For example, the following output shows the `LEAST_REQUEST` policy, with the `choice_count` field set to `3`, and settings for the slow start window.
       ```json

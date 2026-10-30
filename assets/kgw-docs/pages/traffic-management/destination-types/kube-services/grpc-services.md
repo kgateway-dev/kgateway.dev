@@ -205,7 +205,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
    |---------|-------------|
    | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
    | `spec.listeners` | Configuration for the HTTP listener for this Gateway. |
-   | `hostname` | The hostname for routing. This values must match the hostname in your GRPCRoute. |
+   | `hostname` | The hostname for routing. This value must match the hostname in your GRPCRoute. |
    {{< /version >}}
 
 2. Check the status of the Gateway.
@@ -219,7 +219,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
    status:
      addresses:
      - type: IPAddress
-       value: ${INGRESS_GW_ADDRESS}
+       value: ${GATEWAY_IP}
      conditions:
      - lastTransitionTime: "2024-11-20T16:01:25Z"
        message: ""
@@ -454,7 +454,12 @@ Explore the traffic management, resiliency, and security policies that you can a
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```bash
-kubectl delete -A gateways,grpcroutes,pod,svc,secrets -l app=grpc-echo
+kubectl delete -A gateways,grpcroutes -l app=grpc-echo
+kubectl delete deployment grpc-echo
+kubectl delete service grpc-echo-svc
+kubectl delete pod grpcurl-client
+kubectl delete secret grpc-example-com-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete referencegrant allow-grpc-route-to-echo -n default
+rm grpc.example.com.key grpc.example.com.crt
 ```
 

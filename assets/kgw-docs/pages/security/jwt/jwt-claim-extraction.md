@@ -36,7 +36,39 @@ sequenceDiagram
 
 To extract claims, you configure the `claimsToHeaders` list within your JWT provider configuration.
 
-1. Create a `GatewayExtension` that defines your JWT provider. In this example, we use a provider that validates JWTs against a remote JWKS endpoint and extracts the `sub` and `email` claims.
+1. Create a `Backend` for your identity provider, and a `BackendConfigPolicy` that sets up TLS to it with the system's trusted CA certificates. The gateway fetches the JWKS through this Backend. Replace `auth.example.com` with the host of your identity provider.
+
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: auth-idp
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     type: Static
+     static:
+       hosts:
+       - host: auth.example.com
+         port: 443
+   ---
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: BackendConfigPolicy
+   metadata:
+     name: auth-idp-tls
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     targetRefs:
+     - group: gateway.kgateway.dev
+       kind: Backend
+       name: auth-idp
+     tls:
+       sni: auth.example.com
+       wellKnownCACertificates: System
+   EOF
+   ```
+
+2. Create a `GatewayExtension` that defines your JWT provider. In this example, we use a provider that validates JWTs against a remote JWKS endpoint and extracts the `sub` and `email` claims.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -52,8 +84,13 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
            issuer: https://auth.example.com/
            audiences:
              - my-app-audience
-           remoteJwks:
-             url: https://auth.example.com/.well-known/jwks.json
+           jwks:
+             remote:
+               url: https://auth.example.com/.well-known/jwks.json
+               backendRef:
+                 group: gateway.kgateway.dev
+                 kind: Backend
+                 name: auth-idp
            claimsToHeaders:
              - name: "sub"
                header: "X-User-ID"
@@ -62,7 +99,7 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
    EOF
    ```
 
-2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that applies the JWT authentication to your gateway.
+3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that applies the JWT authentication to your gateway.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -76,18 +113,18 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
        - group: gateway.networking.k8s.io
          kind: Gateway
          name: http
-     jwt:
+     jwtAuth:
        extensionRef:
          name: jwt-provider
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    EOF
    ```
 
-3. Send a request to your application with a valid JWT. Verify that the backend receives the injected headers. If you are using the `httpbin` app, you can check the `/headers` endpoint output.
+4. Send a request to your application with a valid JWT. Verify that the backend receives the injected headers. If you are using the `httpbin` app, you can check the `/headers` endpoint output.
 
    ```sh
-   curl -X GET "http://localhost:8080/headers" \
-     -H "host: www.example.com" \
+   curl -X GET "http://$INGRESS_GW_ADDRESS:8080/headers" \
+     -H "host: www.example.com:8080" \
      -H "Authorization: Bearer <your-valid-jwt>"
    ```
 
@@ -97,8 +134,12 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
    {
      "headers": {
        ...
-       "X-User-ID": "user-12345",
-       "X-User-Email": "alice@example.com",
+       "X-User-Email": [
+         "alice@example.com"
+       ],
+       "X-User-Id": [
+         "user-12345"
+       ],
        ...
      }
    }
@@ -111,13 +152,15 @@ To extract claims, you configure the `claimsToHeaders` list within your JWT prov
 ```sh
 kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-auth-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete gatewayextension jwt-provider -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete backendconfigpolicy auth-idp-tls -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete backend auth-idp -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 ## Advanced usage
 
 ### Extracting nested claims
 
-If your JWT has nested claims (e.g., inside a `profile` object), you can use dot notation to reach them.
+If your JWT has nested claims (for example, inside a `profile` object), you can use dot notation to reach them.
 
 ```yaml
 claimsToHeaders:
@@ -127,4 +170,4 @@ claimsToHeaders:
 
 ### Overwriting vs. Appending
 
-By default, if the client sends a header with the same name as one of your extracted claims (e.g., a malicious client sending their own `X-User-ID` header), kgateway will **overwrite** the client's header with the verified value from the JWT. This ensures that your backend can trust the value in these headers.
+By default, if the client sends a header with the same name as one of your extracted claims (for example, a malicious client sending their own `X-User-ID` header), kgateway will **overwrite** the client's header with the verified value from the JWT. This ensures that your backend can trust the value in these headers.

@@ -271,14 +271,14 @@ EOF
 
    * **Load balancer IP**:
      ```sh
-     curl -vik --resolve "app.example.com:8443:${INGRESS_GW_ADDRESS}" \
+     curl -vi --resolve "app.example.com:8443:${INGRESS_GW_ADDRESS}" \
        --cacert example_certs/root.crt \
        https://app.example.com:8443/status/200
      ```
 
    * **Load balancer hostname**:
      ```sh
-     curl -vik --resolve "app.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" \
+     curl -vi --resolve "app.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" \
        --cacert example_certs/root.crt \
        https://app.example.com:8443/status/200
      ```
@@ -300,7 +300,7 @@ EOF
 
 2. Send a request to the `app.example.com` domain and verify that you get back a 200 HTTP response code.
    ```sh
-   curl -vik --connect-to app.example.com:8443:localhost:8443 \
+   curl -vi --connect-to app.example.com:8443:localhost:8443 \
      --cacert example_certs/root.crt \
      https://app.example.com:8443/status/200
    ```
@@ -323,13 +323,15 @@ EOF
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}
 ```sh
-kubectl delete -A gateways,tlsroutes,secret -l example=tls-terminate
+kubectl delete -A gateways,tlsroutes -l example=tls-terminate
+kubectl delete secret tls-terminate -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf example_certs
 ```
 {{% /tab %}}
-{{% tab name="ListenerSet" %}}
+{{% tab name="ListenerSets" %}}
 ```sh
-kubectl delete -A gateways,tlsroutes,listenersets,secret -l example=tls-terminate
+kubectl delete -A gateways,tlsroutes,listenersets -l example=tls-terminate
+kubectl delete secret tls-terminate -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 rm -rf example_certs
 ```
 {{% /tab %}}

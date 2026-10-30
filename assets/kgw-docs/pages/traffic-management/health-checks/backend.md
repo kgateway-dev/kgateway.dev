@@ -200,7 +200,7 @@ To verify an active health check, use an app that has several endpoints, of whic
    kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
    sleep 5
    curl -s 127.0.0.1:19000/clusters | grep health-check-demo | grep health_flags
-   lsof -ti:19000 | xargs kill -9
+   pkill -f "kubectl port-forward deploy/http"
    ```
 
    Example output:

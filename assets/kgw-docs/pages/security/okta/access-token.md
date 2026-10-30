@@ -132,7 +132,7 @@ Verify the access token validation flow with these steps.
 
    The JWT policy validates the signature, issuer, and audience of the token you present. It does not depend on which grant produced the token. Use an option supported by your Okta org, and request the token from the same Okta address that you set as the `issuer` on the `GatewayExtension`.
 
-   * **Authorization code flow**: Complete the [authorization code flow]({{< link-hextra path="/security/oauth/okta/authorization-code/" >}}) in a browser. Then copy the value of the `AccessToken` cookie set by the gateway.
+   * **Authorization code flow**: Complete the [authorization code flow]({{< link-hextra path="/security/oauth/okta/authorization-code/" >}}) in a browser. Then copy the value of the `AccessToken-<suffix>` cookie that the gateway sets, such as `AccessToken-a1b2c3d4`.
 
    ```sh
    export TOKEN=<access-token-cookie-value>
@@ -155,7 +155,7 @@ Verify the access token validation flow with these steps.
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
    ```sh
-   echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
+   echo $TOKEN | jq -rR 'split(".")[1] | gsub("-"; "+") | gsub("_"; "/") | @base64d | fromjson | {iss, aud}'
    ```
 
    Example output. If `aud` does not include the expected audience, update the `audiences` list in your `GatewayExtension`.

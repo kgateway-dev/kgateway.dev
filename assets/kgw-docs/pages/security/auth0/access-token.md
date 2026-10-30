@@ -135,7 +135,7 @@ Use the verification steps below to confirm that the access token validation flo
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
    ```sh
-   echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
+   echo $TOKEN | jq -rR 'split(".")[1] | gsub("-"; "+") | gsub("_"; "/") | @base64d | fromjson | {iss, aud}'
    ```
 
    Example output. If `aud` does not include your API Identifier, check the `audience` value that you passed to the token endpoint.

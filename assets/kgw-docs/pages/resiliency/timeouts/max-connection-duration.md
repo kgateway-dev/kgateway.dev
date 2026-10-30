@@ -44,8 +44,10 @@ You can set a maximum connection duration on connections from a client to the ga
 
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
+   PF_PID=$!
    sleep 2
    curl -s 127.0.0.1:19000/config_dump | jq '.configs[] | select(."@type" == "type.googleapis.com/envoy.admin.v3.ListenersConfigDump") | .. | objects | select(has("common_http_protocol_options"))'
+   kill $PF_PID
    ```
 
    Example output:
@@ -87,8 +89,10 @@ You can set a maximum connection duration on connections from a client to the ga
 
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
+   PF_PID=$!
    sleep 2
    curl -s 127.0.0.1:19000/config_dump | jq '[.. | objects | select(has("common_http_protocol_options")) | {common_http_protocol_options}]'
+   kill $PF_PID
    ```
 
    Example output:

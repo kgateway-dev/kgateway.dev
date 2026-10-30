@@ -240,6 +240,7 @@ EOF
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```sh
+kubectl delete trafficpolicy httpbin-mirror -n httpbin --ignore-not-found
 kubectl delete service httpbin2 -n httpbin
 kubectl delete deployment httpbin2 -n httpbin
 kubectl delete httproute httpbin-mirror -n httpbin

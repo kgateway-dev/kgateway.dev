@@ -58,7 +58,7 @@ Attach a ListenerPolicy to the Gateway that serves the `www.example.com` route f
    HTTP/1.1 200 OK
    access-control-allow-credentials: true
    access-control-allow-origin: *
-   content-type: application/json; encoding=utf-8 
+   content-type: application/json; encoding=utf-8
    x-envoy-upstream-service-time: 16
    content-length: 440
    server: envoy

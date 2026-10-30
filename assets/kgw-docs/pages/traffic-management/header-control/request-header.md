@@ -268,16 +268,16 @@ Setting headers is similar to adding headers. If the request does not include th
    {{< /tabs >}}
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-header: hello` header was added. 
    {{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -305,18 +305,18 @@ curl -vi localhost:8080/headers -H "host: headers.example"
 
 1. Send another request to the httpbin app. This time, you already include the `my-header` header in your request. Verify that you get back a 200 HTTP response code and that your `my-header` header value is overwritten with the value from the `RequestHeaderModifier` filter. 
    {{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
--H "my-header: foo"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: headers.example" \
--H "my-header: foo" 
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080" \
+   -H "my-header: foo"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example" \
+   -H "my-header: foo" 
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
    
    Example output: 
@@ -360,16 +360,16 @@ You can remove HTTP headers from a request before the request is forwarded to th
 
 1. Send a request to the httpbin app and find the `User-Agent` header. 
    {{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: www.example.com"
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: www.example.com:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: www.example.com"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -477,22 +477,22 @@ curl -vi localhost:8080/headers -H "host: www.example.com"
    {{% /tab %}}
    {{< /tabs >}}
 
-3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `User-Agent` request header is removed. 
+3. Send a request to the httpbin app on the `headers.example` domain. Verify that the `User-Agent` request header is removed. 
    {{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
-   ```sh
+   ```json
    {
      "headers": {
        "Accept": [
@@ -610,44 +610,44 @@ If the header value is sensitive, such as a backend API key or a tenant credenti
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the upstream sees the `X-Api-Key` and `X-Tenant-Id` headers with the values from the Secret. Note that the values do not appear in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} or in the request you sent.
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: headers.example"
-```
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
-Example output:
-```json
-{
-  "headers": {
-    "Host": [
-      "headers.example:8080"
-    ],
-    "X-Api-Key": [
-      "my-secret-api-key"
-    ],
-    "X-Tenant-Id": [
-      "tenant-abc"
-    ],
-    ...
-  }
-}
-```
+   Example output:
+   ```json
+   {
+     "headers": {
+       "Host": [
+         "headers.example:8080"
+       ],
+       "X-Api-Key": [
+         "my-secret-api-key"
+       ],
+       "X-Tenant-Id": [
+         "tenant-abc"
+       ],
+       ...
+     }
+   }
+   ```
 
 5. Optional: When you are finished, you can clean up the resources that you created.
 
-```sh
-kubectl delete httproute httpbin-headers -n httpbin
-kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} httpbin-secret-headers -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-kubectl delete secret backend-creds -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-```
+   ```sh
+   kubectl delete httproute httpbin-headers -n httpbin
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} httpbin-secret-headers -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl delete secret backend-creds -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
 
 ### Field defaulting
 
@@ -796,20 +796,20 @@ You can return dynamic information about the request in the request header. For 
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that the `X-Client-Ip` request header is set to the downstream remote address without the port. 
    {{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
-   ```sh
+   ```json
    {
      "headers": {
        "Accept": [
