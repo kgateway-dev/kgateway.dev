@@ -16,7 +16,7 @@ When you use the httpbin sample app, keep in mind that httpbin limits the maximu
 
 ## Set up buffer limits per gateway
 
-Use an annotation to set a per-connection buffer limit on your Gateway, which applies the buffer limit to all routes served by the Gateway. 
+Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which applies the buffer limit to all routes served by the Gateway. 
 
 1. Create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
    ```yaml
@@ -39,7 +39,7 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
    EOF
    ```
 
-2. Annotate the http Gateway resource to set a buffer limit of 1 kilobytes.
+2. Create a ListenerPolicy for the http Gateway that sets a buffer limit of 1024 bytes.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -59,10 +59,10 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 3. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
-4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
+4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a 413 Payload Too Large response, indicating that the buffer limit was exceeded.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -186,10 +186,10 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
 
 4. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
-5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
+5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a 413 Payload Too Large response, indicating that the buffer limit was exceeded.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -209,7 +209,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
+6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 1024-byte limit.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

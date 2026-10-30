@@ -95,7 +95,7 @@ Deploy a Keycloak instance to test this guide against. The following steps creat
    kubectl rollout status deployment/keycloak -n keycloak
    ```
 
-## Alternative: ConfigMap-based setup
+## Alternative: ConfigMap-based setup {#configmap-setup}
 
 Instead of manually configuring Keycloak through the admin console, you can define the realm, client, and user declaratively in a ConfigMap. Keycloak imports the configuration on startup, which is more repeatable and GitOps‑friendly.
 

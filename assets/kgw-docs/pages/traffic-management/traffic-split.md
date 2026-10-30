@@ -30,7 +30,7 @@ To demonstrate weighted routing for multiple apps, deploy 3 versions of the Hell
 
 3. Verify that the Helloworld pods are up and running. 
    ```sh
-   kubectl -n default get pods -n helloworld
+   kubectl get pods -n helloworld
    ```
 
    Example output: 

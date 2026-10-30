@@ -54,7 +54,7 @@ The global rate limiting feature consists of three components:
 
 ### Response headers
 
-When rate limiting is enabled, {{< reuse "kgw-docs/snippets/kgateway.md" >}} adds the following headers to responses. These headers help clients understand their current rate limit status and adapt their behavior accordingly.
+When a request is rate limited, the gateway proxy adds the `x-envoy-ratelimited` header to the response. To also add the `x-ratelimit-*` headers to responses, set `spec.rateLimit.xRateLimitHeaders` to `DraftVersion03` in your GatewayExtension. These headers help clients understand their current rate limit status and adapt their behavior accordingly.
 
 | Header | Description | Example |
 |--------|-------------|---------|
@@ -109,7 +109,7 @@ kubectl describe configmap ratelimit-config -n kgateway-test-extensions
 
 Example output:
 
-```yaml
+```console
 Data
 ====
 config.yaml:
@@ -129,7 +129,7 @@ descriptors:
     value: "/path2"
     rate_limit:
       unit: minute
-      requests_per_unit: 2
+      requests_per_unit: 1
   - key: X-User-ID
     rate_limit:
       unit: minute
@@ -143,7 +143,7 @@ descriptors:
     value: premium-api
     rate_limit:
       unit: minute
-      requests_per_unit: 2
+      requests_per_unit: 1
 
 
 BinaryData
@@ -373,8 +373,8 @@ descriptors:
 
 Combine local and global rate limiting in the same {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} such as in the following example. For more information, see [Local rate limiting](../local).
 
-* Local: A rate limit of 5 requests per second is applied to all requests.
-* Global: A rate limit of 2 requests per minute is applied to requests with a `service` descriptor key of `premium-api`.
+* Local: All requests share a token bucket that allows a burst of up to 5 requests and then 1 request per second.
+* Global: A rate limit of 1 request per minute is applied to requests with a `service` descriptor key of `premium-api`.
 
 ```yaml
 kubectl apply -f - <<EOF
@@ -403,6 +403,7 @@ spec:
             value: "premium-api"
       extensionRef:
         name: global-ratelimit
+EOF
 ```
 
 {{% /tab %}}
@@ -464,6 +465,7 @@ Test the rate limits by sending requests to the Gateway. The following steps ass
 ```sh
 kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/rate_limit/global/testdata/rate-limit-server.yaml
 kubectl delete gatewayextension global-ratelimit -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} ip-rate-limit user-rate-limit combined-rate-limit local-global-rate-limit -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete referencegrant global-ratelimit -n kgateway-test-extensions
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} ip-rate-limit request-path user-rate-limit combined-rate-limit local-global-rate-limit -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
 ```
 

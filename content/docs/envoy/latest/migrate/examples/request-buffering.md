@@ -41,25 +41,65 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
   --input-file upload-ingress.yaml > upload-kgateway.yaml
 ```
 
+The tool prints these warnings:
+
+* The tool does not translate HTTPS for the `upload.example.com` host. By default, Ingress NGINX serves HTTPS for every host with a self-signed certificate. The generated Gateway has only an HTTP listener. To serve HTTPS, add an HTTPS listener to the Gateway. For more information, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
+* `Failed to apply ... "nginx.ingress.kubernetes.io/proxy-body-size" ... Most Gateway API implementations have reasonable body size and buffering defaults`. Despite this warning, the output has a TrafficPolicy with the body size limit.
+
 ## After: TrafficPolicy with Buffer
 
-The `TrafficPolicy` enforces the body size limit. `buffer.maxRequestSize` accepts a Kubernetes [Quantity](https://kubernetes.io/docs/reference/kubernetes-api/definitions/quantity-resource/) string.
+```bash
+cat upload-kgateway.yaml
+```
+
+The output has a Gateway, an HTTPRoute, and a `TrafficPolicy` that enforces the body size limit. The TrafficPolicy has the same name as the HTTPRoute that it targets. `buffer.maxRequestSize` accepts a Kubernetes [Quantity](https://kubernetes.io/docs/reference/kubernetes-api/definitions/quantity-resource/) string.
 
 > [!NOTE]
 > NGINX's `m` suffix uses binary multipliers (1024 × 1024), so `proxy-body-size: 20m` is identical to the Quantity `20Mi`. If you copied a value with a decimal suffix (`20M`), keep in mind it is ~5% smaller (20 × 10^6 bytes).
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nginx
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - hostname: upload.example.com
+    name: upload-example-com-http
+    port: 80
+    protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: upload-demo-upload-example-com
+spec:
+  hostnames:
+  - upload.example.com
+  parentRefs:
+  - name: nginx
+  rules:
+  - backendRefs:
+    - name: upload-svc
+      port: 8080
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+    name: rule-0
+---
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: TrafficPolicy
 metadata:
-  name: buffering-policy
+  name: upload-demo-upload-example-com
 spec:
+  buffer:
+    maxRequestSize: 20Mi
   targetRefs:
   - group: gateway.networking.k8s.io
     kind: HTTPRoute
     name: upload-demo-upload-example-com
-  buffer:
-    maxRequestSize: "20Mi"
 ```
 
 ## Apply and verify

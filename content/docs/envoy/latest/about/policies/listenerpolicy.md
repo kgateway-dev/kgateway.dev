@@ -15,9 +15,9 @@ Learn more about how you can attach policies to gateway listeners.
 
 ### All listeners on a gateway
 
-You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRef` section in the ListenerPolicy resource. 
+You can apply a policy to all the listeners that are defined on the gateway by using the `spec.targetRefs` section in the ListenerPolicy resource. 
 
-The following ListenerPolicy resource sets a request read and write buffer limit and applies this policy to a Gateway resource that is named `http`.
+The following ListenerPolicy resource sets a per-connection buffer limit and applies this policy to a Gateway resource that is named `http`.
 
 ```yaml {hl_lines=[8,9,10,11]}
 kubectl apply -f- <<EOF
@@ -42,11 +42,12 @@ Instead of attaching a policy to all the listeners that are defined on the gatew
 
 The following Gateway resource defines two listeners, an HTTP (`http`) and HTTPS (`https`) listener. 
 
-```yaml {hl_lines=[8,15]}
+```yaml {hl_lines=[9,16]}
 kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1
 metadata:
   name: http
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   listeners:
@@ -77,7 +78,7 @@ To apply the policy to only the `https` listener, you specify the port in the `s
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: ListenerPolicy
 metadata:
-  name: access-logs
+  name: buffer-limits
   namespace: kgateway-system
 spec:
   targetRefs:

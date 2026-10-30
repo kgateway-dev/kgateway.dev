@@ -56,7 +56,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
      name: parent1
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      annotations:
-      kgateway.dev/inherited-policy-priority: ShallowMergePreferParent
+       kgateway.dev/inherited-policy-priority: ShallowMergePreferParent
    spec:
      parentRefs:
      - name: http
@@ -88,7 +88,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
      name: parent2
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      annotations:
-      delegation.kgateway.dev/inherited-policy-priority: PreferChild
+       kgateway.dev/inherited-policy-priority: ShallowMergePreferChild
    spec:
      parentRefs:
      - name: http
@@ -183,7 +183,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    EOF
    ```
 
-6. Send a request to the httpbin app on the `delegation.parent1.example` domain. Because the `parent1` HTTPRoute annotation lets parent policies override the child policies, the child HTTPRoute inherits the policies that are set on the `parent1` HTTPRoute. The TrafficPolicy that you created earlier and applied to the `child-team1` HTTPRoute is ignored. Verify that you see the `X-Parent-Policy` header in your response.
+6. Send a request to the httpbin app on the `delegation-parent1.example` domain. Because the `parent1` HTTPRoute annotation lets parent policies override the child policies, the child HTTPRoute inherits the policies that are set on the `parent1` HTTPRoute. The TrafficPolicy that you created earlier and applied to the `child-team1` HTTPRoute is ignored. Verify that you see the `X-Parent-Policy` header in your response.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -236,7 +236,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    }
    ```
 
-7. Send another request to the `delegation.parent1.example` domain. Verify that this time the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
+7. Send another request to the `delegation-parent1.example` domain. Verify that this time the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -263,7 +263,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    local_rate_limited%
    ```     
 
-8. Send a request to the `delegation.parent2.example` domain. Because the `parent2` HTTPRoute annotation keeps the default policy merging behavior, the child HTTPRoute overrides any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
+8. Send a request to the `delegation-parent2.example` domain. Because the `parent2` HTTPRoute annotation keeps the default policy merging behavior, the child HTTPRoute overrides any top-level policies that are defined on `parent2`. Policies that are not overridden are still inherited from the parent and applied to the child HTTPRoute. 
 
    Verify that you see the custom `X-Child-Team1` header in your response. 
    {{< tabs >}}
@@ -316,7 +316,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    }
    ```
 
-9. Send another request to the `delegation.parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
+9. Send another request to the `delegation-parent2.example` domain. Because the child HTTPRoute does not define any rate limiting policies, it inherits the rate limiting policy of `parent2`. Verify that the request is rate limited and a 429 HTTP response is returned, because only 1 request is allowed in a 60 second timeframe. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

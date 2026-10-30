@@ -203,11 +203,11 @@ You can set up access logs to write to a file. The following example writes acce
    spec:
      kube:
        envoyContainer:
-         volumeMounts:
+         extraVolumeMounts:
            - mountPath: /dev/
              name: access-logs
        podTemplate:
-         volumes:
+         extraVolumes:
            - name: access-logs
              emptyDir: {}  # Creates a writable volume for the logs
    EOF

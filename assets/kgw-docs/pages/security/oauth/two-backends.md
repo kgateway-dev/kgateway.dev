@@ -12,7 +12,7 @@ The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate back
 ## Before you begin
 
 1. {{< reuse "kgw-docs/snippets/prereq.md" >}}
-2. Complete the [OAuth2/OIDC guide]({{< link-hextra path="/security/extauth/oauth2/" >}}).
+2. Complete the [OAuth2/OIDC guide for Keycloak]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}).
 
 ## Configure separate backends
 

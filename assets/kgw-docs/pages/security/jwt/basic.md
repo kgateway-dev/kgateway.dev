@@ -324,7 +324,7 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 | Scenario | Recommended configuration |
 | -------- | ------------------------- |
-| JWKS endpoint is external or occasionally slow | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures. |
+| JWKS endpoint is external or occasionally slow | Increase `numRetries`, such as to 3-5, and use a larger `backOff.maxInterval`, such as 30s-60s, to handle intermittent failures. |
 | Gateway startup should not be blocked by JWKS fetch failures | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background. |
 | Authentication must fail closed until JWKS is available | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched. |
 | Seeing frequent network failures | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect. |
@@ -594,7 +594,7 @@ Example output:
 
 ```
 < HTTP/1.1 401 Unauthorized
-Jwt validation failed: audience mismatch
+Audiences in Jwt are not allowed
 ```
 
 ### Customize token source {#token-source}
@@ -744,7 +744,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: jwt-disable
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: httpbin
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
@@ -786,6 +786,7 @@ Expected output:
 
 ```sh
 kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-disable -n httpbin --ignore-not-found
 kubectl delete gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 

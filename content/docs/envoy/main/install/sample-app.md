@@ -210,7 +210,7 @@ Now that your httpbin app is running and exposed on the gateway proxy, you can s
          "*/*"
        ],
        "Host": [
-         "www.example.com"
+         "www.example.com:8080"
        ],
        "User-Agent": [
          "curl/8.7.1"
@@ -293,16 +293,16 @@ Now that you have {{< reuse "/kgw-docs/snippets/kgateway.md" >}} set up and runn
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 
-1. Delete the httpbin app.
-
-   ```sh
-   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "kgw-docs/versions/github-branch.md" >}}/examples/httpbin.yaml
-   ```
-
-2. Delete the HTTPRoute.
+1. Delete the HTTPRoute.
 
    ```sh
    kubectl delete httproute httpbin -n httpbin
+   ```
+
+2. Delete the httpbin app.
+
+   ```sh
+   kubectl delete -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/{{< reuse "kgw-docs/versions/github-branch.md" >}}/examples/httpbin.yaml
    ```
 
 3. Delete the Gateway.

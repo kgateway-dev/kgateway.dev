@@ -116,7 +116,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.httpOnly`, `cookie.secure`, `cookie.sameSite` | Additional attributes for the generated cookie. This example sets `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
 
@@ -163,7 +163,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
 ### Maglev
 
-With Maglev, you use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
+With Maglev, you use a fixed lookup table of 65,537 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
 
 > [!NOTE]
 > If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
@@ -241,7 +241,7 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.httpOnly`, `cookie.secure`, `cookie.sameSite` | Additional attributes for the generated cookie. This example sets `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
    {{% /tab %}}
@@ -353,7 +353,7 @@ Send a few requests to the httpbin app and verify that the request is served by 
    * **Cookies**: 
      1. Send a request to the httpbin app and verify that you get back a `set-cookie` header with a `session-id`. 
         ```sh
-        curl -i -c -k localhost:8080/headers \
+        curl -i -c cookie-jar localhost:8080/headers \
         -H "host: www.example.com"
         ```
         
@@ -371,7 +371,7 @@ Send a few requests to the httpbin app and verify that the request is served by 
    {{% /tab %}}
    {{< /tabs >}}
 
-7. Check the logs of each httpbin instance. Verify that only one of the instances served all 10 of the subsequent requests that you made.
+4. Check the logs of each httpbin instance. Verify that only one of the instances served all 10 of the subsequent requests that you made.
    ```sh
    kubectl logs -n httpbin <httpbin-pod>
    ```

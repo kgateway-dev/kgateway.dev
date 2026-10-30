@@ -120,7 +120,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    EOF
    ```
 
-4. Create the child HTTPRoute resource `child-team2` in the `team2` namespace that matches traffic on the `/anything/team1/bar` exact prefix and routes traffic to the httpbin app in the `team2` namespace. The child HTTPRoute resource specifies the `parent1` HTTPRoute resource in the `spec.parentRefs` section. Because of that, only `parent1` can delegate traffic to this child. 
+4. Create the child HTTPRoute resource `child-team2` in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path and routes traffic to the httpbin app in the `team2` namespace. The child HTTPRoute resource specifies the `parent1` HTTPRoute resource in the `spec.parentRefs` section. Because of that, only `parent1` can delegate traffic to this child. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -145,7 +145,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    EOF
    ```
    
-6. Send a request to the `delegation-parent1.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
+5. Send a request to the `delegation-parent1.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -171,7 +171,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
 
-7. Send another request to the `delegation-parent1.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code. 
+6. Send another request to the `delegation-parent1.example` domain along the `/anything/team2/bar` path. Verify that you get back a 200 HTTP response code. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -197,7 +197,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
 
-8. Now, send a request to the `delegation-parent2.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
+7. Now, send a request to the `delegation-parent2.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -223,7 +223,7 @@ In this guide you walk through a route delegation example that demonstrates rout
    transfer-encoding: chunked
    ```
    
-9. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the route is considered invalid and replaced with a 500 HTTP direct response. 
+8. Send another request to the `delegation-parent2.example` domain. This time, you send traffic along the `/anything/team2/bar` path. Notice that although the `parent2` HTTPRoute resource delegates traffic to the `child-team2` HTTPRoute resource, the child resource allows traffic from the `parent1` HTTPRoute resource only. Because of that, the route is considered invalid and replaced with a 500 HTTP direct response. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

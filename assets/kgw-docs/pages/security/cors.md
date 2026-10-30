@@ -1,13 +1,13 @@
-Enforce client-site access controls with cross-origin resource sharing (CORS).
+Enforce client-side access controls with cross-origin resource sharing (CORS).
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
 
 ## About CORS
 
-Cross-Origin Resource Sharing (CORS) is a security feature that is implemented by web browsers and that controls how web pages in one domain can request and interact with resources that are hosted on a different domain. By default, web browsers only allow requests to resources that are hosted on the same domain as the web page that served the original request. Access to web pages or resources that are hosted on a different domain is restricted to prevent potential security vulnerabilities, such as cross-site request forgery (CRSF).
+Cross-Origin Resource Sharing (CORS) is a security feature that is implemented by web browsers and that controls how web pages in one domain can request and interact with resources that are hosted on a different domain. By default, web browsers only allow requests to resources that are hosted on the same domain as the web page that served the original request. Access to web pages or resources that are hosted on a different domain is restricted to prevent potential security vulnerabilities, such as cross-site request forgery (CSRF).
 
 When CORS is enabled in a web browser and a request for a different domain comes in, the web browser checks whether this request is allowed or not. To do that, it typically sends a preflight request (HTTP `OPTIONS` method) to the server or service that serves the requested resource. The service returns the methods that are permitted to send the actual cross-origin request, such as GET, POST, etc. If the request to the different domain is allowed, the response includes CORS-specific headers that instruct the web browser how to make the cross-origin request. For example, the CORS headers typically include the origin that is allowed to access the resource, and the credentials or headers that must be included in the cross-origin request.
 
@@ -204,7 +204,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
@@ -228,7 +228,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-allow-headers: Origin
    access-control-max-age: 86400
    access-control-expose-headers: Origin, X-HTTPRoute-Header
    date: Tue, 24 Jun 2025 13:19:53 GMT
@@ -268,7 +268,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-allow-headers: Origin
    access-control-max-age: 86400
    access-control-expose-headers: Origin, X-HTTPRoute-Header
    date: Tue, 24 Jun 2025 13:19:53 GMT
@@ -278,7 +278,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    ```
    {{< /version >}}
 
-2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
+2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods, because `notallowed.com` is not configured as a supported origin. The `access-control-*` headers in the example output come from the httpbin app's own CORS handling, not from your CORS policy.  
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -291,7 +291,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"

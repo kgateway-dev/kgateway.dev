@@ -53,7 +53,7 @@ In this guide, you use the following methods to transform a JSON body:
    ```
 
 2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules: 
-   * A new body is created in the response with the values of the `author`, `title`, and `slides` fields.
+   * A new body is created in the response with the values of the `author` and `title` fields.
    * To extract the values, you use dot notation. Because the transformation sets `body.parseAs: AsJson`, the response body is parsed into the template context, so you can access the fields directly without defining extractors. Without `parseAs: AsJson`, the rustformation engine treats the body as a string and the dot-notation access does not resolve.
 
    ```yaml
@@ -72,7 +72,7 @@ In this guide, you use the following methods to transform a JSON body:
        response:
          body: 
            parseAs: AsJson
-           value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
+           value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}"}'
    EOF
    ```
    
@@ -94,10 +94,7 @@ In this guide, you use the following methods to transform a JSON body:
    
    Example output:
    ```console
-   {"author": "Yours Truly", "title": "Sample Slide Show", "slides":
-   "[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":
-   ["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],
-   "title":"Overview","type":"all"}]}
+   {"author": "Yours Truly", "title": "Sample Slide Show"}
    ```
 
 4. Update the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to replace the `all` pattern with a random string.

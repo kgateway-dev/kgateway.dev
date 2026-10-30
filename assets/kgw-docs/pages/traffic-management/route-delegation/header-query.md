@@ -2,9 +2,9 @@ Use header and query matchers in a route delegation setup.
 
 ## Configuration overview
 
-In this guide you walk through a route delegation example where headers and query parameters are added as matchers to the parent and child HTTPRoute resources. A routing hierarchy can be created only if the child defines the same header and query matchers that the parent HTTPResource defines. You can optionally define additional header or query matchers on the child HTTPRoute resource.
+In this guide you walk through a route delegation example where headers and query parameters are added as matchers to the parent and child HTTPRoute resources. A routing hierarchy can be created only if the child defines the same header and query matchers that the parent HTTPRoute resource defines. You can optionally define additional header or query matchers on the child HTTPRoute resource.
 
-For example, if the parent HTTPRoute resource specifies the `header` header, the child must specify the same header matcher. 
+For example, if the parent HTTPRoute resource specifies a header matcher, the child must specify the same header matcher. 
 
 The following image illustrates the route delegation hierarchy:
 
@@ -13,7 +13,7 @@ The following image illustrates the route delegation hierarchy:
 
 **`parent` HTTPRoute**: 
 * The parent HTTPRoute resource delegates traffic as follows: 
-  * `/anything/team1` delegates traffic to the child HTTPRoute resource `child-team1` in namespace `team1` for requests that include the `header1; val1` request header and the `query1=val1` query parameter. 
+  * `/anything/team1` delegates traffic to the child HTTPRoute resource `child-team1` in namespace `team1` for requests that include the `header1: val1` request header and the `query1=val1` query parameter. 
   * `/anything/team2` delegates traffic to the child HTTPRoute resource `child-team2` in namespace `team2` for requests that include the `header2: val2` request header and the `query2=val2` query parameter. 
   
 **`child-team1` HTTPRoute**: 

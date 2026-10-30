@@ -12,7 +12,7 @@ The kgateway proxy comes with built-in API key auth support via the {{< reuse "k
 * Specify a **label selector** that matches the label of one or more API key secrets. Labels are the more flexible, scalable approach.
 * Refer to the **name and namespace** of each secret.
 
-The proxy matches a request to a route that is secured by the external auth policy. The request must have a valid API key in the `api-key` header to be accepted. You can configure the name of the expected header. If the header is missing, or the API key is invalid, the proxy denies the request and returns a `401` response. 
+The proxy matches a request to a route that is secured by the API key auth policy. The request must have a valid API key in the `api-key` header to be accepted. You can configure the name of the expected header. If the header is missing, or the API key is invalid, the proxy denies the request and returns a `401` response. 
 
 The following diagram illustrates the flow: 
 
@@ -27,7 +27,7 @@ sequenceDiagram
 
     AGW->>AGW: API key auth check:<br/>No API key found
 
-    AGW-->>C: 401 Unauthorized<br/>"no API Key found"
+    AGW-->>C: 401 Unauthorized<br/>"Client authentication failed"
 
     Note over C,Backend: Retry with API key
 
@@ -38,7 +38,7 @@ sequenceDiagram
 
     AGW->>AGW: Compare API key from<br/>request header vs secret
 
-    alt mode: Strict — Key valid
+    alt Key valid
         AGW->>Backend: Forward request
         Backend-->>AGW: Response
         AGW-->>C: 200 OK + Response
@@ -68,7 +68,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: httpbin
-   type: extauth.solo.io/apikey
+   type: Opaque
    stringData:
      api-key: N2YwMDIxZTEtNGUzNS1jNzgzLTRkYjAtYjE2YzRkZGVmNjcy
    EOF
@@ -80,7 +80,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
    kubectl get secret apikey -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
 
-4. Create an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The following example uses the `Strict` validation mode, which requires requests to include a valid `Authorization` header to be authenticated successfully. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
+4. Create an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The policy requires requests to include a valid API key in the `api-key` header. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -124,7 +124,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
    ...
    ```
 
-6. Repeat the request. This time, you provide a valid API key in the `Authorization` header. Verify that the request now succeeds. 
+6. Repeat the request. This time, you provide a valid API key in the `api-key` header. Verify that the request now succeeds. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -352,7 +352,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: apikey-auth-disable
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: httpbin
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io

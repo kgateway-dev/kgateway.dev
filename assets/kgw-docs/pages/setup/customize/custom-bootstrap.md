@@ -68,7 +68,7 @@ Because you start from a copy of the generated bootstrap, the proxy keeps its co
    ```
 
 3. Make the following changes to your ConfigMap. 
-   1. Change the `metadata.name` field to a custom name, such as `custom-bootstrap`. You must create the ConfigMap under a different name to avoid automatic overwrites of the ConfigMap by the managed proxy. 
+   1. Change the `metadata.name` field to a custom name, such as `custom-bootstrap`. You must create the ConfigMap under a different name to avoid automatic overwrites of the ConfigMap by the managed proxy. Also remove the `metadata.resourceVersion`, `metadata.uid`, `metadata.creationTimestamp`, and `metadata.ownerReferences` fields so that the file creates a new ConfigMap that the Gateway does not own. 
    2. Find the Envoy bootstrap configuration in the `envoy.yaml` entry and customize it to your needs. The following example adds a `stats_config` block with custom histogram bucket boundaries (in milliseconds) for cluster stats. Add the block as a new top-level key. Make sure to leave all the existing keys of your Envoy bootstrap configuration unchanged.
       ```yaml
       stats_config:
@@ -83,8 +83,6 @@ Because you start from a copy of the generated bootstrap, the proxy keeps its co
       > ```sh
       > kubectl get configmap custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} \
       > -o jsonpath='{.data.envoy\.yaml}' > envoy.yaml
-      >
-      > open envoy.yaml
       > ```
   
    3. Apply the new ConfigMap. 

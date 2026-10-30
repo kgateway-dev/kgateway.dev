@@ -101,7 +101,7 @@ Use a ListenerPolicy to disable path normalization, slash merging, or both, for 
    ```
 
    > [!NOTE]
-   > The 301 response comes from httpbin's underlying Werkzeug framework, which has its own, independent path normalization. Httpbin redirects any request with a repeated slash to the canonical single-slash path. This behavior only triggers if httpbin receives the raw, unmerged path with repeated slashes. If Envoy had merged the slashes before proxying the request, httpbin would receive the already-canonical path and return a normal 200 response with no redirect.
+   > The 301 response comes from the sample httpbin app, which is built on Go's `net/http` package and has its own, independent path normalization. The app redirects any request with a repeated slash to the canonical single-slash path. This behavior only triggers if httpbin receives the raw, unmerged path with repeated slashes. If Envoy had merged the slashes before proxying the request, httpbin would receive the already-canonical path and return a normal 200 response with no redirect.
 
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Handle escaped slashes {#escaped-slashes}

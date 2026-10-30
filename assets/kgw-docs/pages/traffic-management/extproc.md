@@ -24,7 +24,7 @@ The following diagram shows an example for how request header manipulation works
 
 ### ExtProc server considerations
 
-The ExtProc server is a gRPC interface that must be able to respond to events in the lifecycle of an HTTP request. When the ExtProc filter is enabled in Gloo Gateway and a request or response is received on the gateway, the filter communicates with the ExtProc server by using bidirectional gRPC streams.
+The ExtProc server is a gRPC interface that must be able to respond to events in the lifecycle of an HTTP request. When the ExtProc filter is enabled in {{< reuse "kgw-docs/snippets/kgateway.md" >}} and a request or response is received on the gateway, the filter communicates with the ExtProc server by using bidirectional gRPC streams.
 
 To implement your own ExtProc server, make sure that you follow [Envoy's technical specification for an external processor](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor). This guide uses a sample ExtProc server that you can use to try out the ExtProc functionality.
 
@@ -84,8 +84,7 @@ Use a sample ExtProc server implementation to try out the ExtProc functionality 
        "header1": "value1",
        "header2": "value2"
      },
-     "removeHeaders": [ "header3", "header4" ],
-     }
+     "removeHeaders": [ "header3", "header4" ]
    }
    ```
 
@@ -191,7 +190,7 @@ You can enable ExtProc for a particular route in an HTTPRoute resource.
    EOF
    ```
    
-5. Send a request to the httpbin app along the `/headers` path and provide your instructions in the `instruction` header. This example instructs the ExtProc server to add the `extproc: true` header. Verify that you get back a 200 HTTP response and that your response includes the `extproc: true` header. 
+5. Send a request to the httpbin app along the `/headers` path and provide your instructions in the `instructions` header. This example instructs the ExtProc server to add the `extproc: true` header. Verify that you get back a 200 HTTP response and that your response includes the `extproc: true` header. 
 
    {{< tabs >}}
 
@@ -371,7 +370,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    EOF
    ```
    
-5. Send a request to the httpbin app along the `/headers` path and provide your instructions in the `instruction` header. This example instructs the ExtProc server to add the `extproc: true` header. Verify that you get back a 200 HTTP response and that your response includes the `extproc: true` header. 
+5. Send a request to the httpbin app along the `/headers` path and provide your instructions in the `instructions` header. This example instructs the ExtProc server to add the `extproc: true` header. Verify that you get back a 200 HTTP response and that your response includes the `extproc: true` header. 
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/headers -H "host: extproc.example" -H 'instructions: {"addHeaders":{"extproc":"true"}}' 
    ```

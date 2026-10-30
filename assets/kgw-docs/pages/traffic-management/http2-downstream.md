@@ -32,7 +32,7 @@ Tune how the gateway handles HTTP/2 connections from downstream clients by confi
    | -- | -- |
    | `initialStreamWindowSize` | Initial flow-control window size for each HTTP/2 stream in bytes. Valid values: 65535–2147483647. Defaults to 268435456 (256 MiB). Accepts Kubernetes resource quantity strings, such as `128Ki`. |
    | `initialConnectionWindowSize` | Initial flow-control window size for the HTTP/2 connection in bytes. Same valid range and default as `initialStreamWindowSize`. Accepts Kubernetes resource quantity strings such as `256Ki`. |
-   | `maxConcurrentStreams` | Maximum number of concurrent HTTP/2 streams per connection in bytes. Valid values: 1–2147483647. Envoy defaults to 1024. |
+   | `maxConcurrentStreams` | Maximum number of concurrent HTTP/2 streams per connection. Valid values: 1–2147483647. Envoy defaults to 1024. |
 
 2. Port-forward the gateway proxy on port 19000.
    ```sh
@@ -84,7 +84,7 @@ EOF
 | `allowConnect` | Enables RFC 8441 Extended CONNECT support on the HTTP/2 listener. Set to `true` to allow clients that use WebSocket-over-HTTP/2, such as Firefox, to establish WebSocket connections. Envoy translates the Extended CONNECT request into an HTTP/1.1 Upgrade before forwarding it to the upstream service. Defaults to `false`. |
 
 > [!NOTE]
-The `allowConnect` setting only allows the Extended CONNECT request through the gateway proxy. Envoy still converts it into a regular `websocket` upgrade internally, so you also need to enable the `websocket` upgrade token, either on the listener or on the route.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} For more information, see [HTTP protocol upgrades]({{< link-hextra path="/traffic-management/http-upgrades/" >}}).{{< /version >}}
+> The `allowConnect` setting only allows the Extended CONNECT request through the gateway proxy. Envoy still converts it into a regular `websocket` upgrade internally, so you also need to enable the `websocket` upgrade token, either on the listener or on the route.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} For more information, see [HTTP protocol upgrades]({{< link-hextra path="/traffic-management/http-upgrades/" >}}).{{< /version >}}
 {{< /version >}}
 
 ## Cleanup

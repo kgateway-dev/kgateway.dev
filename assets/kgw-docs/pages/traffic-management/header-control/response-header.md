@@ -8,7 +8,7 @@ For more information, see the [HTTPHeaderFilter specification](https://gateway-a
 
 ## Add response headers {#add-response-headers-route}
 
-Add headers to incoming requests before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
+Add headers to responses before they are sent back to the client. If the response already has the header set, the value of the header in the `ResponseHeaderModifier` filter is appended to the value of the header in the response. 
 
 1. Set up a header modifier that adds a `my-response: hello` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy.
    {{< tabs >}}
@@ -42,7 +42,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    |Setting|Description|
    |--|--|
    |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
-   |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.type`| The type of filter that you want to apply to responses. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.add`|The name and value of the response header that you want to add. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
@@ -93,7 +93,7 @@ Add headers to incoming requests before they are sent back to the client. If the
    
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that you see the `my-response` header in the response. 
    {{< tabs >}}
-   {{% tab name="Cloud Provider Loadbalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
    ```
@@ -143,7 +143,7 @@ Add headers to incoming requests before they are sent back to the client. If the
 
 ## Set response headers 
 
-Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the request already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
+Setting headers is similar to adding headers. If the response does not include the header, it is added by the `ResponseHeaderModifier` filter. However, if the response already contains the header, its value is overwritten with the value from the `ResponseHeaderModifier` filter. 
 
 1. Set up a header modifier that sets a `my-response: custom` response header. Choose between the HTTPRoute for a Gateway API-native way, or {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} for more [flexible attachment options](../../../about/policies/trafficpolicy/) such as a gateway-level policy. 
    {{< tabs >}}
@@ -177,7 +177,7 @@ Setting headers is similar to adding headers. If the response does not include t
    |Setting|Description|
    |--|--|
    |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` Gateway that was created as part of the get started guide. |
-   |`spec.rules.filters.type`| The type of filter that you want to apply to incoming requests. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.type`| The type of filter that you want to apply to responses. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.set`|The name and value of the response header that you want to set. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
@@ -228,16 +228,16 @@ Setting headers is similar to adding headers. If the response does not include t
 
 2. Send a request to the httpbin app on the `headers.example` domain. Verify that you get back a 200 HTTP response code and that the `my-response: custom` header was set. 
    {{< tabs >}}
-{{% tab name="Cloud Provider Loadbalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: headers.example"
-```
-{{% /tab %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
    {{< /tabs >}}
 
    Example output: 
@@ -278,7 +278,7 @@ You can remove HTTP headers from a response before the response is sent back to 
 
 1. Send a request to the httpbin app and find the `content-length` header. 
    {{< tabs >}}
-   {{% tab name="Cloud Provider Loadbalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: www.example.com:8080"
    ```
@@ -341,7 +341,7 @@ You can remove HTTP headers from a response before the response is sent back to 
    |Setting|Description|
    |--|--|
    |`spec.parentRefs`| The name and namespace of the gateway that serves this HTTPRoute. In this example, you use the `http` gateway that was created as part of the get started guide. |
-   |`spec.rules.filters.type`| The type of filter that you want to apply. In this example, the `ResponseHeaderModifier` filter is used.|
+   |`spec.rules.filters.type`| The type of filter that you want to apply to responses. In this example, the `ResponseHeaderModifier` filter is used.|
    |`spec.rules.filters.responseHeaderModifier.remove`|The name of the response header that you want to remove. |
    |`spec.rules.backendRefs`|The backend destination you want to forward traffic to. In this example, all traffic is forwarded to the httpbin app that you set up as part of the get started guide. |
    {{% /tab %}}
@@ -389,9 +389,9 @@ You can remove HTTP headers from a response before the response is sent back to 
    {{% /tab %}}
    {{< /tabs >}}
 
-3. Send a request to the httpbin app on the `headers.example` domain . Verify that the `content-length` response header is removed. 
+3. Send a request to the httpbin app on the `headers.example` domain. Verify that the `content-length` response header is removed. 
    {{< tabs >}}
-   {{% tab name="Cloud Provider Loadbalancer" %}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
    curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
    ```
@@ -516,37 +516,37 @@ The same defaulting rules and cross-namespace `ReferenceGrant` requirement that 
 
 4. Send a request to the httpbin app on the `headers.example` domain and confirm that the response includes the `X-Response-Signature` header with the value from the Secret.
 
-{{< tabs >}}
-{{% tab name="Cloud Provider Loadbalancer" %}}
-```sh
-curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
-```
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
-```sh
-curl -vi localhost:8080/response-headers -H "host: headers.example"
-```
-{{% /tab %}}
-{{< /tabs >}}
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers -H "host: headers.example:8080"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vi localhost:8080/response-headers -H "host: headers.example"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
-Example output:
-```sh
-HTTP/1.1 200 OK
-access-control-allow-credentials: true
-access-control-allow-origin: *
-content-type: application/json; encoding=utf-8
-x-envoy-upstream-service-time: 0
-x-response-signature: my-response-signing-key
-server: envoy
-```
+   Example output:
+   ```sh
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-origin: *
+   content-type: application/json; encoding=utf-8
+   x-envoy-upstream-service-time: 0
+   x-response-signature: my-response-signing-key
+   server: envoy
+   ```
 
 5. Optional: When you are finished, clean up the resources that you created.
 
-```sh
-kubectl delete httproute httpbin-headers -n httpbin
-kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} httpbin-secret-response-headers -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-kubectl delete secret response-signing -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
-```
+   ```sh
+   kubectl delete httproute httpbin-headers -n httpbin
+   kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} httpbin-secret-response-headers -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl delete secret response-signing -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
 
 ### Field defaulting
 

@@ -125,7 +125,7 @@ Set up an HTTP listener on your Gateway.
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
+2. Check the status of the Gateway to make sure that your configuration is accepted. In the output, the Gateway has an `Accepted` condition of `True`. Each listener also has a `Conflicted` condition of `False`, which means that the listener does not conflict with other listeners on the Gateway. 
    ```sh
    kubectl get gateway my-http-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
@@ -228,7 +228,7 @@ Set up an HTTP listener on your Gateway.
    - attachedRoutes: 1
    ```
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
 
    ```sh
    kubectl get listenerset -n httpbin my-http-listenerset -o yaml
@@ -320,7 +320,7 @@ Set up an HTTP listener on your Gateway.
 kubectl delete -A gateways,httproutes -l example=httpbin-mydomain
 ```
 {{% /tab %}}
-{{% tab name="ListenerSet" %}}
+{{% tab name="ListenerSets" %}}
 ```sh
 kubectl delete -A gateways,httproutes,listenersets -l example=httpbin-mydomain
 ```

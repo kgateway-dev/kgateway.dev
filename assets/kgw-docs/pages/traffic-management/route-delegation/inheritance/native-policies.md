@@ -19,7 +19,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
 
 **`parent` HTTPRoute**: 
 * The `parent` HTTPRoute resource delegates traffic as follows: 
-  * Requests to`/anything/team1` are delegated to the child HTTPRoute resource `child-team1` in namespace `team1`. A timeout policy of 10s is defined on this route.
+  * Requests to `/anything/team1` are delegated to the child HTTPRoute resource `child-team1` in namespace `team1`. A timeout policy of 10s is defined on this route.
   * Requests to `/anything/team2` are delegated to the child HTTPRoute resource `child-team2` in namespace `team2`. A timeout policy of 20s is defined on this route.
 
 **`child-team1` HTTPRoute**: 
@@ -27,7 +27,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
 * The `child-team1` resource does not define any custom timeout policies. Because of that, the timeout policy that is set on the parent is automatically inherited and enforced. 
 
 **`child-team2` HTTPRoute**: 
-* The child HTTPRoute resource `child-team2` delegates traffic on the `/anything/team2/bar` path to a grandchild HTTPRoute resource in the `team2` namespace. 
+* The child HTTPRoute resource `child-team2` routes traffic on the `/anything/team2/bar` path to the httpbin app in the `team2` namespace. 
 * The `child-team2` resource defines a custom timeout policy. Because of that, the timeout policy on the parent is ignored and only the timeout policy on the `child-team2` resource is enforced. 
 
 ## Before you begin
@@ -98,7 +98,7 @@ The following image illustrates the route delegation hierarchy and policy inheri
    EOF
    ```
 
-3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that specifies a custom timeout policy and matches traffic on the `/anything/team2/bar/` prefix. The custom timeout policy overrides the timeout policy that is set on the `parent`. 
+3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that specifies a custom timeout policy and matches traffic on the `/anything/team2/bar` prefix. The custom timeout policy overrides the timeout policy that is set on the `parent`. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1

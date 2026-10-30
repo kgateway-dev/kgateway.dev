@@ -91,7 +91,7 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
    |Setting|Description|
    |--|--|
    |`spec.gatewayClassName`| The name of the Kubernetes GatewayClass that you want to use to configure the Gateway. When you set up {{< reuse "kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. {{< reuse "kgw-docs/snippets/agw-gatewayclass-choice.md" >}} |
-   |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TCP Gateway that listens for incoming traffic on port 8000. The Gateway can serve TCPRoutes from any namespace. |
+   |`spec.listeners`|Configure the listeners for this Gateway. In this example, you configure a TCP Gateway that listens for incoming traffic on port 8000. The Gateway accepts TCPRoutes from the same namespace as the Gateway. |
 
    {{% /tab %}}
    {{% tab name="ListenerSets" %}}
@@ -162,11 +162,11 @@ Create a TCP listener so that the gateway can route TCP traffic. In the followin
       |Setting|Description|
       |--|--|
       |`spec.parentRef`|The name of the Gateway to attach the ListenerSet to. |
-      |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure a TCP listener for port 8000. The gateway can serve TCPRoutes from any namespace. |
+      |`spec.listeners`|Configure the listeners for this ListenerSet. In this example, you configure a TCP listener for port 8000. The listener accepts TCPRoutes from the same namespace as the Gateway. |
    {{% /tab %}}
    {{< /tabs >}}
 
-2. Check the status of the Gateway to make sure that your configuration is accepted. Note that in the output, a `NoConflicts` status of `False` indicates that the Gateway is accepted and does not conflict with other Gateway configuration. 
+2. Check the status of the Gateway to make sure that your configuration is accepted. In the output, the Gateway has an `Accepted` condition of `True`. Each listener also has a `Conflicted` condition of `False`, which means that the listener does not conflict with other listeners on the Gateway. 
    ```sh
    kubectl get gateway tcp-gateway -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
@@ -355,7 +355,8 @@ Verify that the TCP route to the TCP echo app is working.
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```shell
-kubectl delete -A gateways,tcproutes,pod,svc -l app=tcp-echo
+kubectl delete -A gateways,listenersets,tcproutes,pod,svc -l app=tcp-echo
+kubectl delete referencegrant allow-tcp-route-to-echo -n default
 ```
 
 

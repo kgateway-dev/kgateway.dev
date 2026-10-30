@@ -39,7 +39,7 @@ The kgateway proxy requires passwords to be hashed using [SHA-1](https://en.wiki
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 3. Make sure that you have the following CLI tools, or something comparable:
-   * `htpasswd` to generate hashed, salted passwords.
+   * `htpasswd` to generate hashed passwords.
    * `base64` to encode strings.
  
 
@@ -108,7 +108,7 @@ The kgateway proxy requires passwords to be hashed using [SHA-1](https://en.wiki
    dXNlcjpwYXNzd29yZA==
    ```
 
-5. Repeat the request. This time, you include the base64 user credentials in an `Authorization` header. Verify that the request now succeeds and returns.
+5. Repeat the request. This time, you include the base64 user credentials in an `Authorization` header. Verify that the request now succeeds and returns a 200 HTTP response code.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -224,7 +224,7 @@ Instead of listing users inline, store the htpasswd data in a Kubernetes secret 
 1. Create a secret with your htpasswd data.
    ```sh
    kubectl create secret generic basic-auth-users \
-     --from-literal=.htpasswd="admin:{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=" \ 
+     --from-literal=.htpasswd="admin:{SHA}W6ph5Mm5Pz8GgiULbPgzG37mj9g=" \
      -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
@@ -280,7 +280,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: basic-auth-disable
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: httpbin
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io

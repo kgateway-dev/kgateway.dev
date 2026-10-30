@@ -45,13 +45,13 @@ Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to insta
    kubectl get gateway self-managed -n kgateway-system -o yaml
    ```
 
-4. Verify that no gateway proxy deployment and service were created for your Gateway. The output is blank.
+4. Verify that no gateway proxy pods and services were created for your Gateway. The output is blank.
    ```sh
    kubectl get pods -n kgateway-system | grep self-managed
    kubectl get services -n kgateway-system | grep self-managed
    ```
    
-5. Create your own gateway proxy deployment. Note that this deployment needs to have valid Envoy configuration that includes the correct name and namespace of your Gateway resource to successfully bootstrap your gateway proxy and bind it to the Gateway resource. You can use the following template as a starting point to build your own Envoy configuration. To bind your gateway proxy with the Gateway resource, ensure that you replace `$GATEWAY_NAME` and `$GATEWAY_NAMESPACE` with the name of the Gateway that you created earlier. 
+5. Create your own gateway proxy deployment. Note that this deployment needs to have valid Envoy configuration that includes the correct name and namespace of your Gateway resource to successfully bootstrap your gateway proxy and bind it to the Gateway resource. You can use the following template as a starting point to build your own Envoy configuration. To bind your gateway proxy with the Gateway resource, ensure that you replace `$GATEWAY_NAME` and `$GATEWAY_NAMESPACE` with the name and namespace of the Gateway that you created earlier. Replace `$CONTROLLER_HOST` with the address of the kgateway control plane Service, such as `kgateway.{{< reuse "kgw-docs/snippets/namespace.md" >}}.svc.cluster.local`. 
    
    Example deployment template in the {{< version exclude-if="2.0.x,2.1.x" >}}[GitHub `deployment.yaml` file](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "kgw-docs/versions/github-branch.md" >}}/pkg/kgateway/helm/envoy/templates/deployment.yaml){{< /version >}}{{< version include-if="2.0.x,2.1.x" >}}[GitHub `proxy-deployment.yaml` file](https://github.com/kgateway-dev/kgateway/blob/{{< reuse "kgw-docs/versions/github-branch.md" >}}/internal/kgateway/helm/kgateway/templates/gateway/proxy-deployment.yaml){{< /version >}}.
    
@@ -64,7 +64,7 @@ Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to insta
    node:
      cluster: $GATEWAY_NAME.$GATEWAY_NAMESPACE
      metadata:
-       role: gloo-kube-gateway-api~$GATEWAY_NAMESPACE~$GATEWAY_NAMESPACE-$GATEWAY_NAME
+       role: kgateway-kube-gateway-api~$GATEWAY_NAMESPACE~$GATEWAY_NAME
    static_resources:
      listeners:
      - name: read_config_listener
@@ -109,11 +109,11 @@ Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to insta
                      address: $CONTROLLER_HOST
                      port_value: 9977
          typed_extension_protocol_options:
-           envoy.extensions.backends.http.v3.HttpProtocolOptions:
-             "@type": type.googleapis.com/envoy.extensions.backends.http.v3.HttpProtocolOptions
+           envoy.extensions.upstreams.http.v3.HttpProtocolOptions:
+             "@type": type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions
              explicit_http_config:
                http2_protocol_options: {}
-         backend_connection_options:
+         upstream_connection_options:
            tcp_keepalive:
              keepalive_time: 10
          type: STRICT_DNS

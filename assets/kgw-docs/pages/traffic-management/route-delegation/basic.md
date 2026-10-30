@@ -16,7 +16,7 @@ In this guide you walk through a basic route delegation example that demonstrate
 * The child HTTPRoute resource `child-team1` matches incoming traffic for the `/anything/team1/foo` prefix path and routes that traffic to the httpbin app in namespace `team1`. 
 
 **`child-team2` HTTPRoute**: 
-* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact prefix path and routes that traffic to the httpbin app in namespace `team2`. 
+* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact path and routes that traffic to the httpbin app in namespace `team2`. 
 
 ## Before you begin
 
@@ -81,7 +81,7 @@ In this guide you walk through a basic route delegation example that demonstrate
    EOF
    ```
 
-3. Create the child HTTPRoute resource for the `team2` namespace that matches traffic on the `/anything/team2/bar` exact prefix and routes traffic to the httpbin app in the `team2` namespace. The child HTTPRoute resource specifies a specific parent HTTPRoute resource by using the `spec.parentRefs` field. 
+3. Create the child HTTPRoute resource for the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path and routes traffic to the httpbin app in the `team2` namespace. The child HTTPRoute resource specifies a specific parent HTTPRoute resource by using the `spec.parentRefs` field. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1

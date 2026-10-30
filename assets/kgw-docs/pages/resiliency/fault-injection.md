@@ -108,7 +108,7 @@ Terminate requests early by returning an error code to the caller. You can confi
    | `faultInjection.abort.httpStatus` | The HTTP status code to return. Must be between `200` and `599`. Mutually exclusive with `grpcStatus`. Note that if you want to set `grpcStatus` instead, use a value between `0` and `16`.  |
    | `faultInjection.abort.percentage` | The percentage of requests to abort. Defaults to `100`. |
 
-3. Send a request to the httpbin app. Verify that the request is aborted with a 503 response.
+2. Send a request to the httpbin app. Verify that the request is aborted with a 503 response.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

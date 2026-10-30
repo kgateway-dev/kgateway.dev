@@ -33,17 +33,13 @@ weight: 30
 
     Validate the binary against the checksum file.
 
-    Using Command Prompt, manually compare CertUtil's output to the downloaded checksum file.
+    Compute the SHA256 hash of the archive with CertUtil.
 
     ```bash
     CertUtil -hashfile ingress2gateway_${OS}_${ARCH}.zip SHA256
     ```
 
-    If valid, the output is:
-
-    ```bash
-    ingress2gateway_$OS_$ARCH.zip: OK
-    ```
+    The release is valid if the hash in the output matches the hash on the archive's line in the `checksums.txt` file.
 
 4. Extract the tarball.
 

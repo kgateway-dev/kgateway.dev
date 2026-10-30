@@ -44,7 +44,7 @@ Before you upgrade {{< reuse "/kgw-docs/snippets/kgateway.md" >}}, review the fo
    * Experimental channel: Note that some CRDs are prefixed with `X` to indicate that the entire CRD is experimental and subject to change.
      
      ```sh
-     kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+     kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
      ```   
 
    Example output: 
@@ -157,7 +157,7 @@ For Istio upgrades, consult the docs based on the way that you installed Istio. 
    
    Example output:
    ```
-   cr.{{< reuse "kgw-docs/snippets/kgateway.md" >}}.dev/controller:{{< reuse "kgw-docs/versions/n-patch.md" >}}
+   cr.kgateway.dev/kgateway-dev/kgateway:v{{< reuse "kgw-docs/versions/n-patch.md" >}}
    ```
 
 6. Confirm that the control plane is up and running. 

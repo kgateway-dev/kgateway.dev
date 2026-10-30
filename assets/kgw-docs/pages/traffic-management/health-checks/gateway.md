@@ -8,7 +8,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
  
 ## Configure a health check on a gateway
 
-1. Create a ListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. You can define any path, such as `/check/healthz`.
+1. Create a ListenerPolicy resource to configure a health check path for the HTTP or HTTPS listener on the gateway. This example uses `/check/healthz`, but you can define any path.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -24,7 +24,7 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
      default:
        httpSettings:
          healthCheck:
-           path: <path>
+           path: /check/healthz
    EOF
    ```
 
@@ -42,12 +42,12 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   curl -i $INGRESS_GW_ADDRESS:8080/check/healthz
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -i localhost:8080/<path>
+   curl -i localhost:8080/check/healthz
    ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -72,12 +72,12 @@ Enable a health check plugin on your gateway proxy to respond with common HTTP c
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -i $INGRESS_GW_ADDRESS:8080/<path>
+   curl -i $INGRESS_GW_ADDRESS:8080/check/healthz
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -i localhost:8080/<path>
+   curl -i localhost:8080/check/healthz
    ```
    {{% /tab %}}
    {{< /tabs >}}

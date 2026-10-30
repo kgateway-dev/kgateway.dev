@@ -44,7 +44,7 @@ Set `statsForAllMethods` to `true` to emit per-method statistics for every gRPC 
    | `enableUpstreamStats` | Optional. Emits a histogram for the upstream wire latency of each request. |
 
 
-2. Port-forward the gateway proxy admin port.
+2. Port-forward the gateway proxy admin port, 19000.
 
    ```sh
    kubectl port-forward deployment/grpc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
@@ -80,7 +80,7 @@ Set `statsForAllMethods` to `true` to emit per-method statistics for every gRPC 
    ]
    ```
 
-4. Send a gRPC request through the Gateway. The `-vv` flag makes `grpcurl` issue a `ServerReflectionInfo` call first to resolve the method signature, so you see stats for both calls.
+4. Send a gRPC request through the Gateway. Because you do not provide a proto file, `grpcurl` first calls `ServerReflectionInfo` to resolve the method signature, so you see stats for both calls. The `-vv` flag prints verbose output.
 
    ```sh
    kubectl exec -n {{< reuse "kgw-docs/snippets/namespace.md" >}} grpcurl-client -c grpcurl -- \
@@ -151,7 +151,7 @@ Set `methodAllowlist` to record per-method statistics for only the gRPC methods 
    | `methodAllowlist` | Fully qualified gRPC methods to record, in the `/package.Service/Method` format. The list must contain 1-128 methods. Do not set this field together with `statsForAllMethods`. |
 
 
-2. Port-forward the gateway proxy admin port.
+2. Port-forward the gateway proxy admin port, 19000.
 
    ```sh
    kubectl port-forward deployment/grpc -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
@@ -241,5 +241,5 @@ Set `methodAllowlist` to record per-method statistics for only the gRPC methods 
 Remove the ListenerPolicy resources that you created.
 
 ```sh
-kubectl delete listenerpolicy grpc-stats grpc-stats-allowlist -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
+kubectl delete listenerpolicy grpc-stats -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --ignore-not-found
 ```

@@ -36,6 +36,8 @@ EOF
 ingress2gateway print --providers=ingress-nginx --emitter=kgateway --input-file basic-ingress.yaml > basic-kgateway.yaml
 ```
 
+The tool prints a warning that it does not translate HTTPS for the `demo.localdev.me` host. By default, Ingress NGINX serves HTTPS for every host with a self-signed certificate. The generated Gateway has only an HTTP listener. To serve HTTPS, add an HTTPS listener to the Gateway. For more information, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
+
 ## After: Gateway API resources
 
 ```bash
@@ -72,6 +74,7 @@ spec:
     - path:
         type: PathPrefix
         value: /
+    name: rule-0
 ```
 
 ## Apply and verify

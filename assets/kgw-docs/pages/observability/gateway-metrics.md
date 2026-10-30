@@ -136,7 +136,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
@@ -146,7 +146,17 @@ spec:
     - protocol: HTTP
       port: 8080
       name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 EOF
+```
+
+The stats matcher is part of the bootstrap configuration of the gateway proxy, which the proxy reads only when it starts. Restart the gateway proxy to apply the matcher.
+
+```sh
+kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 **Exclusion list**
@@ -176,7 +186,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
@@ -186,7 +196,17 @@ spec:
     - protocol: HTTP
       port: 8080
       name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 EOF
+```
+
+The stats matcher is part of the bootstrap configuration of the gateway proxy, which the proxy reads only when it starts. Restart the gateway proxy to apply the matcher.
+
+```sh
+kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}

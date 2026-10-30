@@ -14,6 +14,9 @@ For HTTP/2 and gRPC connections, you can configure HTTP/2 PING-based keepalive i
 
 HTTP/2 keepalive only applies when the gateway proxy uses HTTP/2 to connect to the backend. To enable this, set `appProtocol: kubernetes.io/h2c` on the Service port so that kgateway treats the upstream as an HTTP/2 backend.
 
+> [!NOTE]
+> The httpbin sample app serves only HTTP/1.1, so requests to httpbin fail while its Service port uses `kubernetes.io/h2c`. This guide verifies only that the keepalive settings reach the gateway proxy. Use HTTP/2 keepalive with backends that serve HTTP/2, such as gRPC services, and run the cleanup steps when you are done.
+
 1. Patch the httpbin Service to use HTTP/2 on port 8000.
 
    ```sh

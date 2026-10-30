@@ -134,7 +134,7 @@ Deploy your own HTTP-based external authorization service as a backend service t
 
 ## Create external auth policy {#create-policy}
 
-You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply the policy at both levels, the request must pass both policies to be authorized.
+You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply external auth settings at both levels, the HTTPRoute-level settings take precedence for the routes that they apply to. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
 
 1. Send a test request to the httpbin sample app. Verify that you get back a 200 HTTP response code and that no authorization is required.
 

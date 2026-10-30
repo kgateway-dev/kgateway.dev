@@ -101,7 +101,7 @@ Match headers by an exact string, such as `version`.
 Match headers with regular expressions (regex).
 
 1. Create an HTTPRoute resource to match multiple headers with regex. Only if all headers are present in the request, the request is accepted and processed by the gateway proxy. The following rules apply: 
-   * ` (dogs|cats)`: The value of the `pet` request header must either be `dogs` or `cats`.
+   * `(dogs|cats)`: The value of the `pet` request header must either be `dogs` or `cats`.
    * `\\d[.]\\d.*`: The value of the `version` header must meet the following conditions: 
      * `\\d` matches a single digit.
      * `[.]` matches a literal period.
@@ -144,7 +144,7 @@ Match headers with regular expressions (regex).
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080" -H "host: match.example" \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080" \
    -H "Authorization: Bearer 123" \
    -H "pet: dogs" \
    -H "version: 3.0" 
@@ -152,7 +152,7 @@ Match headers with regular expressions (regex).
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/status/200 -H "host: match.example" -H "host: match.example" \
+   curl -vi localhost:8080/status/200 -H "host: match.example" \
    -H "Authorization: Bearer 123" \
    -H "pet: dogs" \
    -H "version: 3.0"
@@ -181,7 +181,7 @@ Match headers with regular expressions (regex).
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080" -H "host: match.example" \
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: match.example:8080" \
    -H "Authorization: Bearer 123" \
    -H "pet: dogs" \
    -H "version: 30"
@@ -189,7 +189,7 @@ Match headers with regular expressions (regex).
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -vi localhost:8080/status/200 -H "host: match.example" -H "host: match.example" \
+   curl -vi localhost:8080/status/200 -H "host: match.example" \
    -H "Authorization: Bearer 123" \
    -H "pet: dogs" \
    -H "version: 30"
