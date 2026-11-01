@@ -15,6 +15,9 @@ import platform
 import shutil
 import stat
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fix_metric_names import fix_metric_names
+
 
 _LINK_FIXUPS_CACHE = None
 
@@ -893,7 +896,8 @@ def generate_metrics_docs(version, link_version, kgateway_dir='kgateway'):
         '--markdown', f'./{kgateway_dir}'
     ], capture_output=True, text=True, check=True)
     
-    metrics_content = _apply_link_fixups(result.stdout)
+    metrics_content = fix_metric_names(result.stdout, kgateway_dir)
+    metrics_content = _apply_link_fixups(metrics_content)
 
     with open(f'assets/kgw-docs/snippets/{link_version}/metrics-control-plane.md', 'w') as f:
         f.write(metrics_content)
