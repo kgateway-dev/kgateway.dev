@@ -244,7 +244,7 @@ To route TLS traffic to the nginx server directly without terminating the TLS co
 
 ## Create a TLSRoute
 
-If multiple TLSRoutes overlap this listener hostname, the route with the most specific hostname owns each SNI domain. For more information, see [Route hostname precedence]({{< link-hextra path="/setup/listeners/sni/#route-hostname-precedence" >}}).
+If multiple TLSRoutes overlap this listener hostname, the route with the most specific hostname owns each SNI domain. For more information, see [Route hostname precedence]({{< link-hextra path="/setup/listeners/overview/#route-hostname-precedence" >}}).
 
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}
