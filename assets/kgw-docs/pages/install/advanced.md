@@ -434,14 +434,62 @@ If a policy reports `missing reference grant`, check the following settings of y
 
 By default, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart creates a `ClusterRole` and `ClusterRoleBinding` that grant the controller's service account the permissions it needs to watch and manage Kubernetes resources. In environments where RBAC resources are managed externally, such as by a platform or security team that controls all cluster-scoped permissions, you can disable the creation of these resources by setting `rbac.create: false`.
 
+The `rbac.create` setting does not affect the ServiceAccount of the controller. The chart still creates the ServiceAccount, so that you can bind your own permissions to it. To skip the ServiceAccount too, set `serviceAccount.create: false`.
+
 > [!CAUTION]
 > If you disable the creation of ClusterRole and ClusterRoleBinding resources, you must create equivalent resources yourself before or alongside the {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation. Without these resources, the controller cannot watch and manage Gateways, HTTPRoutes, Secrets, or other resources. 
 
-To skip RBAC resource creation, set `rbac.create: false` in your Helm values:
+To disable automatic RBAC creation, create the permissions yourself, and then turn off the chart's RBAC resources.
 
-```yaml
-rbac:
-  create: false
-```
+1. Render the ClusterRole and ClusterRoleBinding that the Helm chart creates by default. Use the output as the starting point for your own resources. The ClusterRole is in the `role.yaml` template, and the ClusterRoleBinding is in the `serviceaccount.yaml` template. The output also includes the ServiceAccount of the controller.
+
+   ```sh
+   helm template {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "kgw-docs/snippets/helm-template-license-flag.md" >}} \
+     --show-only templates/role.yaml \
+     --show-only templates/serviceaccount.yaml {{< reuse "kgw-docs/snippets/helm-template-extra-templates.md" >}} > rbac.yaml
+   ```
+
+2. Open the `rbac.yaml` file and review the rules of the ClusterRole. Then remove the ServiceAccount resource from the file. This is the YAML document with `apiVersion: v1` and `kind: ServiceAccount`. The chart still creates the ServiceAccount, and a ServiceAccount that you create yourself with the same name conflicts with it. Keep the `serviceaccounts` rule in the ClusterRole and the ServiceAccount in the `subjects` of the ClusterRoleBinding.
+
+3. If you upgrade an existing installation, change the names of the ClusterRole and ClusterRoleBinding resources in the file, and update the `roleRef` of each ClusterRoleBinding to use the new ClusterRole name. The upgrade in step 6 removes the ClusterRole and ClusterRoleBinding resources that the chart created earlier. It also removes any resource that has the same name as one of them.
+
+4. Create the resources in your cluster.
+
+   ```sh
+   kubectl apply -f rbac.yaml
+   ```
+
+5. Add the `rbac.create` setting to your Helm values file.
+
+   ```yaml
+   rbac:
+     create: false
+   ```
+
+6. Install or upgrade the Helm release with the values file.
+
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml
+   ```
+
+7. Verify that the Helm release no longer includes a ClusterRole or ClusterRoleBinding. The command returns no output.
+
+   ```sh
+   helm get manifest {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} | grep -E "^kind: (ClusterRole|ClusterRoleBinding)$"
+   ```
+
+8. Verify that the control plane is running.
+
+   ```sh
+   kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
+{{< reuse "kgw-docs/snippets/rbac-additional-components.md" >}}
 
 {{< /version >}}
