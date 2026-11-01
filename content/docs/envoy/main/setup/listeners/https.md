@@ -146,6 +146,8 @@ Set up an HTTPS listener on your Gateway.
    ```
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
+
+   If multiple HTTPRoutes overlap this listener hostname, hostname specificity is evaluated before HTTP match specificity. The route with the most specific hostname takes precedence. For more information, see [Route hostname precedence]({{< link-hextra path="/setup/listeners/sni/#route-hostname-precedence" >}}).
    
    {{< tabs >}}
    {{% tab name="Gateway listeners" %}}

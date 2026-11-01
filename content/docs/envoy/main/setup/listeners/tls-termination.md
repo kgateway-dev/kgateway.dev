@@ -204,6 +204,8 @@ Set up a TLS listener on the Gateway with `tls.mode: Terminate`. The Gateway dec
 
 Create a TLSRoute that routes SNI traffic for `app.example.com` to the httpbin app.
 
+If multiple TLSRoutes overlap this listener hostname, the route with the most specific hostname owns each SNI domain. For more information, see [Route hostname precedence]({{< link-hextra path="/setup/listeners/sni/#route-hostname-precedence" >}}).
+
 {{< tabs >}}
 {{% tab name="Gateway listeners" %}}
 ```yaml

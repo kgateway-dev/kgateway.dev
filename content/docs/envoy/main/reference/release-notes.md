@@ -290,6 +290,10 @@ The `commonLabels` Helm value now applies to the controller pod template, in add
 
 The control plane now emits the `kgateway_build_info` metric, so you can see which controller build is running from Prometheus. The metric always has the value `1`. The build details are in its labels: `version`, `revision` (Git commit), `goversion`, `goos`, and `goarch`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
 
+#### Gateway route hostname precedence {#v25-gateway-route-hostname-precedence}
+
+Routes whose hostnames overlap a listener hostname now follow the Gateway API `GatewayRouteHostnameIntersectionPrecedence` rules. More specific HTTPRoute and TLSRoute hostnames take precedence before HTTP match specificity, and losing TLSRoutes report `kgateway.dev/Programmed=False` with reason `Conflicted`. For more information, see [Route hostname precedence]({{< link-hextra path="/setup/listeners/sni/#route-hostname-precedence" >}}).
+
 ### 🔄 Feature changes {#v25-feature-changes}
 
 #### Lambda backends set the Host header {#v25-lambda-host-header}

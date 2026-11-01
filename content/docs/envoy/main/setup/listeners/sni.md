@@ -11,6 +11,12 @@ Each host comes with its own TLS certificates that the Gateway uses to authentic
 
 Serving multiple hosts on a single listener is also referred to as Server Name Indication (SNI) routing. SNI is an extension to the TLS protocol and allows clients to indicate which hostname they want to connect to at the start of the TLS handshake. After the HTTPS/TLS traffic is accepted at the gateway, the TLS connection is terminated, and the unencrypted HTTP/TCP request is forwarded to the destination.
 
+## Route hostname precedence {#route-hostname-precedence}
+
+HTTPRoute and TLSRoute hostnames can overlap a listener hostname. When overlapping routes intersect with the listener hostname to the same hostname, hostname specificity is evaluated before HTTP match specificity. The route with the most specific hostname takes precedence. Exact hostnames take precedence over wildcard hostnames. Longer wildcard hostnames take precedence over shorter wildcard hostnames. Routes without hostnames have the lowest hostname precedence.
+
+For TLSRoutes, only one route can own each SNI domain. If a TLSRoute loses every SNI domain to more specific routes, the route reports `kgateway.dev/Programmed=False` with reason `Conflicted`. If a TLSRoute owns some SNI domains and loses others, the route keeps serving the SNI domains that it owns. The `Conflicted` condition message reports the lost domains.
+
 ## About this guide
 
 In this guide, you learn how to set up an HTTPS Gateway that serves two different domains, `httpbin.example.com` and `petstore.example.com` on the same port 443. When sending a request to the Gateway, you indicate the hostname you want to connect to. Based on the selected hostname, the Gateway presents the hostname-specific certificate. 
