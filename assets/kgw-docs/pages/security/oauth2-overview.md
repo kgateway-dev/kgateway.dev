@@ -62,6 +62,16 @@ This design allows you to:
 - Migrate between providers with minimal changes
 - Support multiple IdPs within the same cluster
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+## OIDC discovery and private CAs {#oidc-discovery-private-cas}
+
+When a GatewayExtension sets `spec.oauth2.issuerURI` and omits one or more provider endpoints, the control plane fetches the issuer's `/.well-known/openid-configuration` document. For this discovery request, the control plane trusts the CA certificates from the effective BackendTLSPolicy on `spec.oauth2.backendRef`, in addition to the system trust store.
+
+Use a BackendTLSPolicy when the issuer uses a private or self-signed CA and the GatewayExtension relies on discovery. BackendConfigPolicy `spec.tls` settings are not used for OIDC discovery. If you set `authorizationEndpoint`, `tokenEndpoint`, `endSessionEndpoint`, and, when JWT validation is configured, `jwt.jwksURI`, discovery is skipped.
+
+Only CA trust is reused from the BackendTLSPolicy. The control plane connects directly to `issuerURI` and verifies the host in `issuerURI`, not the hostname or SNI configured for the backend.
+{{< /version >}}
+
 ## How kgateway handles OAuth2
 
 When you configure OAuth2/OIDC in kgateway, the gateway proxy acts as the OAuth2/OIDC client on behalf of downstream applications. It intercepts incoming requests, handles the handshake with the authorization server, and manages token storage and validation.
