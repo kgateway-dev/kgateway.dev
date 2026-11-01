@@ -417,6 +417,10 @@ The following table compares what each policy supports for TLS settings.
 | SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` |
 {{< /version >}}
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+When you use `tls.files`, the file paths must exist in the gateway proxy container. The control plane accepts these paths in both `standard` and `strict` validation modes. Envoy reports missing files, invalid file contents, or certificate and key mismatches when the proxy loads the configuration.
+{{< /version >}}
+
 The following examples update the `nginx-tls-policy` that you created earlier. The values in the examples are illustrative. Adjust them to match what your backend supports.
 
 {{< version include-if="2.4.x" >}}
