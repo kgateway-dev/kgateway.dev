@@ -292,6 +292,10 @@ The `commonLabels` Helm value now applies to the controller pod template, in add
 
 The control plane now emits the `kgateway_build_info` metric, so you can see which controller build is running from Prometheus. The metric always has the value `1`. The build details are in its labels: `version`, `revision` (Git commit), `goversion`, `goos`, and `goarch`. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/#reference" >}}).
 
+#### Configure no-traffic health check intervals {#v25-configure-no-traffic-health-check-intervals}
+
+You can now set `spec.healthCheck.noTrafficInterval` in a BackendConfigPolicy to control how often Envoy checks a backend before the backend receives its first request. If you omit the field, Envoy keeps its default no-traffic interval of 60 seconds. For more information, see [Backend health checks]({{< link-hextra path="/traffic-management/health-checks/backend/#backend" >}}).
+
 ### 🔄 Feature changes {#v25-feature-changes}
 
 #### Lambda backends set the Host header {#v25-lambda-host-header}

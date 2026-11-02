@@ -46,6 +46,37 @@ spec:
 | `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `grpc.serviceName` | Optional: Name of the gRPC service to check. The example omits this field because the Backend is not a gRPC service. |
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+To run health checks before a {{< reuse "/kgw-docs/snippets/backend.md" >}} receives its first request, set `spec.healthCheck.noTrafficInterval`. The `interval` field sets the time between health checks after the {{< reuse "/kgw-docs/snippets/backend.md" >}} receives traffic. If you omit `noTrafficInterval`, Envoy uses its default no-traffic interval of 60 seconds.
+
+```yaml
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: healthcheck-policy
+  namespace: {{< reuse "/kgw-docs/snippets/namespace.md" >}}
+spec:
+  targetRefs:
+    - name: my-backend
+      group: ""
+      kind: Service
+  healthCheck:
+    healthyThreshold: 1
+    http:
+      path: /status/200
+    interval: 30s
+    noTrafficInterval: 5s
+    timeout: 10s
+    unhealthyThreshold: 1
+```
+
+{{< reuse "/kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+| ------- | ----------- |
+| `noTrafficInterval` | The time between health checks before the {{< reuse "/kgw-docs/snippets/backend.md" >}} receives its first request. The value must be at least `1ms`. If omitted, Envoy uses its default value of 60 seconds. |
+{{< /version >}}
+
 ## Verify the health check configuration {#verify}
 
 To verify an active health check, use an app that has several endpoints, of which only some fail. In the following example, a single Kubernetes service selects the pods of two Deployments. One Deployment runs 1 replica that always returns an `HTTP 503` response. The other Deployment runs 2 replicas that always succeed. The service therefore has three endpoints, and two of them (about 67%) are always healthy. This share is above the default panic threshold of 50%, so the health check can take effect.
