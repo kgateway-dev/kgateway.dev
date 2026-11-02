@@ -268,10 +268,6 @@ External auth filters now expose per-request stats that you can reference in acc
 
 The ListenerPolicy now supports access logs for TCP and TLS listeners via the `tcpSettings.accessLog` field. For more information, see [Access logs for TCP and TLS listeners]({{< link-hextra path="/security/access-logging/#tcp-access-log" >}}).
 
-#### Route change batching {#v25-route-change-batching}
-
-The control plane now batches route changes before Gateway translation, so each affected Gateway rebuilds once per batch instead of once per route. Batching is enabled by default and waits `10ms` after the last change, up to a maximum of `100ms`. To adjust the timing, set the `KGW_TRANSLATION_DEBOUNCE` and `KGW_TRANSLATION_DEBOUNCE_MAX` environment variables on the controller. For more information, see [Tune route translation batching]({{< link-hextra path="/install/advanced/#route-translation-batching" >}}).
-
 #### Scope xDS configuration per gateway {#v25-xds-scoping}
 
 You can now configure the control plane to send each gateway's proxies only the clusters that the gateway's configuration references, instead of a cluster for every discovered backend. This reduces the size of the config dump and the number of stats of each proxy in clusters with many Services and few routed ones. To enable this experimental feature, set the `controller.xds.scoping.mode` Helm value to `REFERENCED`. The default is `ALL`. If you used a 2.5.0 beta with the `KGW_CLUSTER_DISCOVERY_MODE`, `KGW_CLUSTER_REFERENCE_AHEAD`, or `KGW_CLUSTER_DEREFERENCE_GRACE` setting, rename it to `KGW_XDS_SCOPING_MODE`, `KGW_XDS_SCOPING_REFERENCE_AHEAD`, or `KGW_XDS_SCOPING_DEREFERENCE_GRACE`. The control plane does not start while an old name is set. For more information, see [Scope xDS configuration per gateway]({{< link-hextra path="/install/advanced/#xds-scoping" >}}).
