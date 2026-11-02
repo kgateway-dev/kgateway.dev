@@ -21,7 +21,7 @@ The default engine is rustformation, which is powered by the [MiniJinja template
 The only supported engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). For details, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 {{< /version >}}
 
-The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
+The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure, with example values. To learn more about each attribute, see [Template attributes](#template-attributes).
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -30,29 +30,29 @@ metadata:
   name: transformation
   namespace: httpbin
 spec:
-  transformation: 
+  transformation:
     request:
-      add: 
-      - name: 
-        value: 
-      set: 
-      - name: 
-        value: 
-      remove: []
-      body:
-        value: 
-        parseAs: 
-    response: 
       add:
-      - name: 
-        value: 
-      set: 
-      - name: 
-        value: 
-      remove: []
-      body: 
-        value: 
-        parseAs:
+      - name: my-header
+        value: static
+      set:
+      - name: x-gateway-request
+        value: '{{ request_header(":path") }}'
+      remove: ["x-remove-me"]
+      body:
+        value: '{{ body() }}'
+        parseAs: AsString
+    response:
+      add:
+      - name: x-podname
+        value: '{{ env("POD_NAME") }}'
+      set:
+      - name: x-gateway-response
+        value: '{{ request_header("x-gateway-request") }}'
+      remove: ["x-remove-me"]
+      body:
+        value: '{{ body() }}'
+        parseAs: AsString
 ```
 
 When writing your templates, you can take advantage of all the core template features, such as loops, conditional logic, and functions. In addition, you can use [custom transformation functions](#custom-inja-functions) to transform request and response metadata more easily.

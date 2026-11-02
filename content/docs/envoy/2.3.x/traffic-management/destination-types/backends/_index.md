@@ -28,16 +28,15 @@ spec:
     namespace: kgateway-system
   hostnames:
     - static.example
-     rules:
-       - backendRefs:
-         - name: json-backend
-           kind: Backend
-           group: gateway.kgateway.dev
-         filters:
-         - type: URLRewrite
-           urlRewrite:
-             hostname: jsonplaceholder.typicode.com
-   EOF
+  rules:
+    - backendRefs:
+      - name: json-backend
+        kind: Backend
+        group: gateway.kgateway.dev
+      filters:
+      - type: URLRewrite
+        urlRewrite:
+          hostname: jsonplaceholder.typicode.com
 ```
 
 For an example, see the [Static]({{< link-hextra path="/traffic-management/destination-types/backends/static/" >}}) Backend guide. 
