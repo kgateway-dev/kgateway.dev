@@ -1,6 +1,6 @@
 Bring your own {{< gloss "External Authorization" >}}external authorization{{< /gloss >}} service to protect requests that go through your Gateway.
 
-{{< version exclude-if="2.0.x,2.1.x" >}}
+{{< version exclude-if="2.1.x" >}}
 > [!NOTE]
 > This guide covers gRPC-based external authorization services. For HTTP-based services, see the [HTTP guide]({{< link-hextra path="/security/extauth/byo-ext-auth-service/http/" >}}).
 {{< /version >}}
@@ -306,7 +306,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    ...
    ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!TIP]
 > To see how long the external auth check takes for each request, write the ext-auth latency to your access logs. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
 {{< /version >}}

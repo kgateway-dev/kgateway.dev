@@ -50,157 +50,6 @@
             "steps": [
               {
                 "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 2
-              },
-              {
-                "color": "orange",
-                "value": 3
-              },
-              {
-                "color": "red",
-                "value": 4
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 8,
-        "x": 0,
-        "y": 1
-      },
-      "id": 7,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.0.2",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum(kgateway_translator_translations_running{translator=~\"$translator|\",namespace=~\"$namespace|\"}) by (translator)",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-      "title": "Number of Translations Running per Translator",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
-              },
-              {
-                "color": "yellow",
-                "value": 2
-              },
-              {
-                "color": "orange",
-                "value": 3
-              },
-              {
-                "color": "red",
-                "value": 4
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 5,
-        "w": 8,
-        "x": 8,
-        "y": 1
-      },
-      "id": 8,
-      "options": {
-        "minVizHeight": 75,
-        "minVizWidth": 75,
-        "orientation": "auto",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true,
-        "sizing": "auto"
-      },
-      "pluginVersion": "12.0.2",
-      "targets": [
-        {
-          "editorMode": "code",
-          "expr": "sum(kgateway_controller_reconciliations_running{controller=~\"$controller|\",namespace=~\"$namespace|\"}) by (controller)",
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "sum(gloo_gateway_controller_reconciliations_running{controller=~\"$controller|\",namespace=~\"$namespace|\"}) by (controller)",
-          "hide": false,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "B"
-        }
-      ],
-      "title": "Number of Reconciliations Running per Controller",
-      "type": "gauge"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green"
               }
             ]
           }
@@ -210,7 +59,7 @@
       "gridPos": {
         "h": 12,
         "w": 8,
-        "x": 16,
+        "x": 0,
         "y": 1
       },
       "id": 6,
@@ -533,15 +382,15 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(rate(kgateway_status_syncer_status_syncs_total{namespace=~\"$namespace|\"}[5m])) by (syncer, result) ",
+          "expr": "sum(rate(kgateway_status_writes_total[5m])) by (kind, result)",
           "hide": false,
           "instant": false,
-          "legendFormat": "{{syncer}}: {{result}}",
+          "legendFormat": "{{kind}}: {{result}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Syncs Rate by Results",
+      "title": "Status Writes Rate by Result",
       "type": "timeseries"
     },
     {
@@ -624,10 +473,10 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "sum(kgateway_status_syncer_status_syncs_total{namespace=~\"$namespace|\"}) by (syncer)",
+          "expr": "sum(kgateway_status_writes_total) by (kind, result)",
           "hide": false,
           "instant": false,
-          "legendFormat": "Syncer: {{syncer}}",
+          "legendFormat": "Status write: {{kind}} {{result}}",
           "range": true,
           "refId": "C"
         }
@@ -834,7 +683,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -959,7 +808,7 @@
               }
             ]
           },
-          "unit": "s"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -991,10 +840,10 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total{result=\"error\"}[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p99",
+          "legendFormat": "{{kind}}",
           "range": true,
           "refId": "B"
         },
@@ -1004,10 +853,10 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total{result=\"conflict\"}[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p90",
+          "legendFormat": "{{kind}} conflict",
           "range": true,
           "refId": "A"
         },
@@ -1017,15 +866,15 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_status_syncer_status_sync_duration_seconds{name=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total{result=\"not_found\"}[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p70",
+          "legendFormat": "{{kind}} not_found",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Status Syncer Latency",
+      "title": "Status Write Retry Outcomes",
       "type": "timeseries"
     },
     {
@@ -1366,10 +1215,10 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p99",
+          "legendFormat": "{{kind}}",
           "range": true,
           "refId": "B"
         },
@@ -1379,10 +1228,10 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.90, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total{result=\"written\"}[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p90",
+          "legendFormat": "{{kind}} written",
           "range": true,
           "refId": "A"
         },
@@ -1392,15 +1241,15 @@
             "uid": "${DS_PROMETHEUS}"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.70, sum by(le)(rate(kgateway_resources_status_sync_duration_seconds{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}[5m])))",
+          "expr": "sum(rate(kgateway_status_writes_total{result=\"unchanged\"}[5m])) by (kind)",
           "hide": false,
           "instant": false,
-          "legendFormat": "p70",
+          "legendFormat": "{{kind}} unchanged",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Resource Status Sync Latency",
+      "title": "Status Writes Rate by Kind",
       "type": "timeseries"
     },
     {
@@ -1454,14 +1303,14 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(kgateway_resources_status_syncs_completed_total{gateway=~\"$gateway|\",namespace=~\"$namespace|\"}) by (resource)",
+          "expr": "sum(kgateway_status_writes_total) by (kind, result)",
           "instant": false,
-          "legendFormat": " {{resource}}",
+          "legendFormat": "{{kind}}: {{result}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Status Syncs by Resource",
+      "title": "Status Writes by Kind",
       "type": "stat"
     }
   ],

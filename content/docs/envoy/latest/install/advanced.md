@@ -8,7 +8,7 @@ description: Install kgateway and related components.
 
 ## Common labels
 
-Add custom labels to all resources that are created by the Helm charts, including the Deployment, Service, ServiceAccount, and ClusterRoles. This allows you to better organize your resources or integrate with external tooling. 
+Add custom labels to all resources that are created by the Helm charts. These resources include the controller Deployment metadata, controller pod template, Service, ServiceAccount, and ClusterRoles. The labels are separate from selector labels, so you can update `commonLabels` without changing the Deployment's immutable selector labels.
 
 The following snippet adds the `label-key` and `kgw-managed` labels to all resources. 
 
@@ -175,6 +175,43 @@ controller:
     KGW_XDS_FIRST_CONNECT_DELAY: "2s"
 ```
 
+## DNS lookup family {#dns-lookup-family}
+
+When the gateway proxy resolves a Backend through DNS, such as a Static Backend with a hostname or an AWS Lambda Backend, it looks up IPv4 and IPv6 addresses. By default, the gateway proxy prefers IPv4. The gateway proxy falls back to IPv6 only when DNS returns no IPv4 address.
+
+To change the default for all Backends, set the `KGW_DNS_LOOKUP_FAMILY` environment variable on the controller. For example, use `V6_ONLY` in an IPv6-only cluster.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_DNS_LOOKUP_FAMILY: "V6_ONLY"
+```
+
+The following lookup mechanisms are supported: 
+
+| Value | Description |
+| -- | -- |
+| `V4_PREFERRED` | Resolve both families and prefer IPv4. This value is the default. |
+| `V4_ONLY` | Resolve IPv4 addresses only. |
+| `V6_ONLY` | Resolve IPv6 addresses only. |
+| `AUTO` | Resolve both families and prefer IPv6. |
+| `ALL` | Resolve both families and return every address. |
+
+The preferred values fall back to the other family only when DNS returns no addresses for the preferred family. They do not fall back when a connection fails. With `ALL`, most backends treat each address as a separate endpoint, so requests that are sent to an unreachable address family fail instead of falling back.
+
+## Listener bind address {#listener-bind-address}
+
+By default, the control plane binds the listeners that it configures on the gateway proxy to the IPv6 wildcard address `::` with IPv4 compatibility, so that they accept both IPv6 and IPv4 connections. This includes the readiness listener on port 8082 and the stats listener on port 9091 of the gateway proxy.
+
+On nodes that disable the IPv6 kernel stack, such as with `ipv6.disable=1`, binding to `::` can prevent the gateway proxy from starting. In this case, set the `KGW_LISTENER_BIND_IPV6` environment variable to `false` on the controller. The listeners then bind to the IPv4 wildcard address `0.0.0.0`.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_LISTENER_BIND_IPV6: "false"
+```
+
+The control plane writes the bind address into the gateway proxy's bootstrap configuration. After you change the setting, restart the gateway proxy pods to pick up the new bootstrap configuration.
 
 ## Controller admin server bind address
 

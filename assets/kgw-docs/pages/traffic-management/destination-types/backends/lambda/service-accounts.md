@@ -335,7 +335,7 @@ Create `Backend` and `HTTPRoute` resources to route requests to the Lambda funct
 
 At this point, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} is routing directly to the `echo` Lambda function using an IRSA!
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 ## Assume a different IAM role (optional) {#assume-role}
 
 By default, the gateway proxy signs requests to Lambda with the credentials of its own IRSA. To use a separate, least-privilege role for a Lambda Backend, set `auth.type` to `AssumeRole` instead. The proxy then uses the credentials of its IRSA to call `sts:AssumeRole` for the role that you specify, and signs requests to Lambda with the temporary credentials that AWS returns. You can use a different role for each Backend.
@@ -348,7 +348,7 @@ The proxy calls the AWS STS endpoint for the Backend's region, such as `sts.us-e
 > In 2.4 versions earlier than 2.4.5, the proxy ignores the `assumeRole.roleArn` setting and signs requests with the credentials of its IRSA instead.
 
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 1. Create an IAM role that the gateway proxy IRSA is allowed to assume, and attach the Lambda policy to it. The `lambda-role` in this example is the IRSA that you created earlier.
    ```sh
    aws iam create-role \
@@ -429,7 +429,7 @@ The proxy calls the AWS STS endpoint for the Backend's region, such as `sts.us-e
 
 2. Use the AWS Lambda console to delete the `echo` test function.
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}### Assumed role (optional)
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}### Assumed role (optional)
 
 If you created the `lambda-invoke-role` role, delete it and the inline policy of the IRSA.
 

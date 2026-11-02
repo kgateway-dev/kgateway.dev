@@ -1,6 +1,6 @@
 ---
-linkTitle: "Kgateway 2.4.x"
-title: Kgateway 2.4.x
+linkTitle: "Kgateway 2.5.x"
+title: Kgateway 2.5.x
 description: Kgateway is a Kubernetes-native API gateway built on Envoy and the Gateway API.
 # PDF export. This one page opting into `book` is the whole opt-in: the format
 # stitches this page plus its entire .Pages subtree into one print document, so

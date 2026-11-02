@@ -89,7 +89,7 @@ def test_page_moves_resolve_with_and_without_trailing_slash():
         "/docs/main/setup/hpa": "/docs/envoy/main/setup/customize/configs/",
         "/docs/main/setup/selfmanaged": "/docs/envoy/main/setup/customize/envoy/selfmanaged/",
     }
-    for version in ("2.1.x", "2.2.x", "2.3.x", "latest", "main"):
+    for version in ("2.1.x", "2.2.x", "2.3.x", "2.4.x", "latest", "main"):
         expected[f"/docs/envoy/{version}/security/jwt/basic"] = (
             f"/docs/envoy/{version}/security/jwt/simple/basic/"
         )

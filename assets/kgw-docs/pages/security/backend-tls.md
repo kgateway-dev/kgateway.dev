@@ -1,6 +1,6 @@
 Originate a one-way TLS connection from the Gateway to a backend. 
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
@@ -21,10 +21,10 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 {{< /version >}}
 
@@ -146,7 +146,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml
    ```
 
-2. Create the TLS policy.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+2. Create the TLS policy.{{< version include-if="2.1.x,2.2.x,2.3.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -303,7 +303,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
-   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+   {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -395,7 +395,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
 
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 ## Other configurations {#other}
 
 Review other configurations.
@@ -406,7 +406,7 @@ Restrict the TLS settings that the gateway proxy uses when it originates the ups
 
 Set the parameters in the same policy that you created for the TLS connection in this guide. When a backend has both a BackendTLSPolicy and a BackendConfigPolicy, the BackendTLSPolicy takes precedence for TLS and the BackendConfigPolicy TLS settings are ignored.
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The following table compares what each policy supports for TLS settings.
 
 | Capability | BackendTLSPolicy | BackendConfigPolicy |
@@ -423,7 +423,7 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 {{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< tabs >}}
 {{% tab name="BackendConfigPolicy" %}}
 

@@ -1,6 +1,6 @@
 ---
 title: gRPC routing
-weight: 10
+weight: 20
 description: Route traffic to gRPC services by using the GRPCRoute resource for protocol-aware routing.
 ---
 
