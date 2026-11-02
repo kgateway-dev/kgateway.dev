@@ -1,25 +1,22 @@
 Name|Type|Labels|Help
 --|--|--|--
+kgateway_build_info|gauge|version, revision, goversion, goos, goarch|Build information of the running controller. The series always has value 1.
 kgateway_controller_reconcile_duration_seconds|histogram|controller, name, namespace|Reconcile duration for controller
-kgateway_controller_reconciliations_running|gauge|controller, name, namespace|Number of reconciliations currently running
 kgateway_controller_reconciliations_total|counter|controller, name, namespace, result|Total number of controller reconciliations
 kgateway_ec2_discovery_endpoints_active|gauge|namespace, name|Current number of active Envoy endpoints discovered for an EC2 Backend
 kgateway_ec2_discovery_error_state|gauge|namespace, name|Whether the most recent EC2 discovery poll for a Backend failed (1) or succeeded (0)
 kgateway_ec2_discovery_poll_duration_seconds|histogram|namespace, name, result|Duration of EC2 endpoint discovery polls per Backend
 kgateway_ec2_discovery_poll_total|counter|namespace, name, result, reason|Total number of EC2 endpoint discovery refresh attempts per Backend
-kgateway_envoy_xds_rejects_active|gauge|gateway_namespace, gateway_name, type_url|Number of xDS responses currently rejected by envoy proxy
-kgateway_envoy_xds_rejects_total|counter|gateway_namespace, gateway_name, type_url|Total number of xDS responses rejected by envoy proxy
+kgateway_envoy_xds_nack_resends_suppressed_total|counter|type_url|Number of times a NACKed xDS response was not re-sent because the snapshot had not changed
+kgateway_envoy_xds_reconnect_responses_total|counter|type_url|Number of reconnecting proxies' first endpoint, route or secret requests whose held version was cleared, so the current or next snapshot answers them even at that version
+kgateway_envoy_xds_rejects_active|gauge|gateway_namespace, gateway_name, type_url|Number of connected stream and resource type pairs with unresolved xDS rejections
+kgateway_envoy_xds_rejects_total|counter|gateway_namespace, gateway_name, type_url|Total xDS rejection episodes by stream and resource type; repeated NACKs count once until a request without an error
 kgateway_resources_managed|gauge|namespace, parent, resource|Current number of resources managed
-kgateway_resources_status_sync_duration_seconds|histogram|gateway, namespace, resource|Duration of time for a resource update to receive a status report
-kgateway_resources_status_syncs_completed_total|counter|gateway, namespace, resource|Total number of status syncs completed for resources
-kgateway_resources_status_syncs_started_total|counter|gateway, namespace, resource|Total number of status syncs started
-kgateway_resources_updates_dropped_total|counter||Total number of resources metrics updates dropped. If this metric is ever greater than 0, all resources subsystem metrics should be considered invalid until process restart
+kgateway_resources_updates_dropped_total|counter||Total number of xds_snapshot sync metrics updates dropped. If this metric is ever greater than 0, the xds_snapshot sync metrics should be considered invalid until process restart
 kgateway_routing_domains|gauge|namespace, gateway, port|Number of domains per listener
 kgateway_routing_replacements_total|counter|gateway_namespace, gateway, error_type|Number of routes, virtual hosts, or route configurations replaced with a synthetic 500 direct response due to invalid configuration detected during translation.
-kgateway_status_syncer_status_sync_duration_seconds|histogram|name, namespace, syncer|Status sync duration
-kgateway_status_syncer_status_syncs_total|counter|name, namespace, syncer, result|Total number of status syncs
+kgateway_status_writes_total|counter|kind, result|Total number of status write attempts by resource kind and result. result=\"error\" counts writes that failed after every retry.
 kgateway_translator_translation_duration_seconds|histogram|name, namespace, translator|Translation duration
-kgateway_translator_translations_running|gauge|name, namespace, translator|Current number of translations running
 kgateway_translator_translations_total|counter|name, namespace, translator, result|Total number of translations
 kgateway_validation_cache_hits_total|counter|caller|Total number of Envoy validation cache hits.
 kgateway_validation_cache_misses_total|counter|caller|Total number of Envoy validation cache misses.
@@ -32,6 +29,15 @@ kgateway_validation_valid_total|counter|caller|Total number of successful Envoy 
 kgateway_xds_auth_rq_failure_total|counter||Total number of failed xDS auth requests
 kgateway_xds_auth_rq_success_total|counter||Total number of successful xDS auth requests
 kgateway_xds_auth_rq_total|counter||Total number of xDS auth requests
+kgateway_xds_scoping_disabled_gateways|gauge|gateway, namespace|Gateways with a connected proxy group whose CDS, EDS and backend-owned LDS/SDS resources are unscoped because its configuration selects a destination at request time
+kgateway_xds_scoping_dropped_clusters|gauge|gateway, namespace|Most backend clusters withheld from any of a gateway's connected proxy groups because their configuration references none of them
+kgateway_xds_scoping_transitions_total|counter|gateway, namespace, transition|Clusters whose emitted-set change needed a grace window, per proxy group, by transition
+kgateway_xds_snapshot_deferred_clients|gauge|gateway, namespace|Connected xDS clients whose snapshot is currently withheld because per-client inputs are not ready
+kgateway_xds_snapshot_perclient_bounded_publishes_total|counter|gateway, namespace, mode|Withheld or held per-client publications released by a time bound before every referenced cluster was ready, by mode
+kgateway_xds_snapshot_perclient_defers_total|counter|gateway, namespace, reason|Per-client xDS snapshots built while a referenced cluster was not ready, by reason
+kgateway_xds_snapshot_perclient_inconsistent_snapshots_total|counter||Per-client xDS snapshots that failed the pre-publication consistency check; any increment is a bug
+kgateway_xds_snapshot_perclient_reclaimed_total|counter||Per-client xDS snapshot cache entries reclaimed after their client left and stayed gone for the grace period
+kgateway_xds_snapshot_perclient_withheld_clients|gauge|gateway, namespace, state|Clients whose first publish on their connection is withheld until referenced clusters are ready, by state
 kgateway_xds_snapshot_resources|gauge|gateway, namespace, resource|Current number of resources in XDS snapshot
 kgateway_xds_snapshot_sync_duration_seconds|histogram|gateway, namespace|Duration of time for a gateway resource update to be synced in an XDS snapshot
 kgateway_xds_snapshot_syncs_total|counter|gateway, namespace|Total number of XDS snapshot syncs

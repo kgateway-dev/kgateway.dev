@@ -168,7 +168,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    EOF
    ```
 
-4. Set up a BackendConfigPolicy or BackendTLSPolicy, such as the following examples. This way, the Gateway can initiate a TLS connection to the secured backend.{{< version exclude-if="2.0.x" >}} For more information, see the [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}) guide.{{< /version >}}
+4. Set up a BackendConfigPolicy or BackendTLSPolicy, such as the following examples. This way, the Gateway can initiate a TLS connection to the secured backend. For more information, see the [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}) guide.
 
    > [!NOTE]
    > If you generated a self-signed certificate when setting up the HTTPS listener, make sure the certificate contains Subject Alternative Name (SAN) entries for the hostname you configured (for example, both `example.com` and `*.example.com` for wildcard coverage) and install the root certificate into your local trust store of your system or pass it to your client. For example, for a `curl` client, add the `--cacert example_certs/root.crt` option (update the path to match where you stored the certificate).
@@ -193,7 +193,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ```
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
-   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+   {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -326,7 +326,7 @@ You simply add the list of static hosts or DNS names to your Backend resource an
    ...
    ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ## Next steps
 

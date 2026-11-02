@@ -50,7 +50,7 @@ Specify timeouts for a specific route.
    ```
    {{% /tab %}}
    {{% tab name="Option 2: TrafficPolicy" %}}
-{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
+{{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x" %}}
    1.  Install the experimental channel of the Kubernetes Gateway API to use this feature.
        ```sh
        kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml

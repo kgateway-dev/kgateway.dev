@@ -228,7 +228,7 @@ EOF
 ```
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Change the listener drain behavior {#drain-settings}
 
 When a listener is modified or removed, Envoy drains the connections on the old listener. By default, {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} starts the gateway proxy with `--drain-time-s 60` and `--drain-strategy immediate`. Envoy asks the connections on the old listener to close right away, and force-closes the connections that are still open after 60 seconds.
@@ -504,7 +504,7 @@ EOF
 > [!CAUTION]
 > Changing the pod-network bind address to all interfaces exposes the SDS endpoint to any pod on the cluster network. Enable this feature only in a trusted environment.
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Run the proxy with hostNetwork {#host-network-ports}
 
 The proxy Deployment does not list Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled.

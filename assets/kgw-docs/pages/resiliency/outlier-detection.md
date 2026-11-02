@@ -228,7 +228,7 @@ Outlier detection is an important part of building resilient apps. An outlier de
     ```
 
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Separate local-origin failures from 5xx responses {#local-origin-outlier-detection}
 
 By default, outlier detection counts 5xx responses from the upstream and connection failures toward the same threshold. This behavior is a problem when your upstream returns 5xx responses during normal operation. For example, a gRPC service can return a status such as `UNAVAILABLE`, which outlier detection treats as an HTTP 503 error.
@@ -486,7 +486,7 @@ In the following steps, a host is one of the two httpbin replicas that you scale
    kubectl delete backendconfigpolicy httpbin-policy -n httpbin
    ```
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 3. Remove the HTTPRoute for the `/refused` path that you created in the local-origin section.
    ```sh
    kubectl delete httproute httpbin-refused -n httpbin

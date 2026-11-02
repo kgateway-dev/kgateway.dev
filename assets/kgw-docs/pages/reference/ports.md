@@ -29,7 +29,6 @@ A standard installation of {{< reuse "kgw-docs/snippets/kgateway.md" >}} include
 
 The components are instantiated by using pods and services. The following table lists the deployed pods and ports in use by each pod.
 
-{{< version exclude-if="2.0.x" >}}
 ### Control plane ports
 
 | Pod | Port | Usage |
@@ -40,16 +39,6 @@ The components are instantiated by using pods and services. The following table 
 ### Gateway proxy ports
 
 {{< reuse "kgw-docs/snippets/reserved-ports.md" >}}
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
-| Pod | Port | Usage |
-|-----|------|-------|
-| kgateway | 9976 | REST xDS | 
-| kgateway | 9977 | xDS Server |
-| gateway proxy | 8080 | HTTP |
-| gateway proxy | 8443 | HTTPS |
-| gateway proxy | 19000 | Envoy admin |
-{{< /version >}}
 
 <!--
 ## mTLS considerations

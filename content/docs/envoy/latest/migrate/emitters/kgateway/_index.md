@@ -153,7 +153,7 @@ routing rules.
 
 ### Access Logging
 
-- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, creates an `HTTPListenerPolicy` that configures a basic Envoy access log policy via `HTTPListenerPolicy.spec.accessLog[].fileSink`. This can be further customized as needed; see the [access logging docs]({{< relref "../../../security/access-logging.md" >}}).
+- `nginx.ingress.kubernetes.io/enable-access-log`: If enabled, creates a ListenerPolicy that configures a basic Envoy access log policy via `ListenerPolicy.spec.default.httpSettings.accessLog[].fileSink`. This policy can be further customized as needed; see the [access logging docs]({{< relref "../../../security/access-logging.md" >}}).
 
 ### Regex Path Matching and Rewrites
 

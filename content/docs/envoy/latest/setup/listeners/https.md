@@ -146,7 +146,7 @@ Set up an HTTPS listener on your Gateway.
    ```
 
 3. Create an HTTPRoute resource for the httpbin app that is served by the gateway or ListenerSet that you created.
-   
+
    {{< tabs >}}
    {{% tab name="Gateway listeners" %}}
    ```yaml

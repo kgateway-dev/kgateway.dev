@@ -128,6 +128,7 @@
 /docs/envoy/2.1.x/security/jwt/basic* /docs/envoy/2.1.x/security/jwt/simple/basic/ 301
 /docs/envoy/2.2.x/security/jwt/basic* /docs/envoy/2.2.x/security/jwt/simple/basic/ 301
 /docs/envoy/2.3.x/security/jwt/basic* /docs/envoy/2.3.x/security/jwt/simple/basic/ 301
+/docs/envoy/2.4.x/security/jwt/basic* /docs/envoy/2.4.x/security/jwt/simple/basic/ 301
 /docs/envoy/latest/security/jwt/basic* /docs/envoy/latest/security/jwt/simple/basic/ 301
 /docs/envoy/main/security/jwt/basic* /docs/envoy/main/security/jwt/simple/basic/ 301
 

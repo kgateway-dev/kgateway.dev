@@ -4,10 +4,8 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to attach poli
 
 You can apply {{< reuse "kgw-docs/snippets/trafficpolicies.md" >}} to all routes in an HTTPRoute resource or only to specific routes. 
 
-{{< version exclude-if="2.0.x" >}}
 > [!NOTE]
 > By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /version >}}
 
 ### All HTTPRoute routes {#attach-to-all-routes}
 
@@ -65,7 +63,7 @@ spec:
 Instead of applying the policy to all routes that are defined in an HTTPRoute resource, you can apply them to specific routes by using the `ExtensionRef` filter in the HTTPRoute resource. 
 
 > [!WARNING]
-> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later{{< /version >}}.
+> Attaching a policy via the `ExtensionRef` filter is legacy behavior and might be deprecated in a future release. Instead, use the [HTTPRoute rule attachment option](#attach-to-rule) to apply a policy to an individual route{{< version include-if="2.1.x,2.2.x,2.3.x" >}}, which requires the Kubernetes Gateway API experimental channel version 1.3.0 or later{{< /version >}}.
 
 The following example shows a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that defines a transformation rule. Note that the `spec.targetRefs` field is not set. Because of that, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not apply until it is referenced in an HTTPRoute by using the `ExtensionRef` filter. 
 
@@ -122,7 +120,7 @@ spec:
 
 ### HTTPRoute rule {#attach-to-rule}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 > [!NOTE]
 > To use this feature, you must install the Kubernetes Gateway API experimental channel version 1.3.0 or later.
 {{< /version >}}
@@ -312,11 +310,11 @@ The way policies are inherited along the route delegation chain depends on the t
 
 {{< reuse "kgw-docs/snippets/policy-inheritance-native.md" >}}
 
-{{< version exclude-if="2.0.x" >}}For an example, see the policy inheritance guide for [Native Gateway API policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/native-policies/" >}}).{{< /version >}}
+For an example, see the policy inheritance guide for [Native Gateway API policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/native-policies/" >}}).
 
 #### Kgateway policies
 
 {{< reuse "kgw-docs/snippets/policy-inheritance.md" >}}
 
-{{< version exclude-if="2.0.x" >}}For an example, see the policy inheritance guide for [kgateway policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/kgateway-policies/" >}}).{{< /version >}} 
+For an example, see the policy inheritance guide for [kgateway policies]({{< link-hextra path="/traffic-management/route-delegation/inheritance/kgateway-policies/" >}}). 
 

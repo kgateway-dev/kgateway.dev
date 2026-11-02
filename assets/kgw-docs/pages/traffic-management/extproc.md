@@ -433,7 +433,7 @@ You can enable ExtProc for all a Gateway. This way, the ExtProc configuration ap
    ```
 -->  
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ## Other configurations
 
