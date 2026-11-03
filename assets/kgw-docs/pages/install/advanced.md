@@ -208,6 +208,53 @@ You can tune how long the control plane delays each half of a transition with th
 
 Watch the rate of the `reference_ahead_held` transition. A high rate means that your route changes often add clusters that are new to the gateway, and each change waits for the `referenceAhead` time. If these waits delay your route changes more than you can accept, consider setting a lower `referenceAhead` time. A lower time increases the risk of brief 503 errors.
 
+## Bound xDS publication {#xds-publication}
+
+The control plane can delay the configuration that it publishes to a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay keeps a proxy from receiving routes to clusters that it does not have yet. The control plane delays the configuration in the following cases:
+
+* **First configuration**: A gateway proxy connects, such as when a new gateway pod starts.
+* **Route change**: You change a route so that it references a cluster that is not ready yet.
+
+To keep a cluster that never becomes ready from blocking the configuration of a proxy, the control plane limits how long it delays each publication. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to a cluster that is not ready return a `503` response until the cluster becomes ready. These time limits apply in every xDS scoping mode.
+
+### Tune the time limits {#xds-publication-settings}
+
+You can tune the time limits with the following environment variables. Set them in the `controller.extraEnv` section of your Helm values file. The control plane reads the variables when it starts.
+
+```yaml
+controller:
+  extraEnv:
+    KGW_PER_CLIENT_PUBLISH_BUDGET: "20s"
+```
+
+| Environment variable | Description | Default |
+| -- | -- | -- |
+| `KGW_PER_CLIENT_PUBLISH_BUDGET` | How long the control plane delays the first configuration of a proxy, or a route change, while referenced clusters are not ready. Keep this value well below the startup probe time of the gateway proxy, which is 60 seconds by default. If the first configuration arrives after the probe time, the proxy restarts. Set `0` to remove the time limit, so that the control plane delays the configuration until all referenced clusters are ready. | `15s` |
+| `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` | How long the control plane continues to delay the configuration of a proxy that reconnects with configuration that it already has, such as after the control plane restarts, while referenced clusters are missing. This time starts after the `KGW_PER_CLIENT_PUBLISH_BUDGET` time expires. The value also limits how long the control plane keeps sending the last configuration of a cluster that is missing. Keep this value well above the time that the control plane needs to translate all resources after a restart. If the value is too low, routes fail each time the control plane restarts. Set `0` to remove the time limit. This setting has no effect if `KGW_PER_CLIENT_PUBLISH_BUDGET` is `0`. | `10m` |
+
+### Monitor xDS publication {#xds-publication-metrics}
+
+The control plane reports the following metrics, each with the `gateway` and `namespace` labels.
+
+{{< table >}}
+| Metric | Description |
+| -- | -- |
+| `kgateway_xds_snapshot_perclient_defers_total` (Counter) | The number of times that the control plane built configuration for a proxy while a referenced cluster was not ready. The `reason` label is `missing_clusters` or `missing_endpoints`. |
+| `kgateway_xds_snapshot_perclient_withheld_clients` (Gauge) | The number of proxy groups whose first configuration is delayed. The `state` label is `within_budget` while the `KGW_PER_CLIENT_PUBLISH_BUDGET` time runs, and `warm_withheld` while the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time runs. |
+| `kgateway_xds_snapshot_perclient_bounded_publishes_total` (Counter) | The number of times that the control plane published configuration because a time limit expired before all referenced clusters were ready. The `mode` label shows which delay ended, such as `first_publish` for the first configuration of a proxy, `flip_release` for a route change, and `warm_release` for a proxy that reconnected. |
+| `kgateway_xds_snapshot_perclient_inconsistent_snapshots_total` (Counter) | The number of configurations that failed the consistency check of the control plane before publication. This value always stays `0`. If it increases, report the issue to the kgateway project. |
+{{< /table >}}
+
+A rising `kgateway_xds_snapshot_perclient_bounded_publishes_total` value means that routes reference clusters that do not become ready in time. Check the backends of these routes, for example for a Service with no ready endpoints.
+
+To check the metrics, query the metrics endpoint of the control plane.
+
+```sh
+kubectl get --raw \
+  "/api/v1/namespaces/{{< reuse "kgw-docs/snippets/namespace.md" >}}/services/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}:9092/proxy/metrics" \
+  | grep kgateway_xds_snapshot_perclient
+```
+
 {{< /version >}}
 
 ## TLS encryption {#tls-encryption}
