@@ -18,11 +18,12 @@ name: Doc tests
 # A pull request runs only the scenarios its changed files reach (see "Select
 # tests for changed files"); the schedule and manual runs run all of them.
 #
-# Jobs: "Select tests" picks the scenarios once. "Run doc tests" runs the Linux
-# ones in kind clusters, plus the schema checks. "Run doc tests (macos)" and
-# "(windows)" run the scenarios a manifest gives `runner: macos` or `runner:
-# windows`, such as the ingress2gateway install pages, with no cluster. "Report
-# results" merges every job's results into the doc-test-results artifact, posts
+# Jobs: "Select tests" picks the scenarios once and splits the Linux ones into
+# up to 30 shards. "Run doc tests (shard n/N)" runs one shard's scenarios in
+# kind clusters. "Run schema checks" runs the schema scenarios, with no
+# cluster. "Run doc tests (macos)" and "(windows)" run the scenarios a manifest
+# gives `runner: macos` or `runner: windows`, such as the ingress2gateway
+# install pages, with no cluster. "Report results" merges every job's results into the doc-test-results artifact, posts
 # to Slack, and on a PR posts the grey check.
 #
 # On a pull request, red means the author has something to fix, and green means
@@ -95,6 +96,8 @@ jobs:
       pages: ${{ steps.select.outputs.pages }}
       # Every selected functional scenario, {file, test, runner}, for the PR verdicts.
       expected: ${{ steps.select.outputs.expected }}
+      # The Linux functional scenarios, split into shards for "Run doc tests".
+      matrix: ${{ steps.select.outputs.matrix }}
       # The macOS and Windows runners with scenarios to run.
       os_matrix: ${{ steps.select.outputs.os_matrix }}
       has_os: ${{ steps.select.outputs.has_os }}
@@ -147,7 +150,7 @@ jobs:
               done < "$RUNNER_TEMP/pages.txt"
               if [ ! -s "$RUNNER_TEMP/selected.txt" ]; then
                 echo "::notice::The changed files reach no page with doc tests. No tests run."
-                { echo "run=false"; echo "schema=false"; echo "has_os=false"; echo 'os_matrix={"include":[]}'; echo "expected=[]"; } >> "$GITHUB_OUTPUT"
+                { echo "run=false"; echo "schema=false"; echo "has_os=false"; echo 'os_matrix={"include":[]}'; echo 'matrix={"include":[]}'; echo "expected=[]"; } >> "$GITHUB_OUTPUT"
                 exit 0
               fi
               file_args=(--file)
@@ -172,21 +175,41 @@ jobs:
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
+          # Up to 30 shards, dealt round-robin. A scenario takes about a minute
+          # and a half with its own kind cluster, so the full suite (about 450)
+          # is about 15 a shard, 20 to 25 minutes. One job for all of them
+          # would take more than the 6 hours a hosted job may run. Not more
+          # shards: they share the kgateway-dev org's limit on jobs that run at
+          # once with kgateway's own CI.
+          matrix=$(jq -c --argjson max 30 '
+            [.[] | select(.runner == "linux") | {file, test}] as $linux
+            | ($linux | length | [., $max] | min) as $n
+            | {include: [range($n) as $i | {shard: ($i + 1), of: $n,
+                tests: ([$linux | to_entries[] | select(.key % $n == $i) | .value] | tojson)}]}' <<<"$TESTS")
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "Shards: $(jq '.include | length' <<<"$matrix")"
           os_matrix=$(jq -c '{include: [map(.runner) | unique[] | select(. != "linux") | {runner: ., os: "\(.)-latest"}]}' <<<"$TESTS")
           echo "Other runners: $os_matrix"
           echo "os_matrix=$os_matrix" >> "$GITHUB_OUTPUT"
           echo "has_os=$(jq '.include | length > 0' <<<"$os_matrix")" >> "$GITHUB_OUTPUT"
 
+  # The Linux functional scenarios, spread over the shards "Select tests"
+  # chose. Each shard runs its scenarios one after another, one kind cluster
+  # each, so the suite's time is about the slowest shard's, not the sum.
   run-test:
-    name: Run doc tests
+    name: Run doc tests (shard ${{ matrix.shard }}/${{ matrix.of }})
     needs: select
+    if: needs.select.outputs.run != 'false'
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     # actions: read, for the nightly run's results in "Find the nightly
     # results on main". Still nothing that writes.
     permissions:
       contents: read
       actions: read
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.select.outputs.matrix) }}
     steps:
       # persist-credentials: false on both checkouts, so the token is not left
       # in .git/config for the commands this job runs from the pages.
@@ -214,10 +237,10 @@ jobs:
           node-version: 'lts/*'
 
       - name: Install Python dependencies
-        run: pip install pyyaml jsonschema
+        run: pip install pyyaml
 
-      # The selected pages as a file, one per line, for --file. None means
-      # the full suite.
+      # The selected pages as a file, one per line, for --affected-pages. None
+      # means the full suite.
       - name: Write the selected pages
         id: pages
         if: needs.select.outputs.pages != ''
@@ -228,7 +251,6 @@ jobs:
           echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
 
       - name: Install yamltest
-        if: needs.select.outputs.run != 'false'
         run: npm install -g yamltest@latest
 
       # A release binary rather than `go install`, pinned and checksum-verified.
@@ -236,7 +258,6 @@ jobs:
       # service a load balancer address, which the guides read into
       # INGRESS_GW_ADDRESS.
       - name: Install cloud-provider-kind
-        if: needs.select.outputs.run != 'false'
         env:
           CPK_VERSION: v0.12.0
         run: |
@@ -256,21 +277,196 @@ jobs:
       # lists markup that no longer matches its page, so the runner skips that
       # scenario with a warning instead of running it with a step missing.
       - name: Attach test annotations
-        if: needs.select.outputs.run != 'false' || needs.select.outputs.schema != 'false'
         run: |
           python3 docs-tests/scripts/annotations.py attach --repo . \
             --annotations docs-tests/products/kgateway/annotations \
             --report out/annotations/attach-report.json
 
-      # Schema checks: each version tree against the CRDs of the release it
-      # documents. main/ documents kgateway's default branch. latest/
-      # documents the newest stable patch of the minor that hugo.yaml labels
-      # `latest` (2.5.x -> v2.5.<n>). It is not read from n-patch.md, so a
-      # pin that lags a release still gets checked against the fields that
-      # the pages document.
+      # This shard's scenarios, one kind cluster each, each with its own
+      # report, merged at the end. The list is read on fd 3 and each scenario
+      # gets </dev/null as stdin, so a guide command that reads stdin (such as
+      # `kubectl exec -i`) cannot swallow the rest of the list.
+      - name: Run doc tests
+        id: run
+        env:
+          DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
+          PYTHONUNBUFFERED: '1'
+          SHARD_TESTS: ${{ matrix.tests }}
+        run: |
+          failed=0
+          index=0
+          while IFS=$'\t' read -r -u 3 file test; do
+            python3 docs-tests/scripts/doc_test_run.py --repo-root . \
+              --docs-tests-root docs-tests --condition envoy \
+              --annotation-report out/annotations/attach-report.json \
+              --file "$file" --test "$test" \
+              --report-file "out/tests/generated/shard/${index}/test-results.yaml" \
+              < /dev/null || failed=1
+            index=$((index + 1))
+          done 3< <(jq -r '.[] | "\(.file)\t\(.test)"' <<<"$SHARD_TESTS")
+          python3 docs-tests/scripts/merge_test_results.py out/tests/generated/shard/ out/tests/generated/test-results.yaml
+          # A scenario the loop did not reach must fail the shard, not pass
+          # it with fewer results.
+          expected=$(jq 'length' <<<"$SHARD_TESTS")
+          if [ "$index" -ne "$expected" ]; then
+            echo "::error::This shard ran $index of its $expected scenario(s)."
+            exit 1
+          fi
+          [ "$failed" -eq 0 ] && exit 0
+          # On a pull request, "Check whether this change caused the failure"
+          # decides whether this job goes red.
+          echo "failed=true" >> "$GITHUB_OUTPUT"
+          [ "${{ github.event_name }}" = pull_request ] || exit 1
+
+      # The runner exits 0 when it finds nothing to run, for example when the
+      # docs-tests ref has no products/kgateway/ yet. That green run tested
+      # nothing, so it must fail here instead. A scenario skipped because its
+      # test markup no longer attaches is listed under skipped_needs_update, not
+      # tests. It counts here: it proves products/kgateway/ resolved, and the
+      # summary already flags it as a warning.
+      - name: Check that tests ran
+        if: ${{ !cancelled() }}
+        run: |
+          count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}) + len(d.get('skipped_needs_update') or {}))" 2>/dev/null || echo 0)
+          echo "Doc test scenarios run: $count"
+          if [ "$count" -eq 0 ]; then
+            echo "::error::No doc test scenarios ran. Check that docs-tests (ref '${{ inputs.docs_tests_ref || 'main' }}') has products/kgateway/."
+            exit 1
+          fi
+
+      # The latest nightly run's results, to tell a failure this PR caused from
+      # one that also happens on main. A cancelled nightly run has only some of
+      # the results, so it is passed over. No nightly results means nothing is
+      # known to fail on main.
+      - name: Find the nightly results on main
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # `|| true`: an error here only means there is nothing to compare with.
+          RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
+            --branch main --event schedule --status completed --limit 10 \
+            --json databaseId,conclusion --jq '[.[] | select(.conclusion != "cancelled")][0].databaseId // empty' || true)
+          if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
+              --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
+            echo "Comparing with nightly run $RUN_ID."
+          else
+            echo "::notice::No nightly doc test results to compare with."
+          fi
+
+      # Red only when the PR broke a step: a code block on a page the PR
+      # reaches failed, and main's nightly run did not already fail there.
+      # Anything else (a failure that also happens on main, a docs-tests check
+      # that is out of date, a step on a page the PR does not reach) is for the
+      # docs team, which sees it in the nightly run. "Report results" lists
+      # those on the grey "Doc tests: test update required" check.
+      - name: Check whether this change caused the failure
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
+        env:
+          SHARD_TESTS: ${{ matrix.tests }}
+          SELECTED: ${{ steps.pages.outputs.files }}
+        run: |
+          set -euo pipefail
+          ARGS=()
+          if [ -n "$SELECTED" ]; then
+            ARGS+=(--affected-pages "$SELECTED")
+          fi
+          if [ -f "$RUNNER_TEMP/nightly/test-results.yaml" ]; then
+            ARGS+=(--known-results "$RUNNER_TEMP/nightly/test-results.yaml")
+          fi
+          printf '%s' "$SHARD_TESTS" > expected.json
+          python3 docs-tests/scripts/classify_pr_results.py \
+            --results out/tests/generated/test-results.yaml \
+            --expected expected.json "${ARGS[@]}" --output verdicts.json
+          jq -r '.[] | select(.conclusion == "failure") | "\n## Needs your fix: `\(.name)`\n\n\(.summary)\n"' verdicts.json \
+            >> "$GITHUB_STEP_SUMMARY"
+          if jq -e 'any(.[]; .conclusion == "failure")' verdicts.json > /dev/null; then
+            jq -r '.[] | select(.conclusion == "failure")
+              | "::error title=Your change broke a doc test::\(.name): \(.title). The run summary shows the step and its output."' verdicts.json
+            exit 1
+          fi
+
+      # "Report results" merges every shard's results with the schema and the
+      # macOS and Windows jobs' results. overwrite: a re-run of a failed shard
+      # replaces the first attempt's results instead of failing on the name.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: test-result-linux-${{ matrix.shard }}
+          path: out/tests/generated/test-results.yaml
+          retention-days: 1
+          if-no-files-found: ignore
+          overwrite: true
+
+      - name: Upload test context (on failure)
+        if: failure() || steps.run.outputs.failed == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: doc-test-context-${{ matrix.shard }}
+          path: out/tests/generated/context/
+          retention-days: 7
+          if-no-files-found: ignore
+          overwrite: true
+
+  # Schema checks: each version tree against the CRDs of the release it
+  # documents. No cluster, so its own job, which does not wait for the
+  # functional scenarios.
+  run-schema:
+    name: Run schema checks
+    needs: select
+    if: needs.select.outputs.schema != 'false'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - name: Checkout kgateway.dev
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Checkout docs-tests
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          repository: solo-io/docs-tests
+          ref: ${{ inputs.docs_tests_ref || 'main' }}
+          path: docs-tests
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: pip install pyyaml jsonschema
+
+      # The selected pages as a file, one per line, for --file. None means
+      # the full suite.
+      - name: Write the selected pages
+        id: pages
+        if: needs.select.outputs.pages != ''
+        env:
+          PAGES: ${{ needs.select.outputs.pages }}
+        run: |
+          jq -r '.[]' <<<"$PAGES" > "$RUNNER_TEMP/selected.txt"
+          echo "files=$RUNNER_TEMP/selected.txt" >> "$GITHUB_OUTPUT"
+
+      - name: Attach test annotations
+        run: |
+          python3 docs-tests/scripts/annotations.py attach --repo . \
+            --annotations docs-tests/products/kgateway/annotations \
+            --report out/annotations/attach-report.json
+
+      # main/ documents kgateway's default branch. latest/ documents the
+      # newest stable patch of the minor that hugo.yaml labels `latest`
+      # (2.5.x -> v2.5.<n>). It is not read from n-patch.md, so a pin that
+      # lags a release still gets checked against the fields that the pages
+      # document.
       - name: Resolve kgateway release for latest
         id: latest-tag
-        if: needs.select.outputs.schema != 'false'
         run: |
           set -euo pipefail
           MINOR=$(python3 -c 'import yaml; v = yaml.safe_load(open("hugo.yaml"))["params"]["versions"]; print(next(e["version"] for e in v if e.get("linkVersion") == "latest").removesuffix(".x"))')
@@ -284,7 +480,6 @@ jobs:
           echo "latest/ is checked against kgateway $TAG CRDs; main/ against the default branch."
 
       - name: Checkout kgateway main (CRD schemas for main)
-        if: needs.select.outputs.schema != 'false'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: kgateway-dev/kgateway
@@ -293,7 +488,6 @@ jobs:
           persist-credentials: false
 
       - name: Checkout kgateway ${{ steps.latest-tag.outputs.tag }} (CRD schemas for latest)
-        if: needs.select.outputs.schema != 'false'
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           repository: kgateway-dev/kgateway
@@ -309,8 +503,6 @@ jobs:
       # (Service, Deployment, ...) go through kubeconform, against the newest
       # Kubernetes version these docs support.
       - name: Prepare CRD schemas and kubeconform
-        id: schema-prep
-        if: needs.select.outputs.schema != 'false'
         env:
           KUBECONFORM_VERSION: v0.8.0
         run: |
@@ -342,39 +534,8 @@ jobs:
           echo "KUBERNETES_VERSION=${KUBE}.0" >> "$GITHUB_ENV"
           echo "Kubernetes ${KUBE}.0 schemas via kubeconform ${KUBECONFORM_VERSION}."
 
-      # Every scenario docs-tests defines for this site, one kind cluster each.
-      # stdin is closed so a guide command that reads stdin cannot swallow the
-      # rest of the run.
-      - name: Run doc tests
-        id: run
-        if: needs.select.outputs.run != 'false'
-        env:
-          DOCS_TESTS_ROOT: ${{ github.workspace }}/docs-tests
-          PYTHONUNBUFFERED: '1'
-          SELECTED: ${{ steps.pages.outputs.files }}
-        run: |
-          file_args=()
-          if [ -n "$SELECTED" ]; then
-            file_args=(--file)
-            while IFS= read -r page; do file_args+=("$page"); done < "$SELECTED"
-          fi
-          status=0
-          python3 docs-tests/scripts/doc_test_run.py --repo-root . \
-            --docs-tests-root docs-tests --condition envoy \
-            --annotation-report out/annotations/attach-report.json \
-            "${file_args[@]}" < /dev/null || status=$?
-          [ "$status" -eq 0 ] && exit 0
-          # On a pull request, "Check whether this change caused the failure"
-          # decides whether this job goes red.
-          echo "failed=true" >> "$GITHUB_OUTPUT"
-          [ "${{ github.event_name }}" = pull_request ] || exit "$status"
-
-      # Runs even when a functional test failed, so one report covers both.
-      # Writes its own report, which the next step merges into the one the
-      # badge, the job summary, and Slack read.
       - name: Run schema checks
         id: schema
-        if: ${{ !cancelled() && steps.schema-prep.outcome == 'success' }}
         env:
           SELECTED: ${{ steps.pages.outputs.files }}
         run: |
@@ -398,81 +559,21 @@ jobs:
           echo "failed=true" >> "$GITHUB_OUTPUT"
           [ "${{ github.event_name }}" = pull_request ] || exit "$status"
 
-      - name: Merge functional and schema results
-        if: ${{ !cancelled() }}
-        run: |
-          mkdir -p "$RUNNER_TEMP/results/functional" "$RUNNER_TEMP/results/schema"
-          [ -f out/tests/generated/test-results.yaml ] && cp out/tests/generated/test-results.yaml "$RUNNER_TEMP/results/functional/"
-          [ -f out/tests/schema/test-results.yaml ] && cp out/tests/schema/test-results.yaml "$RUNNER_TEMP/results/schema/"
-          if [ -n "$(find "$RUNNER_TEMP/results" -name test-results.yaml)" ]; then
-            python3 docs-tests/scripts/merge_test_results.py "$RUNNER_TEMP/results" out/tests/generated/test-results.yaml
-          fi
-
-      # The runner exits 0 when it finds nothing to run, for example when the
-      # docs-tests ref has no products/kgateway/ yet. That green run tested
-      # nothing, so it must fail here instead. A scenario skipped because its
-      # test markup no longer attaches is listed under skipped_needs_update, not
-      # tests. It counts here: it proves products/kgateway/ resolved, and the
-      # summary already flags it as a warning.
-      - name: Check that tests ran
-        if: ${{ !cancelled() && needs.select.outputs.run != 'false' }}
-        run: |
-          count=$(python3 -c "import yaml; d = yaml.safe_load(open('out/tests/generated/test-results.yaml')) or {}; print(len(d.get('tests') or {}) + len(d.get('skipped_needs_update') or {}))" 2>/dev/null || echo 0)
-          echo "Doc test scenarios run: $count"
-          if [ "$count" -eq 0 ]; then
-            echo "::error::No doc test scenarios ran. Check that docs-tests (ref '${{ inputs.docs_tests_ref || 'main' }}') has products/kgateway/."
-            exit 1
-          fi
-
-      # The latest nightly run's results, to tell a failure this PR caused from
-      # one that also happens on main. No nightly results means nothing is
-      # known to fail on main.
+      # The same nightly results as the shards read; see there.
       - name: Find the nightly results on main
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && (steps.run.outputs.failed == 'true' || steps.schema.outputs.failed == 'true') }}
+        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.schema.outputs.failed == 'true' }}
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           # `|| true`: an error here only means there is nothing to compare with.
           RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
-            --branch main --event schedule --status completed --limit 1 \
-            --json databaseId --jq '.[0].databaseId // empty' || true)
+            --branch main --event schedule --status completed --limit 10 \
+            --json databaseId,conclusion --jq '[.[] | select(.conclusion != "cancelled")][0].databaseId // empty' || true)
           if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
               --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
             echo "Comparing with nightly run $RUN_ID."
           else
             echo "::notice::No nightly doc test results to compare with."
-          fi
-
-      # Red only when the PR broke a step: a code block on a page the PR
-      # reaches failed, and main's nightly run did not already fail there.
-      # Anything else (a failure that also happens on main, a docs-tests check
-      # that is out of date, a step on a page the PR does not reach) is for the
-      # docs team, which sees it in the nightly run. "Report results" lists
-      # those on the grey "Doc tests: test update required" check.
-      - name: Check whether this change caused the failure
-        if: ${{ !cancelled() && github.event_name == 'pull_request' && steps.run.outputs.failed == 'true' }}
-        env:
-          EXPECTED: ${{ needs.select.outputs.expected }}
-          SELECTED: ${{ steps.pages.outputs.files }}
-        run: |
-          set -euo pipefail
-          ARGS=()
-          if [ -n "$SELECTED" ]; then
-            ARGS+=(--affected-pages "$SELECTED")
-          fi
-          if [ -f "$RUNNER_TEMP/nightly/test-results.yaml" ]; then
-            ARGS+=(--known-results "$RUNNER_TEMP/nightly/test-results.yaml")
-          fi
-          jq -c 'map(select(.runner == "linux") | {file, test})' <<<"$EXPECTED" > expected.json
-          python3 docs-tests/scripts/classify_pr_results.py \
-            --results out/tests/generated/test-results.yaml \
-            --expected expected.json "${ARGS[@]}" --output verdicts.json
-          jq -r '.[] | select(.conclusion == "failure") | "\n## Needs your fix: `\(.name)`\n\n\(.summary)\n"' verdicts.json \
-            >> "$GITHUB_STEP_SUMMARY"
-          if jq -e 'any(.[]; .conclusion == "failure")' verdicts.json > /dev/null; then
-            jq -r '.[] | select(.conclusion == "failure")
-              | "::error title=Your change broke a doc test::\(.name): \(.title). The run summary shows the step and its output."' verdicts.json
-            exit 1
           fi
 
       # The schema results carry no failed step for classify_pr_results.py to
@@ -506,25 +607,15 @@ jobs:
           sys.exit(1 if new else 0)
           EOF
 
-      # "Report results" merges this with the macOS and Windows jobs' results.
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: test-result-linux
-          path: out/tests/generated/test-results.yaml
+          name: test-result-schema
+          path: out/tests/schema/test-results.yaml
           retention-days: 1
           if-no-files-found: ignore
-
-      - name: Upload test context (on failure)
-        if: failure() || steps.run.outputs.failed == 'true'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: doc-test-context
-          path: out/tests/generated/context/
-          retention-days: 7
-          if-no-files-found: ignore
-
+          overwrite: true
   # Scenarios a manifest gives `runner: macos` or `runner: windows`, such as
   # the ingress2gateway install pages: no cluster, on that OS's hosted
   # runner. doc_test_run.py runs only the scenarios for the OS it is on.
@@ -638,8 +729,8 @@ jobs:
         run: |
           # `|| true`: an error here only means there is nothing to compare with.
           RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
-            --branch main --event schedule --status completed --limit 1 \
-            --json databaseId --jq '.[0].databaseId // empty' || true)
+            --branch main --event schedule --status completed --limit 10 \
+            --json databaseId,conclusion --jq '[.[] | select(.conclusion != "cancelled")][0].databaseId // empty' || true)
           if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
               --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
             echo "Comparing with nightly run $RUN_ID."
@@ -681,7 +772,7 @@ jobs:
   # can have checks: write for the grey check.
   report:
     name: Report results
-    needs: [select, run-test, run-test-os]
+    needs: [select, run-test, run-schema, run-test-os]
     if: ${{ !cancelled() && needs.select.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
@@ -823,8 +914,8 @@ jobs:
         run: |
           # `|| true`: an error here only means there is nothing to compare with.
           RUN_ID=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow doc-tests.yaml \
-            --branch main --event schedule --status completed --limit 1 \
-            --json databaseId --jq '.[0].databaseId // empty' || true)
+            --branch main --event schedule --status completed --limit 10 \
+            --json databaseId,conclusion --jq '[.[] | select(.conclusion != "cancelled")][0].databaseId // empty' || true)
           if [ -n "$RUN_ID" ] && gh run download "$RUN_ID" --repo "$GITHUB_REPOSITORY" \
               --name doc-test-results --dir "$RUNNER_TEMP/nightly"; then
             echo "Comparing with nightly run $RUN_ID."
