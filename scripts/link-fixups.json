@@ -131,6 +131,11 @@
       "reason": "Gateway API status description wraps a bare URL in parentheses, so the link checker includes the closing parenthesis in the fragment (#names%29). Use a Markdown link, as newer versions do."
     },
     {
+      "old": "Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "new": "[Kubernetes names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "reason": "Same Gateway API status description as the previous entry, as rendered by crd-ref-docs in the 2.1.x API reference table, where the line break becomes <br /> instead of a space."
+    },
+    {
       "old": "https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html",
       "new": "https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades",
       "reason": "Envoy docs dropped the .html suffix; the old URL redirects."
