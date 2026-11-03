@@ -95,7 +95,7 @@ There are more of these than usual this cycle, so work through them before you u
 
 **Kubernetes 1.33 is now the minimum.** We raised it alongside the Gateway API 1.7.0 bump. The [supported versions page](https://kgateway.dev/docs/envoy/latest/reference/versions/) has the full matrix.
 
-**The `HTTPListenerPolicy` CRD is removed.** Everything it configured now lives under the `spec.default.httpSettings` block on the [`ListenerPolicy`](https://kgateway.dev/docs/envoy/latest/about/policies/listenerpolicy/) resource, with no field renamed, retyped or dropped. In most cases you change the resource `kind` and re-indent your existing fields:
+**The HTTPListenerPolicy CRD is removed.** Everything it configured now lives under the `spec.default.httpSettings` block on the [ListenerPolicy](https://kgateway.dev/docs/envoy/latest/about/policies/listenerpolicy/) resource, with no field renamed, retyped or dropped. In most cases you change the resource `kind` and re-indent your existing fields:
 
 ```yaml
 # The same fields, nested under default.httpSettings.
@@ -116,7 +116,7 @@ spec:
       streamIdleTimeout: 30s
 ```
 
-Migrate before you upgrade. The `HTTPListenerPolicy` CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining `HTTPListenerPolicy` resources, including the configuration that they applied. Refer to the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) for the full field mapping and the upgrade ordering.
+Migrate before you upgrade. The HTTPListenerPolicy CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining HTTPListenerPolicy resources, including the configuration that they applied. Refer to the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) for the full field mapping and the upgrade ordering.
 
 **kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. Moving to 1.7 is optional. If you do move, apply its CRDs yourself, because they are not part of the kgateway chart.
 
@@ -189,7 +189,7 @@ helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
   --version v2.5.0 --namespace kgateway-system --create-namespace
 ```
 
-Migrate `HTTPListenerPolicy` first, and if you are moving to Gateway API v1.7.0, apply its CRDs and migrate route `sessionPersistence` before the chart goes in. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
+Migrate HTTPListenerPolicy first, and if you are moving to Gateway API v1.7.0, apply its CRDs and migrate route `sessionPersistence` before the chart goes in. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
 
 ## Availability
 
