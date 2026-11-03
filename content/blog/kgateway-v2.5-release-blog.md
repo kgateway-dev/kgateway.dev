@@ -121,7 +121,9 @@ spec:
 
 Migrate before you upgrade: the CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining `HTTPListenerPolicy` objects and the configuration they were applying along with them. The [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) has the full field mapping and the upgrade ordering.
 
-**kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. If you move to 1.7, apply its CRDs yourself: they are not part of the kgateway chart. Route `sessionPersistence` now uses `cookie.name`, `cookie` and `header.name`, and `sessionName` and `cookieConfig` are gone, so migrate those first. With `cookie.lifetimeType` unset the cookie becomes a Session cookie and `absoluteTimeout` stops applying; set `lifetimeType: Permanent` to keep the `Max-Age`. The [session affinity guide](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) covers the current fields.
+**kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. Moving to 1.7 is optional. If you do move, apply its CRDs yourself: they are not part of the kgateway chart.
+
+One thing to watch if you use session persistence in your HTTPRoutes, which is still experimental in Gateway API: 1.7 renames several of its fields, so update those routes before you apply the new CRDs. The change easiest to miss is the cookie lifetime. Leave it unset and you get a session cookie, and the absolute timeout you had configured no longer applies. The [session affinity guide](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) has the current fields.
 
 **Backends with a [`BackendTLSPolicy`](https://kgateway.dev/docs/envoy/latest/security/backend-tls/) and no `appProtocol` now negotiate HTTP/2 over ALPN.** This one applies whichever Gateway API version you are on, because it comes from kgateway's own translation, not from the CRDs. It fixes backends that only accept HTTP/2 over TLS, gRPC being the common case. Set `appProtocol: http` on the Service to stay on HTTP/1.1.
 
