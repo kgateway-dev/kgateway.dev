@@ -2,7 +2,7 @@
 title: "kgateway v2.5: Gateway API 1.7, scoped xDS, and CONNECT tunneling"
 toc: false
 publishDate: 2026-11-03T10:00:00-00:00
-author: Duncan Doyle
+author: Duncan Doyle, Nadine Spies
 excludeSearch: true
 ---
 
@@ -16,7 +16,9 @@ xDS scoping leads this release. It cuts down what every proxy has to carry in a 
 
 Most of the work in v2.5 went into what the control plane does at scale.
 
-**xDS scoping** changes what each proxy has to carry. By default, every gateway proxy receives a cluster for every backend the controller discovers. There is a reason for that default: route and cluster updates reach Envoy independently, so when a route changes destination, say `/foo` moving from `service-a` to `service-b`, a proxy that learns the new route before the new cluster drops requests in the gap. Sending every cluster up front means the destination is always already there. In a large Kubernetes cluster that gets expensive: a gateway routing to a dozen Services still carries every one of the thousands the controller knows about. `REFERENCED` mode changes that, sending a proxy only the clusters its gateway's configuration references, along with those backends' endpoints, listeners and secrets:
+**xDS scoping** changes the configuration that each proxy has to carry. By default, every gateway proxy receives a cluster and its endpoints for every backend the controller discovers, whether or not a route uses it. In a Kubernetes cluster with 300 Services where a gateway routes to only 16 of them, every proxy replica still carries all 300 Services in memory, in its config dump, and in its stats. In a large Kubernetes cluster this setup can get expensive quickly. With the xDS `REFERENCED` scoping mode, you can now send a proxy only the clusters its gateway's configuration references, along with those backends' endpoints, listeners and secrets. This setting significantly reduces the size of the config dump, the memory the proxy needs, and stats that it emits. Smaller xDS snapshots are also less to push, and less for a restarting proxy to take in.
+
+To enable this feature, use the `controller.xds.scoping` Helm value as shown in the following example: 
 
 ```yaml
 controller:
@@ -31,25 +33,19 @@ controller:
       dereferenceGrace: 5s
 ```
 
-The saving scales with how little of the cluster a gateway uses. A gateway that routes to 16 Services in a cluster of 300 carries 16 clusters instead of 300: in the memory of every one of its proxy replicas, in its config dump, and in its `/stats`, where each cluster contributes a whole family of series. Smaller snapshots are also less to push, and less for a restarting proxy to take in.
-
-Three things keep it as safe as the default. A cluster a route is about to need is sent before that route, and one nothing references any more is kept for a while afterwards, so the two changes do not cross. When the controller cannot tell whether a cluster is needed, it keeps it: an unused cluster costs a little memory, a missing one is an outage. And a gateway that picks its destination at request time keeps receiving everything, because there is no way to know up front what it will need. Both of those windows are timers, so give them room if updates are slow to reach your proxies.
-
-Scoping is [experimental](https://kgateway.dev/docs/envoy/latest/reference/feature-maturity/) and off by default. Three metrics report what it is doing, each labelled by gateway and namespace:
+Scoping is [experimental](https://kgateway.dev/docs/envoy/latest/reference/feature-maturity/) and off by default. To monitor the configuration that proxies receive, you can use the following metrics. Each metric is labelled by gateway and namespace:
 
 - `kgateway_xds_scoping_dropped_clusters`: the most clusters any one of a gateway's proxy groups is withholding.
 - `kgateway_xds_scoping_disabled_gateways`: 1 while any of them has reverted to sending everything. Worth an alert, because the fallback is otherwise silent.
 - `kgateway_xds_scoping_transitions_total`: how many clusters needed one of the two windows, which tells you whether the windows are sized right.
 
-The settings are in the [Helm chart reference](https://kgateway.dev/docs/envoy/latest/reference/helm/kgateway/), the metrics in the [control plane metrics guide](https://kgateway.dev/docs/envoy/latest/observability/control-plane-metrics/).
+To learn more about this feature, check out [Scope xDS configuration per gateway](https://kgateway.dev/docs/envoy/latest/install/advanced/#xds-scoping). 
 
-**Ordered ADS is now the default**, which closes the same gap from the other end. The snapshot cache has always built responses in dependency order, CDS then EDS then LDS then RDS, but the xDS server did not always preserve that order on the wire. With several responses ready at once, a route update could reach Envoy ahead of the cluster update it referenced, and the proxy would answer with a transient `503 NC`. Ordered ADS sends all types down a single path, so the order the cache produces is the order Envoy sees. Set `KGW_ENABLE_ORDERED_ADS=false` to return to the previous behavior.
+**Ordered ADS is now the default**, which closes the same gap from the other end. The snapshot cache has always built responses in dependency order, CDS then EDS then LDS then RDS, but the xDS server did not always preserve that order on the wire. With several responses ready at once, a route update could reach Envoy ahead of the cluster update it referenced, and the proxy would answer with a transient `503 NC`. Ordered ADS sends all types down a single path, so the order the cache produces is the order Envoy sees. Set `KGW_ENABLE_ORDERED_ADS=false` on the control plane to return to the previous behavior. 
 
-**Redundant Gateway rebuilds are now skipped during route churn.** When a burst of input events queues several recomputes for the same key, KRT skips the ones a later recomputation has already taken in, so a burst of route updates no longer rebuilds the same Gateway several times over. The same dependency bump also shrinks KRT's maps after a large de-allocation, so memory freed at scale is given back instead of held.
+**The controller now skips stale recomputes** during bursts of route updates and keeps only the latest, instead of rebuilding the same Gateway several times. Config that is identical for every proxy is also built once and shared, and validation results are reused until the cluster changes, so controller memory and CPU grow more slowly as you add proxies.
 
-Underneath all of this, the controller does less work per connected proxy. Config that is identical for every proxy is now built once and shared instead of being rebuilt for each one, and validation results are reused when the cluster has not changed. Controller memory and CPU therefore grow far more slowly as you add proxies. A hashing fix also stops backends with more than one label from publishing a new endpoint version on every recomputation, which was pushing updates to every connected proxy when nothing had actually changed.
-
-Finally, `controller.goMemLimitPercent` keeps the Go runtime's memory at a percentage of the controller container's memory limit, and follows that limit while the pod runs, so an in-place resize is picked up instead of being ignored until the next restart. It is `0` by default, which keeps reading the limit once at startup. Set it to a value between 1 and 100 to turn it on, with 90 a good starting point:
+**The controller can now set its Go memory limit (GOMEMLIMIT)** as a percentage of its container's memory limit, and it follows in-place resizes of that limit. This feature is off by default (0). To turn it on, set the `controller.goMemLimitPercent` Helm value to a value between 1 and 100, with 90 as a good starting point. Use a lower value, such as 80, if a lot of memory is allocated outside the Go runtime or you want extra headroom against out-of-memory kills.
 
 ```yaml
 controller:
@@ -60,7 +56,7 @@ controller:
 
 ### Egress through an HTTP CONNECT proxy
 
-Plenty of environments require outbound traffic to leave through a forward proxy. Gloo Gateway has supported this for years, and for teams that depend on it the absence of an equivalent in kgateway was enough to hold up a migration. That gap is closed. `BackendConfigPolicy.spec.tunnel` points a Backend at the proxy: the gateway sends `CONNECT` to it, and the proxy opens the connection to the destination.
+Plenty of environments require outbound traffic to leave through a forward proxy. Gloo Gateway has supported this for years, and the lack of an equivalent in kgateway held up migrations for teams that depend on it. That gap is now closed. The `BackendConfigPolicy.spec.tunnel` points a Backend at the forward proxy. When enabled, the gateway proxy sends an HTTP `CONNECT` request to the forward proxy, which opens the connection to the destination.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -86,11 +82,11 @@ spec:
         key: proxy-authorization   # omit key and the header name is used as the key
 ```
 
-Credentials belong in a Secret, and kgateway redacts them from xDS snapshots, KRT dumps, policy diagnostics and validation errors, so they never show up in a config dump. Destination TLS and proxy TLS stay separate, so tunneling does not change how the destination is verified.
+Proxy credentials can come from a Secret, and kgateway keeps them out of config dumps and error messages. Destination TLS and proxy TLS stay separate, so tunneling does not change how the destination is verified.
 
 A few constraints to plan around. The destination must be a static Backend with exactly one host, the proxy must be a Service or a static Backend, and you cannot tunnel to the proxy itself. `healthCheck`, `tcpKeepalive` and `upstreamProxyProtocol` cannot be set on a tunneled Backend. The [documentation](https://kgateway.dev/docs/envoy/latest/traffic-management/http-connect-tunnels/) walks the whole thing through against a Squid proxy, including reading the `CONNECT` out of the proxy access log.
 
-The other direction is new too: accepting `CONNECT` at the gateway and terminating it, configured per route with [`TrafficPolicy.spec.httpUpgrade`](https://kgateway.dev/docs/envoy/latest/traffic-management/http-upgrades/) and `connect.terminate: true`.
+The other direction is new too. You can now accept `CONNECT` requests at the gateway and terminate them for each route with the [`TrafficPolicy.spec.httpUpgrade`](https://kgateway.dev/docs/envoy/latest/traffic-management/http-upgrades/) setting. 
 
 ## Breaking changes and removals
 
@@ -98,7 +94,7 @@ There are more of these than usual this cycle, so work through them before you u
 
 **Kubernetes 1.33 is now the minimum**. We raised it alongside the Gateway API 1.7.0 bump. The [supported versions page](https://kgateway.dev/docs/envoy/latest/reference/versions/) has the full matrix.
 
-**The `HTTPListenerPolicy` CRD is removed.** Everything it configured now lives on [`ListenerPolicy`](https://kgateway.dev/docs/envoy/latest/about/policies/listenerpolicy/) under `spec.default.httpSettings`, with no field renamed, retyped or dropped. In most cases you change `kind` and re-indent:
+**The HTTPListenerPolicy CRD is removed.** Everything it configured now lives under the `spec.default.httpSettings` block on the [ListenerPolicy](https://kgateway.dev/docs/envoy/latest/about/policies/listenerpolicy/) resource, with no field renamed, retyped or dropped. In most cases you change the resource `kind` and re-indent your existing fields:
 
 ```yaml
 # The same fields, nested under default.httpSettings.
@@ -119,22 +115,22 @@ spec:
       streamIdleTimeout: 30s
 ```
 
-Migrate before you upgrade: the CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining `HTTPListenerPolicy` objects and the configuration they were applying along with them. The [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) has the full field mapping and the upgrade ordering.
+Migrate before you upgrade: The HTTPListenerPolicy CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining HTTPListenerPolicy resources, including the configuration that they applied. Refer to the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) for the full field mapping and the upgrade ordering.
 
-**kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. Moving to 1.7 is optional. If you do move, apply its CRDs yourself: they are not part of the kgateway chart.
+**kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. Moving to 1.7 is optional. If you do move, apply its CRDs yourself, because they are not part of the kgateway chart.
 
-One thing to watch if you use session persistence in your HTTPRoutes, which is still experimental in Gateway API: 1.7 renames several of its fields, so update those routes before you apply the new CRDs. The change easiest to miss is the cookie lifetime. Leave it unset and you get a session cookie, and the absolute timeout you had configured no longer applies. The [session affinity guide](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) has the current fields.
+Note that if you use session persistence in your HTTPRoutes, which is still experimental in Gateway API version 1.7, several fields were renamed. Make sure to update those routes before you apply the new CRDs. The change that is easiest to miss is the cookie lifetime. If you set `absoluteTimeout` and leave `cookie.lifetimeType` unset, the cookie is now a session cookie and the timeout no longer applies. To keep the timeout in effect, set `lifetimeType: Permanent`. Check out the [session affinity guide](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) guide to find examples that include the new fields.
 
 **Backends with a [`BackendTLSPolicy`](https://kgateway.dev/docs/envoy/latest/security/backend-tls/) and no `appProtocol` now negotiate HTTP/2 over ALPN.** This one applies whichever Gateway API version you are on, because it comes from kgateway's own translation, not from the CRDs. It fixes backends that only accept HTTP/2 over TLS, gRPC being the common case. Set `appProtocol: http` on the Service to stay on HTTP/1.1.
 
-**Listener stats now tell you which listener they came from.** Every HTTP and HTTPS listener used to share `stat_prefix: http`, and route prefixes contained dots that split them across metric names, so the numbers were hard to attribute and sometimes hard to query at all. HTTP connection manager and TCP proxy stats now carry a stable per-listener prefix: `http_<port>`, `https_<port>_<listener>`, and `tcp_<port>_<namespace>_<route>` or `tls_<port>_<namespace>_<route>` for TCPRoutes and TLSRoutes. If you use any of these stats in your queries, you will need to update them. Queries matching `envoy_http_conn_manager_prefix="http"` or the old per-route `envoy_tcp_*` names need repointing, as do `GatewayParameters` `stats.matcher` entries matching raw names such as `http.http.`. Aggregations that ignore these labels are unaffected. On the controller side, `kgateway_status_writes_total{kind, result}` replaces the status syncer metrics, and we removed three series that cost real CPU to record on every route of every translation. The [gateway](https://kgateway.dev/docs/envoy/latest/observability/gateway-metrics/) and [control plane](https://kgateway.dev/docs/envoy/latest/observability/control-plane-metrics/) metrics guides list what is published now.
+**Listener stats now tell you which listener they came from.** Every HTTP and HTTPS listener used to share the `stat_prefix: http`, and route prefixes contained dots that split them across metric names, so the numbers were hard to attribute and sometimes hard to query at all. HTTP connection manager and TCP proxy stats now carry a stable per-listener prefix: `http_<port>`, `https_<port>_<listener>`, and `tcp_<port>_<namespace>_<route>` or `tls_<port>_<namespace>_<route>` for TCPRoutes and TLSRoutes. If you use any of these stats in your queries, you will need to update them. Queries matching `envoy_http_conn_manager_prefix="http"` or the old per-route `envoy_tcp_*` names need repointing, as do `GatewayParameters` `stats.matcher` entries matching raw names such as `http.http.`. Aggregations that ignore these labels are unaffected. On the controller side, `kgateway_status_writes_total{kind, result}` replaces the status syncer metrics, and we removed three series that cost real CPU to record on every route of every translation. The [gateway](https://kgateway.dev/docs/envoy/latest/observability/gateway-metrics/) and [control plane](https://kgateway.dev/docs/envoy/latest/observability/control-plane-metrics/) metrics guides list what is published now.
 
 The rest is smaller:
 
-- **The proxy now drains in 60s with the `immediate` strategy** instead of Envoy's 600s gradual default, releasing the memory held by old listener configuration much sooner. Long-lived connections on a modified listener may now be closed after 60s. Restore the old behavior with `--drain-time-s 600 --drain-strategy gradual` in [`GatewayParameters`](https://kgateway.dev/docs/envoy/latest/setup/customize/envoy/) `spec.kube.envoyContainer.extraArgs`.
-- **Changing a listener port no longer restarts the proxy pods**, and listener ports are no longer container ports on the Deployment. Switch any reference to the named ports (`listener-<port>`) to port numbers before upgrading. If you run the proxy with `hostNetwork`, add the ports back with a `deploymentOverlay`.
-- **Route source metadata changed shape.** `rule` now carries the originating xRoute's rule name where it has one, falling back to a generated value reflecting the rule's index, and the match's index is exposed as a new `match` field. Access logs and trace pipelines parsing `io.kgateway.route_source` need updating.
-- **The SDS sidecar binds to `127.0.0.1:8234`** instead of `0.0.0.0:8234`. Set `SDS_SERVER_ADDRESS` if you reach it from elsewhere on the cluster network.
+- **The proxy now drains in 60s with the `immediate` strategy** instead of Envoy's 600s gradual default, releasing the memory held by old listener configuration much sooner. Long-lived connections on a modified listener might now be closed after 60s. Restore the old behavior with `--drain-time-s 600 --drain-strategy gradual` in the `spec.kube.envoyContainer.extraArgs` block of your [`GatewayParameters`](https://kgateway.dev/docs/envoy/latest/setup/customize/envoy/) resource.
+- **Changing a listener port no longer restarts the proxy pods**, and listener ports are no longer container ports on the Deployment. Switch any reference to the named ports (`listener-<port>`) to port numbers before upgrading. If you run the proxy with `hostNetwork`, add the ports back with a [`deploymentOverlay`](https://kgateway.dev/docs/envoy/latest/setup/customize/configs/#host-network-ports).
+- **Route source metadata changed shape.** The `rule` field now holds the rule name from the originating xRoute when it has one, and a generated value based on the rule's index otherwise. A new match field holds the index of the originating match. [Update any access log or trace pipeline that parses this metadata](https://kgateway.dev/docs/envoy/latest/security/access-logging/#route-source-metadata).
+- **The SDS sidecar binds to `127.0.0.1:8234`** instead of `0.0.0.0:8234`. [Set the `SDS_SERVER_ADDRESS` environment variable](https://kgateway.dev/docs/envoy/latest/setup/customize/configs/#sds-bind-address) on the SDS container if you reach it from elsewhere on the cluster network.
 
 One feature is removed: running kgateway as an Istio ambient waypoint, taking the `kgateway-waypoint` GatewayClass, Istio `AuthorizationPolicy` translation and `KGW_WAYPOINT_LOCAL_BINDING` with it. The [waypoint migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md) covers the move to Istio waypoints. Sending ingress traffic through an Istio waypoint is still supported, though `KGW_INGRESS_USE_WAYPOINTS` now defaults to `false`.
 
@@ -143,14 +139,14 @@ One feature is removed: running kgateway as an Istio ambient waypoint, taking th
 The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) have the full list, and the [API reference](https://kgateway.dev/docs/envoy/latest/reference/api/) every field. A few more to call out:
 
 - **[Authentication](https://kgateway.dev/docs/envoy/latest/security/jwt/).** A third JWT validation mode, `AllowMissingOrFailed`, verifies every token and rejects nothing, so a policy can be measured against live traffic before it is enforced. JWT providers also gained a verified-token `cache` and a `clockSkew` tolerance, and OAuth2 discovery now retries in the background, so a provider that was unreachable at startup no longer costs you a control-plane restart.
-- **Experimental: IPv6 and dual-stack.** `GatewayParameters.spec.kube.service` takes `ipFamilies` and `ipFamilyPolicy`, and `BackendConfigPolicy.spec.dns.lookupFamily` overrides the DNS lookup family for one backend. One part is not experimental: `KGW_LISTENER_BIND_IPV6` defaults to `true`, so the readiness and stats listeners now bind `[::]` with IPv4 compatibility, and a node with `ipv6.disable=1` needs it set to `false`.
-- **Traffic management.** [Session persistence](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) and [`healthCheck.noTrafficInterval`](https://kgateway.dev/docs/envoy/latest/traffic-management/health-checks/) on `BackendConfigPolicy`, outlier detection on `consecutiveGatewayFailure`, the `kgateway.dev/*` TLS options on `BackendTLSPolicy`, and [shadow mode for global rate limiting](https://kgateway.dev/docs/envoy/latest/security/ratelimit/global/) via `percentEnabled` and `percentEnforced`.
-- **Observability.** Per-connection access logging on TCP and TLS listeners, [`grpcStats`](https://kgateway.dev/docs/envoy/latest/traffic-management/grpc-statistics/) for per-service gRPC metrics, ext-auth latency through filter state, and a `kgateway_build_info` gauge.
+- **[Experimental: IPv6 and dual-stack](https://kgateway.dev/docs/envoy/latest/setup/customize/configs/#proxy-service-ip-families).** `GatewayParameters.spec.kube.service` takes `ipFamilies` and `ipFamilyPolicy`, and `BackendConfigPolicy.spec.dns.lookupFamily` overrides the DNS lookup family for one backend. One part is not experimental: `KGW_LISTENER_BIND_IPV6` defaults to `true`, so the readiness and stats listeners now bind `[::]` with IPv4 compatibility, and a node with `ipv6.disable=1` needs it set to `false`.
+- **Traffic management.** [Session persistence](https://kgateway.dev/docs/envoy/latest/traffic-management/session-affinity/) and [`healthCheck.noTrafficInterval`](https://kgateway.dev/docs/envoy/latest/traffic-management/health-checks/) on `BackendConfigPolicy`, outlier detection on [`consecutiveGatewayFailure`](https://kgateway.dev/docs/envoy/latest/resiliency/outlier-detection/#gateway-failure-outlier-detection), the `kgateway.dev/*` TLS options on `BackendTLSPolicy`, and [shadow mode for global rate limiting](https://kgateway.dev/docs/envoy/latest/security/ratelimit/global/) via `percentEnabled` and `percentEnforced`.
+- **Observability.** Per-connection access logging on [TCP and TLS listeners](https://kgateway.dev/docs/envoy/latest/security/access-logging/#tcp-access-log), [`grpcStats`](https://kgateway.dev/docs/envoy/latest/traffic-management/grpc-statistics/) for per-service gRPC metrics, [ext-auth latency](https://kgateway.dev/docs/envoy/latest/security/access-logging/#extauth-latency) through filter state, and a `kgateway_build_info` gauge.
 - **Envoy v1.39.6.** The gateway proxy moves up from v1.38.3.
 
 ## Catching up: highlights from v2.3 and v2.4
 
-Two traffic management features landed in v2.4, both experimental, which means they can be subject to breaking changes in future releases until they are promoted to GA. We do encourage users to try them out and give us feedback. `BackendConfigPolicy` gained [zone-aware routing](https://kgateway.dev/docs/envoy/latest/traffic-management/zone-routing/) built on Envoy's native prefer-local and force-local support, with the proxy's locality wired into its bootstrap so Envoy can tell which zone an endpoint shares with the gateway instance talking to it. Prefer-local keeps traffic in the local zone while enough healthy endpoints are available there and spills over when they are not. Force-local keeps it local unconditionally. It addresses cross-zone data transfer cost and the latency of leaving an availability zone, which on a busy gateway adds up.
+Two traffic management features landed in v2.4, both experimental, which means they can be subject to breaking changes in future releases until they are promoted to GA. We do encourage users to try them out and give us feedback. `BackendConfigPolicy` gained [zone-aware routing](https://kgateway.dev/docs/envoy/latest/traffic-management/zone-routing/) built on Envoy's native prefer-local and force-local support, with the proxy's locality wired into its bootstrap so Envoy can tell which zone an endpoint shares with the gateway instance talking to it. Prefer-local keeps traffic in the local zone while enough healthy endpoints are available there and spills over when they are not. Force-local keeps it local unconditionally. It addresses cross-zone data transfer cost and the latency of leaving an availability zone, which adds up on a busy gateway.
 
 The second is a new [`priorityGroups`](https://kgateway.dev/docs/envoy/latest/traffic-management/destination-types/backends/priority-groups/) Backend type, which turns an ordered list of Backends into Envoy priority levels for active and passive failover:
 
@@ -174,12 +170,12 @@ Referenced Backends must live in the same namespace and must not themselves be `
 
 v2.3 is further back. If you skipped it, these are the pieces worth knowing about:
 
-- **[Fault injection](https://kgateway.dev/docs/envoy/latest/resiliency/fault-injection/)** on `TrafficPolicy`: delays and HTTP or gRPC aborts for resiliency testing, with a per-route override to turn it off.
+- **[Fault injection](https://kgateway.dev/docs/envoy/latest/resiliency/fault-injection/)** on TrafficPolicy: Delays and HTTP or gRPC aborts for resiliency testing, with a per-route override to turn it off.
 - **TLS termination for TLSRoute**, and [per-listener client certificate validation](https://kgateway.dev/docs/envoy/latest/security/mtls-listener/).
-- **[Per-route tracing](https://kgateway.dev/docs/envoy/latest/observability/tracing/)** on `TrafficPolicy`: sampling overrides, custom attributes, or tracing switched off for one route.
-- **GRPCRoute policy attachment**, so `TrafficPolicy` applies to gRPC routes, and GRPCRoutes can attach to HTTPS listeners.
-- **[Data plane overlays](https://kgateway.dev/docs/envoy/latest/setup/customize/envoy/)** in `GatewayParameters`, a strategic merge patch over the generated Envoy resources, plus PodDisruptionBudget, HPA and VPA support.
-- **GCP Backends**, for routing to Cloud Run and other Google Cloud services.
+- **[Per-route tracing](https://kgateway.dev/docs/envoy/latest/observability/tracing/)** on TrafficPolicy: Sampling overrides, custom attributes, or tracing switched off for one route.
+- **GRPCRoute policy attachment**, so TrafficPolicy applies to gRPC routes, and GRPCRoutes can attach to HTTPS listeners.
+- **[Data plane overlays](https://kgateway.dev/docs/envoy/latest/setup/customize/envoy/)** in GatewayParameters: A strategic merge patch over the generated Envoy resources, plus PodDisruptionBudget, HPA and VPA support.
+- **GCP Backends** for routing to Cloud Run and other Google Cloud services.
 
 ## Upgrading
 
@@ -192,7 +188,7 @@ helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
   --version v2.5.0 --namespace kgateway-system --create-namespace
 ```
 
-Migrate `HTTPListenerPolicy` first, and if you are moving to Gateway API v1.7.0, apply its CRDs and migrate route `sessionPersistence` before the chart goes in. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
+Migrate HTTPListenerPolicy first, and if you are moving to Gateway API v1.7.0, apply its CRDs and migrate route `sessionPersistence` before the chart goes in. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
 
 ## Availability
 
