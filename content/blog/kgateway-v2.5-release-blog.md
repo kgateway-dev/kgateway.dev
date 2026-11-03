@@ -8,7 +8,7 @@ excludeSearch: true
 
 The kgateway team is happy to announce the release of kgateway v2.5.0! Since we haven't published a release blog for a while, this post covers v2.3, v2.4 and v2.5 together. A few of the features below carry an "available since" note rather than being new today.
 
-Two prerequisites first: **the minimum supported Kubernetes version is now 1.33**, and the release is built against **Gateway API v1.7.0**, whose CRDs upgrade alongside the chart. Neither is optional. If you have been using session persistence in your HTTPRoutes, which is still experimental in Gateway API, there is a migration step.
+Two things to check first. **The minimum supported Kubernetes version is now 1.33**, and that one is not optional. The release is built against **Gateway API v1.7.0** and still supports 1.5 and 1.6, so moving to 1.7 is your call. Gateway API CRDs are not part of the kgateway chart, so you apply them yourself. If you do move to 1.7 and you use session persistence in your HTTPRoutes, which is still experimental in Gateway API, there is a migration step.
 
 Let's start with the breaking changes. There are more of them than usual this cycle. One policy CRD, `HTTPListenerPolicy`, is removed, so its resources need migrating before you upgrade. We've cleaned up our stats and metrics, so any dashboards built on them might need an update.
 
@@ -39,7 +39,7 @@ spec:
 
 Migrate before you upgrade: the CRD is removed from the `kgateway-crds` chart, so the upgrade deletes any remaining `HTTPListenerPolicy` objects and the configuration they were applying along with them. The [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) has the full field mapping and the upgrade ordering.
 
-**Gateway API moves to v1.7.0**, so upgrade its CRDs alongside the chart if you want to use the latest and greatest Gateway API version. Route `sessionPersistence` now uses `cookie.name`, `cookie` and `header.name`, and `sessionName` and `cookieConfig` are gone, so migrate those first. With `cookie.lifetimeType` unset the cookie becomes a Session cookie and `absoluteTimeout` stops applying; set `lifetimeType: Permanent` to keep the `Max-Age`. Backends with a `BackendTLSPolicy` and no `appProtocol` now negotiate HTTP/2 over ALPN, so set `appProtocol: http` to stay on HTTP/1.1.
+**kgateway v2.5 is built against Gateway API v1.7.0**, and supports 1.5 and 1.6 as well. If you move to 1.7, apply its CRDs yourself: they are not part of the kgateway chart. Route `sessionPersistence` now uses `cookie.name`, `cookie` and `header.name`, and `sessionName` and `cookieConfig` are gone, so migrate those first. With `cookie.lifetimeType` unset the cookie becomes a Session cookie and `absoluteTimeout` stops applying; set `lifetimeType: Permanent` to keep the `Max-Age`. Backends with a `BackendTLSPolicy` and no `appProtocol` now negotiate HTTP/2 over ALPN, so set `appProtocol: http` to stay on HTTP/1.1.
 
 **Listener stats now tell you which listener they came from.** Every HTTP and HTTPS listener used to share `stat_prefix: http`, and route prefixes contained dots that split them across metric names, so the numbers were hard to attribute and sometimes hard to query at all. HTTP connection manager and TCP proxy stats now carry a stable per-listener prefix: `http_<port>`, `https_<port>_<listener>`, and `tcp_<port>_<namespace>_<route>` or `tls_<port>_<namespace>_<route>` for TCPRoutes and TLSRoutes. If you use any of these stats in your queries, you will need to update them. Queries matching `envoy_http_conn_manager_prefix="http"` or the old per-route `envoy_tcp_*` names need repointing, as do `GatewayParameters` `stats.matcher` entries matching raw names such as `http.http.`. Aggregations that ignore these labels are unaffected. On the controller side, `kgateway_status_writes_total{kind, result}` replaces the status syncer metrics, and we removed three series that cost real CPU to record on every route of every translation.
 
@@ -77,7 +77,7 @@ spec:
 
 Referenced Backends must live in the same namespace and must not themselves be `priorityGroups` Backends. Failover is driven by health, so pair the Backend with an active health check in `BackendConfigPolicy`, otherwise Envoy has nothing to mark unhealthy and the first group keeps receiving traffic.
 
-Both are aimed at the same thing: keeping traffic close, and keeping it flowing when something fails. Zone-aware routing addresses cross-zone data transfer cost and the latency of leaving an availability zone, which on a busy gateway adds up on both counts. Priority groups cover active and passive pairs, the shape a disaster recovery site or a legacy system kept warm behind a new one usually takes.
+Both are aimed at the same thing: keeping traffic close, and keeping it flowing when something fails. Zone-aware routing addresses cross-zone data transfer cost and the latency of leaving an availability zone, which on a busy gateway adds up on both counts. Priority groups handle active/passive setups: a disaster recovery site, or an old system kept running behind its replacement, that should only see traffic when the primary is unhealthy.
 
 ## Scaling the control plane
 
@@ -97,6 +97,8 @@ controller:
       referenceAhead: 2s
       dereferenceGrace: 5s
 ```
+
+The saving scales with how little of the cluster a gateway actually uses. A gateway that routes to 16 Services in a cluster of 300 carries 16 clusters instead of 300: in the memory of every one of its proxy replicas, in its config dump, and in its `/stats`, where each cluster contributes a whole family of series. Smaller snapshots are also less to push, and less for a restarting proxy to take in.
 
 Three things are meant to keep it as safe as the default. A cluster a route is about to need is sent before that route, and one nothing references any more is kept for a while afterwards, so the two changes do not cross. When the controller is unsure whether a cluster is needed it keeps it, because one cluster nobody uses costs a little memory while a missing one is an outage. And a gateway that picks its destination at request time, where there is no way to know up front what it will need, keeps receiving everything. Both of those windows are timers, so give them room if updates are slow to reach your proxies.
 
@@ -171,7 +173,7 @@ helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
   --version v2.5.0 --namespace kgateway-system --create-namespace
 ```
 
-Migrate `HTTPListenerPolicy` and route `sessionPersistence` first, and upgrade the Gateway API CRDs to v1.7.0 with the chart. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
+Migrate `HTTPListenerPolicy` first, and if you are moving to Gateway API v1.7.0, apply its CRDs and migrate route `sessionPersistence` before the chart goes in. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
 
 ## Availability
 
@@ -185,40 +187,40 @@ The simplest way to get involved with kgateway is to join us on [Slack](https://
 
 This release had 35 contributors. Thank you, all of you.
 
-<p>
-<a href="https://github.com/alex1989hu" title="alex1989hu"><img src="https://github.com/alex1989hu.png?size=96" alt="alex1989hu" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/alexliu541" title="alexliu541"><img src="https://github.com/alexliu541.png?size=96" alt="alexliu541" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/andy-fong" title="andy-fong"><img src="https://github.com/andy-fong.png?size=96" alt="andy-fong" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/ayushi-work" title="ayushi-work"><img src="https://github.com/ayushi-work.png?size=96" alt="ayushi-work" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/blacksoxx" title="blacksoxx"><img src="https://github.com/blacksoxx.png?size=96" alt="blacksoxx" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/chandler-solo" title="chandler-solo"><img src="https://github.com/chandler-solo.png?size=96" alt="chandler-solo" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/chris530" title="chris530"><img src="https://github.com/chris530.png?size=96" alt="chris530" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/christianscott" title="christianscott"><img src="https://github.com/christianscott.png?size=96" alt="christianscott" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/CodingRI" title="CodingRI"><img src="https://github.com/CodingRI.png?size=96" alt="CodingRI" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/davidjumani" title="davidjumani"><img src="https://github.com/davidjumani.png?size=96" alt="davidjumani" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/davidxia" title="davidxia"><img src="https://github.com/davidxia.png?size=96" alt="davidxia" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/devennavani" title="devennavani"><img src="https://github.com/devennavani.png?size=96" alt="devennavani" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/DuncanDoyle" title="DuncanDoyle"><img src="https://github.com/DuncanDoyle.png?size=96" alt="DuncanDoyle" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/haoqixu" title="haoqixu"><img src="https://github.com/haoqixu.png?size=96" alt="haoqixu" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/harkirath1511" title="harkirath1511"><img src="https://github.com/harkirath1511.png?size=96" alt="harkirath1511" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/Harsh-2005d" title="Harsh-2005d"><img src="https://github.com/Harsh-2005d.png?size=96" alt="Harsh-2005d" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/JCigan" title="JCigan"><img src="https://github.com/JCigan.png?size=96" alt="JCigan" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/jenshu" title="jenshu"><img src="https://github.com/jenshu.png?size=96" alt="jenshu" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/joerauschenbusch" title="joerauschenbusch"><img src="https://github.com/joerauschenbusch.png?size=96" alt="joerauschenbusch" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/justaparth" title="justaparth"><img src="https://github.com/justaparth.png?size=96" alt="justaparth" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/kamilblaz360" title="kamilblaz360"><img src="https://github.com/kamilblaz360.png?size=96" alt="kamilblaz360" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/kanywst" title="kanywst"><img src="https://github.com/kanywst.png?size=96" alt="kanywst" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/kristin-kronstain-brown" title="kristin-kronstain-brown"><img src="https://github.com/kristin-kronstain-brown.png?size=96" alt="kristin-kronstain-brown" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/marvin-roesch" title="marvin-roesch"><img src="https://github.com/marvin-roesch.png?size=96" alt="marvin-roesch" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/MaxFreedomPollard" title="MaxFreedomPollard"><img src="https://github.com/MaxFreedomPollard.png?size=96" alt="MaxFreedomPollard" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/praneshnikhar" title="praneshnikhar"><img src="https://github.com/praneshnikhar.png?size=96" alt="praneshnikhar" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/puertomontt" title="puertomontt"><img src="https://github.com/puertomontt.png?size=96" alt="puertomontt" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/rishabhsai" title="rishabhsai"><img src="https://github.com/rishabhsai.png?size=96" alt="rishabhsai" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/Roniscend" title="Roniscend"><img src="https://github.com/Roniscend.png?size=96" alt="Roniscend" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/RosieOh" title="RosieOh"><img src="https://github.com/RosieOh.png?size=96" alt="RosieOh" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/saylee21" title="saylee21"><img src="https://github.com/saylee21.png?size=96" alt="saylee21" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/sheidkamp" title="sheidkamp"><img src="https://github.com/sheidkamp.png?size=96" alt="sheidkamp" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/Tazmainiandevil" title="Tazmainiandevil"><img src="https://github.com/Tazmainiandevil.png?size=96" alt="Tazmainiandevil" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/UchihaIthachi" title="UchihaIthachi"><img src="https://github.com/UchihaIthachi.png?size=96" alt="UchihaIthachi" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-<a href="https://github.com/ziv-yatzik" title="ziv-yatzik"><img src="https://github.com/ziv-yatzik.png?size=96" alt="ziv-yatzik" width="48" height="48" style="border-radius:50%;margin:3px;" /></a>
-</p>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:1rem;">
+<a href="https://github.com/alex1989hu" title="alex1989hu"><img src="https://github.com/alex1989hu.png?size=96" alt="alex1989hu" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/alexliu541" title="alexliu541"><img src="https://github.com/alexliu541.png?size=96" alt="alexliu541" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/andy-fong" title="andy-fong"><img src="https://github.com/andy-fong.png?size=96" alt="andy-fong" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/ayushi-work" title="ayushi-work"><img src="https://github.com/ayushi-work.png?size=96" alt="ayushi-work" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/blacksoxx" title="blacksoxx"><img src="https://github.com/blacksoxx.png?size=96" alt="blacksoxx" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/chandler-solo" title="chandler-solo"><img src="https://github.com/chandler-solo.png?size=96" alt="chandler-solo" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/chris530" title="chris530"><img src="https://github.com/chris530.png?size=96" alt="chris530" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/christianscott" title="christianscott"><img src="https://github.com/christianscott.png?size=96" alt="christianscott" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/CodingRI" title="CodingRI"><img src="https://github.com/CodingRI.png?size=96" alt="CodingRI" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/davidjumani" title="davidjumani"><img src="https://github.com/davidjumani.png?size=96" alt="davidjumani" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/davidxia" title="davidxia"><img src="https://github.com/davidxia.png?size=96" alt="davidxia" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/devennavani" title="devennavani"><img src="https://github.com/devennavani.png?size=96" alt="devennavani" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/DuncanDoyle" title="DuncanDoyle"><img src="https://github.com/DuncanDoyle.png?size=96" alt="DuncanDoyle" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/haoqixu" title="haoqixu"><img src="https://github.com/haoqixu.png?size=96" alt="haoqixu" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/harkirath1511" title="harkirath1511"><img src="https://github.com/harkirath1511.png?size=96" alt="harkirath1511" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/Harsh-2005d" title="Harsh-2005d"><img src="https://github.com/Harsh-2005d.png?size=96" alt="Harsh-2005d" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/JCigan" title="JCigan"><img src="https://github.com/JCigan.png?size=96" alt="JCigan" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/jenshu" title="jenshu"><img src="https://github.com/jenshu.png?size=96" alt="jenshu" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/joerauschenbusch" title="joerauschenbusch"><img src="https://github.com/joerauschenbusch.png?size=96" alt="joerauschenbusch" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/justaparth" title="justaparth"><img src="https://github.com/justaparth.png?size=96" alt="justaparth" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/kamilblaz360" title="kamilblaz360"><img src="https://github.com/kamilblaz360.png?size=96" alt="kamilblaz360" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/kanywst" title="kanywst"><img src="https://github.com/kanywst.png?size=96" alt="kanywst" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/kristin-kronstain-brown" title="kristin-kronstain-brown"><img src="https://github.com/kristin-kronstain-brown.png?size=96" alt="kristin-kronstain-brown" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/marvin-roesch" title="marvin-roesch"><img src="https://github.com/marvin-roesch.png?size=96" alt="marvin-roesch" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/MaxFreedomPollard" title="MaxFreedomPollard"><img src="https://github.com/MaxFreedomPollard.png?size=96" alt="MaxFreedomPollard" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/praneshnikhar" title="praneshnikhar"><img src="https://github.com/praneshnikhar.png?size=96" alt="praneshnikhar" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/puertomontt" title="puertomontt"><img src="https://github.com/puertomontt.png?size=96" alt="puertomontt" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/rishabhsai" title="rishabhsai"><img src="https://github.com/rishabhsai.png?size=96" alt="rishabhsai" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/Roniscend" title="Roniscend"><img src="https://github.com/Roniscend.png?size=96" alt="Roniscend" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/RosieOh" title="RosieOh"><img src="https://github.com/RosieOh.png?size=96" alt="RosieOh" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/saylee21" title="saylee21"><img src="https://github.com/saylee21.png?size=96" alt="saylee21" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/sheidkamp" title="sheidkamp"><img src="https://github.com/sheidkamp.png?size=96" alt="sheidkamp" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/Tazmainiandevil" title="Tazmainiandevil"><img src="https://github.com/Tazmainiandevil.png?size=96" alt="Tazmainiandevil" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/UchihaIthachi" title="UchihaIthachi"><img src="https://github.com/UchihaIthachi.png?size=96" alt="UchihaIthachi" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+<a href="https://github.com/ziv-yatzik" title="ziv-yatzik"><img src="https://github.com/ziv-yatzik.png?size=96" alt="ziv-yatzik" width="48" height="48" style="display:block;border-radius:50%;" /></a>
+</div>
