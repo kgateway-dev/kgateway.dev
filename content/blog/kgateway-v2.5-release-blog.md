@@ -104,7 +104,7 @@ It is experimental and off by default. Three metrics report what it is doing, ea
 
 **Redundant Gateway rebuilds are now skipped during route churn.** When a burst of input events queues several recomputes for the same key, KRT skips any whose change a later recomputation has already taken in, so a burst of route updates no longer rebuilds the same Gateway several times over. The same dependency bump also shrinks KRT's maps after a large de-allocation, so memory freed at scale is returned rather than held.
 
-Underneath both, the controller does less work per connected proxy. Config that is identical for every proxy is now built once and shared instead of being rebuilt for each one, and validation results are reused when the cluster has not changed. The practical effect is that the controller's memory and CPU grow far more slowly as you add gateways. A hashing fix also stops backends with more than one label from publishing a new endpoint version on every recomputation, which was pushing updates to every connected proxy when nothing had actually changed.
+Underneath both, the controller does less work per connected proxy. Config that is identical for every proxy is now built once and shared instead of being rebuilt for each one, and validation results are reused when the cluster has not changed. The practical effect is that the controller's memory and CPU grow far more slowly as you add proxies. A hashing fix also stops backends with more than one label from publishing a new endpoint version on every recomputation, which was pushing updates to every connected proxy when nothing had actually changed.
 
 Finally, `controller.goMemLimitPercent` keeps the Go runtime's memory at a percentage of the controller container's memory limit, and follows that limit while the pod runs, so an in-place resize is picked up instead of being ignored until the next restart. It is `0` by default, which keeps reading the limit once at startup. Set it to a value between 1 and 100 to turn it on, with 90 a good starting point:
 
@@ -173,7 +173,13 @@ helm upgrade -i kgateway oci://cr.kgateway.dev/kgateway-dev/charts/kgateway \
 
 Migrate `HTTPListenerPolicy` and route `sessionPersistence` first, and upgrade the Gateway API CRDs to v1.7.0 with the chart. The [release notes](https://github.com/kgateway-dev/kgateway/releases/tag/v2.5.0) carry the complete list, and the [documentation](https://kgateway.dev/docs/envoy/latest/) covers every field mentioned here.
 
-If you are trying the experimental features, xDS scoping and dual-stack especially, we would love to hear how they work for you. Feedback is what shapes where they go next, and bug reports and use cases are equally welcome on [GitHub](https://github.com/kgateway-dev/kgateway/issues). The [#kgateway channel](https://kgateway.dev/slack/) on CNCF Slack is the fastest way to reach the maintainers. If you want to work through it hands-on first, the [labs](https://www.solo.io/resources/lab?product=kgateway) are a good starting point.
+## Availability
+
+kgateway v2.5.0 is available for download on [GitHub](https://github.com/kgateway-dev/kgateway). If you are new to the project, the [getting started guide](https://kgateway.dev/docs/envoy/latest/quickstart/) is the quickest way in, and the [labs](https://www.solo.io/resources/lab?product=kgateway) walk through it hands-on.
+
+## Get Involved
+
+The simplest way to get involved with kgateway is to join us on [Slack](https://kgateway.dev/slack/) and at the [community meetings](https://github.com/kgateway-dev/community?tab=readme-ov-file#community-meetings). If you are trying the experimental features, xDS scoping and dual-stack especially, we would love to hear how they work for you. Feedback is what shapes where they go next, and bug reports and use cases are equally welcome on [GitHub](https://github.com/kgateway-dev/kgateway/issues).
 
 ## Contributors
 
