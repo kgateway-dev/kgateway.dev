@@ -1,7 +1,7 @@
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/">}}) to ensure that your apps are available even if they are temporarily unavailable.
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
@@ -12,10 +12,10 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 > [!NOTE]
@@ -28,9 +28,9 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Step 1: Set up your environment for retries
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To use retries, you need to install the experimental channel. You can also set up two things that help you test retries:{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To test retries, set up two things:{{< /version >}} a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To use retries, you need to install the experimental channel. You can also set up two things that help you test retries:{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To test retries, set up two things:{{< /version >}} a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
 
-{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
+{{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x" %}}
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh

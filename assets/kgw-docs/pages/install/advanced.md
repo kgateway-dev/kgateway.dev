@@ -26,7 +26,7 @@ When using the development build {{< reuse "kgw-docs/versions/patch-dev.md" >}},
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features such as the following:
 
 - TCPRoutes
@@ -36,7 +36,7 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 - Retries
 - Session persistence
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features and API versions, such as the following:
 
 - Session persistence in HTTPRoutes, which is deprecated in favor of session persistence in a BackendConfigPolicy
@@ -46,13 +46,13 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled. Retries are in the standard channel in Gateway API version 1.7 and later.
 {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
+{{< version include-if="2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 
 ```yaml
 controller:
   extraEnv:
     KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
-```{{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}In kgateway version 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable these features, set the environment variable to `false` in your kgateway controller deployment in your Helm values file.
+```{{< /version >}}{{< version exclude-if="2.1.x" >}}In kgateway version 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable these features, set the environment variable to `false` in your kgateway controller deployment in your Helm values file.
 
 ```yaml
 controller:
@@ -72,7 +72,7 @@ controller:
     KGW_DISABLE_LEADER_ELECTION: "true"
 ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Leader election timings {#leader-election-timings}
 
 On clusters with a slow or temporarily unavailable Kubernetes API server, the controller can fail to renew its lease in time. The controller then repeatedly loses and re-acquires leadership. To make the controller more tolerant of a slow API server, increase the leader election timings through the `controller.leaderElection` Helm values.
@@ -128,7 +128,7 @@ discoveryNamespaceSelectors:
 ```
 
 {{< conditional-text include-if="envoy" >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Scope xDS configuration per gateway {#xds-scoping}
 
 > [!WARNING]
@@ -237,8 +237,8 @@ Strict mode does not keep a previous version of a route when an update to the ro
 
 | Invalid configuration | Result | Status |
 | --- | --- | --- |
-| A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
-| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+| A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
+| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 | A virtual host that is still invalid after the control plane removes or replaces its invalid route rules | The control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response. | `Accepted=False` with reason `ListenerReplaced` on the listener |{{< /version >}}
 
 For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
@@ -271,7 +271,7 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x,2.0.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Tune the controller Go memory limit {#controller-memory-limit}
 
 By default, the Go runtime that the kgateway controller runs on does not know how much memory Kubernetes allows its container to use. The controller's garbage collector just runs on its own schedule, so the controller can keep allocating memory right up to the container's limit. When it crosses that limit, the Linux kernel kills the container immediately, with no warning and no chance for the controller to free memory first. This event appears as a Kubernetes pod restart, often labeled `OOMKilled`.
@@ -294,7 +294,7 @@ controller:
 If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
 {{< /version >}}
 
-{{< version exclude-if="2.2.x,2.1.x">}}
+{{< version exclude-if="2.1.x,2.2.x">}}
 
 ## ReferenceGrant enforcement modes
 
@@ -321,10 +321,10 @@ The following table shows which cross-namespace references are checked in each m
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
-| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
-| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
+| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.1.x,2.2.x,2.3.x" %}}
 | ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
 | {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
@@ -428,7 +428,7 @@ If a policy reports `missing reference grant`, check the following settings of y
 
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ## Disable automatic RBAC creation {#disable-rbac}
 

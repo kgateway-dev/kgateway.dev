@@ -48,7 +48,7 @@ EOF
 ```
 {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x" >}}
+{{< version include-if="2.1.x" >}}
 ```yaml
 kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -402,7 +402,7 @@ To demonstrate the HTTP/2 routing capabilities, deploy a sample nginx server and
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-{{< version exclude-if="2.0.x,2.1.x" >}}
+{{< version exclude-if="2.1.x" >}}
 ```sh
 kubectl delete listenerpolicy access-logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete httproute nginx
@@ -414,7 +414,7 @@ kubectl delete httproute http2
 ```
 {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x" >}}
+{{< version include-if="2.1.x" >}}
 ```sh
 kubectl delete httplistenerpolicy access-logs -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete httproute nginx

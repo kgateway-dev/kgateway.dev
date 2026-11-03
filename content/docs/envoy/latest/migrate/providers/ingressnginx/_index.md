@@ -157,8 +157,8 @@ The `ingress-nginx` provider currently supports translating the following annota
   - When the annotation is present, the provider records an explicit boolean:
     - `"true"` enables access logging.
     - Any other value is treated as `false`.
-  - For kgateway, when access logging is enabled, the emitter creates an `HTTPListenerPolicy` that configures a basic Envoy access log policy via
-    `HTTPListenerPolicy.spec.accessLog[].fileSink`.
+  - For kgateway, when access logging is enabled, the emitter creates a ListenerPolicy that configures a basic Envoy access log policy via
+    `ListenerPolicy.spec.default.httpSettings.accessLog[].fileSink`.
 
 ---
 

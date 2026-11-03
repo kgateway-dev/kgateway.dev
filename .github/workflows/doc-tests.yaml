@@ -265,7 +265,7 @@ jobs:
       # Schema checks: each version tree against the CRDs of the release it
       # documents. main/ documents kgateway's default branch. latest/
       # documents the newest stable patch of the minor that hugo.yaml labels
-      # `latest` (2.4.x -> v2.4.<n>). It is not read from n-patch.md, so a
+      # `latest` (2.5.x -> v2.5.<n>). It is not read from n-patch.md, so a
       # pin that lags a release still gets checked against the fields that
       # the pages document.
       - name: Resolve kgateway release for latest
