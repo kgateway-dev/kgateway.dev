@@ -71,27 +71,23 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
    > [!WARNING]
    > The OAuth2 filter does not protect against CSRF attacks on routes with cached authentication cookies. Pair it with a `CSRFPolicy` on the same route.
 
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-metadata:
-  name: entra-id-oauth2-policy
-  namespace: httpbin
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: httpbin
-  oauth2:
-    extensionRef:
-      name: entra-id-oauth2
-      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-EOF
-```
-
-
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
+   metadata:
+     name: entra-id-oauth2-policy
+     namespace: httpbin
+   spec:
+     targetRefs:
+       - group: gateway.networking.k8s.io
+         kind: HTTPRoute
+         name: httpbin
+     oauth2:
+       extensionRef:
+         name: entra-id-oauth2
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   EOF
 4. Verify that the policy is attached to the route.
 
    ```sh
