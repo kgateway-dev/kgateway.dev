@@ -14,7 +14,7 @@ xDS scoping leads this release. It cuts down what every proxy has to carry in a 
 
 ### Scaling the control plane
 
-Most of the work in v2.5 went into what the control plane does at scale.
+A lot of the work in v2.5 went into improving control plane performance at scale.
 
 **xDS scoping** changes the configuration that each proxy has to carry. By default, every gateway proxy receives a cluster and its endpoints for every backend the controller discovers, whether or not a route uses it. In a Kubernetes cluster with 300 Services where a gateway routes to only 16 of them, every proxy replica still carries all 300 Services in memory, in its config dump, and in its stats. With the xDS `REFERENCED` scoping mode, you can now send a proxy only the clusters its gateway's configuration references, along with those backends' endpoints, listeners and secrets. This setting significantly reduces the size of the config dump, the memory the proxy needs, and the stats it emits. Smaller xDS snapshots are also quicker to push and quicker for a restarting proxy to take in.
 
