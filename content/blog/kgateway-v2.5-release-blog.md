@@ -126,14 +126,14 @@ Note that if you use session persistence in your HTTPRoutes, which is still expe
 
 **Listener stats now tell you which listener they came from.** Every HTTP and HTTPS listener used to share the `stat_prefix: http`, and route prefixes contained dots that split them across metric names, so the numbers were hard to attribute and sometimes hard to query at all. HTTP connection manager and TCP proxy stats now carry a stable per-listener prefix: `http_<port>`, `https_<port>_<listener>`, and `tcp_<port>_<namespace>_<route>` or `tls_<port>_<namespace>_<route>` for TCPRoutes and TLSRoutes. If you use any of these stats in your queries, you will need to update them. Queries matching `envoy_http_conn_manager_prefix="http"` or the old per-route `envoy_tcp_*` names need repointing, as do `GatewayParameters` `stats.matcher` entries matching raw names such as `http.http.`. Aggregations that ignore these labels are unaffected. On the controller side, `kgateway_status_writes_total{kind, result}` replaces the status syncer metrics, and we removed several series that cost real CPU to record on every route of every translation. The [gateway](https://kgateway.dev/docs/envoy/latest/observability/gateway-metrics/) and [control plane](https://kgateway.dev/docs/envoy/latest/observability/control-plane-metrics/) metrics guides list what is published now.
 
-The rest is smaller:
+Other highlights:
 
 - **The proxy now drains in 60s with the `immediate` strategy** instead of Envoy's 600s gradual default, releasing the memory held by old listener configuration much sooner. Long-lived connections on a modified listener might now be closed after 60s. Restore the old behavior with `--drain-time-s 600 --drain-strategy gradual` in the `spec.kube.envoyContainer.extraArgs` block of your [`GatewayParameters`](https://kgateway.dev/docs/envoy/latest/setup/customize/envoy/) resource.
 - **Changing a listener port no longer restarts the proxy pods**, and listener ports are no longer container ports on the Deployment. Switch any reference to the named ports (`listener-<port>`) to port numbers before upgrading. If you run the proxy with `hostNetwork`, add the ports back with a [`deploymentOverlay`](https://kgateway.dev/docs/envoy/latest/setup/customize/configs/#host-network-ports).
 - **Route source metadata changed shape.** The `rule` field now holds the rule name from the originating xRoute when it has one, and a generated value based on the rule's index otherwise. A new `match` field holds the index of the originating match. Update any access log or trace pipeline that parses this metadata. For details, see the [access logging guide](https://kgateway.dev/docs/envoy/latest/security/access-logging/#route-source-metadata).
 - **The SDS sidecar binds to `127.0.0.1:8234`** instead of `0.0.0.0:8234`. Set the `SDS_SERVER_ADDRESS` environment variable on the SDS container if you reach it from elsewhere on the cluster network. For details, see the [SDS bind address settings](https://kgateway.dev/docs/envoy/latest/setup/customize/configs/#sds-bind-address).
 
-One feature is removed: running kgateway as an Istio ambient waypoint, taking the `kgateway-waypoint` GatewayClass, Istio `AuthorizationPolicy` translation and `KGW_WAYPOINT_LOCAL_BINDING` with it. The [waypoint migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md) covers the move to Istio waypoints. Sending ingress traffic through an Istio waypoint is still supported, though `KGW_INGRESS_USE_WAYPOINTS` now defaults to `false`.
+One deprecated feature is removed: running kgateway as an Istio ambient waypoint, taking the `kgateway-waypoint` GatewayClass, Istio `AuthorizationPolicy` translation and `KGW_WAYPOINT_LOCAL_BINDING` with it. The [waypoint migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md) covers the move to Istio waypoints. Sending ingress traffic through an Istio waypoint is still supported, though `KGW_INGRESS_USE_WAYPOINTS` now defaults to `false`.
 
 ## Also in v2.5
 
@@ -169,7 +169,7 @@ spec:
 
 Referenced Backends must live in the same namespace and must not themselves be `priorityGroups` Backends. Failover is driven by health, so pair the Backend with an active health check in `BackendConfigPolicy`, otherwise Envoy has nothing to mark unhealthy and the first group keeps receiving traffic. Priority groups handle active/passive setups: a disaster recovery site, or an old system kept running behind its replacement, that should only see traffic when the primary is unhealthy.
 
-v2.3 is further back. If you skipped it, these are the pieces worth knowing about:
+v2.3:
 
 - **[Fault injection](https://kgateway.dev/docs/envoy/latest/resiliency/fault-injection/)** on TrafficPolicy: Delays and HTTP or gRPC aborts for resiliency testing, with a per-route override to turn it off.
 - **TLS termination for TLSRoute**, and [per-listener client certificate validation](https://kgateway.dev/docs/envoy/latest/security/mtls-listener/).
