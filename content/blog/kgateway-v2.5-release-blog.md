@@ -57,7 +57,7 @@ controller:
 
 ### Egress through an HTTP CONNECT proxy
 
-Plenty of environments require outbound traffic to leave through a forward proxy. Gloo Gateway has supported this for years, and the lack of an equivalent in kgateway held up migrations for teams that depend on it. That gap is now closed. The `BackendConfigPolicy.spec.tunnel` field points a Backend at the forward proxy. When enabled, the gateway proxy sends an HTTP `CONNECT` request to the forward proxy, which opens the connection to the destination.
+Plenty of environments require outbound traffic to leave through a forward proxy, so that egress is filtered, logged and allowlisted in one place. kgateway can now route through one natively. The `BackendConfigPolicy.spec.tunnel` field points a Backend at the forward proxy. When enabled, the gateway proxy sends an HTTP `CONNECT` request to the forward proxy, which opens the connection to the destination.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
