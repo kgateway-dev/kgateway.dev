@@ -55,15 +55,15 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
    ```
 
    | **Field** | **Description** |
-| :--- | :--- |
-| `backendRef` | Points to the `Backend` from [Entra ID setup]({{< link-hextra path="/security/oauth/entra-id/setup/#create-backend" >}}). Kgateway uses it to reach Entra ID for token exchange and OIDC discovery. |
-| `issuerURI` | For v1.0 tokens, this must be `https://sts.windows.net/{tenant-id}/`. |
-| `authorizationEndpoint` | The Entra ID endpoint that the gateway redirects browser users to for login. |
-| `tokenEndpoint` | The Entra ID endpoint that the gateway calls to exchange the authorization code for tokens. |
-| `redirectURI` | The callback URL that kgateway sends to Entra ID as the `redirect_uri` parameter. This must match the URI registered in your App Registration exactly. |
-| `scopes` | Must include `openid` for OIDC. If you are using the access token validation flow, include your custom scope (such as,`api://{client-id}/access_as_user`). |
-| `endSessionEndpoint` | Handles single logout. |
-| `clientSecretRef.name` | Must match the Secret name from the previous step. |
+   | :--- | :--- |
+   | `backendRef` | Points to the `Backend` from [Entra ID setup]({{< link-hextra path="/security/oauth/entra-id/setup/#create-backend" >}}). Kgateway uses it to reach Entra ID for the token exchange. |
+   | `issuerURI` | Triggers OIDC discovery of the endpoints. Because this example sets `authorizationEndpoint`, `tokenEndpoint`, and `endSessionEndpoint` explicitly, the explicit values win and kgateway skips discovery. |
+   | `authorizationEndpoint` | The Entra ID endpoint that the gateway redirects browser users to for login. |
+   | `tokenEndpoint` | The Entra ID endpoint that the gateway calls to exchange the authorization code for tokens. |
+   | `redirectURI` | The callback URL that kgateway sends to Entra ID as the `redirect_uri` parameter. This value must exactly match the redirect URI in your App Registration. |
+   | `scopes` | Must include `openid` for OIDC. To use the access token from this flow with the access token validation flow, include your custom scope, such as `api://{client-id}/access_as_user`. |
+   | `endSessionEndpoint` | Handles single logout. When a user goes to `/logout`, kgateway clears the session cookies and sends the browser to this URL so that Entra ID ends its session too. |
+   | `clientSecretRef.name` | Must match the Secret name from the previous step. Kgateway reads the `client-secret` key inside that Secret. |
 
 
 3. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the extension by name.
