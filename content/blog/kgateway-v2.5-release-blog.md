@@ -47,7 +47,7 @@ To learn more about this feature, check out [Scope xDS configuration per gateway
 
 **The controller now skips stale recomputes** during bursts of route updates and keeps only the latest, instead of rebuilding the same Gateway several times. Config that is identical for every proxy is also built once and shared, and validation results are reused until the cluster changes, so controller memory and CPU grow more slowly as you add proxies.
 
-**The controller can now set its Go memory limit (`GOMEMLIMIT`)** as a percentage of its container's memory limit, and it follows in-place resizes of that limit. This feature is off by default (`0`). To turn it on, set the `controller.goMemLimitPercent` Helm value to a value between 1 and 100, with 90 as a good starting point. Use a lower value, such as 80, if a lot of memory is allocated outside the Go runtime or you want extra headroom against out-of-memory kills.
+**The controller can now set its Go memory limit (GOMEMLIMIT)** as a percentage of its container's memory limit, and follows it while the pod runs. This feature is off by default. To turn it on, set the `controller.goMemLimitPercent` Helm value to a value between 1 and 100, with 90 as a good starting point. Use a lower value, such as 80, if a lot of memory is allocated outside the Go runtime or you want extra headroom against out-of-memory kills.
 
 ```yaml
 controller:
