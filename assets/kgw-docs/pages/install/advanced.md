@@ -210,16 +210,16 @@ Watch the rate of the `reference_ahead_held` transition. A high rate means that 
 
 ## Limit xDS publication delays {#xds-publication}
 
-The control plane can delay the configuration that it publishes to a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay keeps a proxy from receiving routes to clusters that it does not have yet. The control plane delays the configuration in the following cases:
+The control plane can delay the configuration for a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay keeps a proxy from receiving routes to clusters that the proxy does not have yet. The control plane delays the configuration in the following cases:
 
 * **First configuration**: A gateway proxy connects, such as when a new gateway pod starts.
 * **Route change**: You change a route so that it references a cluster that is not ready yet.
 
-To keep a cluster that never becomes ready from blocking the configuration of a proxy, the control plane limits how long it delays each publication. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to a cluster that is not ready return a `503` response until the cluster becomes ready. These time limits apply in every xDS scoping mode.
+To keep a cluster that never becomes ready from blocking the configuration of a proxy, the control plane limits how long each delay lasts. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to a cluster that is not ready return a `503` response until the cluster becomes ready. These time limits apply in every xDS scoping mode.
 
 ### Tune the time limits {#xds-publication-settings}
 
-You can tune the time limits with environment variables on the control plane. The control plane reads the variables when it starts.
+You can tune the time limits with environment variables on the control plane. The control plane reads the variables at startup.
 
 1. Set the environment variables in the `controller.extraEnv` section of your Helm values file. The following example sets a longer time limit for the first configuration of a proxy.
    ```yaml
@@ -230,7 +230,7 @@ You can tune the time limits with environment variables on the control plane. Th
 
    | Environment variable | Description | Default |
    | -- | -- | -- |
-   | `KGW_PER_CLIENT_PUBLISH_BUDGET` | How long the control plane delays the first configuration of a proxy, or a route change, while referenced clusters are not ready. Keep this value well below the startup probe time of the gateway proxy, which is 60 seconds by default. You can change the probe in the `spec.kube.podTemplate.startupProbe` field of the GatewayParameters resource. This value is not the total time until the proxy is ready. Translation, the first connection delay that the `KGW_XDS_FIRST_CONNECT_DELAY` variable sets, and delivery to the proxy add to it. If the first configuration arrives after the probe time, the proxy restarts. Set `0` to remove the time limit, so that the control plane delays the configuration until all referenced clusters are ready. With `0`, a new proxy that references a cluster that never becomes ready never receives configuration and never becomes ready. | `15s` |
+   | `KGW_PER_CLIENT_PUBLISH_BUDGET` | How long the control plane delays the first configuration of a proxy, or a route change, while referenced clusters are not ready. Keep this value well below the startup probe time of the gateway proxy, which is 60 seconds by default. You can change the probe in the `spec.kube.podTemplate.startupProbe` field of the GatewayParameters resource. This value is not the total time until the proxy is ready. The total time also includes translation, the first connection delay that the `KGW_XDS_FIRST_CONNECT_DELAY` variable sets, and delivery to the proxy. If the first configuration arrives after the probe time, the proxy restarts. Set `0` to remove the time limit, so that the control plane delays the configuration until all referenced clusters are ready. With `0`, a new proxy that references a cluster that never becomes ready never receives configuration and never becomes ready. | `15s` |
    | `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` | How long the control plane continues to delay the configuration of a proxy that reconnects with configuration that it already has, such as after the control plane restarts, while referenced clusters are missing. This time starts after the `KGW_PER_CLIENT_PUBLISH_BUDGET` time expires. While the control plane delays the configuration, the proxy receives no updates at all, including certificate rotations. The value also limits how long the control plane keeps sending the last configuration of a cluster that is missing. Keep this value well above the time that the control plane needs to translate all resources after a restart. If the value is too low, routes fail each time the control plane restarts. Set `0` to remove the time limit. This setting has no effect if `KGW_PER_CLIENT_PUBLISH_BUDGET` is `0`. | `10m` |
 
 2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file.
@@ -266,7 +266,7 @@ Example output after the control plane restarts:
 kgateway_xds_snapshot_perclient_defers_total{gateway="http",namespace="demo",reason="missing_endpoints"} 1
 ```
 
-In this example, the control plane delayed the configuration of the `http` gateway once after the restart, until it translated the endpoints of a referenced cluster. The control plane reports each metric only after the event that the metric counts happens for the first time. If the command returns no output, the control plane did not delay any configuration.
+In this example, the control plane delayed the configuration of the `http` gateway once after the restart, until the control plane translated the endpoints of a referenced cluster. The control plane reports each metric only after the event that the metric counts happens for the first time. If the command returns no output, the control plane did not delay any configuration.
 
 {{< /version >}}
 
