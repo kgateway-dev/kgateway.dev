@@ -41,16 +41,16 @@ Create a `GatewayExtension` to configure token validation. Then create a `Traffi
    EOF
    ```
 
-| **Field** | **Description** |
-| :--- | :--- |
-| `name` | A required, unique name for the provider. |
-| `issuer` | Must match the `iss` claim in your tokens exactly. For v1.0 tokens, use `https://sts.windows.net/{tenant-id}/`. |
-| `jwks.remote.backendRef` | The `Backend` that the gateway uses to fetch the signing keys. |
-| `jwks.remote.url` | The JWKS URL. For v1.0 tokens, use `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. |
-| `audiences` | Accepted values for the `aud` claim. This should be your Application ID URI (e.g., `api://YOUR_CLIENT_ID`). |
+   | **Field** | **Description** |
+   | :--- | :--- |
+   | `name` | A required, unique name for the provider. |
+   | `issuer` | Must exactly match the `iss` claim in your tokens. For v1.0 tokens, use `https://sts.windows.net/{tenant-id}/`. |
+   | `jwks.remote.backendRef` | The `Backend` that the gateway uses to fetch the signing keys. |
+   | `jwks.remote.url` | The JWKS URL. For v1.0 tokens, use `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. |
+   | `audiences` | Accepted values for the `aud` claim. Use your Application ID URI, such as `api://YOUR_CLIENT_ID`. |
 
-> [!NOTE]
-> The `validationMode` field is optional and defaults to `Strict`. This mode requires a valid JWT on every request. Set it to `AllowMissing` only if you want requests without a token to pass through. Pair that mode with an authorization policy that restricts those requests.
+   > [!NOTE]
+   > The `validationMode` field is optional and defaults to `Strict`. This mode requires a valid JWT on every request. Set it to `AllowMissing` only if you want requests without a token to pass through. Pair that mode with an authorization policy that restricts those requests.
 
 2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the JWT GatewayExtension. Make sure that the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} is in the same namespace as the HTTPRoute that it targets.
 
