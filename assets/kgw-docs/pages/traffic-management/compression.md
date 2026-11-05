@@ -6,7 +6,7 @@ Gzip is an HTTP option that enables your gateway proxy to compress response data
 
 Use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to configure gzip compression and decompression per route. Choose between the following options: 
 
-- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header.{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} You can also configure [Brotli and Zstd](#multi-codec) as additional codecs by using the `libraries` field. Envoy negotiates the codec with the client with the `Accept-Encoding` header and uses the configured library order as a tiebreaker when the client accepts multiple codecs equally.{{< /version >}} The following content types are compressed by default:
+- **Response compression**: When enabled on a route, {{< reuse "kgw-docs/snippets/kgateway.md" >}} compresses HTTP responses by using gzip when the downstream client includes an `Accept-Encoding: gzip` header.{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} You can also configure [Brotli and Zstd](#multi-codec) as additional codecs by using the `libraries` field. Envoy picks the codec from the client's `Accept-Encoding` header. If the client accepts more than one codec with the same quality value, Envoy uses the codec that the client lists first.{{< /version >}} The following content types are compressed by default:
   - `application/javascript`
   - `application/json`
   - `application/xhtml+xml`
@@ -227,11 +227,11 @@ Enable gzip decompression on a route so that {{< reuse "kgw-docs/snippets/kgatew
 
 ### Brotli and Zstd compression codecs {#multi-codec}
 
-By default, response compression uses Gzip only. You can offer additional codecs by setting the `responseCompression.libraries` field to an ordered list of codecs. Envoy negotiates the codec with the client by using the `Accept-Encoding` header. The configured order serves as a tiebreaker when the client accepts multiple codecs equally. Clients that do not accept any of the configured codecs receive an uncompressed response.
+By default, response compression uses Gzip only. You can offer additional codecs by setting the `responseCompression.libraries` field to a list of codecs. Envoy picks the codec with the highest quality value in the client's `Accept-Encoding` header. If the client accepts more than one codec with the same quality value, Envoy uses the codec that the client lists first. The order of the `libraries` list does not set a preference. Clients that do not accept any of the configured codecs receive an uncompressed response.
 
 Supported codec values: `Gzip`, `Brotli`, `Zstd`.
 
-The following example configures Brotli as the preferred codec with Gzip as a fallback.
+The following example offers Brotli, Gzip, and Zstd. A client that sends `Accept-Encoding: br, gzip` gets a Brotli-compressed response. A client that sends `Accept-Encoding: gzip, br` gets a gzip-compressed response.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -255,7 +255,7 @@ EOF
 ```
 ### Brotli and Zstd request decompression {#multi-codec-decompression}
 
-By default, request decompression handles only Gzip-encoded request bodies. You can add support for additional codecs by setting the `requestDecompression.libraries` field to an ordered list of codecs. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} installs one Envoy decompressor filter per codec and selects the appropriate one based on the `Content-Encoding` header of the incoming request.
+By default, request decompression handles only Gzip-encoded request bodies. You can add support for additional codecs by setting the `requestDecompression.libraries` field to a list of codecs. The order of the list does not matter. {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} installs one Envoy decompressor filter per codec and selects the appropriate one based on the `Content-Encoding` header of the incoming request.
 
 Supported codec values: `Gzip`, `Brotli`, `Zstd`.
 

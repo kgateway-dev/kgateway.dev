@@ -214,7 +214,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    
    
 
-2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods, because `notallowed.com` is not configured as a supported origin. The `access-control-*` headers in the example output come from the httpbin app's own CORS handling, not from your CORS policy.  
+2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Because `notallowed.com` is not configured as a supported origin, the response does not include the `access-control-allow-origin` header for your origin.
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -235,7 +235,26 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: 
+   {{< version exclude-if="2.1.x,2.2.x" >}}
+   The gateway answers the preflight request itself with a `200` response, and does not forward it to the httpbin app. The response has no `access-control-allow-origin` header, so the browser blocks the cross-origin request. The response still includes other values from your CORS policy, such as the allowed methods and the max age. These values have no effect without a matching `access-control-allow-origin` header. The `access-control-allow-headers` value depends on the resource that you created.
+
+   Example output:
+   ```console
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-methods: GET, POST, OPTIONS
+   access-control-allow-headers: Origin
+   access-control-max-age: 86400
+   date: Thu, 05 Nov 2026 06:47:07 GMT
+   server: envoy
+   content-length: 0
+   ```
+   {{< /version >}}
+
+   {{< version include-if="2.1.x,2.2.x" >}}
+   Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods. The gateway forwards the preflight request to the httpbin app. The `access-control-*` headers in the example output come from the httpbin app's own CORS handling, not from your CORS policy.
+
+   Example output:
    ```console
    HTTP/1.1 200 OK
    x-correlation-id: aaaaaaaa
@@ -253,6 +272,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    x-envoy-upstream-service-time: 1
    server: envoy
    ```
+   {{< /version >}}
 
 ## Cleanup
 

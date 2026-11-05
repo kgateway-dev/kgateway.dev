@@ -513,7 +513,7 @@ For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< 
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -l app=nginx
    ```
 {{% /tab %}}
 {{% tab name="BackendTLSPolicy" %}}
@@ -526,7 +526,7 @@ For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< 
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -l app=nginx
    kubectl delete configmap ca -n kgateway-base --ignore-not-found
    ```
 

@@ -128,7 +128,7 @@ spec:
         inclusionList:
           - prefix: "http."
           - suffix: ".rq_total"
-          - safeRegex: "^cluster\\..*\\.upstream_cx_active$"
+          - safeRegex: "^cluster[.].*[.]upstream_cx_active$"
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway

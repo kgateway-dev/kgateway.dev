@@ -593,7 +593,7 @@ curl -vik localhost:8080/headers \
 Example output:
 
 ```
-< HTTP/1.1 401 Unauthorized
+< HTTP/1.1 403 Forbidden
 Audiences in Jwt are not allowed
 ```
 
