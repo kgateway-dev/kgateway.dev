@@ -391,10 +391,7 @@ Add an audience mapper so that tokens carry your client ID, which lets the JWT p
 6. Verify that **Add to access token** is on.
 7. Click **Save**.
 
-Tokens for this client now include `kgateway-client` in the `aud` claim. For the test user that you created in the admin console, the claim is `"aud": ["kgateway-client", "account"]`.
-
-> [!NOTE]
-> The [ConfigMap-based setup](#configmap-setup) adds the same audience mapper. Its test user has no realm roles, so tokens for that user carry only `"aud": "kgateway-client"`. Both forms pass the JWT policy, because the policy accepts `kgateway-client`.
+Tokens for this client now include `kgateway-client` in the `aud` claim. For the test user that you created in the admin console, the claim is `"aud": ["kgateway-client", "account"]`. The [ConfigMap-based setup](#configmap-setup) adds the same audience mapper, but its test user has no realm roles. Tokens for that user carry only `"aud": "kgateway-client"`. Both forms pass the JWT policy, because the policy accepts `kgateway-client`.
 
 > [!NOTE]
 > The steps above create the `myrealm` realm for testing only. For production, use a dedicated Keycloak instance with a certificate from a CA that the gateway trusts, and a realm that your organization manages.
