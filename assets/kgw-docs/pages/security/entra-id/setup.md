@@ -16,14 +16,14 @@ When you finish, you choose an authentication flow:
    | **Supported account types** | Accounts in this organizational directory only |
    | **Platform** | Web |
    | **Redirect URI** | `https://www.example.com/oauth2/redirect` |
-   | **Front-channel logout URL** | `https://www.example.com` |
 
+   
    The redirect URI path is `/oauth2/redirect`, which is the default callback path that kgateway registers. You can override it with `redirectURI` in the `GatewayExtension` if needed.
 
 2. A test user created in your Entra ID directory and assigned to the App Registration.
 
 > [!IMPORTANT]
-> **Entra ID token version finding:** When you configure custom API scopes (as required for access token validation), Entra ID issues **v1.0 tokens**, even if you configure the manifest for v2.0. This means the `iss` claim will be `https://sts.windows.net/{tenant-id}/` and the JWKS endpoint will be `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. This is different from the standard v2.0 endpoints (`/v2.0` and `/discovery/v2.0/keys`). You must use the v1.0 endpoints in your `GatewayExtension`.
+> By default, Entra ID issues **v1.0 access tokens** for an API that you expose on your App Registration. A v1.0 token has the `iss` claim `https://sts.windows.net/{tenant-id}/` and an `aud` claim of your Application ID URI, such as `api://{client-id}`. Its signing keys are at `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. These values differ from the v2.0 values (`/v2.0` and `/discovery/v2.0/keys`), so use the v1.0 values in the access token validation flow. To get v2.0 tokens instead, set `requestedAccessTokenVersion` to `2` in the App Registration manifest.
 
 ## Configure Microsoft Entra ID
 
@@ -43,14 +43,8 @@ Kgateway is a server-side confidential client. It holds the client secret and pe
 
    {{< reuse-image src="img/entra-id/entra-create-app.png" >}}
 
-### Configure Authentication and Logout
 
-1. On the App Registration page, go to **Authentication**.
-2. Under **Front-channel logout URL**, enter `https://www.example.com`.
-3. Under **Implicit grant and hybrid flows**, leave both checkboxes unchecked (we use the Authorization Code flow).
-4. Click **Save**.
-
-### Expose an API Scope
+### Expose an API scope
 
 To use the access token validation flow, you must define a custom scope.
 
@@ -58,7 +52,7 @@ To use the access token validation flow, you must define a custom scope.
 2. Click **Set** next to Application ID URI. Accept the default `api://{client-id}` and click **Save**.
 3. Click **Add a scope**:
    * **Scope name**: `access_as_user`
-   * **Who can consent**: Admins and users
+   * **Who can consent**: Admins only
    * **Admin consent display name**: Access kgateway as the user
    * **Admin consent description**: Allows the app to access kgateway on behalf of the signed-in user
    * **State**: Enabled
@@ -66,17 +60,22 @@ To use the access token validation flow, you must define a custom scope.
 
    {{< reuse-image src="img/entra-id/entra-expose-scope.png" >}}
 
-### Copy the Client ID and Client Secret
+5. Go to **API permissions** > **Add a permission** > **My APIs** > **kgateway-app**.
+6. Select **Delegated permissions**, check `access_as_user`, and click **Add permissions**.
+7. Click **Grant admin consent for [Your Tenant]**.
 
-1. Go to **Overview** and copy the **Application (client) ID**.
+### Copy the tenant ID, client ID, and client secret
+
+1. Go to **Overview**. Copy the **Application (client) ID** and the **Directory (tenant) ID**. The flow guides use these values for `YOUR_CLIENT_ID` and `YOUR_TENANT_ID`.
 2. Go to **Certificates & secrets** > **Client secrets**, and click **New client secret**.
-3. Add a description (e.g., `kgateway-secret`) and select an expiry period. Click **Add**.
-4. **Copy the secret value immediately.** It will not be shown again.
+3. Add a description, such as `kgateway-secret`, and select an expiry period. Click **Add**.
+4. **Copy the secret value immediately.**
 
    {{< reuse-image src="img/entra-id/entra-client-credentials.png" >}}
 
+
    > [!NOTE]
-   > The Client Secret is shown only once after creation. If you lose it, you can generate a new one, but generating a new one invalidates any existing tokens.
+   > Entra ID shows the secret value only once, right after you create it. If you lose it, create a new client secret and update the Kubernetes Secret. Then delete the old client secret from the App Registration.
 
 ### Create a test user {#create-test-user}
 
@@ -90,12 +89,15 @@ To use the access token validation flow, you must define a custom scope.
 
    {{< reuse-image src="img/entra-id/entra-create-user.png" >}}
 
-5. Go back to your App Registration > **Enterprise applications** > **kgateway-app** > **Users and groups**.
+5. Go to **Applications** > **Enterprise applications** > **kgateway-app** > **Users and groups**.
 6. Click **Add user/group**, select the test user, and assign them to the app.
 
    {{< reuse-image src="img/entra-id/entra-assign-user.png" >}}
 
-   
+   > [!NOTE]
+   > User assignment only takes effect if **Assignment required?** is set to **Yes** in the Enterprise Application's Properties.
+
+
 ## Connect kgateway to Microsoft Entra ID
 
 Both authentication flows need a network path from the gateway to Entra ID. Create these two resources before configuring either flow.

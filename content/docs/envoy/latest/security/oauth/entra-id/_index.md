@@ -1,4 +1,4 @@
-﻿---
+---
 aliases:
   - /docs/envoy/latest/security/oauth2/entra-id/
 title: Microsoft Entra ID

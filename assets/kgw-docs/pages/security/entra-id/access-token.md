@@ -7,7 +7,7 @@ Complete the [Microsoft Entra ID setup]({{< link-hextra path="/security/oauth/en
 This flow does not need the client secret in a Kubernetes Secret. The gateway does not exchange an authorization code. The flow also works over HTTP because it does not use cookies.
 
 > [!IMPORTANT]
-> **Entra ID uses v1.0 tokens:** Because we configured a custom API scope, Entra ID issues v1.0 tokens. The `issuer` must be `https://sts.windows.net/{tenant-id}/` and the `jwks` URL must be `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. If you use the standard v2.0 endpoints (`/v2.0`), token validation will fail.
+> By default, Entra ID issues **v1.0 access tokens** for an API that you expose on your App Registration. A v1.0 token has the `iss` claim `https://sts.windows.net/{tenant-id}/` and an `aud` claim of your Application ID URI, such as `api://{client-id}`. Its signing keys are at `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. These values differ from the v2.0 values (`/v2.0` and `/discovery/v2.0/keys`), so use the v1.0 values in the access token validation flow. To get v2.0 tokens instead, set `requestedAccessTokenVersion` to `2` in the App Registration manifest.
 
 ## Configure access token validation
 
@@ -40,7 +40,7 @@ Create a `GatewayExtension` to configure token validation. Then create a `Traffi
              - api://YOUR_CLIENT_ID
    EOF
    ```
-
+   
    | **Field** | **Description** |
    | :--- | :--- |
    | `name` | A required, unique name for the provider. |
@@ -51,6 +51,7 @@ Create a `GatewayExtension` to configure token validation. Then create a `Traffi
 
    > [!NOTE]
    > The `validationMode` field is optional and defaults to `Strict`. This mode requires a valid JWT on every request. Set it to `AllowMissing` only if you want requests without a token to pass through. Pair that mode with an authorization policy that restricts those requests.
+
 
 2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the JWT GatewayExtension. Make sure that the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} is in the same namespace as the HTTPRoute that it targets.
 
@@ -118,13 +119,29 @@ Verify the access token validation flow with these steps.
 
 2. Obtain an access token from the Entra ID authorization server.
 
-   The JWT policy validates the signature, issuer, and audience of the token you present. Use the authorization code flow in a browser to log in and copy the value of the `AccessToken` cookie set by the gateway.
+   The JWT policy validates the signature, issuer, and audience of the token that you present. Complete the [authorization code flow]({{< link-hextra path="/security/oauth/entra-id/authorization-code/" >}}) in a browser. Then copy the value of the `AccessToken-<suffix>` cookie that the gateway sets, such as `AccessToken-a1b2c3d4`.
 
    ```sh
    export TOKEN=<access-token-cookie-value>
    ```
 
-3. Send a request with the token in the `Authorization` header.
+3. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`.
+
+   ```sh
+   echo $TOKEN | jq -rR 'split(".")[1] | gsub("-"; "+") | gsub("_"; "/") | @base64d | fromjson | {iss, aud, ver}'
+   ```
+
+   Example output for a v1.0 token:
+
+   ```json
+   {
+     "iss": "https://sts.windows.net/YOUR_TENANT_ID/",
+     "aud": "api://YOUR_CLIENT_ID",
+     "ver": "1.0"
+   }
+   ```
+                        
+4. Send a request with the token in the `Authorization` header.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

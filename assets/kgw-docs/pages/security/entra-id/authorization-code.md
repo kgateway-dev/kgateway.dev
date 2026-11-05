@@ -20,9 +20,6 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
 
 2. Create a GatewayExtension that holds everything the gateway needs to talk to Entra ID.
 
-   > [!IMPORTANT]
-   > **Entra ID uses v1.0 endpoints:** Because we configured a custom API scope, Entra ID issues v1.0 tokens. The `issuerURI` must point to the v1.0 endpoint (`sts.windows.net`), not the standard `/v2.0` path. If you use the v2.0 paths, token validation will fail.
-
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -38,9 +35,9 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
          name: entra-id
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
        issuerURI: https://sts.windows.net/YOUR_TENANT_ID/
-       authorizationEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/authorize
-       tokenEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/token
-       endSessionEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/logout
+       authorizationEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/v2.0/authorize
+       tokenEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/v2.0/token
+       endSessionEndpoint: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/v2.0/logout
        redirectURI: https://www.example.com/oauth2/redirect
        scopes:
          - openid
@@ -53,6 +50,7 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
            name: entra-id-client-secret
    EOF
    ```
+
 
    | **Field** | **Description** |
    | :--- | :--- |
@@ -88,6 +86,8 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
          name: entra-id-oauth2
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
    EOF
+   ```
+
 4. Verify that the policy is attached to the route.
 
    ```sh
@@ -121,7 +121,7 @@ Create the Kubernetes Secret that holds the Entra ID client secret, a `GatewayEx
 
    ```text
    < HTTP/2 302
-   < location: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
+   < location: https://login.microsoftonline.com/YOUR_TENANT_ID/oauth2/v2.0/authorize?client_id=YOUR_CLIENT_ID&...&redirect_uri=https%3A%2F%2Fwww.example.com%2Foauth2%2Fredirect
    < set-cookie: OauthNonce-...;path=/;Max-Age=600;secure;HttpOnly
    ```
 
