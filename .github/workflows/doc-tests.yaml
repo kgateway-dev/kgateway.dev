@@ -19,12 +19,13 @@ name: Doc tests
 # tests for changed files"); the schedule and manual runs run all of them.
 #
 # Jobs: "Select tests" picks the scenarios once and splits the Linux ones into
-# up to 30 shards. "Run doc tests (shard n/N)" runs one shard's scenarios in
-# kind clusters. "Run schema checks" runs the schema scenarios, with no
-# cluster. "Run doc tests (macos)" and "(windows)" run the scenarios a manifest
-# gives `runner: macos` or `runner: windows`, such as the ingress2gateway
-# install pages, with no cluster. "Report results" merges every job's results into the doc-test-results artifact, posts
-# to Slack, and on a PR posts the grey check.
+# shards by version tree and docs section. A shard job, such as "latest ·
+# security 2/4", runs that shard's scenarios in kind clusters. "Run schema
+# checks" runs the schema scenarios, with no cluster. "[macos] <scenarios>"
+# and "[windows] <scenarios>" run the scenarios a manifest gives `runner:
+# macos` or `runner: windows`, such as the ingress2gateway install pages, with
+# no cluster. "Report results" merges every job's results into the
+# doc-test-results artifact, posts to Slack, and on a PR posts the grey check.
 #
 # On a pull request, red means the author has something to fix, and green means
 # they do not. "Run doc tests" is red only when the PR broke a step on a page it
@@ -175,20 +176,38 @@ jobs:
           else
             echo "run=true" >> "$GITHUB_OUTPUT"
           fi
-          # Up to 30 shards, dealt round-robin. A scenario takes about a minute
-          # and a half with its own kind cluster, so the full suite (about 450)
-          # is about 15 a shard, 20 to 25 minutes. One job for all of them
-          # would take more than the 6 hours a hosted job may run. Not more
-          # shards: they share the kgateway-dev org's limit on jobs that run at
-          # once with kgateway's own CI.
-          matrix=$(jq -c --argjson max 30 '
-            [.[] | select(.runner == "linux") | {file, test}] as $linux
-            | ($linux | length | [., $max] | min) as $n
-            | {include: [range($n) as $i | {shard: ($i + 1), of: $n,
-                tests: ([$linux | to_entries[] | select(.key % $n == $i) | .value] | tojson)}]}' <<<"$TESTS")
+          # Shards by version tree and docs section, as in "latest ·
+          # security 2/4", so a red job says where to look without opening it.
+          # A section with more than 15 scenarios is split into even parts. A
+          # scenario takes about a minute and a half with its own kind cluster,
+          # so a shard of 15 takes 20 to 25 minutes. One job for all of them
+          # (about 450) would take more than the 6 hours a hosted job may run.
+          # The full suite makes about 45 shards; "Run doc tests" runs at most
+          # 30 at once (max-parallel), because they share the kgateway-dev
+          # org's limit on jobs that run at once with kgateway's own CI. The
+          # small sections finish in a few minutes, so the queue costs little.
+          matrix=$(jq -c --argjson size 15 '
+            [.[] | select(.runner == "linux") | {file, test}]
+            | group_by(.file | split("/") | [.[3], (.[4] | sub("\\.md$"; ""))])
+            | [.[] | (.[0].file | split("/") | "\(.[3]) · \(.[4] | sub("\\.md$"; ""))") as $label
+                | length as $n
+                | (($n + $size - 1) / $size | floor) as $k
+                | (($n + $k - 1) / $k | floor) as $per
+                | . as $group
+                | range($k) as $j
+                | {name: (if $k > 1 then "\($label) \($j + 1)/\($k)" else $label end),
+                   tests: $group[$j * $per:($j + 1) * $per]}
+                | select(.tests | length > 0)]
+            | length as $total
+            | {include: [to_entries[] | {shard: (.key + 1), of: $total, name: .value.name,
+                tests: (.value.tests | tojson)}]}' <<<"$TESTS")
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           echo "Shards: $(jq '.include | length' <<<"$matrix")"
-          os_matrix=$(jq -c '{include: [map(.runner) | unique[] | select(. != "linux") | {runner: ., os: "\(.)-latest"}]}' <<<"$TESTS")
+          os_matrix=$(jq -c '. as $all
+            | {include: [map(.runner) | unique[] | select(. != "linux") | . as $r
+                | {runner: $r, os: "\($r)-latest",
+                   name: ("[\($r)] " + ([$all[] | select(.runner == $r) | .test | sub("::.*$"; "")] | unique | join(", "))
+                     | if length > 80 then .[:77] + "..." else . end)}]}' <<<"$TESTS")
           echo "Other runners: $os_matrix"
           echo "os_matrix=$os_matrix" >> "$GITHUB_OUTPUT"
           echo "has_os=$(jq '.include | length > 0' <<<"$os_matrix")" >> "$GITHUB_OUTPUT"
@@ -197,7 +216,7 @@ jobs:
   # chose. Each shard runs its scenarios one after another, one kind cluster
   # each, so the suite's time is about the slowest shard's, not the sum.
   run-test:
-    name: Run doc tests (shard ${{ matrix.shard }}/${{ matrix.of }})
+    name: ${{ matrix.name }}
     needs: select
     if: needs.select.outputs.run != 'false'
     runs-on: ubuntu-latest
@@ -209,6 +228,8 @@ jobs:
       actions: read
     strategy:
       fail-fast: false
+      # See "Select tests": the shards share the org's job limit.
+      max-parallel: 30
       matrix: ${{ fromJson(needs.select.outputs.matrix) }}
     steps:
       # persist-credentials: false on both checkouts, so the token is not left
@@ -620,7 +641,7 @@ jobs:
   # the ingress2gateway install pages: no cluster, on that OS's hosted
   # runner. doc_test_run.py runs only the scenarios for the OS it is on.
   run-test-os:
-    name: Run doc tests (${{ matrix.runner }})
+    name: ${{ matrix.name }}
     needs: select
     if: needs.select.outputs.has_os == 'true'
     runs-on: ${{ matrix.os }}
