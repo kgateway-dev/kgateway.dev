@@ -145,7 +145,7 @@ Review other common fault injection configurations.
 
 Throttle the response body data rate to simulate slow or degraded upstream connections.
 
-1. Create a policy that sets a response rate limit of `64` on all requests.
+1. Create a policy that sets a response rate limit of `64` KiB per second on all requests.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
