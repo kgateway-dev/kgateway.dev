@@ -18,8 +18,7 @@
    ```sh
    helm upgrade -i kgateway-crds oci://cr.kgateway.dev/kgateway-dev/charts/kgateway-crds \
    --create-namespace --namespace kgateway-system \
-   --version v{{< reuse "kgw-docs/versions/n-patch.md" >}} \
-   --set controller.image.pullPolicy=Always
+   --version v{{< reuse "kgw-docs/versions/n-patch.md" >}}
    ```
 
 3. Install kgateway by using Helm.
