@@ -484,7 +484,7 @@ jobs:
         with:
           repository: kgateway-dev/kgateway
           path: kgateway-main
-          sparse-checkout: install/helm/kgateway-crds
+          sparse-checkout: install/helm
           persist-credentials: false
 
       - name: Checkout kgateway ${{ steps.latest-tag.outputs.tag }} (CRD schemas for latest)
@@ -493,7 +493,7 @@ jobs:
           repository: kgateway-dev/kgateway
           ref: ${{ steps.latest-tag.outputs.tag }}
           path: kgateway-latest
-          sparse-checkout: install/helm/kgateway-crds
+          sparse-checkout: install/helm
           persist-credentials: false
 
       # The kgateway CRD chart templates some CRDs, so render it rather than
@@ -534,11 +534,22 @@ jobs:
           echo "KUBERNETES_VERSION=${KUBE}.0" >> "$GITHUB_ENV"
           echo "Kubernetes ${KUBE}.0 schemas via kubeconform ${KUBECONFORM_VERSION}."
 
+      # Helm values a page sets (`--set`, `-f values.yaml`) are checked against
+      # the kgateway and kgateway-crds charts at the same two releases as the
+      # CRDs. The charts ship no values.schema.json, so the checker builds one
+      # from each chart's values.yaml and templates; see docs-tests'
+      # doc_test_helm_values.py.
       - name: Run schema checks
         id: schema
         env:
           SELECTED: ${{ steps.pages.outputs.files }}
         run: |
+          helm_args=()
+          for tree in latest main; do
+            for chart in kgateway kgateway-crds; do
+              helm_args+=(--helm-chart "$tree=kgateway-$tree/install/helm/$chart")
+            done
+          done
           file_args=()
           if [ -n "$SELECTED" ]; then
             file_args=(--file)
@@ -549,6 +560,8 @@ jobs:
             --crd-dir main="$RUNNER_TEMP/crds/main" \
             --kubeconform "$RUNNER_TEMP/kubeconform" \
             --kubernetes-version "$KUBERNETES_VERSION" \
+            "${helm_args[@]}" \
+            --helm-overlay docs-tests/products/kgateway/helm-values.yaml \
             --docs-tests-root docs-tests --condition envoy \
             --annotation-report out/annotations/attach-report.json \
             --report-file out/tests/schema/test-results.yaml \
