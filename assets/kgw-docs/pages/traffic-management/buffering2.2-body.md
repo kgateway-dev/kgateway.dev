@@ -18,7 +18,7 @@ When you use the httpbin sample app, keep in mind that httpbin limits the maximu
 
 Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which applies the buffer limit to all routes served by the Gateway. 
 
-1. Create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
+1. Create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the request body to the httpbin sample app. The gateway proxy must buffer the full request body before it can apply the transformation, so the buffer limit applies to the request.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -32,7 +32,7 @@ Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which
        kind: HTTPRoute
        name: httpbin
      transformation:
-       response:
+       request:
          body:
            parseAs: AsString
            value: '{{ body() }}'
@@ -87,14 +87,10 @@ Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which
    * upload completely sent off: 2747 bytes
    < HTTP/1.1 413 Payload Too Large
    HTTP/1.1 413 Payload Too Large
-   < access-control-allow-credentials: true
-   access-control-allow-credentials: true
-   < access-control-allow-origin: *
-   access-control-allow-origin: *
-   < x-envoy-upstream-service-time: 1
-   x-envoy-upstream-service-time: 1
    < content-length: 17
    content-length: 17
+   < content-type: text/plain
+   content-type: text/plain
    < server: envoy
    server: envoy
    ```
@@ -140,7 +136,7 @@ Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which
 
 You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} to control how much data can be buffered per connection at the level of individual routes. This can provide more fine-grained control than applying the buffer limit at the Gateway, or can provide a method of overriding a buffer limit at the level of the Gateway.
 
-1. If you did not already, create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
+1. If you did not already, create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the request body to the httpbin sample app. The gateway proxy must buffer the full request body before it can apply the transformation, so the buffer limit applies to the request.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -154,7 +150,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
        kind: HTTPRoute
        name: httpbin
      transformation:
-       response:
+       request:
          body:
            parseAs: AsString
            value: '{{ body() }}'
