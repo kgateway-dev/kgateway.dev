@@ -208,14 +208,16 @@ You can tune how long the control plane delays each half of a transition with th
 
 Watch the rate of the `reference_ahead_held` transition. A high rate means that your route changes often add clusters that are new to the gateway, and each change waits for the `referenceAhead` time. If these waits delay your route changes more than you can accept, consider setting a lower `referenceAhead` time. A lower time increases the risk of brief 503 errors.
 
+The `referenceAhead` hold is one of several delays that the control plane applies before it publishes configuration to a proxy. A separate time limit ends any delay that lasts too long. For more information, see [Limit xDS publication delays](#xds-publication).
+
 ## Limit xDS publication delays {#xds-publication}
 
-The control plane can delay the configuration for a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay keeps a proxy from receiving routes to clusters that the proxy does not have yet. The control plane delays the configuration in the following cases:
+The settings in this section apply whether or not you enable [xDS scoping](#xds-scoping). The control plane can delay the configuration for a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay keeps a proxy from receiving routes to clusters that the proxy does not have yet. The control plane delays the configuration in the following cases:
 
 * **First configuration**: A gateway proxy connects, such as when a new gateway pod starts.
 * **Route change**: You change a route so that it references a cluster that is not ready yet.
 
-To keep a cluster that never becomes ready from blocking the configuration of a proxy, the control plane limits how long each delay lasts. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to a cluster that is not ready return a `503` response until the cluster becomes ready. These time limits apply in every xDS scoping mode.
+To keep a cluster that never becomes ready from blocking the configuration of a proxy, the control plane limits how long each delay lasts. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to a cluster that is not ready return a `503` response until the cluster becomes ready.
 
 ### Tune the time limits {#xds-publication-settings}
 
