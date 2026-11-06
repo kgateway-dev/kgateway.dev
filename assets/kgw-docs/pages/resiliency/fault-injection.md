@@ -145,7 +145,7 @@ Review other common fault injection configurations.
 
 Throttle the response body data rate to simulate slow or degraded upstream connections.
 
-1. Create a policy that limits the response rate to 64 kbits/s on all requests.
+1. Create a policy that sets a response rate limit of `64` KiB per second on all requests.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -167,20 +167,20 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
 
    | Field | Description |
    |---|---|
-   | `faultInjection.responseRateLimit.kbitsPerSecond` | The maximum response data rate in kilobits per second. Must be at least `1`. |
+   | `faultInjection.responseRateLimit.kbitsPerSecond` | The maximum response data rate. Must be at least `1`. Envoy applies this value in KiB (1,024 bytes) per second, not in kilobits per second. For example, `64` limits the response to 64 KiB, or 65,536 bytes, per second. |
    | `faultInjection.responseRateLimit.percentage` | The percentage of responses to rate limit. Defaults to `100`. |
 
-2. Request a 500 KB response from httpbin with the rate limit and record the time as a baseline.
+2. Request a 100 KiB response, 102,400 bytes, from httpbin with the rate limit and record the time as a baseline. 102,400 bytes is the largest response that the httpbin `/bytes` endpoint returns.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/500000 \
+   time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/102400 \
      -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   time curl -s -o /dev/null localhost:8080/bytes/500000 \
+   time curl -s -o /dev/null localhost:8080/bytes/102400 \
      -H "host: www.example.com"
    ```
    {{% /tab %}}
@@ -188,7 +188,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
 
    Example output:
    ```
-   0.00s user 0.01s system 63% cpu 0.017 total
+   0.00s user 0.01s system 0% cpu 1.581 total
    ```
 
 3. Re-apply the rate limit with a smaller response data rate and repeat the request. Verify that the download is significantly slower than the baseline.
@@ -211,7 +211,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
          kbitsPerSecond: 8
          percentage: 100
    EOF
-   time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/500000 \
+   time curl -s -o /dev/null http://$INGRESS_GW_ADDRESS:8080/bytes/102400 \
      -H "host: www.example.com:8080"
    ```
    {{% /tab %}}
@@ -233,7 +233,7 @@ Throttle the response body data rate to simulate slow or degraded upstream conne
          kbitsPerSecond: 8
          percentage: 100
    EOF
-   time curl -s -o /dev/null localhost:8080/bytes/500000 \
+   time curl -s -o /dev/null localhost:8080/bytes/102400 \
      -H "host: www.example.com"
    ```
    {{% /tab %}}

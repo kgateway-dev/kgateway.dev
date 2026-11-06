@@ -529,7 +529,7 @@ You can remove HTTP headers from a request before the request is forwarded to th
    {{% /tab %}}
    {{< /tabs >}}
 
-{{< version exclude-if="2.3.x,2.2.x,2.1.x,2.0.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 ## Source a header value from a Secret {#header-from-secret}
 
 If the header value is sensitive, such as a backend API key or a tenant credential, you might not want to commit it to a manifest in plain text or send it as part of the request. You can source a request header value from a Kubernetes Secret by replacing `value` with `secretRef` in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource. The gateway proxy resolves the Secret at translation time, so the value never appears in the policy spec. If the Secret changes later, the proxy applies the changes automatically.

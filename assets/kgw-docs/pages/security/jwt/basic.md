@@ -334,7 +334,7 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 #### JWKS fetch timeout {#jwks-timeout}
 
@@ -357,7 +357,7 @@ jwks:
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 ### JWT caching {#jwt-caching}
 
@@ -419,7 +419,7 @@ By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads`
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 ### Clock skew tolerance {#clock-skew}
 
@@ -455,7 +455,7 @@ Use the `validationMode` field to control whether requests without a JWT are all
 
 Requests with valid tokens populate JWT dynamic metadata and any headers that you configure in the `claimsToHeaders` field.
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view the requests that failed the JWT validation. Note that failures are still captured, even if you choose a validation mode that allows through invalid-token requests, such as `AllowMissingOrFailed`.
 {{< /version >}}
 
@@ -505,7 +505,7 @@ spec:
 EOF
 ```
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 #### AllowMissingOrFailed {#allow-missing-or-failed}
 
@@ -593,7 +593,7 @@ curl -vik localhost:8080/headers \
 Example output:
 
 ```
-< HTTP/1.1 401 Unauthorized
+< HTTP/1.1 403 Forbidden
 Audiences in Jwt are not allowed
 ```
 

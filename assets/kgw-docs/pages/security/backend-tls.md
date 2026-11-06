@@ -1,6 +1,6 @@
 Originate a one-way TLS connection from the Gateway to a backend. 
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
@@ -21,10 +21,10 @@ In this guide, you learn how to use the BackendTLSPolicy and BackendConfigPolicy
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 {{< /version >}}
 
@@ -146,7 +146,7 @@ Create a TLS policy for the NGINX workload. You can use the Gateway API BackendT
    kubectl apply -f https://raw.githubusercontent.com/kgateway-dev/kgateway/refs/heads/main/test/e2e/features/backendtls/testdata/configmap.yaml
    ```
 
-2. Create the TLS policy.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+2. Create the TLS policy.{{< version include-if="2.1.x,2.2.x,2.3.x" >}} Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f - <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -303,7 +303,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
-   {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
+   {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -395,7 +395,7 @@ Set up a Backend resource that represents your external service. Then, use a Bac
    ```
 
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 ## Other configurations {#other}
 
 Review other configurations.
@@ -406,7 +406,7 @@ Restrict the TLS settings that the gateway proxy uses when it originates the ups
 
 Set the parameters in the same policy that you created for the TLS connection in this guide. When a backend has both a BackendTLSPolicy and a BackendConfigPolicy, the BackendTLSPolicy takes precedence for TLS and the BackendConfigPolicy TLS settings are ignored.
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The following table compares what each policy supports for TLS settings.
 
 | Capability | BackendTLSPolicy | BackendConfigPolicy |
@@ -414,11 +414,9 @@ The following table compares what each policy supports for TLS settings.
 | ECDH curves, cipher suites, TLS version range, signature algorithms, and ALPN protocols | Supported through `spec.options` | Supported through `tls.parameters` and `tls.alpnProtocols` |
 | Certificate hash verification | Supported through `kgateway.dev/verify-certificate-hash` | Not supported |
 | Additional Subject Alternative Name verification | Not supported. The `kgateway.dev/verify-subject-alt-names` option is rejected because `spec.validation.hostname` already sets the required check. | Supported through `tls.verifySubjectAltNames` |
-| SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` |
-{{< /version >}}
+| SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` </br></br> The `tls.files` paths must exist in the gateway proxy container, not in the control plane container. |
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
-When you use `tls.files`, the file paths must exist in the gateway proxy container. The control plane accepts these paths in both `standard` and `strict` validation modes. Envoy reports missing files, invalid file contents, or certificate and key mismatches when the proxy loads the configuration.
+
 {{< /version >}}
 
 The following examples update the `nginx-tls-policy` that you created earlier. The values in the examples are illustrative. Adjust them to match what your backend supports.
@@ -427,7 +425,7 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 {{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< tabs >}}
 {{% tab name="BackendConfigPolicy" %}}
 
@@ -517,7 +515,7 @@ For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< 
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendconfigpolicy,secret,httproute -l app=nginx
    ```
 {{% /tab %}}
 {{% tab name="BackendTLSPolicy" %}}
@@ -530,7 +528,7 @@ For more information about the `appProtocol` setting, see [HTTP/2 upstream]({{< 
 2. Delete the routing resources that you created for the NGINX server.
    
    ```sh
-   kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -A -l app=nginx
+   kubectl -n kgateway-base delete backendtlspolicy,configmap,httproute -l app=nginx
    kubectl delete configmap ca -n kgateway-base --ignore-not-found
    ```
 

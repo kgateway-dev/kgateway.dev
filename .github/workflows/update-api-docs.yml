@@ -4,7 +4,7 @@ on:
   workflow_dispatch:  # Allow manual triggers
     inputs:
       version:
-        description: 'Version to generate docs for (e.g., "2.2.x", "2.1.x", "2.0.x") or "all" for all versions'
+        description: 'Version to generate docs for (e.g., "2.5.x", "2.4.x", "2.3.x") or "all" for all versions'
         required: true
         default: 'all'
         type: string
@@ -127,7 +127,7 @@ jobs:
             - Control plane metrics documentation
             - Each version uses the latest corresponding tag from the kgateway repository
 
-            **File locations:** `{LINK_VERSION}` is the URL path segment (`main`, `latest`, `2.3.x`), `{VERSION}` is the version family (`2.5.x`, `2.4.x`).
+            **File locations:** `{LINK_VERSION}` is the URL path segment (`main`, `latest`, `2.4.x`), `{VERSION}` is the version family (`2.6.x`, `2.5.x`).
             - API docs: `content/docs/envoy/{LINK_VERSION}/reference/api.md`
             - Helm docs: `assets/kgw-docs/pages/reference/helm/{VERSION}/` (included in content pages via `reuse` shortcode)
             - Metrics docs: `assets/kgw-docs/snippets/{LINK_VERSION}/metrics-control-plane.md`

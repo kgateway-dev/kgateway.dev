@@ -26,7 +26,7 @@ When using the development build {{< reuse "kgw-docs/versions/patch-dev.md" >}},
 
 ### Experimental Gateway API features {#experimental-gateway-api-features}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features such as the following:
 
 - TCPRoutes
@@ -36,7 +36,7 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 - Retries
 - Session persistence
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support for experimental Gateway API features and API versions, such as the following:
 
 - Session persistence in HTTPRoutes, which is deprecated in favor of session persistence in a BackendConfigPolicy
@@ -46,13 +46,13 @@ The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` feature gate controls support
 Features that are in the standard channel of the Gateway API, such as ListenerSets, TCPRoutes, CORS policies, and retries, work when the gate is disabled. Retries are in the standard channel in Gateway API version 1.7 and later.
 {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
+{{< version include-if="2.1.x" >}}This setting defaults to `false` and must be explicitly enabled. To enable these features, set the environment variable in your kgateway controller deployment in your Helm values file.
 
 ```yaml
 controller:
   extraEnv:
     KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES: "true"
-```{{< /version >}}{{< version exclude-if="2.0.x,2.1.x" >}}In kgateway version 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable these features, set the environment variable to `false` in your kgateway controller deployment in your Helm values file.
+```{{< /version >}}{{< version exclude-if="2.1.x" >}}In kgateway version 2.2 and later, this setting defaults to `true`, so experimental features are enabled by default and no additional configuration is required. To disable these features, set the environment variable to `false` in your kgateway controller deployment in your Helm values file.
 
 ```yaml
 controller:
@@ -72,7 +72,7 @@ controller:
     KGW_DISABLE_LEADER_ELECTION: "true"
 ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Leader election timings {#leader-election-timings}
 
 On clusters with a slow or temporarily unavailable Kubernetes API server, the controller can fail to renew its lease in time. The controller then repeatedly loses and re-acquires leadership. To make the controller more tolerant of a slow API server, increase the leader election timings through the `controller.leaderElection` Helm values.
@@ -128,7 +128,7 @@ discoveryNamespaceSelectors:
 ```
 
 {{< conditional-text include-if="envoy" >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Scope xDS configuration per gateway {#xds-scoping}
 
 > [!WARNING]
@@ -203,10 +203,82 @@ You can tune how long the control plane delays each half of a transition with th
 
 | Helm value | Environment variable | Description | Default |
 | -- | -- | -- | -- |
-| `referenceAhead` | `KGW_XDS_SCOPING_REFERENCE_AHEAD` | How long the control plane holds routes, listeners, and secrets that name a cluster that is new to a proxy, so that the cluster reaches the proxy first. The metric counts each hold as `reference_ahead_held`. | `2s` |
+| `referenceAhead` | `KGW_XDS_SCOPING_REFERENCE_AHEAD` | How long the control plane holds routes, listeners, and secrets that name a cluster that is new to a proxy, so that the cluster reaches the proxy first. The metric counts each hold as `reference_ahead_held`. A hold also ends when the `KGW_PER_CLIENT_PUBLISH_BUDGET` time expires. For more information, see [Limit xDS publication delays](#xds-publication). | `2s` |
 | `dereferenceGrace` | `KGW_XDS_SCOPING_DEREFERENCE_GRACE` | How long a cluster stays published after the control plane sends the route update that stops naming it, so that the update reaches the proxy first. The cluster of a deleted backend is removed at once. The metric counts a kept cluster as `dereference_graced`, and the removal of the cluster afterward as `dereference_pruned`. | `5s` |
 
 Watch the rate of the `reference_ahead_held` transition. A high rate means that your route changes often add clusters that are new to the gateway, and each change waits for the `referenceAhead` time. If these waits delay your route changes more than you can accept, consider setting a lower `referenceAhead` time. A lower time increases the risk of brief 503 errors.
+
+The `referenceAhead` hold is one of several delays that the control plane applies before it publishes configuration to a proxy. A separate time limit ends any delay that lasts too long. For more information, see [Limit xDS publication delays](#xds-publication).
+
+## Limit xDS publication delays {#xds-publication}
+
+The settings in this section apply whether or not you enable [xDS scoping](#xds-scoping). The control plane can delay sending configuration to a gateway proxy until the clusters that the configuration references are ready. A cluster is ready when the control plane has translated the cluster and its endpoints. The delay matters because the control plane can translate a route before it translates the cluster that the route points to. If the proxy received the route first, requests on that route would fail with a `503` response until the cluster arrived.
+
+The control plane delays configuration in the following cases:
+
+* **First configuration**: A gateway proxy connects to the control plane and requests its configuration for the first time, such as when a new gateway pod starts. The control plane waits so that the proxy starts with routes that work.
+* **Route change**: You change a route so that it references a cluster that is not ready yet. The proxy keeps its current routes until the cluster is ready, while the new cluster and its endpoints still reach the proxy.
+
+A cluster might never become ready, for example if a route references a Service that does not exist. To keep that cluster from blocking the proxy, the control plane limits how long each delay lasts. When the time limit expires, the control plane publishes the latest configuration. Requests on routes to the missing cluster return a `503` response until the cluster becomes ready.
+
+### Tune the time limits {#xds-publication-settings}
+
+You can tune the time limits with environment variables on the control plane. The control plane reads the variables at startup.
+
+1. Set the environment variables in the `controller.extraEnv` section of your Helm values file. The following example sets a longer time limit for the first configuration of a proxy.
+   ```yaml
+   controller:
+     extraEnv:
+       KGW_PER_CLIENT_PUBLISH_BUDGET: "20s"
+   ```
+
+   | Environment variable | Description | Default |
+   | -- | -- | -- |
+   | `KGW_PER_CLIENT_PUBLISH_BUDGET` | How long the control plane delays the first configuration of a proxy, or a route change, while referenced clusters are not ready. Keep this value well below the startup probe time of the gateway proxy, which is 60 seconds by default. You can change the probe in the `spec.kube.podTemplate.startupProbe` field of the GatewayParameters resource. This value is not the total time until the proxy is ready. The total time also includes translation, the first connection delay that the `KGW_XDS_FIRST_CONNECT_DELAY` variable sets, and delivery to the proxy. If the first configuration arrives after the probe time, the proxy restarts. Set `0` to remove the time limit, so that the control plane delays the configuration until all referenced clusters are ready. With `0`, a new proxy that references a cluster that never becomes ready never receives configuration and never becomes ready. | `15s` |
+   | `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` | How long the control plane continues to delay the configuration of a proxy that reconnects with configuration that it already has, such as after the control plane restarts, while referenced clusters are missing. This time starts after the `KGW_PER_CLIENT_PUBLISH_BUDGET` time expires. While the control plane delays the configuration, the proxy receives no updates at all, including certificate rotations. The value also limits how long the control plane keeps sending the last configuration of a cluster that is missing. Keep this value well above the time that the control plane needs to translate all resources after a restart. If the value is too low, routes fail each time the control plane restarts. Set `0` to remove the time limit. This setting has no effect if `KGW_PER_CLIENT_PUBLISH_BUDGET` is `0`. | `10m` |
+
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file. The `--reuse-values` setting re-applies any Helm values that you previously set.
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
+     --reuse-values \
+     -f values.yaml
+   ```
+
+3. Verify that the control plane runs with the new value. The upgrade restarts the control plane, so wait for the rollout to finish first. The command prints the value of the variable that you set, such as `20s`.
+   ```sh
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} rollout status deployment/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}
+   kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_PER_CLIENT_PUBLISH_BUDGET")].value}'
+   ```
+
+### Monitor xDS publication {#xds-publication-metrics}
+
+The control plane reports the following metrics so that you can monitor xDS publication in your cluster.
+
+| Metric | Description |
+| -- | -- |
+| `kgateway_xds_snapshot_perclient_defers_total` (Counter) | The number of times that the control plane built configuration for a proxy while a referenced cluster was not ready. The `reason` label is `missing_clusters` or `missing_endpoints`. |
+| `kgateway_xds_snapshot_perclient_withheld_clients` (Gauge) | The number of proxy groups where the first configuration is delayed. The `state` label is `within_budget` while the `KGW_PER_CLIENT_PUBLISH_BUDGET` time runs, and `warm_withheld` while the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time runs. The control plane reports no value for a state that has no delayed proxy groups, so the metric is missing when no configuration is delayed. |
+| `kgateway_xds_snapshot_perclient_bounded_publishes_total` (Counter) | The number of times that the control plane published configuration because a time limit expired before all referenced clusters were ready. The `mode` label shows which delay ended: <ul><li>`first_publish`: The first configuration of a proxy.</li><li>`warm_truth`: The first configuration of a proxy that reconnected, when only the endpoints of referenced clusters were missing.</li><li>`warm_release`: The configuration of a proxy that reconnected, after the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time expired. Routes to the missing clusters fail until the clusters appear.</li><li>`flip_release`: A route change to a cluster that is not ready.</li><li>`carry_expired`: The control plane stopped sending the last configuration of a missing cluster after the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time expired. Routes to the cluster fail until the cluster appears.</li><li>`reference_ahead`: A hold for a cluster that is new to the proxy, in the `REFERENCED` scoping mode. For more information, see [Tune cluster transitions](#xds-scoping-transitions).</li></ul> |
+
+A rising `kgateway_xds_snapshot_perclient_bounded_publishes_total` value means that routes reference clusters that do not become ready in time. To find these clusters, check the control plane logs for warnings such as `first-publish budget expired`. The warnings list the missing clusters.
+
+To check the metrics, query the metrics endpoint of the control plane.
+
+```sh
+kubectl get --raw \
+  "/api/v1/namespaces/{{< reuse "kgw-docs/snippets/namespace.md" >}}/services/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}:9092/proxy/metrics" \
+  | grep kgateway_xds_snapshot_perclient
+```
+
+Example output after the control plane restarts:
+```console
+kgateway_xds_snapshot_perclient_defers_total{gateway="http",namespace="demo",reason="missing_endpoints"} 1
+```
+
+In this example, the control plane delayed the configuration of the `http` gateway once after the restart, until the control plane translated the endpoints of a referenced cluster. The control plane reports each metric only after the event that the metric counts happens for the first time. If the command returns no output, the control plane did not delay any configuration.
 
 {{< /version >}}
 
@@ -226,7 +298,7 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 | Mode | Behavior |
 | --- | --- |
 | `standard` (default) | The control plane translates all valid resources and replaces invalid routes with a direct response (typically `HTTP 500`). Valid routes that are unrelated to the invalid resource are unaffected. </br></br>The control plane does not run Envoy in this mode, so configuration that only Envoy can detect as invalid, such as an invalid RE2 regular expression in a route matcher, is still sent to the proxies. Envoy rejects (NACKs) that update and keeps serving the last route configuration that it accepted, so later route changes on the same listener are not applied until you fix the error. The routes keep reporting that they are accepted and programmed, so the resource statuses do not show the problem. To find out when Envoy rejects an update, [monitor NACKs]({{< link-hextra path="/observability/control-plane-metrics/#monitor-nacks" >}}). |
-| `strict` | In addition to the `standard` checks, the control plane validates the generated configuration with Envoy before it sends the configuration to the proxies. Instead of sending invalid configuration, the control plane removes or replaces only the invalid parts, so that Envoy does not NACK the update and valid changes continue to be applied. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The `tls.files` paths in BackendConfigPolicy are an exception because the files exist in the gateway proxy container, not the control plane container. Envoy reports missing files, invalid file contents, or certificate and key mismatches when the proxy loads the configuration. {{< /version >}} For more information, see [How strict mode handles invalid configuration](#strict-invalid-configuration). |
+| `strict` | In addition to the `standard` checks, the control plane validates the generated configuration with Envoy before it sends the configuration to the proxies. Instead of sending invalid configuration, the control plane removes or replaces only the invalid parts, so that Envoy does not NACK the update and valid changes continue to be applied. For more information, see [How strict mode handles invalid configuration](#strict-invalid-configuration). |
 
 > [!NOTE]
 > The `standard` mode is the default resource validation mode and is appropriate for most production environments. Use `strict` mode when you cannot tolerate that a NACKed xDS update reaches the data plane. For example, use `strict` mode when one team's invalid route must not block configuration updates for other routes on the same listener. In exchange, the invalid route itself returns errors until you fix it, instead of continuing to serve its previous configuration. For more information, see [Invalid configuration handling in strict mode](#strict-invalid-configuration).
@@ -237,8 +309,8 @@ Strict mode does not keep a previous version of a route when an update to the ro
 
 | Invalid configuration | Result | Status |
 | --- | --- | --- |
-| A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
-| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+| A route matcher, such as an invalid RE2 regular expression in a path, header, or query parameter match | The control plane removes the route rule. Requests that the rule matched are handled by the remaining routes, or receive an `HTTP 404` response if no other route matches. | {{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleDropped` on the route |
+| Any other part of a route rule, such as a filter or policy setting that Envoy rejects | The control plane replaces the route rule with a direct `HTTP 500` response. | {{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}`kgateway.dev/Programmed=False`{{< /version >}}{{< version include-if="2.1.x,2.2.x,2.3.x" >}}`Accepted=False`{{< /version >}} with reason `RouteRuleReplaced` on the route. If a policy setting fails validation, the policy resource also reports `Accepted=False` with reason `Invalid` and a message that describes the error. |{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 | A virtual host that is still invalid after the control plane removes or replaces its invalid route rules | The control plane replaces all routes for the virtual host's domains with a direct `HTTP 500` response. | `Accepted=False` with reason `ListenerReplaced` on the listener |{{< /version >}}
 
 For example, suppose that `route-a` and `route-b` are attached to the same listener, and you update `route-b` with an invalid regular expression in a path match. In `strict` mode, `route-a` continues to serve traffic, the invalid rule of `route-b` is removed so that its requests receive an `HTTP 404` response, and `route-b` reports the `RouteRuleDropped` reason. In `standard` mode, the invalid regular expression is sent to Envoy, which rejects the update. Both routes keep their previous configuration on the proxies that already accepted it, but no further route changes on that listener take effect until you fix `route-b`.
@@ -271,7 +343,7 @@ Strict validation runs the preflight against an Envoy binary that is bundled in 
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x,2.0.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Tune the controller Go memory limit {#controller-memory-limit}
 
 By default, the Go runtime that the kgateway controller runs on does not know how much memory Kubernetes allows its container to use. The controller's garbage collector just runs on its own schedule, so the controller can keep allocating memory right up to the container's limit. When it crosses that limit, the Linux kernel kills the container immediately, with no warning and no chance for the controller to free memory first. This event appears as a Kubernetes pod restart, often labeled `OOMKilled`.
@@ -294,7 +366,7 @@ controller:
 If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
 {{< /version >}}
 
-{{< version exclude-if="2.2.x,2.1.x">}}
+{{< version exclude-if="2.1.x,2.2.x">}}
 
 ## ReferenceGrant enforcement modes
 
@@ -321,10 +393,10 @@ The following table shows which cross-namespace references are checked in each m
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
-| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
+| GatewayExtension | `spec.oauth2.backendRef`{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} / <br>`spec.oauth2.jwt.jwksBackendRef`{{< /version >}} | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.jwt.providers[].jwks.remote.backendRef` | Service / Backend | checked | checked | allowed |
 | ListenerPolicy | `spec.default.httpSettings.accessLog[].grpcService.backendRef` / <br>`spec.default.httpSettings.accessLog[].openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
-| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
+| ListenerPolicy | `spec.default.httpSettings.tracing.provider.openTelemetry.grpcService.backendRef` | Service / Backend | checked | checked | allowed |{{% version exclude-if="2.1.x,2.2.x,2.3.x" %}}
 | ListenerPolicy | `spec.default.httpSettings.localReplies.mappers[].headers.set[].secretRef` / <br>`spec.default.httpSettings.localReplies.mappers[].headers.add[].secretRef` | Secret | checked | checked | allowed |
 | {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.headerModifiers.request.set[].secretRef` / <br>`spec.headerModifiers.request.add[].secretRef` / <br>`spec.headerModifiers.response.set[].secretRef` / <br>`spec.headerModifiers.response.add[].secretRef` | Secret | checked | checked | allowed |{{% /version %}}
 | {{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}{{% downstream %}}*{{% /downstream %}} | `spec.basicAuth.secretRef` / <br>`spec.apiKeyAuth.secretRef` / <br>`spec.apiKeyAuth.secretSelector` | Secret | checked | checked | allowed |
@@ -428,20 +500,68 @@ If a policy reports `missing reference grant`, check the following settings of y
 
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ## Disable automatic RBAC creation {#disable-rbac}
 
 By default, the {{< reuse "kgw-docs/snippets/kgateway.md" >}} Helm chart creates a `ClusterRole` and `ClusterRoleBinding` that grant the controller's service account the permissions it needs to watch and manage Kubernetes resources. In environments where RBAC resources are managed externally, such as by a platform or security team that controls all cluster-scoped permissions, you can disable the creation of these resources by setting `rbac.create: false`.
 
+The `rbac.create` setting does not affect the ServiceAccount of the controller. The chart still creates the ServiceAccount, so that you can bind your own permissions to it. To skip the ServiceAccount too, set `serviceAccount.create: false`.
+
 > [!CAUTION]
 > If you disable the creation of ClusterRole and ClusterRoleBinding resources, you must create equivalent resources yourself before or alongside the {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation. Without these resources, the controller cannot watch and manage Gateways, HTTPRoutes, Secrets, or other resources. 
 
-To skip RBAC resource creation, set `rbac.create: false` in your Helm values:
+To disable automatic RBAC creation, create the permissions yourself, and then turn off the chart's RBAC resources.
 
-```yaml
-rbac:
-  create: false
-```
+1. Render the ClusterRole and ClusterRoleBinding that the Helm chart creates by default. Use the output as the starting point for your own resources. The ClusterRole is in the `role.yaml` template, and the ClusterRoleBinding is in the `serviceaccount.yaml` template. The output also includes the ServiceAccount of the controller.
+
+   ```sh
+   helm template {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "kgw-docs/snippets/helm-template-license-flag.md" >}} \
+     --show-only templates/role.yaml \
+     --show-only templates/serviceaccount.yaml {{< reuse "kgw-docs/snippets/helm-template-extra-templates.md" >}} > rbac.yaml
+   ```
+
+2. Open the `rbac.yaml` file and review the rules of the ClusterRole. Then remove the ServiceAccount resource from the file. This is the YAML document with `apiVersion: v1` and `kind: ServiceAccount`. The chart still creates the ServiceAccount, and a ServiceAccount that you create yourself with the same name conflicts with it. Keep the `serviceaccounts` rule in the ClusterRole and the ServiceAccount in the `subjects` of the ClusterRoleBinding.
+
+3. If you upgrade an existing installation, change the names of the ClusterRole and ClusterRoleBinding resources in the file, and update the `roleRef` of each ClusterRoleBinding to use the new ClusterRole name. The upgrade in step 6 removes the ClusterRole and ClusterRoleBinding resources that the chart created earlier. It also removes any resource that has the same name as one of them.
+
+4. Create the resources in your cluster.
+
+   ```sh
+   kubectl apply -f rbac.yaml
+   ```
+
+5. Add the `rbac.create` setting to your Helm values file.
+
+   ```yaml
+   rbac:
+     create: false
+   ```
+
+6. Install or upgrade the Helm release with the values file.
+
+   ```sh
+   helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     -f values.yaml
+   ```
+
+7. Verify that the Helm release no longer includes a ClusterRole or ClusterRoleBinding. The command returns no output.
+
+   ```sh
+   helm get manifest {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} | grep -E "^kind: (ClusterRole|ClusterRoleBinding)$"
+   ```
+
+8. Verify that the control plane is running.
+
+   ```sh
+   kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
+{{< reuse "kgw-docs/snippets/rbac-additional-components.md" >}}
 
 {{< /version >}}

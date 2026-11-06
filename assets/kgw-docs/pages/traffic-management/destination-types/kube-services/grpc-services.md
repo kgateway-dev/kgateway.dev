@@ -117,7 +117,7 @@ Steps to set up the sample gRPC service:
 
 ## Set up the Gateway for gRPC routes {#gateway}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version exclude-if="2.1.x,2.2.x" >}}
 Create an HTTPS listener so that the gateway can route gRPC traffic. In version 2.3 and later, GRPCRoute can be attached either to HTTPS listeners for TLS termination, or to HTTP listeners. For more information about the following steps, see the [HTTPS listener guide](../../../../setup/listeners/https/).
 
 1. Create a TLS certificate for testing.
@@ -172,7 +172,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. In version 
    | `tls.mode: Terminate` | Terminate TLS at the gateway. |
    {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version include-if="2.1.x,2.2.x" >}}
 Create an HTTP listener so that the gateway can route gRPC traffic. For more information, see the [HTTP listener guide](../../../../setup/listeners/http/). Note that GRPCRoutes can be attached to HTTPS listeners for TLS termination only in version 2.3 and later.
 
 1. Create a Gateway resource with an HTTP listener.
@@ -252,7 +252,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
      parentRefs:
      - name: grpc-gateway
        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-       sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
+       sectionName: {{< version exclude-if="2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.1.x,2.2.x" >}}http{{< /version >}}
      hostnames:
      - "grpc.example.com"
      rules:
@@ -299,7 +299,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
          kind: Gateway
          name: grpc-gateway
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-         sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
+         sectionName: {{< version exclude-if="2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.1.x,2.2.x" >}}http{{< /version >}}
    ```
 
 ## Verify the gRPC route {#verify-grpcroute}
@@ -308,7 +308,7 @@ Verify that the gRPC route to the echo service is working.
 
 1. Get the external address of the gateway and save it in an environment variable.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -324,7 +324,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -342,7 +342,7 @@ Verify that the gRPC route to the echo service is working.
 
 2. Explore the API dynamically.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -359,7 +359,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -390,7 +390,7 @@ Verify that the gRPC route to the echo service is working.
 
 3. Send a gRPC request to test the route.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -411,7 +411,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash

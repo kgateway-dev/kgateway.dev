@@ -40,7 +40,7 @@ _Appears in:_
 | `forwardCredential` _boolean_ | forwardCredential controls whether the API key is included in the request sent to the upstream.<br />If false (default), the API key is removed from the request before sending to upstream.<br />If true, the API key is included in the request sent to upstream.<br />This applies to all configured key sources (header, query parameter, or cookie). |  |  |
 | `clientIdHeader` _string_ | clientIdHeader specifies the header name to forward the authenticated client identifier.<br />If not specified, the client identifier will not be forwarded in any header.<br />Example: "x-client-id" |  |  |
 | `secretRef` _[SecretObjectReference](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#secretobjectreference)_ | secretRef references a Kubernetes secret storing a set of API Keys. If there are many keys, 'secretSelector' can be<br />used instead.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
-| `secretSelector` _[LabelSelector](#labelselector)_ | secretSelector selects multiple secrets containing API Keys. If the same key is defined in multiple secrets, the<br />behavior is undefined.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
+| `secretSelector` _[LabelSelector](#labelselector)_ | secretSelector selects multiple secrets containing API Keys.<br /><br />Each API key value must identify one client. Envoy rejects a configuration that contains the same<br />key value twice, so kgateway handles duplicates before it sends the configuration:<br />  - If the same entry name and key value appear in more than one selected secret, for example<br />    because you copied a secret to another namespace, kgateway uses the credential once.<br />  - If two different entry names share a key value, kgateway cannot tell which client the key<br />    identifies. The policy reports Accepted=False with the reason Invalid, and the status<br />    message names both entries and their secrets but not the key value. The routes that the<br />    policy applies to return a 500 response.<br /><br />Each entry in the Secret represents one API Key. The key is an arbitrary identifier.<br />The value is a string, representing the API Key.<br /><br />Example:<br /><br />apiVersion: v1<br />kind: Secret<br />metadata:<br />  name: api-key<br />stringData:<br />  client1: "k-123"<br />  client2: "k-456" |  |  |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the API key authentication filter.<br />Can be used to disable API key authentication policies applied at a higher level in the config hierarchy. |  |  |
 
 
@@ -110,7 +110,7 @@ _Appears in:_
 _Underlying type:_ _struct_
 
 AccessLogFilter represents the top-level filter structure.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-accesslogfilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-accesslogfilter
 
 _Validation:_
 - MaxProperties: 1
@@ -327,7 +327,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
+| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. A value of 0 also uses 80. | 80 |  |
 | `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
 | `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
 
@@ -448,7 +448,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target references to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
-| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  | MaxLength: 32 <br />Type: string <br /> |
+| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
 | `dns` _[DNS](#dns)_ | DNS contains DNS configuration. Note that this only applies to backends that resolve to Envoy DNS clusters, i.e.,<br />Backends of type Static, AWS, or GCP. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | Soft limit on the size of the cluster's connections read and write buffers.<br />If unspecified, an implementation-defined default is applied (1MiB). |  | Minimum: 0 <br /> |
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
@@ -536,7 +536,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. |  | MaxLength: 32 <br />Type: string <br /> |
+| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The base interval to be used for the next back off computation. Must be at least 1ms and less than or equal to max_interval. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |  | MaxLength: 32 <br />Type: string <br /> |
 
 
@@ -628,7 +628,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `match` _string_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true.<br />see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto |  |  |
+| `match` _string_ | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true.<br />see: https://www.envoyproxy.io/docs/envoy/latest/xds/type/v3/cel.proto#common-expression-language-cel-proto |  |  |
 
 
 #### CSRFPolicy
@@ -749,7 +749,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxConnectionDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxConnectionDuration is the maximum duration of a connection, measured from<br />when the connection was established. When this duration is reached, Envoy starts<br />the drain sequence. If unset, there is no maximum connection duration.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-connection-duration |  | MaxLength: 32 <br />Type: string <br /> |
-| `maxHeadersCount` _integer_ | Specifies the maximum number of response headers that the upstream connection will accept<br />from the backend. If not specified, the default of 100 is used.<br />To configure the maximum number of headers accepted in downstream requests, use<br />ListenerPolicy.spec.default.httpSettings.maxHeadersCount. |  | Minimum: 0 <br /> |
+| `maxHeadersCount` _integer_ | Specifies the maximum number of response headers that the upstream connection will accept<br />from the backend. Must be at least 1. If not specified, the default of 100 is used.<br />To configure the maximum number of headers accepted in downstream requests, use<br />ListenerPolicy.spec.default.httpSettings.maxHeadersCount. |  | Minimum: 1 <br /> |
 | `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  | Minimum: 0 <br /> |
 
@@ -759,7 +759,7 @@ _Appears in:_
 
 
 ComparisonFilter represents a filter based on a comparison.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-comparisonfilter
 
 
 
@@ -955,7 +955,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `refreshRate` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RefreshRate controls how frequently Envoy polls DNS for this backend's hostnames.<br /><br />Minimum value is 1ms. If unset, Envoy's default of 5s is used.<br />When Envoy respects DNS TTLs, lower TTL values effectively override this setting,<br />so RefreshRate acts as the maximum polling interval.<br />Recommended value for large-scale deployments is 60s or higher. |  | MaxLength: 32 <br />Type: string <br /> |
+| `refreshRate` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RefreshRate controls how frequently Envoy polls DNS for this backend's hostnames.<br /><br />Must be greater than 1ms. If unset, Envoy's default of 5s is used.<br />When Envoy respects DNS TTLs, lower TTL values effectively override this setting,<br />so RefreshRate acts as the maximum polling interval.<br />Recommended value for large-scale deployments is 60s or higher. |  | MaxLength: 32 <br />Type: string <br /> |
 | `jitter` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Jitter adds a random delay of up to this duration before each DNS refresh,<br />spreading query load over time and helping prevent thundering-herd spikes.<br />Must be less than or equal to refreshRate when both are set. |  | MaxLength: 32 <br />Type: string <br /> |
 | `respectTTL` _boolean_ | RespectTTL instructs Envoy to honor TTL values returned by DNS responses.<br />When enabled, TTLs lower than RefreshRate effectively become the refresh interval. |  |  |
 | `lookupFamily` _[DnsLookupFamily](#dnslookupfamily)_ | LookupFamily selects the address families used to resolve this backend's<br />hostnames. It applies only to backends resolved through DNS, such as a<br />Backend with a hostname, and has no effect on Kubernetes Services. When<br />omitted, KGW_DNS_LOOKUP_FAMILY applies; its default, V4_PREFERRED, is<br />equivalent to IPv4Preferred.<br /><br />For backends reached through DNS64/NAT64 without IPv4 egress, use IPv6Only<br />or IPv6Preferred so Envoy can use synthesized AAAA records. IPv4Preferred<br />selects IPv4 addresses when available, even if those addresses are<br />unreachable, so a cluster that reaches all IPv4 destinations this way should<br />change KGW_DNS_LOOKUP_FAMILY rather than override each backend.<br /><br />Amazon EKS IPv6 clusters using the Amazon VPC CNI provide IPv4 egress<br />through a host-local IPv4 address and node SNAT, so the default reaches<br />IPv4-only backends without an override.<br /><br />IPv6Preferred and IPv4Preferred fall back only when DNS returns no addresses<br />for the preferred family, not when a connection fails. All returns both<br />families, and for most backends each address becomes a separate endpoint,<br />so requests sent to an unreachable family fail rather than fall back.<br /><br />Note: This feature is experimental and subject to breaking changes in future releases. |  | Enum: [IPv4Preferred IPv4Only IPv6Only IPv6Preferred All] <br /> |
@@ -1061,7 +1061,7 @@ _Appears in:_
 _Underlying type:_ _[ComparisonFilter](#comparisonfilter)_
 
 DurationFilter filters based on request duration.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-durationfilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-durationfilter
 
 
 
@@ -1160,7 +1160,7 @@ _Appears in:_
 | `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 | `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
 | `enableReadinessProbeProxyProtocol` _boolean_ | EnableReadinessProbeProxyProtocol enables the PROXY protocol listener filter<br />on the kgateway readiness listener (port 8082).<br />Set this to true if and only if the load balancer in front of the gateway<br />prepends PROXY protocol headers to incoming TCP connections targeting the<br />readiness port. For example, when using an AWS NLB with proxy protocol v2<br />enabled at the target group level<br />(`service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"`).<br />Defaults to false. |  |  |
-| `maxDownstreamConnections` _integer_ | MaxDownstreamConnections caps active downstream connections across all listeners. Unset by default (no limit).<br />This is bootstrap configuration, so changing it restarts the proxy. |  | Minimum: 1 <br /> |
+| `maxDownstreamConnections` _integer_ | MaxDownstreamConnections caps active downstream connections across all listeners. Unset by default (no limit).<br />This is bootstrap configuration, so changing it restarts the proxy.<br /><br />Must be at most 9007199254740991 (2^53-1). |  | Maximum: 9.007199254740991e+15 <br />Minimum: 1 <br /> |
 
 
 #### EnvoyContainer
@@ -1180,7 +1180,7 @@ _Appears in:_
 | `image` _[Image](#image)_ | The envoy container image. See<br />https://kubernetes.io/docs/concepts/containers/images<br />for details.<br /><br />Default values, which may be overridden individually:<br /><br />	registry: quay.io/solo-io<br />	repository: envoy-wrapper<br />	tag: <kgateway version><br />	pullPolicy: IfNotPresent |  |  |
 | `securityContext` _[SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#securitycontext-v1-core)_ | The security context for this container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#securitycontext-v1-core<br />for details. |  |  |
 | `resources` _[ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#resourcerequirements-v1-core)_ | The compute resources required by this container. See<br />https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/<br />for details. |  |  |
-| `extraArgs` _string array_ | Additional arguments to pass to the Envoy binary.<br /><br />Similar to Kubernetes container args, variable references $(VAR_NAME) are<br />expanded using the container's environment. If a variable cannot be<br />resolved, the reference is left unchanged. Double $$ are reduced to a<br />single $, which allows escaping the $(VAR_NAME) syntax.<br /><br />The following Envoy flags are already managed by kgateway and must not be<br />set here: `--disable-hot-restart`, `--service-node`, `--log-level`, and<br />`--component-log-level`. Consider using a DeploymentOverlay to override these values if desired. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
+| `extraArgs` _string array_ | Additional arguments to pass to the Envoy binary.<br /><br />Similar to Kubernetes container args, variable references $(VAR_NAME) are<br />expanded using the container's environment. If a variable cannot be<br />resolved, the reference is left unchanged. Double $$ are reduced to a<br />single $, which allows escaping the $(VAR_NAME) syntax.<br /><br />The following Envoy flags are already managed by kgateway and must not be<br />set here: `--disable-hot-restart`, `--service-node`, `--log-level`, and<br />`--component-log-level`. Consider using a DeploymentOverlay to override these values if desired.<br /><br />By default, kgateway starts Envoy with `--drain-time-s 60` and<br />`--drain-strategy immediate`. A flag that you set here replaces its default.<br />For example, set `--drain-time-s 600` and `--drain-strategy gradual` to<br />restore the Envoy defaults. |  | MaxItems: 32 <br />MinItems: 1 <br /> |
 | `env` _[EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#envvar-v1-core) array_ | The container environment variables. |  |  |
 | `extraVolumeMounts` _[VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#volumemount-v1-core) array_ | Additional volume mounts to add to the container. See<br />https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.26/#volumemount-v1-core<br />for details. |  |  |
 
@@ -1263,7 +1263,7 @@ _Appears in:_
 | `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext auth service is unavailable.<br />Defaults to false, meaning requests will be denied if the ext auth service is unavailable. | false |  |
 | `clearRouteCache` _boolean_ | ClearRouteCache determines if the route cache should be cleared to allow the<br />external authentication service to correctly affect routing decisions. | false |  |
 | `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the auth service.<br />Warning: buffering has implications for streaming and therefore performance. |  |  |
-| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />auth server returns an error or cannot be reached. Must be in the range of 100-511 inclusive.<br />The default matches the deny response code of 403 Forbidden. | 403 | Maximum: 511 <br />Minimum: 100 <br /> |
+| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />auth server returns an error or cannot be reached. Must be one of the status codes<br />that Envoy defines (envoy.type.v3.StatusCode): 100, 200-208, 226, 300-305, 307, 308,<br />400-417, 421-424, 426, 428, 429, 431, 500-508, 510 or 511.<br />The default matches the deny response code of 403 Forbidden. | 403 | Enum: [100 200 201 202 203 204 205 206 207 208 226 300 301 302 303 304 305 307 308 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 421 422 423 424 426 428 429 431 500 501 502 503 504 505 506 507 508 510 511] <br /> |
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extauthz filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 
 
@@ -1345,8 +1345,8 @@ _Appears in:_
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams. |  |  |
 | `allowProcessingModeOverride` _boolean_ | AllowProcessingModeOverride determines if the processing mode can be overridden.<br />Defaults to false, meaning the processing mode cannot be overridden. | false |  |
 | `allowedProcessingModeOverrides` _[ProcessingMode](#processingmode) array_ | AllowedProcessingModeOverrides specifies which processing modes are allowed to override the default.<br />Empty or unspecified means all overrides are allowed (if AllowProcessingModeOverride is true).<br />This is an allowlist; any processing mode in this list will allow the override to the specified mode.<br />If AllowProcessingModeOverride is false, this field is ignored.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-field-extensions-filters-http-ext-proc-v3-externalprocessor-allowed-override-modes |  |  |
-| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server. |  | MaxLength: 32 <br />Type: string <br /> |
-| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />The default value 0, which effectively disables the override_message_timeout API. |  | MaxLength: 32 <br />Type: string <br /> |
+| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server.<br />Must be between 1ms and 1h. |  | MaxLength: 32 <br />Type: string <br /> |
+| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />Must be between 1ms and 1h. If unset, the override_message_timeout API is disabled. |  | MaxLength: 32 <br />Type: string <br /> |
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 | `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
 | `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
@@ -1442,7 +1442,7 @@ _Appears in:_
 | `delay` _[FaultDelay](#faultdelay)_ | Delay injects latency into requests before forwarding upstream. |  |  |
 | `abort` _[FaultAbort](#faultabort)_ | Abort injects HTTP or gRPC errors to terminate requests early. |  |  |
 | `responseRateLimit` _[FaultResponseRateLimit](#faultresponseratelimit)_ | ResponseRateLimit limits the response body data rate to simulate<br />slow or degraded upstream connections. |  |  |
-| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
+| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 0 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the fault injection filter.<br />Can be used to disable fault injection policies applied at a higher level<br />in the config hierarchy. |  |  |
 
 
@@ -1582,7 +1582,7 @@ _Appears in:_
 
 
 FractionalPercent represents a fraction as a numerator and denominator.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/type/v3/percent.proto#envoy-v3-api-msg-type-v3-fractionalpercent
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/v3/percent.proto#envoy-v3-api-msg-type-v3-fractionalpercent
 
 
 
@@ -1843,7 +1843,7 @@ _Appears in:_
 
 
 GrpcStatusFilter filters gRPC requests based on their response status.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
 
 
 
@@ -1870,10 +1870,10 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
+| `accessLog` _[AccessLog](#accesslog) array_ | AccessLoggingConfig contains various settings for Envoy's access logging service.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto |  | MaxItems: 16 <br /> |
 | `tracing` _[Tracing](#tracing)_ | Tracing contains various settings for Envoy's OpenTelemetry tracer.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/trace/v3/opentelemetry.proto.html |  |  |
 | `localReplies` _[LocalReplyConfig](#localreplyconfig)_ | LocalReplies configures how Envoy's local replies are formatted etc. |  |  |
-| `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades |  |  |
+| `upgradeConfig` _[UpgradeConfig](#upgradeconfig)_ | UpgradeConfig contains configuration for HTTP upgrades like WebSocket.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/http/upgrades |  |  |
 | `useRemoteAddress` _boolean_ | UseRemoteAddress determines whether to use the remote address for the original client.<br />Note: If this field is omitted, it will fallback to the default value of 'true', which we set for all Envoy HCMs.<br />Thus, setting this explicitly to true is unnecessary (but will not cause any harm).<br />When true, Envoy will use the remote address of the connection as the client address.<br />When false, Envoy will use the X-Forwarded-For header to determine the client address. Furthermore, SkipXffAppend will implicitly be set to true unless explicitly configured.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-use-remote-address |  |  |
 | `preserveExternalRequestId` _boolean_ | PreserveExternalRequestId determines whether the connection manager will keep the x-request-id header if passed for<br />a request that is edge (Edge request is the request from external clients to front Envoy) and not reset it, which is the current Envoy behaviour. This defaults to false.<br />See here for more information https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-preserve-external-request-id |  |  |
 | `generateRequestId` _boolean_ | GenerateRequestId:  Whether the connection manager will generate the x-request-id header if it does not exist.<br />This defaults to true. Generating a random UUID4 is expensive so in high throughput scenarios where this feature is not desired it can be disabled.<br />See here for more information https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/network/http_connection_manager/v3/http_connection_manager.proto#envoy-v3-api-field-extensions-filters-network-http-connection-manager-v3-httpconnectionmanager-generate-request-id |  |  |
@@ -1946,7 +1946,7 @@ _Appears in:_
 
 
 HeaderFilter filters requests based on headers.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
 
 
 
@@ -2033,8 +2033,9 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. |  | MaxLength: 32 <br />Type: string <br /> |
-| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Interval is the time between health checks. |  | MaxLength: 32 <br />Type: string <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Interval is the time between health checks after the backend receives its first request.<br />Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
+| `noTrafficInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | NoTrafficInterval is the time between health checks before the backend receives<br />its first request. If unset, uses Envoy's default of 60 seconds.<br />Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
 | `unhealthyThreshold` _integer_ | UnhealthyThreshold is the number of consecutive failed health checks that will be considered<br />unhealthy.<br />Note that for HTTP health checks, if a host responds with a code not in ExpectedStatuses or RetriableStatuses,<br />this threshold is ignored and the host is considered immediately unhealthy. |  | Minimum: 0 <br /> |
 | `healthyThreshold` _integer_ | HealthyThreshold is the number of healthy health checks required before a host is marked<br />healthy. Note that during startup, only a single successful health check is<br />required to mark a host healthy. |  | Minimum: 0 <br /> |
 | `http` _[HealthCheckHttp](#healthcheckhttp)_ | Http contains the options to configure the HTTP health check. |  |  |
@@ -2090,7 +2091,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
-| `port` _integer_ | Port is the port to use for the backend. |  |  |
+| `port` _integer_ | Port is the port to use for the backend. Must be between 1 and 65535. |  |  |
 
 
 #### Http1ProtocolOptions
@@ -2203,7 +2204,7 @@ _Appears in:_
 | `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
 | `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
 | `responseHeadersToCopy` _[HTTPHeaderName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `maxRedirects` _integer_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
+| `maxRedirects` _integer_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### InternalRedirectResponseCode
@@ -2349,8 +2350,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `size` _integer_ | Size is the number of verified tokens to cache, per Envoy worker thread.<br />If unspecified, the Envoy default of 100 is used. |  | Minimum: 1 <br /> |
-| `maxTokenSize` _integer_ | MaxTokenSize is the maximum size of a single cached token in bytes.<br />If this field is not set the default value 4096<br />bytes is used. The maximum value for a token is inclusive. |  | Minimum: 1 <br /> |
+| `size` _integer_ | Size is the number of verified tokens to cache, per Envoy worker thread.<br />If unspecified, the Envoy default of 100 is used. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
+| `maxTokenSize` _integer_ | MaxTokenSize is the maximum size of a single cached token in bytes.<br />If this field is not set the default value 4096<br />bytes is used. The maximum value for a token is inclusive. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### JWTClaimToHeader
@@ -2632,7 +2633,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. | 2 |  |
+| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. Must be at least 2. | 2 | Minimum: 2 <br /> |
 | `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
 
 
@@ -2679,8 +2680,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. |  | Minimum: 0 <br /> |
-| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. |  | Minimum: 0 <br /> |
+| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. Must be between 1 and 8388608. |  | Maximum: 8.388608e+06 <br />Minimum: 1 <br /> |
+| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. Must be at most 8388608, and at least<br />minimumRingSize (default 1024). |  | Maximum: 8.388608e+06 <br />Minimum: 0 <br /> |
 | `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
 | `hashPolicies` _[HashPolicy](#hashpolicy) array_ | HashPolicies specifies the hash policies for hashing load balancers (RingHash, Maglev). |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
@@ -2732,7 +2733,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket configures the local rate limiter's token bucket. |  |  |
+| `tokenBucket` _[TokenBucket](#tokenbucket)_ | TokenBucket configures the local rate limiter's token bucket.<br /><br />Each Envoy pod keeps its own token buckets. The number of buckets depends on<br />the resource that the policy targets:<br />  - HTTPRoute: one bucket for each path match of the route. The maxTokens<br />    value applies to each path match separately, and not to the route as a<br />    whole. Path matches in the same rule also get separate buckets, so adding<br />    a path match to the route increases the total that the route admits. If<br />    the route matches more than one hostname, each hostname also gets its own<br />    bucket for each path match.<br />  - Gateway: one bucket for each generated Envoy route configuration, which<br />    covers one HTTP port or one HTTPS filter chain. All routes and hostnames<br />    on that port or filter chain share the bucket. Listeners on different<br />    ports, and separate HTTPS filter chains, get separate buckets, so the<br />    policy does not enforce a single limit across the whole Gateway.<br />  - HTTP listener (sectionName): one bucket for each hostname on the<br />    listener. Routes that share a hostname share a bucket.<br />  - HTTPS listener (sectionName): one bucket for the listener, which all of<br />    its hostnames share.<br /><br />To enforce one limit across many routes on the same port, target the<br />Gateway. If the Gateway has more than one port or HTTPS filter chain, each<br />one enforces the limit separately. To share the bucket across the replicas<br />of a Gateway, set shareAcrossGateway. |  |  |
 | `percentEnabled` _integer_ | PercentEnabled specifies the percentage of requests for which the rate limiter is enabled. |  | Maximum: 100 <br />Minimum: 0 <br /> |
 | `percentEnforced` _integer_ | PercentEnforced specifies the percentage of requests for which the rate limiter is enforced. |  | Maximum: 100 <br />Minimum: 0 <br /> |
 | `shareAcrossGateway` _boolean_ | ShareAcrossGateway applies the token bucket to the Gateway as a whole rather than to each<br />proxy replica individually. Each replica is given an even share of the bucket based on the<br />current number of replicas of the Gateway, so the configured rate is the total rate admitted<br />by all replicas combined. For example, with tokensPerFill=100 and fillInterval=1s, a Gateway<br />with 4 replicas admits 25 requests per second per gateway. Because the allocation is divided,<br />maxTokens must be greater than or equal to the number of replicas, otherwise no requests are<br />admitted.<br /><br />Defaults to false. |  |  |
@@ -3549,7 +3550,7 @@ _Appears in:_
 
 
 ResponseFlagFilter filters based on response flags.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
 
 
 
@@ -3662,7 +3663,7 @@ _Appears in:_
 
 RuntimeFilter filters for random sampling of access logs.
 A request will be logged if the runtime key is set and the request's random value is less than the percent_sampled value.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter
 
 
 
@@ -3837,7 +3838,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `absoluteTimeout` _[Duration](#duration)_ | AbsoluteTimeout defines the absolute timeout of the persistent<br />session. Once the AbsoluteTimeout duration has elapsed, the<br />session becomes invalid.<br /><br />Only cookie sessions with lifetimeType Permanent support this field, where it<br />sets the cookie lifetime. It has no effect for header sessions and for Session<br />cookies (the default lifetimeType), as the gateway does not track the session<br />lifetime separately from the cookie. |  |  |
+| `absoluteTimeout` _[Duration](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#duration)_ | AbsoluteTimeout defines the absolute timeout of the persistent<br />session. Once the AbsoluteTimeout duration has elapsed, the<br />session becomes invalid.<br /><br />Only cookie sessions with lifetimeType Permanent support this field, where it<br />sets the cookie lifetime. It has no effect for header sessions and for Session<br />cookies (the default lifetimeType), as the gateway does not track the session<br />lifetime separately from the cookie. |  |  |
 | `type` _[SessionPersistenceType](#sessionpersistencetype)_ | Type defines the type of session persistence such as through<br />the use of a header or cookie. Defaults to cookie based session<br />persistence. | Cookie | Enum: [Cookie Header] <br /> |
 | `cookie` _[SessionPersistenceCookieConfig](#sessionpersistencecookieconfig)_ | Cookie provides configuration settings that are specific<br />to cookie-based session persistence. |  |  |
 | `header` _[SessionPersistenceHeaderConfig](#sessionpersistenceheaderconfig)_ | Header provides configuration settings that are specific<br />to header-based session persistence. |  |  |
@@ -3972,7 +3973,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `enabled` _boolean_ | Whether to expose metrics annotations and ports for scraping metrics. |  |  |
+| `enabled` _boolean_ | Whether to expose metrics annotations and ports for scraping metrics.<br />When enabled, the proxy has the http-monitoring container port (9091), and<br />the pod has the annotations for scraping. If you disable stats, the proxy<br />has neither. The container port also matters when you set hostNetwork in a<br />deployment overlay, because the scheduler does not place two pods that use<br />the same host port on one node. |  |  |
 | `routePrefixRewrite` _string_ | The Envoy stats endpoint to which the metrics are written |  |  |
 | `enableStatsRoute` _boolean_ | Enables an additional route to the stats cluster defaulting to /stats |  |  |
 | `statsRoutePrefixRewrite` _string_ | The Envoy stats endpoint with general metrics for the additional stats route |  |  |
@@ -4004,7 +4005,7 @@ _Appears in:_
 _Underlying type:_ _[ComparisonFilter](#comparisonfilter)_
 
 StatusCodeFilter filters based on HTTP status code.
-Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-statuscodefilter
+Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-statuscodefilter
 
 
 
@@ -4469,7 +4470,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `minEndpointsInZoneThreshold` _integer_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Minimum: 1 <br /> |
+| `minEndpointsInZoneThreshold` _integer_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### ZoneAwareLoadBalancer
@@ -4618,7 +4619,7 @@ Configuration defining a jittered exponential back off strategy. Ref: https://ww
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
+| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. Must be at least 1ms and less than or equal to max_interval. **Required.** |
 | `maxInterval` | *_metav1.Duration_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
 
 #### BodyFormat
@@ -4650,7 +4651,7 @@ CELFilter filters requests based on Common Expression Language (CEL).
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `match` | string | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true. see: https://www.envoyproxy.io/docs/envoy/v1.33.0/xds/type/v3/cel.proto.html#common-expression-language-cel-proto **Required.** |
+| `match` | string | The CEL expressions to evaluate. AccessLogs are only emitted when the CEL expressions evaluates to true. see: https://www.envoyproxy.io/docs/envoy/latest/xds/type/v3/cel.proto#common-expression-language-cel-proto **Required.** |
 
 #### CommonAccessLogGrpcService
 
@@ -4697,7 +4698,7 @@ DenominatorType defines the fraction percentages support several fixed denominat
 
 _Underlying type:_ _ComparisonFilter_
 
-DurationFilter filters based on request duration. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-durationfilter
+DurationFilter filters based on request duration. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-durationfilter
 
 #### EnvironmentResourceDetectorConfig
 
@@ -4709,7 +4710,7 @@ EnvironmentResourceDetectorConfig specifies the EnvironmentResourceDetector conf
 
 #### FilterType
 
-FilterType represents the type of filter to apply (only one of these should be set). Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-accesslogfilter
+FilterType represents the type of filter to apply (only one of these should be set). Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-accesslogfilter
 
 **Validation:**
 - MaxProperties=1
@@ -4719,17 +4720,17 @@ FilterType represents the type of filter to apply (only one of these should be s
 |-------|------|-------------|
 | `statusCodeFilter` | *[StatusCodeFilter](#statuscodefilter) |  |
 | `durationFilter` | *[DurationFilter](#durationfilter) |  |
-| `notHealthCheckFilter` | *bool | Filters for requests that are not health check requests. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-nothealthcheckfilter |
-| `traceableFilter` | *bool | Filters for requests that are traceable. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-traceablefilter |
+| `notHealthCheckFilter` | *bool | Filters for requests that are not health check requests. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-nothealthcheckfilter |
+| `traceableFilter` | *bool | Filters for requests that are traceable. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-traceablefilter |
 | `headerFilter` | *[HeaderFilter](#headerfilter) |  |
 | `responseFlagFilter` | *[ResponseFlagFilter](#responseflagfilter) |  |
 | `grpcStatusFilter` | *[GrpcStatusFilter](#grpcstatusfilter) |  |
 | `celFilter` | *[CELFilter](#celfilter) |  |
-| `runtimeFilter` | *[RuntimeFilter](#runtimefilter) | Filters for random sampling of access logs. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter |
+| `runtimeFilter` | *[RuntimeFilter](#runtimefilter) | Filters for random sampling of access logs. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter |
 
 #### FractionalPercent
 
-FractionalPercent represents a fraction as a numerator and denominator. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/type/v3/percent.proto#envoy-v3-api-msg-type-v3-fractionalpercent
+FractionalPercent represents a fraction as a numerator and denominator. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/type/v3/percent.proto#envoy-v3-api-msg-type-v3-fractionalpercent
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -4747,7 +4748,7 @@ GrpcStatus represents possible gRPC statuses.
 
 #### GrpcStatusFilter
 
-GrpcStatusFilter filters gRPC requests based on their response status. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
+GrpcStatusFilter filters gRPC requests based on their response status. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#enum-config-accesslog-v3-grpcstatusfilter-status
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -4783,7 +4784,7 @@ HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request o
 
 #### HeaderFilter
 
-HeaderFilter filters requests based on headers. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
+HeaderFilter filters requests based on headers. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-headerfilter
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -4992,7 +4993,7 @@ ResourceDetector defines the list of supported ResourceDetectors
 
 #### ResponseFlagFilter
 
-ResponseFlagFilter filters based on response flags. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
+ResponseFlagFilter filters based on response flags. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-responseflagfilter
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -5009,7 +5010,7 @@ Specifies the retry policy of remote data source when fetching fails. Ref: https
 
 #### RuntimeFilter
 
-RuntimeFilter filters for random sampling of access logs. A request will be logged if the runtime key is set and the request's random value is less than the percent_sampled value. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter
+RuntimeFilter filters for random sampling of access logs. A request will be logged if the runtime key is set and the request's random value is less than the percent_sampled value. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#config-accesslog-v3-runtimefilter
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -5043,7 +5044,7 @@ SecretRefWithKey identifies a Kubernetes Secret and optionally a specific key wi
 
 _Underlying type:_ _ComparisonFilter_
 
-StatusCodeFilter filters based on HTTP status code. Based on: https://www.envoyproxy.io/docs/envoy/v1.33.0/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-statuscodefilter
+StatusCodeFilter filters based on HTTP status code. Based on: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/accesslog/v3/accesslog.proto#envoy-v3-api-msg-config-accesslog-v3-statuscodefilter
 
 #### Timeouts
 

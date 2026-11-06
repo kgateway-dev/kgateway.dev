@@ -7,7 +7,7 @@ excludeSearch: true
 ---
 
 ## How the journey started
-Three months ago I received my acceptance for the [LFX Mentorship Program](https://mentorship.lfx.linuxfoundation.org/project/1c354620-3475-474a-9641-a0a93f6961cf) and I was absolutely thrilled. But of course right after that the questions started piling up. How does this actually work? What exactly is expected of me? Am I actually able to deliver what they need?
+Three months ago I received my acceptance for the [LFX Mentorship Program](https://mentorship.linuxfoundation.org/programs/1c354620-3475-474a-9641-a0a93f6961cf) and I was absolutely thrilled. But of course right after that the questions started piling up. How does this actually work? What exactly is expected of me? Am I actually able to deliver what they need?
 
 The anticipation was huge.
 

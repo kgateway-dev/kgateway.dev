@@ -46,6 +46,13 @@ The requirements depend on the option that you use.
   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
   ```
 
+  If your cluster already has the standard channel CRDs, this command can fail with the error `Installing experimental CRDs on top of standard channel CRDs is prohibited by default`. Gateway API version 1.5 and later includes a `safe-upgrades.gateway.networking.k8s.io` ValidatingAdmissionPolicy that blocks this switch. To continue, delete the binding of the policy, and then apply the experimental bundle again. The bundle re-creates the policy and its binding.
+
+  ```sh
+  kubectl delete validatingadmissionpolicybinding safe-upgrades.gateway.networking.k8s.io
+  kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+  ```
+
 * **BackendConfigPolicy**: You do not need the experimental channel of the Kubernetes Gateway API. The option also works if you disable experimental Gateway API features.
 
 ## Configure session persistence

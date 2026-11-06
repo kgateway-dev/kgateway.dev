@@ -44,7 +44,7 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
    EOF
    ```
 
-   {{< reuse "kgw-docs/snippets/review-table.md" >}}{{< version exclude-if="2.0.x" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#csrfpolicy" >}}).{{< /version >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#csrfpolicy" >}}).
 
    | Field | Description |
    |-------|-------------|
@@ -145,13 +145,13 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
    Example output:
 
    ```console
-   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.missing_source_origin: 1
-   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_invalid: 0
-   http.{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_valid: 1
+   http.{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.missing_source_origin: 1
+   http.{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_invalid: 0
+   http.{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}http_8080{{< /version >}}.csrf.request_valid: 1
    ...
    ```
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
    The stat prefix `http_8080` consists of `http_` and the port of the listener.
    {{< /version >}}
 

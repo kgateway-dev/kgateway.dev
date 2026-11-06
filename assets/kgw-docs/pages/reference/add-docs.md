@@ -181,12 +181,12 @@ Use the version shortcode to conditionally display content based on the document
 
 Example:
 ```markdown
-{{< version include-if="2.2.x,2.1.x" >}}
-Content to show only for the specified 2.1.x version.
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
-Content to show only for the specified 2.0.x version.
-{{< /version >}}
+{{</* version include-if="2.6.x,2.5.x" */>}}
+Content to show only for the specified 2.6.x and 2.5.x versions.
+{{</* /version */>}}
+{{</* version include-if="2.4.x" */>}}
+Content to show only for the specified 2.4.x version.
+{{</* /version */>}}
 ```
 
 Supported parameters:

@@ -31,7 +31,7 @@ Before you upgrade {{< reuse "/kgw-docs/snippets/kgateway.md" >}}, review the fo
 1. Decide on the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version that you want to use. 
 
    * For help, review the [Upgrade Notes in the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} docs for each version](https://gateway-api.sigs.k8s.io/guides/getting-started/#v12-upgrade-notes).
-{{< version exclude-if="2.0.x,2.1.x" >}}   * Check if you need to install the [experimental channel for the features that you want to use](../../reference/feature-maturity/#experimental-features).{{< /version >}}
+{{< version exclude-if="2.1.x" >}}   * Check if you need to install the [experimental channel for the features that you want to use](../../reference/feature-maturity/#experimental-features).{{< /version >}}
 
 2. Install the custom resources of the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}} version that you want to upgrade to, such as the standard {{< reuse "kgw-docs/versions/k8s-gw-version.md" >}} version.
    

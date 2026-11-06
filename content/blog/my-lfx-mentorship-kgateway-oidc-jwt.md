@@ -10,7 +10,7 @@ excludeSearch: true
 
 They say when you don't succeed at first, you try again, and again, and again.
 
-I first applied to the [LFX Mentorship Program](https://mentorship.lfx.linuxfoundation.org/) for Term 1, 2026, between February and March. I did not get through, but I did get an interview. That experience opened my eyes. It showed me exactly what I needed to work on and where I needed to grow. Instead of feeling defeated, I felt motivated. I came back stronger for Term 2.
+I first applied to the [LFX Mentorship Program](https://mentorship.linuxfoundation.org/) for Term 1, 2026, between February and March. I did not get through, but I did get an interview. That experience opened my eyes. It showed me exactly what I needed to work on and where I needed to grow. Instead of feeling defeated, I felt motivated. I came back stronger for Term 2.
 
 I had already been contributing to the kgateway project before the mentorship. I built a glossary tooltip system using Hugo shortcodes, audited over thirty technical terms, worked on a Request Header Modification guide, and even presented a live demo of a custom Rust module extension at a kgateway community meeting. I had also interacted with [Art Berger](https://github.com/artberger) on Slack during some of those contributions, so I had a sense of how he worked, and I admired his approach.
 
@@ -78,7 +78,7 @@ This mentorship has been one of the most valuable experiences of my life. A few 
 
 I plan to continue contributing to kgateway after the mentorship ends. I would like to add guides for Entra ID and Google and stay involved in the project. The mentorship may be ending, but my journey with kgateway is just getting started.
 
-If you are thinking of applying to the [LFX program](https://mentorship.lfx.linuxfoundation.org/), I would say go for it. It is not easy and the work is real. But if you are willing to put in the effort, communicate with your mentors, and stay curious, you will get so much out of it.
+If you are thinking of applying to the [LFX program](https://mentorship.linuxfoundation.org/), I would say go for it. It is not easy and the work is real. But if you are willing to put in the effort, communicate with your mentors, and stay curious, you will get so much out of it.
 
 
 A huge thank you to [@Art](https://github.com/artberger) and [@Nina](https://github.com/npolshakova) for being awesome mentors, for the support and the fast feedback throughout the whole term.
