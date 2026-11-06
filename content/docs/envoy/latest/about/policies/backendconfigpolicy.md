@@ -8,12 +8,13 @@ description: Configure backend connection, TLS, and load balancing with BackendC
 
 ## Policy priority and merging rules
 
-If you apply multiple BackendConfigPolicy resources to the same backend, policies are merged at the field level.
+If you apply multiple BackendConfigPolicy resources to the same backend, policies are merged at the top-level field level.
 
 The following rules apply:
 
 * If you apply multiple BackendConfigPolicy resources that set the same top-level field, only the oldest policy is enforced for that field. Policies with a later timestamp are ignored for that field. If two policies share the same creation timestamp, they are tie-broken alphabetically by resource name.
 * BackendConfigPolicy resources that set different top-level fields are merged and are enforced in combination.
+* Merging does not descend into a top-level field. If two policies set different sub-fields of the same top-level field, such as `http2ProtocolOptions.maxConcurrentStreams` in one policy and `http2ProtocolOptions.connectionKeepalive` in another, only the oldest policy's entire `http2ProtocolOptions` block is enforced. To combine sub-fields, set them in the same BackendConfigPolicy.
 * Native Kubernetes Gateway API policies, such as [BackendTLSPolicy]({{< link-hextra path="/security/backend-tls/" >}}), have higher priority than BackendConfigPolicy for TLS configuration. If both a BackendConfigPolicy and a BackendTLSPolicy target the same backend, the BackendTLSPolicy's TLS settings are enforced and the `spec.tls` field in the BackendConfigPolicy is ignored.
 
 ### Multiple BackendConfigPolicies {#multiple-bcps}

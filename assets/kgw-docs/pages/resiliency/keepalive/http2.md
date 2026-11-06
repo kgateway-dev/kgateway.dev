@@ -17,6 +17,8 @@ HTTP/2 keepalive only applies when the gateway proxy uses HTTP/2 to connect to t
 > [!NOTE]
 > The httpbin sample app serves only HTTP/1.1, so requests to httpbin fail while its Service port uses `kubernetes.io/h2c`. This guide verifies only that the keepalive settings reach the gateway proxy. Use HTTP/2 keepalive with backends that serve HTTP/2, such as gRPC services, and run the cleanup steps when you are done.
 
+Before you create a separate policy, check whether the backend has another BackendConfigPolicy that sets `http2ProtocolOptions`. Examples include `maxConcurrentStreams` and `initialStreamWindowSize`. Add `connectionKeepalive` to that policy. BackendConfigPolicy resources merge at the top-level field level, so only the oldest policy's `http2ProtocolOptions` block is enforced. For more information, see [Policy priority and merging rules]({{< link-hextra path="/about/policies/backendconfigpolicy/#policy-priority-and-merging-rules" >}}).
+
 1. Patch the httpbin Service to use HTTP/2 on port 8000.
 
    ```sh
