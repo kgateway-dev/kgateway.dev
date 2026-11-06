@@ -46,7 +46,7 @@ You can set a maximum connection duration on connections from a client to the ga
    kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
    PF_PID=$!
    sleep 2
-   curl -s 127.0.0.1:19000/config_dump | jq '.configs[] | select(."@type" == "type.googleapis.com/envoy.admin.v3.ListenersConfigDump") | .. | objects | select(has("common_http_protocol_options"))'
+   curl -s 127.0.0.1:19000/config_dump | jq '.configs[] | select(."@type" == "type.googleapis.com/envoy.admin.v3.ListenersConfigDump") | .. | objects | select(has("common_http_protocol_options")) | {common_http_protocol_options}'
    kill $PF_PID
    ```
 
@@ -91,21 +91,23 @@ You can set a maximum connection duration on connections from a client to the ga
    kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
    PF_PID=$!
    sleep 2
-   curl -s 127.0.0.1:19000/config_dump | jq '[.. | objects | select(has("common_http_protocol_options")) | {common_http_protocol_options}]'
+   curl -s 127.0.0.1:19000/config_dump | jq '.. | objects | select(has("common_http_protocol_options") and has("explicit_http_config"))'
    kill $PF_PID
    ```
+
+   The `httpbin` sample service exposes two ports, so the output contains the following object once for each port.
 
    Example output:
 
    ```console
    {
-    "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
+     "@type": "type.googleapis.com/envoy.extensions.upstreams.http.v3.HttpProtocolOptions",
      "common_http_protocol_options": {
-    "max_connection_duration": "600s"
+       "max_connection_duration": "600s"
      },
      "explicit_http_config": {
        "http_protocol_options": {}
-    }
+     }
    }
    ```
 

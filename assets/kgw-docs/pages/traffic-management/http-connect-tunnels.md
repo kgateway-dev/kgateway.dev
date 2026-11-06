@@ -232,6 +232,8 @@ Send connections for a Static {{< reuse "kgw-docs/snippets/backend.md" >}} throu
    kubectl exec -n httpbin deploy/egress-proxy -- cat /var/log/squid/access.log
    ```
 
+   The entry can take several seconds to appear in the log. If the log is empty, wait a few seconds, and run the command again.
+
    Example output:
 
    ```console

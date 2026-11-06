@@ -210,22 +210,32 @@ EOF
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Limit downstream connections {#limit-downstream-connections}
 
-Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be `1` or greater. Because this setting changes the Envoy bootstrap configuration, updating the value restarts the proxy.
+Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be `1` or greater.
 
-```yaml
-kubectl apply -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    envoyContainer:
-      bootstrap:
-        maxDownstreamConnections: 5000
-EOF
-```
+> [!IMPORTANT]
+> Envoy reads its bootstrap configuration only when it starts. A change to this value updates the proxy ConfigMap, but the running proxy keeps enforcing the previous limit until its pods restart. Restart the proxy after you update the value, as shown in the following steps.
+
+1. Set the limit.
+   ```yaml
+   kubectl apply -f- <<'EOF'
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: gw-params
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     kube:
+       envoyContainer:
+         bootstrap:
+           maxDownstreamConnections: 5000
+   EOF
+   ```
+
+2. If the gateway proxy is already running, restart it so that Envoy picks up the new limit. A proxy that you create after you apply the resource starts with the new limit.
+   ```sh
+   kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
 {{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}

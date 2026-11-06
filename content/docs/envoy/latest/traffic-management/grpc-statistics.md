@@ -1,7 +1,7 @@
 ---
 title: gRPC statistics
 description: Collect per-service and per-method gRPC metrics from Gateway listeners.
-weight: 15
+weight: 20
 ---
 
 Use the `grpcStats` field on a ListenerPolicy resource to add Envoy's `grpc_stats` HTTP filter to the listeners on a Gateway. The filter records per-service and per-method gRPC metrics, including the gRPC status code that is not visible in ordinary HTTP response-code metrics.
@@ -184,7 +184,7 @@ Set `methodAllowlist` to record per-method statistics for only the gRPC methods 
          "individual_method_stats_allowlist": {
            "services": [
              {
-               "service_name": "yages.Echo",
+               "name": "yages.Echo",
                "method_names": ["Ping"]
              }
            ]
