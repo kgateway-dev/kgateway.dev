@@ -414,7 +414,9 @@ The following table compares what each policy supports for TLS settings.
 | ECDH curves, cipher suites, TLS version range, signature algorithms, and ALPN protocols | Supported through `spec.options` | Supported through `tls.parameters` and `tls.alpnProtocols` |
 | Certificate hash verification | Supported through `kgateway.dev/verify-certificate-hash` | Not supported |
 | Additional Subject Alternative Name verification | Not supported. The `kgateway.dev/verify-subject-alt-names` option is rejected because `spec.validation.hostname` already sets the required check. | Supported through `tls.verifySubjectAltNames` |
-| SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` |
+| SNI, skipping verification, client certificates from files, and renegotiation | Not supported | Supported through `tls.sni`, `tls.insecureSkipVerify`, `tls.files`, and `tls.allowRenegotiation` </br></br> The `tls.files` paths must exist in the gateway proxy container, not in the control plane container. |
+
+
 {{< /version >}}
 
 The following examples update the `nginx-tls-policy` that you created earlier. The values in the examples are illustrative. Adjust them to match what your backend supports.
