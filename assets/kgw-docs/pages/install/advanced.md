@@ -255,12 +255,12 @@ You can tune the time limits with environment variables on the control plane. Th
 
 ### Monitor xDS publication {#xds-publication-metrics}
 
-The control plane reports the following metrics, each with the `gateway` and `namespace` labels.
+The control plane reports the following metrics so that you can monitor xDS publication in your cluster.
 
 | Metric | Description |
 | -- | -- |
 | `kgateway_xds_snapshot_perclient_defers_total` (Counter) | The number of times that the control plane built configuration for a proxy while a referenced cluster was not ready. The `reason` label is `missing_clusters` or `missing_endpoints`. |
-| `kgateway_xds_snapshot_perclient_withheld_clients` (Gauge) | The number of proxy groups whose first configuration is delayed. The `state` label is `within_budget` while the `KGW_PER_CLIENT_PUBLISH_BUDGET` time runs, and `warm_withheld` while the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time runs. The control plane reports no value for a state that has no delayed proxy groups, so the metric is missing when no configuration is delayed. |
+| `kgateway_xds_snapshot_perclient_withheld_clients` (Gauge) | The number of proxy groups where the first configuration is delayed. The `state` label is `within_budget` while the `KGW_PER_CLIENT_PUBLISH_BUDGET` time runs, and `warm_withheld` while the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time runs. The control plane reports no value for a state that has no delayed proxy groups, so the metric is missing when no configuration is delayed. |
 | `kgateway_xds_snapshot_perclient_bounded_publishes_total` (Counter) | The number of times that the control plane published configuration because a time limit expired before all referenced clusters were ready. The `mode` label shows which delay ended: <ul><li>`first_publish`: The first configuration of a proxy.</li><li>`warm_truth`: The first configuration of a proxy that reconnected, when only the endpoints of referenced clusters were missing.</li><li>`warm_release`: The configuration of a proxy that reconnected, after the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time expired. Routes to the missing clusters fail until the clusters appear.</li><li>`flip_release`: A route change to a cluster that is not ready.</li><li>`carry_expired`: The control plane stopped sending the last configuration of a missing cluster after the `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` time expired. Routes to the cluster fail until the cluster appears.</li><li>`reference_ahead`: A hold for a cluster that is new to the proxy, in the `REFERENCED` scoping mode. For more information, see [Tune cluster transitions](#xds-scoping-transitions).</li></ul> |
 
 A rising `kgateway_xds_snapshot_perclient_bounded_publishes_total` value means that routes reference clusters that do not become ready in time. To find these clusters, check the control plane logs for warnings such as `first-publish budget expired`. The warnings list the missing clusters.
