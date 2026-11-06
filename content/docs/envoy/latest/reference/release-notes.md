@@ -272,6 +272,12 @@ The ListenerPolicy now supports access logs for TCP and TLS listeners via the `t
 
 You can now configure the control plane to send each gateway's proxies only the clusters that the gateway's configuration references, instead of a cluster for every discovered backend. This reduces the size of the config dump and the number of stats of each proxy in clusters with many Services and few routed ones. To enable this experimental feature, set the `controller.xds.scoping.mode` Helm value to `REFERENCED`. The default is `ALL`. If you used a 2.5.0 beta with the `KGW_CLUSTER_DISCOVERY_MODE`, `KGW_CLUSTER_REFERENCE_AHEAD`, or `KGW_CLUSTER_DEREFERENCE_GRACE` setting, rename it to `KGW_XDS_SCOPING_MODE`, `KGW_XDS_SCOPING_REFERENCE_AHEAD`, or `KGW_XDS_SCOPING_DEREFERENCE_GRACE`. The control plane does not start while an old name is set. For more information, see [Scope xDS configuration per gateway]({{< link-hextra path="/install/advanced/#xds-scoping" >}}).
 
+#### Limit xDS publication delays {#v25-xds-publication}
+
+The control plane now limits how long it delays the configuration of a gateway proxy while the clusters that the configuration references are not ready. Before, a new proxy that referenced a cluster that never became ready could wait indefinitely for its first configuration. Now the control plane publishes the latest configuration after 15 seconds by default, and requests on routes to a cluster that is not ready return a `503` response until the cluster is ready. A proxy that reconnects after a controller restart is delayed for at most 10 minutes by default.
+
+You do not need to take any action. To tune the time limits, set the `KGW_PER_CLIENT_PUBLISH_BUDGET` and `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` environment variables on the controller. For more information, see [Limit xDS publication delays]({{< link-hextra path="/install/advanced/#xds-publication" >}}).
+
 #### Configure leader election timings {#v25-leader-election-timings}
 
 You can now configure the leader election timings of the controller with the `controller.leaderElection.*` Helm values. For more information, see [Leader election timings]({{< link-hextra path="/install/advanced/#leader-election-timings" >}}).
