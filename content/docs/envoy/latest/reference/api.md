@@ -327,7 +327,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. | 80 |  |
+| `port` _integer_ | Port is the port to use for discovered instances.<br />Defaults to 80. A value of 0 also uses 80. | 80 |  |
 | `addressType` _[AwsAddressType](#awsaddresstype)_ | AddressType selects whether to route to the instance private or public IP.<br />Defaults to PrivateIP. | PrivateIP | Enum: [PrivateIP PublicIP] <br /> |
 | `filters` _[AwsTagFilter](#awstagfilter) array_ | Filters select which instances should be associated with this backend.<br />When multiple filters are provided, an instance must match all of them.<br />If this list is omitted or empty, all running instances in the configured<br />region are selected. Be careful: an accidentally empty filter list broadens<br />the backend to the whole regional fleet rather than matching nothing. |  | MaxItems: 16 <br /> |
 
@@ -448,7 +448,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `targetRefs` _[LocalPolicyTargetReference](#localpolicytargetreference) array_ | TargetRefs specifies the target references to attach the policy to. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 | `targetSelectors` _[LocalPolicyTargetSelector](#localpolicytargetselector) array_ | TargetSelectors specifies the target selectors to select resources to attach the policy to. |  |  |
-| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. |  | MaxLength: 32 <br />Type: string <br /> |
+| `connectTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The timeout for new network connections to hosts in the cluster. Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
 | `dns` _[DNS](#dns)_ | DNS contains DNS configuration. Note that this only applies to backends that resolve to Envoy DNS clusters, i.e.,<br />Backends of type Static, AWS, or GCP. |  |  |
 | `perConnectionBufferLimitBytes` _integer_ | Soft limit on the size of the cluster's connections read and write buffers.<br />If unspecified, an implementation-defined default is applied (1MiB). |  | Minimum: 0 <br /> |
 | `tcpKeepalive` _[TCPKeepalive](#tcpkeepalive)_ | Configure OS-level TCP keepalive checks. |  |  |
@@ -536,7 +536,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. |  | MaxLength: 32 <br />Type: string <br /> |
+| `baseInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The base interval to be used for the next back off computation. Must be at least 1ms and less than or equal to max_interval. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |  | MaxLength: 32 <br />Type: string <br /> |
 
 
@@ -749,7 +749,7 @@ _Appears in:_
 | --- | --- | --- | --- |
 | `idleTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | The idle timeout for connections. The idle timeout is defined as the<br />period in which there are no active requests. When the<br />idle timeout is reached the connection will be closed. If the connection is an HTTP/2<br />downstream connection a drain sequence will occur prior to closing the connection.<br />Note that request based timeouts mean that HTTP/2 PINGs will not keep the connection alive.<br />If not specified, this defaults to 1 hour. To disable idle timeouts explicitly set this to 0.<br />	Disabling this timeout has a highly likelihood of yielding connection leaks due to lost TCP<br />	FIN packets, etc. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxConnectionDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxConnectionDuration is the maximum duration of a connection, measured from<br />when the connection was established. When this duration is reached, Envoy starts<br />the drain sequence. If unset, there is no maximum connection duration.<br />See here for more information: https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/core/v3/protocol.proto#envoy-v3-api-field-config-core-v3-httpprotocoloptions-max-connection-duration |  | MaxLength: 32 <br />Type: string <br /> |
-| `maxHeadersCount` _integer_ | Specifies the maximum number of response headers that the upstream connection will accept<br />from the backend. If not specified, the default of 100 is used.<br />To configure the maximum number of headers accepted in downstream requests, use<br />ListenerPolicy.spec.default.httpSettings.maxHeadersCount. |  | Minimum: 0 <br /> |
+| `maxHeadersCount` _integer_ | Specifies the maximum number of response headers that the upstream connection will accept<br />from the backend. Must be at least 1. If not specified, the default of 100 is used.<br />To configure the maximum number of headers accepted in downstream requests, use<br />ListenerPolicy.spec.default.httpSettings.maxHeadersCount. |  | Minimum: 1 <br /> |
 | `maxStreamDuration` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Total duration to keep alive an HTTP request/response stream. If the time limit is reached the stream will be<br />reset independent of any other timeouts. If not specified, this value is not set. |  | MaxLength: 32 <br />Type: string <br /> |
 | `maxRequestsPerConnection` _integer_ | Maximum requests for a single upstream connection.<br />If set to 0 or unspecified, defaults to unlimited. |  | Minimum: 0 <br /> |
 
@@ -955,7 +955,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `refreshRate` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RefreshRate controls how frequently Envoy polls DNS for this backend's hostnames.<br /><br />Minimum value is 1ms. If unset, Envoy's default of 5s is used.<br />When Envoy respects DNS TTLs, lower TTL values effectively override this setting,<br />so RefreshRate acts as the maximum polling interval.<br />Recommended value for large-scale deployments is 60s or higher. |  | MaxLength: 32 <br />Type: string <br /> |
+| `refreshRate` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | RefreshRate controls how frequently Envoy polls DNS for this backend's hostnames.<br /><br />Must be greater than 1ms. If unset, Envoy's default of 5s is used.<br />When Envoy respects DNS TTLs, lower TTL values effectively override this setting,<br />so RefreshRate acts as the maximum polling interval.<br />Recommended value for large-scale deployments is 60s or higher. |  | MaxLength: 32 <br />Type: string <br /> |
 | `jitter` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Jitter adds a random delay of up to this duration before each DNS refresh,<br />spreading query load over time and helping prevent thundering-herd spikes.<br />Must be less than or equal to refreshRate when both are set. |  | MaxLength: 32 <br />Type: string <br /> |
 | `respectTTL` _boolean_ | RespectTTL instructs Envoy to honor TTL values returned by DNS responses.<br />When enabled, TTLs lower than RefreshRate effectively become the refresh interval. |  |  |
 | `lookupFamily` _[DnsLookupFamily](#dnslookupfamily)_ | LookupFamily selects the address families used to resolve this backend's<br />hostnames. It applies only to backends resolved through DNS, such as a<br />Backend with a hostname, and has no effect on Kubernetes Services. When<br />omitted, KGW_DNS_LOOKUP_FAMILY applies; its default, V4_PREFERRED, is<br />equivalent to IPv4Preferred.<br /><br />For backends reached through DNS64/NAT64 without IPv4 egress, use IPv6Only<br />or IPv6Preferred so Envoy can use synthesized AAAA records. IPv4Preferred<br />selects IPv4 addresses when available, even if those addresses are<br />unreachable, so a cluster that reaches all IPv4 destinations this way should<br />change KGW_DNS_LOOKUP_FAMILY rather than override each backend.<br /><br />Amazon EKS IPv6 clusters using the Amazon VPC CNI provide IPv4 egress<br />through a host-local IPv4 address and node SNAT, so the default reaches<br />IPv4-only backends without an override.<br /><br />IPv6Preferred and IPv4Preferred fall back only when DNS returns no addresses<br />for the preferred family, not when a connection fails. All returns both<br />families, and for most backends each address becomes a separate endpoint,<br />so requests sent to an unreachable family fail rather than fall back.<br /><br />Note: This feature is experimental and subject to breaking changes in future releases. |  | Enum: [IPv4Preferred IPv4Only IPv6Only IPv6Preferred All] <br /> |
@@ -1160,7 +1160,7 @@ _Appears in:_
 | `componentLogLevels` _object (keys:string, values:string)_ | Envoy log levels for specific components. The keys are component names and<br />the values are one of "trace", "debug", "info", "warn", "error",<br />"critical", or "off", e.g.<br /><br />	<br />	componentLogLevels:<br />	  upstream: debug<br />	  connection: trace<br />	<br /><br />These will be converted to the `--component-log-level` Envoy argument<br />value. See<br />https://www.envoyproxy.io/docs/envoy/latest/start/quick-start/run-envoy#debugging-envoy<br />for more information.<br /><br />Note: the keys and values cannot be empty, but they are not otherwise validated. |  |  |
 | `dnsResolver` _[DnsResolver](#dnsresolver)_ | DNS resolver configuration for Envoy's CARES DNS resolver.<br />This configuration applies to all clusters and affects DNS query behavior.<br />See https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/network/dns_resolver/cares/v3/cares_dns_resolver.proto<br />for more information. |  |  |
 | `enableReadinessProbeProxyProtocol` _boolean_ | EnableReadinessProbeProxyProtocol enables the PROXY protocol listener filter<br />on the kgateway readiness listener (port 8082).<br />Set this to true if and only if the load balancer in front of the gateway<br />prepends PROXY protocol headers to incoming TCP connections targeting the<br />readiness port. For example, when using an AWS NLB with proxy protocol v2<br />enabled at the target group level<br />(`service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"`).<br />Defaults to false. |  |  |
-| `maxDownstreamConnections` _integer_ | MaxDownstreamConnections caps active downstream connections across all listeners. Unset by default (no limit).<br />This is bootstrap configuration, so changing it restarts the proxy. |  | Minimum: 1 <br /> |
+| `maxDownstreamConnections` _integer_ | MaxDownstreamConnections caps active downstream connections across all listeners. Unset by default (no limit).<br />This is bootstrap configuration, so changing it restarts the proxy.<br /><br />Must be at most 9007199254740991 (2^53-1). |  | Maximum: 9.007199254740991e+15 <br />Minimum: 1 <br /> |
 
 
 #### EnvoyContainer
@@ -1263,7 +1263,7 @@ _Appears in:_
 | `failOpen` _boolean_ | FailOpen determines if requests are allowed when the ext auth service is unavailable.<br />Defaults to false, meaning requests will be denied if the ext auth service is unavailable. | false |  |
 | `clearRouteCache` _boolean_ | ClearRouteCache determines if the route cache should be cleared to allow the<br />external authentication service to correctly affect routing decisions. | false |  |
 | `withRequestBody` _[ExtAuthBufferSettings](#extauthbuffersettings)_ | WithRequestBody allows the request body to be buffered and sent to the auth service.<br />Warning: buffering has implications for streaming and therefore performance. |  |  |
-| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />auth server returns an error or cannot be reached. Must be in the range of 100-511 inclusive.<br />The default matches the deny response code of 403 Forbidden. | 403 | Maximum: 511 <br />Minimum: 100 <br /> |
+| `statusOnError` _integer_ | StatusOnError sets the HTTP status response code that is returned to the client when the<br />auth server returns an error or cannot be reached. Must be one of the status codes<br />that Envoy defines (envoy.type.v3.StatusCode): 100, 200-208, 226, 300-305, 307, 308,<br />400-417, 421-424, 426, 428, 429, 431, 500-508, 510 or 511.<br />The default matches the deny response code of 403 Forbidden. | 403 | Enum: [100 200 201 202 203 204 205 206 207 208 226 300 301 302 303 304 305 307 308 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 421 422 423 424 426 428 429 431 500 501 502 503 504 505 506 507 508 510 511] <br /> |
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extauthz filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 
 
@@ -1345,8 +1345,8 @@ _Appears in:_
 | `processingMode` _[ProcessingMode](#processingmode)_ | ProcessingMode defines how the filter should interact with the request/response streams. |  |  |
 | `allowProcessingModeOverride` _boolean_ | AllowProcessingModeOverride determines if the processing mode can be overridden.<br />Defaults to false, meaning the processing mode cannot be overridden. | false |  |
 | `allowedProcessingModeOverrides` _[ProcessingMode](#processingmode) array_ | AllowedProcessingModeOverrides specifies which processing modes are allowed to override the default.<br />Empty or unspecified means all overrides are allowed (if AllowProcessingModeOverride is true).<br />This is an allowlist; any processing mode in this list will allow the override to the specified mode.<br />If AllowProcessingModeOverride is false, this field is ignored.<br />See: https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-field-extensions-filters-http-ext-proc-v3-externalprocessor-allowed-override-modes |  |  |
-| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server. |  | MaxLength: 32 <br />Type: string <br /> |
-| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />The default value 0, which effectively disables the override_message_timeout API. |  | MaxLength: 32 <br />Type: string <br /> |
+| `messageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MessageTimeout is the timeout for each message sent to the external processing server.<br />Must be between 1ms and 1h. |  | MaxLength: 32 <br />Type: string <br /> |
+| `maxMessageTimeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | MaxMessageTimeout specifies the upper bound of override_message_timeout that may be sent from the external processing server.<br />Must be between 1ms and 1h. If unset, the override_message_timeout API is disabled. |  | MaxLength: 32 <br />Type: string <br /> |
 | `statPrefix` _string_ | StatPrefix is an optional prefix to include when emitting stats from the extproc filter,<br />enabling different instances of the filter to have unique stats. |  | MinLength: 1 <br /> |
 | `routeCacheAction` _[ExtProcRouteCacheAction](#extprocroutecacheaction)_ | RouteCacheAction describes the route cache action to be taken when an<br />external processor response is received in response to request headers.<br />The default behavior is "FromResponse" which will only clear the route cache when<br />an external processing response has the clear_route_cache field set. | FromResponse | Enum: [FromResponse Clear Retain] <br /> |
 | `metadataOptions` _[MetadataOptions](#metadataoptions)_ | MetadataOptions allows configuring metadata namespaces to forwarded or received from the external<br />processing server. |  |  |
@@ -1442,7 +1442,7 @@ _Appears in:_
 | `delay` _[FaultDelay](#faultdelay)_ | Delay injects latency into requests before forwarding upstream. |  |  |
 | `abort` _[FaultAbort](#faultabort)_ | Abort injects HTTP or gRPC errors to terminate requests early. |  |  |
 | `responseRateLimit` _[FaultResponseRateLimit](#faultresponseratelimit)_ | ResponseRateLimit limits the response body data rate to simulate<br />slow or degraded upstream connections. |  |  |
-| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Minimum: 0 <br /> |
+| `maxActiveFaults` _integer_ | MaxActiveFaults limits the number of concurrent active faults.<br />When this limit is reached, new requests will not have faults injected.<br />If not specified, defaults to unlimited. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 0 <br /> |
 | `disable` _[PolicyDisable](#policydisable)_ | Disable the fault injection filter.<br />Can be used to disable fault injection policies applied at a higher level<br />in the config hierarchy. |  |  |
 
 
@@ -2033,8 +2033,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. |  | MaxLength: 32 <br />Type: string <br /> |
-| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Interval is the time between health checks after the backend receives its first request. |  | MaxLength: 32 <br />Type: string <br /> |
+| `timeout` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Timeout is time to wait for a health check response. If the timeout is reached the<br />health check attempt will be considered a failure. Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
+| `interval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | Interval is the time between health checks after the backend receives its first request.<br />Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
 | `noTrafficInterval` _[Duration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.31/#duration-v1-meta)_ | NoTrafficInterval is the time between health checks before the backend receives<br />its first request. If unset, uses Envoy's default of 60 seconds.<br />Must be at least 1ms. |  | MaxLength: 32 <br />Type: string <br /> |
 | `unhealthyThreshold` _integer_ | UnhealthyThreshold is the number of consecutive failed health checks that will be considered<br />unhealthy.<br />Note that for HTTP health checks, if a host responds with a code not in ExpectedStatuses or RetriableStatuses,<br />this threshold is ignored and the host is considered immediately unhealthy. |  | Minimum: 0 <br /> |
 | `healthyThreshold` _integer_ | HealthyThreshold is the number of healthy health checks required before a host is marked<br />healthy. Note that during startup, only a single successful health check is<br />required to mark a host healthy. |  | Minimum: 0 <br /> |
@@ -2091,7 +2091,7 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `host` _string_ | Host is the host name to use for the backend. |  | MinLength: 1 <br /> |
-| `port` _integer_ | Port is the port to use for the backend. |  |  |
+| `port` _integer_ | Port is the port to use for the backend. Must be between 1 and 65535. |  |  |
 
 
 #### Http1ProtocolOptions
@@ -2204,7 +2204,7 @@ _Appears in:_
 | `redirectResponseCodes` _[InternalRedirectResponseCode](#internalredirectresponsecode) array_ | RedirectResponseCodes are upstream status codes that trigger internal redirects.<br />If unset, only 302 redirects are followed. |  | Enum: [301 302 303 307 308] <br />MaxItems: 5 <br />MinItems: 1 <br /> |
 | `allowCrossSchemeRedirect` _boolean_ | AllowCrossSchemeRedirect permits redirects across http/https schemes.<br />Defaults to false. |  |  |
 | `responseHeadersToCopy` _[HTTPHeaderName](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpheadername) array_ | ResponseHeadersToCopy are copied from the redirect response to the<br />internally redirected request. |  | MaxItems: 16 <br />MinItems: 1 <br /> |
-| `maxRedirects` _integer_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Minimum: 1 <br /> |
+| `maxRedirects` _integer_ | MaxRedirects caps followed redirects for a single downstream request.<br />Defaults to 1. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### InternalRedirectResponseCode
@@ -2350,8 +2350,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `size` _integer_ | Size is the number of verified tokens to cache, per Envoy worker thread.<br />If unspecified, the Envoy default of 100 is used. |  | Minimum: 1 <br /> |
-| `maxTokenSize` _integer_ | MaxTokenSize is the maximum size of a single cached token in bytes.<br />If this field is not set the default value 4096<br />bytes is used. The maximum value for a token is inclusive. |  | Minimum: 1 <br /> |
+| `size` _integer_ | Size is the number of verified tokens to cache, per Envoy worker thread.<br />If unspecified, the Envoy default of 100 is used. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
+| `maxTokenSize` _integer_ | MaxTokenSize is the maximum size of a single cached token in bytes.<br />If this field is not set the default value 4096<br />bytes is used. The maximum value for a token is inclusive. |  | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### JWTClaimToHeader
@@ -2633,7 +2633,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. | 2 |  |
+| `choiceCount` _integer_ | How many choices to take into account.<br />Defaults to 2. Must be at least 2. | 2 | Minimum: 2 <br /> |
 | `slowStart` _[SlowStart](#slowstart)_ | SlowStart configures the slow start configuration for the load balancer. |  |  |
 
 
@@ -2680,8 +2680,8 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. |  | Minimum: 0 <br /> |
-| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. |  | Minimum: 0 <br /> |
+| `minimumRingSize` _integer_ | MinimumRingSize is the minimum size of the ring. Must be between 1 and 8388608. |  | Maximum: 8.388608e+06 <br />Minimum: 1 <br /> |
+| `maximumRingSize` _integer_ | MaximumRingSize is the maximum size of the ring. Must be at most 8388608, and at least<br />minimumRingSize (default 1024). |  | Maximum: 8.388608e+06 <br />Minimum: 0 <br /> |
 | `useHostnameForHashing` _boolean_ | UseHostnameForHashing specifies whether to use the hostname instead of the resolved IP address for hashing.<br />Defaults to false. |  |  |
 | `hashPolicies` _[HashPolicy](#hashpolicy) array_ | HashPolicies specifies the hash policies for hashing load balancers (RingHash, Maglev). |  | MaxItems: 16 <br />MinItems: 1 <br /> |
 
@@ -4470,7 +4470,7 @@ _Appears in:_
 
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
-| `minEndpointsInZoneThreshold` _integer_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Minimum: 1 <br /> |
+| `minEndpointsInZoneThreshold` _integer_ | MinEndpointsInZoneThreshold is the minimum number of endpoints that must<br />exist in the local zone for forced zone-local routing to be active.<br />If the local zone has fewer endpoints than this threshold, the system<br />falls back to standard zone-aware routing behavior.<br />Defaults to 1. | 1 | Format: uint32 <br />Maximum: 4.294967295e+09 <br />Minimum: 1 <br /> |
 
 
 #### ZoneAwareLoadBalancer
@@ -4619,7 +4619,7 @@ Configuration defining a jittered exponential back off strategy. Ref: https://ww
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. It should be greater than zero and less than or equal to max_interval. **Required.** |
+| `baseInterval` | _metav1.Duration_ | The base interval to be used for the next back off computation. Must be at least 1ms and less than or equal to max_interval. **Required.** |
 | `maxInterval` | *_metav1.Duration_ | Specifies the maximum interval between retries. This parameter is optional, but must be greater than or equal to the base_interval if set. The default is 10 times the base_interval. |
 
 #### BodyFormat
