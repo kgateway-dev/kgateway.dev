@@ -178,7 +178,7 @@ EOF
 {{% /tab %}}
 {{% tab name="Force local zone" %}}
 
-The `force` mode routes all traffic exclusively to the local zone as long as the local zone has at least `minEndpointsInZoneThreshold` healthy endpoints. If the local zone drops below that threshold, the gateway proxy falls back to prefer-local zone-aware routing.
+The `force` mode routes all traffic exclusively to the local zone as long as the local zone has at least `minEndpointsInZoneThreshold` healthy endpoints. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The `minEndpointsInZoneThreshold` value must be between `1` and `4294967295`.{{< /version >}} If the local zone drops below that threshold, the gateway proxy falls back to prefer-local zone-aware routing.
 
 ```yaml
 kubectl apply -f- <<EOF

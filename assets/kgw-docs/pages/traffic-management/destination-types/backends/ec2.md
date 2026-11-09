@@ -1,4 +1,4 @@
-Route traffic directly to AWS EC2 instances that the gateway proxy discovers dynamically by using tag-based filters. Endpoints are refreshed periodically and served to Envoy through EDS (Endpoint Discovery Service), so your routing stays up to date as instances start and stop.
+Route traffic directly to AWS EC2 instances that the gateway proxy discovers dynamically by using tag-based filters. Endpoints are refreshed periodically and served to Envoy through EDS (Endpoint Discovery Service), so your routing stays up to date as instances start and stop. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}If you set `spec.aws.ec2.port`, the value must be between `0` and `65535`. A value of `0` selects port `80`.{{< /version >}}
 
 ## Before you begin
 
