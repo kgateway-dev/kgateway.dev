@@ -1,4 +1,4 @@
-Route traffic directly to AWS EC2 instances that the gateway proxy discovers dynamically by using tag-based filters. Endpoints are refreshed periodically and served to Envoy through EDS (Endpoint Discovery Service), so your routing stays up to date as instances start and stop.
+Route traffic directly to AWS EC2 instances that the control plane discovers dynamically by using tag-based filters. Endpoints are refreshed periodically and served to Envoy through EDS (Endpoint Discovery Service), so your routing stays up to date as instances start and stop.
 
 ## Before you begin
 
@@ -79,16 +79,16 @@ Enable EC2 discovery by setting the `controller.enableAwsEc2Discovery` Helm valu
 
 ## Step 3: Configure AWS credentials {#credentials}
 
-For the gateway proxy to discover and route traffic to the EC2 instance, you must configure the proxy with the required AWS credentials. You can choose between the following authentication methods:
+For the control plane to discover the EC2 instances that the gateway proxy routes traffic to, you must provide the required AWS credentials. You can choose between the following authentication methods:
 * **Static AWS credentials**: Store your AWS access key ID and secret access key in a Kubernetes secret.
-* **Role assumption**: Configure an IAM role that the gateway proxy assumes to get temporary credentials.
+* **Role assumption**: Configure an IAM role that the control plane assumes to get temporary credentials.
 
 For static credentials, the IAM user must have at least `ec2:DescribeInstances` permissions. For role assumption, the IAM user must have `sts:AssumeRole` permissions and the role must have at least `ec2:DescribeInstances` permissions.
 
 {{< tabs >}}
 {{% tab name="Static AWS credentials" %}}
 
-Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the gateway proxy uses those credentials as-is to discover EC2 instances.
+Use this method when your IAM user and EC2 instances are in the same AWS account and you want a simple setup. The `ec2:DescribeInstances` permission is attached directly to your IAM user, and the control plane uses those credentials as-is to discover EC2 instances.
 
 > [!NOTE]
 > The steps in this example require a permanent IAM user with long-lived credentials. If you authenticate through AWS SSO (IAM Identity Center), `aws sts get-caller-identity` returns a role ARN rather than an IAM user ARN, and `aws iam create-access-key` fails with a `NoSuchEntity` error. In this case, create a dedicated IAM user first:

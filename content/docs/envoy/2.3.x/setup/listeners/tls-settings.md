@@ -13,7 +13,7 @@ metadata:
   name: example-gateway
   namespace: default
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   listeners:
   - name: https
     protocol: HTTPS
