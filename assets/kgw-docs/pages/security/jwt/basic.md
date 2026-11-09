@@ -317,7 +317,7 @@ jwks:
 | Field | Description |
 | ----- | ----- |
 | `retryPolicy.numRetries` | Number of retry attempts when the JWKS fetch fails. Must be at least `1`. Defaults to `1` if unset. |
-| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. |
+| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. The value must be at least `1ms`. |
 | `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
 
 In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` policy. The defaults are intended to work for typical JWKS endpoints. Use the following guidelines to choose appropriate values.
@@ -410,8 +410,8 @@ spec:
 | Field | Description |
 | ----- | ----------- |
 | `cache` | Enables Envoy JWT caching for this provider. An empty object turns on caching with Envoy defaults. |
-| `cache.size` | The number of verified tokens to cache per Envoy worker thread. Must be at least `1` if set. If unset, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
-| `cache.maxTokenSize` | The maximum size of one cached token in bytes. Must be at least `1` if set. If unset, Envoy uses `4096`. |
+| `cache.size` | The number of verified tokens to cache per Envoy worker thread. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
+| `cache.maxTokenSize` | The maximum size of one cached token in bytes. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `4096`. |
 
 Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
 
