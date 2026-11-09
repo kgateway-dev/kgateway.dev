@@ -220,7 +220,7 @@ Set up an HTTPS listener on your Gateway.
          reason: ResolvedRefs
          status: "True"
          type: ResolvedRefs
-       controllerName: kgateway.dev/kgateway
+       controllerName: {{< reuse "kgw-docs/snippets/controller-name.md" >}}
      parentRef:
        group: gateway.networking.k8s.io
        kind: Gateway

@@ -274,7 +274,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}

@@ -333,7 +333,7 @@ The accepted values for `validation.level` are `standard` and `strict` (case-ins
 To check which mode is active, inspect the `KGW_VALIDATION_MODE` environment variable on the kgateway controller deployment. The expected output is `standard` or `strict`.
 
 ```sh
-kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment kgateway \
+kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
   -o jsonpath='{.spec.template.spec.containers[*].env[?(@.name=="KGW_VALIDATION_MODE")].value}'
 ```
 

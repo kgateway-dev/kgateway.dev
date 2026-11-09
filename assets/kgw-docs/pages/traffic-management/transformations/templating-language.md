@@ -232,7 +232,7 @@ Assuming a body with the following format:
 ```yaml
 {
   "slideshow": {
-    "editor": "Yours Truly",
+    "author": "Yours Truly",
     "date": "date of publication",
     "slides": [
       {
@@ -260,10 +260,10 @@ transformation:
   response:
     body:
       parseAs: AsJson
-      value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
+      value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": {{ slideshow.slides }}}'
 ```
 
 The following body is returned after transformation: 
 ```
-{"author": "Yours Truly", "title": "Sample Slide Show", "slides": "[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}]}% 
+{"author": "Yours Truly", "title": "Sample Slide Show", "slides": [{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}]}
 ```

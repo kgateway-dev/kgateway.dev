@@ -201,7 +201,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
        cert-manager.io/issuer: letsencrypt-http
      namespace: kgateway-system
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - allowedRoutes:
          namespaces:
@@ -310,7 +310,7 @@ server: envoy
      name: http
      namespace: kgateway-system
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      listeners:
      - protocol: HTTP
        port: 8080

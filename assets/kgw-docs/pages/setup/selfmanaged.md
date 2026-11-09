@@ -5,8 +5,8 @@ Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to insta
 1. Create a GatewayParameters resource that allows you to create self-managed gateway proxies. 
    ```yaml
    kubectl apply -f- <<EOF
-   apiVersion: gateway.kgateway.dev/v1alpha1
-   kind: GatewayParameters
+   apiVersion: {{< reuse "kgw-docs/snippets/gatewayparam-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
    metadata:
      name: self-managed
      namespace: kgateway-system
@@ -24,12 +24,12 @@ Follow the [Get started guide]({{< link-hextra path="/quickstart/" >}}) to insta
      name: self-managed
      namespace: kgateway-system
    spec:
-     gatewayClassName: kgateway
+     gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
      infrastructure:
        parametersRef:
          name: self-managed
-         group: gateway.kgateway.dev
-         kind: GatewayParameters        
+         group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
+         kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
      listeners:
      - protocol: HTTP
        port: 80
