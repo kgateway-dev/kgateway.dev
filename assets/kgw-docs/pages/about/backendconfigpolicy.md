@@ -42,7 +42,7 @@ metadata:
   namespace: httpbin
 spec:
   targetSelectors:
-    - group: networking.istio.io
+    - group: ""
       kind: Service
       matchLabels:
         app: httpbin
