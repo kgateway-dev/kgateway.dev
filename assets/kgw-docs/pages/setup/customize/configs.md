@@ -210,7 +210,7 @@ EOF
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Limit downstream connections {#limit-downstream-connections}
 
-Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be `1` or greater.
+Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be between `1` and `9007199254740991`.
 
 > [!IMPORTANT]
 > Envoy reads its bootstrap configuration only when it starts. A change to this value updates the proxy ConfigMap, but the running proxy keeps enforcing the previous limit until its pods restart. Restart the proxy after you update the value, as shown in the following steps.

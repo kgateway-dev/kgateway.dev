@@ -1,6 +1,6 @@
 Route requests to services that listen for incoming traffic on a fixed IP address and port or hostname and port combination by using static Backends.
 
-You simply add the list of static hosts or DNS names to your Backend resource and then reference the Backend in your HTTPRoute resource.
+Add the list of static hosts or DNS names to your {{< reuse "kgw-docs/snippets/backend.md" >}} resource and then reference the {{< reuse "kgw-docs/snippets/backend.md" >}} in your HTTPRoute resource. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}For each static host, the `port` value must be between `1` and `65535`.{{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!NOTE]

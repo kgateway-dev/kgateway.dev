@@ -9,7 +9,7 @@ Internal redirects are configured in the {{< reuse "kgw-docs/snippets/trafficpol
 | Field | Type | Default | Description |
 |---|---|---|---|
 | `redirectResponseCodes` | `[]integer` | `[302]` | HTTP response codes that trigger an internal redirect. Valid values: `301`, `302`, `303`, `307`, `308`. Specify 1–5 unique codes. |
-| `maxRedirects` | `integer` | `1` | Maximum number of internal redirects to follow for a single downstream request. |
+| `maxRedirects` | `integer` | `1` | Maximum number of internal redirects to follow for a single downstream request. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `1` and `4294967295`.{{< /version >}} |
 | `allowCrossSchemeRedirect` | `boolean` | `false` | Allow the gateway to follow redirects that change the scheme, for example HTTP to HTTPS. |
 | `responseHeadersToCopy` | `[]string` | — | Response headers from the redirect response to copy to the outgoing redirected request. Specify 1–16 unique header names. |
 
@@ -136,7 +136,7 @@ The following example configures the gateway to follow `302` and `303` redirects
    | Field | Description |
    |---|---|
    | `redirectResponseCodes` | The gateway follows `302` and `303` redirect responses from the upstream. |
-   | `maxRedirects` | The gateway follows up to 3 consecutive redirects per downstream request. If the chain exceeds this limit, the last redirect response is returned to the client. |
+   | `maxRedirects` | The gateway follows up to 3 consecutive redirects per downstream request. If the chain exceeds this limit, the last redirect response is returned to the client. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `1` and `4294967295`.{{< /version >}} |
    | `responseHeadersToCopy` | The `access-control-allow-credentials` header from the redirect response is copied to the follow-up request sent to the redirect target. |
 
 2. Send a request that triggers a `303` redirect. Verify that the gateway follows it and returns a 200 response. Check the `headers` section in the response body and confirm that `Access-Control-Allow-Credentials` is present, which proves it was copied from the redirect response to the follow-up request.

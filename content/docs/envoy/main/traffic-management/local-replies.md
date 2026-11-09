@@ -229,7 +229,7 @@ Review other common mapper configurations.
 
 ### Remap a status code {#remap-status-code}
 
-Use the `statusCode` field to change the HTTP status code that is returned to the client. In the following example, you convert 403 error responses to a 404 error response.
+Use the `statusCode` field to change the HTTP status code that the client receives. The value must be between `200` and `599`. In the following example, you convert 403 error responses to a 404 error response.
 
 ```yaml
 kubectl apply -f- <<EOF
