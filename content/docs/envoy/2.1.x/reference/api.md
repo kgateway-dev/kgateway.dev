@@ -1605,7 +1605,7 @@ _Appears in:_
 
 
 
-GeminiConfig settings for the [Gemini](https://ai.google.dev/gemini-api/docs) LLM provider.
+GeminiConfig settings for the [Gemini](https://aistudio.google.com/docs) LLM provider.
 
 
 
@@ -1616,8 +1616,8 @@ _Appears in:_
 | Field | Description | Default | Validation |
 | --- | --- | --- | --- |
 | `authToken` _[SingleAuthToken](#singleauthtoken)_ | The authorization token that the AI gateway uses to access the Gemini API.<br />This token is automatically sent in the `key` query parameter of the request. |  |  |
-| `model` _string_ | The Gemini model to use.<br />For more information, see the [Gemini models docs](https://ai.google.dev/gemini-api/docs/models). |  |  |
-| `apiVersion` _string_ | The version of the Gemini API to use.<br />For more information, see the [Gemini API version docs](https://ai.google.dev/gemini-api/docs/api-versions). |  |  |
+| `model` _string_ | The Gemini model to use.<br />For more information, see the [Gemini models docs](https://aistudio.google.com/docs/models). |  |  |
+| `apiVersion` _string_ | The version of the Gemini API to use.<br />For more information, see the [Gemini API version docs](https://aistudio.google.com/api-reference/api-versions). |  |  |
 
 
 #### GracefulShutdownSpec

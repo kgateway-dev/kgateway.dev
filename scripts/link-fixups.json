@@ -92,8 +92,18 @@
     },
     {
       "old": "https://ai.google.dev/gemini-api/docs/models/gemini",
-      "new": "https://ai.google.dev/gemini-api/docs/models",
-      "reason": "Google dropped the /gemini suffix from the Gemini models page."
+      "new": "https://aistudio.google.com/docs/models",
+      "reason": "Google dropped the /gemini suffix from the Gemini models page, and the Gemini API docs then moved from ai.google.dev to aistudio.google.com."
+    },
+    {
+      "old": "https://ai.google.dev/gemini-api/docs/api-versions",
+      "new": "https://aistudio.google.com/api-reference/api-versions",
+      "reason": "The Gemini API docs moved to aistudio.google.com, where the API versions page lives under /api-reference/ instead of /docs/. Listed before the /gemini-api/docs entry below, which would otherwise rewrite this prefix to the wrong path."
+    },
+    {
+      "old": "https://ai.google.dev/gemini-api/docs",
+      "new": "https://aistudio.google.com/docs",
+      "reason": "The Gemini API docs moved from ai.google.dev/gemini-api/docs to aistudio.google.com/docs; the old URLs redirect."
     },
     {
       "old": "https://cloud.google.com/vertex-ai/docs/reference#versions",
