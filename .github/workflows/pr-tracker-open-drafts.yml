@@ -75,6 +75,7 @@ env:
 
 jobs:
   find:
+    if: github.repository == 'kgateway-dev/kgateway.dev'
     name: Sort draft branches into new and already-open
     runs-on: ubuntu-latest
     permissions:
