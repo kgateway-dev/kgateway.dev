@@ -50,7 +50,7 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource to define your
 The following examples walk through common ACL configurations with the httpbin sample app.
 
 > [!NOTE]
-> The ACL filter matches the client IP address that the gateway proxy sees. Depending on your load balancer and the `externalTrafficPolicy` setting of the gateway proxy Service, this address might be a private address of a node or load balancer instead of the original client IP address. For example, in a local kind cluster, requests from outside the cluster usually arrive from a private IP address. In that case, the results of the following examples differ for requests from outside the cluster.
+> The ACL filter matches the client IP address that the gateway proxy sees. Depending on your load balancer and the `externalTrafficPolicy` setting of the gateway proxy Service, this address might be a private address of a node or load balancer instead of the original client IP address. For example, in a local kind cluster, requests from outside the cluster usually arrive from a private IP address. In that case, the results of the following examples differ for requests from outside the cluster. If your gateway proxy runs behind a load balancer or proxy that sets the `X-Forwarded-For` header, you can configure the gateway proxy to take the client IP address from that header instead. For more information, see [Original client IP address]({{< link-hextra path="/traffic-management/header-control/original-client-ip/" >}}).
 
 ### Default deny with an allowlist
 
