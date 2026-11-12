@@ -154,11 +154,12 @@ You can scope the xDS configuration so that each gateway's proxies receive only 
 
    The Helm value sets the `KGW_XDS_SCOPING_MODE` environment variable on the control plane.
 
-2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file.
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file. The `--reuse-values` setting re-applies any Helm values that you previously set.
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
+     --reuse-values \
      -f values.yaml
    ```
 
@@ -541,12 +542,13 @@ To disable automatic RBAC creation, create the permissions yourself, and then tu
      create: false
    ```
 
-6. Install or upgrade the Helm release with the values file.
+6. Install or upgrade the Helm release with the values file. The `--reuse-values` setting re-applies any Helm values that you previously set.
 
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     --reuse-values \
      -f values.yaml
    ```
 
