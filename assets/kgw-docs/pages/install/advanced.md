@@ -154,11 +154,12 @@ You can scope the xDS configuration so that each gateway's proxies receive only 
 
    The Helm value sets the `KGW_XDS_SCOPING_MODE` environment variable on the control plane.
 
-2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file.
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the values file. The `--reuse-values` flag keeps the Helm values of your current installation, so the values file needs only the scoping setting.
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}} \
+     --reuse-values \
      -f values.yaml
    ```
 
@@ -237,7 +238,7 @@ You can tune the time limits with environment variables on the control plane. Th
    | `KGW_PER_CLIENT_PUBLISH_BUDGET` | How long the control plane delays the first configuration of a proxy, or a route change, while referenced clusters are not ready. Keep this value well below the startup probe time of the gateway proxy, which is 60 seconds by default. You can change the probe in the `spec.kube.podTemplate.startupProbe` field of the GatewayParameters resource. This value is not the total time until the proxy is ready. The total time also includes translation, the first connection delay that the `KGW_XDS_FIRST_CONNECT_DELAY` variable sets, and delivery to the proxy. If the first configuration arrives after the probe time, the proxy restarts. Set `0` to remove the time limit, so that the control plane delays the configuration until all referenced clusters are ready. With `0`, a new proxy that references a cluster that never becomes ready never receives configuration and never becomes ready. | `15s` |
    | `KGW_PER_CLIENT_WARM_WITHHOLD_BOUND` | How long the control plane continues to delay the configuration of a proxy that reconnects with configuration that it already has, such as after the control plane restarts, while referenced clusters are missing. This time starts after the `KGW_PER_CLIENT_PUBLISH_BUDGET` time expires. While the control plane delays the configuration, the proxy receives no updates at all, including certificate rotations. The value also limits how long the control plane keeps sending the last configuration of a cluster that is missing. Keep this value well above the time that the control plane needs to translate all resources after a restart. If the value is too low, routes fail each time the control plane restarts. Set `0` to remove the time limit. This setting has no effect if `KGW_PER_CLIENT_PUBLISH_BUDGET` is `0`. | `10m` |
 
-2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the updated values file. The `--reuse-values` setting re-applies any Helm values that you previously set.
+2. Upgrade your {{< reuse "kgw-docs/snippets/kgateway.md" >}} installation with the values file. The `--reuse-values` flag keeps the Helm values of your current installation, so the values file needs only the environment variables.
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
@@ -541,12 +542,13 @@ To disable automatic RBAC creation, create the permissions yourself, and then tu
      create: false
    ```
 
-6. Install or upgrade the Helm release with the values file.
+6. Install or upgrade the Helm release with the values file. If you upgrade, the `--reuse-values` flag keeps the Helm values of your current installation, so the values file needs only the `rbac.create` setting.
 
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      --version {{< reuse "kgw-docs/versions/n-patch.md" >}} \
+     --reuse-values \
      -f values.yaml
    ```
 
