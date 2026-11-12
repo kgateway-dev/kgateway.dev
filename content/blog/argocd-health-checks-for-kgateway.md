@@ -1,7 +1,7 @@
 ---
 title: "Green means accepted: ArgoCD health checks for kgateway"
 toc: false
-publishDate: 2026-11-17T10:00:00-00:00
+publishDate: 2026-11-12T10:00:00-00:00
 author: Duncan Doyle
 excludeSearch: true
 ---
