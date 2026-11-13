@@ -22,7 +22,7 @@ Here is what that looks like for a small storefront application. Almost everythi
 
 {{< reuse-image src="blog/argocd-health-checks-for-kgateway-1.png" width="750px" >}}
 
-Click a degraded resource and ArgoCD shows why, in kgateway's own words:
+Select a degraded resource and ArgoCD shows the health status of the resource in kgateway:
 
 {{< reuse-image src="blog/argocd-health-checks-for-kgateway-2.png" width="750px" >}}
 
