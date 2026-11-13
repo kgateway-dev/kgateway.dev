@@ -44,7 +44,7 @@ The health checks are tested against kgateway v2.4 and v2.5. For Gateway API kin
 
 The health checks are a small set of Lua scripts that you add to ArgoCD's `argocd-cm` ConfigMap. No deployment or restart is necessary. If you install ArgoCD with the `argo-helm` chart, you pass an extra values file that contains the checks> Otherwise you can update the ConfigMap with the `kubectl patch` command directly. Hosted ArgoCD offerings that accept health customizations can take the same entries.
 
-You can find everything in the [kgateway-argocd-healthchecks](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks) repository. The [installation guide](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks/blob/main/docs/INSTALL.md) walks through each installation method, and an [in-depth appendix](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks/blob/main/docs/HEALTH-MODEL.md) explains exactly how each state is decided.
+You can find everything that you need to get started in the [kgateway-argocd-healthchecks](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks) repository. The [installation guide](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks/blob/main/docs/INSTALL.md) walks through each installation method, and an [in-depth appendix](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks/blob/main/docs/HEALTH-MODEL.md) explains exactly how each state is decided.
 
 ## What's next
 
