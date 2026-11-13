@@ -1,10 +1,2 @@
-github.com/solo-io/docs-theme-extras v0.4.1 h1:obzPo9UpTDO0UMgTwQ/tlqc5G/grEUx2ZNYj526kqFE=
-github.com/solo-io/docs-theme-extras v0.4.1/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.3 h1:b0eqBWm8eozA8OoE4Hc+CgrQwTReUMN6NGJWxtfLy90=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.3/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.4 h1:zzHniI02ezS7OJAcCvTy4mY9ug/YHBl8cvW0o1301jc=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.4/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.5 h1:GgqUBpHr77ZjyIDgIgVHLa1nGDr7ODw688xFuq+d658=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.5/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.6 h1:/6iaErwrSEeU/diw8BgKlAQ6oNydtIqtHXg4fjBWm9U=
-github.com/solo-io/docs-theme-extras v0.5.0-beta.6/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
+github.com/solo-io/docs-theme-extras v0.5.0 h1:O2Z0O5UvVN/pCQE1rOpY5QxxnAgcnhxuzFX2A9xopDg=
+github.com/solo-io/docs-theme-extras v0.5.0/go.mod h1:jjjYu/QoD+vMu30zgcpfEuTEGuJOJWs5qai/K18kltg=
