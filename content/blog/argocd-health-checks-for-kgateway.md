@@ -6,7 +6,7 @@ author: Duncan Doyle
 excludeSearch: true
 ---
 
-GitOps is a natural fit for kgateway: Gateways, routes and policies are all Kubernetes resources, so they live in Git, and ArgoCD keeps the cluster in sync. ArgoCD does more than apply manifests. It also asks every resource whether it is healthy, and that answer drives the Application's status, sync waves and notifications. Today I'm happy to introduce ArgoCD health checks for kgateway, so ArgoCD can give that answer for kgateway's own resources too.
+GitOps is a natural fit for kgateway: Gateways, routes and policies are all Kubernetes resources, so they live in Git, and ArgoCD keeps the cluster in sync. ArgoCD does more than applying manifests. It also asks every resource whether it is healthy, and that answer drives the Application's status, sync waves and notifications. Today I'm happy to introduce ArgoCD health checks for kgateway, so ArgoCD can give that answer for kgateway's own resources too.
 
 These health checks are a separate open-source project in the [kgateway-argocd-healthchecks](https://github.com/DuncanDoyle/kgateway-argocd-healthchecks) repository. They are currently not part of ArgoCD or kgateway, and no ArgoCD release includes them. You add them to your existing ArgoCD installation yourself.
 
