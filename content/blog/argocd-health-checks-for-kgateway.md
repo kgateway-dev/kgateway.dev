@@ -38,7 +38,7 @@ The health checks cover the kgateway resources that report a status:
 | `DirectResponse` | A canned response returned by the gateway |
 | `Backend` | A destination that is external to the cluster |
 
-They are tested against kgateway v2.4 and v2.5. For Gateway API kinds like `Gateway` and `HTTPRoute`, ArgoCD 3.1 and later include their own checks, so together you get health for the whole gateway configuration.
+The health checks are tested against kgateway v2.4 and v2.5. For Gateway API kinds like Gateway and HTTPRoute, ArgoCD 3.1 and later include their own checks, so together you can monitor the health for the whole gateway configuration.
 
 ## Getting started
 
