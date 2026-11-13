@@ -10,7 +10,7 @@ GitOps is a natural fit for kgateway: Gateways, routes and policies are all Kube
 
 ## Health for kgateway resources
 
-ArgoCD knows how to judge a Deployment or a Service, and recent releases also ship checks for Gateway API kinds such as `Gateway` and `HTTPRoute`. kgateway's own custom resources had no check yet, so ArgoCD left them without a health status and did not count them when it rolled up an Application. A `TrafficPolicy` that kgateway had rejected could sit in an Application that still reported Healthy.
+ArgoCD knows how to check the health of a Kubernetes Deployment or a Service, and recent releases also ship checks for Gateway API resources, such as Gateways and HTTPRoutes. Kgateway's own custom resources had no check yet, so ArgoCD left them without a health status and did not count them when it rolled up an Application. A TrafficPolicy that kgateway rejected could sit in an Application that still reported Healthy.
 
 The new health checks close that gap. They read the status kgateway already writes on each resource, and turn it into one of ArgoCD's states:
 
