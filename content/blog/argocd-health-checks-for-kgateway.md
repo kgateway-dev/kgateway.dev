@@ -36,7 +36,7 @@ The health checks cover the kgateway resources that report a status:
 | ListenerPolicy | Listener-level settings on a Gateway |
 | `BackendConfigPolicy` | Connection settings towards a backend |
 | `DirectResponse` | A canned response returned by the gateway |
-| `Backend` | A destination outside the cluster's Services |
+| `Backend` | A destination that is external to the cluster |
 
 They are tested against kgateway v2.4 and v2.5. For Gateway API kinds like `Gateway` and `HTTPRoute`, ArgoCD 3.1 and later include their own checks, so together you get health for the whole gateway configuration.
 
