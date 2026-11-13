@@ -210,25 +210,35 @@ EOF
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Limit downstream connections {#limit-downstream-connections}
 
-Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be `1` or greater. Because this setting changes the Envoy bootstrap configuration, updating the value restarts the proxy.
+Use `envoyContainer.bootstrap.maxDownstreamConnections` to cap active downstream connections across all Envoy listeners. If you omit the field, Envoy does not set a global downstream connection limit. The value must be between `1` and `9007199254740991`.
 
-```yaml
-kubectl apply -f- <<'EOF'
-apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
-metadata:
-  name: gw-params
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-spec:
-  kube:
-    envoyContainer:
-      bootstrap:
-        maxDownstreamConnections: 5000
-EOF
-```
+> [!IMPORTANT]
+> Envoy reads its bootstrap configuration only when it starts. A change to this value updates the proxy ConfigMap, but the running proxy keeps enforcing the previous limit until its pods restart. Restart the proxy after you update the value, as shown in the following steps.
+
+1. Set the limit.
+   ```yaml
+   kubectl apply -f- <<'EOF'
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: gw-params
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     kube:
+       envoyContainer:
+         bootstrap:
+           maxDownstreamConnections: 5000
+   EOF
+   ```
+
+2. If the gateway proxy is already running, restart it so that Envoy picks up the new limit. A proxy that you create after you apply the resource starts with the new limit.
+   ```sh
+   kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Change the listener drain behavior {#drain-settings}
 
 When a listener is modified or removed, Envoy drains the connections on the old listener. By default, {{< reuse "kgw-docs/snippets/kgateway-capital.md" >}} starts the gateway proxy with `--drain-time-s 60` and `--drain-strategy immediate`. Envoy asks the connections on the old listener to close right away, and force-closes the connections that are still open after 60 seconds.
@@ -282,7 +292,7 @@ EOF
 
 ### Pod and node affinity {#pod-scheduling}
 
-Use the built-in `podTemplate` fields to configure node selectors, affinities, tolerations, and topology spread constraints that control where gateway proxy pods are scheduled.
+Use the built-in `podTemplate` fields to configure node selectors, affinities, tolerations, and topology spread constraints that control where gateway proxy pods are scheduled. The following example uses placeholder node labels. Replace them with labels that your nodes have, or the gateway proxy pod stays in a `Pending` state.
 
 ```yaml
 kubectl apply -f- <<'EOF'
@@ -318,7 +328,7 @@ spec:
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
             matchLabels:
-              app: kgateway
+              app.kubernetes.io/name: custom
 EOF
 ```
 
@@ -397,7 +407,7 @@ EOF
 
 ### Mount a ConfigMap as a volume {#configmap-volume}
 
-Use `podTemplate.extraVolumes` to add a ConfigMap-backed volume and `envoyContainer.extraVolumeMounts` to mount it in the proxy container.
+Use `podTemplate.extraVolumes` to add a ConfigMap-backed volume and `envoyContainer.extraVolumeMounts` to mount it in the proxy container. The following example mounts a `my-custom-config` ConfigMap. Create the ConfigMap in the same namespace as the gateway proxy before you apply the example.
 
 ```yaml
 kubectl apply -f- <<'EOF'
@@ -478,7 +488,7 @@ EOF
 
 ### Change the SDS sidecar's pod-network bind address {#sds-bind-address}
 
-The SDS sidecar binds to `127.0.0.1:8234` by default so the endpoint is reachable only from within its own pod. If you need to reach the SDS sidecar from outside its pod in a trusted environment, override the `SDS_SERVER_ADDRESS` environment variable on the `sds` container to bind to all interfaces instead (`0.0.0.0:8234`). 
+The SDS sidecar binds to `127.0.0.1:8234` by default so the endpoint is reachable only from within its own pod. If you need to reach the SDS sidecar from outside its pod in a trusted environment, override the `SDS_SERVER_ADDRESS` environment variable on the `sds` container to bind to all interfaces instead (`0.0.0.0:8234`). The `sds` container exists only when Istio integration is enabled. Without it, the overlay adds an incomplete container and the Deployment update is rejected. 
 
 ```yaml
 kubectl apply --server-side -f- <<'EOF'
@@ -504,7 +514,7 @@ EOF
 > [!CAUTION]
 > Changing the pod-network bind address to all interfaces exposes the SDS endpoint to any pod on the cluster network. Enable this feature only in a trusted environment.
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ### Run the proxy with hostNetwork {#host-network-ports}
 
 The proxy Deployment does not list Gateway and ListenerSet listener ports, such as `listener-8080`, as container ports. Only `http-monitoring` (9091) remains, when stats are enabled.
@@ -512,6 +522,7 @@ The proxy Deployment does not list Gateway and ListenerSet listener ports, such 
 If you set `hostNetwork` in a deployment overlay, the proxy uses the network of the node, and each container port also acts as a host port. The scheduler does not place two pods that use the same host port on one node. Keep the following considerations in mind.
 
 * **DNS policy**: The proxy connects to the control plane by the DNS name of the control plane Service, which ends in `.svc.cluster.local`. A pod with `hostNetwork` uses the DNS settings of the node by default, and the node cannot resolve in-cluster names. As a result, the proxy cannot reach the control plane and never becomes ready. Set `dnsPolicy: ClusterFirstWithHostNet` in the overlay so that the pod uses the DNS of the cluster, even though it uses the network of the node.
+* **Listener ports below 1024**: If a Gateway listener uses a port below 1024, such as `80`, the generated pod security context includes the `net.ipv4.ip_unprivileged_port_start` sysctl. This sysctl lets the proxy bind the port without root privileges. Kubernetes rejects this sysctl in a pod with `hostNetwork`, so the proxy Deployment is not updated and keeps its previous settings. For a proxy that uses the network of the node, use listener ports of 1024 or higher.
 * **Two proxies on one node**: Two proxies on the same node conflict on the ports that they bind, such as the Envoy admin port `19000`. The second proxy fails to start with an error such as `cannot bind '127.0.0.1:19000': Address already in use`.
   * **Stats enabled (default)**: Each proxy has the `http-monitoring` container port 9091, so the scheduler already keeps the proxies on different nodes.
   * **Stats disabled**: Nothing keeps the proxies apart, and the scheduler can place both on one node. To keep proxies that use the same listener ports on different nodes, add your Gateway's listener ports as container ports in the overlay.
@@ -568,7 +579,7 @@ EOF
 ```
 
 > [!CAUTION]
-> Replacing all volumes removes volumes that are generated by the control plane and can prevent the proxy from starting. A production replacement must re-declare every generated volume that the proxy requires. If you only need to add volumes, use `podTemplate.extraVolumes` instead.
+> Replacing all volumes removes volumes that are generated by the control plane, such as `envoy-config` and `xds-token`. If the proxy container still mounts a volume that your list leaves out, Kubernetes rejects the Deployment update. A production replacement must re-declare every generated volume that the proxy requires. If you only need to add volumes, use `podTemplate.extraVolumes` instead.
 
 ## Service configuration
 

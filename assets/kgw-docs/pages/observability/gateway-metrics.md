@@ -2,7 +2,7 @@ By default, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} exposes metrics in Pr
 
 ## View default data plane metrics in Prometheus {#prometheus-metrics}
 
-The following steps show you how to quickly view the metrics endpoint of the gateway proxy deployment.{{< version exclude-if="2.0.x" >}} To integrate the Prometheus metrics into your observability stack, see the [OpenTelemetry guide]({{< link-hextra path="/observability/otel-stack/" >}}).{{< /version >}}
+The following steps show you how to quickly view the metrics endpoint of the gateway proxy deployment. To integrate the Prometheus metrics into your observability stack, see the [OpenTelemetry guide]({{< link-hextra path="/observability/otel-stack/" >}}).
 
 1. Port-forward the gateway deployment on port 19000.
    
@@ -19,7 +19,7 @@ The following steps show you how to quickly view the metrics endpoint of the gat
    envoy_cluster_external_upstream_rq{envoy_response_code="200",envoy_cluster_name="kube_httpbin_httpbin_8000"} 5
    ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Per-listener metrics {#listener-metrics}
 
 The gateway proxy reports the HTTP connection manager and TCP proxy stats for each listener separately. Envoy names these stats with a stat prefix that {{< reuse "kgw-docs/snippets/kgateway.md" >}} sets for each listener. In Prometheus, the stat prefix is the value of the `envoy_http_conn_manager_prefix` label for HTTP and HTTPS listeners, and of the `envoy_tcp_prefix` label for TCPRoutes and TLSRoutes. In the Envoy admin stats, it is part of the stat name, such as `http.http_8080.downstream_rq_total` or `tcp.tcp_8000_<namespace>_<route>.downstream_cx_total`. In earlier versions, all HTTP and HTTPS listeners shared the stat prefix `http`.
@@ -128,7 +128,7 @@ spec:
         inclusionList:
           - prefix: "http."
           - suffix: ".rq_total"
-          - safeRegex: "^cluster\\..*\\.upstream_cx_active$"
+          - safeRegex: "^cluster[.].*[.]upstream_cx_active$"
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
@@ -136,7 +136,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
@@ -146,7 +146,17 @@ spec:
     - protocol: HTTP
       port: 8080
       name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 EOF
+```
+
+The stats matcher is part of the bootstrap configuration of the gateway proxy, which the proxy reads only when it starts. Restart the gateway proxy to apply the matcher.
+
+```sh
+kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 
 **Exclusion list**
@@ -176,7 +186,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}
@@ -186,10 +196,20 @@ spec:
     - protocol: HTTP
       port: 8080
       name: http
+      allowedRoutes:
+        namespaces:
+          from: All
 EOF
 ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+The stats matcher is part of the bootstrap configuration of the gateway proxy, which the proxy reads only when it starts. Restart the gateway proxy to apply the matcher.
+
+```sh
+kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+```
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ## Per-route statistics {#per-route-stats}
 
@@ -254,7 +274,7 @@ metadata:
   name: http
   namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
-  gatewayClassName: kgateway
+  gatewayClassName: {{< reuse "kgw-docs/snippets/gatewayclass.md" >}}
   infrastructure:
     parametersRef:
       group: {{< reuse "kgw-docs/snippets/gatewayparam-group.md" >}}

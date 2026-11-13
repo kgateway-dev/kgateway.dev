@@ -34,7 +34,7 @@ For a BackendTLSPolicy it's a reference to a service.  But we can imagine other 
 
 The kgateway project comes with different policy types that aim to extend the core capabilities of the Kubernetes Gateway API with advanced traffic management, resiliency, security, and even AI capabilities. You can apply these policies to an HTTPRoute or Gateway. 
 
-Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/envoy/latest/reference/api/#httplistenerpolicy). You use the `targetRefs` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
+Let’s start exploring a simple [HTTPListenerPolicy](https://kgateway.dev/docs/envoy/2.4.x/reference/api/#httplistenerpolicy). You use the `targetRefs` section to attach this policy to a Gateway. A very common use case for an HttpListenerPolicy is to configure or customize access logs. 
 
 In the below example resource, the policy attaches to the gateway named `infra-gateway` and specifies "standard output" as the access logging "file sink". It then proceeds to specify the fields that will constitute each log line:
 

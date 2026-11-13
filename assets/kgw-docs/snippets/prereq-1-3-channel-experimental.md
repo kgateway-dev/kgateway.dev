@@ -17,10 +17,16 @@
    {{% /tab %}}
    {{< /tabs >}}
 
-4. **Important**: Install the experimental channel of version 1.3 of the Kubernetes Gateway API to use this feature.
+4. **Important**: Install the experimental channel of the Kubernetes Gateway API to use this feature.
    ```shell
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.3.0/experimental-install.yaml
-   ```{{< version exclude-if="2.0.x,2.1.x" >}}
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```
+
+   If your cluster already has the standard channel CRDs, this command can fail with the error `Installing experimental CRDs on top of standard channel CRDs is prohibited by default`. Gateway API version 1.5 and later includes a `safe-upgrades.gateway.networking.k8s.io` ValidatingAdmissionPolicy that blocks this switch. To continue, delete the binding of the policy, and then apply the experimental bundle again. The bundle re-creates the policy and its binding.
+   ```sh
+   kubectl delete validatingadmissionpolicybinding safe-upgrades.gateway.networking.k8s.io
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   ```{{< version exclude-if="2.1.x" >}}
 
 5. In kgateway version 2.2 and later, experimental Gateway API features are enabled by default. The `KGW_ENABLE_EXPERIMENTAL_GATEWAY_API_FEATURES` environment variable on the kgateway controller deployment defaults to `true`, so no additional configuration is required. To disable these features, set the variable to `false` in your Helm values and upgrade your installation.
 

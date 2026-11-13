@@ -20,7 +20,7 @@ By default, the gateway proxy rejects upgrade requests from clients. To enable u
 - **`CONNECT` termination is per route.** You cannot configure `CONNECT` termination on a listener by using a ListenerPolicy. Always use the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource instead.
 - **Terminating `CONNECT` requests forwards raw bytes.** If you configure TLS for the selected backend, those bytes are wrapped in a separate upstream TLS session. Leave backend TLS disabled when the payload must reach the backend unchanged.
 - **You cannot combine upgrades with request buffering.** A {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that sets both `httpUpgrade` and `buffer` is rejected, unless the `buffer` setting disables buffering.
-- **WebSocket over HTTP/2 needs an additional listener setting.** Clients such as Firefox open WebSocket connections over HTTP/2 with Extended CONNECT requests that the listener rejects by default. Allowing Extended CONNECT requests is a separate setting from the upgrade configuration on this page. You need set the `allowConnect` field on the listener's `http2ProtocolOptions`, and enable Websocket upgrades on the gateway listener or route. Envoy converts an accepted Extended CONNECT request into a regular `websocket` upgrade internally, so it still has to accept the same upgrade token as any other WebSocket request. For more information, see [WebSocket over HTTP/2]({{< link-hextra path="/traffic-management/http2-downstream/#allow-connect" >}}).
+- **WebSocket over HTTP/2 needs an additional listener setting.** Clients such as Firefox open WebSocket connections over HTTP/2 with Extended CONNECT requests that the listener rejects by default. Allowing Extended CONNECT requests is a separate setting from the upgrade configuration on this page. You need to set the `allowConnect` field on the listener's `http2ProtocolOptions`, and enable Websocket upgrades on the gateway listener or route. Envoy converts an accepted Extended CONNECT request into a regular `websocket` upgrade internally, so it still has to accept the same upgrade token as any other WebSocket request. For more information, see [WebSocket over HTTP/2]({{< link-hextra path="/traffic-management/http2-downstream/#allow-connect" >}}).
 
 ## Before you begin
 
@@ -92,7 +92,7 @@ Configure a gateway listener to accept protocol upgrade requests.
    | ----- | ----- |
    | `enabledUpgrades` | The upgrade tokens that the listener accepts, such as `websocket` or `CONNECT`. Tokens are case-insensitive. List at least one. Enabling `CONNECT` here proxies CONNECT requests upstream without terminating them. |
 
-3. Send the same upgrade request again, and confirm that the gateway proxy now forwards it instead of rejecting it. Note that the sample httpbin app does not implement WebSocket, so it never completes the handshake with a `101 Switching Protocols` response. Instead, the gateway proxy now accepts the upgrade and holds the connection open, waiting on the httpbin backend, until curl times out after 5 seconds. Getting a timeout instead of a `403` is the proof that the gateway proxy forwarded the request.
+3. Send the same upgrade request again, and confirm that the gateway proxy now forwards it instead of rejecting it. Note that the sample httpbin app does not implement WebSocket, so it never completes the handshake with a `101 Switching Protocols` response. Instead, httpbin ignores the upgrade headers and answers the request as a regular HTTP request. Getting a `200` instead of a `403` is the proof that the gateway proxy forwarded the request.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -122,8 +122,12 @@ Configure a gateway listener to accept protocol upgrade requests.
    Example output:
 
    ```console
-   * Request completely sent off
-   * Operation timed out after 5001 milliseconds with 0 bytes received
+   < HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   < server: envoy
+   < connection: close
+   < content-length: 0
    ```
 
 ## Enable WebSocket on a route {#websocket-route}
@@ -161,7 +165,7 @@ The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource must be in the s
    | ----- | ----- |
    | `httpUpgrade[].type` | The upgrade token, such as `websocket`, `CONNECT`, or `spdy/3.1`. Required, and case-insensitive. Do not list the same token twice, including variants that differ only in letter case. Up to 16 entries. |
 
-3. Send an upgrade request to the httpbin route. Because the sample httpbin app does not implement WebSocket, the connection times out instead of completing a `101 Switching Protocols` handshake. 
+3. Send an upgrade request to the httpbin route. Because the sample httpbin app does not implement WebSocket, it ignores the upgrade headers and answers with a regular `200 OK` response instead of completing a `101 Switching Protocols` handshake. Getting a `200` instead of a `403` is the proof that the gateway proxy forwarded the request. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -190,8 +194,12 @@ The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource must be in the s
    Example output:
 
    ```console
-   * Request completely sent off
-   * Operation timed out after 5001 milliseconds with 0 bytes received
+   < HTTP/1.1 200 OK
+   < access-control-allow-credentials: true
+   < access-control-allow-origin: *
+   < server: envoy
+   < connection: close
+   < content-length: 0
    ```
 
 4. Delete the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}, and send the same request again. Verify that this time, the gateway proxy rejects the request with a 403 HTTP response, because neither the gateway proxy nor the route accept WebSocket upgrades. 

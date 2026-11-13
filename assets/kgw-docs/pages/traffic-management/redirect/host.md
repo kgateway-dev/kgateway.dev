@@ -31,7 +31,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    EOF
    ```
 
-4. Send a request to the httpbin app on the `host.redirect.example` domain and verify that you get back a 302 HTTP response code and the redirect location `www.example.com/headers`. 
+2. Send a request to the httpbin app on the `host.redirect.example` domain and verify that you get back a 302 HTTP response code and the redirect location `www.example.com/headers`. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

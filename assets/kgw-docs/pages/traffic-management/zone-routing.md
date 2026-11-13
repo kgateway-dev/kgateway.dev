@@ -178,7 +178,7 @@ EOF
 {{% /tab %}}
 {{% tab name="Force local zone" %}}
 
-The `force` mode routes all traffic exclusively to the local zone as long as the local zone has at least `minEndpointsInZoneThreshold` healthy endpoints. If the local zone drops below that threshold, the gateway proxy falls back to prefer-local zone-aware routing.
+The `force` mode routes all traffic exclusively to the local zone as long as the local zone has at least `minEndpointsInZoneThreshold` healthy endpoints. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The `minEndpointsInZoneThreshold` value must be between `1` and `4294967295`.{{< /version >}} If the local zone drops below that threshold, the gateway proxy falls back to prefer-local zone-aware routing.
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -211,9 +211,10 @@ EOF
 Confirm that Envoy received the zone-aware routing configuration by checking the config dump.
 ```sh
 kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
+PF_PID=$!
 sleep 2
 curl -s http://localhost:19000/config_dump | grep -A 6 'zone_aware_lb_config'
-lsof -ti:19000 | xargs kill -9
+kill $PF_PID
 ```
 
 Example output:
@@ -244,8 +245,9 @@ Example output:
 kubectl delete BackendConfigPolicy httpbin-zone-aware -n httpbin
 ```
 
-If you created a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource for manual zone configuration (Kubernetes < 1.35), also remove it:
+If you created a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource for manual zone configuration (Kubernetes < 1.35), remove the reference to it from the `http` Gateway, and then delete it:
 
 ```sh
-kubectl delete {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} zone-aware-gw-params -n kgateway-system
+kubectl patch gateway http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} --type=json -p '[{"op": "remove", "path": "/spec/infrastructure"}]'
+kubectl delete {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} zone-aware-gw-params -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```

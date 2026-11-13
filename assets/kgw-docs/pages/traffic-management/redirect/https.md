@@ -8,6 +8,8 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
 
 ## Set up an HTTPS listener
 
+This guide uses the `redirect.example.com` hostname, which the `*.example.com` certificate that you create in the following steps covers.
+
 {{% reuse "kgw-docs/snippets/listeners-https-create-cert.md" %}}
 
 5. Configure an HTTPS listener on the Gateway that you created earlier. Note that your Gateway now has two listeners, `http` and `https`. You reference these listeners later in this guide to configure the HTTP to HTTPS redirect. 
@@ -59,7 +61,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          sectionName: http
      hostnames: 
-       - redirect.example
+       - redirect.example.com
      rules:
        - filters:
          - type: RequestRedirect
@@ -94,7 +96,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
          sectionName: https
      hostnames: 
-       - redirect.example
+       - redirect.example.com
      rules:
        - backendRefs:
            - name: httpbin
@@ -102,27 +104,28 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    EOF
    ```
 
-3. Send an HTTP request to the httpbin app on the `redirect.example` domain. Verify that you get back a 301 HTTP response code and that your redirect location shows `https://redirect.example:8080/status/200`. 
+3. Send an HTTP request to the httpbin app on the `redirect.example.com` domain. Verify that you get back a 301 HTTP response code and the redirect location for the HTTPS listener.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: redirect.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/status/200 -H "host: redirect.example.com"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -vik localhost:8080/status/200 -H "host: redirect.example"
+   curl -vi localhost:8080/status/200 -H "host: redirect.example.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: 
+   {{< version exclude-if="2.1.x,2.2.x" >}}Because the redirect uses the `https` scheme and no port, the location uses the default HTTPS port 443, which is omitted from the URL.
+
    ```
    * Mark bundle as not supporting multiuse
    < HTTP/1.1 301 Moved Permanently
    HTTP/1.1 301 Moved Permanently
-   < location: https://redirect.example:8080/status/200
-   location: https://redirect.example:8080/status/200
+   < location: https://redirect.example.com/status/200
+   location: https://redirect.example.com/status/200
    < date: Mon, 06 Nov 2024 01:48:12 GMT
    date: Mon, 06 Nov 2024 01:48:12 GMT
    < server: envoy
@@ -130,12 +133,29 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    < content-length: 0
    content-length: 0
    ```
+   {{< /version >}}
+   {{< version include-if="2.1.x,2.2.x" >}}The location keeps the port of the HTTP listener, `8080`.
+
+   ```
+   * Mark bundle as not supporting multiuse
+   < HTTP/1.1 301 Moved Permanently
+   HTTP/1.1 301 Moved Permanently
+   < location: https://redirect.example.com:8080/status/200
+   location: https://redirect.example.com:8080/status/200
+   < date: Mon, 06 Nov 2024 01:48:12 GMT
+   date: Mon, 06 Nov 2024 01:48:12 GMT
+   < server: envoy
+   server: envoy
+   < content-length: 0
+   content-length: 0
+   ```
+   {{< /version >}}
   
-4. Send an HTTPS request to the httpbin app on the `redirect.example` domain. Verify that you get back a 200 HTTP response code and that you can see a successful TLS handshake with the gateway. 
+4. Send an HTTPS request to the httpbin app on the `redirect.example.com` domain. The `--cacert` option verifies the gateway certificate against the root certificate that you created earlier. Verify that you get back a 200 HTTP response code and that the certificate is verified. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vik https://$INGRESS_GW_ADDRESS:443/status/200 -H "host: redirect.example"
+   curl -vi --cacert example_certs/root.crt --resolve "redirect.example.com:443:${INGRESS_GW_ADDRESS}" https://redirect.example.com/status/200
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
@@ -146,7 +166,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    
    2. Send an HTTPS request to the httpbin app. 
       ```sh
-      curl -vik --connect-to redirect.example:443:localhost:8443 https://redirect.example/status/200
+      curl -vi --cacert example_certs/root.crt --connect-to redirect.example.com:443:localhost:8443 https://redirect.example.com/status/200
       ```
    {{% /tab %}}
    {{< /tabs >}}
@@ -164,14 +184,15 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    * SSL connection using TLSv1.3 / AEAD-CHACHA20-POLY1305-SHA256 / [blank] / UNDEF
    * ALPN: server did not agree on a protocol. Uses default.
    * Server certificate:
-   *  subject: CN=*; O=any domain
+   *  subject: CN=*.example.com; O=any domain
    *  start date: Mar 14 13:37:22 2025 GMT
    *  expire date: Mar 14 13:37:22 2026 GMT
+   *  subjectAltName: host "redirect.example.com" matched cert's "*.example.com"
    *  issuer: O=any domain; CN=*
-   *  SSL certificate verify result: unable to get local issuer certificate (20), continuing anyway.
+   *  SSL certificate verify ok.
    * using HTTP/1.x
    > GET /status/200 HTTP/1.1
-   > Host: redirect.example
+   > Host: redirect.example.com
    > User-Agent: curl/8.7.1
    > Accept: */*
    > 

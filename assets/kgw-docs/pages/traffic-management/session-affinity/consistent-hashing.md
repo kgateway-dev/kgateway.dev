@@ -67,8 +67,8 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
    | Setting | Description | 
    | -- | -- | 
-   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
-   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `1` and `8388608`.{{< /version >}} |
+   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `minimumRingSize` and `8388608`. By default, `minimumRingSize` is `1024`.{{< /version >}} |
    | `header.name` | The expected header name to create the hash with. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal` field to determine which policy is the priority. For example, in this policy, the `x-user-id` header has the `terminal: true` setting. This indicates that if the request has the `x-user-id` header, any subsequent policies (such as the `x-session-id` header in this example) are skipped. This field is useful for defining fallback policies, and limiting the amount of time spent generating hash keys. |
    | `closeConnectionsOnHostSetChange` | If set to true, the proxy drains all existing connections to a backend host whenever hosts are added or removed for a backend pool. | 
@@ -111,12 +111,12 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
    | Setting | Description | 
    | -- | -- | 
-   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
-   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `1` and `8388608`.{{< /version >}} |
+   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `minimumRingSize` and `8388608`. By default, `minimumRingSize` is `1024`.{{< /version >}} |
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.httpOnly`, `cookie.secure`, `cookie.sameSite` | Additional attributes for the generated cookie. This example sets `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
 
@@ -149,8 +149,8 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
    | Setting | Description | 
    | -- | -- | 
-   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. |
-   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. | 
+   | `ringHash.minimumRingSize` | The minimum ring size. The size of the ring determines the number of hashes that can be assigned for each host and placed on the ring. The ring number is divided by the number of hosts that serve the request. For example, if you have 2 hosts and the minimum ring size is 1000, each host gets approximately 500 hashes in the ring. When a request is received, the request is assigned a hash in the ring, and therefore assigned to a particular host. Generally speaking, the larger the ring size is, the better distribution between hosts can be achieved. If not set, the minimum ring size defaults to 1024. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `1` and `8388608`.{{< /version >}} |
+   | `ringHash.maximumRingSize` | The maximum ring size. If not set, the maximum ring size defaults to 8 million. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be between `minimumRingSize` and `8388608`. By default, `minimumRingSize` is `1024`.{{< /version >}} |
    | `sourceIP` | Hash based on the source IP address of the request. No further configuration is required. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
@@ -163,7 +163,7 @@ Ringhash allows you to tune the ring size to balance memory usage vs load distri
 
 ### Maglev
 
-With Maglev, you use a fixed lookup table of 65,357 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
+With Maglev, you use a fixed lookup table of 65,537 entries that is optimized for fast request routing with deterministic performance. This option is well-suited for general-purpose workloads that do not require custom tuning. For more information, see the [Envoy docs](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/upstream/load_balancing/load_balancers#maglev).
 
 > [!NOTE]
 > If you want to hash by hostname instead of resolved IP address, you can set `useHostnameForHashing: true` in the `loadBalancer` section of your BackendConfigPolicy resource. This setting is only supported for static backends and has no effect on Kubernetes service backends.
@@ -241,7 +241,7 @@ With Maglev, you use a fixed lookup table of 65,357 entries that is optimized fo
    | `cookie.name` | The expected cookie name to create the hash with. In this example, the cookie is named `session-id`. |
    | `cookie.path` | The name of the path for the cookie, such as `/api` in this example. |
    | `cookie.ttl` | If the cookie is not present, a cookie with this duration of time for validity is generated, such as 30 minutes in this example. |
-   | `cookie.attributes` | Define additional attributes for an HTTP cookie. This example sets three additional attributes: `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
+   | `cookie.httpOnly`, `cookie.secure`, `cookie.sameSite` | Additional attributes for the generated cookie. This example sets `httpOnly: true`, `secure: true`, and `sameSite: Strict`. |
    | `terminal` | If you define multiple `hashPolicies` in one BackendConfigPolicy, you can use the `terminal: true` setting to indicate the priority policy. |
 
    {{% /tab %}}
@@ -353,7 +353,7 @@ Send a few requests to the httpbin app and verify that the request is served by 
    * **Cookies**: 
      1. Send a request to the httpbin app and verify that you get back a `set-cookie` header with a `session-id`. 
         ```sh
-        curl -i -c -k localhost:8080/headers \
+        curl -i -c cookie-jar localhost:8080/headers \
         -H "host: www.example.com"
         ```
         
@@ -371,7 +371,7 @@ Send a few requests to the httpbin app and verify that the request is served by 
    {{% /tab %}}
    {{< /tabs >}}
 
-7. Check the logs of each httpbin instance. Verify that only one of the instances served all 10 of the subsequent requests that you made.
+4. Check the logs of each httpbin instance. Verify that only one of the instances served all 10 of the subsequent requests that you made.
    ```sh
    kubectl logs -n httpbin <httpbin-pod>
    ```

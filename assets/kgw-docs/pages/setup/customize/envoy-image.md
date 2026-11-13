@@ -177,6 +177,7 @@ If you want every Gateway using the `{{< reuse "kgw-docs/snippets/gatewayclass.m
 
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
+     --version {{< reuse "/kgw-docs/versions/helm-version-flag.md" >}} \
      oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml
    ```

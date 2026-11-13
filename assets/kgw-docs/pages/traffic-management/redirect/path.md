@@ -13,7 +13,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
 1. Create an HTTPRoute for the httpbin app. In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
 
-   Because the `ReplacePrefixPath` path modifier is used, only the path prefix is replaced during the redirect. For example, requests to `http://path.redirect.example/get` result in the `https://path.redirect.example/status/200` redirect location. However, for longer paths, such as in `http://path.redirect.example/get/headers`, only the prefix is replaced and a redirect location of `https://path.redirect.example/status/200/headers` is returned.
+   Because the `ReplacePrefixMatch` path modifier is used, only the path prefix is replaced during the redirect. For example, requests to `http://path.redirect.example/get` result in the `http://path.redirect.example/status/200` redirect location. However, for longer paths, such as in `http://path.redirect.example/get/headers`, only the prefix is replaced and a redirect location of `http://path.redirect.example/status/200/headers` is returned.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -50,7 +50,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    |`spec.rules.matches.path`|The prefix path that you want to redirect. In this example, you want to redirect all requests to the `/get` path. |
    |`spec.rules.filters.type`|The type of filter that you want to apply to incoming requests. In this example, the `RequestRedirect` is used.|
    |`spec.rules.filters.requestRedirect.path.type`|The type of path modifier that you want to apply. In this example, you want to replace only the prefix path.  |
-   |`spec.rules.filters.requestRedirect.path.replacePrefixPath`|The prefix path you want to redirect to. In this example, all requests to the `/get` prefix path are redirected to the `/status/200` prefix path.  |
+   |`spec.rules.filters.requestRedirect.path.replacePrefixMatch`|The prefix path you want to redirect to. In this example, all requests to the `/get` prefix path are redirected to the `/status/200` prefix path.  |
    |`spec.rules.filters.requestRedirect.statusCode`| The HTTP status code that you want to return to the client in case of a redirect. For non-permanent redirects, use the 302 HTTP response code. |
 
 2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and the `path.redirect.example:8080/status/200` redirect location. 
@@ -111,7 +111,7 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
 
 1. Create an HTTPRoute for the httpbin app. In the following example, requests to the `/get` path are redirected to the `/status/200` path, and a 302 HTTP response code is returned to the user.
 
-   Because the `ReplaceFullPath` path modifier is used, requests to `http://path.redirect.example/get` and `http://path.redirect.example/get/headers` both receive `https://path.redirect.example/status/200` as the redirect location.
+   Because the `ReplaceFullPath` path modifier is used, requests to `http://path.redirect.example/get` and `http://path.redirect.example/get/headers` both receive `http://path.redirect.example/status/200` as the redirect location.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -147,8 +147,8 @@ Path redirects use the HTTP path modifier to replace either an entire path or pa
    |`spec.hostnames`| The hostname for which you want to apply the redirect.|
    |`spec.rules.matches.path`|The prefix path that you want to redirect. In this example, you want to redirect all requests to the `/get` path. |
    |`spec.rules.filters.type`|The type of filter that you want to apply to incoming requests. In this example, the `RequestRedirect` is used.|
-   |`spec.rules.filters.requestRedirect.path.type`|The type of path modifier that you want to apply. In this example, you want to replace the full path..  |
-   |`spec.rules.filters.requestRedirect.path.replaceFullPath`|The path that you want to redirect to. In this example, all requests to the `/get` prefix path are redirected to the `/status/200` prefix path.  |
+   |`spec.rules.filters.requestRedirect.path.type`|The type of path modifier that you want to apply. In this example, you want to replace the full path.  |
+   |`spec.rules.filters.requestRedirect.path.replaceFullPath`|The path that you want to redirect to. In this example, all requests to the `/get` prefix path are redirected to the `/status/200` path.  |
    |`spec.rules.filters.requestRedirect.statusCode`| The HTTP status code that you want to return to the client in case of a redirect. For non-permanent redirects, use the 302 HTTP response code. |
 
 2. Send a request to the httpbin app on the `path.redirect.example` domain. Verify that you get back a 302 HTTP response code and the redirect location `path.redirect.example:8080/status/200`. 

@@ -22,7 +22,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
            issuer: kgateway.dev
            jwks:
              local:
-               inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+               inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
    EOF
    ```
 
@@ -109,7 +109,7 @@ Use JWT authentication to verify that incoming requests carry a token issued by 
    -->
 
    ```sh
-   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtnYXRld2F5LXB1YmxpYy1rZXktMDAxIn0.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.YCxMm0TmecXsbcbNp6_GXlq5hCFGMD7KhLdOrp3EqzOKl_NX5vm6sNCMNSq5LjbCSKGThn66fnI4P6rlXke7w5kj8khIXQwDn7R0Dy5QOpLAFyE7pk8QGAjkgEGu37bxht5VjbsORdmrfxep1MTy3UEqef60Zwxwt3UtG5KmnsyyedmsCeodPNiNfuhA43r4KahpYg9cIMAnU_Wg-52ztwtqbrVRGxmoj6Efply4FE0xSKhKJZhulViriXR5K2y4zSdxenKvprO46u2ZSka7nq9ehpw_Oqhcwezw7So3lV_xpohiFz_-PGX97TXR1zi0ATjjp7VFxhkbggk8nEEFkQ
+   export TOKEN=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImtnYXRld2F5LXB1YmxpYy1rZXktMDAxIn0.eyJpc3MiOiJrZ2F0ZXdheS5kZXYiLCJvcmciOiJrZ2F0ZXdheS5kZXYiLCJzdWIiOiJhbGljZSIsInRlYW0iOiJkZXYiLCJleHAiOjIwNzQyNzQ4ODQsImxsbXMiOnsib3BlbmFpIjpbImdwdC0zLjUtdHVyYm8iXX19.lTQr9PIyDeIQYn0c_qxaNb1sAJ3-rCMzZ0jR33v_P5ZWw9eiIHm9e_LDWaBZp2s6CCeqSubJvk7QT06SeKqiq84uQNUG6o5vKVolIfep6L7LCH9GFuTsJgTLxznJPc4oh5qIum0zBC2fy_IOOGeV_FzeFh1Jidi3onGS1fxV2EhY9btbM3br8oFwkhU4Gv1d-lUK1_j0cuP0Cuyx3EoaJkarmB_chJYqFe-EoUVbKXdsYdBLGCwK8u30FOBleRUWvuekQB7atlfYG0qptG0iOPVVv4tynL44cNQ_5GBt4QfIwBqAQyoJCcqbxNrZi_Ie6UP-IMWuejlXMDgTHJggqA
    ```
 
    {{< tabs >}}
@@ -156,7 +156,7 @@ You can extract claims from the verified JWT and forward them as headers to the 
                header: x-org
            jwks:
              local:
-               inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+               inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
    EOF
    ```
 
@@ -317,14 +317,14 @@ jwks:
 | Field | Description |
 | ----- | ----- |
 | `retryPolicy.numRetries` | Number of retry attempts when the JWKS fetch fails. Must be at least `1`. Defaults to `1` if unset. |
-| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. |
+| `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. The value must be at least `1ms`. |
 | `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
 
 In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` policy. The defaults are intended to work for typical JWKS endpoints. Use the following guidelines to choose appropriate values.
 
 | Scenario | Recommended configuration |
 | -------- | ------------------------- |
-| JWKS endpoint is external or occasionally slow | Increase `numRetries` (e.g., 3-5) and use a larger `backOff.maxInterval` (e.g., 30s-60s) to handle intermittent failures. |
+| JWKS endpoint is external or occasionally slow | Increase `numRetries`, such as to 3-5, and use a larger `backOff.maxInterval`, such as 30s-60s, to handle intermittent failures. |
 | Gateway startup should not be blocked by JWKS fetch failures | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background. |
 | Authentication must fail closed until JWKS is available | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched. |
 | Seeing frequent network failures | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect. |
@@ -334,7 +334,7 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 #### JWKS fetch timeout {#jwks-timeout}
 
@@ -357,7 +357,7 @@ jwks:
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 ### JWT caching {#jwt-caching}
 
@@ -410,8 +410,8 @@ spec:
 | Field | Description |
 | ----- | ----------- |
 | `cache` | Enables Envoy JWT caching for this provider. An empty object turns on caching with Envoy defaults. |
-| `cache.size` | The number of verified tokens to cache per Envoy worker thread. Must be at least `1` if set. If unset, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
-| `cache.maxTokenSize` | The maximum size of one cached token in bytes. Must be at least `1` if set. If unset, Envoy uses `4096`. |
+| `cache.size` | The number of verified tokens to cache per Envoy worker thread. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
+| `cache.maxTokenSize` | The maximum size of one cached token in bytes. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `4096`. |
 
 Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
 
@@ -419,7 +419,7 @@ By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads`
 
 {{< /version >}}
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 ### Clock skew tolerance {#clock-skew}
 
@@ -455,7 +455,7 @@ Use the `validationMode` field to control whether requests without a JWT are all
 
 Requests with valid tokens populate JWT dynamic metadata and any headers that you configure in the `claimsToHeaders` field.
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 In all validation modes, JWT verification failures are written to Envoy dynamic metadata at `envoy.filters.http.jwt_authn:failed_status`. Use the `%DYNAMIC_METADATA(envoy.filters.http.jwt_authn:failed_status)%` expression in access logs to view the requests that failed the JWT validation. Note that failures are still captured, even if you choose a validation mode that allows through invalid-token requests, such as `AllowMissingOrFailed`.
 {{< /version >}}
 
@@ -478,7 +478,7 @@ spec:
         issuer: kgateway.dev
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 
@@ -501,11 +501,11 @@ spec:
         issuer: kgateway.dev
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 
-{{< version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 #### AllowMissingOrFailed {#allow-missing-or-failed}
 
@@ -529,7 +529,7 @@ spec:
         issuer: kgateway.dev
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 
@@ -568,7 +568,7 @@ spec:
           - my-api
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 Send a request with the sample token to verify audience enforcement:
@@ -593,8 +593,8 @@ curl -vik localhost:8080/headers \
 Example output:
 
 ```
-< HTTP/1.1 401 Unauthorized
-Jwt validation failed: audience mismatch
+< HTTP/1.1 403 Forbidden
+Audiences in Jwt are not allowed
 ```
 
 ### Customize token source {#token-source}
@@ -622,7 +622,7 @@ spec:
             prefix: "Bearer "
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 Send a request with the token in the `x-jwt` header:
@@ -669,7 +669,7 @@ spec:
         forwardToken: true
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"tNxnW0ZghyIUdfRc97EuZ6Hii0z4AucJrbOCT8MxKznlnV9Z-OrOYMf_hyjiD2Q_qyGrv-sRhinKOjokr-cbLKhHlAlEkEW1ah4wQ-zzO3DT0SdAKX_7RkMkl5Sba443vfDlDmuVSBeyHQr6cKZZGBIe8TlzcKR0xYlop13p1DYAHsIiX8A_q2CmsRlnV4CbneNMGZOmHuBiFG3DJ2lc1ZgvKc8SN1gt3oEujRqxy4yPLHVJ3wQ58ezYtgV2gzbyllzJdi1DSoPtnCFFGvfDqmAcDdmfVtHUHqagCF0ivEQsrxt7PYKqxuCbkaSY1_ef7ub01_5KF1GhlA9y5XSqJQ","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
 EOF
 ```
 Send a request with the token to verify it is forwarded to the upstream:
@@ -744,7 +744,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: jwt-disable
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: httpbin
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io
@@ -786,6 +786,7 @@ Expected output:
 
 ```sh
 kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-policy -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} jwt-disable -n httpbin --ignore-not-found
 kubectl delete gatewayextension selfminted-jwt -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 ```
 

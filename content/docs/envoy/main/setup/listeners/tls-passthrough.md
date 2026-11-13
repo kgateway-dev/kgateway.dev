@@ -21,7 +21,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
    ```
    
 2. Create a server certificate and private key for the `nginx.example.com` domain. 
-   ```
+   ```shell
    openssl req -out example_certs/nginx.example.com.csr -newkey rsa:2048 -nodes -keyout example_certs/nginx.example.com.key -subj "/CN=nginx.example.com/O=some organization"
    openssl x509 -req -sha256 -days 365 -CA example_certs/example.com.crt -CAkey example_certs/example.com.key -set_serial 0 -in example_certs/nginx.example.com.csr -out example_certs/nginx.example.com.crt
    ```
@@ -33,7 +33,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
     --cert example_certs/nginx.example.com.crt
    ```
    
-5. Prepare your nginx configuration. The following example configures nginx for HTTPS traffic with the certificate that you created earlier.
+4. Prepare your nginx configuration. The following example configures nginx for HTTPS traffic with the certificate that you created earlier.
    ```shell
    cat <<\EOF > ./nginx.conf
    events {
@@ -60,12 +60,12 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
    EOF
    ```
    
-6. Store the nginx configuration in a configmap. 
+5. Store the nginx configuration in a configmap. 
    ```shell
    kubectl create configmap nginx-configmap --from-file=nginx.conf=./nginx.conf
    ```
 
-7. Deploy the nginx server. 
+6. Deploy the nginx server. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: v1
@@ -117,7 +117,7 @@ Deploy a sample nginx server and configure the server for HTTPS traffic.
    EOF
    ```
 
-8. Verify that the server is up and running. 
+7. Verify that the server is up and running. 
    ```sh
    kubectl get pods | grep nginx
    ```
@@ -419,7 +419,7 @@ kubectl delete service my-nginx
 kubectl delete secret nginx-server-certs   
 ```
 {{% /tab %}}
-{{% tab name="ListenerSet" %}}
+{{% tab name="ListenerSets" %}}
 ```sh
 rm -r example_certs
 rm nginx.conf

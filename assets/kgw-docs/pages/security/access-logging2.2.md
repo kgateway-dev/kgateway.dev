@@ -31,7 +31,7 @@ When Envoy is used as an HTTP proxy, additional HTTP information is available fo
 
 You can set up access logs to write to a standard (stdout/stderr) stream. The following example writes access logs to a stdout in the pod of the selected `http` gateway.
 
-1. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom string format that is defined in the `jsonFormat` field. 
+1. Create a ListenerPolicy resource to define your access logging rules. The following example writes access logs to the `stdout` stream of the gateway proxy container by using a custom JSON format that is defined in the `jsonFormat` field. 
 
    ```yaml 
    kubectl apply -f- <<EOF
@@ -180,7 +180,7 @@ kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} logs deployments/http 
 
 Example output:
 ```console
-[2024-08-19T20:57:57.511Z] "GET /headers" "HTTP/1.1" "200" "-"
+[2024-08-19T20:57:57.511Z] "GET /status/200" "HTTP/1.1" "200" "-"
 ```
 
 <!-- TODO
@@ -203,11 +203,11 @@ You can set up access logs to write to a file. The following example writes acce
    spec:
      kube:
        envoyContainer:
-         volumeMounts:
+         extraVolumeMounts:
            - mountPath: /dev/
              name: access-logs
        podTemplate:
-         volumes:
+         extraVolumes:
            - name: access-logs
              emptyDir: {}  # Creates a writable volume for the logs
    EOF
@@ -428,14 +428,14 @@ You send access logs to a gRPC service. This way, you can collect logs from seve
 
 -->
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ### Route source metadata {#route-source-metadata}
 
 > [!WARNING]
 > This feature is an experimental API and subject to breaking changes in future releases.
 
-You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}}. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
+You can optionally enable kgateway to attach route source metadata to every Envoy route. When enabled, each Envoy route carries a `dev.kgateway.route_source` filter metadata entry that identifies the originating Kubernetes route resource by `kind`, `group`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}}. You can reference these fields in your access log format strings by using the `%METADATA(ROUTE:dev.kgateway.route_source:<field>)%` command operator.
 
 1. Get the Helm values file for your current installation and save the values to a local file. 
    ```sh
@@ -452,10 +452,10 @@ You can optionally enable kgateway to attach route source metadata to every Envo
    ```sh
    helm upgrade -i -n {{< reuse "kgw-docs/snippets/namespace.md" >}} {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} \
      -f values.yaml \
-     --version {{< reuse "kgw-docs/versions/n-patch.md" >}} 
+     --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}}
    ```
 
-4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}} of the originating route resource to the JSON access log output.
+4. Update your ListenerPolicy to include route source metadata fields in your access log format. The following example adds the `kind`, `name`, `namespace`, {{< version include-if="2.4.x" >}}and `rule`{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}`rule`, and `match`{{< /version >}} of the originating route resource to the JSON access log output.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -481,7 +481,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
                  route_kind: "%METADATA(ROUTE:dev.kgateway.route_source:kind)%"
                  route_name: "%METADATA(ROUTE:dev.kgateway.route_source:name)%"
                  route_namespace: "%METADATA(ROUTE:dev.kgateway.route_source:namespace)%"
-                 route_rule: "%METADATA(ROUTE:dev.kgateway.route_source:rule)%"{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+                 route_rule: "%METADATA(ROUTE:dev.kgateway.route_source:rule)%"{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
                  route_match: "%METADATA(ROUTE:dev.kgateway.route_source:match)%"{{< /version >}}
    EOF
    ```
@@ -492,12 +492,12 @@ You can optionally enable kgateway to attach route source metadata to every Envo
    | `%METADATA(ROUTE:dev.kgateway.route_source:name)%` | The name of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:namespace)%` | The namespace of the Kubernetes route resource. |
    | `%METADATA(ROUTE:dev.kgateway.route_source:group)%` | The API group of the Kubernetes route resource. |
-   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | {{< version include-if="2.4.x" >}}The generated name of the Envoy route that the route rule translates into, in the format `<kind>-<name>-<namespace>-<rule_index>-<match_index>-<rule_name>`, such as `httproute-my-route-default-0-0-to-backend`. If the rule has no name, the `-<rule_name>` suffix is omitted.{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}The name of the rule in the route resource that matched the request, such as `to-backend`. If the rule has no name, the value is `_rule-<index>`, where `<index>` is the zero-based position of the rule in the `rules` list, such as `_rule-1`. The `_` prefix keeps generated values from colliding with rule names, because Gateway API rule names must start with a letter.{{< /version >}} |{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+   | `%METADATA(ROUTE:dev.kgateway.route_source:rule)%` | {{< version include-if="2.4.x" >}}The generated name of the Envoy route that the route rule translates into, in the format `<kind>-<name>-<namespace>-<rule_index>-<match_index>-<rule_name>`, such as `httproute-my-route-default-0-0-to-backend`. If the rule has no name, the `-<rule_name>` suffix is omitted.{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The name of the rule in the route resource that matched the request, such as `to-backend`. If the rule has no name, the value is `_rule-<index>`, where `<index>` is the zero-based position of the rule in the `rules` list, such as `_rule-1`. The `_` prefix keeps generated values from colliding with rule names, because Gateway API rule names must start with a letter.{{< /version >}} |{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
    | `%METADATA(ROUTE:dev.kgateway.route_source:match)%` | The match in the rule that the Envoy route was generated from, in the format `_match-<index>`, where `<index>` is the zero-based position of the match in the rule's `matches` list, such as `_match-0`. Together, `rule` and `match` identify the exact match that handled the request. |{{< /version >}}
 
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 
 ### Log ext-auth latency {#extauth-latency}
 
@@ -565,7 +565,7 @@ If you use an external auth service, you can write the time that the external au
 
 {{< /version >}}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Access logs for TCP and TLS listeners {#tcp-access-log}
 
 The `httpSettings.accessLog` field applies to HTTP and HTTPS listeners. To log connections on listeners that serve TCPRoutes or TLSRoutes, set the `tcpSettings.accessLog` field in a ListenerPolicy instead. This field applies to TCP listeners and to TLS listeners in both the `Terminate` and `Passthrough` modes. The proxy writes one log entry for each connection, and not for each request.

@@ -11,7 +11,7 @@ You can use a BackendConfigPolicy to apply HTTP connection settings to a service
 
 * [General connection settings](#general-settings)
 * [HTTP protocol options](#http)
-* [Additional HTTP 1.0 protocol options](#http1)
+* [Additional HTTP/1.1 protocol options](#http1)
 
 ### General connection settings {#general-settings}
 
@@ -34,7 +34,7 @@ spec:
 
 | Setting | Description | 
 | -- | -- | 
-| `connectTimeout` | The timeout for new network connections to an upstream service. | 
+| `connectTimeout` | The timeout for new network connections to an upstream service. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be at least `1ms`.{{< /version >}} |
 | `perConnectionBufferLimitBytes` | Set the size of the read and write buffer per connection. By default, the gateway has a maximum of 1MiB for the read and write buffer for each connection. For large requests that must be buffered and that exceed the default buffer limit, the gateway proxy either disconnects the connection to the downstream service if headers were already sent, or returns a 500 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that you want to allow to be buffered between the gateway and the downstream service. |
 
 ### HTTP protocol options {#http}
@@ -63,13 +63,13 @@ spec:
 | Setting | Description | 
 | -- | -- | 
 | `idleTimeout` | The idle timeout for connections. The idle timeout is defined as the period in which there are no active requests. When the idle timeout is reached, the connection is closed. Note that request-based timeouts mean that HTTP/2 PINGs do not keep the connection alive. If not specified, the idle timeout defaults to 1 hour. To disable idle timeouts, explicitly set this field to 0. **Warning**: Disabling the timeout has a highly likelihood of yielding connection leaks, such as due to lost TCP FIN packets.| 
-| `maxHeadersCount` | The maximum number of headers that can be sent in a connection. If not specified, the number defaults to 100. Requests that exceed this limit receive a 431 response for HTTP/1 and cause a stream reset for HTTP/2. | 
+| `maxHeadersCount` | The maximum number of headers that can be sent in a connection. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be at least `1`.{{< /version >}} If you omit this field, the number defaults to `100`. Requests that exceed this limit receive a 431 response for HTTP/1 and cause a stream reset for HTTP/2. |
 | `maxStreamDuration` | The total duration to keep alive an HTTP request/response stream. If the time limit is reached, the stream is reset independent of any other timeouts. If not specified, this value is not set. | 
 | `maxRequestsPerConnection` | The maximum number of requests that can be sent per connection. | {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 | `maxConnectionDuration` | The maximum duration of a connection, measured from the time that the connection was established. When this duration is reached, the gateway starts the drain sequence. Unlike `idleTimeout`, this setting closes the connection even when the connection is actively serving requests, which makes it useful for forcing clients to periodically reconnect and rebalance. If not specified, connections have no maximum duration. | {{< /version >}}
  
 
-#### Additional HTTP 1.0 protocol options {#http1}
+#### Additional HTTP/1.1 protocol options {#http1}
 
 The BackendConfigPolicy allows you to apply additional configuration to HTTP/1 connections. 
 
@@ -94,7 +94,7 @@ spec:
 | -- | -- | 
 | `enableTrailers` | Enables trailers for HTTP/1 requests. Trailers are headers that are sent after the request body is sent. By default, the HTTP/1 codec drops proxied trailers. | 
 | `overrideStreamErrorOnInvalidHttpMessage` | When set to false, the proxy terminates HTTP/1.1 connections when an invalid HTTP message is received, such as malformatted headers. When set to true, the proxy leaves the HTTP/1.1 connection open where possible. | 
-| `headerFormat` | By default, the proxy normalizes header keys to lowercase. Set to `PreserveCaseHeaderKeyFormat` to preserve the original casing after the request is proxied. Set to `properCaseHeaderKeyFormat` to capitalize the first character and any character following a special character if it's an alpha character. For example, `content-type` becomes `Content-Type`, and `foo$b#$are` becomes `Foo$B#$Are`. |
+| `preserveHttp1HeaderCase` | By default, the proxy normalizes header keys to lowercase. Set to `true` to preserve the original casing of HTTP/1.1 header keys after the request is proxied. |
 
 
 ## Before you begin

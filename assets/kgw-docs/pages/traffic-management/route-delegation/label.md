@@ -21,7 +21,7 @@ Explore an example for delegating traffic to an HTTPRoute with a specific label 
 
 `child-team2` HTTPRoute:
 
-* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace.
+* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact path and routes that traffic to the httpbin app in the `team2` namespace.
 
 {{% /tab %}}
 {{% tab name="Wildcard namespace" %}}
@@ -41,7 +41,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
 
 `child-team2` HTTPRoute:
 
-* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team1/bar` prefix path and routes that traffic to the httpbin app in the `team2` namespace. The HTTPRoute is configured with the `delegation.kgateway.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
+* The child HTTPRoute resource `child-team2` matches incoming traffic for the `/anything/team2/bar` exact path and routes that traffic to the httpbin app in the `team2` namespace. The HTTPRoute is configured with the `delegation.kgateway.dev/label: wildcard` label so that it can receive delegated traffic from the `parent`. 
 {{% /tab %}}
 
 {{< /tabs >}}
@@ -115,7 +115,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    EOF
    ```
 
-3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact prefix. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.kgateway.dev/label: team2` label that you defined on the `parent` HTTPRoute. 
+3. Create the `child-team2` HTTPRoute resource in the `team2` namespace that matches traffic on the `/anything/team2/bar` exact path. To delegate traffic to this HTTPRoute, you must label the route with the `delegation.kgateway.dev/label: team2` label that you defined on the `parent` HTTPRoute. 
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -137,7 +137,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    EOF
    ```
       
-5. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
+4. Send a request to the `delegation.example` domain along the `/anything/team1/foo` path. Verify that you get back a 200 HTTP response code. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -193,7 +193,7 @@ Learn how to use a wildcard for the namespace to streamline your route delegatio
    }
    ```
 
-6. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
+5. Send a request to the `delegation.example` domain along the `/anything/team2/bar` path. Verify that you also get back a 200 HTTP response code.  
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

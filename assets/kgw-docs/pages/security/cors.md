@@ -1,13 +1,13 @@
-Enforce client-site access controls with cross-origin resource sharing (CORS).
+Enforce client-side access controls with cross-origin resource sharing (CORS).
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
 
 ## About CORS
 
-Cross-Origin Resource Sharing (CORS) is a security feature that is implemented by web browsers and that controls how web pages in one domain can request and interact with resources that are hosted on a different domain. By default, web browsers only allow requests to resources that are hosted on the same domain as the web page that served the original request. Access to web pages or resources that are hosted on a different domain is restricted to prevent potential security vulnerabilities, such as cross-site request forgery (CRSF).
+Cross-Origin Resource Sharing (CORS) is a security feature that is implemented by web browsers and that controls how web pages in one domain can request and interact with resources that are hosted on a different domain. By default, web browsers only allow requests to resources that are hosted on the same domain as the web page that served the original request. Access to web pages or resources that are hosted on a different domain is restricted to prevent potential security vulnerabilities, such as cross-site request forgery (CSRF).
 
 When CORS is enabled in a web browser and a request for a different domain comes in, the web browser checks whether this request is allowed or not. To do that, it typically sends a preflight request (HTTP `OPTIONS` method) to the server or service that serves the requested resource. The service returns the methods that are permitted to send the actual cross-origin request, such as GET, POST, etc. If the request to the different domain is allowed, the response includes CORS-specific headers that instruct the web browser how to make the cross-origin request. For example, the CORS headers typically include the origin that is allowed to access the resource, and the credentials or headers that must be included in the cross-origin request.
 
@@ -20,7 +20,6 @@ CORS policies are typically implemented to limit access to server resources for 
 * A JavaScript on a web page at `example.com` tries to access a different port, such as `example.com:3001`.
 * A JavaScript on a web page at `https://example.com` tries to access the resources by using a different protocol, such as `http://example.com`.
 
-{{< version exclude-if="2.0.x" >}}
 
 ### Configuration options {#options}
 
@@ -29,14 +28,13 @@ You can configure the CORS policy at two levels:
 * **HTTPRoute**: For the native way in Kubernetes Gateway API, configure a CORS policy in the HTTPRoute. You can choose to apply the CORS policy to all the routes that are defined in the HTTPRoute, or to a selection of `backendRefs`. This route-level policy takes precedence over any {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} CORS that you might configure. For more information, see the [Kubernetes Gateway API docs](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpcorsfilter) and [CORS design docs](https://gateway-api.sigs.k8s.io/geps/gep-1767/).
 * **{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}**: For more flexibility to reuse the CORS policy across HTTPRoutes, specific routes and Gateways, configure a CORS policy in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. You can attach a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to a Gateway, all HTTPRoutes via `targetRefs`, or an individual route via `extensionRef`. To attach to a `backendRef`, use a CORS policy in the HTTPRoute instead. For more information about attachment and merging rules, see the [{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} concept docs](../../about/policies/trafficpolicy/).
 
-{{< /version >}}
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 {{< /version >}}
 
@@ -44,7 +42,6 @@ You can configure the CORS policy at two levels:
 
 Create a CORS policy for the httpbin app in an HTTPRoute or {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 
-{{% version exclude-if="2.0.x" %}}
 
 ### CORS in HTTPRoute
 
@@ -145,47 +142,6 @@ EOF
    EOF
    ```
 
-{{% /version %}}
-{{< version include-if="2.0.x" >}}
-
-Create an HTTPRoute resource for the httpbin app that applies a CORS filter. The following example allows requests from the `https://example.com/` origin.
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: httpbin-cors
-  namespace: httpbin
-spec:
-  parentRefs:
-    - name: http
-      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-  hostnames:
-    - cors.example
-  rules:
-    - filters:
-        - type: CORS
-          cors:
-            allowCredentials: true
-            allowHeaders:
-              - Origin               
-            allowMethods:
-              - GET
-              - POST
-              - OPTIONS               
-            allowOrigins:
-              - "https://example.com"
-            exposeHeaders:
-            - Origin
-            - X-HTTPRoute-Header
-            maxAge: 86400
-      backendRefs:
-        - name: httpbin
-          port: 8000
-EOF
-```
-{{< /version >}}
 
 ## Test CORS policies
 
@@ -204,7 +160,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://example.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
@@ -212,7 +168,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: {{< version exclude-if="2.0.x" >}}Notice that the `access-control-*` values reflect your CORS policy and change depending on the resources that you created.
+   Example output: Notice that the `access-control-*` values reflect your CORS policy and change depending on the resources that you created.
    * If you created an HTTPRoute with a CORS filter, you see the `Origin` and `X-HTTPRoute-Header` headers.
    * If you created a TrafficPolicy with a CORS filter, you see the `Origin` and `X-TrafficPolicy-Header` headers.
 
@@ -228,7 +184,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    access-control-allow-origin: https://example.com
    access-control-allow-credentials: true
    access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
+   access-control-allow-headers: Origin
    access-control-max-age: 86400
    access-control-expose-headers: Origin, X-HTTPRoute-Header
    date: Tue, 24 Jun 2025 13:19:53 GMT
@@ -255,30 +211,10 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    server: envoy
    content-length: 0
    ```
-   {{< /version >}}
-   {{< version include-if="2.0.x" >}}Note the `Origin` and `X-HTTPRoute-Header` headers.
-
-   ```console {hl_lines=[7,8,9]}
-   HTTP/1.1 200 OK
-   x-correlation-id: aaaaaaaa
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   content-length: 0
    
-   HTTP/1.1 200 OK
-   access-control-allow-origin: https://example.com
-   access-control-allow-credentials: true
-   access-control-allow-methods: GET, POST, OPTIONS
-   access-control-allow-headers: Origin, Authorization, Content-Type
-   access-control-max-age: 86400
-   access-control-expose-headers: Origin, X-HTTPRoute-Header
-   date: Tue, 24 Jun 2025 13:19:53 GMT
-   server: envoy
-   content-length: 0
-   ...
-   ```
-   {{< /version >}}
+   
 
-2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods, because `notallowed.com` is not configured as a supported origin.  
+2. Send another request to the httpbin app. This time, you use `notallowed.com` as your origin. Because `notallowed.com` is not configured as a supported origin, the response does not include the `access-control-allow-origin` header for your origin.
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -291,7 +227,7 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -I -X OPTIONS localhost:8080/headers -H "host: cors.example:8080" \
+   curl -I -X OPTIONS localhost:8080/get -H "host: cors.example:8080" \
     -H "Origin: https://notallowed.com" \
     -H "Access-Control-Request-Method: POST" \
     -H "Access-Control-Request-Headers: Origin"
@@ -299,7 +235,26 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    {{% /tab %}}
    {{< /tabs >}}
    
-   Example output: 
+   {{< version exclude-if="2.1.x,2.2.x" >}}
+   The gateway answers the preflight request itself with a `200` response, and does not forward it to the httpbin app. The response has no `access-control-allow-origin` header, so the browser blocks the cross-origin request. The response still includes other values from your CORS policy, such as the allowed methods and the max age. These values have no effect without a matching `access-control-allow-origin` header. The `access-control-allow-headers` value depends on the resource that you created.
+
+   Example output:
+   ```console
+   HTTP/1.1 200 OK
+   access-control-allow-credentials: true
+   access-control-allow-methods: GET, POST, OPTIONS
+   access-control-allow-headers: Origin
+   access-control-max-age: 86400
+   date: Thu, 05 Nov 2026 06:47:07 GMT
+   server: envoy
+   content-length: 0
+   ```
+   {{< /version >}}
+
+   {{< version include-if="2.1.x,2.2.x" >}}
+   Although the request succeeds, you do not get back your configured CORS settings such as max age, allowed origin, or allowed methods. The gateway forwards the preflight request to the httpbin app. The `access-control-*` headers in the example output come from the httpbin app's own CORS handling, not from your CORS policy.
+
+   Example output:
    ```console
    HTTP/1.1 200 OK
    x-correlation-id: aaaaaaaa
@@ -317,12 +272,12 @@ Now that you have CORS policies applied via an HTTPRoute or {{< reuse "kgw-docs/
    x-envoy-upstream-service-time: 1
    server: envoy
    ```
+   {{< /version >}}
 
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
-{{< version exclude-if="2.0.x" >}}
 **CORS in HTTPRoute**
 ```sh
 kubectl delete httproute httpbin-cors -n httpbin
@@ -334,10 +289,3 @@ kubectl delete httproute httpbin-cors -n httpbin
 kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} httpbin-cors -n httpbin
 ```
 
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
-
-```sh
-kubectl delete httproute httpbin-cors -n httpbin
-```
-{{< /version >}}

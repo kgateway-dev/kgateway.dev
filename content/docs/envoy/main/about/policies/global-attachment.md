@@ -237,12 +237,10 @@ To enable the global policy attachment feature, upgrade your {{< reuse "/kgw-doc
 1. Get the Helm values for your current Helm installation. 
    ```sh
    helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
-   open {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
 2. Add the following values to the Helm values file to enable the global policy namespace feature. The example uses the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace as the "global" namespace, but you can use any existing namespace that you want.
    ```yaml
-   
    controller:
      extraEnv:
        KGW_GLOBAL_POLICY_NAMESPACE: {{< reuse "kgw-docs/snippets/namespace.md" >}}
@@ -333,7 +331,7 @@ Create a global policy in the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` n
    x-envoy-upstream-service-time: 0
    server: envoy
    
-   I'm a teapot!%
+   I'm a teapot!
    ```
 
 

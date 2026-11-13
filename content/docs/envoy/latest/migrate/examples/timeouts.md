@@ -1,10 +1,10 @@
 ---
 title: "Timeouts"
-description: Convert NGINX proxy timeout annotations to kgateway TrafficPolicy and BackendConfigPolicy timeouts.
+description: Convert NGINX proxy timeout annotations to an HTTPRoute request timeout, and add the connect timeout in a kgateway BackendConfigPolicy.
 weight: 36
 ---
 
-Connection and request timeouts are critical for stability. NGINX uses proxy-level directives like `proxy_read_timeout` and `proxy_connect_timeout`. In kgateway, request and idle-stream timeouts live on a `TrafficPolicy`, while the upstream connection timeout belongs to a `BackendConfigPolicy`.
+Connection and request timeouts are critical for stability. NGINX uses proxy-level directives like `proxy_read_timeout` and `proxy_connect_timeout`. The conversion tool turns these timeouts into one request timeout on the HTTPRoute rule. In kgateway, the upstream connection timeout belongs to a `BackendConfigPolicy`, which you add by hand.
 
 ## Before: Ingress with Timeouts
 
@@ -42,44 +42,84 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
   --input-file timeouts-ingress.yaml > timeouts-kgateway.yaml
 ```
 
-## After: TrafficPolicy and BackendConfigPolicy
+The tool prints these warnings:
 
-The `TrafficPolicy` defines the request and idle-stream timeouts on the targeted route. The kgateway `Timeouts` type exposes two fields: `request` (overall request timeout) and `streamIdle` (idle stream timeout, equivalent to NGINX's `proxy_read_timeout`).
+* The tool does not translate HTTPS for the `timeouts.example.com` host. By default, Ingress NGINX serves HTTPS for every host with a self-signed certificate. The generated Gateway has only an HTTP listener. To serve HTTPS, add an HTTPS listener to the Gateway. For more information, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
+* `ingress-nginx only supports TCP-level timeouts; i2gw has made a best-effort translation to Gateway API timeouts.request`. The NGINX timeouts apply to single network operations, such as one read. A Gateway API request timeout applies to the whole request.
 
-```yaml
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: TrafficPolicy
-metadata:
-  name: timeouts-policy
-spec:
-  targetRefs:
-  - group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    name: timeouts-demo-timeouts-example-com
-  timeouts:
-    request: 60s
-    streamIdle: 60s
+## After: HTTPRoute with a request timeout
+
+```bash
+cat timeouts-kgateway.yaml
 ```
 
-The NGINX `proxy-connect-timeout` annotation has no equivalent under `TrafficPolicy.timeouts`. Connection-level timeouts are configured on a `BackendConfigPolicy` that targets the upstream Service:
+The output has a Gateway and an HTTPRoute. The output has no TrafficPolicy or BackendConfigPolicy. Instead, the HTTPRoute rule has a `timeouts.request` value of `10m0s`. The tool takes the largest NGINX timeout, 60 seconds, and multiplies it by 10. Check whether 10 minutes fits your app, and change the value if it does not.
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nginx
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - hostname: timeouts.example.com
+    name: timeouts-example-com-http
+    port: 80
+    protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: timeouts-demo-timeouts-example-com
+spec:
+  hostnames:
+  - timeouts.example.com
+  parentRefs:
+  - name: nginx
+  rules:
+  - backendRefs:
+    - name: slow-svc
+      port: 80
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+    name: rule-0
+    timeouts:
+      request: 10m0s
+```
+
+The output does not keep the 15-second connect timeout from the `proxy-connect-timeout` annotation. To keep it, you add a `BackendConfigPolicy` with `connectTimeout` that targets the `slow-svc` Service.
+
+## Apply and verify
+
+Apply the converted resources.
+
+```bash
+kubectl apply -f timeouts-kgateway.yaml
+```
+
+Create a BackendConfigPolicy that sets the connect timeout for the `slow-svc` Service. The policy takes effect only when the `slow-svc` Service exists in the same namespace.
+
+```yaml
+kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: BackendConfigPolicy
 metadata:
-  name: timeouts-backend
+  name: slow-svc-backend-config
 spec:
   targetRefs:
   - group: ""
     kind: Service
     name: slow-svc
   connectTimeout: 15s
+EOF
 ```
 
-## Apply and verify
+Check the request timeout on the HTTPRoute and the BackendConfigPolicy.
 
 ```bash
-kubectl apply -f timeouts-kgateway.yaml
-kubectl get trafficpolicies
+kubectl get httproute timeouts-demo-timeouts-example-com -o jsonpath='{.spec.rules[0].timeouts}'
 kubectl get backendconfigpolicies
 ```

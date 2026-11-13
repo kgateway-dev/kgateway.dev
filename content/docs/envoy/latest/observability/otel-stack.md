@@ -37,7 +37,7 @@ Now that you have the telemetry stack set up, you can configure the telemetry po
                  port: 4317
                logName: "http-gateway-access-logs"
              body: >-
-               "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %RESPONSE_CODE% "%REQ(:AUTHORITY)%" "%UPSTREAM_CLUSTER%"'
+               "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %RESPONSE_CODE% "%REQ(:AUTHORITY)%" "%UPSTREAM_CLUSTER%"
    EOF
    ```
 
@@ -158,7 +158,7 @@ To verify that your setup is working, generate sample traffic and review the log
    kubectl -n telemetry logs deploy/opentelemetry-collector-traces | grep 'http.status_code: Str(418)' | wc -l
    ```
 
-   Example output: The count traces the number of services that were involved in responding to the request, such as `10`.
+   Example output: The count is the number of spans that the query returned, such as `10`.
 
    ```
 

@@ -12,7 +12,7 @@ The `jwksBackendRef` field in `OAuth2JWTConfig` lets you specify a separate back
 ## Before you begin
 
 1. {{< reuse "kgw-docs/snippets/prereq.md" >}}
-2. Complete the [OAuth2/OIDC guide]({{< link-hextra path="/security/extauth/oauth2/" >}}).
+2. Complete the [OAuth2/OIDC guide for Keycloak]({{< link-hextra path="/security/oauth/keycloak/authorization-code/" >}}).
 
 ## Configure separate backends
 
@@ -146,38 +146,36 @@ spec:
 
 ## Verify the configuration
 
-After deploying the GatewayExtension, verify that the JWKS is fetched from the correct backend.
+Log in through the gateway to verify that the gateway fetches the JWKS from the correct backend. After the login, the gateway validates the access token against that JWKS. Send these requests to the HTTPS listener, because the session cookies of the login flow use the `Secure` attribute.
 
-**Send a request with a valid token**:
+> [!NOTE]
+> The OAuth2 policy reads tokens only from the session cookies that the gateway sets after a login. A request that carries only an `Authorization: Bearer` header has no session. The gateway redirects that request to the login page, or returns `401` if the request matches the [`denyRedirect` setting]({{< link-hextra path="/security/oauth/keycloak/authorization-code/#deny-redirect" >}}). So you cannot verify this configuration with a bearer token. To validate bearer tokens from API clients, use [access token validation]({{< link-hextra path="/security/oauth/keycloak/access-token/" >}}).
 
-{{< tabs >}}
-{{% tab name="Cloud Provider LoadBalancer" %}}
+1. Send a request without a session cookie. The gateway redirects you to Keycloak.
 
-```sh
-curl -vik http://$INGRESS_GW_ADDRESS:8080/headers \
-  -H "host: www.example.com:8080" \
-  --header "Authorization: Bearer $TOKEN"
-```
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik "https://${INGRESS_GW_ADDRESS}:8443/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -vik "https://localhost:8443/headers" -H "host: www.example.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
 
-{{% /tab %}}
-{{% tab name="Port-forward for local testing" %}}
+   Example output:
 
-```sh
-curl -vik localhost:8080/headers \
-  -H "host: www.example.com:8080" \
-  --header "Authorization: Bearer $TOKEN"
-```
+   ```text
+   < HTTP/2 302
+   < location: https://keycloak.example.com/realms/myrealm/protocol/openid-connect/auth?client_id=kgateway-client&...
+   ```
 
-{{% /tab %}}
-{{< /tabs >}}
+2. Open a browser and go to your protected route, such as `https://www.example.com/headers`. Log in with the test user credentials, `testuser` and `password`.
 
-**Expected output**:
-
-```text
-< HTTP/1.1 200 OK
-```
-
-If the JWKS is fetched correctly, you should see a 200 OK response.
+3. Verify that the response shows the httpbin output. The gateway validated the access token against the JWKS that it fetched through the `jwksBackendRef` backend. If the gateway cannot fetch the JWKS, the request after the login fails and does not return the httpbin output.
 
 ### Backward Compatibility
 

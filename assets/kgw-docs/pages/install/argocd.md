@@ -5,7 +5,7 @@ In this installation guide, you install {{< reuse "/kgw-docs/snippets/kgateway.m
 1. Create or use an existing Kubernetes cluster. 
 2. Install the following command-line tools.
    * [`kubectl`](https://kubernetes.io/docs/tasks/tools/#kubectl), the Kubernetes command line tool. Download the `kubectl` version that is within one minor version of the Kubernetes clusters you plan to use.
-   * [`argo`](https://argo-cd.readthedocs.io/en/stable/cli_installation/), the Argo CD command line tool.
+   * [`argocd`](https://argo-cd.readthedocs.io/en/stable/cli_installation/), the Argo CD command line tool.
 3. If you do not already have Argo CD installed in your cluster, install it.
    ```shell
    kubectl create namespace argocd

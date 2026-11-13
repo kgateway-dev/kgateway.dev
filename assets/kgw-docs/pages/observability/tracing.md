@@ -294,7 +294,11 @@ EOF
 
 ### Disable tracing per route {#disable-tracing}
 
-When listener-level tracing is configured, use `disable: {}` on a route-level {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to exempt specific routes from tracing. The `disable` field is mutually exclusive with all other `tracing` fields.
+When listener-level tracing is configured, use `disable: {}` on a route-level {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to exempt specific routes from tracing. The `disable` field is mutually exclusive with all other `tracing` fields. If you already applied a route-level tracing policy to the same route, such as `tracing-route` from the previous section, delete that policy first. Otherwise, the older policy takes precedence and tracing stays on for the route.
+
+```sh
+kubectl delete {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} tracing-route -n httpbin --ignore-not-found
+```
 
 ```yaml
 kubectl apply -f- <<EOF

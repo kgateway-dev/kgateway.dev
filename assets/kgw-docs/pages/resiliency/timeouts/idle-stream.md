@@ -40,7 +40,7 @@ You can change the default idle stream timeout setting with a {{< reuse "kgw-doc
    2. Get the configuration of your gateway proxy as a config dump.
 
       ```sh
-      curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
+      curl -s "127.0.0.1:19000/config_dump?include_eds" > gateway-config.json
       ```
 
    3. Open the config dump and find the route configuration for the `kube_httpbin_httpbin_8000` Envoy cluster on the `listener~8080~www_example_com` virtual host. Verify that the timeout policy is set as you configured it.

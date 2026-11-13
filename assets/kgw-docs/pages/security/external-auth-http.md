@@ -127,14 +127,14 @@ Deploy your own HTTP-based external authorization service as a backend service t
    | `pathPrefix` | Prefix prepended to the authorization request path. Use this field when your auth server expects requests at a specific path, such as `/check` or `/verify`. |
    | `requestTimeout` | Timeout for the authorization request. Defaults to 2 seconds. |
    | `authorizationRequest.headersToAdd` | Additional headers to add to every authorization request that is sent to the auth service. |
-   | `authorizationResponse.headersToBackend` | Headers from the authorization response to forward to the upstream service when the request is allowed. |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
-   | `authorizationResponse.headersToClient` | Headers from a denial response to forward to the downstream client. Use this field to pass redirect headers, such as `Location` and `Set-Cookie`, back to the client during redirect-based authentication flows (for example, oauth2-proxy). |
-   | `authorizationResponse.headersToClientOnSuccess` | Headers from a successful authorization response to forward to the downstream client. |{{% /version %}}
+   | `authorizationResponse.headersToBackend` | Headers from the authorization response to forward to the upstream service when the request is allowed. By default, no auth response headers are forwarded to the upstream service. Set this field to add exactly the listed headers. |{{% version exclude-if="2.1.x,2.2.x,2.3.x" %}}
+   | `authorizationResponse.headersToClient` | Headers from a denial response to forward to the downstream client. By default, Envoy forwards all auth response headers on denial. Set this field to restrict the denial response to exactly the listed headers, such as `Location` and `Set-Cookie` for redirect-based authentication flows (for example, oauth2-proxy). |
+   | `authorizationResponse.headersToClientOnSuccess` | Headers from a successful authorization response to forward to the downstream client. By default, no auth response headers are forwarded to the client on success. Set this field to add exactly the listed headers. |{{% /version %}}
    | `headersToForward` | Client request headers to forward to the authorization service. HTTP services receive only `Host`, `Method`, `Path`, `Content-Length`, and `Authorization` by default. |
 
 ## Create external auth policy {#create-policy}
 
-You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply the policy at both levels, the request must pass both policies to be authorized.
+You can apply a policy at two levels: the Gateway level or the HTTPRoute level. If you apply external auth settings at both levels, the HTTPRoute-level settings take precedence for the routes that they apply to. For more information, see [Policy merging]({{< link-hextra path="/about/policies/merging/" >}}).
 
 1. Send a test request to the httpbin sample app. Verify that you get back a 200 HTTP response code and that no authorization is required.
 
@@ -267,7 +267,7 @@ You can apply a policy at two levels: the Gateway level or the HTTPRoute level. 
    ...
    ```
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!TIP]
 > To see how long the external auth check takes for each request, write the ext-auth latency to your access logs. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
 {{< /version >}}

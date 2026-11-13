@@ -25,7 +25,8 @@ spec:
     healthyThreshold: 1
     http:
       path: /status/200
-    interval: 30s
+    interval: 30s{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+    noTrafficInterval: 60s{{< /version >}}
     timeout: 10s
     unhealthyThreshold: 1
 ```
@@ -39,8 +40,9 @@ spec:
 | `http.host` | The host header in the HTTP health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
 | `http.path` | The path on your app that you want {{< reuse "/kgw-docs/snippets/kgateway.md" >}} to send the health check request to. |
 | `http.method` | The HTTP method for the health check to use. If unset, defaults to GET. |
-| `interval` | The amount of time between sending health checks to the Backend. You can increase this value to ensure that you don't overload your Backend service. |
-| `timeout` | The time to wait for a health check response. If the timeout is reached, the health check is considered unsuccessful. |
+| `interval` | The amount of time between sending health checks to the Backend. You can increase this value to avoid overloading your backend service. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be at least `1ms`.{{< /version >}} |{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+| `noTrafficInterval` | The time between health checks while the {{< reuse "/kgw-docs/snippets/backend.md" >}} has not yet received any traffic. After the first request is routed to the {{< reuse "/kgw-docs/snippets/backend.md" >}}, health checks use `interval` instead. Typically, you set this value higher than `interval` to avoid sending health check traffic to an idle {{< reuse "/kgw-docs/snippets/backend.md" >}}. The value must be at least `1ms`. If omitted, Envoy uses its default value of 60 seconds. |{{< /version >}}
+| `timeout` | The time to wait for a health check response. If the timeout is reached, the health check is considered unsuccessful. {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The value must be at least `1ms`.{{< /version >}} |
 | `unhealthyThreshold` | The number of unsuccessful health checks required before a Backend is marked unhealthy. Note that for HTTP health checking, if a Backend responds with `503 Service Unavailable`, this threshold is ignored and the Backend is immediately considered unhealthy. |
 | `grpc` | Optional configuration for a gRPC health check. The example omits this field because the Backend is not a gRPC service. |
 | `grpc.authority` | The authority header in the gRPC health check request. If unset, defaults to the name of the Backend that this health check is associated with. |
@@ -200,7 +202,7 @@ To verify an active health check, use an app that has several endpoints, of whic
    kubectl port-forward deploy/http -n {{< reuse "/kgw-docs/snippets/namespace.md" >}} 19000 &
    sleep 5
    curl -s 127.0.0.1:19000/clusters | grep health-check-demo | grep health_flags
-   lsof -ti:19000 | xargs kill -9
+   pkill -f "kubectl port-forward deploy/http"
    ```
 
    Example output:

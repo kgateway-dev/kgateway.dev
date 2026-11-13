@@ -70,12 +70,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    ```
 
 4. Store the server certificate and key in a Kubernetes secret. 
-   ```yaml
-   # Base64 encode server certificate and key
-   SERVER_CERT=$(cat server-cert.pem | base64 -w 0)
-   SERVER_KEY=$(cat server-key.pem | base64 -w 0)
-
-   # Create the secret
+   ```sh
    kubectl create secret tls https-cert \
      --cert=server-cert.pem \
      --key=server-key.pem \
@@ -104,7 +99,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      -extensions v3_req -extfile <(echo "[v3_req]"; echo "subjectAltName=DNS:example.com,DNS:*.example.com")
    ```
 
-7. Continue with configuring a [Default configuration for all listeners](#default). Alternatively, you can explore how to override the default configuration [for a specific port](#perport) or [for an individual listener](#per-listener). 
+7. Continue with configuring a [Default configuration for all listeners](#default). The [per port configuration](#perport) builds on the default configuration, so complete the default configuration first. Alternatively, you can skip to the [per listener configuration](#per-listener), which sets up its own Gateway and HTTPRoutes. 
 
 
 ## Default configuration for all listeners {#default}
@@ -177,7 +172,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    EOF
    ```
 
-5. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
+3. Get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -192,32 +187,30 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Send a request to the httpbin app without a client certificate on both 8443 and 8444 ports. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
+4. Send a request to the httpbin app without a client certificate on both 8443 and 8444 ports. Verify that the TLS handshake fails, because a TLS certificate is required to establish the connection. 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
-   curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
-   curl -v -k --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get
    ```
 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
-     --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com"
+   curl -v --cacert ca-cert.pem https://example.com:8443/get \
+     --resolve example.com:8443:127.0.0.1
   
-   curl -v -k https://localhost:8444/get \
-     --resolve example.com:8444:127.0.0.1 \
-     -H "Host: example.com"
+   curl -v --cacert ca-cert.pem https://example.com:8444/get \
+     --resolve example.com:8444:127.0.0.1
    ```
    {{% /tab %}}
    {{< /tabs >}} 
@@ -231,16 +224,16 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    curl: (56) LibreSSL SSL_read: LibreSSL/3.3.6: error:1404C45C:SSL routines:ST_OK:reason(1116), errno 0
    ```
 
-7. Repeat the request. This time, you include the client certificate that you created earlier. 
+5. Repeat the request. This time, you include the client certificate that you created earlier. 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get \
+   curl -v --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -248,12 +241,12 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get \
+   curl -v --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -262,16 +255,14 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
+   curl -v https://example.com:8443/get \
      --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k https://localhost:8444/get \
+   curl -v https://example.com:8444/get \
      --resolve example.com:8444:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -410,28 +401,26 @@ In this example, you override the default certificate validation configuration f
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get
 
-   curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get
    ```
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get
 
-   curl -v -k --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get
+   curl -v --cacert ca-cert.pem --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get
    ```
 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
-     --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com"
+   curl -v --cacert ca-cert.pem https://example.com:8443/get \
+     --resolve example.com:8443:127.0.0.1
   
-   curl -v -k https://localhost:8444/get \
-     --resolve example.com:8444:127.0.0.1 \
-     -H "Host: example.com"
+   curl -v --cacert ca-cert.pem https://example.com:8444/get \
+     --resolve example.com:8444:127.0.0.1
    ```
    {{% /tab %}}
    {{< /tabs >}} 
@@ -456,12 +445,12 @@ In this example, you override the default certificate validation configuration f
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get \
+   curl -v --resolve "example.com:8444:${INGRESS_GW_ADDRESS}"  https://example.com:8444/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -469,12 +458,12 @@ In this example, you override the default certificate validation configuration f
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get \
+   curl -v --resolve "example.com:8444:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8444/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -483,16 +472,14 @@ In this example, you override the default certificate validation configuration f
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
+   curl -v https://example.com:8443/get \
      --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
 
-   curl -v -k https://localhost:8444/get \
+   curl -v https://example.com:8444/get \
      --resolve example.com:8444:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -719,7 +706,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "tenant-a.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-a.example.com:8443/get \
+   curl -v --resolve "tenant-a.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-a.example.com:8443/get \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
      --cacert ca-cert.pem
@@ -727,7 +714,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "tenant-a.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-a.example.com:8443/get \
+   curl -v --resolve "tenant-a.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-a.example.com:8443/get \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
      --cacert ca-cert.pem
@@ -735,7 +722,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://tenant-a.example.com:8443/get \
+   curl -v https://tenant-a.example.com:8443/get \
      --resolve tenant-a.example.com:8443:127.0.0.1 \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
@@ -752,11 +739,11 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    ...
    ```
 
-8. Repeat the request to the listener of tenant B, but continue to use the client certificate of tenant A. Verify that the request fails, because the listener of tenant B only trusts the CA of tenant B. Without per-listener validation, this request would succeed, because both CAs would be part of the trust pool of port 8443.
+8. Repeat the request to the listener of tenant B, but continue to use the client certificate of tenant A. Verify that the request fails, because the listener of tenant B only trusts the CA of tenant B. The ListenerPolicy for tenant B replaces the Gateway's default CA with the CA of tenant B on this listener.
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
+   curl -v --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
      --cacert ca-cert.pem
@@ -764,7 +751,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
+   curl -v --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
      --cacert ca-cert.pem
@@ -772,7 +759,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://tenant-b.example.com:8443/get \
+   curl -v https://tenant-b.example.com:8443/get \
      --resolve tenant-b.example.com:8443:127.0.0.1 \
      --cert tenant-a-client-cert.pem \
      --key tenant-a-client-key.pem \
@@ -793,7 +780,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
+   curl -v --resolve "tenant-b.example.com:8443:${INGRESS_GW_ADDRESS}" https://tenant-b.example.com:8443/get \
      --cert tenant-b-client-cert.pem \
      --key tenant-b-client-key.pem \
      --cacert ca-cert.pem
@@ -801,7 +788,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
+   curl -v --resolve "tenant-b.example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)" https://tenant-b.example.com:8443/get \
      --cert tenant-b-client-cert.pem \
      --key tenant-b-client-key.pem \
      --cacert ca-cert.pem
@@ -809,7 +796,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://tenant-b.example.com:8443/get \
+   curl -v https://tenant-b.example.com:8443/get \
      --resolve tenant-b.example.com:8443:127.0.0.1 \
      --cert tenant-b-client-cert.pem \
      --key tenant-b-client-key.pem \
@@ -831,14 +818,15 @@ In this example, you serve two tenants from two listeners that share port 8443, 
 You can configure your mTLS listener to limit connections to clients that present a certificate with a specific certificate hash and Subject Alternative Names. Alternatively, you can configure your listeners to enforce other TLS settings, such as a minimum or maximum TLS version, specific cipher suites, or ECDH curves. For more information, see [Additional TLS settings]({{< link-hextra path="/setup/listeners/tls-settings/" >}}). 
 
 
-1. Get the certificate hash of the client certificate. 
+1. Get the certificate hash of the client certificate and save it in an environment variable. 
    ```sh
-   openssl x509 -in client-cert.pem -noout -fingerprint -sha256
+   export CLIENT_CERT_HASH=$(openssl x509 -in client-cert.pem -noout -fingerprint -sha256 | cut -d= -f2)
+   echo $CLIENT_CERT_HASH
    ```
   
    Example output: 
    ```console
-   sha256 Fingerprint=46:DB:0D:C2:E1:4F:0A:05:8C:4F:05:8D:77:B1:8D:7C:1A:BE:18:4F:AF:81:BF:E2:B1:CD:03:43:7F:D8:65:4B
+   46:DB:0D:C2:E1:4F:0A:05:8C:4F:05:8D:77:B1:8D:7C:1A:BE:18:4F:AF:81:BF:E2:B1:CD:03:43:7F:D8:65:4B
    ```
    
 2. Update port 8443 on the Gateway to allow connections only if the client certificate includes a specific hash and Subject Alt Name. 
@@ -871,7 +859,7 @@ You can configure your mTLS listener to limit connections to clients that presen
              kind: Secret
          options:
            kgateway.dev/verify-subject-alt-names: "example.com"
-           kgateway.dev/verify-certificate-hash: "46:DB:0D:C2:E1:4F:0A:05:8C:4F:05:8D:77:B1:8D:7C:1A:BE:18:4F:AF:81:BF:E2:B1:CD:03:43:7F:D8:65:4B"
+           kgateway.dev/verify-certificate-hash: "${CLIENT_CERT_HASH}"
        allowedRoutes:
          namespaces:
            from: All
@@ -887,7 +875,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -895,7 +883,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -905,9 +893,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
+   curl -v https://example.com:8443/get \
      --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -988,7 +975,7 @@ You can configure your mTLS listener to limit connections to clients that presen
              kind: Secret
          options:
            kgateway.dev/verify-subject-alt-names: "mtls.com"
-           kgateway.dev/verify-certificate-hash: "46:DB:0D:C2:E1:4F:0A:05:8C:4F:05:8D:77:B1:8D:7C:1A:BE:18:4F:AF:81:BF:E2:B1:CD:03:43:7F:D8:65:4B"
+           kgateway.dev/verify-certificate-hash: "${CLIENT_CERT_HASH}"
        allowedRoutes:
          namespaces:
            from: All
@@ -999,7 +986,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:${INGRESS_GW_ADDRESS}"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -1007,7 +994,7 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{% /tab %}}
    {{% tab name="LoadBalancer hostname" %}}
    ```sh
-   curl -v -k --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
+   curl -v --resolve "example.com:8443:$(dig +short $INGRESS_GW_ADDRESS | head -n1)"  https://example.com:8443/get \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem
@@ -1017,9 +1004,8 @@ You can configure your mTLS listener to limit connections to clients that presen
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
    ```sh
-   curl -v -k https://localhost:8443/get \
+   curl -v https://example.com:8443/get \
      --resolve example.com:8443:127.0.0.1 \
-     -H "Host: example.com" \
      --cert client-cert.pem \
      --key client-key.pem \
      --cacert ca-cert.pem

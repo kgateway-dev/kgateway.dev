@@ -43,7 +43,7 @@ Create a `GatewayExtension` that tells the gateway how to validate tokens, and a
    | `issuer` | Must match the `iss` claim in your tokens exactly. Keycloak derives `iss` from the URL that the token request arrives on, so a token that you fetch through a port-forward on `https://localhost:9443` carries that address, not the in-cluster Service name. Decode a real token and read its `iss` claim rather than assuming. |
    | `jwks.remote.backendRef` | The network path that the gateway uses to fetch the signing keys. This is the `Backend` for Keycloak, so the JWKS endpoint does not have to be reachable from outside the cluster. |
    | `jwks.remote.url` | The JWKS URL. Kgateway connects through `backendRef`, and uses this value for the request path and `Host` header. |
-   | `audiences` | The accepted values of the `aud` claim. A token is rejected with a `403` response if none of its audiences match. **Note**: Do not add `account` to `audiences` as a way to make token validation pass. `account` is the realm's built-in client, and every token that the realm issues carries it, so accepting it lets a token minted for **any** client in the realm through this policy. If your tokens do not contain your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client instead. You can decode a token and check its `aud` claim at [jwt.io](https://www.jwt.io/).|
+   | `audiences` | The accepted values of the `aud` claim. A token is rejected with a `403` response if none of its audiences match. **Note**: Do not add `account` to `audiences` as a way to make token validation pass. `account` is the realm's built-in client, and tokens for any user with the realm's default roles carry it, so accepting it lets a token minted for **any** client in the realm through this policy. If your tokens do not contain your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client instead. You can decode a token and check its `aud` claim at [jwt.io](https://www.jwt.io/).|
 
 2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} that references the JWT GatewayExtension. Make sure that the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} is in the same namespace as the HTTPRoute that it targets.
 
@@ -111,6 +111,8 @@ Use the verification steps below to confirm that the Access Token Validation flo
 
 3. Obtain a token from Keycloak with the `password` grant. The `-k` option accepts the self-signed certificate that the setup steps create.
 
+   Replace `YOUR_CLIENT_SECRET` with your Keycloak client secret. If you used the [ConfigMap-based setup]({{< link-hextra path="/security/oauth/keycloak/setup/#configmap-setup" >}}), the secret is `kgateway-client-secret`.
+
    Request the token from the same Keycloak address that you set as the `issuer` on the `GatewayExtension`. Keycloak derives the `iss` claim from the address the request arrives on, so fetching a token from a different address produces a token that the gateway rejects.
 
    {{< tabs >}}
@@ -147,7 +149,7 @@ Use the verification steps below to confirm that the Access Token Validation flo
 4. Confirm that the token's `iss` and `aud` claims match your `GatewayExtension`. Decode the payload.
 
    ```sh
-   echo $TOKEN | jq -rR 'split(".")[1] | @base64d' | jq '{iss, aud}'
+   echo $TOKEN | jq -rR 'split(".")[1] | gsub("-"; "+") | gsub("_"; "/") | @base64d | fromjson | {iss, aud}'
    ```
 
    Example output. If `aud` does not include your client ID, add the [audience mapper]({{< link-hextra path="/security/oauth/keycloak/setup/#audience-mapper" >}}) to the Keycloak client.
@@ -158,6 +160,8 @@ Use the verification steps below to confirm that the Access Token Validation flo
      "aud": ["kgateway-client", "account"]
    }
    ```
+
+   If you used the ConfigMap-based setup, the output shows `"aud": "kgateway-client"` without `account`, because that test user has no realm roles.
 
 5. Send a request with the token in the `Authorization` header.
 

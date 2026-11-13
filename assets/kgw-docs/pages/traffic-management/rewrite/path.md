@@ -501,7 +501,7 @@ Use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to rewrite full paths w
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/buildings -H "host: rewrite.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/anything/stores/us/buildings -H "host: rewrite.example:8080"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}

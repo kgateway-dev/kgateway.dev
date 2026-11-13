@@ -87,14 +87,14 @@ Create TLS certificates for the `httpbin.example.com` and `petstore.example.com`
    petstore.example.com.csr example.com.key          httpbin.example.com.csr
    ```
     
-6. Store the credentials for the `httpbin.example.com` domain in a Kubernetes secret. 
+5. Store the credentials for the `httpbin.example.com` domain in a Kubernetes secret. 
    ```shell
    kubectl create -n {{< reuse "kgw-docs/snippets/namespace.md" >}} secret tls httpbin-credential \
      --key=example_certs/httpbin.example.com.key \
      --cert=example_certs/httpbin.example.com.crt
    ```
 
-7. Store the credentials for the `petstore.example.com` domain in a Kubernetes secret. 
+6. Store the credentials for the `petstore.example.com` domain in a Kubernetes secret. 
    ```shell
    kubectl create -n {{< reuse "kgw-docs/snippets/namespace.md" >}} secret tls petstore-credential \
      --key=example_certs/petstore.example.com.key \
@@ -158,7 +158,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    |`spec.listeners.tls.certificateRefs`|The Kubernetes secret that holds the TLS certificate and key for the Gateway. The Gateway uses these credentials to establish the TLS connection with a client, and to decrypt incoming HTTPS requests.|
 
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
    
    1. Create a Gateway that enables the attachment of ListenerSets.
 
@@ -273,7 +273,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    ```
 
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -325,7 +325,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    ```
 
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -366,7 +366,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    {{% /tab %}}
    {{< /tabs >}}
 
-5. Send a request to the `httpbin.example.com` domain with the client certificate that you created earlier. Verify that the gateway presents the TLS certificate for the `httpbin.example.com` domain during the TLS handshake. 
+5. Send a request to the `httpbin.example.com` domain Verify that the gateway presents the TLS certificate for the `httpbin.example.com` domain during the TLS handshake. 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
@@ -406,14 +406,14 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    *  issuer: O=example Inc.; CN=example.com
    *  SSL certificate verify result: unable to get local issuer certificate (20), continuing   anyway.
    * using HTTP/2
-   * [HTTP/2] [1] OPENED stream for https://httpbin.example.com:443/headers
+   * [HTTP/2] [1] OPENED stream for https://httpbin.example.com:443/anything
    * [HTTP/2] [1] [:method: GET]
    * [HTTP/2] [1] [:scheme: https]
    * [HTTP/2] [1] [:authority: httpbin.example.com]
-   * [HTTP/2] [1] [:path: /headers]
+   * [HTTP/2] [1] [:path: /anything]
    * [HTTP/2] [1] [user-agent: curl/8.7.1]
    * [HTTP/2] [1] [accept: */*]
-   > GET /headers HTTP/2
+   > GET /anything HTTP/2
    > Host: httpbin.example.com
    > User-Agent: curl/8.7.1
    > Accept: */*
@@ -444,7 +444,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    }
    ```
 
-6. Send a request to the `petstore.example.com` domain with the client certificate that you created earlier. Verify that the gateway presents the TLS certificate for the `petstore.example.com` domain during the TLS handshake. 
+6. Send a request to the `petstore.example.com` domain Verify that the gateway presents the TLS certificate for the `petstore.example.com` domain during the TLS handshake. 
    {{< tabs >}}
    {{% tab name="LoadBalancer IP address" %}}
    ```sh
@@ -523,7 +523,7 @@ Set up an SNI Gateway that serves multiple hosts on the same port.
    kubectl delete service petstore
    ```
    {{% /tab %}}
-   {{% tab name="ListenerSet" %}}
+   {{% tab name="ListenerSets" %}}
    ```sh
    kubectl delete secret httpbin-credential -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    kubectl delete secret petstore-credential -n {{< reuse "kgw-docs/snippets/namespace.md" >}}

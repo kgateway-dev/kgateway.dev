@@ -17,11 +17,11 @@ The engine is the classic transformation filter, which is powered by version 3.4
 {{< version include-if="2.2.x" >}}
 The default engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). On `x86_64`, classic transformation (powered by version 3.4 of the [Inja template engine](https://github.com/pantor/inja/tree/v3.4.0)) is available as an opt-out fallback. For a comparison of the two engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version exclude-if="2.1.x,2.2.x" >}}
 The only supported engine is rustformation, which is powered by the [MiniJinja template engine](https://github.com/mitsuhiko/minijinja). For details, see [Transformation engine]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
 {{< /version >}}
 
-The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure. To learn more about each attribute, see [Template attributes](#template-attributes).
+The following TrafficPolicy shows the structure of the transformation template and all the attributes that you can configure, with example values. To learn more about each attribute, see [Template attributes](#template-attributes).
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -30,29 +30,29 @@ metadata:
   name: transformation
   namespace: httpbin
 spec:
-  transformation: 
+  transformation:
     request:
-      add: 
-      - name: 
-        value: 
-      set: 
-      - name: 
-        value: 
-      remove: []
-      body:
-        value: 
-        parseAs: 
-    response: 
       add:
-      - name: 
-        value: 
-      set: 
-      - name: 
-        value: 
-      remove: []
-      body: 
-        value: 
-        parseAs:
+      - name: my-header
+        value: static
+      set:
+      - name: x-gateway-request
+        value: '{{ request_header(":path") }}'
+      remove: ["x-remove-me"]
+      body:
+        value: '{{ body() }}'
+        parseAs: AsString
+    response:
+      add:
+      - name: x-podname
+        value: '{{ env("POD_NAME") }}'
+      set:
+      - name: x-gateway-response
+        value: '{{ request_header("x-gateway-request") }}'
+      remove: ["x-remove-me"]
+      body:
+        value: '{{ body() }}'
+        parseAs: AsString
 ```
 
 When writing your templates, you can take advantage of all the core template features, such as loops, conditional logic, and functions. In addition, you can use [custom transformation functions](#custom-inja-functions) to transform request and response metadata more easily.
@@ -69,17 +69,17 @@ When specifying your transformation template, you can leverage custom functions 
 | `base64url_decode(string)` | Decodes the input string from URL-safe base64. |
 | `body()` | Returns the request or response body. For an example, see [Update response body]({{< link-hextra path="/traffic-management/transformations/update-response-body" >}}). |
 | `context()` | Returns the base JSON context. You can use this context to parse a JSON body that is an array. |
-| `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |{{% version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x" %}}
+| `env(env_var_name)` | Returns the value of the environment variable with the given name. Because the transformation filter is processed in the gateway proxy, the environment variables are returned in the context of the gateway proxy. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |{{% version exclude-if="2.1.x,2.2.x,2.3.x" %}}
 | `get_cookie(cookie_name)` | Returns the value of the cookie with the given name from the request `Cookie` header. Cookie name matching is case-sensitive, per [RFC 6265](https://datatracker.ietf.org/doc/html/rfc6265). Returns an empty string if the cookie is not present. |
 | `get_cookie_i(cookie_name)` | Returns the value of the cookie with the given name from the request `Cookie` header by using a case-insensitive name match. Returns an empty string if the cookie is not present. |{{% /version %}}
 | `header(header_name)` | Returns the value of the response header with the given name. For an example, see [Change response status]({{< link-hextra path="/traffic-management/transformations/change-response-status/" >}}). |
 | `raw_string(string)` | Returns the input string with escaped characters intact. This function is useful for constructing JSON request or response bodies. For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers" >}}). |
-| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. {{< version exclude-if="2.0.x,2.1.x" >}}See the known-issue note below this table about constant-folding behavior in rustformation.{{< /version >}} For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |{{< version exclude-if="2.0.x,2.1.x" >}}
+| `replace_with_random(string, pattern)` | Finds the pattern in the input string and replaces this pattern with a random value. {{< version exclude-if="2.1.x" >}}See the known-issue note below this table about constant-folding behavior in rustformation.{{< /version >}} For an example, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |{{< version exclude-if="2.1.x" >}}
 | `replace_with_string(input, pattern, replacement)` | Finds the pattern in the input string and replaces every occurrence with `replacement`. Useful for redacting tokens or normalizing values before they are forwarded. |{{< /version >}}
 | `request_header(header_name)` | Returns the value of the request header with the given name. This function is useful to add the request header values in response transformations. For an example for how to extract a request header value and inject it into a response header, see [Inject response headers]({{< link-hextra path="/traffic-management/transformations/inject-response-headers/" >}}). |
 | `substring(string, start_pos, substring_len)` | Returns a substring of the input string, starting at `start_pos` and extending for `substring_len` characters. If `substring_len` is omitted or `<= 0`, the substring extends to the end of the input string. For an example, see [Decode base64 headers]({{< link-hextra path="/traffic-management/transformations/decode-base64-headers/" >}}). |
 
-{{< version exclude-if="2.0.x,2.1.x" >}}
+{{< version exclude-if="2.1.x" >}}
 > [!WARNING]
 > **Known issue: `replace_with_random` returns the same value across requests in rustformation.** With rustformation, MiniJinja evaluates `replace_with_random` at template compile time when its arguments are constants and stores the result in the compiled template, so every request returns the same generated value. To get a fresh random per request, pass a per-request input such as `request_header("x-request-id")` — a non-constant argument can't be folded at compile time, so MiniJinja re-evaluates the function on every render. Tracked in [kgateway-dev/kgateway#13634](https://github.com/kgateway-dev/kgateway/issues/13634).
 {{< /version >}}
@@ -156,7 +156,7 @@ The default and the available modes depend on the [transformation engine]({{< li
 * `AsString`: The body is buffered and exposed to the template as a raw string. This is the rustformation default. With the classic engine, you must set `parseAs: AsString` explicitly if your body is not valid JSON.
 * `AsJson`: The body is buffered and parsed as JSON. Top-level fields are available to the template by name. This is the classic default. With the rustformation engine, you must set `parseAs: AsJson` explicitly to access JSON fields directly. If the body is not valid JSON, the classic engine returns a 400 Bad Request response, and the rustformation engine skips the transformation.
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version exclude-if="2.1.x,2.2.x" >}}
 * `AsString` (default): The body is buffered and exposed to the template as a raw string. Use this mode when you want to read or rewrite the body with [`body()`](#custom-inja-functions) but do not need field-level access.
 * `AsJson`: The body is buffered and parsed as JSON. Top-level fields are exposed to the template context, so you can read them with dot or bracket notation. If the body is not valid JSON, the filter falls back to skipping the transformation.
 * `None`: The body is not buffered and all body processing is skipped. The [`body()`](#custom-inja-functions) and [`context()`](#custom-inja-functions) functions return an empty string. Attempts to read JSON variables from a header template return a 400 response.
@@ -224,7 +224,7 @@ This template results in a body similar to `This is the value of the :path pseud
 {{< version include-if="2.2.x" >}}
 With rustformation (the 2.2.x default), set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject into your custom body. If you opted out of rustformation by setting `useRustFormations: false`, the classic engine continues to auto-parse the body as JSON whenever a transformation is configured, so `parseAs: AsJson` is implied.
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version exclude-if="2.1.x,2.2.x" >}}
 Set `body.parseAs: AsJson` on the transformation. With `parseAs: AsJson`, the body is parsed and the top-level JSON fields are exposed to the template, so you can access them directly to inject them into your custom body.
 {{< /version >}}
 
@@ -232,7 +232,7 @@ Assuming a body with the following format:
 ```yaml
 {
   "slideshow": {
-    "editor": "Yours Truly",
+    "author": "Yours Truly",
     "date": "date of publication",
     "slides": [
       {
@@ -260,10 +260,10 @@ transformation:
   response:
     body:
       parseAs: AsJson
-      value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": "{{ slideshow.slides }}}'
+      value: '{"author": "{{ slideshow.author }}", "title": "{{ slideshow.title }}", "slides": {{ slideshow.slides }}}'
 ```
 
 The following body is returned after transformation: 
 ```
-{"author": "Yours Truly", "title": "Sample Slide Show", "slides": "[{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}]}% 
+{"author": "Yours Truly", "title": "Sample Slide Show", "slides": [{"title":"Wake up to WonderWidgets!","type":"all"},{"items":["Why <em>WonderWidgets</em> are great","Who <em>buys</em> WonderWidgets"],"title":"Overview","type":"all"}]}
 ```

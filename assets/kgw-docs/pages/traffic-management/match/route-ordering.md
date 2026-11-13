@@ -6,7 +6,7 @@ For all non-regex matchers, the Gateway API specification requires implementatio
 
 | Priority | Criterion | Rule |
 |---|---|---|
-| 1 (highest) | Path match type | `Exact` before `PathPrefix` before `RegularExpression` matching |
+| 1 (highest) | Path match type | `Exact` before `RegularExpression` before `PathPrefix` matching |
 | 2 | Prefix length | Longer `PathPrefix` wins |
 | 3 | Method match | Route with a method match wins over a route without a method match |
 | 4 | Header match count | More header matchers wins |
@@ -48,7 +48,7 @@ When two routes from different HTTPRoute objects are equally specific by all cri
 
 The Gateway API specification does not define a specificity ordering for `RegularExpression` path matches. Regex patterns cannot be reliably ranked by specificity from their string representation alone.
 
-Regex routes are always placed after `Exact` and `PathPrefix` routes (see [Specificity-based ordering](#ordering)). However, when multiple regex routes match the same request, the winner is determined by the same tiebreakers that are used for equally-specific routes:
+Regex routes are always placed after `Exact` routes and before `PathPrefix` routes (see [Specificity-based ordering](#ordering)). A regex rule wins over a `PathPrefix` rule that matches the same request, even if the `PathPrefix` rule is listed first or has a longer value. However, when multiple regex routes match the same request, the winner is determined by the same tiebreakers that are used for equally specific routes:
 
 - **Within the same HTTPRoute**: The rule list position determines route precedence. The first matching rule in the list wins.
 - **Across HTTPRoutes**: Route order is first determined by the HTTPRoute's creation timestamp, with older HTTPRoutes taking priority. If the HTTPRoute resources were created with the same timestamp, HTTPRoutes are ordered alphabetically by `{namespace}/{name}`. 

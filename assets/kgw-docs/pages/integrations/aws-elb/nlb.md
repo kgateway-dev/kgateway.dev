@@ -65,6 +65,8 @@ In this guide you explore how to expose the {{< reuse "kgw-docs/snippets/kgatewa
    | `aws-load-balancer-scheme: internet-facing ` | Create the NLB with a public IP addresses that is accessible from the internet. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/nlb/#prerequisites).  | 
    | `aws-load-balancer-nlb-target-type: "instance"` | Use the Gateway's instance ID to register it as a target with the NLB. For more information, see the [AWS documentation](https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/guide/service/nlb/#instance-mode_1).  | 
 
+   {{< reuse "kgw-docs/snippets/params-shared-extensions-note.md" >}}
+
 2. Depending on the annotations that you use on your gateway proxy, you can configure the NLB in different ways. 
 
    {{< tabs >}}

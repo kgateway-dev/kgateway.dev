@@ -145,7 +145,7 @@ Use `AlwaysForwardOnly` to forward an existing XFCC header to the upstream backe
          "curl/8.7.1"
        ],
        "X-Envoy-Expected-Rq-Timeout-Ms": [
-        "15000"
+         "15000"
        ],
        "X-Envoy-External-Address": [
          "127.0.0.1"
@@ -175,7 +175,7 @@ Review other common configuration examples.
 Use `ForwardOnly` to pass the existing XFCC header from the client to the upstream without modification. 
 
 > [!NOTE]
-> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
+> This mode takes effect only on an mTLS gateway listener. On a plain HTTP listener, the mode has no effect and the header is stripped. To set up an mTLS listener, see [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}).
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -201,7 +201,7 @@ EOF
 Use `AppendForward` to keep any XFCC header that is already present in the request and append a new entry with details from the current downstream client certificate. This is useful in multi-hop proxy chains where you want each hop to add its own identity without discarding previous entries. 
 
 > [!NOTE]
-> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
+> This mode takes effect only on an mTLS gateway listener. On a plain HTTP listener, the mode has no effect and the header is stripped. To set up an mTLS listener, see [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}).
 
 ```yaml
 kubectl apply -f- <<EOF
@@ -230,7 +230,7 @@ EOF
 Use `SanitizeSet` to remove any XFCC header that the client sent and replace it with a new one that the gateway proxy builds from the actual client certificate that is used in the mTLS handshake. The upstream receives a trustworthy header that the proxy generated, and not a header that the client might have forged. Use the `details` field to control the information that you want to include in the header. 
 
 > [!NOTE]
-> This configuration can only be applied to an mTLS gateway listener. On a plain HTTP listener, this mode has no effect and the header is stripped.
+> This mode takes effect only on an mTLS gateway listener. On a plain HTTP listener, the mode has no effect and the header is stripped. To set up an mTLS listener, see [mTLS listener]({{< link-hextra path="/setup/listeners/mtls/" >}}).
 
 In the following example, you include the subject, DNS, and URI fields from the certificate.
 

@@ -10,7 +10,4 @@ prev: /docs/traffic-management/route-delegation
 
 ## Move the buffer filter before body-reading filters
 
-> [!NOTE]
-> The `buffer.filterStage` field is available in {{< reuse "/kgw-docs/snippets/kgateway.md" >}} version 2.4.5 and later.
-
 {{< reuse "kgw-docs/snippets/buffering-filter-stage.md" >}}

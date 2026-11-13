@@ -10,7 +10,7 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: kube-backend
-  namespace: default
+  namespace: httpbin
 spec:
   parentRefs:
   - name: http
@@ -21,11 +21,5 @@ spec:
     - backendRefs:
       - name: httpbin
         port: 8000
-      filters:
-      - type: ExtensionRef
-        extensionRef:
-          group: gateway.kgateway.dev
-          kind: TrafficPolicy
-          name: rewrite
 ```
 

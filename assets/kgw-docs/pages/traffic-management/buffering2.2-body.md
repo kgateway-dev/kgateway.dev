@@ -4,7 +4,7 @@ Fine-tune connection speeds for read and write operations by setting a connectio
 
 By default, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} is set up with 1MiB of request read and write buffer for each gateway. For large requests that must be buffered and that exceed the default buffer limit, {{< reuse "/kgw-docs/snippets/kgateway.md" >}} either disconnects the connection to the downstream service if headers were already sent, or returns a 413 HTTP response code. To make sure that large requests can be sent and received, you can specify the maximum number of bytes that can be buffered between the gateway and the downstream service. Alternatively, when using {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as an edge proxy, configuring the buffer limit can be important when dealing with untrusted downstreams. By setting the limit to a small number, such as 32KiB, you can better guard against potential attacks or misconfigured downstreams that could excessively use the proxy's resources.
 
-The connection buffer limit can be configured on the Gateway level{{< version exclude-if="2.0.x" >}} or on an individual route{{< /version >}}. 
+The connection buffer limit can be configured on the Gateway level or on an individual route. 
 
 ## Considerations when using httpbin
 
@@ -16,9 +16,9 @@ When you use the httpbin sample app, keep in mind that httpbin limits the maximu
 
 ## Set up buffer limits per gateway
 
-Use an annotation to set a per-connection buffer limit on your Gateway, which applies the buffer limit to all routes served by the Gateway. 
+Use a ListenerPolicy to set a per-connection buffer limit on your Gateway, which applies the buffer limit to all routes served by the Gateway. 
 
-1. Create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
+1. Create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the request body to the httpbin sample app. The gateway proxy must buffer the full request body before it can apply the transformation, so the buffer limit applies to the request.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -32,14 +32,14 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
        kind: HTTPRoute
        name: httpbin
      transformation:
-       response:
+       request:
          body:
            parseAs: AsString
            value: '{{ body() }}'
    EOF
    ```
 
-2. Annotate the http Gateway resource to set a buffer limit of 1 kilobytes.
+2. Create a ListenerPolicy for the http Gateway that sets a buffer limit of 1024 bytes.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -59,10 +59,10 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 3. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
-4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
+4. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a 413 Payload Too Large response, indicating that the buffer limit was exceeded.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -87,14 +87,10 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
    * upload completely sent off: 2747 bytes
    < HTTP/1.1 413 Payload Too Large
    HTTP/1.1 413 Payload Too Large
-   < access-control-allow-credentials: true
-   access-control-allow-credentials: true
-   < access-control-allow-origin: *
-   access-control-allow-origin: *
-   < x-envoy-upstream-service-time: 1
-   x-envoy-upstream-service-time: 1
    < content-length: 17
    content-length: 17
+   < content-type: text/plain
+   content-type: text/plain
    < server: envoy
    server: envoy
    ```
@@ -140,7 +136,7 @@ Use an annotation to set a per-connection buffer limit on your Gateway, which ap
 
 You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} to control how much data can be buffered per connection at the level of individual routes. This can provide more fine-grained control than applying the buffer limit at the Gateway, or can provide a method of overriding a buffer limit at the level of the Gateway.
 
-1. If you did not already, create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the response from the httpbin sample app.
+1. If you did not already, create a {{< reuse "/kgw-docs/snippets/trafficpolicy.md" >}} called `transformation-buffer-body` that forces buffering by transforming the request body to the httpbin sample app. The gateway proxy must buffer the full request body before it can apply the transformation, so the buffer limit applies to the request.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "/kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -154,7 +150,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
        kind: HTTPRoute
        name: httpbin
      transformation:
-       response:
+       request:
          body:
            parseAs: AsString
            value: '{{ body() }}'
@@ -186,10 +182,10 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
 
 4. To test the buffer limit, create a payload in a temp file that exceeds the 1Ki buffer limit.
    ```sh
-   dd if=/dev/zero bs=2048 count=1 | base64 -w 0 > /tmp/large_payload_2k.txt
+   dd if=/dev/zero bs=2048 count=1 | base64 | tr -d '\n' > /tmp/large_payload_2k.txt
    ```
 
-5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a connection error or timeout, indicating that the buffer limit was exceeded.
+5. Send a request to the `/anything` httpbin path with the large payload. Verify that the request fails with a 413 Payload Too Large response, indicating that the buffer limit was exceeded.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -209,7 +205,7 @@ You can configure connection buffer limits using a {{< reuse "/kgw-docs/snippets
    {{% /tab %}}
    {{< /tabs >}}
 
-6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 2Ki limit.
+6. Test the buffer limit again by sending a request with a small payload, `"hello world"`. This request succeeds with a normal response from httpbin because the payload size is within the 1024-byte limit.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh

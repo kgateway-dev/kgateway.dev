@@ -57,7 +57,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080/get -H "host: redirect.example"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/get -H "host: redirect.example"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}

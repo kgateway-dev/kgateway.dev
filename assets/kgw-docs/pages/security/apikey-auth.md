@@ -12,7 +12,7 @@ The kgateway proxy comes with built-in API key auth support via the {{< reuse "k
 * Specify a **label selector** that matches the label of one or more API key secrets. Labels are the more flexible, scalable approach.
 * Refer to the **name and namespace** of each secret.
 
-The proxy matches a request to a route that is secured by the external auth policy. The request must have a valid API key in the `api-key` header to be accepted. You can configure the name of the expected header. If the header is missing, or the API key is invalid, the proxy denies the request and returns a `401` response. 
+The proxy matches a request to a route that is secured by the API key auth policy. The request must have a valid API key in the `api-key` header to be accepted. You can configure the name of the expected header. If the header is missing, or the API key is invalid, the proxy denies the request and returns a `401` response. 
 
 The following diagram illustrates the flow: 
 
@@ -27,7 +27,7 @@ sequenceDiagram
 
     AGW->>AGW: API key auth check:<br/>No API key found
 
-    AGW-->>C: 401 Unauthorized<br/>"no API Key found"
+    AGW-->>C: 401 Unauthorized<br/>"Client authentication failed"
 
     Note over C,Backend: Retry with API key
 
@@ -38,7 +38,7 @@ sequenceDiagram
 
     AGW->>AGW: Compare API key from<br/>request header vs secret
 
-    alt mode: Strict — Key valid
+    alt Key valid
         AGW->>Backend: Forward request
         Backend-->>AGW: Response
         AGW-->>C: 200 OK + Response
@@ -68,7 +68,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
      namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
      labels:
        app: httpbin
-   type: extauth.solo.io/apikey
+   type: Opaque
    stringData:
      api-key: N2YwMDIxZTEtNGUzNS1jNzgzLTRkYjAtYjE2YzRkZGVmNjcy
    EOF
@@ -80,7 +80,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
    kubectl get secret apikey -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml
    ```
 
-4. Create an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The following example uses the `Strict` validation mode, which requires requests to include a valid `Authorization` header to be authenticated successfully. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
+4. Create an {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource that configures API key authentication for all routes that the Gateway serves and reference the `apikey` secret that you created earlier. The policy requires requests to include a valid API key in the `api-key` header. For other common configuration examples, see [Other configuration examples](#other-configuration-examples).  
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -124,7 +124,7 @@ Store your API keys in a Kubernetes secret so that you can reference it in an {{
    ...
    ```
 
-6. Repeat the request. This time, you provide a valid API key in the `Authorization` header. Verify that the request now succeeds. 
+6. Repeat the request. This time, you provide a valid API key in the `api-key` header. Verify that the request now succeeds. 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
@@ -226,11 +226,14 @@ spec:
 EOF
 ```
 
-A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}} If the same key value is stored under two different entry names, the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports a `duplicate API key value` error in its status and API key auth is not applied. If the same key value is stored under the same entry name in more than one secret, the extra copies are ignored and no error is reported.{{< /version >}}
+A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version exclude-if="2.1.x,2.2.x" >}} If the same key value is stored under two different entry names, {{< reuse "kgw-docs/snippets/kgateway.md" >}} cannot tell which client the key identifies. The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports `Accepted=False` with a `duplicate API key value` message that names both entries and their secrets, and the routes that the policy applies to return a 500 HTTP response until you remove the duplicate. If the same key value is stored under the same entry name in more than one secret, for example because you copied a secret to another namespace, the extra copies are ignored and no error is reported.{{< /version >}}
+
+> [!WARNING]
+> Versions that do not check for duplicate key values (2.2 and earlier, and the 2.3 and 2.4 patch versions earlier than 2.3.9 and 2.4.5) send the duplicate to the gateway proxy, which rejects it. The proxy then stops applying configuration updates for the entire listener, while the policy and routes still report `Accepted`. Upgrade to a version that includes the check, or make sure that no two secrets contain the same key value.
 
 ### Secrets in another namespace
 
-The secrets that you refer to in `secretRef`, or match with `secretSelector`, do not need to be in the same namespace as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. A cross-namespace reference requires a [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) in the namespace that holds the secret. In the ReferenceGrant, the `from` section must use the `{{< reuse "kgw-docs/snippets/trafficpolicy-group.md" >}}` group and the `{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}` kind.{{< version exclude-if="2.2.x" >}} For an example, see [ReferenceGrant example]({{< link-hextra path="/install/advanced/#referencegrant-example" >}}).{{< /version >}}
+The secrets that you refer to in `secretRef`, or match with `secretSelector`, do not need to be in the same namespace as the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}. A cross-namespace reference requires a [ReferenceGrant](https://gateway-api.sigs.k8s.io/reference/api-types/referencegrant/) in the namespace that holds the secret. In the ReferenceGrant, the `from` section must use the `{{< reuse "kgw-docs/snippets/referencegrant-from-group.md" >}}` group and the `{{< reuse "kgw-docs/snippets/referencegrant-from-kind.md" >}}` kind.{{< version exclude-if="2.2.x" >}} For an example, see [ReferenceGrant example]({{< link-hextra path="/install/advanced/#referencegrant-example" >}}).{{< /version >}}
 
 The API server accepts a ReferenceGrant with a different group or kind, but that grant never matches the policy, so the reference is denied. If a `secretRef` reference is denied, the policy reports `Accepted=False` with the reason `Invalid` and a message such as `API key secret <name>: cannot reference secret <namespace>/<name> : missing reference grant`.
 
@@ -238,8 +241,8 @@ Note the following behavior when you use `secretSelector`:
 
 * The selector matches labels in every namespace, not only the namespace of the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 * A matching secret in another namespace is skipped when no ReferenceGrant allows the reference.
-* {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}Skipped secrets are reported only when no secret is left. {{< /version >}}If at least one secret is allowed, such as a secret in the same namespace as the policy, the policy is applied with the remaining secrets and no error is reported. As a result, a missing ReferenceGrant can silently reduce the set of API keys that are accepted.
-* {{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}The `failed to get secrets by selector: missing reference grant` error means that every matching secret was skipped.{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}If every matching secret is skipped, the policy reports `Accepted=False` with the reason `Invalid` and the message `no secrets found matching selector <labels> in namespace <namespace>`. This is the same message as when no secret matches, so it does not show that a matching secret exists in a namespace that did not grant access.{{< /version >}}
+* {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}Skipped secrets are reported only when no secret is left. {{< /version >}}If at least one secret is allowed, such as a secret in the same namespace as the policy, the policy is applied with the remaining secrets and no error is reported. As a result, a missing ReferenceGrant can silently reduce the set of API keys that are accepted.
+* {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}The `failed to get secrets by selector: missing reference grant` error means that every matching secret was skipped.{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}If every matching secret is skipped, the policy reports `Accepted=False` with the reason `Invalid` and the message `no secrets found matching selector <labels> in namespace <namespace>`. This is the same message as when no secret matches, so it does not show that a matching secret exists in a namespace that did not grant access.{{< /version >}}
 
 ### Custom header name
 
@@ -349,7 +352,7 @@ apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
 kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
 metadata:
   name: apikey-auth-disable
-  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+  namespace: httpbin
 spec:
   targetRefs:
     - group: gateway.networking.k8s.io

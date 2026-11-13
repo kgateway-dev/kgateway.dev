@@ -9,7 +9,7 @@ Grafana is a suite of open source tools that help you analyze, visualize, and mo
 
 Steps to install:
 
-1. Deploy Grafana Loki to your cluster.
+1. Deploy Grafana Loki to your cluster. This example runs Loki as a single binary that stores logs on its own persistent volume. For production setups, configure an object store such as Amazon S3 instead.
 
    ```yaml
    helm upgrade --install loki loki \
@@ -25,16 +25,20 @@ Steps to install:
        configs:
          - from: 2024-04-01
            store: tsdb
-           object_store: s3
+           object_store: filesystem
            schema: v13
            index:
              prefix: loki_index_
              period: 24h
+     storage:
+       type: filesystem
      auth_enabled: false
+     limits_config:
+       allow_structured_metadata: true
    singleBinary:
      replicas: 1
    minio:
-     enabled: true
+     enabled: false
    gateway:
      enabled: false
    test:
@@ -46,8 +50,10 @@ Steps to install:
          installOperator: false
    lokiCanary:
      enabled: false
-   limits_config:
-     allow_structured_metadata: true
+   chunksCache:
+     enabled: false
+   resultsCache:
+     enabled: false
    memberlist:
      service:
        publishNotReadyAddresses: true

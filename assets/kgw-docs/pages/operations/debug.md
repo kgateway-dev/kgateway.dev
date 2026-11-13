@@ -20,9 +20,10 @@ Use built-in tools to troubleshoot issues in your {{< reuse "/kgw-docs/snippets/
    | Endpoint | Description |
    | -- | -- |
    | `/debug/pprof` | View the pprof profile of the control plane. A profile shows you the stack traces of the call sequences, such as Go routines, that led to particular events, such as memory allocation. The endpoint includes descriptions of each available profile.|
-   | `/logging` | Review the current logging levels of each component in the control plane. You can also interactively set the log level by component, such as to enable `DEBUG` logs. |
+   | `/logging` | Set the log level by component, such as to enable `DEBUG` logs. The admin server page lists the current logging level of each component in the control plane under this endpoint. |
    | `/snapshots/krt` | View the current krt snapshot, or the point-in-time view of the transformed Kubernetes resources and their sync status that the control plane processed. These resources are then used to generate gateway configuration that is sent to the gateway proxies for routing decisions. |
    | `/snapshots/xds` | View the current xDS snapshot, or the Envoy-specific configuration (such as Listeners, Routes, Backends, and Workloads) that is being sent to and applied by Envoy gateway proxies. These snapshots show the final translated configuration that Envoy gateway proxies use for routing decisions. For snapshots to be present, you must have a Gateway resource that creates a connected, Envoy-based kgateway proxy. | 
+   | `/version` | Get the version and commit information of the control plane. |
 
 ## Debug your gateway setup
 
@@ -88,7 +89,7 @@ You can set the log level for the Envoy proxy to get more detailed logs. Envoy l
    apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
-     name: httpbin
+     name: debug-httpbin
      namespace: httpbin
    spec:
      parentRefs:
@@ -160,7 +161,7 @@ As part of debugging, you might have noticed that your HTTPRoute or Gateway had 
 
    Example ReferenceGrant for external auth GatewayExtension:
 
-   * The GrantExtension for external auth, HTTPRoute, and backing Service are in the app namespace, such as `httpbin`.
+   * The GatewayExtension for external auth, HTTPRoute, and backing Service are in the app namespace, such as `httpbin`.
    * The external auth service is in the `{{< reuse "kgw-docs/snippets/namespace.md" >}}` namespace.
 
    ```yaml

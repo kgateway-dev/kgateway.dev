@@ -185,7 +185,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
 Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressions to match incoming requests.
 
 1. Create an HTTPRoute resource for the `match.example` domain that uses a regular expression (regex) to match incoming requests. The following regex patterns are defined in the example: 
-   * **`\/.*my-path.*`**: 
+   * **`/.*my-path.*`**: 
      * The request path must start with `/`
      * The expression `.*` means that any character before and after the `my-path` string is allowed. 
      * Allowed pattern: `/anything/this-is-my-path-1`, not allowed: `/anything`. 
@@ -194,15 +194,15 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
      * `[^/]+?` matches any character except `/`.
      * The request path must end with `/entities`.
      * Allowed pattern: `/anything/stores/us/entities`, not allowed: `/anything/stores/us/south/entities`. 
-   * **`/anything/(dogs|cats)/\\d[.]\\d.*`**
+   * **`/anything/(dogs|cats)/\d[.]\d.*`**
      * The request path must start with `/anything/`, followed by either `dogs/` or `cats/`.
-     * `\\d` matches a single digit.
+     * `\d` matches a single digit.
      * `[.]` matches a literal period.
-     * `\\d.*` matches a single digit followed by zero or any character.
+     * `\d.*` matches a single digit followed by zero or any character.
      * Allowed pattern: `/anything/dogs/3.0-game`, not allowed: `/anything/birds`
    ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: gateway.networking.k8s.io/v1beta1
+   kubectl apply -f- <<'EOF'
+   apiVersion: gateway.networking.k8s.io/v1
    kind: HTTPRoute
    metadata:
      name: httpbin-match
@@ -223,7 +223,7 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
              value: /anything/stores/[^/]+?/entities
          - path:
              type: RegularExpression
-             value: /anything/(dogs|cats)/\\d[.]\\d.*
+             value: /anything/(dogs|cats)/\d[.]\d.*
          backendRefs:
          - name: httpbin
            namespace: httpbin
@@ -232,9 +232,9 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
    ```
    
 2. Send multiple requests to the httpbin app on the `match.example` domain. 
-   * `/anything/this-is-my-path-1` matches the regex pattern `\/.*my-path.*` 
+   * `/anything/this-is-my-path-1` matches the regex pattern `/.*my-path.*` 
    * `/anything/stores/us/entities` matches the regex pattern `/anything/stores/[^/]+?/entities` 
-   * `/anything/dogs/3.0-game` matches the regex pattern `/anything/(dogs|cats)/\\d[.]\\d.*`
+   * `/anything/dogs/3.0-game` matches the regex pattern `/anything/(dogs|cats)/\d[.]\d.*`
    
    Verify that the requests succeed and that you get back a 200 HTTP response code.  
    {{< tabs >}}
@@ -274,9 +274,9 @@ Use [RE2 syntax](https://github.com/google/re2/wiki/Syntax) for regular expressi
    ```
 
 3. Send requests to the httpbin app that do not meet the defined regex patterns.
-   * `/anything` does not match the regex pattern `\/.*my-path.*` 
-   * `/anything/stores/us/south/entities` does not match the regex pattern `/anything/stores/[^/]+?/
-   * `/anything/birds/1.1-game` does not match the regex pattern `/anything/(dogs|cats)/\\d[.]\\d.*`
+   * `/anything` does not match the regex pattern `/.*my-path.*` 
+   * `/anything/stores/us/south/entities` does not match the regex pattern `/anything/stores/[^/]+?/entities`
+   * `/anything/birds/1.1-game` does not match the regex pattern `/anything/(dogs|cats)/\d[.]\d.*`
    
    Verify that all requests fail with a 404 HTTP response code, because the path does not match the regex pattern that you defined. 
    {{< tabs >}}

@@ -92,8 +92,18 @@
     },
     {
       "old": "https://ai.google.dev/gemini-api/docs/models/gemini",
-      "new": "https://ai.google.dev/gemini-api/docs/models",
-      "reason": "Google dropped the /gemini suffix from the Gemini models page."
+      "new": "https://aistudio.google.com/docs/models",
+      "reason": "Google dropped the /gemini suffix from the Gemini models page, and the Gemini API docs then moved from ai.google.dev to aistudio.google.com."
+    },
+    {
+      "old": "https://ai.google.dev/gemini-api/docs/api-versions",
+      "new": "https://aistudio.google.com/api-reference/api-versions",
+      "reason": "The Gemini API docs moved to aistudio.google.com, where the API versions page lives under /api-reference/ instead of /docs/. Listed before the /gemini-api/docs entry below, which would otherwise rewrite this prefix to the wrong path."
+    },
+    {
+      "old": "https://ai.google.dev/gemini-api/docs",
+      "new": "https://aistudio.google.com/docs",
+      "reason": "The Gemini API docs moved from ai.google.dev/gemini-api/docs to aistudio.google.com/docs; the old URLs redirect."
     },
     {
       "old": "https://cloud.google.com/vertex-ai/docs/reference#versions",
@@ -129,6 +139,11 @@
       "old": "Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
       "new": "[Kubernetes names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
       "reason": "Gateway API status description wraps a bare URL in parentheses, so the link checker includes the closing parenthesis in the fragment (#names%29). Use a Markdown link, as newer versions do."
+    },
+    {
+      "old": "Kubernetes names<br />(https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "new": "[Kubernetes names](https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)",
+      "reason": "Same Gateway API status description as the previous entry, as rendered by crd-ref-docs in the 2.1.x API reference table, where the line break becomes <br /> instead of a space."
     },
     {
       "old": "https://www.envoyproxy.io/docs/envoy/v1.34.1/intro/arch_overview/http/upgrades.html",

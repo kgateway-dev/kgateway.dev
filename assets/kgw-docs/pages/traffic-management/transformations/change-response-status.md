@@ -8,10 +8,8 @@ Update the response status based on headers being present in a response.
 
 ## Change the response status
 
-1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo:bar` is present. If the `foo:bar` response header is not present, you return a 403 HTTP response code. 
+1. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. In this example, you change the value of the `:status` pseudo response header to 401 if the response header `foo: bar` is present. If the `foo: bar` response header is not present, you return a 403 HTTP response code. 
 
-   {{< tabs >}}
-   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -31,36 +29,13 @@ Update the response status based on headers being present in a response.
            value: '{% if header("foo") == "bar" %}401{% else %}403{% endif %}'
    EOF
    ```
-   {{% /tab %}}
-   {{% tab name="Agentgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     name: transformation
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     transformation:
-       response:
-         set:
-         - name: ":status"
-           value: 'request.uri.contains("foo=bar") ? 401 : 403'
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
-2. Send a request to the httpbin app and include the `foo:bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
+2. Send a request to the httpbin app and include the `foo=bar` query parameter. This query parameter automatically gets added as a response header and therefore triggers the transformation rule that you set up. Verify that you get back a 401 HTTP response code. 
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=bar \
+   curl -vi "http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=bar" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
@@ -104,7 +79,7 @@ Update the response status based on headers being present in a response.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=baz \
+   curl -vi "http://$INGRESS_GW_ADDRESS:8080/response-headers?foo=baz" \
     -H "host: www.example.com:8080" 
    ```
    {{% /tab %}}
@@ -126,8 +101,8 @@ Update the response status based on headers being present in a response.
    access-control-allow-origin: *
    < content-type: application/json; encoding=utf-8
    content-type: application/json; encoding=utf-8
-   < foo: bar
-   foo: bar
+   < foo: baz
+   foo: baz
    < content-length: 29
    content-length: 29
    < x-envoy-upstream-service-time: 4

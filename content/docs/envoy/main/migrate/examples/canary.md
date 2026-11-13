@@ -60,36 +60,51 @@ ingress2gateway print --providers=ingress-nginx --emitter=kgateway \
   --input-file canary-ingress.yaml > canary-kgateway.yaml
 ```
 
+The tool prints a warning that it does not translate HTTPS for the `app.example.com` host. By default, Ingress NGINX serves HTTPS for every host with a self-signed certificate. The generated Gateway has only an HTTP listener. To serve HTTPS, add an HTTPS listener to the Gateway. For more information, see [HTTPS listener]({{< link-hextra path="/setup/listeners/https/" >}}).
+
 ## After: HTTPRoute with weighted backends
 
 ```bash
 cat canary-kgateway.yaml
 ```
 
-Both Ingresses merge into one HTTPRoute. Traffic is split 80/20:
+The output has a Gateway and one HTTPRoute. Both Ingresses merge into the HTTPRoute, which takes its name from the canary Ingress, `app-canary`. The weights send 80% of traffic to `app-v1` and 20% to `app-v2`. The order of the two backends in the output can change from one run to the next.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: nginx
+spec:
+  gatewayClassName: kgateway
+  listeners:
+  - hostname: app.example.com
+    name: app-example-com-http
+    port: 80
+    protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: app-primary-app-example-com
+  name: app-canary-app-example-com
 spec:
   hostnames:
   - app.example.com
   parentRefs:
   - name: nginx
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /
-    backendRefs:
+  - backendRefs:
     - name: app-v1
       port: 80
       weight: 80
     - name: app-v2
       port: 80
       weight: 20
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+    name: rule-0
 ```
 
 ## Apply

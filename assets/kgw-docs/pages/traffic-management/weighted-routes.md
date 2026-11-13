@@ -190,13 +190,12 @@ Review route precedence in action:
 
 By default, weighted routes are disabled. Upgrade your {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm installation to enable the feature.
 
-1. Get the Helm values for your current Helm installation. 
+1. Get the Helm values for your current Helm installation and save them to a file. 
    ```sh
    helm get values {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o yaml > {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
-   open {{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}}.yaml
    ```
    
-2. Add the following values to the Helm values file to enable the weighted routes feature in {{< reuse "/kgw-docs/snippets/kgateway.md" >}}.
+2. Open the Helm values file in your editor, and add the following values to enable the weighted routes feature in {{< reuse "/kgw-docs/snippets/kgateway.md" >}}.
    ```yaml
    
    controller:
@@ -305,7 +304,7 @@ Steps to weight routes:
 
 3. Add a weight of `10` to the HTTPRoute with the matching rule for the `/anything` path that is served by the httpbin service, and a weight of `1` to the HTTPRoute with the matching rule for the `/anything/a` path that is served by the hello-world service.
 
-   ```yaml
+   ```sh
    kubectl annotate httproute -n httpbin httpbin kgateway.dev/route-weight=10
    kubectl annotate httproute -n httpbin hello-world-a kgateway.dev/route-weight=1
    ```

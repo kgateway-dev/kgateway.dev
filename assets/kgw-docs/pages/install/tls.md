@@ -18,7 +18,7 @@ cert-manager is a Kubernetes controller that helps you automate the process of o
 2. Install cert-manager in your cluster. **Note**: cert-manager versions 1.18 and later have stricter validation rules. Certificate durations must be at least 1 hour, and renewal windows must be at least 5 minutes.
    ```sh
    helm upgrade --install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace \
-   --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set installCRDs=true
+   --set "extraArgs={--feature-gates=ExperimentalGatewayAPISupport=true}" --set crds.enabled=true
    ```
    > [!NOTE]
    > To allow cert-manager to use the {{< reuse "kgw-docs/snippets/k8s-gateway-api-name.md" >}}, you must set `--feature-gates=ExperimentalGatewayAPISupport=true` in the cert-manager Helm installation.
@@ -134,6 +134,13 @@ Upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}} with TLS enabled for the c
    kubectl get pods -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
    ```
 
+6. Restart any gateway proxies that existed before the upgrade, such as the `http` gateway from the sample app. A proxy reads its xDS connection settings only at startup, so existing proxies do not pick up the CA bundle until they restart.
+
+   ```sh
+   kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
 ## Step 3: Verify the TLS connection {#verify-tls-connection}
 
 Now that the control plane is up and running, verify the TLS connection.
@@ -144,10 +151,16 @@ Now that the control plane is up and running, verify the TLS connection.
    kubectl port-forward -n {{< reuse "kgw-docs/snippets/namespace.md" >}} svc/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} 9977
    ```
 
-2. Send a request to the control plane in plaintext without TLS authentication. You get back an `authentication failed` error.
+2. Send a request to the control plane in plaintext. The request fails, because the xDS server accepts only TLS connections.
 
    ```sh
    grpcurl -plaintext localhost:9977 list
+   ```
+
+3. Send the request over TLS. The `-insecure` flag skips certificate verification, because the server certificate is issued for the control plane service names, not `localhost`. The TLS connection succeeds, and the server rejects the request with an `authentication failed` error, because the request has no Kubernetes service account token.
+
+   ```sh
+   grpcurl -insecure localhost:9977 list
    ```
 
    Example output:
@@ -156,13 +169,13 @@ Now that the control plane is up and running, verify the TLS connection.
    Failed to list services: rpc error: code = Unknown desc = authentication failed: [Authenticator KubeJWTAuthenticator: target JWT extraction error: no HTTP authorization header exists]
    ```
 
-3. Port-forward the control plane deployment on port 9092.
+4. Port-forward the control plane deployment on port 9092.
 
    ```sh
    kubectl port-forward -n {{< reuse "kgw-docs/snippets/namespace.md" >}} deploy/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} 9092
    ```
 
-4. Send a request to the metrics endpoint to check for `xds_auth` metrics.
+5. Send a request to the metrics endpoint to check for `xds_auth` metrics.
 
    ```sh
    curl localhost:9092/metrics | grep xds_auth

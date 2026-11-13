@@ -64,7 +64,7 @@ Configure a ListenerPolicy to enable TCP keepalive on connections that downstrea
 
    ```console
    {
-     "name": "listener~80",
+     "name": "listener~8080",
      "tcp_keepalive": {
        "keepalive_probes": 3,
        "keepalive_time": 1200,
@@ -107,13 +107,13 @@ Configure a BackendConfigPolicy to enable TCP keepalive on connections from the 
 2. Port-forward the gateway proxy on port 19000.
 
    ```sh
-   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000
+   kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
    ```
 
 3. Get the configuration of your gateway proxy as a config dump.
 
    ```sh
-   curl -X POST 127.0.0.1:19000/config_dump\?include_eds > gateway-config.json
+   curl -s "127.0.0.1:19000/config_dump?include_eds" > gateway-config.json
    ```
 
 4. Open the config dump and find the `kube_httpbin_httpbin_8000` cluster. Verify that you see all the connection settings that you enabled in your BackendConfigPolicy.

@@ -95,7 +95,7 @@ Deploy a Keycloak instance to test this guide against. The following steps creat
    kubectl rollout status deployment/keycloak -n keycloak
    ```
 
-## Alternative: ConfigMap-based setup
+## Alternative: ConfigMap-based setup {#configmap-setup}
 
 Instead of manually configuring Keycloak through the admin console, you can define the realm, client, and user declaratively in a ConfigMap. Keycloak imports the configuration on startup, which is more repeatable and GitOps‑friendly.
 
@@ -379,7 +379,7 @@ Keycloak rejects the login request with `Invalid parameter: redirect_uri` unless
 
 Complete this step only if you plan to use the access token validation flow.
 
-By default, Keycloak does not put your client ID in the `aud` claim of an access token. A token that is issued to `kgateway-client` carries `"aud": "account"`, which is the realm's built-in account client. Passing an `audience` parameter to the token endpoint does not change this, because Keycloak derives the audience from the client's protocol mappers rather than from the request.
+By default, Keycloak does not put your client ID in the `aud` claim of an access token. A user who you create in the admin console gets the realm's default roles, which include roles on the realm's built-in `account` client. As a result, a token that is issued to `kgateway-client` for that user carries `"aud": "account"`, not your client ID. An `audience` parameter on the token request does not change this. Keycloak takes the audience from the client's protocol mappers, not from the request.
 
 Add an audience mapper so that tokens carry your client ID, which lets the JWT policy restrict access to this client.
 
@@ -391,7 +391,7 @@ Add an audience mapper so that tokens carry your client ID, which lets the JWT p
 6. Verify that **Add to access token** is on.
 7. Click **Save**.
 
-Tokens for this client now include `"aud": ["kgateway-client", "account"]`.
+Tokens for this client now include `kgateway-client` in the `aud` claim. For the test user that you created in the admin console, the claim is `"aud": ["kgateway-client", "account"]`. The [ConfigMap-based setup](#configmap-setup) adds the same audience mapper, but its test user has no realm roles. Tokens for that user carry only `"aud": "kgateway-client"`. Both forms pass the JWT policy, because the policy accepts `kgateway-client`.
 
 > [!NOTE]
 > The steps above create the `myrealm` realm for testing only. For production, use a dedicated Keycloak instance with a certificate from a CA that the gateway trusts, and a realm that your organization manages.

@@ -117,7 +117,7 @@ Steps to set up the sample gRPC service:
 
 ## Set up the Gateway for gRPC routes {#gateway}
 
-{{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version exclude-if="2.1.x,2.2.x" >}}
 Create an HTTPS listener so that the gateway can route gRPC traffic. In version 2.3 and later, GRPCRoute can be attached either to HTTPS listeners for TLS termination, or to HTTP listeners. For more information about the following steps, see the [HTTPS listener guide](../../../../setup/listeners/https/).
 
 1. Create a TLS certificate for testing.
@@ -172,7 +172,7 @@ Create an HTTPS listener so that the gateway can route gRPC traffic. In version 
    | `tls.mode: Terminate` | Terminate TLS at the gateway. |
    {{< /version >}}
 
-{{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+{{< version include-if="2.1.x,2.2.x" >}}
 Create an HTTP listener so that the gateway can route gRPC traffic. For more information, see the [HTTP listener guide](../../../../setup/listeners/http/). Note that GRPCRoutes can be attached to HTTPS listeners for TLS termination only in version 2.3 and later.
 
 1. Create a Gateway resource with an HTTP listener.
@@ -205,7 +205,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
    |---------|-------------|
    | `spec.gatewayClassName` | The name of the Kubernetes GatewayClass. When you set up {{< reuse "/kgw-docs/snippets/kgateway.md" >}}, a default GatewayClass is set up for you. |
    | `spec.listeners` | Configuration for the HTTP listener for this Gateway. |
-   | `hostname` | The hostname for routing. This values must match the hostname in your GRPCRoute. |
+   | `hostname` | The hostname for routing. This value must match the hostname in your GRPCRoute. |
    {{< /version >}}
 
 2. Check the status of the Gateway.
@@ -219,7 +219,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
    status:
      addresses:
      - type: IPAddress
-       value: ${INGRESS_GW_ADDRESS}
+       value: ${GATEWAY_IP}
      conditions:
      - lastTransitionTime: "2024-11-20T16:01:25Z"
        message: ""
@@ -252,7 +252,7 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
      parentRefs:
      - name: grpc-gateway
        namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-       sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
+       sectionName: {{< version exclude-if="2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.1.x,2.2.x" >}}http{{< /version >}}
      hostnames:
      - "grpc.example.com"
      rules:
@@ -293,13 +293,13 @@ Create an HTTP listener so that the gateway can route gRPC traffic. For more inf
          reason: ResolvedRefs
          status: "True"
          type: ResolvedRefs
-       controllerName: kgateway.dev/kgateway
+       controllerName: {{< reuse "kgw-docs/snippets/controller-name.md" >}}
        parentRef:
          group: gateway.networking.k8s.io
          kind: Gateway
          name: grpc-gateway
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
-         sectionName: {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.0.x,2.1.x,2.2.x" >}}http{{< /version >}}
+         sectionName: {{< version exclude-if="2.1.x,2.2.x" >}}https{{< /version >}}{{< version include-if="2.1.x,2.2.x" >}}http{{< /version >}}
    ```
 
 ## Verify the gRPC route {#verify-grpcroute}
@@ -308,7 +308,7 @@ Verify that the gRPC route to the echo service is working.
 
 1. Get the external address of the gateway and save it in an environment variable.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -324,7 +324,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -342,7 +342,7 @@ Verify that the gRPC route to the echo service is working.
 
 2. Explore the API dynamically.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -359,7 +359,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -390,7 +390,7 @@ Verify that the gRPC route to the echo service is working.
 
 3. Send a gRPC request to test the route.
 
-   {{< version exclude-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version exclude-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -411,7 +411,7 @@ Verify that the gRPC route to the echo service is working.
    {{< /tabs >}}
    {{< /version >}}
 
-   {{< version include-if="2.0.x,2.1.x,2.2.x" >}}
+   {{< version include-if="2.1.x,2.2.x" >}}
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```bash
@@ -454,7 +454,12 @@ Explore the traffic management, resiliency, and security policies that you can a
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
 
 ```bash
-kubectl delete -A gateways,grpcroutes,pod,svc,secrets -l app=grpc-echo
+kubectl delete -A gateways,grpcroutes -l app=grpc-echo
+kubectl delete deployment grpc-echo
+kubectl delete service grpc-echo-svc
+kubectl delete pod grpcurl-client
+kubectl delete secret grpc-example-com-cert -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
 kubectl delete referencegrant allow-grpc-route-to-echo -n default
+rm grpc.example.com.key grpc.example.com.crt
 ```
 

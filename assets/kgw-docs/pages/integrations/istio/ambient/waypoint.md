@@ -1,11 +1,5 @@
-{{< version exclude-if="2.0.x" >}}
 > [!WARNING]
 > The waypoint integration for Envoy-based gateway proxies is deprecated and is planned to be removed in version 2.2. If you want to use AI capabilities, see the [agentgateway documentation](https://agentgateway.dev/docs) instead.
-{{< /version >}}
-{{< version include-if="2.0.x" >}}
-> [!WARNING]
-> The waypoint integration for Envoy-based gateway proxies is alpha. If you are interested in trying out waypoints with kgateway, reach out to the kgateway maintainers on [Slack](https://kgateway.dev/slack/).
-{{< /version >}}
 
 Enforce Layer 7 policies for the apps in your ambient mesh by using {{< reuse "/kgw-docs/snippets/kgateway.md" >}} as a waypoint proxy.
 
@@ -270,7 +264,6 @@ Install the httpbin2, httpbin3, and curl client sample apps into the httpbin nam
    kubectl label ns httpbin istio.io/dataplane-mode=ambient
    ```
 
-{{% version exclude-if="2.0.x" %}}
 
 ## Enable the waypoint integration {#waypoint-integration}
 
@@ -301,7 +294,6 @@ Enable the waypoint integration for Envoy-based kgateway proxies.
    kgateway            kgateway.dev/kgateway   True       2d19h
    kgateway-waypoint   kgateway.dev/kgateway   True       1s
    ```
-{{% /version %}}
 
 ## Create a waypoint proxy
 

@@ -228,24 +228,25 @@ params:
   # Also consumed by this repo's local partials (navbar.html,
   # navbar-version.html, breadcrumb.html).
   versions:
-    - version: "2.5.x"
+    - version: "2.6.x"
       sections: ["envoy"]
       dropdown: "main"
       linkVersion: "main"
+    - version: "2.5.x"
+      sections: ["envoy"]
+      dropdown: "2.5 (latest)"
+      linkVersion: "latest"
     - version: "2.4.x"
       sections: ["envoy"]
-      dropdown: "2.4 (latest)"
-      linkVersion: "latest"
+      dropdown: "2.4"
+      # NOTE: linkVersion "2.4.x" means this is NOT the entry version-noindex
+      # treats as current — that is the 2.5.x entry above, whose linkVersion
+      # IS "latest". So /latest/ stays indexable and duplicate pages under
+      # /main/, /2.4.x/, /2.3.x/, /2.2.x/ and /2.1.x/ are noindexed.
+      linkVersion: "2.4.x"
     - version: "2.3.x"
       sections: ["envoy"]
       dropdown: "2.3"
-      # NOTE: this says linkVersion "2.3.x", so it is NOT the entry
-      # version-noindex treats as current — that is the 2.4.x entry above,
-      # whose linkVersion IS "latest". So /latest/ stays indexable and
-      # duplicate pages under /main/, /2.3.x/, /2.2.x/ and /2.1.x/ are
-      # noindexed. An earlier comment here claimed the opposite; left as-is
-      # behaviorally, since which version should be canonical is a kgateway
-      # release decision rather than a config typo.
       linkVersion: "2.3.x"
     - version: "2.2.x"
       sections: ["envoy"]

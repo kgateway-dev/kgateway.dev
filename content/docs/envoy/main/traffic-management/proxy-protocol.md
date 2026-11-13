@@ -197,7 +197,7 @@ Set `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true`
          name: gw-params
      listeners:
      - protocol: HTTP
-       port: 80
+       port: 8080
        name: http
        allowedRoutes:
          namespaces:
@@ -205,7 +205,14 @@ Set `spec.kube.envoyContainer.bootstrap.enableReadinessProbeProxyProtocol: true`
    EOF
    ```
 
-3. Verify that the filter is applied by checking the Envoy listener configuration.
+3. Restart the gateway proxy. The readiness listener is part of the Envoy bootstrap configuration, which Envoy reads only at startup, so the running proxy does not pick up the change on its own.
+
+   ```sh
+   kubectl rollout restart deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   kubectl rollout status deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   ```
+
+4. Verify that the filter is applied by checking the Envoy listener configuration.
 
    ```sh
    kubectl port-forward deployment/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000:19000 &
@@ -347,7 +354,7 @@ To verify that the gateway sends PROXY protocol headers to an upstream backend, 
 5. Check the echo pod logs to verify that the PROXY header was received by the backend.
 
    ```sh
-   kubectl logs proxy-echo
+   kubectl logs proxy-echo -n default
    ```
 
    Example output:

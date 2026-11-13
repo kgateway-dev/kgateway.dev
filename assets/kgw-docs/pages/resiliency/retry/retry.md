@@ -1,7 +1,7 @@
 Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service.
 You might commonly use retries alongside [Timeouts]({{< link-hextra path="/resiliency/timeouts/">}}) to ensure that your apps are available even if they are temporarily unavailable.
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 > [!WARNING]
 > {{< reuse "kgw-docs/versions/warn-experimental.md" >}}
 {{< /version >}}
@@ -12,29 +12,29 @@ A request retry is the number of times a request is retried if it fails. This se
 
 ## Before you begin
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq-x-channel.md" >}}
 {{< /version >}}
-{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
 
 > [!NOTE]
 > Retries are part of the standard channel in Gateway API version 1.7 and later. If your cluster runs Gateway API version 1.6 or earlier, install the experimental channel instead of the standard channel. The following example installs version 1.6.3.
 >
 > ```sh
-> kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/experimental-install.yaml
+> kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.3/experimental-install.yaml
 > ```
 {{< /version >}}
 
 ## Step 1: Set up your environment for retries
 
-{{< version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To use retries, you need to install the experimental channel. You can also set up two things that help you test retries:{{< /version >}}{{< version exclude-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" >}}To test retries, set up two things:{{< /version >}} a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To use retries, you need to install the experimental channel. You can also set up two things that help you test retries:{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}To test retries, set up two things:{{< /version >}} a sample app that can simulate a failure and an access log policy that tracks whether the request was retried.
 
-{{% version include-if="2.0.x,2.1.x,2.2.x,2.3.x,2.4.x" %}}
+{{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x" %}}
 1. Install the experimental Kubernetes Gateway API CRDs.
    
    ```sh
-   kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
+   kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v{{< reuse "kgw-docs/versions/k8s-gw-version.md" >}}/experimental-install.yaml
    ```
 {{% /version %}}
 1. Install a sample app that you can simulate a failure for, such as adding a `sleep` command to the [Bookinfo reviews app](https://istio.io/latest/docs/examples/bookinfo/).
@@ -186,7 +186,6 @@ Set up retries to the reviews app.
    | `parentRefs` | The gateway to which the request is sent. In this example, you select the `http` gateway that you set up before you began. |
    | `rules` | The rules to apply to requests. |
    | `matches` | The path to match the request. In this example, you match any requests to the reviews app with `/`. |
-   | `path` | The path to match the request. In this example, you match the request to the `/reviews/1` path. |
    | `backendRefs` | The backend service to which the request is sent. In this example, you select the `reviews` service that you set up in the previous step. |
    | `retry.attempts` | The number of times to retry the request. In this example, you retry the request 3 times. |
    | `retry.backoff` | The duration to wait before retrying the request. In this example, you wait 1 second before retrying the request. |
@@ -430,7 +429,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:80"
+   curl -vi http://$INGRESS_GW_ADDRESS:8080/reviews/1 -H "host: retry.example:8080"
    ```
    {{% /tab %}}
    {{% tab name="Port-forward for local testing" %}}
@@ -457,7 +456,7 @@ Simulate a failure for the reviews app so that you can verify that the request i
    Example output: Note that the `response_flags` field now has values as follows:
 
    * `URX` means `UpstreamRetryLimitExceeded`, which verifies that the request was retried.
-   * `UF` means `UpstreamOverflow`, which verifies that the request failed.
+   * `UF` means upstream connection failure, which verifies that the request failed because the gateway proxy could not connect to the reviews app.
    
    ```json
    {

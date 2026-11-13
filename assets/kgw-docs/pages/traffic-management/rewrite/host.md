@@ -130,7 +130,7 @@ For more information, see the [{{< reuse "kgw-docs/snippets/k8s-gateway-api-name
    EOF
    ```
 
-2. Send a request to the `external-rewrite.example` domain. Verify that you get back a 200 HTTP response code and that you see the `Host: httpbin.org` header in your response. 
+3. Send a request to the `external-rewrite.example` domain. Verify that you get back a 200 HTTP response code and that you see the `Host: httpbin.org` header in your response. 
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

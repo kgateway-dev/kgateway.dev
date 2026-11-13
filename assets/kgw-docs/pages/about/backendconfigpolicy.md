@@ -4,10 +4,8 @@ Use a BackendConfigPolicy resource to configure connection settings for a backen
 
 You can apply BackendConfigPolicies to individual Kubernetes services, any backend that matches a specific label, or a global service in your ambient mesh.
 
-{{< version exclude-if="2.0.x" >}}
 > [!NOTE]
 > By default, you must attach policies to resources that are in the same namespace. To create global policies that can attach to resources in any namespace, see the [Global policy attachment](../global-attachment/) guide.
-{{< /version >}}
 
 ### Individual backend {#attach-to-backend}
 
@@ -44,7 +42,7 @@ metadata:
   namespace: httpbin
 spec:
   targetSelectors:
-    - group: networking.istio.io
+    - group: ""
       kind: Service
       matchLabels:
         app: httpbin

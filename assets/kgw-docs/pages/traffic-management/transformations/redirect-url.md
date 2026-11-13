@@ -1,54 +1,5 @@
 Extract the values of common headers to generate a redirect URL.
 
-{{< version exclude-if="2.0.x" >}}
-<!--TODO agentgateway transformation
-   {{< tabs >}}
-   {{% tab name="Envoy-based kgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     name: transformation
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     transformation:
-       request:  
-         add:
-         - name: x-forwarded-uri
-           value: 'https://{{ request_header(":authority") }}{{ request_header(":path") }}'
-   EOF
-   ```
-   {{% /tab %}}
-   {{% tab name="Agentgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     name: transformation
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     transformation:
-       request:  
-         add:
-         - name: x-forwarded-uri
-           value: '"https://" + request.headers["host"] + request.path'
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
--->
-{{< /version >}}
-
 ## About pseudo headers 
 
 Pseudo headers are special headers that are used in HTTP/2 to provide metadata about the request or response in a structured way. Although they look like traditional HTTP/1.x headers, they come with specific characteristics:
@@ -73,7 +24,7 @@ Common pseudo headers include:
    * Build a redirect URL with the values of the `:authority` and `:path` pseudo headers. These headers are extracted from the request with the `request_header` function that is provided in {{< reuse "kgw-docs/snippets/kgateway.md" >}}.
    * The `:authority` pseudo header contains the hostname that the request is sent to.
    * The `:path` pseudo header is set to the request path.
-   * The redirect URL is added to the `x-forwarded-uri` response header.
+   * The redirect URL is added to the `x-forwarded-uri` request header.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -95,7 +46,7 @@ Common pseudo headers include:
    EOF
    ```
 
-2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` response header. 
+2. Send a request to the httpbin app. Verify that you get back a 200 HTTP response code and that you see the redirect URL in the `x-forwarded-uri` request header that the httpbin app echoes back. 
    
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

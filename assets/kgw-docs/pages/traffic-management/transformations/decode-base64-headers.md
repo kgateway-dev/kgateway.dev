@@ -2,7 +2,7 @@ Combine multiple transformation functions to accomplish the following tasks:
 
 - Extract a base64-encoded value from a specific request header. 
 - Decode the base64-encoded value. 
-- Trim the decoded value and only capture everything starting from the 11th character. 
+- Trim the decoded value and only capture everything starting from the twelfth character (index 11, counting from zero). 
 - Add the captured string as a response header. 
 
 ## Before you begin
@@ -21,10 +21,8 @@ Combine multiple transformation functions to accomplish the following tasks:
    dHJhbnNmb3JtYXRpb24gdGVzdA==
    ```
    
-2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the 11th character. 
+2. Create a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} resource with your transformation rules. Make sure to create the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} in the same namespace as the HTTPRoute resource. In the following example, you decode the base64-encoded value from the `x-base64-encoded` request header and populate the decoded value into an `x-base64-decoded` header starting from the twelfth character (index 11, counting from zero). 
 
-   {{< tabs >}}
-   {{% tab name="Envoy-based kgateway" %}}
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
@@ -44,29 +42,6 @@ Combine multiple transformation functions to accomplish the following tasks:
            value: '{{ substring(base64_decode(request_header("x-base64-encoded")), 11) }}'
    EOF
    ```
-   {{% /tab %}}
-   {{% tab name="Agentgateway" %}}
-   ```yaml
-   kubectl apply -f- <<EOF
-   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
-   kind: {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}
-   metadata:
-     name: transformation
-     namespace: httpbin
-   spec:
-     targetRefs:
-     - group: gateway.networking.k8s.io
-       kind: HTTPRoute
-       name: httpbin
-     transformation:
-       response:
-         add:
-         - name: x-base64-decoded
-           value: 'string(base64_decode(request.headers["x-base64-encoded"])).substring(11)'
-   EOF
-   ```
-   {{% /tab %}}
-   {{< /tabs >}}
 
 3. Send a request to the httpbin app and include your base64-encoded string in the `x-base64-encoded` request header. Verify that you get back a 200 HTTP response code and that you see the trimmed decoded value of your base64-encoded string in the `x-base64-decoded` response header. 
    
