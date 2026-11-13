@@ -34,7 +34,7 @@ The health checks cover the kgateway resources that report a status:
 |---|---|
 | TrafficPolicy | Route-level traffic behavior, such as auth, rate limiting, and header changes |
 | ListenerPolicy | Listener-level settings on a Gateway |
-| `BackendConfigPolicy` | Connection settings towards a backend |
+| BackendConfigPolicy | Connection settings for a backend |
 | `DirectResponse` | A canned response returned by the gateway |
 | `Backend` | A destination that is external to the cluster |
 
