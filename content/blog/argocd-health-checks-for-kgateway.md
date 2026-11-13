@@ -18,7 +18,7 @@ The new health checks close that gap. They read the status kgateway already writ
 - **Progressing**: kgateway has not reached a verdict yet, for example right after a change.
 - **Degraded**: kgateway rejected all or part of the resource. The badge shows kgateway's own message, such as which reference it could not resolve.
 
-Here is what that looks like for a small storefront application. Almost everything is green, and ArgoCD now points straight at the two resources that need attention: a route whose backend Service was never deployed, and a `TrafficPolicy` that references an auth extension that does not exist.
+Here is what that looks like for a small storefront application. Almost everything is green, and ArgoCD now points straight at the two resources that need attention. In this example, it shows a route where the backend Service was never deployed, and a TrafficPolicy that references an auth extension that does not exist.
 
 {{< reuse-image src="blog/argocd-health-checks-for-kgateway-1.png" width="750px" >}}
 
