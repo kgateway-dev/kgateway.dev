@@ -497,7 +497,7 @@ You can optionally enable kgateway to attach route source metadata to every Envo
 
 {{< /version >}}
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ### Log ext-auth latency {#extauth-latency}
 
