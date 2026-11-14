@@ -482,6 +482,39 @@ EOF
 {{% /tab %}}
 {{< /tabs >}}
 
+#### Client certificate files {#client-certificate-files}
+
+Use `tls.files` when the gateway proxy already has the upstream TLS files mounted as files. The paths in `tls.files.tlsCertificate`, `tls.files.tlsKey`, and `tls.files.rootCA` must exist in the gateway proxy container. Strict validation accepts these paths without reading the files from the control plane container. Envoy reports a bad path or bad file when the gateway proxy loads the configuration.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: kgateway-base
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  tls:
+    sni: "example.com"
+    files:
+      tlsCertificate: /etc/proxy-certs/tls.crt
+      tlsKey: /etc/proxy-certs/tls.key
+      rootCA: /etc/ssl/certs/cacerts-custom.crt
+EOF
+```
+
+{{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+|---------|-------------|
+| `tls.files.tlsCertificate` | The path to the client certificate file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsKey`. |
+| `tls.files.tlsKey` | The path to the client private key file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsCertificate`. |
+| `tls.files.rootCA` | The path to the root CA file in the gateway proxy container. |
+
 ### HTTP version {#http-version}
 
 If you attach a BackendTLSPolicy to a Service and the Service port has no `appProtocol`, the gateway proxy offers HTTP/2 and HTTP/1.1 during the TLS handshake (ALPN) and uses the version that the backend selects. The proxy uses HTTP/2 if the backend supports it. For example, a backend such as an NGINX server that has HTTP/2 enabled on its TLS port is reached over HTTP/2. Previously, the gateway proxy always used HTTP/1.1 for these backends.
