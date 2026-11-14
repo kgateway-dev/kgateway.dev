@@ -45,7 +45,7 @@ Review how the gateway proxy determines the client IP address without a Listener
    {{% /tab %}}
    {{< /tabs >}}
 
-   Example output for a port-forward: The `X-Envoy-External-Address` header shows the client IP address that the gateway proxy determined. This address is the source address of the connection, `127.0.0.1`, and not the address in the XFF header that the client sent. The XFF header that is forwarded to the httpbin app has another address appended to it. For connections from a loopback address, such as through a port-forward, the gateway proxy appends its own IP address, such as `10.244.0.7`. For other connections, the gateway proxy appends the source address of the connection.
+   Example output for a port-forward. The `X-Envoy-External-Address` header shows the client IP address that the gateway proxy determined. This address is the source address of the connection, `127.0.0.1`, and not the address in the XFF header that the client sent. If you use a LoadBalancer, the header shows the address of your load balancer or node instead. The XFF header that is forwarded to the httpbin app has another address appended to it. For connections from a loopback address, such as through a port-forward, the gateway proxy appends its own IP address, such as `10.244.0.7`. For other connections, the gateway proxy appends the source address of the connection.
 
    ```console {hl_lines=[15,16,18,19]}
    {
@@ -109,7 +109,7 @@ Use the `xffNumTrustedHops` setting when you know how many proxies that append t
    | `spec.targetRefs` | The Gateway that this policy applies to. The policy applies to all HTTP and HTTPS listeners on the Gateway. |
    | `spec.default.httpSettings.xffNumTrustedHops` | The number of trusted proxies that append to the XFF header. Because `useRemoteAddress` is `true` by default, a value of `1` sets the client IP address to the rightmost address in the XFF header that the gateway proxy receives. |
 
-2. Repeat the request with the `203.0.113.10` address in the XFF header. Verify that the `X-Envoy-External-Address` header now shows the `203.0.113.10` address from the XFF header.
+2. Repeat the request with the `203.0.113.10` address in the XFF header. In this example, your curl request plays the role of the trusted load balancer that adds the client address to the XFF header. Verify that the `X-Envoy-External-Address` header now shows the `203.0.113.10` address from the XFF header.
 
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
@@ -221,7 +221,7 @@ Use the `xffTrustedCIDRs` setting when you know the IP address ranges of your pr
    | Setting | Description |
    | -- | -- |
    | `spec.default.httpSettings.useRemoteAddress` | Set to `false` to take the client IP address from the XFF header. This setting is required for `xffTrustedCIDRs`. |
-   | `spec.default.httpSettings.xffTrustedCIDRs` | The CIDR ranges of your trusted proxies. Replace `10.0.0.0/8` with the address ranges of your load balancers or proxies. The `127.0.0.1/32` range trusts connections through a port-forward for local testing. Remove it in production setups. |
+   | `spec.default.httpSettings.xffTrustedCIDRs` | The CIDR ranges of your trusted proxies. Replace `10.0.0.0/8` with the address ranges of your load balancers or proxies. The `127.0.0.1/32` range trusts connections through a port-forward for local testing. Remove it in production setups. With this configuration, a request from a trusted address with an XFF header of `198.51.100.7, 203.0.113.10, 10.0.0.5` gets the client IP address `203.0.113.10`, because `10.0.0.5` is in a trusted range. The gateway proxy does not set the `X-Envoy-External-Address` header in this mode. |
 
 2. Port-forward the gateway proxy on port 19000 to open the Envoy admin interface.
 
@@ -264,8 +264,6 @@ Use the `xffTrustedCIDRs` setting when you know the IP address ranges of your pr
      }
    ]
    ```
-
-   With this configuration, a request from a trusted address with an XFF header of `198.51.100.7, 203.0.113.10, 10.0.0.5` gets the client IP address `203.0.113.10`, because `10.0.0.5` is in a trusted range. Because `useRemoteAddress` is `false`, the gateway proxy forwards the XFF header of requests from trusted addresses without appending to it, and does not set the `X-Envoy-External-Address` header. To append the source address of the connection to the XFF header, set `skipXFFAppend` to `false`.
 
 ## Stop appending to the XFF header {#skip-xff-append}
 
