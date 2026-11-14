@@ -184,6 +184,22 @@ x-envoy-upstream-service-time: 1
    ```
    {{< /version >}}
 
+   {{< version include-if="2.3.x" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.default.httpSettings.serverHeaderTransformation` | Set to `AppendIfAbsent` to keep the `server` header from the backend, and to set the `envoy` value only if the backend does not send one. |
+   {{< /version >}}
+   {{< version exclude-if="2.3.x" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.default.httpSettings.serverHeaderTransformation` | Set to `AppendIfAbsent` to keep the `server` header from the backend, and to set a `server` header only if the backend does not send one. |
+   | `spec.default.httpSettings.serverName` | The value that the gateway proxy sets in the `server` header when the backend does not send one. If not set, the value is `envoy`. |
+   {{< /version >}}
+
 2. Repeat the request to the `/response-headers` endpoint. Verify that the response includes the `server: my-backend` header from the httpbin app.
 
    {{< tabs >}}
@@ -275,6 +291,12 @@ x-envoy-upstream-service-time: 1
          serverName: my-gateway
    EOF
    ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.default.httpSettings.serverName` | The value that the gateway proxy sets in the `server` header. Because `serverHeaderTransformation` is not set, the default `Overwrite` mode applies, and the gateway proxy replaces any `server` header from the backend with this value. |
 
 2. Repeat the request to the `/response-headers` endpoint. Verify that the gateway proxy replaces the `server: my-backend` header from the httpbin app with the `my-gateway` value.
 
