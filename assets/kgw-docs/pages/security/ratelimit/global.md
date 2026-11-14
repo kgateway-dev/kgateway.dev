@@ -3,7 +3,7 @@ Configure global rate limiting rules across all of your Gateways to protect the 
 
 ## About {#about}
 
-Global rate limiting in {{< reuse "kgw-docs/snippets/kgateway.md" >}} is powered by [Envoy's rate limiting service protocol](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/rate_limit_filter). With global rate limiting, you can apply distributed, consistent rate limits across multiple Gateways. Unlike local rate limiting, which operates per Gateway instance, global rate limiting uses a central service to coordinate rate limits. Therefore, to use global rate limiting, you must bring your own rate limit service that implements the Envoy protocol.
+Global rate limiting in {{< reuse "kgw-docs/snippets/kgateway.md" >}} is powered by [Envoy's rate limiting service protocol](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/rate_limit_filter). With global rate limiting, you can apply distributed, consistent rate limits across multiple Gateways. Unlike local rate limiting, which operates per Gateway instance by default, global rate limiting uses a central service to coordinate rate limits. Therefore, to use global rate limiting, you must bring your own rate limit service that implements the Envoy protocol.
 
 With your own rate limit service in place, you get benefits such as:
 
