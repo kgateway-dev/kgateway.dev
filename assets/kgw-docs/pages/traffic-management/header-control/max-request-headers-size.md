@@ -4,8 +4,8 @@ By default, Envoy accepts request headers with a total size of up to 60 KiB. Whe
 
 You might want to change the limit in the following cases:
 
-- **Lower the limit** to protect your backends from oversized requests and to limit header-based attack vectors.
-- **Raise the limit** for clients that send large headers, such as large cookies or tokens. Note that your backends might enforce their own header size limits. You can tell where a `431` response comes from by its headers: a `431` response from a backend includes the `x-envoy-upstream-service-time` header, but a `431` response from the gateway proxy does not.
+- **Lower the limit** to protect your backends from oversized requests and to reduce the memory that each request can use in the gateway proxy.
+- **Raise the limit** for clients that send large headers, such as large cookies or tokens. Your backends might enforce their own header size limits. To find out where a `431` response comes from, check its headers. A `431` response from a backend includes the `x-envoy-upstream-service-time` header, but a `431` response from the gateway proxy does not.
 
 > [!NOTE]
 > The limit applies to the total size of all request headers, including the names and values of headers that HTTP clients add automatically. For example, curl always sends the `Host`, `User-Agent`, and `Accept` headers. To limit the number of headers instead of their size, see [Limit request header count]({{< link-hextra path="/traffic-management/header-control/max-headers-count/" >}}).
