@@ -12,7 +12,7 @@ You can use the following settings in the `spec.default.httpSettings` section of
 | -- | -- |
 | `preserveExternalRequestId` | Set to `true` to keep the `x-request-id` header that a client sends. The gateway proxy still generates a request ID for requests without an `x-request-id` header. Defaults to `false`. |
 | `generateRequestId` | Set to `false` to stop generating request IDs, such as to save the cost of generating a UUID for each request in high-throughput setups. Requests without an `x-request-id` header are forwarded without one, and an `x-request-id` header that a client sends is forwarded unchanged. Defaults to `true`. |
-| `uuidRequestIdConfig.packTraceReason` | When tracing is set up, the gateway proxy can change one character of the request ID to record the trace sampling decision in the UUID. Set to `false` to forward request IDs unchanged, such as to keep the exact UUIDs that an external system sets. Note that without the sampling decision in the request ID, stable sampling of traces and access logs no longer works, and only random sampling is possible. Defaults to `true`. |
+| `uuidRequestIdConfig.packTraceReason` | When tracing is set up, the gateway proxy can change one character of the request ID to record the trace sampling decision in the UUID. Set to `false` to forward request IDs unchanged, such as to keep the exact UUIDs that an external system sets. Without the sampling decision in the request ID, stable sampling of traces and access logs no longer works, and only random sampling is possible. Defaults to `true`. |
 | `uuidRequestIdConfig.useRequestIdForTraceSampling` | Whether the gateway proxy uses the request ID to make trace sampling decisions. When `true`, the sampling decision is consistent for all requests with the same request ID. Defaults to `true`. |
 
 > [!NOTE]
@@ -159,7 +159,9 @@ If a client or a proxy in front of the gateway proxy already sets request IDs, k
 
 ## Stop generating request IDs {#disable}
 
-1. Update the ListenerPolicy to set `generateRequestId` to `false`.
+Use `generateRequestId: false` to stop the gateway proxy from generating request IDs. Use when you handle high-throughput traffic and do not use request IDs for log correlation or tracing.
+
+1. Update the ListenerPolicy to set `generateRequestId` to `false`. This replaces the policy from the previous section, so `preserveExternalRequestId` is no longer set.
 
    ```yaml
    kubectl apply -f- <<EOF
@@ -178,6 +180,13 @@ If a client or a proxy in front of the gateway proxy already sets request IDs, k
          generateRequestId: false
    EOF
    ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information about the available fields, see the [API reference]({{< link-hextra path="/reference/api/#httpsettings" >}}).
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.targetRefs` | The Gateway that this policy applies to. The policy applies to all HTTP and HTTPS listeners on the Gateway. |
+   | `spec.default.httpSettings.generateRequestId` | Set to `false` to stop generating request IDs. An `x-request-id` header that a client sends is still forwarded unchanged. |
 
 2. Send a request without an `x-request-id` header. Verify that the httpbin app does not receive an `X-Request-Id` header.
 
