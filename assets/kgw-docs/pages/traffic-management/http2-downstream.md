@@ -30,8 +30,8 @@ Tune how the gateway handles HTTP/2 connections from downstream clients by confi
 
    | Setting | Description |
    | -- | -- |
-   | `initialStreamWindowSize` | Initial flow-control window size for each HTTP/2 stream in bytes. Valid values: 65535–2147483647. Defaults to 268435456 (256 MiB). Accepts Kubernetes resource quantity strings, such as `128Ki`. |
-   | `initialConnectionWindowSize` | Initial flow-control window size for the HTTP/2 connection in bytes. Same valid range and default as `initialStreamWindowSize`. Accepts Kubernetes resource quantity strings such as `256Ki`. |
+   | `initialStreamWindowSize` | Initial flow-control window size for each HTTP/2 stream in bytes. Valid values: 65535–2147483647. {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Defaults to 268435456 (256 MiB).{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}Defaults to 16777216 (16 MiB).{{< /version >}} Accepts Kubernetes resource quantity strings, such as `128Ki`. |
+   | `initialConnectionWindowSize` | Initial flow-control window size for the HTTP/2 connection in bytes. Valid values: 65535–2147483647. {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Defaults to the same value as `initialStreamWindowSize`.{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}Defaults to 25165824 (24 MiB).{{< /version >}} Accepts Kubernetes resource quantity strings such as `256Ki`. |
    | `maxConcurrentStreams` | Maximum number of concurrent HTTP/2 streams per connection. Valid values: 1–2147483647. Envoy defaults to 1024. |
 
 2. Port-forward the gateway proxy on port 19000.
