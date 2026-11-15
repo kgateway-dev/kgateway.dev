@@ -8,7 +8,7 @@ You can configure retries by using a Kubernetes Gateway API-native configuration
 | Type of timeout| Description | Configured via | Attach to | 
 | -- | -- | -- | --- | 
 | [Request retries]({{< link-hextra path="/resiliency/retry/retry/" >}}) | Specify the number of times and duration for the gateway to try a connection to an unresponsive backend service. | <ul><li>HTTPRoute</li><li>{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute</li><li>HTTPRoute rule</li><li>Gateway listener ({{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} only)</li></ul> | 
-| [Per-try timeout]({{< link-hextra path="/resiliency/retry/per-try-timeout/" >}}) | Set a shorter timeout for retries than the overall request timeout.  | <ul><li>HTTPRoute</li><li>{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute </li><li>HTTPRoute rule</li><li>Gateway listener ({{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} only)</li></ul> | 
+| [Per-try timeout]({{< link-hextra path="/resiliency/retry/per-try-timeout/" >}}) | {{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}Set a shorter timeout for retries than the overall request timeout.{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}Set the time limit for each retry attempt. In a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}, `retry.perTryTimeout` can equal `timeouts.request`.{{< /version >}} | <ul><li>HTTPRoute</li><li>{{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} </li></ul>| <ul><li>HTTPRoute </li><li>HTTPRoute rule</li><li>Gateway listener ({{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} only)</li></ul> |
 
 
 
