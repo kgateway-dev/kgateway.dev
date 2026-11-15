@@ -53,7 +53,7 @@ Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} control plane by usin
 
 3. Install the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart.
 
-   1. **Optional**: Pull and inspect the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI. For more information, see [Advanced settings](../advanced).
+   1. **Optional**: Pull and inspect the {{< reuse "/kgw-docs/snippets/kgateway.md" >}} Helm chart values before installation. You might want to update the Helm chart values files to customize the installation. For example, you might change the namespace, update the resource limits and requests, or enable extensions such as for AI. For more information, see [Advanced settings](../advanced).{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}} By default, the Helm chart does not set `GOMAXPROCS` from the controller CPU limit. To pin `GOMAXPROCS` and disable Go runtime updates from the live cgroup CPU quota, set `controller.extraEnv.GOMAXPROCS`.{{< /version >}}
 
       ```sh
       helm pull oci://{{< reuse "/kgw-docs/snippets/helm-path.md" >}}/charts/{{< reuse "/kgw-docs/snippets/helm-kgateway.md" >}} --version {{< reuse "kgw-docs/versions/helm-version-flag.md" >}}
