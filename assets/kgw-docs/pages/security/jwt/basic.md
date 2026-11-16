@@ -372,10 +372,12 @@ Set the `spec.jwt.providers[].cache` block on the GatewayExtension resource to t
 The following example sets the custom cache size and max token size values:
 
 ```yaml
+kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   jwt:
     providers:
@@ -386,16 +388,19 @@ spec:
           maxTokenSize: 8192
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
+EOF
 ```
 
 To enable caching with Envoy's defaults instead of overriding them, set `cache` to an empty object:
 
 ```yaml
+kubectl apply -f- <<EOF
 apiVersion: gateway.kgateway.dev/v1alpha1
 kind: GatewayExtension
 metadata:
   name: selfminted-jwt
+  namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
 spec:
   jwt:
     providers:
@@ -404,18 +409,64 @@ spec:
         cache: {}
         jwks:
           local:
-            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"...","e":"AQAB"}]}'
+            inline: '{"keys":[{"kty":"RSA","kid":"kgateway-public-key-001","use":"sig","alg":"RS256","n":"rmNzxClHNlcAjnEsHFgQz9iYmZetZOiNAjAnm1ZW3nf8w6uGx5KMqlMQmmf-_RYdcFpYaRkjMPr5iEOHARH6w_W_gbJufZn0P4zIXhjQVV6bFwmPC4WKFeq4TpU6-uxkIzBbLIZ2tCTE6uFUUb_wPlwc7_Mevjzkckait4-qRc-JX32NVvh1vzgeFAtjRO9qUYOVpQPkQ8hnbhBv3tZPwyz04MPsFrHSXIddYW-gRxrS7esbSAbKpwBobZXCKPyjJ9GZb2O5OZDUIS0Zvwt276IzEPz3ObZLsFQsTgfUrXaGmJVlXapZWM4gyVVPCYYt1gxiN5Lsb6s1-kP_egDyiw","e":"AQAB"}]}'
+EOF
 ```
 
 | Field | Description |
 | ----- | ----------- |
 | `cache` | Enables Envoy JWT caching for this provider. An empty object turns on caching with Envoy defaults. |
 | `cache.size` | The number of verified tokens to cache per Envoy worker thread. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `100`. The effective number of cached tokens for the whole proxy is `cache.size` multiplied by the number of Envoy worker threads. |
-| `cache.maxTokenSize` | The maximum size of one cached token in bytes. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `4096`. |
+| `cache.maxTokenSize` | The maximum size of one cached token in bytes. If you set this field, the value must be between `1` and `4294967295`. If you omit this field, Envoy uses `4096`. Envoy still verifies a token that is larger than this value, but never caches it. Repeated requests with that token never produce a cache hit. Tokens that carry many scopes or audiences can exceed the default size. To check the size of a token in bytes, run `echo -n "$TOKEN" \| wc -c`. The sample token on this page is 587 bytes. |
 
-Caching does not extend a token's validity. Envoy caches only verified tokens, checks token time constraints on each cache hit, and removes expired tokens from the cache.
+Envoy caches only tokens that pass signature verification. On every cache hit, Envoy checks the token's `exp` and `nbf` claims again, with the provider's [clock skew tolerance](#clock-skew). Envoy refuses a cached token after it expires, the same as a token that was never cached.
 
 By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. To make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
+
+To verify that caching works, send the same token twice on one connection, and then check the JWT statistics of the gateway proxy. Each Envoy worker thread has its own cache and handles whole connections. Only a repeated request on the same connection is sure to reach the cache that stored the token.
+
+1. Send two requests with the same token in one `curl` command. The `curl` command reuses one connection for all the URLs that you list. The two `-o /dev/null` options discard both response bodies, one for each URL.
+
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -s -o /dev/null -o /dev/null -w "%{http_code} " \
+     http://$INGRESS_GW_ADDRESS:8080/headers http://$INGRESS_GW_ADDRESS:8080/headers \
+     -H "host: www.example.com:8080" \
+     --header "Authorization: Bearer $TOKEN"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port-forward for local testing" %}}
+   ```sh
+   curl -s -o /dev/null -o /dev/null -w "%{http_code} " \
+     localhost:8080/headers localhost:8080/headers \
+     -H "host: www.example.com:8080" \
+     --header "Authorization: Bearer $TOKEN"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+
+   ```
+   200 200
+   ```
+
+2. Port-forward the admin port of the gateway proxy, and then check the JWT cache statistics.
+
+   ```sh
+   kubectl port-forward deploy/http -n {{< reuse "kgw-docs/snippets/namespace.md" >}} 19000 &
+   curl -s localhost:19000/stats | grep jwt_cache
+   ```
+
+   Example output:
+
+   ```
+   http.http.jwt_authn.jwt_cache_hit: 1
+   http.http.jwt_authn.jwt_cache_miss: 7
+   ```
+
+   The counters are totals since the proxy started. The `jwt_cache_hit` counter goes up by one for each repeated request that the cache serves. The `jwt_cache_miss` counter goes up even when caching is turned off, so use `jwt_cache_hit` to verify that caching works.
 
 {{< /version >}}
 
