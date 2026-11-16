@@ -13,7 +13,7 @@ This flow does not need the client secret in a Kubernetes Secret. The gateway do
 
 Create a `GatewayExtension` to configure token validation. Then create a `TrafficPolicy` to enforce validation on a route.
 
-1. Create a GatewayExtension for JWT validation. The `issuer` must match the token's `iss` claim from Entra ID. The `audiences` list must include the token's `aud` claim (which is your custom API scope).
+1. Create a GatewayExtension for JWT validation. The issuer must match the token's `iss` claim from Entra ID. The audiences list must include the token's `aud` claim, which is your Application ID URI.
 
    ```yaml
    kubectl apply -f- <<EOF

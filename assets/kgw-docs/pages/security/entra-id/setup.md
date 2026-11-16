@@ -20,7 +20,7 @@ When you finish, you choose an authentication flow:
    
    The redirect URI path is `/oauth2/redirect`, which is the default callback path that kgateway registers. You can override it with `redirectURI` in the `GatewayExtension` if needed.
 
-2. A test user created in your Entra ID directory and assigned to the App Registration.
+2. A test user in your Entra ID directory. You create this user in [Create a test user](#create-test-user).
 
 > [!IMPORTANT]
 > By default, Entra ID issues **v1.0 access tokens** for an API that you expose on your App Registration. A v1.0 token has the `iss` claim `https://sts.windows.net/{tenant-id}/` and an `aud` claim of your Application ID URI, such as `api://{client-id}`. Its signing keys are at `https://login.microsoftonline.com/{tenant-id}/discovery/keys`. These values differ from the v2.0 values (`/v2.0` and `/discovery/v2.0/keys`), so use the v1.0 values in the access token validation flow. To get v2.0 tokens instead, set `requestedAccessTokenVersion` to `2` in the App Registration manifest.
@@ -148,6 +148,7 @@ spec:
     wellKnownCACertificates: System
 EOF
 ```
+
 ## Next steps
 
 Microsoft Entra ID is configured and the gateway can reach it. Now protect a route with the flow that matches how your clients arrive.
