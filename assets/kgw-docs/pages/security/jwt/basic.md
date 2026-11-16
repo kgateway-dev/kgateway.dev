@@ -423,7 +423,7 @@ Envoy caches only tokens that pass signature verification. On every cache hit, E
 
 By default, the proxy does not set Envoy's `--concurrency` or `--cpuset-threads` flags, so it uses one worker thread per CPU that Envoy detects on the node, not the CPU request or limit set on the proxy pod. To make the worker thread count follow the pod's CPU limit instead, add `--cpuset-threads` (or a fixed `--concurrency <N>`) to `envoyContainer.extraArgs` on the GatewayParameters resource. For more information, see [Change proxy config]({{< link-hextra path="/setup/customize/gateway/" >}}).
 
-To verify that caching works, send the same token twice on one connection, and then check the JWT statistics of the gateway proxy. Each Envoy worker thread has its own cache and handles whole connections. Only a repeated request on the same connection is sure to reach the cache that stored the token.
+To verify that caching works, send the same token twice on one connection, then check the JWT statistics of the gateway proxy. Each Envoy worker thread has its own cache and handles whole connections. Only a repeated request on the same connection is sure to reach the cache that stored the token.
 
 1. Send two requests with the same token in one `curl` command. The `curl` command reuses one connection for all the URLs that you list. The two `-o /dev/null` options discard both response bodies, one for each URL.
 
