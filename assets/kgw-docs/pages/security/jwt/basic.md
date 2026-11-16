@@ -448,7 +448,7 @@ To verify that caching works, send the same token twice on one connection, then 
 
    Example output:
 
-   ```
+   ```console
    200 200
    ```
 
