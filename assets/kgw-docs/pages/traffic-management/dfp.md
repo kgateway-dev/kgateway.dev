@@ -94,7 +94,7 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
    
 ### Enable HTTPS forwarding
 
-By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward requests to HTTPS endpoints, set `enableTLS: true` in the `dynamicForwardProxy` spec. For the full list of available fields, see the [DynamicForwardProxyBackend API reference]({{< link-hextra path="/reference/api/#dynamicforwardproxybackend" >}})
+By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward requests to HTTPS endpoints, set `enableTls: true` in the `dynamicForwardProxy` spec. When TLS is enabled, the gateway uses the request hostname for SNI and validates the upstream certificate against the system CA bundle. Self-signed certificates are not accepted by default. For the full list of available fields, see the [DynamicForwardProxyBackend API reference]({{< link-hextra path="/reference/api/#dynamicforwardproxybackend" >}}).
   
   
 1. Create a Backend with TLS enabled.
@@ -108,11 +108,11 @@ By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward reque
    spec:
      type: DynamicForwardProxy
      dynamicForwardProxy:
-       enableTLS: true
+       enableTls: true
    EOF
    ```
 
-2. Create an HTTPRoute that routes incoming traffic to the TLS-enabled DFP Backend.
+2. Create an HTTPRoute that routes traffic for `google.com` to the TLS-enabled DFP Backend. By specifying a hostname, this route takes precedence over the existing `dfp-httproute` for requests to `google.com` without conflicting with it.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1
@@ -124,6 +124,8 @@ By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward reque
      parentRefs:
        - name: http
          namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+     hostnames:
+       - "google.com"
      rules:
        - backendRefs:
            - name: dfp-backend-tls
@@ -132,19 +134,31 @@ By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward reque
    EOF
    ```
 
-3. Send a request to an HTTPS hostname. The gateway receives the request on port 8080 (HTTP) and forwards it to the upstream on port 443 (HTTPS) because `enableTLS: true` is set. Verify that your gateway proxy successfully resolves the host and returns a response.
+3. Send a request to `google.com`. Because `enableTls: true` is set, the gateway forwards the request to `google.com:443` over HTTPS and receives a `200` response. Without `enableTls: true`, the gateway would connect to `google.com:80`, which returns a `301` redirect to HTTPS instead, making the difference observable.
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}
    ```sh
-   curl -vik http://$INGRESS_GW_ADDRESS:8080 -H "host: httpbin.org"
+   curl -vik http://$INGRESS_GW_ADDRESS:8080 -H "host: google.com"
    ```
    {{% /tab %}}
    {{% tab name="Port forward for local testing" %}}
    ```sh
-   curl -vik http://localhost:8080 -H "host: httpbin.org"
+   curl -vik http://localhost:8080 -H "host: google.com"
    ```
    {{% /tab %}}
    {{< /tabs >}}
+
+   Example output:
+   ```console
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < content-type: text/html; charset=ISO-8859-1
+   content-type: text/html; charset=ISO-8859-1
+   ...
+   <!doctype html>
+   ...
+   ```
 
 ## Cleanup
 
@@ -158,6 +172,16 @@ By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward reque
 2. Remove the HTTPRoute. 
    ```sh
    kubectl delete httproute dfp-httproute -n httpbin
+   ```
+
+3. Remove the TLS-enabled DFP Backend.
+   ```sh
+   kubectl delete backend dfp-backend-tls -n httpbin
+   ```
+
+4. Remove the TLS HTTPRoute.
+   ```sh
+   kubectl delete httproute dfp-httproute-tls -n httpbin
    ```
 
 
