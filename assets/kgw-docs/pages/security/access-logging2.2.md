@@ -497,11 +497,16 @@ You can optionally enable kgateway to attach route source metadata to every Envo
 
 {{< /version >}}
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}}
 
 ### Log ext-auth latency {#extauth-latency}
 
 If you use an external auth service, you can write the time that the external auth check took for each request to your access logs. The data is emitted from the Envoy `ext_authz` filter and is available for every request that makes an external auth check, including requests that the service denies. For more information, see the [Envoy `ext_authz` filter documentation](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/ext_authz_filter#logging).
+
+{{% upstream %}}{{< version include-if="2.4.x" >}}
+> [!NOTE]
+> In 2.4 versions earlier than 2.4.8, the ext-auth filter does not emit the `latency_us`, `bytesSent`, and `bytesReceived` fields, so the access log values for those fields are empty.
+{{< /version >}}{{% /upstream %}}
 
 1. Set up external auth for your gateway or route. For more information, see [External auth]({{< link-hextra path="/security/extauth/" >}}).
 
