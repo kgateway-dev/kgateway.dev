@@ -265,9 +265,9 @@ You can now disable Envoy's default path normalization and slash merging on a li
 
 For more information, see [Preserve request paths]({{< link-hextra path="/traffic-management/preserve-request-paths/" >}}).
 
-#### Log ext-auth latency in access logs {#v24-log-ext-auth-latency-in-access-logs}
+#### Log ext-auth latency in access logs {#v24-extauth-latency}
 
-GatewayExtension ext-auth filters now emit filter state stats, so you can add `%FILTER_STATE(ext_auth/<namespace>/<name>:FIELD:latency_us)%` to ListenerPolicy access log formats to record external auth latency. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
+Starting in version 2.4.8, GatewayExtension ext-auth filters emit filter state stats, so you can add `%FILTER_STATE(ext_auth/<namespace>/<name>:FIELD:latency_us)%` to ListenerPolicy access log formats to record external auth latency. For more information, see [Log ext-auth latency]({{< link-hextra path="/security/access-logging/#extauth-latency" >}}).
 
 
 <!--
