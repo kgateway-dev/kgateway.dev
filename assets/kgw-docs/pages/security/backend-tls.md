@@ -423,6 +423,48 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 
 {{< version include-if="2.4.x" >}}
 {{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
+
+#### Client certificate files {#client-certificate-files}
+
+You can store the TLS certificate, key, and CA files in the gateway proxy container instead of in a Kubernetes secret. Then, use the `tls.files` setting in the BackendConfigPolicy to point to the file paths. Client certificate files require version 2.4.8 or later.
+
+Keep in mind:
+
+* The files must be in the gateway proxy container, not in the control plane container. To add files to the gateway proxy, see [Mount a ConfigMap as a volume]({{< link-hextra path="/setup/customize/configs/#configmap-volume" >}}).
+* The control plane does not check the files. Even with [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}), the policy is accepted. If a path is wrong or a file is not valid, the gateway proxy reports the error when the configuration is loaded.
+
+The following example replaces the `secretRef` setting in the `nginx-tls-policy` with file paths. Replace the paths with the paths of the files in your gateway proxy container.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: kgateway-base
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  tls:
+    sni: "example.com"
+    files:
+      tlsCertificate: /etc/proxy-certs/tls.crt
+      tlsKey: /etc/proxy-certs/tls.key
+      rootCA: /etc/ssl/certs/cacerts-custom.crt
+EOF
+```
+
+{{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+|---------|-------------|
+| `tls.files.tlsCertificate` | The path to the client certificate file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsKey`. |
+| `tls.files.tlsKey` | The path to the client private key file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsCertificate`. |
+| `tls.files.rootCA` | The path to the root CA file in the gateway proxy container. |
+
+You cannot combine `tls.files` with `tls.secretRef`, `tls.insecureSkipVerify`, or `tls.wellKnownCACertificates` in the same policy.
 {{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
