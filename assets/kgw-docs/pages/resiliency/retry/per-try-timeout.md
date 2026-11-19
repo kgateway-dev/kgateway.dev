@@ -12,7 +12,7 @@ When per-try timeouts are enabled, Envoy returns the `x-envoy-upstream-rq-per-tr
 Note that if you configured a global request timeout, the per-try timeout must be less than the global request timeout.
 {{< /version >}}
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
-When you use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} with `timeouts.request`, `retry.perTryTimeout` can be less than or equal to that request timeout. Set `timeouts.request` to `0s` to disable the request timeout and keep `retry.perTryTimeout`.
+In a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}, the per-try timeout (`retry.perTryTimeout`) cannot be longer than the request timeout (`timeouts.request`), but the two timeouts can be equal. To limit each attempt without limiting the overall request, set `timeouts.request` to `0s`. This value disables the request timeout, so the per-try timeout can be any length.
 {{< /version >}}
 
 Per-try timeouts can be configured on an HTTPRoute directly. To enable per-try timeouts on a Gateway listener level, use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} instead. 
