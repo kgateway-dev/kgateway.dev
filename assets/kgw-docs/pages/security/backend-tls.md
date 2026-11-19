@@ -428,7 +428,7 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 
 You can store the TLS certificate, key, and CA files in the gateway proxy container instead of in a Kubernetes secret. Then, use the `tls.files` setting in the BackendConfigPolicy to point to the file paths. Client certificate files require version 2.4.8 or later.
 
-Keep in mind the following points:
+Keep in mind:
 
 * The files must be in the gateway proxy container, not in the control plane container. To add files to the gateway proxy, see [Mount a ConfigMap as a volume]({{< link-hextra path="/setup/customize/configs/#configmap-volume" >}}).
 * The control plane does not check the files. Even with [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}), the policy is accepted. If a path is wrong or a file is not valid, the gateway proxy reports the error when the configuration is loaded.
