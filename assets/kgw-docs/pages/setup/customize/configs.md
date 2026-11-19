@@ -271,6 +271,62 @@ EOF
 For more information, see the [Envoy draining documentation](https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/operations/draining) and the [Envoy command line options](https://www.envoyproxy.io/docs/envoy/latest/operations/cli).
 {{< /version >}}
 
+### Graceful shutdown of proxy pods {#graceful-shutdown}
+
+When a gateway proxy pod is deleted, such as during a rollout, a scale-down, or a node drain, Envoy exits as soon as it receives the `SIGTERM` signal. Requests that are still in flight at that moment fail. To avoid this, {{< reuse "kgw-docs/snippets/kgateway.md" >}} adds a `preStop` hook to the gateway proxy container by default. The hook gives the proxy time to finish its work before Kubernetes sends `SIGTERM`.
+
+When Kubernetes terminates a gateway proxy pod with the default settings, the following steps happen:
+
+1. Kubernetes marks the pod as terminating, and starts to remove it from the endpoints of the gateway proxy Service. Kube-proxy and load balancers can take a few seconds to stop sending new connections to the pod.
+2. At the same time, the `preStop` hook sends a `POST` request to the `/healthcheck/fail` endpoint on the Envoy admin port. Envoy keeps serving requests, but its `/ready` endpoint now returns `503` with the body `DRAINING`, so the readiness probe and any external health check on that endpoint fail. Envoy also asks clients to close their keep-alive connections, for example by adding `connection: close` to HTTP/1.1 responses.
+3. The hook sleeps for `sleepTimeSeconds` (default `10`). In-flight requests complete during this time.
+4. Kubernetes sends `SIGTERM`, and Envoy exits. Connections that are still open, such as long-lived WebSocket or gRPC streams, are closed.
+
+The `terminationGracePeriodSeconds` setting (default `60`) caps the time for the whole sequence, including the `preStop` hook. If the hook is still running when the grace period ends, Kubernetes gives it two more seconds and then stops the container with `SIGKILL`.
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
+The `--drain-time-s` and `--drain-strategy` flags from [Change the listener drain behavior](#drain-settings) apply when a listener is modified or removed. They do not extend the time that a terminating pod keeps serving requests.
+{{< /version >}}
+
+Use the `podTemplate.gracefulShutdown` and `podTemplate.terminationGracePeriodSeconds` fields to change these settings.
+
+| Field | Default | Description |
+| -- | -- | -- |
+| `gracefulShutdown.enabled` | `true` | Add the `preStop` hook to the gateway proxy container. If set to `false`, the hook is removed and Envoy exits as soon as the pod is deleted. |
+| `gracefulShutdown.sleepTimeSeconds` | `10` | The time in seconds that the `preStop` hook waits after it fails the health check. A value of `0` is treated as unset, so the hook still waits 10 seconds. To skip the wait, set `enabled` to `false` instead. |
+| `terminationGracePeriodSeconds` | `60` | The pod's termination grace period in seconds. Set it higher than `sleepTimeSeconds` so that the hook can finish. A value of `0` is treated as unset, so the Kubernetes default of 30 seconds applies. |
+
+The following example gives in-flight requests 30 seconds to complete, and allows up to 90 seconds for the pod to shut down.
+
+1. Change the graceful shutdown settings.
+   ```yaml
+   kubectl apply -f- <<'EOF'
+   apiVersion: {{< reuse "kgw-docs/snippets/trafficpolicy-apiversion.md" >}}
+   kind: {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}}
+   metadata:
+     name: gw-params
+     namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+   spec:
+     kube:
+       podTemplate:
+         terminationGracePeriodSeconds: 90
+         gracefulShutdown:
+           sleepTimeSeconds: 30
+   EOF
+   ```
+
+2. Verify that the gateway proxy Deployment picked up the new settings. The following commands use the `custom` Gateway from [Change proxy settings]({{< link-hextra path="/setup/customize/gateway/" >}}), which references the `gw-params` resource.
+   ```sh
+   kubectl get deployment custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o jsonpath='{.spec.template.spec.terminationGracePeriodSeconds}{"\n"}'
+   kubectl get deployment custom -n {{< reuse "kgw-docs/snippets/namespace.md" >}} -o jsonpath='{.spec.template.spec.containers[?(@.name=="kgateway-proxy")].lifecycle.preStop.exec.command[2]}{"\n"}'
+   ```
+
+   Example output:
+   ```console
+   90
+   wget --post-data "" -O /dev/null 127.0.0.1:19000/healthcheck/fail; sleep 30
+   ```
+
 ### Image pull secrets {#image-pull-secrets}
 
 Add image pull secrets to pull container images from private registries with the built-in `podTemplate.imagePullSecrets` field.
