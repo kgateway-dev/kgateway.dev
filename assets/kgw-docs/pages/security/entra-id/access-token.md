@@ -40,6 +40,8 @@ Create a `GatewayExtension` to configure token validation. Then create a `Traffi
              - api://YOUR_CLIENT_ID
    EOF
    ```
+
+   Replace `YOUR_TENANT_ID` and `YOUR_CLIENT_ID` with the values that you copied in [Entra ID setup]({{< link-hextra path="/security/oauth/entra-id/setup/" >}}).
    
    | **Field** | **Description** |
    | :--- | :--- |
