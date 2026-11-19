@@ -12,10 +12,10 @@ You can use the following settings in the `spec.default.httpSettings` section of
 
 | Setting | Description |
 | -- | -- |
-| `useRemoteAddress` | Defaults to `true`. When `true`, the gateway proxy uses the source address of the connection as the client IP address, unless you also set `xffNumTrustedHops`. When `false`, the gateway proxy takes the client IP address from the XFF header and stops appending to the XFF header, unless you set `skipXFFAppend` to `false`. When `false`, the gateway proxy also does not set the `X-Envoy-External-Address` header. |
+| `useRemoteAddress` | Defaults to `true`. When `true`, the gateway proxy uses the source address of the connection as the client IP address, unless you also set `xffNumTrustedHops`. When `false`, the gateway proxy takes the client IP address from the XFF header and does not append to the XFF header, unless you set `skipXFFAppend` to `false` or the connection comes from an address outside your `xffTrustedCIDRs` ranges. When `false`, the gateway proxy also does not set the `X-Envoy-External-Address` header. |
 | `xffNumTrustedHops` | The number of trusted proxies in front of the gateway proxy that append to the XFF header. If `useRemoteAddress` is `true` and you set this value to `N`, the client IP address is the `N`th address from the right of the XFF header that the gateway proxy receives. If `useRemoteAddress` is `false`, the client IP address is the `N+1`th address from the right, and a value of `0` uses the rightmost address. If the XFF header contains fewer addresses, the gateway proxy uses the source address of the connection. You cannot set this field together with `xffTrustedCIDRs`. |
 | `xffTrustedCIDRs` | The CIDR ranges of your trusted proxies. If the source address of the connection is in one of these ranges, the gateway proxy reads the XFF header from right to left and uses the first address that is not in a trusted range as the client IP address. If all addresses in the XFF header are trusted, the leftmost address is used. If the source address of the connection is not in a trusted range, the gateway proxy uses the source address as the client IP address and appends it to the XFF header. You must set `useRemoteAddress` to `false` to use this field, and you cannot set this field together with `xffNumTrustedHops`. |
-| `skipXFFAppend` | Set to `true` to forward the XFF header without appending the source address of the connection. If unset, the gateway proxy appends to the XFF header when `useRemoteAddress` is `true`, and does not append when `useRemoteAddress` is `false`. |
+| `skipXFFAppend` | Set to `true` to forward the XFF header without appending the source address of the connection. If unset, the gateway proxy appends to the XFF header when `useRemoteAddress` is `true`, and does not append when `useRemoteAddress` is `false`. If you set `xffTrustedCIDRs`, the gateway proxy always appends the source address of connections from untrusted addresses, even if `skipXFFAppend` is `true`. |
 
 > [!WARNING]
 > Trust the XFF header only for addresses that your own proxies add. If clients can reach the gateway proxy directly without passing through your trusted proxies, they can send a forged XFF header to set any client IP address, such as to bypass an ACL policy or a rate limit.
@@ -318,6 +318,12 @@ By default, the gateway proxy appends the source address of the connection to th
        ],
    ...
    ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.default.httpSettings.skipXFFAppend` | Set to `true` to forward the XFF header without appending the source address of the connection. This policy replaces the policy from the previous section, so `useRemoteAddress` returns to its default value of `true`, and the gateway proxy uses the source address of the connection as the client IP address. |
 
 ## Cleanup
 
