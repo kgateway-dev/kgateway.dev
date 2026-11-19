@@ -426,7 +426,12 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 
 #### Client certificate files {#client-certificate-files}
 
-Instead of a Kubernetes secret, a BackendConfigPolicy can point to TLS files that are already mounted in the gateway proxy container. Use the `tls.files` setting for this purpose. The file paths must exist in the gateway proxy container, not in the control plane container. To mount files into the gateway proxy, see [Mount a ConfigMap as a volume]({{< link-hextra path="/setup/customize/configs/#configmap-volume" >}}). With [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}) enabled, the control plane accepts these paths without reading the files. If a path or file is not valid, Envoy reports the error when the gateway proxy loads the configuration. Client certificate files require version 2.4.8 or later.
+You can store the TLS certificate, key, and CA files in the gateway proxy container instead of in a Kubernetes secret. Then, use the `tls.files` setting in the BackendConfigPolicy to point to the file paths. Client certificate files require version 2.4.8 or later.
+
+Keep in mind the following points:
+
+* The files must be in the gateway proxy container, not in the control plane container. To add files to the gateway proxy, see [Mount a ConfigMap as a volume]({{< link-hextra path="/setup/customize/configs/#configmap-volume" >}}).
+* The control plane does not check the files. Even with [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}), the policy is accepted. If a path is wrong or a file is not valid, the gateway proxy reports the error when the configuration is loaded.
 
 The following example replaces the `secretRef` setting in the `nginx-tls-policy` with file paths. Replace the paths with the paths of the files in your gateway proxy container.
 
