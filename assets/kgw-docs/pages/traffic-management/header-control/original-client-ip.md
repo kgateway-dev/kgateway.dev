@@ -289,6 +289,12 @@ By default, the gateway proxy appends the source address of the connection to th
    EOF
    ```
 
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.default.httpSettings.skipXFFAppend` | Set to `true` to forward the XFF header without appending the source address of the connection. This policy replaces the policy from the previous section, so `useRemoteAddress` returns to its default value of `true`, and the gateway proxy uses the source address of the connection as the client IP address. |
+
 2. Send a request with an XFF header. Verify that the XFF header that the httpbin app receives contains only the `203.0.113.10` address that you sent.
 
    {{< tabs >}}
@@ -318,12 +324,6 @@ By default, the gateway proxy appends the source address of the connection to th
        ],
    ...
    ```
-
-   {{< reuse "kgw-docs/snippets/review-table.md" >}}
-
-   | Setting | Description |
-   | -- | -- |
-   | `spec.default.httpSettings.skipXFFAppend` | Set to `true` to forward the XFF header without appending the source address of the connection. This policy replaces the policy from the previous section, so `useRemoteAddress` returns to its default value of `true`, and the gateway proxy uses the source address of the connection as the client IP address. |
 
 ## Cleanup
 
