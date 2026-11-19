@@ -423,6 +423,43 @@ The following examples update the `nginx-tls-policy` that you created earlier. T
 
 {{< version include-if="2.4.x" >}}
 {{< reuse "kgw-docs/snippets/backend-tls-bcp-parameters.md" >}}
+
+#### Client certificate files {#client-certificate-files}
+
+Instead of a Kubernetes secret, a BackendConfigPolicy can point to TLS files that are already mounted in the gateway proxy container. Use the `tls.files` setting for this purpose. The file paths must exist in the gateway proxy container, not in the control plane container. To mount files into the gateway proxy, see [Mount a ConfigMap as a volume]({{< link-hextra path="/setup/customize/configs/#configmap-volume" >}}). With [strict validation]({{< link-hextra path="/install/advanced/#strict-validation" >}}) enabled, the control plane accepts these paths without reading the files. If a path or file is not valid, Envoy reports the error when the gateway proxy loads the configuration. Client certificate files require version 2.4.8 or later.
+
+The following example replaces the `secretRef` setting in the `nginx-tls-policy` with file paths. Replace the paths with the paths of the files in your gateway proxy container.
+
+```yaml
+kubectl apply -f- <<EOF
+apiVersion: gateway.kgateway.dev/v1alpha1
+kind: BackendConfigPolicy
+metadata:
+  name: nginx-tls-policy
+  namespace: kgateway-base
+spec:
+  targetRefs:
+  - group: ""
+    kind: Service
+    name: nginx
+  tls:
+    sni: "example.com"
+    files:
+      tlsCertificate: /etc/proxy-certs/tls.crt
+      tlsKey: /etc/proxy-certs/tls.key
+      rootCA: /etc/ssl/certs/cacerts-custom.crt
+EOF
+```
+
+{{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+| Setting | Description |
+|---------|-------------|
+| `tls.files.tlsCertificate` | The path to the client certificate file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsKey`. |
+| `tls.files.tlsKey` | The path to the client private key file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsCertificate`. |
+| `tls.files.rootCA` | The path to the root CA file in the gateway proxy container. |
+
+You cannot combine `tls.files` with `tls.secretRef`, `tls.insecureSkipVerify`, or `tls.wellKnownCACertificates` in the same policy.
 {{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
@@ -481,39 +518,6 @@ EOF
 
 {{% /tab %}}
 {{< /tabs >}}
-
-#### Client certificate files {#client-certificate-files}
-
-Use `tls.files` when the gateway proxy already has the upstream TLS files mounted as files. The paths in `tls.files.tlsCertificate`, `tls.files.tlsKey`, and `tls.files.rootCA` must exist in the gateway proxy container. Strict validation accepts these paths without reading the files from the control plane container. Envoy reports a bad path or bad file when the gateway proxy loads the configuration.
-
-```yaml
-kubectl apply -f- <<EOF
-apiVersion: gateway.kgateway.dev/v1alpha1
-kind: BackendConfigPolicy
-metadata:
-  name: nginx-tls-policy
-  namespace: kgateway-base
-spec:
-  targetRefs:
-  - group: ""
-    kind: Service
-    name: nginx
-  tls:
-    sni: "example.com"
-    files:
-      tlsCertificate: /etc/proxy-certs/tls.crt
-      tlsKey: /etc/proxy-certs/tls.key
-      rootCA: /etc/ssl/certs/cacerts-custom.crt
-EOF
-```
-
-{{< reuse "kgw-docs/snippets/review-table.md" >}}
-
-| Setting | Description |
-|---------|-------------|
-| `tls.files.tlsCertificate` | The path to the client certificate file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsKey`. |
-| `tls.files.tlsKey` | The path to the client private key file in the gateway proxy container. If you set this field, you must also set `tls.files.tlsCertificate`. |
-| `tls.files.rootCA` | The path to the root CA file in the gateway proxy container. |
 
 ### HTTP version {#http-version}
 
