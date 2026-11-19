@@ -28,6 +28,10 @@ Review the built-in configurations that are provided via the [{{< reuse "kgw-doc
 > [!NOTE]
 > Use the built-in fields where possible. Built-in fields are validated at apply time, are considered stable, and are updated automatically when you upgrade your gateway proxies.
 
+> [!WARNING]
+> Any user who can create or modify a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource can modify the underlying gateway proxy Deployment, even if the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is in another namespace. Only grant RBAC access to this resource to users who are permitted to change the gateway proxy deployment.
+
+
 ## Overlays {#overlays}
 
 For advanced customization that is not covered by the built-in fields, the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource supports overlays. Overlays use [Kubernetes strategic merge patch (SMP)](https://github.com/kubernetes/community/blob/main/contributors/devel/sig-api-machinery/strategic-merge-patch.md) semantics to modify the raw Kubernetes resources after the control plane renders them. You can also use overlays to create HorizontalPodAutoscaler (HPA), VerticalPodAutoscaler (VPA), and PodDisruptionBudget (PDB) resources that automatically target the proxy Deployment.
@@ -45,6 +49,9 @@ Review the following table for the resource types that you can overlay in the `s
 
 > [!WARNING]
 > Overlays are **not validated** by the {{< reuse "kgw-docs/snippets/kgateway.md" >}} control plane at apply time. Configuration errors surface only when Kubernetes processes the resulting resource. The overlay schema reflects the underlying Kubernetes resource schema and is **not stable** between Kubernetes versions. Test overlay configurations after each cluster upgrade.
+
+> [!WARNING]
+> Any user who can create or modify a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource can modify the underlying gateway proxy Deployment, even if the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is in another namespace. Only grant RBAC access to this resource to users who are permitted to change the gateway proxy deployment.
 
 ### How overlays work
 
@@ -190,3 +197,6 @@ spec:
         searches:     # Gateway map key is added
           - gateway.example
 ```
+
+> [!WARNING]
+> Any user who can create or modify a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource can modify the underlying gateway proxy Deployment, even if the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is in another namespace. Only grant RBAC access to this resource to users who are permitted to change the gateway proxy deployment.
