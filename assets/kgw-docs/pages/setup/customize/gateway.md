@@ -1,7 +1,7 @@
 Customize your gateway proxy with the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource.
 
 > [!WARNING]
-> Any user who can create or modify a {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource can modify the underlying gateway proxy Deployment, even if the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is in another namespace. Only grant RBAC access to this resource to users who are permitted to change the gateway proxy deployment.
+> Any user who can create or modify the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource can modify the underlying gateway proxy Deployment, even if the {{< reuse "kgw-docs/snippets/gatewayparameters.md" >}} resource is in another namespace. Only grant RBAC access to this resource to users who are permitted to change the gateway proxy deployment.
 
 ## Before you begin
 
