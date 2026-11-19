@@ -124,17 +124,9 @@ rbac:
 
 ### Match an OAuth scope {#scope}
 
-You can authorize requests based on an OAuth scope that your identity provider issues. The sample tokens in this guide do not have a `scope` claim, so to try these examples, use a token from your identity provider. Unlike the single-value claims in the previous examples, the scope is conventionally a single string of space-delimited scopes, such as `read write admin`. To match one scope, split the string on spaces and check whether the resulting list contains the scope. A match on `admin` then does not also match a longer scope that contains it, such as `superadmin`. The following policy allows requests with a JWT where the `scope` includes `admin`.
+You can authorize requests based on an OAuth scope that your identity provider issues. The sample tokens in this guide do not have a `scope` claim, so to try this example, use a token from your identity provider. OAuth scopes are commonly represented in the standard `scope` claim as a single string of space-delimited scopes, such as `read write admin`. However, Envoy's CEL runtime does not include the `split()` string function.
 
-```yaml
-rbac:
-  action: Allow
-  policy:
-    matchExpressions:
-      - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope'].split(' ')"
-```
-
-If your identity provider issues `scope` as a list instead of a space-delimited string, remove the `.split(' ')` and match the list directly.
+To match one scope exactly, configure your identity provider or token minter to emit `scope` (or another claim) as a JSON array, decode a token to verify that the claim is an array rather than a space-delimited string, and test for membership in that list. The following policy allows requests with a JWT where the `scope` claim includes `admin`.
 
 ```yaml
 rbac:
@@ -143,6 +135,17 @@ rbac:
     matchExpressions:
       - "'admin' in metadata.filter_metadata['envoy.filters.http.jwt_authn']['payload']['scope']"
 ```
+
+For example, the JWT payload includes an array-shaped claim similar to the following.
+
+```json
+{
+  "scope": ["read", "write", "admin"]
+}
+```
+
+> [!NOTE]
+> Avoid matching a space-delimited `scope` string with substring checks such as `contains('admin')` because that can match longer scope values, such as `superadmin`.
 
 ## Cleanup {#cleanup}
 
