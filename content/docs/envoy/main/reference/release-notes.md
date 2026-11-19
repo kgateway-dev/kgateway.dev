@@ -16,7 +16,7 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 
 
-### 🔄 Feature changes {#v26-feature-changes}
+### ⚒️ Installation changes {#v26-installation-changes}
 
 #### Go runtime sets GOMAXPROCS for the controller {#v26-controller-gomaxprocs}
 
@@ -36,8 +36,6 @@ For more information, see [Controller CPU limit and GOMAXPROCS]({{< link-hextra 
 
 
 <!--
-
-### ⚒️ Installation changes {#v2.2-installation-changes}
 
 ### 🔄 Feature changes {#v2.2-feature-changes}
 
