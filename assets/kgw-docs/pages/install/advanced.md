@@ -367,6 +367,20 @@ controller:
 If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
 {{< /version >}}
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+### Controller CPU limit and GOMAXPROCS {#controller-gomaxprocs}
+
+The `GOMAXPROCS` environment variable sets how many CPU threads the Go runtime uses to run Go code at the same time. The Helm chart does not set `GOMAXPROCS`. Instead, the Go runtime sets `GOMAXPROCS` from the CPU limit of the controller container and updates the value when the CPU limit changes, such as when a VPA resizes the pod in place.
+
+To use a fixed value instead, set `GOMAXPROCS` in `controller.extraEnv`. A fixed value turns off the automatic updates.
+
+```yaml
+controller:
+  extraEnv:
+    GOMAXPROCS: "4"
+```
+{{< /version >}}
+
 {{< version exclude-if="2.1.x,2.2.x">}}
 
 ## ReferenceGrant enforcement modes
