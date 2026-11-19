@@ -145,7 +145,7 @@ For example, the JWT payload includes an array-shaped claim similar to the follo
 ```
 
 > [!NOTE]
-> Avoid matching a space-delimited `scope` string with substring checks such as `contains('admin')` because that can accidentally match longer scope values such as `superadmin`.
+> Avoid matching a space-delimited `scope` string with substring checks such as `contains('admin')` because that can match longer scope values, such as `superadmin`.
 
 ## Cleanup {#cleanup}
 
