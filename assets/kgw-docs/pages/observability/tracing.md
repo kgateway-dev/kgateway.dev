@@ -75,7 +75,7 @@ metadata:
 spec:
   containers:
   - name: otel-collector
-    image: otel/opentelemetry-collector-contrib:0.143.0
+    image: otel/opentelemetry-collector-contrib:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.143.0{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.165.0{{% /version %}}
     command:
     - /otelcol-contrib
     - --config

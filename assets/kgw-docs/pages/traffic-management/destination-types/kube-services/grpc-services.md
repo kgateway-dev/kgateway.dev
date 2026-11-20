@@ -83,7 +83,7 @@ Steps to set up the sample gRPC service:
    spec:
      containers:
        - name: grpcurl
-         image: docker.io/fullstorydev/grpcurl:v1.8.7-alpine
+         image: docker.io/fullstorydev/grpcurl:v{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}1.8.7{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}1.9.3{{% /version %}}-alpine
          command:
            - sleep
            - "infinity"

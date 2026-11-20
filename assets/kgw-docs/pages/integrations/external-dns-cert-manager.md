@@ -92,7 +92,7 @@
          serviceAccountName: external-dns
          containers:
          - name: external-dns
-           image: registry.k8s.io/external-dns/external-dns:v0.13.5
+           image: registry.k8s.io/external-dns/external-dns:v{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.13.5{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.24.0{{% /version %}}
            args:
            - --source=gateway-httproute
            - --log-level=debug

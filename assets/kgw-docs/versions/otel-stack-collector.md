@@ -1,1 +1,1 @@
-0.127.2
+{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.127.2{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.180.0{{% /version %}}

@@ -63,7 +63,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
        spec:
          serviceAccountName: httpbin
          containers:
-           - image: docker.io/mccutchen/go-httpbin:v2.6.0
+           - image: docker.io/mccutchen/go-httpbin:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}v2.6.0{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}2.26.0{{% /version %}}
              imagePullPolicy: IfNotPresent
              name: httpbin
              command: [ go-httpbin ]
@@ -76,7 +76,7 @@ To observe and analyze shadowed traffic, you can use a tool like [Open Diffy](ht
                - containerPort: 8080
            # Include curl container for e2e testing, allows sending traffic mediated by the proxy sidecar
            - name: curl
-             image: curlimages/curl:7.83.1
+             image: curlimages/curl:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}7.83.1{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}8.23.0{{% /version %}}
              resources:
                requests:
                  cpu: "100m"

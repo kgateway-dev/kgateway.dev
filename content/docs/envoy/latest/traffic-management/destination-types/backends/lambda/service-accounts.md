@@ -269,7 +269,7 @@ Save your AWS details, and create the IAM roles and policies for the gateway pro
 
 1. In your EKS cluster, install [cert-manager](https://cert-manager.io/docs/), which is a prerequisite for the webhook.
    ```sh
-   wget https://github.com/cert-manager/cert-manager/releases/download/v1.12.4/cert-manager.yaml
+   wget https://github.com/cert-manager/cert-manager/releases/download/v1.21.3/cert-manager.yaml
    kubectl apply -f cert-manager.yaml
    ```
 

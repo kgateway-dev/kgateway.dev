@@ -32,7 +32,7 @@
 	     # example uses amd64 and v0.11.0
 	     # for other builds and versions,
 	     # see https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases
-         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-amd64"
+         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.11.0{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.18.0{{% /version %}}/gatewayapi-plugin-amd64"
    EOF
    ```
    {{% /tab %}}
@@ -50,7 +50,7 @@
 	     # example uses arm64 and v0.11.0
 	     # for other builds and versions,
 	     # see https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases
-         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.11.0/gatewayapi-plugin-linux-arm64"
+         location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.11.0{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}0.18.0{{% /version %}}/gatewayapi-plugin-linux-arm64"
    EOF
    ```
    {{% /tab %}}
