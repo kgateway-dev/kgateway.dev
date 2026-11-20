@@ -87,70 +87,6 @@ When you enable route source metadata, the `dev.kgateway.route_source` filter me
 If your access log formats, log queries, or dashboards parse the previous `rule` value, update them. For more information, see [Route source metadata]({{< link-hextra path="/security/access-logging/#route-source-metadata" >}}).
 
 
-#### Waypoint support removed {#v25-waypoint-removed}
-
-The deprecated support for running {{< reuse "kgw-docs/snippets/kgateway.md" >}} as an Istio ambient waypoint is removed. The following items are removed:
-
-* The `kgateway-waypoint` GatewayClass.
-* The translation of Istio AuthorizationPolicy resources.
-* The `KGW_WAYPOINT_LOCAL_BINDING` setting.
-
-To move your existing waypoints to Istio waypoints, see the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md).
-
-Sending ingress traffic through the Istio waypoint of a destination is still supported. If you label a Service or ServiceEntry with `istio.io/ingress-use-waypoint=true`, the gateway sends ingress traffic to the cluster IP of the destination, so that ztunnel passes the traffic through the waypoint of the destination. To enable this feature, set the `waypoint.enabled` Helm value to `true`. If you do not use Helm, set the `KGW_INGRESS_USE_WAYPOINTS=true` environment variable on the controller. The default of this setting changed from `true` to `false`, so enable it explicitly if you use this feature. The deprecated `KGW_ENABLE_WAYPOINT` setting still enables this feature if you do not set `KGW_INGRESS_USE_WAYPOINTS`.
-
-> [!NOTE]
-> The controller ClusterRole still grants `get`, `list`, and `watch` permissions on `authorizationpolicies.security.istio.io` APIs, so that upgrades are safe. However, {{< reuse "kgw-docs/snippets/kgateway.md" >}} no longer uses them. The permissions are removed in the next minor release. If you maintain a custom ClusterRole, or use these permissions for something else, plan for their removal.
-
-#### HTTPListenerPolicy removed {#v25-httplistenerpolicy-removed}
-
-The deprecated HTTPListenerPolicy custom resource definition (CRD) is removed. Versions 2.4.x and earlier install this CRD, and version 2.5.x does not, so the upgrade deletes the CRD from your cluster. Kubernetes then garbage-collects every remaining HTTPListenerPolicy object in the cluster. 
-
-Any HTTPListenerPolicy resource that exists in your cluster at the time of the upgrade is deleted along with the CRD, and the listener configuration that it applied stops taking effect.
-
-**Required action**: Migrate your configuration to the ListenerPolicy resource **before** you upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}} by moving the policy spec under the `spec.default.httpSettings` block in your ListenerPolicy resource. If you already migrated to the ListenerPolicy in an earlier version, no action is needed. 
-
-1. List the HTTPListenerPolicy resources in your cluster. 
-   ```sh
-   kubectl get httplistenerpolicies -A
-   ```
-   
-2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link-hextra path="/reference/api/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
-
-3. Confirm that the new resources are accepted and that your listeners behave as expected.
-   ```sh
-   kubectl get ListenerPolicy <name> -n <namespace> -o yaml
-   ```
-
-4. Delete the HTTPListenerPolicy objects. 
-   ```sh
-   kubectl delete HTTPListenerPolicy <name> -n <namespace>
-   ```
-
-5. Continue with the [upgrade]({{< link path="/operations/upgrade/" >}}).
-
-#### Control plane metrics and Go functions removed {#v25-metrics-functions-removal}
-
-The control plane no longer emits the following metrics. If your dashboards, alerts, or recording rules use any of them, update them. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
-
-* **Status sync metrics**: Use the new `kgateway_status_writes_total{kind, result}` metric instead of the following metrics. To catch status writes that still fail after all retries, alert on `result="error"`.
-  * `kgateway_status_syncer_status_syncs_total`
-  * `kgateway_status_syncer_status_sync_duration_seconds`
-  * `kgateway_resources_status_syncs_started_total`
-  * `kgateway_resources_status_syncs_completed_total`
-  * `kgateway_resources_status_sync_duration_seconds`
-* **High-cardinality metrics**: The following metrics and series are removed.
-  * The `kgateway_translator_translations_running` gauge.
-  * The `kgateway_controller_reconciliations_running` gauge.
-  * The `translator="TranslateHTTPRoute"` series of the `kgateway_translator_translations_total` and `kgateway_translator_translation_duration_seconds` metrics.
-
-If you build on kgateway as a Go library, the following functions are also removed. Stop using them in your code:
-
-* `statussync.Writer.OnSync`
-* `statussync.EndResourceStatusSyncOnWriteSuccess`
-* `metrics.StartResourceStatusSync`
-* `metrics.EndResourceStatusSync`
-
 ### 🌟 New features {#v25-new-features}
 
 #### Preserve request paths {#v25-preserve-request-paths}
@@ -316,13 +252,77 @@ controller:
     KGW_ENABLE_ORDERED_ADS: "false"
 ```
 
+### 🗑️ Deprecated or removed features {#v25-removed-features}
+
+#### Waypoint support removed {#v25-waypoint-removed}
+
+The deprecated support for running {{< reuse "kgw-docs/snippets/kgateway.md" >}} as an Istio ambient waypoint is removed. The following items are removed:
+
+* The `kgateway-waypoint` GatewayClass.
+* The translation of Istio AuthorizationPolicy resources.
+* The `KGW_WAYPOINT_LOCAL_BINDING` setting.
+
+To move your existing waypoints to Istio waypoints, see the [migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-kgateway-waypoints.md).
+
+Sending ingress traffic through the Istio waypoint of a destination is still supported. If you label a Service or ServiceEntry with `istio.io/ingress-use-waypoint=true`, the gateway sends ingress traffic to the cluster IP of the destination, so that ztunnel passes the traffic through the waypoint of the destination. To enable this feature, set the `waypoint.enabled` Helm value to `true`. If you do not use Helm, set the `KGW_INGRESS_USE_WAYPOINTS=true` environment variable on the controller. The default of this setting changed from `true` to `false`, so enable it explicitly if you use this feature. The deprecated `KGW_ENABLE_WAYPOINT` setting still enables this feature if you do not set `KGW_INGRESS_USE_WAYPOINTS`.
+
+> [!NOTE]
+> The controller ClusterRole still grants `get`, `list`, and `watch` permissions on `authorizationpolicies.security.istio.io` APIs, so that upgrades are safe. However, {{< reuse "kgw-docs/snippets/kgateway.md" >}} no longer uses them. The permissions are removed in the next minor release. If you maintain a custom ClusterRole, or use these permissions for something else, plan for their removal.
+
+#### HTTPListenerPolicy removed {#v25-httplistenerpolicy-removed}
+
+The deprecated HTTPListenerPolicy custom resource definition (CRD) is removed. Versions 2.4.x and earlier install this CRD, and version 2.5.x does not, so the upgrade deletes the CRD from your cluster. Kubernetes then garbage-collects every remaining HTTPListenerPolicy object in the cluster. 
+
+Any HTTPListenerPolicy resource that exists in your cluster at the time of the upgrade is deleted along with the CRD, and the listener configuration that it applied stops taking effect.
+
+**Required action**: Migrate your configuration to the ListenerPolicy resource **before** you upgrade {{< reuse "kgw-docs/snippets/kgateway.md" >}} by moving the policy spec under the `spec.default.httpSettings` block in your ListenerPolicy resource. If you already migrated to the ListenerPolicy in an earlier version, no action is needed. 
+
+1. List the HTTPListenerPolicy resources in your cluster. 
+   ```sh
+   kubectl get httplistenerpolicies -A
+   ```
+   
+2. For each resource, create an equivalent ListenerPolicy resource. You find the corresponding fields in the `spec.default.httpSettings` block. For more information about the policy and supported fields, see [ListenerPolicy]({{< link-hextra path="/reference/api/#listenerpolicy" >}}). For the field-by-field mapping, see the [HTTPListenerPolicy to ListenerPolicy migration guide](https://github.com/kgateway-dev/kgateway/blob/main/docs/guides/migrating-httplistenerpolicy-to-listenerpolicy.md) in the kgateway open source project.
+
+3. Confirm that the new resources are accepted and that your listeners behave as expected.
+   ```sh
+   kubectl get ListenerPolicy <name> -n <namespace> -o yaml
+   ```
+
+4. Delete the HTTPListenerPolicy objects. 
+   ```sh
+   kubectl delete HTTPListenerPolicy <name> -n <namespace>
+   ```
+
+5. Continue with the [upgrade]({{< link path="/operations/upgrade/" >}}).
+
+#### Control plane metrics and Go functions removed {#v25-metrics-functions-removal}
+
+The control plane no longer emits the following metrics. If your dashboards, alerts, or recording rules use any of them, update them. For more information, see [Control plane metrics]({{< link-hextra path="/observability/control-plane-metrics/" >}}).
+
+* **Status sync metrics**: Use the new `kgateway_status_writes_total{kind, result}` metric instead of the following metrics. To catch status writes that still fail after all retries, alert on `result="error"`.
+  * `kgateway_status_syncer_status_syncs_total`
+  * `kgateway_status_syncer_status_sync_duration_seconds`
+  * `kgateway_resources_status_syncs_started_total`
+  * `kgateway_resources_status_syncs_completed_total`
+  * `kgateway_resources_status_sync_duration_seconds`
+* **High-cardinality metrics**: The following metrics and series are removed.
+  * The `kgateway_translator_translations_running` gauge.
+  * The `kgateway_controller_reconciliations_running` gauge.
+  * The `translator="TranslateHTTPRoute"` series of the `kgateway_translator_translations_total` and `kgateway_translator_translation_duration_seconds` metrics.
+
+If you build on kgateway as a Go library, the following functions are also removed. Stop using them in your code:
+
+* `statussync.Writer.OnSync`
+* `statussync.EndResourceStatusSyncOnWriteSuccess`
+* `metrics.StartResourceStatusSync`
+* `metrics.EndResourceStatusSync`
+
 <!--
 
 ### ⚒️ Installation changes {#v2.2-installation-changes}
 
 ### 🔄 Feature changes {#v2.2-feature-changes}
-
-### 🗑️ Deprecated or removed features {#v2.2-removed-features}
 
 ### 🚧 Known issues {#v2.2-known-issues}
 -->
