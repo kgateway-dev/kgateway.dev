@@ -364,7 +364,8 @@ Prometheus is a monitoring system and time-series database that collects metrics
          - native-histograms
        enableRemoteWriteReceiver: true
    grafana:
-     enabled: true
+     enabled: true{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
+     adminPassword: prom-operator{{% /version %}}
      defaultDashboardsEnabled: true
      datasources:
       datasources.yaml:
