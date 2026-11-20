@@ -396,7 +396,7 @@ Prometheus is a monitoring system and time-series database that collects metrics
            basicAuth: false
            orgId: 1
            uid: tempo
-           url: http://tempo.telemetry.svc.cluster.local:3100
+           url: http://tempo.telemetry.svc.cluster.local:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}3100{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}3200{{% /version %}}
            isDefault: false
            editable: true
          - orgId: 1
