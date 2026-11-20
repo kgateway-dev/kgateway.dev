@@ -24,20 +24,67 @@ export function resolveKeycloakVersion() {
     );
   }
 
-  const version = raw.trim();
+  // The snippet can hold per-docs-version values in {{% version include-if="..." %}} or
+  // exclude-if blocks, for example when older docs versions keep an older Keycloak. Evaluate
+  // them for the DOC_VERSION being captured, the way the site's version shortcode would.
+  const docVersion = process.env.DOC_VERSION || 'latest';
+  const version = evaluateVersionBlocks(raw, versionTokens(docVersion)).trim();
 
-  // The snippet is plain text on purpose. Version snippets elsewhere in this repo wrap values in
-  // {{< version include-if="..." >}} shortcodes for per-docs-version values; if this one ever
-  // grows one, the harness must learn to evaluate it rather than silently pass a shortcode to
-  // `docker run`.
+  // Anything left that is not a bare version means a shortcode form this resolver does not
+  // understand. Fail rather than silently pass a shortcode to `docker run`.
   if (!/^[\w][\w.-]*$/.test(version)) {
     throw new Error(
-      `The Keycloak version snippet at ${path} is not a bare version string (got ${JSON.stringify(
-        version,
-      )}). If it now uses a Hugo shortcode, teach resolveKeycloakVersion() to resolve it for ` +
-        `the DOC_VERSION being captured.`,
+      `The Keycloak version snippet at ${path} did not resolve to a bare version string for ` +
+        `DOC_VERSION=${docVersion} (got ${JSON.stringify(version)}). Only include-if and ` +
+        `exclude-if version blocks are understood.`,
     );
   }
 
   return version;
+}
+
+const BLOCK_RE =
+  /\{\{[%<]\s*version\s+(include-if|exclude-if)="([^"]*)"\s*[%>]\}\}([\s\S]*?)\{\{[%<]\s*\/version\s*[%>]\}\}/g;
+
+/** Keep each version block's content when its condition holds for `tokens`, else drop it. */
+export function evaluateVersionBlocks(text, tokens) {
+  return text.replace(BLOCK_RE, (_, kind, list, inner) => {
+    const listed = list.split(',').map((s) => s.trim()).some((v) => tokens.includes(v));
+    return (kind === 'include-if') === listed ? inner : '';
+  });
+}
+
+/**
+ * The names a docs version line answers to in a version block: the DOC_VERSION itself and its
+ * `version`/`linkVersion` pair from hugo.yaml, so `latest` also matches `2.5.x`.
+ */
+export function versionTokens(docVersion, hugoYaml = readHugoYaml()) {
+  const tokens = new Set([docVersion]);
+  let entry = null;
+  const flush = () => {
+    if (entry && (entry.version === docVersion || entry.link === docVersion)) {
+      if (entry.version) tokens.add(entry.version);
+      if (entry.link) tokens.add(entry.link);
+    }
+  };
+  for (const line of hugoYaml.split('\n')) {
+    const v = line.match(/^\s*-\s*version:\s*"?([^"#\s]+)"?/);
+    if (v) {
+      flush();
+      entry = { version: v[1], link: null };
+      continue;
+    }
+    const l = line.match(/^\s*linkVersion:\s*"?([^"#\s]+)"?/);
+    if (l && entry) entry.link = l[1];
+  }
+  flush();
+  return [...tokens];
+}
+
+function readHugoYaml() {
+  try {
+    return readFileSync(resolve(HERE, '../../hugo.yaml'), 'utf8');
+  } catch {
+    return '';
+  }
 }

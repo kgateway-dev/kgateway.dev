@@ -343,7 +343,13 @@ You can deploy three separate OTel collectors that are optimized for the three d
 ## Step 3: Set up Prometheus {#prometheus}
 
 Prometheus is a monitoring system and time-series database that collects metrics from configured targets at given intervals. It's the de facto standard for metrics collection in cloud-native environments. You can use the PromQL query language to set up flexible queries and alerts based on the metrics.
+{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
+1. Save a password for the Grafana admin user in an environment variable. The Helm values in the next step set this password for Grafana, and you use it to log in to Grafana later.
 
+   ```sh
+   export GRAFANA_ADMIN_PASSWORD=<password>
+   ```
+{{% /version %}}
 1. Deploy Prometheus in your cluster.
 
    ```yaml
@@ -365,7 +371,7 @@ Prometheus is a monitoring system and time-series database that collects metrics
        enableRemoteWriteReceiver: true
    grafana:
      enabled: true{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
-     adminPassword: prom-operator{{% /version %}}
+     adminPassword: $GRAFANA_ADMIN_PASSWORD{{% /version %}}
      defaultDashboardsEnabled: true
      datasources:
       datasources.yaml:
