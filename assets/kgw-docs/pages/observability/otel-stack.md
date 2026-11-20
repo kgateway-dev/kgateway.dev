@@ -160,12 +160,10 @@ You can deploy three separate OTel collectors that are optimized for the three d
        enabled: true
        containerPort: 9099
        servicePort: 9099
-       protocol: TCP
-   
+       protocol: TCP{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
    command:
      extraArgs:
-       - "--feature-gates=receiver.prometheusreceiver.EnableNativeHistograms"
-   
+       - "--feature-gates=receiver.prometheusreceiver.EnableNativeHistograms"{{% /version %}} 
    config:
      receivers:
        prometheus/kgateway-dataplane:
