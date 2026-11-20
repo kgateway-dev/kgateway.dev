@@ -33,7 +33,7 @@ For bodies, choose one of the following modes.
 | `STREAMED` | Send the body to the ExtProc server in chunks as they arrive. |
 | `BUFFERED` | Buffer the entire body in the gateway proxy, and send it in one message. If the body is larger than the [buffer limit]({{< link-hextra path="/traffic-management/buffering/" >}}), the gateway proxy returns an error. |
 | `BUFFERED_PARTIAL` | Buffer the body up to the buffer limit, and send what was buffered in one message. Larger bodies are not rejected. |
-| `FULL_DUPLEX_STREAMED` | Stream the body to the ExtProc server in chunks as they arrive. The ExtProc server can buffer chunks and send its processed chunks back at any time. You must also set the matching trailer mode, such as `requestTrailerMode` for `requestBodyMode`, to `SEND`. |
+| `FULL_DUPLEX_STREAMED` | Stream the body to the ExtProc server in chunks as they arrive. The ExtProc server can buffer chunks and send its processed chunks back at any time. You must also set the matching trailer mode, such as `requestTrailerMode` for `requestBodyMode`, to `SEND`. Otherwise, the gateway proxy rejects the configuration for the entire listener and keeps its previous configuration, even though the resource status shows `Accepted`. |
 
 For more information, see the [Envoy processing mode reference](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/processing_mode.proto).
 
@@ -76,7 +76,7 @@ To use a different mode for some routes, set `extProc.processingMode` in the {{<
 
 In this example, you apply an ExtProc server to a route and check that the server processes both the request headers and the response headers. Then, you use a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} to stop sending the response headers for that route.
 
-1. Create a GatewayExtension for the ExtProc server. The `processingMode` sets the default mode explicitly: the request headers and the response headers are sent to the ExtProc server.
+1. Create a GatewayExtension for the ExtProc server. The `processingMode` field explicitly sets the default mode, which sends the request headers and the response headers to the ExtProc server.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.kgateway.dev/v1alpha1
@@ -96,6 +96,14 @@ In this example, you apply an ExtProc server to a route and check that the serve
          responseHeaderMode: SEND
    EOF
    ```
+
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.extProc.grpcService.backendRef` | The Service of the sample ExtProc server that you deployed before you began. |
+   | `spec.extProc.processingMode.requestHeaderMode` | Set to `SEND` to send the request headers to the ExtProc server. |
+   | `spec.extProc.processingMode.responseHeaderMode` | Set to `SEND` to send the response headers to the ExtProc server. |
 
 2. Create an HTTPRoute for the httpbin app on the `extproc-modes.example` domain.
    ```yaml
@@ -119,7 +127,7 @@ In this example, you apply an ExtProc server to a route and check that the serve
    EOF
    ```
 
-3. Create a ReferenceGrant to allow the HTTPRoute to forward traffic to the httpbin app. This resource is required, because the HTTPRoute and the httpbin app are in different namespaces. If you already created this ReferenceGrant in the [header manipulation guide]({{< link-hextra path="/traffic-management/extproc/header-manipulation/" >}}), you can skip this step.
+3. Create a ReferenceGrant to allow the HTTPRoute to forward traffic to the httpbin app. This resource is required because the HTTPRoute and the httpbin app are in different namespaces. If you already created this ReferenceGrant in the [header manipulation guide]({{< link-hextra path="/traffic-management/extproc/header-manipulation/" >}}), you can skip this step.
    ```yaml
    kubectl apply -f- <<EOF
    apiVersion: gateway.networking.k8s.io/v1beta1
@@ -211,6 +219,12 @@ In this example, you apply an ExtProc server to a route and check that the serve
    EOF
    ```
 
+   {{< reuse "kgw-docs/snippets/review-table.md" >}}
+
+   | Setting | Description |
+   | -- | -- |
+   | `spec.extProc.processingMode.responseHeaderMode` | Set to `SKIP` to stop sending the response headers for this route. The other fields get their default values, not the values from the GatewayExtension. |
+
 7. Repeat the request. Verify that the response still includes the `instructions` header, but no `extproc-response` header, because the response headers are no longer sent to the ExtProc server.
 
    {{< tabs >}}
@@ -282,7 +296,7 @@ An ExtProc server can decide for each request whether it needs more of the reque
 
 The gateway proxy ignores `mode_override` unless you set `allowProcessingModeOverride: true` in the GatewayExtension. To limit the modes that the server can switch to, list them in `allowedProcessingModeOverrides`. The gateway proxy then ignores a `mode_override` that does not match one of the listed modes. If you omit the list, the server can switch to any mode.
 
-Each mode in the list gets the default values from the [processing mode fields](#processing-mode-fields) table for the fields that you omit. The `mode_override` must match one of the resulting modes in every field except `requestHeaderMode`. The following example lets the ExtProc server turn on buffered request body processing. To match the listed mode, the server must send a `mode_override` that sets `requestBodyMode` to `BUFFERED`, `responseHeaderMode` to `SEND`, and both trailer modes to `SKIP`. A `mode_override` that sets only `requestBodyMode` leaves the other fields at Envoy's `DEFAULT` value, does not match, and is ignored.
+Each mode in the list gets the default values from the [processing mode fields](#processing-mode-fields) table for the fields that you omit. The gateway proxy fills the header and trailer fields that the `mode_override` leaves at `DEFAULT` with the values from the `processingMode` of the GatewayExtension, and then compares the result with the list. The result must match one of the listed modes in every field except `requestHeaderMode`. The following example lets the ExtProc server turn on buffered request body processing. Because this GatewayExtension does not set `processingMode`, the fields that the server omits stay at `DEFAULT` and do not match the listed mode. To match, the server must send a `mode_override` that sets `requestBodyMode` to `BUFFERED`, `responseHeaderMode` to `SEND`, and both trailer modes to `SKIP`. If you set `processingMode` in the GatewayExtension, the omitted fields come from that mode instead.
 
 ```yaml
 apiVersion: gateway.kgateway.dev/v1alpha1
@@ -303,7 +317,7 @@ spec:
 ```
 
 > [!NOTE]
-> The ExtProc server cannot override the mode if the body mode is `FULL_DUPLEX_STREAMED`. A mode that you set in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not depend on these settings.
+> The ExtProc server cannot override the mode if the `processingMode` in the GatewayExtension sets a body mode to `FULL_DUPLEX_STREAMED`. A mode that you set in a {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} does not depend on these settings.
 
 For more information, see [`allow_mode_override`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-field-extensions-filters-http-ext-proc-v3-externalprocessor-allow-mode-override) and [`allowed_override_modes`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#envoy-v3-api-field-extensions-filters-http-ext-proc-v3-externalprocessor-allowed-override-modes) in the Envoy documentation.
 
