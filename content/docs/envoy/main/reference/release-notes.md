@@ -11,7 +11,6 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
 
-
 ### 🌟 New features {#v26-new-features}
 
 
@@ -35,11 +34,22 @@ controller:
 For more information, see [Controller CPU limit and GOMAXPROCS]({{< link-hextra path="/install/advanced/#controller-gomaxprocs" >}}).
 
 
+### 🗑️ Deprecated or removed features {#v26-removed-features}
+
+#### Controller reconciliation metrics removed {#v26-controller-reconcile-metrics}
+
+The control plane no longer reports how long each Gateway and GatewayClass reconciliation takes. These metrics added a separate set of series for every Gateway in the cluster, including Gateways that other controllers own.
+
+* The `kgateway_controller_reconcile_duration_seconds` metric is removed.
+* The `kgateway_controller_reconciliations_total` metric no longer has the `name` and `namespace` labels. It keeps the `controller` and `result` labels.
+
+If your dashboards or alerts use the removed metric or filter `kgateway_controller_reconciliations_total` by `name` or `namespace`, update them before you upgrade. The [kgateway operations dashboard]({{< link-hextra path="/observability/otel-stack/" >}}) no longer has the Reconciliation Latency panel.
+
+For more information, see [kgateway-dev/kgateway#14836](https://github.com/kgateway-dev/kgateway/pull/14836).
+
 <!--
 
 ### 🔄 Feature changes {#v2.2-feature-changes}
-
-### 🗑️ Deprecated or removed features {#v2.2-removed-features}
 
 ### 🚧 Known issues {#v2.2-known-issues}
 -->
