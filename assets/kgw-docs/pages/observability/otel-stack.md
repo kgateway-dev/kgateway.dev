@@ -160,12 +160,10 @@ You can deploy three separate OTel collectors that are optimized for the three d
        enabled: true
        containerPort: 9099
        servicePort: 9099
-       protocol: TCP
-   
+       protocol: TCP{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
    command:
      extraArgs:
-       - "--feature-gates=receiver.prometheusreceiver.EnableNativeHistograms"
-   
+       - "--feature-gates=receiver.prometheusreceiver.EnableNativeHistograms"{{% /version %}} 
    config:
      receivers:
        prometheus/kgateway-dataplane:
@@ -345,7 +343,13 @@ You can deploy three separate OTel collectors that are optimized for the three d
 ## Step 3: Set up Prometheus {#prometheus}
 
 Prometheus is a monitoring system and time-series database that collects metrics from configured targets at given intervals. It's the de facto standard for metrics collection in cloud-native environments. You can use the PromQL query language to set up flexible queries and alerts based on the metrics.
+{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
+1. Save a password for the Grafana admin user in an environment variable. The Helm values in the next step set this password for Grafana, and you use it to log in to Grafana later.
 
+   ```sh
+   export GRAFANA_ADMIN_PASSWORD=<password>
+   ```
+{{% /version %}}
 1. Deploy Prometheus in your cluster.
 
    ```yaml
@@ -366,7 +370,8 @@ Prometheus is a monitoring system and time-series database that collects metrics
          - native-histograms
        enableRemoteWriteReceiver: true
    grafana:
-     enabled: true
+     enabled: true{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}
+     adminPassword: $GRAFANA_ADMIN_PASSWORD{{% /version %}}
      defaultDashboardsEnabled: true
      datasources:
       datasources.yaml:
@@ -391,7 +396,7 @@ Prometheus is a monitoring system and time-series database that collects metrics
            basicAuth: false
            orgId: 1
            uid: tempo
-           url: http://tempo.telemetry.svc.cluster.local:3100
+           url: http://tempo.telemetry.svc.cluster.local:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}3100{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}3200{{% /version %}}
            isDefault: false
            editable: true
          - orgId: 1

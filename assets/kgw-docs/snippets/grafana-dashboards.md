@@ -21,7 +21,7 @@ You can use the pre-built Grafana dashboards to observe the control and data pla
    kubectl label -n telemetry cm kgateway-dashboard grafana_dashboard=1
    ```
 
-3. Open and log in to Grafana by using the username `admin` and password `prom-operator`. 
+3. Open and log in to Grafana by using the username `admin` and {{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}password `prom-operator`{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}the password that you saved in the `GRAFANA_ADMIN_PASSWORD` environment variable{{% /version %}}. 
       
    {{< tabs >}}
    {{% tab name="Cloud Provider LoadBalancer" %}}

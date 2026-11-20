@@ -132,7 +132,7 @@ spec:
             initContainers:
               - $patch: replace
               - name: initialize-gateway
-                image: busybox:1.36
+                image: busybox:{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}1.36{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}1.38.0{{% /version %}}
                 command: ["sh", "-c", "echo initialization complete"]
 ```
 

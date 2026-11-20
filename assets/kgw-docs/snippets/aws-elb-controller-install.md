@@ -16,7 +16,7 @@
     --approve
 
    # Fetch the IAM policy that is required for the Kubernetes service account
-   curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.3/docs/install/iam_policy.json
+   curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v{{% version include-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}2.5.3{{% /version %}}{{% version exclude-if="2.4.x,2.3.x,2.2.x,2.1.x" %}}3.6.3{{% /version %}}/docs/install/iam_policy.json
 
    # Create the IAM policy
    aws iam create-policy \
