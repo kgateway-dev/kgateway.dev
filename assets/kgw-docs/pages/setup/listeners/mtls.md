@@ -487,9 +487,14 @@ In this example, you override the default certificate validation configuration f
    {{% /tab %}}
    {{< /tabs >}}
 
-## Per listener configuration {#per-listener}
+## ListenerPolicy certificate validation {#per-listener}
 
+{{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
 Use the `clientCertificateValidation` setting in a ListenerPolicy to validate client certificates for a single listener. The setting overrides the FrontendTLS validation configuration of the Gateway for that listener only. Listeners that are not targeted by a ListenerPolicy continue to use the `default` or `perPort` configuration of the Gateway.
+{{% /version %}}
+{{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
+Use the `clientCertificateValidation` setting in a ListenerPolicy to validate client certificates for one listener or for all TLS-terminating listeners on the Gateway. A policy with `targetRefs.sectionName` overrides the FrontendTLS validation configuration of the Gateway for that listener. A policy without `sectionName` applies to all Gateway listeners, including ListenerSet listeners. A listener-specific policy that configures `clientCertificateValidation` takes precedence.
+{{% /version %}}
 
 The FrontendTLS `default` and `perPort` configurations apply at the port level. When multiple listeners share the same port, the CA certificates of that port are combined into a single trust pool. As a result, any client certificate that is signed by any of these CAs is valid for every listener on that port. To give each listener its own trust boundary, target a single listener with `sectionName`. The gateway selects the listener, and therefore the CA, by using the [Server Name Indication (SNI)]({{< link-hextra path="/setup/listeners/sni/" >}}) that the client sends in the TLS handshake.
 
@@ -679,13 +684,22 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [API docs]({{< link-hextra path="/reference/api/#clientcertificatevalidationconfig" >}}).
 
    | Setting | Description |
-   | -- | -- |
+   | -- | -- |{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
    | `targetRefs.sectionName` | The name of the listener on the Gateway that this policy applies to. If you omit this field, the policy applies to all listeners on the Gateway. |
    | `clientCertificateValidation.mode` | How client certificate validation is enforced on this listener. Set to `Require` or `Optional`. |
-   | `clientCertificateValidation.caCertificateRefs` | References to the Secrets or ConfigMaps that contain the CA certificates that validate client certificates on this listener. Each reference must contain a `ca.crt` key with the PEM data. You can add up to 8 references, which are combined into a single trust pool for this listener. These CA certificates are separate from the server certificate that the listener presents to clients, which you set in the `certificateRefs` field of the Gateway listener. |
+   | `clientCertificateValidation.caCertificateRefs` | References to the Secrets or ConfigMaps that contain the CA certificates that validate client certificates on this listener. Each reference must contain a `ca.crt` key with the PEM data. You can add up to 8 references, which are combined into a single trust pool for this listener. These CA certificates are separate from the server certificate that the listener presents to clients, which you set in the `certificateRefs` field of the Gateway listener. |{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+   | `targetRefs.sectionName` | The name of the listener on the Gateway that this policy applies to. If you omit this field, the policy applies to all TLS-terminating listeners on the Gateway and attached ListenerSets. |
+   | `clientCertificateValidation.mode` | How client certificate validation is enforced on the targeted listeners. Set to `Require` or `Optional`. |
+   | `clientCertificateValidation.caCertificateRefs` | References to the Secrets or ConfigMaps that contain the CA certificates that validate client certificates on the targeted listeners. Each reference must contain a `ca.crt` key with the PEM data. A reference without a namespace resolves in the ListenerPolicy namespace. You can add up to 8 references. The references are combined into a single trust pool for the targeted listeners. These CA certificates are separate from the server certificate that the listener presents to clients, which you set in the `certificateRefs` field of the Gateway listener. |{{< /version >}}
 
+   {{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
    > [!NOTE]
    > If the CA certificate is in a different namespace than the Gateway, you must create a ReferenceGrant. In the `from` section of the ReferenceGrant, refer to the Gateway or ListenerSet that owns the listener, not to the ListenerPolicy. For more information, see [Cross-namespace references]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+   {{% /version %}}
+   {{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
+   > [!NOTE]
+   > If the CA certificate is in a different namespace than the ListenerPolicy, you must create a ReferenceGrant. In the `from` section of the ReferenceGrant, refer to the ListenerPolicy. For more information, see [Cross-namespace references]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+   {{% /version %}}
 
 6. If you have not done so yet, get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available.
    {{< tabs >}}
