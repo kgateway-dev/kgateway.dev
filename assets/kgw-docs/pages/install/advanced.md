@@ -304,6 +304,15 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 > [!NOTE]
 > The `standard` mode is the default resource validation mode and is appropriate for most production environments. Use `strict` mode when you cannot tolerate that a NACKed xDS update reaches the data plane. For example, use `strict` mode when one team's invalid route must not block configuration updates for other routes on the same listener. In exchange, the invalid route itself returns errors until you fix it, instead of continuing to serve its previous configuration. For more information, see [Invalid configuration handling in strict mode](#strict-invalid-configuration).
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+### BackendRef policy errors {#backendref-policy-errors}
+
+If an HTTPRoute backendRef has an `ExtensionRef` filter, the referenced policy must be valid, must exist, and must attach to a backendRef. Otherwise, the affected backendRef fails closed. Requests for that backendRef's share of traffic receive an `HTTP 500` response, and the HTTPRoute reports `kgateway.dev/Programmed=False` with reason `BackendRefReplaced`. Other backendRefs in the same rule keep receiving their share of traffic.
+
+If no resolved backendRef with a nonzero weight remains, the whole route rule is replaced with a direct `HTTP 500` response. The HTTPRoute then reports `kgateway.dev/Programmed=False` with reason `RouteRuleReplaced`. The same behavior applies when a backendRef uses a built-in filter that cannot attach to a backendRef, such as `URLRewrite`, `RequestRedirect`, or `RequestMirror`.
+
+{{< /version >}}
+
 ### Invalid configuration handling in strict mode {#strict-invalid-configuration}
 
 Strict mode does not keep a previous version of a route when an update to the route is invalid. The control plane translates the current state of your resources, and handles invalid configuration as follows.

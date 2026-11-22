@@ -10,6 +10,10 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
+#### BackendRef-level policy errors fail closed {#v26-backendref-level-policy-errors-fail-closed}
+
+Policies that are attached to an HTTPRoute backendRef with an `ExtensionRef` filter now fail closed when the policy has errors, cannot be found, or cannot attach to the backendRef. The affected backendRef's traffic receives an `HTTP 500` response and the route reports `BackendRefReplaced`. If no valid nonzero-weight backendRef remains, the route is replaced and reports `RouteRuleReplaced`. The same behavior applies to unsupported backendRef filters and DirectResponse ExtensionRefs, such as `URLRewrite`, `RequestRedirect`, `RequestMirror`, and `DirectResponse`. For more information, see [BackendRef policy errors]({{< link-hextra path="/install/advanced/#backendref-policy-errors" >}}).
+
 
 ### 🌟 New features {#v26-new-features}
 
