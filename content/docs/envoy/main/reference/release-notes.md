@@ -10,6 +10,10 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
+#### BackendConfigPolicy TLS trust source validation changes {#v26-backendconfigpolicy-tls-trust-source-validation-changes}
+
+BackendConfigPolicy `tls` now requires exactly one trust source. To verify a backend by using the system CA certificates, set `wellKnownCACertificates: System`; unsupported `wellKnownCACertificates` values and `insecureSkipVerify: false` are rejected, and a system-CA certificate must match `tls.sni` when `verifySubjectAltNames` is empty. Existing stored policies that set `insecureSkipVerify: false` now validate against the system CA certificates instead of skipping backend certificate verification. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
+
 
 ### 🌟 New features {#v26-new-features}
 

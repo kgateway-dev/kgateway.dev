@@ -140,7 +140,7 @@ The `ingress-nginx` provider currently supports translating the following annota
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-secret`: Specifies a Secret containing client certificate (`tls.crt`), client key (`tls.key`), and optionally CA certificate (`ca.crt`) in PEM format. The secret name can be specified as `secretName` (same namespace) or `namespace/secretName`. For kgateway, this maps to `BackendConfigPolicy.spec.tls.secretRef`. **Note:** The secret must be in the same namespace as the BackendConfigPolicy.
 
-- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: Enables or disables verification of the proxied HTTPS server certificate. Values: `"on"` or `"off"` (default: `"off"`). For kgateway, this maps to `BackendConfigPolicy.spec.tls.insecureSkipVerify` (inverted: `"on"` = `false`, `"off"` = `true`).
+- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: Enables or disables verification of the proxied HTTPS server certificate. Accepted values are `"on"` and `"off"` (default: `"off"`). For kgateway, `"off"` maps to `BackendConfigPolicy.spec.tls.insecureSkipVerify: true`. `"on"` requires a trust source, such as the Secret from `nginx.ingress.kubernetes.io/proxy-ssl-secret`. The API server rejects `insecureSkipVerify: false`.
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-name`: Overrides the server name used to verify the certificate of the proxied HTTPS server. This value is also passed through SNI (Server Name Indication) when establishing a connection. For kgateway, this maps to `BackendConfigPolicy.spec.tls.sni`. Setting this value automatically enables SNI.
 

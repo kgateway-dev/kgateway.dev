@@ -148,7 +148,7 @@ routing rules.
 ### Backend TLS
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-secret`: Maps to `BackendConfigPolicy.spec.tls.secretRef`
-- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: Maps to `BackendConfigPolicy.spec.tls.insecureSkipVerify` (inverted: `"on"` = `false`, `"off"` = `true`)
+- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: Values of `"off"` map to `BackendConfigPolicy.spec.tls.insecureSkipVerify: true`. Values of `"on"` require a trust source, such as the Secret from `nginx.ingress.kubernetes.io/proxy-ssl-secret`. The API server rejects `insecureSkipVerify: false`.
 - `nginx.ingress.kubernetes.io/proxy-ssl-name`: Maps to `BackendConfigPolicy.spec.tls.sni` (automatically enables SNI)
 
 ### Access Logging
