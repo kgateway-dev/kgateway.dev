@@ -19,8 +19,27 @@ A ListenerPolicy that sets `clientCertificateValidation` without `targetRefs.sec
 * A CA certificate reference to another namespace needs a ReferenceGrant from `ListenerPolicy`. Grants from `Gateway` or `ListenerSet` no longer apply. Update your ReferenceGrants before you upgrade.
 
 For more information, see [ListenerPolicy certificate validation]({{< link-hextra path="/setup/listeners/mtls/#per-listener" >}}).
+#### Stricter BackendConfigPolicy TLS verification {#v26-bcp-tls-verification}
+
+Backend certificate verification for BackendConfigPolicy is stricter. Review your policies before you upgrade, because some existing policies stop working.
+
+* `insecureSkipVerify` accepts only `true`. To verify the backend certificate, remove the field and set a trust source, such as `wellKnownCACertificates: System`. Existing policies with `insecureSkipVerify: false` now verify the backend certificate against the system CA certificates. If the backend certificate is not signed by a publicly trusted CA, the connection fails.
+* `wellKnownCACertificates` accepts only `System`. Existing policies with another value report `Accepted=False`. The routes that use them are replaced.
+* With `wellKnownCACertificates: System` and `sni` set, the backend certificate must be valid for the `sni` hostname. Before, only the certificate chain was checked. To check against other names, set `verifySubjectAltNames`.
+
+For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
+
+#### API key secret selectors require every label {#v26-apikey-selector-labels}
+
+`apiKeyAuth.secretSelector.matchLabels` now matches the way Kubernetes label selectors do. A secret must have every listed label with the listed value. Before, a label with an empty value, such as `keys.example.com/gold: ""`, also matched secrets that did not have that label, so their API keys were accepted. If you select API key secrets by an empty-valued label, add that label to every secret whose keys must stay valid before you upgrade.
+
+For more information, see [Label selectors]({{< link-hextra path="/security/extauth/apikey/#label-selectors" >}}).
 
 ### 🌟 New features {#v26-new-features}
+
+#### Warn when controller memory tuning lacks a container memory limit {#v26-controller-memory-limit-warning}
+
+Helm install notes now warn when `controller.goMemLimitPercent` is nonzero but the controller container has no memory limit in the chart values. Set `controller.resources.limits.memory`, or provide a LimitRange default, so `GOMEMLIMIT` has a finite container memory limit to use. For more information, see [Tune the controller Go memory limit]({{< link-hextra path="/install/advanced/#controller-memory-limit" >}}).
 
 
 

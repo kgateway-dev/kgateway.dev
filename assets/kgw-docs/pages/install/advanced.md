@@ -358,13 +358,26 @@ To adjust the `GOMEMLIMIT` variable dynamically, set the `controller.goMemLimitP
 ```yaml
 controller:
   goMemLimitPercent: 90
+  resources:
+    limits:
+      memory: 1Gi
 ```
 
 | Field | Description |
 | -- | -- |
 | `controller.goMemLimitPercent` | Sets the percentage of the controller container's live memory limit that the Go runtime targets for `GOMEMLIMIT`. Valid values are `0`-`100`. The default value, `0`, sets `GOMEMLIMIT` once at pod startup from the container's memory limit and does not update it afterward. A value between `1` and `100` re-reads the container's live memory limit every 30 seconds and sets `GOMEMLIMIT` to that percentage of it. |
+| `controller.resources.limits.memory` | The memory limit of the controller container. A nonzero `controller.goMemLimitPercent` value is applied to this limit. |
 
-If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`. If the controller container has no finite cgroup memory limit, `GOMEMLIMIT` remains unconstrained and the controller logs a warning.
+If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`.
+
+`controller.goMemLimitPercent` needs a memory limit on the controller container. Set `controller.resources.limits.memory` or apply a LimitRange that sets a default memory limit in the namespace. Without a limit, the result depends on the node's cgroup version:
+
+* cgroup v2: `GOMEMLIMIT` stays unconstrained and the controller logs a warning.
+* cgroup v1: the percentage applies to the node-level memory limit for all pods, and the controller does not log a warning.
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+If your Helm values set `controller.goMemLimitPercent` but not `controller.resources.limits.memory`, the Helm install notes print a warning. The chart cannot see LimitRange defaults, so the warning also appears when a LimitRange supplies the limit.
+{{< /version >}}
 {{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
