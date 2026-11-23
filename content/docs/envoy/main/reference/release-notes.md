@@ -10,9 +10,15 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
-#### BackendConfigPolicy TLS trust source validation changes {#v26-backendconfigpolicy-tls-trust-source-validation-changes}
+#### Stricter BackendConfigPolicy TLS verification {#v26-bcp-tls-verification}
 
-BackendConfigPolicy `tls` now requires exactly one trust source. To verify a backend by using the system CA certificates, set `wellKnownCACertificates: System`; unsupported `wellKnownCACertificates` values and `insecureSkipVerify: false` are rejected, and a system-CA certificate must match `tls.sni` when `verifySubjectAltNames` is empty. Existing stored policies that set `insecureSkipVerify: false` now validate against the system CA certificates instead of skipping backend certificate verification. For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
+BackendConfigPolicy `tls` settings that skipped backend certificate verification without saying so now verify the certificate or are rejected. Review your policies before you upgrade.
+
+* `insecureSkipVerify` accepts only `true`. To verify the backend certificate, remove the field and set a trust source, such as `wellKnownCACertificates: System`. Existing policies that set `insecureSkipVerify: false` now verify the backend certificate against the system CA certificates, so connections fail if the backend certificate is not signed by a publicly trusted CA.
+* `wellKnownCACertificates` accepts only `System`. Existing policies with another value report `Accepted=False`, and the routes that use them are replaced.
+* With `wellKnownCACertificates: System`, `sni` set, and no `verifySubjectAltNames`, the backend certificate must now also be valid for the `sni` hostname. Before, only the certificate chain was checked.
+
+For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
 
 
 ### 🌟 New features {#v26-new-features}

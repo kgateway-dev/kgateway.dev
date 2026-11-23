@@ -306,8 +306,8 @@ Set up a Backend resource that represents your external service. Then, use a Bac
 
    | Setting | Description |
    |---------|-------------|
-   | `tls.wellKnownCACertificates` | The system CA certificates that the gateway proxy uses to verify the backend certificate. `System` is the only supported value. |
-   | `tls.sni` | The Server Name Indication (SNI) hostname that the gateway proxy sends to the backend. When `tls.wellKnownCACertificates` is `System` and `tls.verifySubjectAltNames` is empty, the backend certificate must be valid for this name. |
+   | `tls.wellKnownCACertificates` | The set of well-known CA certificates that the gateway proxy uses to verify the backend certificate. `System`, the only supported value, uses the system CA certificates. |
+   | `tls.sni` | The Server Name Indication (SNI) hostname that the gateway proxy sends to the backend. When `tls.wellKnownCACertificates` is `System` and `tls.verifySubjectAltNames` is empty, the backend certificate must be valid for this name. If you set neither `tls.sni` nor `tls.verifySubjectAltNames`, only the certificate chain is checked, so any certificate from a publicly trusted CA is accepted. |
    {{< /version >}}
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
