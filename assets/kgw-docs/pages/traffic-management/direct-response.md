@@ -14,7 +14,7 @@ When you configure a DirectResponse, the gateway proxy intercepts requests to sp
 Consider the following limitations before creating DirectResponse resources in your cluster: 
 * You cannot configure multiple DirectResponse resources on the same route.
 * You cannot combine a DirectResponse with other route actions on the same route. For example, you cannot configure a DirectResponse and a `RequestRedirect` filter or `backendRefs` rule at the same time. If multiple route actions are defined, the route is replaced with a 500 HTTP response code and an error message is shown on the HTTPRoute. 
-* DirectResponse resources can be referenced by using an `ExtensionRef` filter only. If specified in a `backendRef` filter, the DirectResponse configuration is ignored. 
+{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}* You can reference DirectResponse resources only by using an `ExtensionRef` filter. If you specify a DirectResponse in a `backendRef` filter, the DirectResponse configuration is ignored. {{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}* Reference a DirectResponse in an `ExtensionRef` filter on the route rule, not on a backendRef. A DirectResponse on a backendRef fails closed. Requests for the backendRef's share of traffic receive an `HTTP 500` response. If no other resolved backendRef with a nonzero weight remains, the route rule is replaced with a direct `HTTP 500` response.{{< /version >}}
 * No status information is currently populated to the DirectResponse resource.
 * The DirectResponse CRD currently does not show a description when you run `kubectl explain directresponse`. 
 
