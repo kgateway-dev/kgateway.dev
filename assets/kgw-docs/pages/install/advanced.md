@@ -347,19 +347,19 @@ For more information about transformation engines, see [Transformation engines](
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
 ### BackendRef policy errors {#backendref-policy-errors}
 
-You can attach a policy to a single backendRef by using an `ExtensionRef` filter on the backendRef. In the following cases, the backendRef fails closed. Its traffic receives an error instead of being forwarded without the policy.
+You can attach a policy to a single backendRef by using an `ExtensionRef` filter on the backendRef. In the following cases, the backendRef fails closed. The backendRef's traffic receives an error instead of being forwarded without the policy.
 
 * The policy has errors, such as an external auth policy that refers to a missing GatewayExtension.
 * The policy does not exist.
 * The policy cannot attach to a backendRef, such as a DirectResponse.
-* The backendRef uses the built-in `URLRewrite`, `RequestRedirect`, or `RequestMirror` filter. These filters cannot attach to a backendRef.
+* The backendRef uses the built-in `URLRewrite`, `RequestRedirect`, or `RequestMirror` filter, which cannot attach to a backendRef.
 
-Requests for that backendRef's share of traffic receive an `HTTP 500` response. Other backendRefs in the same rule keep their share. The HTTPRoute reports `kgateway.dev/Programmed=False` with the `BackendRefReplaced` reason.
+Requests for the failed backendRef's share of traffic receive an `HTTP 500` response. Other backendRefs in the same rule keep their share. The HTTPRoute reports `kgateway.dev/Programmed=False` with the `BackendRefReplaced` reason.
 
 If no resolved backendRef with a nonzero weight is left in the rule, the whole rule is replaced with a direct `HTTP 500` response. The HTTPRoute reports `kgateway.dev/Programmed=False` with the `RouteRuleReplaced` reason.
 
 > [!CAUTION]
-> Policies on a backendRef that points to a delegated HTTPRoute are not applied to the delegated routes. If the policy does not exist, the parent rule is replaced with a direct `HTTP 500` response. If the policy exists, it is ignored. Attach policies to the delegated routes instead.
+> Policies on a backendRef that points to a delegated HTTPRoute are not applied to the delegated routes. If the policy does not exist, the parent rule is replaced with a direct `HTTP 500` response. An existing policy is ignored, even when the policy is valid. Attach policies to the delegated routes instead.
 {{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
