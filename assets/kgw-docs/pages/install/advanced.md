@@ -360,6 +360,18 @@ controller:
   goMemLimitPercent: 90
 ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+When you set `controller.goMemLimitPercent` to a nonzero value, also set `controller.resources.limits.memory` unless a LimitRange supplies a default memory limit. Without a finite memory limit, the Helm install notes print a warning. On cgroup v2, `GOMEMLIMIT` normally remains unconstrained. The controller logs a warning.
+
+```yaml
+controller:
+  resources:
+    limits:
+      memory: 1Gi
+  goMemLimitPercent: 90
+```
+{{< /version >}}
+
 | Field | Description |
 | -- | -- |
 | `controller.goMemLimitPercent` | Sets the percentage of the controller container's live memory limit that the Go runtime targets for `GOMEMLIMIT`. Valid values are `0`-`100`. The default value, `0`, sets `GOMEMLIMIT` once at pod startup from the container's memory limit and does not update it afterward. A value between `1` and `100` re-reads the container's live memory limit every 30 seconds and sets `GOMEMLIMIT` to that percentage of it. |
