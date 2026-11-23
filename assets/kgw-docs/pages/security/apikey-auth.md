@@ -226,6 +226,8 @@ spec:
 EOF
 ```
 
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}A secret matches `secretSelector.matchLabels` only if it has every listed label with the listed value. This rule also applies to empty values. For example, `keys.example.com/gold: ""` matches secrets that have the `keys.example.com/gold` label with an empty value, but not secrets that do not have the label.{{< /version >}}
+
 A selector can match several secrets, and each secret can hold several API keys, so make sure that each key value is unique across all of them.{{< version exclude-if="2.1.x,2.2.x" >}} If the same key value is stored under two different entry names, {{< reuse "kgw-docs/snippets/kgateway.md" >}} cannot tell which client the key identifies. The {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}} reports `Accepted=False` with a `duplicate API key value` message that names both entries and their secrets, and the routes that the policy applies to return a 500 HTTP response until you remove the duplicate. If the same key value is stored under the same entry name in more than one secret, for example because you copied a secret to another namespace, the extra copies are ignored and no error is reported.{{< /version >}}
 
 > [!WARNING]

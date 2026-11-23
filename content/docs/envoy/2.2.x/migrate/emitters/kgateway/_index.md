@@ -144,7 +144,7 @@ routing rules.
 ### Backend TLS
 
 - `nginx.ingress.kubernetes.io/proxy-ssl-secret`: Maps to `BackendConfigPolicy.spec.tls.secretRef`
-- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: Maps to `BackendConfigPolicy.spec.tls.insecureSkipVerify` (inverted: `"on"` = `false`, `"off"` = `true`)
+- `nginx.ingress.kubernetes.io/proxy-ssl-verify`: `"off"` maps to `BackendConfigPolicy.spec.tls.insecureSkipVerify: true`. `"on"` maps to `BackendConfigPolicy.spec.tls.secretRef` with the Secret from `nginx.ingress.kubernetes.io/proxy-ssl-secret`. Include a `ca.crt` key in that Secret, or the backend certificate is not verified. If you set `"on"` without `proxy-ssl-secret`, the generated policy has no trust source and the API server rejects it. Add `wellKnownCACertificates: System` to the policy instead.
 - `nginx.ingress.kubernetes.io/proxy-ssl-name`: Maps to `BackendConfigPolicy.spec.tls.sni` (automatically enables SNI)
 
 ### Access Logging
