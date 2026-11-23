@@ -304,15 +304,6 @@ You can enable TLS encryption for the xDS gRPC server in the {{< reuse "kgw-docs
 > [!NOTE]
 > The `standard` mode is the default resource validation mode and is appropriate for most production environments. Use `strict` mode when you cannot tolerate that a NACKed xDS update reaches the data plane. For example, use `strict` mode when one team's invalid route must not block configuration updates for other routes on the same listener. In exchange, the invalid route itself returns errors until you fix it, instead of continuing to serve its previous configuration. For more information, see [Invalid configuration handling in strict mode](#strict-invalid-configuration).
 
-{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
-### BackendRef policy errors {#backendref-policy-errors}
-
-If an HTTPRoute backendRef has an `ExtensionRef` filter, the referenced policy must be valid, must exist, and must attach to a backendRef. Otherwise, the affected backendRef fails closed. Requests for that backendRef's share of traffic receive an `HTTP 500` response, and the HTTPRoute reports `kgateway.dev/Programmed=False` with reason `BackendRefReplaced`. Other backendRefs in the same rule keep receiving their share of traffic.
-
-If no resolved backendRef with a nonzero weight remains, the whole route rule is replaced with a direct `HTTP 500` response. The HTTPRoute then reports `kgateway.dev/Programmed=False` with reason `RouteRuleReplaced`. The same behavior applies when a backendRef uses a built-in filter that cannot attach to a backendRef, such as `URLRewrite`, `RequestRedirect`, or `RequestMirror`.
-
-{{< /version >}}
-
 ### Invalid configuration handling in strict mode {#strict-invalid-configuration}
 
 Strict mode does not keep a previous version of a route when an update to the route is invalid. The control plane translates the current state of your resources, and handles invalid configuration as follows.
@@ -352,6 +343,24 @@ kubectl -n {{< reuse "kgw-docs/snippets/namespace.md" >}} get deployment {{< reu
 Strict validation runs the preflight against an Envoy binary that is bundled in the kgateway control plane image. The control plane image is built from the envoy-wrapper image, which bundles the rustformation dynamic module, and the validator sets `ENVOY_DYNAMIC_MODULES_SEARCH_PATH=/usr/local/lib` before invoking the preflight. As a result, the preflight understands rustformation per-route config and can validate TrafficPolicies that use `transformation`.
 
 For more information about transformation engines, see [Transformation engines]({{< link-hextra path="/traffic-management/transformations/engines/" >}}).
+
+{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+### BackendRef policy errors {#backendref-policy-errors}
+
+You can attach a policy to a single backendRef by using an `ExtensionRef` filter on the backendRef. In the following cases, the backendRef fails closed. Its traffic receives an error instead of being forwarded without the policy.
+
+* The policy has errors, such as an external auth policy that refers to a missing GatewayExtension.
+* The policy does not exist.
+* The policy cannot attach to a backendRef, such as a DirectResponse.
+* The backendRef uses the built-in `URLRewrite`, `RequestRedirect`, or `RequestMirror` filter. These filters cannot attach to a backendRef.
+
+Requests for that backendRef's share of traffic receive an `HTTP 500` response. Other backendRefs in the same rule keep their share. The HTTPRoute reports `kgateway.dev/Programmed=False` with the `BackendRefReplaced` reason.
+
+If no resolved backendRef with a nonzero weight is left in the rule, the whole rule is replaced with a direct `HTTP 500` response. The HTTPRoute reports `kgateway.dev/Programmed=False` with the `RouteRuleReplaced` reason.
+
+> [!CAUTION]
+> Policies on a backendRef that points to a delegated HTTPRoute are not applied to the delegated routes. If the policy does not exist, the parent rule is replaced with a direct `HTTP 500` response. If the policy exists, it is ignored. Attach policies to the delegated routes instead.
+{{< /version >}}
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x" >}}
 ## Tune the controller Go memory limit {#controller-memory-limit}
