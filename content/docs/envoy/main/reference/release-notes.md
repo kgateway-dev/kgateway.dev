@@ -13,7 +13,7 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🌟 New features {#v26-new-features}
 
-#### Warn when controller memory tuning lacks a container memory limit {#v26-warn-when-controller-memory-tuning-lacks-a-container-memory-limit}
+#### Warn when controller memory tuning lacks a container memory limit {#v26-controller-memory-limit-warning}
 
 Helm install notes now warn when `controller.goMemLimitPercent` is nonzero but the controller container has no memory limit in the chart values. Set `controller.resources.limits.memory`, or provide a LimitRange default, so `GOMEMLIMIT` has a finite container memory limit to use. For more information, see [Tune the controller Go memory limit]({{< link-hextra path="/install/advanced/#controller-memory-limit" >}}).
 
