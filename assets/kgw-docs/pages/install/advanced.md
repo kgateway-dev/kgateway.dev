@@ -372,7 +372,7 @@ If you enable [strict validation](#strict-validation), use a lower value such as
 
 `controller.goMemLimitPercent` needs a memory limit on the controller container. Set `controller.resources.limits.memory` or apply a LimitRange that sets a default memory limit in the namespace. Without a limit, the result depends on the node's cgroup version:
 
-* cgroup v2: `GOMEMLIMIT` stays unconstrained, and the controller logs a warning.
+* cgroup v2: `GOMEMLIMIT` stays unconstrained and the controller logs a warning.
 * cgroup v1: the percentage applies to the node-level memory limit for all pods, and the controller does not log a warning.
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
