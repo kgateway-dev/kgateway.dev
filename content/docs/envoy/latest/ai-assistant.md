@@ -1,7 +1,7 @@
 ---
-title: Use an AI assistant
-linkTitle: AI assistant
-description: Install a public skill to help an AI assistant configure and verify kgateway.
+title: Skill for AI assistants
+linkTitle: AI assistant skill
+description: Install a public skill that helps an AI assistant configure and verify kgateway.
 weight: 2
 ---
 
