@@ -370,7 +370,7 @@ controller:
 
 If you enable [strict validation](#strict-validation), use a lower value such as `80` because Envoy subprocess memory is not covered by `GOMEMLIMIT`. Do not set `controller.extraEnv.GOMEMLIMIT` or `controller.extraEnv.AUTOMEMLIMIT` with `controller.goMemLimitPercent`.
 
-`controller.goMemLimitPercent` needs a memory limit on the controller container. Set `controller.resources.limits.memory`, or apply a LimitRange that sets a default memory limit in the namespace. Without a limit, the result depends on the node's cgroup version:
+`controller.goMemLimitPercent` needs a memory limit on the controller container. Set `controller.resources.limits.memory` or apply a LimitRange that sets a default memory limit in the namespace. Without a limit, the result depends on the node's cgroup version:
 
 * cgroup v2: `GOMEMLIMIT` stays unconstrained, and the controller logs a warning.
 * cgroup v1: the percentage applies to the node-level memory limit for all pods, and the controller does not log a warning.
