@@ -12,11 +12,11 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 #### Stricter BackendConfigPolicy TLS verification {#v26-bcp-tls-verification}
 
-BackendConfigPolicy `tls` settings that skipped backend certificate verification without saying so now verify the certificate or are rejected. Review your policies before you upgrade.
+Backend certificate verification for BackendConfigPolicy is stricter. Review your policies before you upgrade, because some existing policies stop working.
 
-* `insecureSkipVerify` accepts only `true`. To verify the backend certificate, remove the field and set a trust source, such as `wellKnownCACertificates: System`. Existing policies that set `insecureSkipVerify: false` now verify the backend certificate against the system CA certificates, so connections fail if the backend certificate is not signed by a publicly trusted CA.
-* `wellKnownCACertificates` accepts only `System`. Existing policies with another value report `Accepted=False`, and the routes that use them are replaced.
-* With `wellKnownCACertificates: System`, `sni` set, and no `verifySubjectAltNames`, the backend certificate must now also be valid for the `sni` hostname. Before, only the certificate chain was checked.
+* `insecureSkipVerify` accepts only `true`. To verify the backend certificate, remove the field and set a trust source, such as `wellKnownCACertificates: System`. Existing policies with `insecureSkipVerify: false` now verify the backend certificate against the system CA certificates. If the backend certificate is not signed by a publicly trusted CA, the connection fails.
+* `wellKnownCACertificates` accepts only `System`. Existing policies with another value report `Accepted=False`. The routes that use them are replaced.
+* With `wellKnownCACertificates: System` and `sni` set, the backend certificate must be valid for the `sni` hostname. Before, only the certificate chain was checked. To check against other names, set `verifySubjectAltNames`.
 
 For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
 
