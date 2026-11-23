@@ -416,8 +416,10 @@ The following table shows which cross-namespace references are checked in each m
 |---|---|---|---|---|---|
 | HTTPRoute / <br>GRPCRoute / <br>TCPRoute / <br>TLSRoute | `spec.rules[].backendRefs` | Service / Backend | checked | checked | allowed |
 | HTTPRoute / <br>GRPCRoute | `spec.rules[].filters[].requestMirror.backendRef` | Service / Backend | checked | checked | allowed |
-| Gateway / <br>ListenerSet | `spec.listeners[].tls.certificateRefs` | Secret | checked | checked | allowed |
-| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs`, or `spec.default.clientCertificateValidation.caCertificateRefs` on a ListenerPolicy that targets the listener | Secret / ConfigMap | checked | checked | allowed |
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.certificateRefs` | Secret | checked | checked | allowed |{{< version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs`, or `spec.default.clientCertificateValidation.caCertificateRefs` on a ListenerPolicy that targets the listener | Secret / ConfigMap | checked | checked | allowed |{{< /version >}}{{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+| Gateway / <br>ListenerSet | `spec.listeners[].tls.frontendValidation.caCertificateRefs` | Secret / ConfigMap | checked | checked | allowed |
+| ListenerPolicy | `spec.default.clientCertificateValidation.caCertificateRefs` | Secret / ConfigMap | checked | checked | allowed |{{< /version >}}
 | Gateway | `spec.backendTLS.clientCertificateRef` | Secret | checked | checked | allowed |
 | GatewayExtension (ExtAuth, ExtProc, RateLimit) | `spec.<type>.grpcService.backendRef` | Service / Backend | checked | checked | allowed |
 | GatewayExtension | `spec.extAuth.httpService.backendRef` | Service / Backend | checked | checked | allowed |
@@ -441,9 +443,16 @@ The following table shows which cross-namespace references are checked in each m
 † Fields that are available only in the {{< reuse "kgw-docs/snippets/trafficpolicy.md" >}}.
 {{% /downstream %}}
 
+{{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
 > [!IMPORTANT]
 > In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, you must use the Gateway or ListenerSet that owns that listener in the `from` section of your ReferenceGrant and not the ListenerPolicy.
 > {{< reuse "kgw-docs/snippets/referencegrant-policy-kind-note.md" >}}
+{{% /version %}}
+{{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
+> [!IMPORTANT]
+> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, use the `{{< reuse "kgw-docs/snippets/referencegrant-from-group.md" >}}` group and the `ListenerPolicy` kind in the `from` section of your ReferenceGrant.
+> {{< reuse "kgw-docs/snippets/referencegrant-policy-kind-note.md" >}}
+{{% /version %}}
 
 ### ReferenceGrant example {#referencegrant-example}
 
