@@ -28,6 +28,8 @@ The ExtProc server is a gRPC interface that must be able to respond to events in
 
 To implement your own ExtProc server, make sure that you follow [Envoy's technical specification for an external processor](https://www.envoyproxy.io/docs/envoy/latest/api-v3/extensions/filters/http/ext_proc/v3/ext_proc.proto#extensions-filters-http-ext-proc-v3-externalprocessor). This guide uses a sample ExtProc server that you can use to try out the ExtProc functionality.
 
+By default, the gateway sends only the request headers and the response headers to the ExtProc server.{{< version exclude-if="2.1.x,2.2.x,2.3.x" >}} To also send bodies or trailers, or to skip headers, see [ExtProc processing modes]({{< link-hextra path="/traffic-management/extproc/processing-modes/" >}}).{{< /version >}}
+
 ## Before you begin
 
 {{< reuse "kgw-docs/snippets/prereq.md" >}}
