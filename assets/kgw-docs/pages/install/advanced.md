@@ -376,7 +376,7 @@ If you enable [strict validation](#strict-validation), use a lower value such as
 * cgroup v1: the percentage applies to the node-level memory limit for all pods, and the controller does not log a warning.
 
 {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
-If your Helm values set `controller.goMemLimitPercent` but not `controller.resources.limits.memory`, the Helm install notes print a warning. The chart cannot see LimitRange defaults, so the warning also appears when a LimitRange supplies the limit. In that case, you can ignore the warning.
+If your Helm values set `controller.goMemLimitPercent` but not `controller.resources.limits.memory`, the Helm install notes print a warning. The chart cannot see LimitRange defaults, so the warning also appears when a LimitRange supplies the limit.
 {{< /version >}}
 {{< /version >}}
 
