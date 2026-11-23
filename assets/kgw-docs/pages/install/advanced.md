@@ -437,7 +437,7 @@ The following table shows which cross-namespace references are checked in each m
 {{% /version %}}
 {{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
 > [!IMPORTANT]
-> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, use the ListenerPolicy in the `from` section of your ReferenceGrant.
+> In most cases, the **Source resource** column is the resource that you name in the `from` section of your ReferenceGrant. If you configure a CA certificate reference on a ListenerPolicy by using the `spec.default.clientCertificateValidation.caCertificateRefs` field, use the `{{< reuse "kgw-docs/snippets/referencegrant-from-group.md" >}}` group and the `ListenerPolicy` kind in the `from` section of your ReferenceGrant.
 > {{< reuse "kgw-docs/snippets/referencegrant-policy-kind-note.md" >}}
 {{% /version %}}
 

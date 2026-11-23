@@ -10,6 +10,15 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
+#### Gateway-wide client certificate validation is enforced {#v26-listenerpolicy-gateway-mtls}
+
+A ListenerPolicy that sets `clientCertificateValidation` without `targetRefs.sectionName` now applies to all TLS-terminating listeners on the Gateway. Before, the policy reported `Accepted` but was not enforced. Review your policies before you upgrade, because clients without a valid certificate start to be rejected.
+
+* The Gateway-wide policy replaces the FrontendTLS `default` and `perPort` validation on those listeners. A policy with `sectionName` replaces the Gateway-wide policy for its listener.
+* A CA certificate reference without a namespace resolves in the namespace of the ListenerPolicy.
+* A CA certificate reference to another namespace needs a ReferenceGrant from `ListenerPolicy`. Grants from `Gateway` or `ListenerSet` no longer apply. Update your ReferenceGrants before you upgrade.
+
+For more information, see [ListenerPolicy certificate validation]({{< link-hextra path="/setup/listeners/mtls/#per-listener" >}}).
 
 ### 🌟 New features {#v26-new-features}
 

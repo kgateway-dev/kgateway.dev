@@ -13,7 +13,7 @@ In addition, you can choose between the following validation modes:
 * **AllowValidOnly**: A connection between a client and the gateway proxy can only be established if the gateway can validate the client's TLS certificate successfully. For an example, see the [Default configuration for all listeners](#default) guide.
 * **AllowInsecureFallback**: The gateway proxy can establish a TLS connection, even if the client TLS certificate could not be validated successfully. For an example, see the [Per port configuration](#perport) guide.
 
-Both the default and perPort configurations are applied at the port level. To isolate the CA certificates of listeners that share a port, override the Gateway configuration for an individual listener by using a ListenerPolicy. For an example, see the [Per listener configuration](#per-listener) guide.
+Both the default and perPort configurations are applied at the port level. To isolate the CA certificates of listeners that share a port, override the Gateway configuration for an individual listener by using a ListenerPolicy. For an example, see the [ListenerPolicy certificate validation](#per-listener) guide.
 
 ## About this guide
 
@@ -99,7 +99,7 @@ When generating your Envoy certificates, make sure to use encryption algorithms 
      -extensions v3_req -extfile <(echo "[v3_req]"; echo "subjectAltName=DNS:example.com,DNS:*.example.com")
    ```
 
-7. Continue with configuring a [Default configuration for all listeners](#default). The [per port configuration](#perport) builds on the default configuration, so complete the default configuration first. Alternatively, you can skip to the [per listener configuration](#per-listener), which sets up its own Gateway and HTTPRoutes. 
+7. Continue with configuring a [Default configuration for all listeners](#default). The [per port configuration](#perport) builds on the default configuration, so complete the default configuration first. Alternatively, you can skip to the [ListenerPolicy certificate validation](#per-listener), which sets up its own Gateway and HTTPRoutes. 
 
 
 ## Default configuration for all listeners {#default}
@@ -492,8 +492,17 @@ In this example, you override the default certificate validation configuration f
 {{% version include-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
 Use the `clientCertificateValidation` setting in a ListenerPolicy to validate client certificates for a single listener. The setting overrides the FrontendTLS validation configuration of the Gateway for that listener only. Listeners that are not targeted by a ListenerPolicy continue to use the `default` or `perPort` configuration of the Gateway.
 {{% /version %}}
+{{% version include-if="2.3.x,2.4.x,2.5.x" %}}
+> [!CAUTION]
+> In this version, `clientCertificateValidation` is enforced only by a ListenerPolicy that sets `targetRefs.sectionName`. A policy that targets the whole Gateway reports `Accepted`, but clients without a certificate are not rejected. Set `sectionName` for each listener that requires client certificates.
+{{% /version %}}
 {{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
-Use the `clientCertificateValidation` setting in a ListenerPolicy to validate client certificates for one listener or for all TLS-terminating listeners on the Gateway. A policy with `targetRefs.sectionName` overrides the FrontendTLS validation configuration of the Gateway for that listener. A policy without `sectionName` applies to all Gateway listeners, including ListenerSet listeners. A listener-specific policy that configures `clientCertificateValidation` takes precedence.
+Use the `clientCertificateValidation` setting in a ListenerPolicy to validate client certificates for one listener or for all TLS-terminating listeners on a Gateway.
+
+* To apply the policy to one listener, set `targetRefs.sectionName`.
+* To apply the policy to all TLS-terminating listeners on the Gateway, including listeners from attached ListenerSets, omit `sectionName` or select the Gateway with `targetSelectors`.
+
+A ListenerPolicy replaces the FrontendTLS `default` and `perPort` validation of the Gateway on the listeners that it applies to. If a listener has its own policy with `clientCertificateValidation`, that policy replaces the Gateway-wide policy for the listener. The two policies are not merged. For example, a Gateway-wide `Require` policy and a listener `Optional` policy result in `Optional` for that listener.
 {{% /version %}}
 
 The FrontendTLS `default` and `perPort` configurations apply at the port level. When multiple listeners share the same port, the CA certificates of that port are combined into a single trust pool. As a result, any client certificate that is signed by any of these CAs is valid for every listener on that port. To give each listener its own trust boundary, target a single listener with `sectionName`. The gateway selects the listener, and therefore the CA, by using the [Server Name Indication (SNI)]({{< link-hextra path="/setup/listeners/sni/" >}}) that the client sends in the TLS handshake.
@@ -698,7 +707,7 @@ In this example, you serve two tenants from two listeners that share port 8443, 
    {{% /version %}}
    {{% version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" %}}
    > [!NOTE]
-   > If the CA certificate is in a different namespace than the ListenerPolicy, you must create a ReferenceGrant. In the `from` section of the ReferenceGrant, refer to the ListenerPolicy. For more information, see [Cross-namespace references]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
+   > If the CA certificate is in a different namespace than the ListenerPolicy, you must create a ReferenceGrant. In the `from` section of the ReferenceGrant, set the group to `{{< reuse "kgw-docs/snippets/referencegrant-from-group.md" >}}` and the kind to `ListenerPolicy`. For more information, see [Cross-namespace references]({{< link-hextra path="/install/advanced/#referencegrant-modes" >}}).
    {{% /version %}}
 
 6. If you have not done so yet, get the external address of the gateway and save it in an environment variable. Note that it might take a few seconds for the gateway address to become available.
