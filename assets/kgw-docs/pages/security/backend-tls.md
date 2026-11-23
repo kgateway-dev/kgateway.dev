@@ -301,6 +301,14 @@ Set up a Backend resource that represents your external service. Then, use a Bac
        wellKnownCACertificates: System
    EOF
    ```
+   {{< version exclude-if="2.1.x,2.2.x,2.3.x,2.4.x,2.5.x" >}}
+   {{< reuse "kgw-docs/snippets/review-table.md" >}} For more information, see the [BackendConfigPolicy API docs]({{< link-hextra path="/reference/api/#backendconfigpolicy" >}}).
+
+   | Setting | Description |
+   |---------|-------------|
+   | `tls.wellKnownCACertificates` | The set of well-known CA certificates that the gateway proxy uses to verify the backend certificate. `System`, the only supported value, uses the system CA certificates. |
+   | `tls.sni` | The Server Name Indication (SNI) hostname that the gateway proxy sends to the backend. When `tls.wellKnownCACertificates` is `System` and `tls.verifySubjectAltNames` is empty, the backend certificate must be valid for this name. If you set neither `tls.sni` nor `tls.verifySubjectAltNames`, only the certificate chain is checked, so any certificate from a publicly trusted CA is accepted. |
+   {{< /version >}}
    {{% /tab %}}
    {{% tab name="BackendTLSPolicy" %}}
    {{< version include-if="2.1.x,2.2.x,2.3.x" >}}Note that to use the BackendTLSPolicy, you must have the experimental channel of the Kubernetes Gateway API version 1.4 or later.{{< /version >}}

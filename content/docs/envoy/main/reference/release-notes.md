@@ -10,6 +10,16 @@ Review the release notes for kgateway. For a detailed list of changes between ta
 
 ### 🔥 Breaking changes {#v26-breaking-changes}
 
+#### Stricter BackendConfigPolicy TLS verification {#v26-bcp-tls-verification}
+
+Backend certificate verification for BackendConfigPolicy is stricter. Review your policies before you upgrade, because some existing policies stop working.
+
+* `insecureSkipVerify` accepts only `true`. To verify the backend certificate, remove the field and set a trust source, such as `wellKnownCACertificates: System`. Existing policies with `insecureSkipVerify: false` now verify the backend certificate against the system CA certificates. If the backend certificate is not signed by a publicly trusted CA, the connection fails.
+* `wellKnownCACertificates` accepts only `System`. Existing policies with another value report `Accepted=False`. The routes that use them are replaced.
+* With `wellKnownCACertificates: System` and `sni` set, the backend certificate must be valid for the `sni` hostname. Before, only the certificate chain was checked. To check against other names, set `verifySubjectAltNames`.
+
+For more information, see [Backend TLS]({{< link-hextra path="/security/backend-tls/" >}}).
+
 #### API key secret selectors require every label {#v26-apikey-selector-labels}
 
 `apiKeyAuth.secretSelector.matchLabels` now matches the way Kubernetes label selectors do. A secret must have every listed label with the listed value. Before, a label with an empty value, such as `keys.example.com/gold: ""`, also matched secrets that did not have that label, so their API keys were accepted. If you select API key secrets by an empty-valued label, add that label to every secret whose keys must stay valid before you upgrade.
