@@ -27,6 +27,34 @@ init-git-hooks:  ## Use the tracked version of Git hooks from this repo
 build: check-node-deps
 	hugo160 --gc --minify
 
+# Offline build: a copy of the site that loads nothing from another host, for
+# readers on an air-gapped network. hugo-offline.yaml layers on top of
+# hugo.yaml and explains what it turns off. Output goes to public-offline/
+# (git-ignored by the `public-*/` rule) so it never mixes with a normal build.
+#
+#   make build-offline                  # site in public-offline/
+#   make offline-tarball                # + kgateway-docs-offline.tar.gz
+#   make offline-image                  # + container image kgateway-docs:offline
+#   docker run --rm -p 8080:8080 kgateway-docs:offline
+OFFLINE_DIR := public-offline
+OFFLINE_IMAGE ?= kgateway-docs:offline
+.PHONY: build-offline
+build-offline: check-node-deps
+	rm -rf $(OFFLINE_DIR)
+	hugo160 --gc --minify --config hugo.yaml,hugo-offline.yaml --destination $(OFFLINE_DIR)
+
+.PHONY: offline-tarball
+offline-tarball: build-offline
+	cp offline/Dockerfile $(OFFLINE_DIR)/Dockerfile
+	tar -czf kgateway-docs-offline.tar.gz -C $(OFFLINE_DIR) .
+	@ls -lh kgateway-docs-offline.tar.gz
+
+# The image is built FROM the built site, never from source: the Dockerfile
+# copies public-offline/ into nginx and does nothing else.
+.PHONY: offline-image
+offline-image: build-offline
+	docker build -f offline/Dockerfile -t $(OFFLINE_IMAGE) $(OFFLINE_DIR)
+
 # Production build with the doc-test "Verified" badge, for Cloudflare Pages.
 # scripts/doc-test-status.sh writes the latest doc-test results into page front
 # matter first; it needs GITHUB_TOKEN, and without it the site builds with no

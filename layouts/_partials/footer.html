@@ -51,7 +51,12 @@
     <div class="pt-6"><p class="text-center text-xs">Copyright © kgateway, a Series of LF Projects, LLC.<br/><a class="link text-secondary-link" href="https://lfprojects.org/policies/">Website terms of use, trademark policy and other project policies</a></p></div>
   </div>
 
+  {{- /* Scarf pageview pixel. Left out of offline builds (`params.offline`):
+         it is analytics, and on an air-gapped network it only produces a
+         failed request on every page. */}}
+  {{- if not site.Params.offline }}
   <img referrerpolicy="no-referrer-when-downgrade" src="https://static.scarf.sh/a.png?x-pxid=f8e98c47-18c1-416e-9f48-c448193f6d93" alt="" />
+  {{- end }}
   {{- /* Glossary tooltip JS is now centralized in docs-theme-extras
          (themeExtras/head-end.html). */ -}}
 </footer>

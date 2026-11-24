@@ -16,22 +16,41 @@
 {{/* Consumer-local PostCSS pipeline. The module ships the docs-theme-extras
      CSS (component baseline + brand layer) via themeExtras/head-end.html;
      this bundle on top carries kgateway-specific Tailwind utility usage. */}}
-{{ $options := dict "inlineImports" true "config" "./assets/css/postcss.config.js" }}
-{{ $styles := resources.Get "css/styles.css" }}
-{{ $styles = $styles | css.PostCSS $options }}
+{{- /* Production builds the bundle in a templates.Defer block, which Hugo runs
+       after every page has rendered, so Tailwind reads a complete
+       hugo_stats.json. This used to be `resources.PostProcess`, which Hugo has
+       deprecated in favour of templates.Defer (gohugoio/hugo#15086), and which
+       broke docs-theme-extras's search: a page that carries a PostProcess
+       placeholder never gets its templates.Defer placeholders replaced, so the
+       module's deferred search <script> tag shipped as a literal
+       `__hdeferred/...` string and search never loaded. `key` makes Hugo build
+       the bundle once and reuse it on every page. Variables outside a Defer
+       block are not visible inside it, so the options are built inside. */ -}}
 {{- if hugo.IsProduction }}
-{{ $styles = $styles | minify | fingerprint | resources.PostProcess }}
+{{- with (templates.Defer (dict "key" "kgateway-styles")) }}
+{{- $options := dict "inlineImports" true "config" "./assets/css/postcss.config.js" }}
+{{- $styles := resources.Get "css/styles.css" | css.PostCSS $options | minify | fingerprint }}
 <link href="{{ $styles.Permalink }}" rel="stylesheet" integrity="{{ $styles.Data.Integrity }}" />
+{{- end }}
 {{- else }}
+{{ $options := dict "inlineImports" true "config" "./assets/css/postcss.config.js" }}
+{{ $styles := resources.Get "css/styles.css" | css.PostCSS $options }}
 <link href="{{ $styles.Permalink }}" rel="stylesheet" />
 {{ end }}
 
 {{/* Font preconnects — perf hints. The module's themeExtras/head-end.html
      emits the brand-conditional font (Open Sans for oss); the Figtree
-     family is kgateway-only and stays here. */}}
+     family is kgateway-only and stays here.
+
+     An offline build (`params.offline`, see hugo-offline.yaml) loads nothing
+     from Google: the module bundles Material Symbols and Open Sans, and
+     Figtree comes from this repo's assets/fonts/offline/ through the
+     `params.offlineFonts` list in hugo-offline.yaml. */}}
+{{- if not site.Params.offline }}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+{{- end }}
 
 {{- /* Glossary tooltip CSS + JS are now centralized in docs-theme-extras
        (loaded from themeExtras/head-end.html above). */ -}}
