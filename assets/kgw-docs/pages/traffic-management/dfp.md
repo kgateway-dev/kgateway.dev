@@ -95,6 +95,74 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
    ...
    ```
    
+### Enable HTTPS forwarding
+
+By default, the Dynamic Forward Proxy routes traffic over HTTP. To forward requests to HTTPS endpoints, set `enableTls: true` in the `dynamicForwardProxy` spec. When TLS is enabled, the gateway uses the request hostname for SNI and validates the upstream certificate against the system CA bundle. Requests to upstreams with self-signed certificates fail validation. For the full list of available fields, see the [DynamicForwardProxyBackend API reference]({{< link-hextra path="/reference/api/#dynamicforwardproxybackend" >}}).
+  
+  
+1. Create a Backend with TLS enabled.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.kgateway.dev/v1alpha1
+   kind: Backend
+   metadata:
+     name: dfp-backend-tls
+     namespace: httpbin
+   spec:
+     type: DynamicForwardProxy
+     dynamicForwardProxy:
+       enableTls: true
+   EOF
+   ```
+
+2. Create an HTTPRoute that routes traffic for `github.com` to the TLS-enabled DFP Backend. By specifying a hostname, this route takes precedence over the existing `dfp-httproute` for requests to `github.com` without conflicting with it.
+   ```yaml
+   kubectl apply -f- <<EOF
+   apiVersion: gateway.networking.k8s.io/v1
+   kind: HTTPRoute
+   metadata:
+     namespace: httpbin
+     name: dfp-httproute-tls
+   spec:
+     parentRefs:
+       - name: http
+         namespace: {{< reuse "kgw-docs/snippets/namespace.md" >}}
+     hostnames:
+       - "github.com"
+     rules:
+       - backendRefs:
+           - name: dfp-backend-tls
+             group: gateway.kgateway.dev
+             kind: Backend
+   EOF
+   ```
+
+3. Send a request to `github.com`. Because `enableTls: true` is set, the gateway forwards the request to `github.com:443` over HTTPS and receives a `200` response. Without `enableTls: true`, the gateway would connect to `github.com:80`, which returns a `301` redirect to HTTPS instead, making the difference observable.
+   {{< tabs >}}
+   {{% tab name="Cloud Provider LoadBalancer" %}}
+   ```sh
+   curl -vik http://$INGRESS_GW_ADDRESS:8080 -H "host: github.com"
+   ```
+   {{% /tab %}}
+   {{% tab name="Port forward for local testing" %}}
+   ```sh
+   curl -vik http://localhost:8080 -H "host: github.com"
+   ```
+   {{% /tab %}}
+   {{< /tabs >}}
+
+   Example output:
+   ```console
+   * Request completely sent off
+   < HTTP/1.1 200 OK
+   HTTP/1.1 200 OK
+   < content-type: text/html; charset=utf-8
+   content-type: text/html; charset=utf-8
+   ...
+   <!DOCTYPE html>
+   ...
+   ```
+
 ## Cleanup
 
 {{< reuse "kgw-docs/snippets/cleanup.md" >}}
@@ -107,6 +175,16 @@ DFPs offer great flexibility for defining routing patterns for your upstream hos
 2. Remove the HTTPRoute. 
    ```sh
    kubectl delete httproute dfp-httproute -n httpbin
+   ```
+
+3. Remove the TLS-enabled DFP Backend.
+   ```sh
+   kubectl delete backend dfp-backend-tls -n httpbin
+   ```
+
+4. Remove the TLS HTTPRoute.
+   ```sh
+   kubectl delete httproute dfp-httproute-tls -n httpbin
    ```
 
 
