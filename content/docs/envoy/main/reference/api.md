@@ -1595,6 +1595,22 @@ _Appears in:_
 | `denominator` _[DenominatorType](#denominatortype)_ | Specifies the denominator. If the denominator specified is less than the numerator,<br />the final fractional percentage is capped at 1 (100%).<br />Defaults to HUNDRED. |  | Enum: [HUNDRED TEN_THOUSAND MILLION] <br /> |
 
 
+#### GRPCWebPolicy
+
+
+
+GRPCWebPolicy configures gRPC-Web to gRPC conversion.
+
+
+
+_Appears in:_
+- [TrafficPolicySpec](#trafficpolicyspec)
+
+| Field | Description | Default | Validation |
+| --- | --- | --- | --- |
+| `disable` _[PolicyDisable](#policydisable)_ | Disable gRPC-Web.<br />Can be used to disable gRPC-Web enabled by a policy applied at a higher level in the<br />config hierarchy. |  |  |
+
+
 #### GatewayExtension
 
 
@@ -4268,6 +4284,7 @@ _Appears in:_
 | `requestMirror` _[RequestMirrorPolicy](#requestmirrorpolicy)_ | RequestMirror configures the behavior of request mirrors defined by<br />HTTPRoute or GRPCRoute RequestMirror filters. It does not create request mirrors.<br />It can target HTTPRoutes, GRPCRoutes, or Gateways (including individual Gateway listeners<br />via sectionName). When attached above the route level it applies to every mirror on the<br />routes it covers, and a more-specific policy wins the whole block: its settings are not<br />combined field-by-field with a less-specific policy. If a covered route has no request<br />mirror, this has no effect. |  | MinProperties: 1 <br /> |
 | `autoHostRewrite` _boolean_ | AutoHostRewrite rewrites the Host header to the DNS name of the selected upstream.<br />NOTE: This field is only honored for HTTPRoute targets.<br />NOTE: If `autoHostRewrite` is set on a route that also has a [URLRewrite filter](https://gateway-api.sigs.k8s.io/reference/api-spec/main/spec/#httpurlrewritefilter)<br />configured to override the `hostname`, the `hostname` value will be used and `autoHostRewrite` will be ignored. |  |  |
 | `buffer` _[Buffer](#buffer)_ | Buffer can be used to set the maximum request size that will be buffered.<br />Requests exceeding this size will return a 413 response. |  |  |
+| `grpcWeb` _[GRPCWebPolicy](#grpcwebpolicy)_ | GRPCWeb enables gRPC-Web on the targeted routes: browser gRPC-Web requests are converted<br />to gRPC before they reach the backend, and gRPC responses are converted back to gRPC-Web.<br />Requests that are not gRPC-Web (by `content-type`) pass through unchanged.<br />The backend must speak gRPC. A backend that already speaks gRPC-Web does not need this.<br />gRPC-Web is disabled unless a policy enables it. Set `grpcWeb: \{\}` to enable it, or<br />`grpcWeb: \{disable: \{\}\}` to disable it for routes covered by a broader policy that<br />enables it.<br />Browsers making cross-origin gRPC-Web calls also need a CORS policy that allows the<br />`x-grpc-web` and `x-user-agent` request headers and exposes the `grpc-status` and<br />`grpc-message` response headers. |  |  |
 | `httpUpgrade` _[ProtocolUpgradeConfig](#protocolupgradeconfig) array_ | HTTPUpgrade configures HTTP protocol upgrades on the targeted routes.<br />Route-level upgrade settings override the matching upgrade type configured<br />on the listener. CONNECT termination is applied per route and cannot be<br />configured on a listener. After an upgrade is established, tunneled payload<br />is not inspected by HTTP filters. Authenticate and authorize the initial<br />upgrade request, enable upgrades only for trusted clients, and avoid request<br />buffering. |  | MaxItems: 16 <br /> |
 | `timeouts` _[Timeouts](#timeouts)_ | Timeouts defines the timeouts for requests.<br />It is applicable to HTTPRoutes, GRPCRoutes, and Gateways (including individual<br />Gateway listeners via sectionName), and ignored for other targeted kinds.<br />When attached above the route level, the timeouts apply to all routes it<br />covers; a route-level timeout (from a more specific TrafficPolicy or the<br />built-in HTTPRoute timeouts) takes precedence. |  |  |
 | `retry` _[Retry](#retry)_ | Retry defines the policy for retrying requests.<br />It is applicable to HTTPRoutes, GRPCRoutes, Gateways, Gateway listeners, and<br />ListenerSets, and ignored for other targeted kinds.<br />When attached above the route level, the retry policy applies to all routes it<br />covers; a route-level retry policy (from a more specific TrafficPolicy or the<br />built-in HTTPRoute retry) takes precedence. |  |  |
