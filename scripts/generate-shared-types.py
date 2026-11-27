@@ -242,15 +242,12 @@ def format_go_type_as_link(go_type: str, documented_types: set[str] | None = Non
     if go_type.startswith("map["):
         return go_type  # Keep maps as-is for simplicity
 
+    # Determine the type name (strip package prefix if present)
+    type_name = go_type.split(".")[-1] if "." in go_type else go_type
+
     # Check if it's a custom type (starts with uppercase, not a builtin)
     builtins = {"string", "int", "int32", "int64", "bool", "float32", "float64", "byte", "error"}
-    if go_type and go_type[0].isupper() and go_type.lower() not in builtins:
-        # Determine the type name (strip package prefix if present)
-        if "." in go_type:
-            type_name = go_type.split(".")[-1]
-        else:
-            type_name = go_type
-
+    if type_name and type_name[0].isupper() and type_name.lower() not in builtins:
         # Only create an anchor link if the type is documented
         if documented_types is not None and type_name not in documented_types:
             return f"_{go_type}_"

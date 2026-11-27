@@ -71,6 +71,14 @@ def test_format_go_type_as_link_respects_documented_types(gen_shared_types):
         gen_shared_types.format_go_type_as_link("[]*AuthConfig", {"AuthConfig"})
         == "[]*[AuthConfig](#authconfig)"
     )
+    assert (
+        gen_shared_types.format_go_type_as_link("shared.PolicyStatus", {"PolicyStatus"})
+        == "[shared.PolicyStatus](#policystatus)"
+    )
+    assert (
+        gen_shared_types.format_go_type_as_link("*metav1.Duration", {"PolicyStatus"})
+        == "*_metav1.Duration_"
+    )
 
 
 def test_generate_markdown_adds_enterprise_suffix_for_duplicates(gen_shared_types):
