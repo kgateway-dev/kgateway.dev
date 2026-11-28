@@ -318,13 +318,13 @@ jwks:
 | ----- | ----- |
 | `retryPolicy.numRetries` | Number of retry attempts when the JWKS fetch fails. Must be at least `1`. Defaults to `1` if unset. |
 | `retryPolicy.backOff.baseInterval` | The initial backoff interval. Required. Accepts Go duration strings, such as `500ms` or `1s`. The value must be at least `1ms`. |
-| `retryPolicy.backOff.maxInterval` | The maximum backoff interval. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
+| `retryPolicy.backOff.maxInterval` | The maximum backoff interval. The `maxInterval` value also limits how long each JWKS fetch attempt can wait for the JWKS server to respond. Set it above your JWKS server's response time. Optional. Must be greater than or equal to `baseInterval`. If unset, Envoy defaults to 10 times the `baseInterval`. |
 
 In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` policy. The defaults are intended to work for typical JWKS endpoints. Use the following guidelines to choose appropriate values.
 
 | Scenario | Recommended configuration |
 | -------- | ------------------------- |
-| JWKS endpoint is external or occasionally slow | Increase `numRetries`, such as to 3-5, and use a larger `backOff.maxInterval`, such as 30s-60s, to handle intermittent failures. |
+| JWKS endpoint is external or occasionally slow | Increase `numRetries`, such as to 3-5, and use a larger `backOff.maxInterval`, such as 30s-60s, to handle intermittent failures. Keep `backOff.maxInterval` above the JWKS server's response time because it is also the time limit for each attempt. |
 | Gateway startup should not be blocked by JWKS fetch failures | Set `asyncFetch.fastListener: true` to allow traffic to flow while the JWKS fetch happens in the background. |
 | Authentication must fail closed until JWKS is available | Keep `fastListener: false` (default) to block traffic until the JWKS is successfully fetched. |
 | Seeing frequent network failures | Increase retries, but keep the max backoff bounded so failures surface quickly. Avoid setting very high retry counts or very long backoff intervals because that can make real JWKS endpoint outages harder to detect. |
@@ -338,7 +338,7 @@ In most cases, you do not need to configure a `retryPolicy` or `asyncFetch` poli
 
 #### JWKS fetch timeout {#jwks-timeout}
 
-The `timeout` field sets how long the gateway waits for the remote JWKS server to respond to a single fetch. It bounds one attempt, so it works alongside `retryPolicy`, which decides how many attempts are made and how long to wait between them.
+The `timeout` field sets how long a JWKS fetch can take. When a `retryPolicy` is set, the timeout covers the whole fetch, including retries and the waits between them. Each individual attempt is limited by `retryPolicy.backOff.maxInterval` instead, so keep `maxInterval` above the time your JWKS server takes to answer.
 
 ```yaml
 jwks:
@@ -353,7 +353,7 @@ jwks:
 
 | Field | Description |
 | ----- | ----- |
-| `jwks.remote.timeout` | How long the gateway waits for the remote JWKS server to respond when it fetches signing keys. Accepts Go duration strings of up to 32 characters, and must be at least `1ms`. If unset, the gateway waits `5s`. |
+| `jwks.remote.timeout` | How long a JWKS fetch can take, including retries. Accepts Go duration strings of up to 32 characters, and must be at least `1ms`. If unset, the gateway waits `5s`. |
 
 {{< /version >}}
 
